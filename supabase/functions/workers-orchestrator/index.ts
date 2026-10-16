@@ -1,9 +1,10 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { executeWorkerTool, listWorkerTools, resolveWorkerAccess } from '../_shared/workers/generated/read-tools.js';
-import { isObject, isUuid, parseWorkerRequest, WorkerError } from '../_shared/workers/contracts.ts';
+import { isObject, isUuid, parseWorkerRequest, redactWorkerText, WorkerError } from '../_shared/workers/contracts.ts';
 import { publicWorkerError, runWorkerTurn, type TurnStart, type WorkerTurnDependencies } from '../_shared/workers/engine.ts';
 import { createLovableProvider, readBoundedJson } from '../_shared/workers/provider.ts';
 import { searchWorkersWeb } from '../_shared/workers/web-search.ts';
+import { workspacePlanner } from '../_shared/workers/workspace-planner.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,7 +14,13 @@ const corsHeaders = {
 
 function publicKey(): string {
   const direct = Deno.env.get('SUPABASE_PUBLISHABLE_KEY')?.trim() || Deno.env.get('SUPABASE_ANON_KEY')?.trim();
-  if (direct && !direct.startsWith('sb_secret_')) return direct;
+  if (direct?.startsWith('sb_publishable_')) return direct;
+  if (direct?.split('.').length === 3) {
+    try {
+      const body: unknown = JSON.parse(atob(direct.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      if (isObject(body) && body.role === 'anon') return direct;
+    } catch { /* Opaque configuration failure; never accept a service-role key. */ }
+  }
   try {
     const values: unknown = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS') ?? '{}');
     if (isObject(values)) {
@@ -68,11 +75,12 @@ Deno.serve(async (req: Request) => {
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     });
     const { data: identity, error: authError } = await client.auth.getUser();
-    if (authError || !identity.user?.id) throw new WorkerError('forbidden', 401);
+    if (authError || !identity.user?.id || identity.user.role === 'service_role') throw new WorkerError('forbidden', 401);
     const access = await resolveWorkerAccess(client, identity.user.id, request.orgId);
     const provider = createLovableProvider({ apiKey: Deno.env.get('LOVABLE_API_KEY'), model: Deno.env.get('WORKERS_ANALYSIS_MODEL') });
     const dependencies: WorkerTurnDependencies = {
       provider,
+      ...workspacePlanner(client, request.orgId),
       signal: abort.signal,
       listTools: worker => listWorkerTools(worker, access),
       executeTool: (name, input) => executeWorkerTool(name, input, access),
@@ -80,7 +88,7 @@ Deno.serve(async (req: Request) => {
       begin: async (value, worker) => {
         const result = await scopedRpc(client, 'ai_workers_begin_turn', {
           _org_id: value.orgId, _request_id: value.requestId, _worker_id: worker,
-          _message: value.message, _conversation_id: value.conversationId ?? null,
+          _message: redactWorkerText(value.message), _conversation_id: value.conversationId ?? null,
         });
         if (!isObject(result) || !isUuid(result.conversationId) || typeof result.replayed !== 'boolean') throw new WorkerError('invalid_storage_response', 503);
         return result as unknown as TurnStart;

@@ -1,0 +1,313 @@
+{
+  "mode": "focusedRoutineRetest",
+  "generatedAt": "2026-10-16T10:20:46.621Z",
+  "boundary": "Real React UI/hooks and real API client using synthetic localhost workers-actions/workers-routines/history. No production RLS, real AI provider, verified cost or physical mobile-device claim. The fixture deliberately never persists/echoes protected commercial inputs.",
+  "screenshots": [
+    {
+      "label": "390x844-light-routine-run-chips",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-routine-run-chips.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-light-routine-proposal",
+      "path": "docs/workers/phase-2-3/captures/390x844-light-routine-proposal.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-routine-run-chips",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-routine-run-chips.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "390x844-dark-routine-proposal",
+      "path": "docs/workers/phase-2-3/captures/390x844-dark-routine-proposal.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "label": "1280x800-light-routine-run-chips",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-routine-run-chips.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-light-routine-proposal",
+      "path": "docs/workers/phase-2-3/captures/1280x800-light-routine-proposal.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-routine-run-chips",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-routine-run-chips.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "label": "1280x800-dark-routine-proposal",
+      "path": "docs/workers/phase-2-3/captures/1280x800-dark-routine-proposal.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      }
+    }
+  ],
+  "expectedTransportErrors": [],
+  "accessibility": [
+    {
+      "label": "390x844-light-routine-run-chips",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-light-routine-proposal",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-routine-run-chips",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "390x844-dark-routine-proposal",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-routine-run-chips",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-light-routine-proposal",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-routine-run-chips",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "label": "1280x800-dark-routine-proposal",
+      "passed": true,
+      "violations": []
+    }
+  ],
+  "overflow": [
+    {
+      "label": "390x844-light-routine-run-chips",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-light-routine-proposal",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-routine-run-chips",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "390x844-dark-routine-proposal",
+      "width": 390,
+      "scrollWidth": 390,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-routine-run-chips",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-light-routine-proposal",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-routine-run-chips",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    },
+    {
+      "label": "1280x800-dark-routine-proposal",
+      "width": 1280,
+      "scrollWidth": 1280,
+      "passed": true
+    }
+  ],
+  "interactions": [],
+  "errors": [],
+  "commands": [
+    {
+      "label": "390x844-light",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-light",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-dark",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-dark",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "390x844-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-light",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-light",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-light",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-dark",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-dark",
+      "endpoint": "/functions/v1/workers-actions",
+      "command": "list",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    },
+    {
+      "label": "1280x800-dark",
+      "endpoint": "/functions/v1/workers-routines",
+      "command": "snapshot",
+      "keys": [
+        "command",
+        "orgId"
+      ]
+    }
+  ],
+  "passed": true
+}

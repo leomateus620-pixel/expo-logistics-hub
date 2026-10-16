@@ -10,13 +10,14 @@ export interface WorkerRequest {
   context?: { route: string; recordId?: string };
   attachments?: Array<{ name: string; text: string }>;
 }
-export interface ReadTool {
+export interface PlannerTool {
   name: string;
   title?: string;
   description: string;
-  readOnly: true;
+  readOnly: boolean;
   inputJsonSchema: Record<string, unknown>;
 }
+export interface ReadTool extends PlannerTool { readOnly: true }
 export interface ReadResult {
   summary: string;
   records: unknown[];
@@ -34,9 +35,9 @@ export interface ToolCall { id: string; type: 'function'; function: { name: stri
 export interface ProviderResponse { calls: ToolCall[]; inputTokens: number; outputTokens: number; usageReported?: boolean }
 export interface WorkerProvider {
   readonly model: string;
-  complete(messages: ProviderMessage[], tools: ReadTool[], signal?: AbortSignal): Promise<ProviderResponse>;
+  complete(messages: ProviderMessage[], tools: PlannerTool[], signal?: AbortSignal): Promise<ProviderResponse>;
 }
-export type EmitWorkerEvent = (event: 'worker' | 'progress' | 'delta' | 'citations' | 'conversation' | 'usage' | 'done' | 'error', data: unknown) => void;
+export type EmitWorkerEvent = (event: 'worker' | 'progress' | 'delta' | 'citations' | 'conversation' | 'workspace' | 'usage' | 'done' | 'error', data: unknown) => void;
 
 export class WorkerError extends Error {
   constructor(public readonly code: string, public readonly status = 400) { super(code); }

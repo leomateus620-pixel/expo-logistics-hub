@@ -8,7 +8,8 @@ const option = name => process.argv[process.argv.indexOf(name) + 1];
 if (!process.argv.includes('--playwright-module')) throw new Error('Pass --playwright-module with an absolute Playwright index.mjs path.');
 const { chromium } = await import(pathToFileURL(option('--playwright-module')).href);
 const browser = await chromium.launch({ headless: true, ...(option('--chrome') ? { executablePath: option('--chrome') } : {}) });
-const directory = path.resolve('docs/workers/phase-0-1/captures/existing');
+const output = process.argv.includes('--output-dir') ? path.resolve(option('--output-dir')) : path.resolve('docs/workers/phase-0-1');
+const directory = path.join(output, 'captures/existing');
 await fs.mkdir(directory, { recursive: true });
 const report = { boundary: 'Unauthenticated login/entry screens only. Authenticated business screens were not accessed; source diff is the additional regression control.', comparisons: [] };
 try {
@@ -35,6 +36,6 @@ try {
   }
 } finally {
   await browser.close();
-  await fs.writeFile(path.resolve('docs/workers/phase-0-1/existing-pages-qa.json'), `${JSON.stringify(report, null, 2)}\n`);
+  await fs.writeFile(path.join(output, 'existing-pages-qa.json'), `${JSON.stringify(report, null, 2)}\n`);
 }
 console.log(JSON.stringify({ pairs: report.comparisons.length, exactMatches: report.comparisons.filter(row => row.exactImageMatch).length }));

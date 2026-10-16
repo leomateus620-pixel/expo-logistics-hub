@@ -1,0 +1,137 @@
+{
+  "boundary": "Dedicated local PostgreSQL 16 database; synthetic tables/identities with real native RPC bodies extracted unchanged. Existing live business RLS/FCM/Google were not exercised. Concurrent tests use two physical connections.",
+  "passed": true,
+  "checks": [
+    {
+      "label": "private redactor removes whole compact/formatted identifiers and raw JWT before base phone masking",
+      "passed": true
+    },
+    {
+      "label": "private schema/helper/payload has no authenticated or anon privileges",
+      "passed": true
+    },
+    {
+      "label": "admin and gestor create notes, operator/read denied without manage; leitura with explicit venue grant works",
+      "passed": true
+    },
+    {
+      "label": "proposal is side-effect free; authorized exact note preview is absent in direct SELECT",
+      "passed": true
+    },
+    {
+      "label": "known PII/secrets/token links, forbidden action kinds and client success/capability fields rejected by SQL",
+      "passed": true
+    },
+    {
+      "label": "proposal request replay is stable and mismatched reuse is rejected",
+      "passed": true
+    },
+    {
+      "label": "edit regenerates exact diff/revision and stale revision never executes",
+      "passed": true
+    },
+    {
+      "label": "cancel and expiry are terminal, audited and wipe private plaintext",
+      "passed": true
+    },
+    {
+      "label": "cross-user/org and stale membership denied; raw RLS hides revoked target access",
+      "passed": true
+    },
+    {
+      "label": "snapshot change refuses effects and edit obtains a new valid snapshot",
+      "passed": true
+    },
+    {
+      "label": "commercial manual form is mandatory/private; reserve and negotiate call native RPCs with optional fields NULL",
+      "passed": true
+    },
+    {
+      "label": "AVAILABLE with active opposite operation, sale or order contract is refused without cancellation",
+      "passed": true
+    },
+    {
+      "label": "deep links use persisted venue type ancestry and exact lot UUID; target labels mask before truncation",
+      "passed": true
+    },
+    {
+      "label": "manual request replay is idempotent; no private fields or secrets can escape its exact SQL schema",
+      "passed": true
+    },
+    {
+      "label": "two physical connections confirming one note commit exactly one effect/receipt",
+      "passed": true
+    },
+    {
+      "label": "two distinct cards on one lot cannot create two commercial effects",
+      "passed": true
+    },
+    {
+      "label": "concurrent cancel wins before confirm without a business effect",
+      "passed": true
+    },
+    {
+      "label": "concurrent edit invalidates the waiting confirmation revision",
+      "passed": true
+    },
+    {
+      "label": "capability revoked while confirm waits for card lock is revalidated and refused",
+      "passed": true
+    },
+    {
+      "label": "expiry is checked after waiting on target locks, not transaction start",
+      "passed": true
+    },
+    {
+      "label": "an additional native trigger wait past expiry rolls back the late business effect",
+      "passed": true
+    },
+    {
+      "label": "failure after native business RPC rolls back business/history and exposes no SQL secret",
+      "passed": true
+    },
+    {
+      "label": "lock wait is bounded and replay with the same proposal remains safe",
+      "passed": true
+    },
+    {
+      "label": "admission rate cap rejects excess proposals before business effects",
+      "passed": true
+    }
+  ],
+  "sources": [
+    {
+      "filename": "scripts/workers/db-fixture.sql",
+      "sha256": "5cb6a5e0316aa3eda2422b331f8a7efa829da38d3b374a30d81f456f84167514"
+    },
+    {
+      "filename": "supabase/migrations/20261016120000_workers_readonly_workspace.sql",
+      "sha256": "a5f5d890c806437c270398e8f0c84b06b33693c9dda2446c8d0c40b98c56056f"
+    },
+    {
+      "filename": "scripts/workers/actions-fixture.sql",
+      "sha256": "afaf349036abd148f2964c377bc47c11fac21d4ad82566fc374b802f9a18ad6e"
+    },
+    {
+      "filename": "supabase/migrations/20260727213855_e641c831-878e-4983-a4c7-ce5fa5d3aaa5.sql",
+      "sha256": "5bbd89b89b7bc25c4961e9d3823d386f231cc1c336ff41ed423163fdfc16b7d4"
+    },
+    {
+      "filename": "supabase/migrations/20260805011308_bfacf637-b666-435a-88a4-8d9af2ba5f61.sql",
+      "sha256": "27ae0c95e21189026d457371cd2bb70e462eb32b8601a8b550acf551884b51e1"
+    },
+    {
+      "filename": "supabase/migrations/20260805012455_1844f1ca-ea09-4776-96f3-3d04eaf64ca6.sql",
+      "sha256": "0e639bf57c9fcc4ac519bd180e6c3582b8a43a8dc255345dd838a666812d869e"
+    },
+    {
+      "filename": "supabase/migrations/20260911101225_b5a3559d-dd0c-4e24-9dc2-224ab8e2d4be.sql",
+      "sha256": "5cd22bfcba8c75325d331d7c713957cc6f8104c2ea7d0c472b15c8749701d35b"
+    },
+    {
+      "filename": "supabase/migrations/20261016130000_workers_confirmed_actions.sql",
+      "sha256": "f4e47843b6b91b0af682254fbd3069a48bba6fa965d4f16187cc36a386a8f600"
+    }
+  ],
+  "version": "PostgreSQL 16.14 on x86_64-apple-darwin24.6.0, compiled by Apple clang version 17.0.0 (clang-1700.6.3.2), 64-bit"
+}

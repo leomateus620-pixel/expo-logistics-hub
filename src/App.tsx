@@ -393,6 +393,7 @@ function AdminRoutes() {
               <Route path="geral" element={<AdminOverviewPage />} />
               <Route path="comissoes/:moduleSlug" element={<AdminCommissionPage />} />
               <Route path="workers/design" element={<WorkersAdminGuard><WorkersRoot /></WorkersAdminGuard>} />
+              <Route path="workers/uso" element={<WorkersAdminGuard><WorkersRoot /></WorkersAdminGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspended>

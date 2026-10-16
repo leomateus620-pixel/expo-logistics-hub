@@ -1,0 +1,10 @@
+{
+  "baselineCommit": "7ea29660e66c165fc9786be23089a1ee564c6d07",
+  "baselineLog": "/tmp/fenasoja-bots-phase23-main-tests.log",
+  "currentLog": "/tmp/fenasoja-bots-phase23-tests.log",
+  "baselineFailedScenarios": 88,
+  "currentFailedScenarios": 88,
+  "added": [],
+  "removed": [],
+  "sameFailureScenarios": true
+}

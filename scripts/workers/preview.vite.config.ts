@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react-swc';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import type { IncomingMessage } from 'node:http';
+import { handleWorkspacePreview } from './preview-workspace';
 
 const harness = path.resolve('scripts/workers');
 const messages: Array<Record<string, unknown>> = [];
@@ -18,6 +19,7 @@ export default defineConfig({
   plugins: [{ name: 'workers-isolated-visual-qa', configureServer(server) {
     server.middlewares.use(async (request, response, next) => {
       const url = new URL(request.url ?? '/', 'http://127.0.0.1:5188');
+      if (await handleWorkspacePreview(request, response, url)) return;
       if (url.pathname.startsWith('/__workers-qa/history/')) {
         const rows = url.pathname.endsWith('/ai_messages') ? messages : conversations;
         const result = rows.filter(row => ['user_id', 'org_id', 'conversation_id', 'state'].every(key => !url.searchParams.has(key) || row[key] === url.searchParams.get(key)));
@@ -48,7 +50,7 @@ export default defineConfig({
         } catch { response.writeHead(400); response.end(); }
         return;
       }
-      if (url.pathname.startsWith('/equipe-ia') || url.pathname.startsWith('/admin/workers/design') || url.pathname.startsWith('/cronograma-eventos')) {
+      if (url.pathname.startsWith('/equipe-ia') || url.pathname.startsWith('/admin/workers/') || url.pathname.startsWith('/cronograma-eventos')) {
         request.url = '/scripts/workers/preview.html' + url.search;
       }
       next();

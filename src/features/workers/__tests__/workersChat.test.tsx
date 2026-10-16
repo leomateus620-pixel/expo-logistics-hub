@@ -193,3 +193,45 @@ describe('bots history and identity isolation', () => {
     expect(result.current.error).not.toContain('private transport details');
   });
 });
+
+describe('bots background routine results and proposal metadata', () => {
+  it('adds stable request IDs to both streamed messages and refreshes completed routine history', async () => {
+    const { result } = renderHook(() => useWorkersChat());
+    act(() => { void result.current.sendMessage('Agenda amanhã'); });
+    await waitFor(() => expect(streams).toHaveLength(1));
+    act(() => streams[0].onEvent({ event: 'conversation', data: { conversationId: CHAT_A } }));
+    expect(result.current.messages.every(message => message.requestId === streams[0].request.requestId)).toBe(true);
+    await act(async () => streams[0].resolve());
+    queryResolver = async query => ({ data: query.table === 'ai_messages' ? [{ ...row('Resultado da rotina'), request_id: CHAT_B }] : [], error: null });
+    await act(async () => result.current.refreshMessages());
+    expect(result.current.messages[0]).toMatchObject({ requestId: CHAT_B, content: 'Resultado da rotina' });
+  });
+
+  it('ignores malformed workspace events and does not reload the active user stream', async () => {
+    const { result } = renderHook(() => useWorkersChat());
+    act(() => { void result.current.sendMessage('Agenda amanhã'); });
+    await waitFor(() => expect(streams).toHaveLength(1));
+    act(() => {
+      streams[0].onEvent({ event: 'conversation', data: { conversationId: CHAT_A } });
+      streams[0].onEvent({ event: 'workspace', data: { kind: 'action', id: 'bad' } });
+    });
+    expect(result.current.workspaceRevision).toBe(0);
+    act(() => streams[0].onEvent({ event: 'workspace', data: { kind: 'action', id: CHAT_B } }));
+    expect(result.current.workspaceRevision).toBeGreaterThan(0);
+    expect(streams[0].signal.aborted).toBe(false);
+    expect(result.current.isStreaming).toBe(true);
+    expect(queries.filter(query => query.table === 'ai_messages')).toHaveLength(0);
+  });
+
+  it('does not replace another conversation with a stale background result', async () => {
+    queryResolver = async query => ({ data: query.table === 'ai_messages' ? [row('Conversa A')] : [], error: null });
+    const { result } = renderHook(() => useWorkersChat());
+    await act(async () => result.current.selectConversation(CHAT_A));
+    const delayed = deferred<DbResult>();
+    queryResolver = query => query.table === 'ai_messages' ? delayed.promise : Promise.resolve({ data: [], error: null });
+    act(() => { void result.current.refreshMessages(); });
+    act(() => result.current.newConversation());
+    await act(async () => delayed.resolve({ data: [row('Resultado privado antigo')], error: null }));
+    expect(result.current.messages).toEqual([]);
+  });
+});

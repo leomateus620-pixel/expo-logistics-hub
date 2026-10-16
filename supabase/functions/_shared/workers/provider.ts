@@ -1,4 +1,4 @@
-import { isObject, type ProviderMessage, type ProviderResponse, type ReadTool, type ToolCall, WorkerError, type WorkerProvider } from './contracts.ts';
+import { isObject, type ProviderMessage, type ProviderResponse, type PlannerTool, type ToolCall, WorkerError, type WorkerProvider } from './contracts.ts';
 
 export const LOVABLE_GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
 export const DEFAULT_WORKERS_MODEL = 'google/gemini-3-flash-preview';
@@ -32,7 +32,7 @@ export function createLovableProvider(options: { apiKey?: string; model?: string
   if (!/^[a-z0-9-]+\/[A-Za-z0-9._-]{1,100}$/.test(model)) throw new WorkerError('provider_not_configured', 503);
   return {
     model,
-    async complete(messages: ProviderMessage[], tools: ReadTool[], signal?: AbortSignal): Promise<ProviderResponse> {
+    async complete(messages: ProviderMessage[], tools: PlannerTool[], signal?: AbortSignal): Promise<ProviderResponse> {
       if (!options.apiKey?.trim()) throw new WorkerError('provider_not_configured', 503);
       let response: Response;
       try {

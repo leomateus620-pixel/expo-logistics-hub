@@ -1,0 +1,123 @@
+{
+  "boundary": "Dedicated local PostgreSQL 16 on 127.0.0.1:55438/routines_phase23, synthetic users/data; business helpers are fixture implementations, not a deployed-business RLS audit.",
+  "version": "PostgreSQL 16.14 on x86_64-apple-darwin24.6.0, compiled by Apple clang version 17.0.0 (clang-1700.6.3.2), 64-bit",
+  "migrationSha256": "263fd3620d60a96a794eeda035f24bfc9b30ab14b03268f5a689777d301e2650",
+  "passed": true,
+  "checks": [
+    {
+      "name": "propose is inert; confirm is idempotent and schedules strictly after DB clock",
+      "passed": true,
+      "milliseconds": 18
+    },
+    {
+      "name": "strict config disallows raw cron, unknown worker/recipe, fake channel and invalid clock",
+      "passed": true,
+      "milliseconds": 4
+    },
+    {
+      "name": "proposed cannot be resumed as active; disabling proposal never creates an active routine",
+      "passed": true,
+      "milliseconds": 4
+    },
+    {
+      "name": "public RPCs reject NULL versions/fences instead of bypassing CAS through SQL unknown",
+      "passed": true,
+      "milliseconds": 20
+    },
+    {
+      "name": "calendar uses Sao Paulo civil time, weekday/weekend and strictly future instants",
+      "passed": true,
+      "milliseconds": 5
+    },
+    {
+      "name": "catch-up uses only latest occurrence of same local day; older occurrence is skipped",
+      "passed": true,
+      "milliseconds": 13
+    },
+    {
+      "name": "complete_run is atomic, idempotent, keeps rich body only in existing own messages, and cost is unknown",
+      "passed": true,
+      "milliseconds": 25
+    },
+    {
+      "name": "real concurrent confirm returns one active routine and one creation event",
+      "passed": true,
+      "milliseconds": 100
+    },
+    {
+      "name": "real concurrent claims produce one occurrence despite separate request IDs",
+      "passed": true,
+      "milliseconds": 99
+    },
+    {
+      "name": "expiration is evaluated after waiting for a real advisory lock",
+      "passed": true,
+      "milliseconds": 112
+    },
+    {
+      "name": "expired lease reclaims same logical run with new generation; old fence cannot complete",
+      "passed": true,
+      "milliseconds": 35
+    },
+    {
+      "name": "pausing after claim fences success, preserves failed attempt and disallows stale Undo",
+      "passed": true,
+      "milliseconds": 28
+    },
+    {
+      "name": "real pause versus completion serializes under the same advisory lock before validating state",
+      "passed": true,
+      "milliseconds": 113
+    },
+    {
+      "name": "business capability is rechecked after claim; removing grant blocks success and hides alerts",
+      "passed": true,
+      "milliseconds": 15
+    },
+    {
+      "name": "claims share immutable chat admission budget and roll back when capped",
+      "passed": true,
+      "milliseconds": 37
+    },
+    {
+      "name": "quota admits at most 10 active routines, including concurrent resume/confirm serialization",
+      "passed": true,
+      "milliseconds": 40
+    },
+    {
+      "name": "at most two claims are admitted and running leases prevent extra concurrent runs",
+      "passed": true,
+      "milliseconds": 14
+    },
+    {
+      "name": "explicit memory masks PII/URLs, supports CAS + disable, and never invents a conversation",
+      "passed": true,
+      "milliseconds": 13
+    },
+    {
+      "name": "snapshot and RLS bind owner/org; admin aggregates do not expose other users memory or messages",
+      "passed": true,
+      "milliseconds": 14
+    },
+    {
+      "name": "inbox deduplicates own reported condition and marking seen has no business mutation",
+      "passed": true,
+      "milliseconds": 24
+    },
+    {
+      "name": "anonymous/service-role-style claims cannot access workspace, and no token fields are persisted",
+      "passed": true,
+      "milliseconds": 16
+    },
+    {
+      "name": "a NULL auth.role is denied, and the real redactor removes whole compact CNPJ/JWT values",
+      "passed": true,
+      "milliseconds": 4
+    },
+    {
+      "name": "empty executeDue and memory receipts cannot grow without a server metadata quota",
+      "passed": true,
+      "milliseconds": 11
+    }
+  ]
+}

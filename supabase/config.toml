@@ -38,3 +38,8 @@ project_id = "btfaumhroqtqzxomqorx"
 
   [functions.workers-orchestrator]
     verify_jwt = true
+
+  [functions.workers-actions]
+    verify_jwt = true
+  [functions.workers-routines]
+    verify_jwt = true

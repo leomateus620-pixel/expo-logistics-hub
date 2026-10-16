@@ -13,6 +13,8 @@ const state = vi.hoisted(() => ({
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: { id: 'reader', user_metadata: { name: 'Leonardo' } } }) }));
 vi.mock('@/hooks/useCurrentOrg', () => ({ useCurrentOrg: () => ({ orgId: 'org', myRole: state.role }) }));
 vi.mock('@/hooks/useCapabilities', () => ({ useCapabilities: () => ({ hasCapability: (cap: string) => state.caps.has(cap) || state.caps.has('full_access'), capSet: state.caps, isLoading: false, loadError: false }) }));
+vi.mock('../workspace-api', () => ({ callWorkerAction: vi.fn().mockResolvedValue([]), callWorkerWorkspace: vi.fn().mockResolvedValue({ serverNow: '2026-10-16T12:00:00Z', routines: [], runs: [], events: [], memories: [], alerts: [] }) }));
+vi.mock('../workspace/useWorkerWorkspace', () => ({ workspaceDate: () => 'Não informado', useWorkerWorkspace: () => ({ scope: 'user:org', orgId: 'org', actions: [], conversationActions: [], pendingActions: [], snapshot: { serverNow: '2026-10-16T12:00:00Z', routines: [], runs: [], events: [], memories: [], alerts: [] }, loading: false, error: null, busyId: null, refresh: vi.fn(), clearError: vi.fn(), mutateAction: vi.fn(), mutateWorkspace: vi.fn() }) }));
 vi.mock('../useWorkersChat', () => ({ useWorkersChat: () => ({ messages: state.messages, conversations: [], conversationId: null, isStreaming: state.isStreaming, progress: [], error: null, sendMessage: state.sendMessage, stop: vi.fn(), selectConversation: vi.fn(), newConversation: vi.fn(), isLoadingHistory: false, clearError: vi.fn(), activeWorkerId: 'agenda' }) }));
 
 beforeEach(() => {
@@ -44,7 +46,7 @@ describe('bots UI de leitura', () => {
     page('/equipe-ia/mapa');
     expect(screen.getByRole('heading', { name: /Oi, eu sou Mapa/ })).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('precisa do acesso ao módulo');
-    expect(screen.getAllByText(/Somente leitura nesta fase/)).toHaveLength(1);
+    expect(screen.getAllByText(/Altera somente com sua confirmação/)).toHaveLength(1);
     expect(screen.queryByRole('button', { name: /^confirmar/i })).not.toBeInTheDocument();
   });
 
@@ -93,6 +95,13 @@ describe('bots UI de leitura', () => {
     page('/equipe-ia?worker=agenda');
     fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
     expect(screen.getByRole('textbox', { name: 'Mensagem para Agenda' })).toHaveFocus();
+    expect(state.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('abre o painel real pelo link de memória sem enviar mensagem', () => {
+    page('/equipe-ia?view=memory');
+    expect(screen.getByRole('dialog')).toHaveTextContent('O que a equipe lembra');
+    expect(screen.getByRole('button', { name: 'Adicionar preferência' })).toBeInTheDocument();
     expect(state.sendMessage).not.toHaveBeenCalled();
   });
 });

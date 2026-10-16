@@ -1,0 +1,78 @@
+name: Fenasoja Bots
+on:
+  pull_request:
+    paths:
+      - 'src/features/workers/**'
+      - 'src/lib/workers/**'
+      - 'src/lib/mcp/tools/**'
+      - 'src/components/WorkersLauncher.tsx'
+      - 'src/features/commercial-map/components/MapLotDeepLink.tsx'
+      - 'src/test/workers*.test.*'
+      - 'src/test/mapLotDeepLink.test.tsx'
+      - 'supabase/functions/_shared/workers/**'
+      - 'supabase/functions/workers-*/**'
+      - 'supabase/migrations/*workers*.sql'
+      - 'scripts/workers/**'
+      - '.github/workflows/fenasoja-bots.yml'
+permissions:
+  contents: read
+jobs:
+  bots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: local-fixture-only
+          POSTGRES_DB: postgres
+        ports:
+          - 55438:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      WORKERS_QA_PG_USER: postgres
+      WORKERS_QA_PG_PORT: 55438
+      PGPASSWORD: local-fixture-only
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: oven-sh/setup-bun@v2
+        with: {bun-version: '1.3.0'}
+      - uses: denoland/setup-deno@v2
+        with: {deno-version: '2.9.6'}
+      - run: bun install --frozen-lockfile
+      - run: npm run typecheck
+      - name: Canonical registry and scoped lint
+        run: |
+          node scripts/workers/build-edge-registry.mjs --check
+          npx eslint src/features/workers src/lib/workers src/components/WorkersLauncher.tsx src/features/commercial-map/components/MapLotDeepLink.tsx supabase/functions/_shared/workers supabase/functions/workers-orchestrator supabase/functions/workers-actions supabase/functions/workers-routines scripts/workers
+      - name: Bot, privacy, transport and existing integration contracts
+        run: >-
+          npx vitest run --maxWorkers=2
+          src/features/workers src/lib/workers src/test/workersOrchestrator.test.ts
+          src/test/workersProposals.test.ts src/test/workersRoutines.test.ts src/test/mapLotDeepLink.test.tsx
+          src/lib/__tests__/cronogramaRpc.test.ts src/test/publicMapHost.test.ts
+          src/test/eventAssignmentPush.test.ts src/test/pushDeviceRevocation.test.ts src/test/eventPushMessage.test.ts
+          src/test/googleCalendarState.test.ts src/test/googleCalendarWidget.test.tsx
+      - name: Deployable Edge contracts
+        run: |
+          deno check --config supabase/functions/workers-orchestrator/deno.json supabase/functions/workers-orchestrator/index.ts
+          deno check --config supabase/functions/workers-routines/deno.json supabase/functions/workers-routines/index.ts
+          deno test --allow-env --config supabase/functions/workers-actions/deno.json supabase/functions/workers-actions/actions_test.ts
+      - name: Concurrent PostgreSQL, permissions and rollback
+        run: |
+          npm install --prefix /tmp/workers-pg-client --no-save --package-lock=false --ignore-scripts pg@8.16.3
+          node scripts/workers/actions-qa.mjs --pg-module /tmp/workers-pg-client/node_modules/pg/lib/index.js
+          node scripts/workers/routines-db-qa.mjs --pg-module /tmp/workers-pg-client/node_modules/pg/lib/index.js
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fenasoja-bots-database-validation
+          path: |
+            docs/workers/phase-2-3/actions-validation.json
+            /tmp/fenasoja-routines-db-validation.json

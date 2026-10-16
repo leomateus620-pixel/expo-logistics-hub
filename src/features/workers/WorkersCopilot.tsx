@@ -8,6 +8,7 @@ import type { WorkerContext, WorkerId } from './types';
 import { resolveWorkersRecord } from './context';
 import './styles/worker-tokens.css';
 import './styles/workers.css';
+import './styles/workspace.css';
 
 export interface WorkersCopilotProps { context?: WorkerContext; workerId?: WorkerId; open?: boolean; onOpenChange?: (open: boolean) => void; showTrigger?: boolean }
 export default function WorkersCopilot({ context, workerId, open: controlledOpen, onOpenChange, showTrigger = true }: WorkersCopilotProps) {

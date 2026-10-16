@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 
+const SessionRunner = lazyWithRetry(() => import('@/features/workers/WorkersSessionRunner'));
 const Copilot = lazyWithRetry(() => import('@/features/workers/WorkersCopilot'));
 
 /** Lightweight entry: Motion, CSS, chat and map stores load only when the user opens it. */
@@ -12,7 +13,7 @@ export default function WorkersLauncher() {
   const { orgId } = useCurrentOrg();
   const location = useLocation();
   const [open, setOpen] = useState(false);
-  const isWorkers = location.pathname.startsWith('/equipe-ia') || location.pathname === '/admin/workers/design';
+  const isWorkers = location.pathname.startsWith('/equipe-ia') || location.pathname.startsWith('/admin/workers/');
   const isPublic = /^\/(?:areas\/|login\/|unsubscribe|\.lovable\/)/.test(location.pathname);
   const enabled = Boolean(user && orgId && !isPublic && !isWorkers);
 
@@ -27,8 +28,10 @@ export default function WorkersLauncher() {
     return () => window.removeEventListener('keydown', onKey);
   }, [enabled]);
 
-  if (!enabled) return null;
+  const runner = user && orgId && !isPublic ? <Suspense fallback={null}><SessionRunner key={`${user.id}:${orgId}`} orgId={orgId} userId={user.id} /></Suspense> : null;
+  if (!enabled) return runner;
   return <>
+    {runner}
     <button type="button" data-workers-launcher aria-label="Abrir copiloto da equipe Fenasoja"
       aria-keyshortcuts="Control+k Meta+k" aria-expanded={open} onClick={() => setOpen(true)}
       className="focus-ring"

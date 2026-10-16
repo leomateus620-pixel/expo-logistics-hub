@@ -80,7 +80,7 @@ describe('workers orchestrator fail-closed execution', () => {
     await runWorkerTurn({ ...request, message: 'Apaga o evento Z' }, deps, emit);
     expect(deps.provider.complete).not.toHaveBeenCalled();
     expect(deps.executeTool).not.toHaveBeenCalled();
-    expect(events.filter(item => item.event === 'delta').map(item => (item.data as { text: string }).text).join('')).toContain('só consulto');
+    expect(events.filter(item => item.event === 'delta').map(item => (item.data as { text: string }).text).join('')).toContain('Não posso realizar');
   });
 
   it('blocks a prompt-injected forbidden tool even if the model calls it', async () => {
