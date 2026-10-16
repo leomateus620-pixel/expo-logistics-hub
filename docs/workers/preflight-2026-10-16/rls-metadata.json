@@ -1,0 +1,783 @@
+{
+  "date": "2026-10-16",
+  "time_zone": "America/Sao_Paulo",
+  "project_ref": "btfaumhroqtqzxomqorx",
+  "authentication": "public publishable/anon key from versioned .env; schema metadata RPCs only; no user JWT or service role used",
+  "scope": "Metadata only. No business rows queried. Not a role-based isolation test.",
+  "rpc_results": {
+    "audit_check_rls_status": 200,
+    "audit_count_policies": 200
+  },
+  "tables": [
+    {
+      "table_name": "agenda_meeting_action_items",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_administrative_tombstones",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_audit_events",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_insights",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_minutes_versions",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_mutation_receipts",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "agenda_meeting_processing_jobs",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "agenda_meeting_segment_receipts",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_sessions",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_transcript_revision_segments",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_transcript_segments",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_transcript_versions",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "agenda_meeting_user_consents",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "audit_log",
+      "rls_enabled": true,
+      "policy_count": 5
+    },
+    {
+      "table_name": "cart_history",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "cart_reservations",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "commercial_exhibitors",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "commercial_lot_corner_audit",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "commercial_lot_price_overrides",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "commercial_lots",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "commercial_price_rules",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "commission_responsibles",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "commissions",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "committee_mobility_forms",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "committee_mobility_members",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "cronograma_evento_anexos",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "cronograma_evento_comissoes",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "cronograma_evento_logs",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "cronograma_evento_responsaveis",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "cronograma_evento_tombstones",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "cronograma_eventos",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "cronograma_planning_viewers",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "cronograma_subevento_acoes",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "cronograma_subevento_comissoes",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "cronograma_subevento_convidados",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "cronograma_subevento_providencias",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "cronograma_subevento_responsaveis",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "cronograma_subeventos",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "cronograma_unidade_anexos",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "electric_carts",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "email_send_log",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "email_send_state",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "email_unsubscribe_tokens",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "event_assignment_notifications",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "event_reminder_deliveries",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "events",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "expense_approvals",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "expense_categories",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "expense_documents",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "expenses",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "fenasoja_events",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "financial_audit_events",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_budget_lines",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_budgets",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_categories",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_custom_fields",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_editions",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_movement_allocations",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_movements",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_mutation_receipts",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "financial_obligations",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_revenues",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_scenarios",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "financial_sponsorships",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "fuel_records",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "google_calendar_connections",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "google_calendar_event_map",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "google_calendar_oauth_attempts",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "google_calendar_sync_preferences",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "google_sync_outbox",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "guests",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "internal_worker_tokens",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "lot_contract_lots",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "lot_contract_versions",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "lot_contracts",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "lot_negotiations",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "lot_prices",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "lot_reservations",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "lot_sale_installments",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "lot_sale_order_items",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "lot_sale_order_revisions",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "lot_sale_orders",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "lot_sales",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "lot_status_history",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "map_activity_logs",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "map_calibrations",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "map_entities",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "map_entity_geometries",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "map_geometry_versions",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "map_layers",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "map_lot_lineage",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "map_projects",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "map_reference_migration_snapshots",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "map_rls_policy_snapshots",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "map_segments",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "mobility_authorizations",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "notification_recipients",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "notification_session_seen",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "official_committees",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "org_members",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "organizations",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "profiles",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "public_form_audit",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "public_form_links",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "public_map_events",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "public_map_links",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "public_mobility_forms",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "public_mobility_members",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "push_devices",
+      "rls_enabled": true,
+      "policy_count": 5
+    },
+    {
+      "table_name": "push_send_log",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "reimbursements",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "schedule_shifts",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "schedules",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "scooter_history",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "scooter_reservations",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "scooters",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "security_audit_reports",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "shift_assignments",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "suppressed_emails",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "tasks",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "transport_guests",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "transport_locations",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "transport_weather_alerts",
+      "rls_enabled": true,
+      "policy_count": 3
+    },
+    {
+      "table_name": "transport_weather_snapshots",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "transports",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "user_capabilities",
+      "rls_enabled": true,
+      "policy_count": 8
+    },
+    {
+      "table_name": "user_roles",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "vehicle_usage",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "vehicles",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "venue_booking_units",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_checklist_templates",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_counterpart_agreements",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_counterpart_ledger",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_counterpart_usage",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_event_approvals",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_event_checklist_items",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_event_documents",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_event_notes",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_event_resources",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_event_responsibles",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_event_spaces",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_events",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_import_batches",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_import_rows",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_mutation_receipts",
+      "rls_enabled": true,
+      "policy_count": 0
+    },
+    {
+      "table_name": "venue_notification_deliveries",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_notification_subscriptions",
+      "rls_enabled": true,
+      "policy_count": 4
+    },
+    {
+      "table_name": "venue_occupancies",
+      "rls_enabled": true,
+      "policy_count": 2
+    },
+    {
+      "table_name": "venue_space_blocks",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_space_booking_units",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_spaces",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "venue_stakeholders",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "weather_city_cache",
+      "rls_enabled": true,
+      "policy_count": 1
+    },
+    {
+      "table_name": "weather_sync_jobs",
+      "rls_enabled": true,
+      "policy_count": 2
+    }
+  ]
+}

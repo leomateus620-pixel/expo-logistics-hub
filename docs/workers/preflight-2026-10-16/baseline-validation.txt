@@ -1,0 +1,74 @@
+Base auditada: 849b0e8d8c02feaea6b771ca911aab525fee6cf7
+Nenhum código alterado.
+
+Typecheck: PASS (exit 0)
+Build: PASS (exit 0)
+Lint: FAIL (exit 1): 1010 errors, 96 warnings
+Vitest: FAIL (exit 1): 48 failed files, 353 passed files; 86 failed tests, 3124 passed tests
+
+Arquivos reportados por FAIL na saída Vitest:
+src/features/alvorada/AlvoradaBrandHero.test.tsx
+src/test/agendaMeetingWorkspace.test.tsx
+src/test/commercialMap2026Reference.test.ts
+src/test/commercialMapArenaCanonical.test.ts
+src/test/commercialMapAtmospherePersistence.test.tsx
+src/test/commercialMapBootLoader.test.tsx
+src/test/commercialMapElectricalInfrastructure.test.ts
+src/test/commercialMapExplorer.test.ts
+src/test/commercialMapExporuralArchitecture.test.ts
+src/test/commercialMapExporuralCartographicFidelity.test.ts
+src/test/commercialMapFenasojaReferenceStructures.test.ts
+src/test/commercialMapLoadingPipeline.test.ts
+src/test/commercialMapMobileExperience.test.ts
+src/test/commercialMapNeCloverleaf.test.ts
+src/test/commercialMapNonPermanentCleanup.test.ts
+src/test/commercialMapPavilion12PlanPresentation.test.ts
+src/test/commercialMapPavilion3PlanPresentation.test.ts
+src/test/commercialMapPavilion5PlanPresentation.test.ts
+src/test/commercialMapPavilion8PlanPresentation.test.ts
+src/test/commercialMapPavilionFourSoyKitchen.test.ts
+src/test/commercialMapPavilionModuleCard.test.tsx
+src/test/commercialMapPavilionRendering.test.ts
+src/test/commercialMapPavilions135Migration.contract.test.ts
+src/test/commercialMapPavilions813Migration.contract.test.ts
+src/test/commercialMapPresentation.test.ts
+src/test/commercialMapRearParking.test.ts
+src/test/commercialMapRearRoadNetwork.test.ts
+src/test/commercialMapRearRoadTreeClearance.test.ts
+src/test/commercialMapRegionalHighways.test.ts
+src/test/commercialMapRoadPrecision.test.ts
+src/test/commercialMapRuntimeStability.test.ts
+src/test/commercialMapSiteEnvironment.test.ts
+src/test/commercialMapSoyGateInfrastructure.test.ts
+src/test/commercialMapSpatialBounds.test.ts
+src/test/commercialMapVisitInteraction.test.tsx
+src/test/commercialMapVisitWorld.test.ts
+src/test/commissionMapMigration.contract.test.ts
+src/test/commissionMapPortals.test.ts
+src/test/cronogramaDashboardIntegration.test.tsx
+src/test/cronogramaDataIntegrity.test.ts
+src/test/cronogramaMobilePresentation.test.tsx
+src/test/cronogramaRegistrationInteractions.test.tsx
+src/test/cronogramaTimeline.test.tsx
+src/test/currentOrgRouteStability.test.tsx
+src/test/eventHarvestCompletion.test.tsx
+src/test/exporural2028Revision.test.ts
+src/test/lotPricing2028.test.ts
+src/test/venueEventsPresentation.test.ts
+
+Regressões direcionadas:
+
+ RUN  v3.2.4 /Users/leonardo/Documents/GitHub/expo-logistics-hub
+
+ ✓ src/test/eventAssignmentPush.test.ts (3 tests) 1ms
+ ✓ src/test/pushDeviceRevocation.test.ts (4 tests) 1ms
+ ✓ src/test/eventPushMessage.test.ts (4 tests) 1ms
+ ✓ src/lib/__tests__/cronogramaRpc.test.ts (16 tests) 4ms
+ ✓ src/test/googleCalendarState.test.ts (27 tests) 2ms
+ ✓ src/test/publicMapHost.test.ts (6 tests) 3ms
+ ✓ src/test/googleCalendarWidget.test.tsx (11 tests) 79ms
+
+ Test Files  7 passed (7)
+      Tests  71 passed (71)
+   Start at  02:54:41
+   Duration  699ms (transform 146ms, setup 330ms, collect 373ms, tests 91ms, environment 1.64s, prepare 284ms)
