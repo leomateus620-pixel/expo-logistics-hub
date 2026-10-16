@@ -29,9 +29,8 @@ export function useWorkerWorkspace({ conversationId, revision = 0, isStreaming =
     const [actionResult, workspaceResult] = results;
     if (actionResult.status === 'fulfilled' && Array.isArray(actionResult.value)) setActions(actionResult.value);
     if (workspaceResult.status === 'fulfilled' && isSnapshot(workspaceResult.value)) setSnapshot(workspaceResult.value);
-    const failure = results.find(result => result.status === 'rejected');
-    if (failure?.status === 'rejected') setError(safeError(failure.reason));
-    else setError(null);
+    // Background reads never interrupt the chat: an unavailable auxiliary service just leaves panels empty.
+    setError(null);
   }, [orgId, userId, scope]);
   useEffect(() => {
     setOwnerScope(scope); setActions([]); setSnapshot(emptySnapshot); setError(null); setBusyId(null); pending.current.clear();
