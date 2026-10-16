@@ -11,6 +11,7 @@ import { getWorker, workerCatalog, workerChatLink } from '../workerCatalog';
 import { useWorkersChat } from '../useWorkersChat';
 import { CatalogWorkerChips, PermissionNote, ProgressSteps, ResultChip, WorkerEmptyState, WorkerLink, WorkerSkeletons } from './WorkerPrimitives';
 import { safeSourceUrl, workerStyle } from '../ui-utils';
+import WorkerRichContent, { richContentToText } from './WorkerRichContent';
 import { WorkerTeamBrand, WorkerTeamMark } from './WorkerTeamBrand';
 import { useWorkerWorkspace } from '../workspace/useWorkerWorkspace';
 import { WorkspaceActionCard } from '../workspace/WorkspaceActionCard';
@@ -28,10 +29,10 @@ function MessageBubble({ message, streaming }: { message: WorkerChatMessage; str
   if (message.role === 'system') return <div className="worker-system-event"><ShieldCheck size={13} /><span>{message.content}</span></div>;
   const sources = (message.sources ?? []).map(source => ({ ...source, safeUrl: safeSourceUrl(source.url) })).filter(source => source.safeUrl);
   const resultChips = [...(message.chips ?? []), ...sources.filter(source => /^\d+\s/.test(source.title)).map(source => ({ label: source.title.split(' · ')[0], href: source.safeUrl! }))];
-  const copy = async () => { try { await navigator.clipboard.writeText(message.content); setCopied(true); clearTimeout(timer.current); timer.current = setTimeout(() => setCopied(false), 1600); } catch { setCopied(false); } };
+  const copy = async () => { try { await navigator.clipboard.writeText(richContentToText(message.content)); setCopied(true); clearTimeout(timer.current); timer.current = setTimeout(() => setCopied(false), 1600); } catch { setCopied(false); } };
   return <m.article className={`worker-message worker-message--${message.role}`} style={workerStyle(worker)} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .2 }}>
     {message.role === 'assistant' && <div className="worker-message__author"><WorkerMascot shape={worker.shape} color={worker.color} size={34} mood={streaming ? 'talking' : 'idle'} paused={!streaming} /><strong>{worker.name}</strong><span>Equipe Fenasoja</span></div>}
-    <div className="worker-message__text">{streaming ? (message.content.match(/[\s\S]{1,100}/g) ?? []).map((block, index) => <span className="worker-message-block" key={index}>{block}</span>) : message.content}{streaming && <span className="worker-stream-cursor" aria-label="Respondendo" />}</div>
+    <div className="worker-message__text">{message.role === 'assistant' ? <WorkerRichContent content={message.content} streaming={streaming} /> : message.content}{streaming && <span className="worker-stream-cursor" aria-label="Respondendo" />}</div>
     {resultChips.length > 0 && <div className="worker-message__chips">{resultChips.map(chip => { const href = safeSourceUrl(chip.href); return href ? <ResultChip key={`${chip.label}-${href}`} label={chip.label} href={href} /> : null; })}</div>}
     {sources.length > 0 && <div className="worker-sources" aria-label="Fontes da resposta"><span>Confira nas fontes</span><div>{sources.map((source, index) => <a href={source.safeUrl!} key={`${source.url}-${index}`} target={source.kind === 'web' ? '_blank' : undefined} rel={source.kind === 'web' ? 'noopener noreferrer' : undefined}><span>{source.kind === 'web' ? <ExternalLink size={13} /> : <ArrowUp size={13} className="worker-record-arrow" />}{source.title}</span>{source.date && <small>{source.date}</small>}</a>)}</div></div>}
     {message.role === 'assistant' && message.content && !streaming && <div className="worker-message__tools"><button type="button" onClick={() => void copy()} aria-label={copied ? 'Resposta copiada' : 'Copiar resposta'}>{copied ? <Check size={15} /> : <Copy size={15} />}<span>{copied ? 'Copiado' : 'Copiar'}</span></button><time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}</time></div>}
