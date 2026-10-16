@@ -99,7 +99,79 @@ function renderValue(value: unknown, depth = 0): string {
   return '';
 }
 
-/** User-visible facts are copied from trusted tool output, never LLM prose. */
+const isoDate = /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/;
+const titleKeys = ['title', 'name', 'displayName', 'display_name', 'label', 'nome', 'titulo'];
+const preferredKeys = ['start_at', 'start_date', 'start_time', 'data', 'date', 'location', 'location_name', 'status', 'block', 'lot_number', 'area_sqm', 'total', 'visits'];
+const technicalKey = /(?:^|_)(?:setup|teardown|approval|conflict|pending|estimated|confirmed|created|updated|version|metadata|raw|internal|code|key|type)(?:_|$)/i;
+const spamLabel = /assistir|ao vivo|futebol|aposta|\bbet\b|casino|cassino|porn|resultados encontrados/i;
+
+/** Brazilian, human formatting; technical enums become readable words. */
+export function humanValue(value: unknown): string {
+  if (value === null || value === undefined || value === '') return '—';
+  if (typeof value === 'boolean') return value ? 'Sim' : 'Não';
+  if (typeof value === 'number') return Number.isFinite(value) ? value.toLocaleString('pt-BR') : '—';
+  if (typeof value !== 'string') return '';
+  const text = displayText(value).trim();
+  if (isoDate.test(text)) {
+    const date = new Date(text.length === 10 ? `${text}T12:00:00-03:00` : text);
+    if (!Number.isNaN(date.getTime())) {
+      const day = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
+      if (text.length === 10) return day;
+      const time = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }).format(date);
+      return `${day} ${time.replace(':', 'h')}`;
+    }
+  }
+  if (/^[a-z]+(?:_[a-z]+)+$/.test(text) || /^[a-z]+$/.test(text)) { const words = text.replace(/_/g, ' '); return words.charAt(0).toUpperCase() + words.slice(1); }
+  return text.length > 80 ? `${text.slice(0, 77)}…` : text;
+}
+
+type Table = { title?: string; columns: string[]; rows: string[][] };
+type Chart = { title: string; data: Array<{ label: string; value: number }> };
+
+function buildTable(records: unknown[]): Table | null {
+  const objects = records.filter(isObject).slice(0, 6);
+  if (!objects.length) return null;
+  const keys = new Set(objects.flatMap(record => Object.keys(record)));
+  const visible = (key: string) => keys.has(key) && !hiddenKey.test(key) && !technicalKey.test(key)
+    && objects.some(record => { const value = record[key]; return value !== null && value !== undefined && typeof value !== 'object'; });
+  const title = titleKeys.find(visible);
+  const others = [...preferredKeys.filter(visible), ...[...keys].filter(key => visible(key) && !preferredKeys.includes(key))]
+    .filter(key => key !== title && !titleKeys.includes(key)).slice(0, title ? 3 : 4);
+  const columns = [...(title ? [title] : []), ...others];
+  if (!columns.length) return null;
+  return {
+    columns: columns.map(key => displayText(displayLabels[key] ?? key.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase()))),
+    rows: objects.map(record => columns.map(key => humanValue(record[key]))),
+  };
+}
+
+function buildChart(records: unknown[]): Chart | null {
+  const objects = records.filter(isObject);
+  if (objects.length < 2) return null;
+  const statusKey = ['status', 'situacao', 'state'].find(key => objects.every(record => typeof record[key] === 'string'));
+  if (statusKey) {
+    const counts = new Map<string, number>();
+    for (const record of objects) { const label = humanValue(record[statusKey]); counts.set(label, (counts.get(label) ?? 0) + 1); }
+    if (counts.size >= 2 && counts.size <= 8) return { title: 'Distribuição por situação', data: [...counts].map(([label, value]) => ({ label, value })) };
+  }
+  const title = titleKeys.find(key => objects.every(record => typeof record[key] === 'string'));
+  const numeric = Object.keys(objects[0]).find(key => !hiddenKey.test(key) && !technicalKey.test(key) && objects.every(record => typeof record[key] === 'number'));
+  if (title && numeric && objects.length <= 10) {
+    return { title: displayText(displayLabels[numeric] ?? numeric.replace(/_/g, ' ')), data: objects.map(record => ({ label: humanValue(record[title]), value: record[numeric] as number })) };
+  }
+  return null;
+}
+
+function headline(result: ReadResult): string {
+  const total = Number.isSafeInteger(result.total) && Number(result.total) >= 0 ? Number(result.total) : result.records.length;
+  const summary = displayText(result.summary).split(/(?<=[.!?])\s/)[0]?.trim() ?? '';
+  const generic = !summary || /registro\(s\)|autorizado\(s\)|resultado parcial/i.test(summary);
+  if (total === 0) return 'Não encontrei registros para esse pedido.';
+  const base = generic ? `Encontrei **${total.toLocaleString('pt-BR')}** ${total === 1 ? 'resultado' : 'resultados'}.` : summary.slice(0, 280);
+  return total > 6 ? `${base} Mostro os principais abaixo; o restante está no módulo.` : base;
+}
+
+/** User-visible facts are copied from trusted tool output, never LLM prose. Visual blocks are server-built. */
 export function renderToolEvidence(results: ReadResult[]): { content: string; citations: WorkerCitation[] } {
   if (!results.length) return { content: 'Não obtive dados verificáveis para esse pedido. Informe a comissão, o período ou o registro que deseja consultar.', citations: [] };
   const citations: WorkerCitation[] = [];
@@ -108,12 +180,16 @@ export function renderToolEvidence(results: ReadResult[]): { content: string; ci
     if (typeof result.summary !== 'string' || !Array.isArray(result.records)) throw new WorkerError('invalid_tool_result', 502);
     const sources = validateCitations(result.citations);
     if (sources.length === 0 && (result.records.length > 0 || Number(result.total ?? 0) > 0)) throw new WorkerError('missing_evidence', 502);
-    for (const citation of sources) if (!citations.some(existing => existing.url === citation.url)) citations.push(citation);
-    const rows = result.records.slice(0, 12).map(record => renderValue(record)).filter(Boolean);
-    const count = Number.isSafeInteger(result.total) && Number(result.total) >= 0 ? [`Registros no filtro consultado: ${result.total}.`] : [];
-    const lines = [displayText(result.summary).slice(0, 1000), ...count, ...rows.map(row => `• ${row}`)];
-    if (result.truncated || result.records.length > 12) lines.push('Exibição parcial. Abra a fonte para consultar os demais registros.');
-    sections.push(lines.join('\n'));
+    for (const citation of sources) {
+      if (citation.source === 'web' && (spamLabel.test(citation.label) || citations.filter(item => item.source === 'web').length >= 4)) continue;
+      if (!citations.some(existing => existing.url === citation.url)) citations.push(citation);
+    }
+    const lines = [headline(result)];
+    const chart = buildChart(result.records);
+    const table = buildTable(result.records);
+    if (chart) lines.push('```fenasoja-chart\n' + JSON.stringify(chart) + '\n```');
+    if (table) lines.push('```fenasoja-table\n' + JSON.stringify(table) + '\n```');
+    sections.push(lines.join('\n\n'));
   }
   if (citations.length > 30) throw new WorkerError('too_many_citations', 502);
   const content = sections.join('\n\n');
