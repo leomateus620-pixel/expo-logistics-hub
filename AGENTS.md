@@ -22,7 +22,5 @@ Regras de frontend do Mapa Comercial: `src/features/commercial-map/AGENTS.md`. R
 
 ## Cursor Cloud specific instructions
 
-- Dependências: `npm install` na raiz. `npm ci` falha neste checkout porque `package.json` declara `drizzle-kit`, `drizzle-orm` e `postgres` e esses pacotes estão ausentes do `package-lock.json`. A segunda execução de `npm install` termina com a árvore já atualizada.
-- Servidor: `npm run dev` escuta em `http://127.0.0.1:8080` (`host` e `port` em `vite.config.ts`).
-- Verificação: `npm run typecheck` e `npm run build`. `npm run lint` reproduz a dívida histórica já descrita no README. `npm test` executa o Vitest; trate falhas atuais da suíte como comportamento do código, separado da instalação do ambiente.
-- Entrada sem sessão: portal em `/`. O login de Mapa Comercial fica em `/login/mapa-comercial`. Abrir `/mapa-comercial` sem sessão mostra o formulário de login. As variáveis públicas do Supabase já estão no `.env` versionado.
+- `npm install` (não `npm ci`: lock sem drizzle-kit/drizzle-orm/postgres). `npm run dev` em 127.0.0.1:8080. Verificar com `npm run typecheck`, `npm run build`, `npm test` (lint tem dívida histórica no README).
+- Sem sessão: portal em `/`; login do mapa em `/login/mapa-comercial`; variáveis públicas no `.env` versionado.
