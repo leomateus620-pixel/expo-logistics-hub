@@ -3,7 +3,9 @@
 CREATE TABLE public.ai_conversations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id uuid NOT NULL REFERENCES public.organizations(id),
-  user_id uuid NOT NULL REFERENCES auth.users(id),
+  -- Identity is validated by auth.uid() and active org membership in every RPC/policy.
+  -- Lovable schema rules do not permit a public-table FK into auth.users.
+  user_id uuid NOT NULL,
   title text NOT NULL CHECK (char_length(title) BETWEEN 1 AND 100),
   worker_id text NOT NULL CHECK (worker_id IN ('agenda','arena','mapa','interesse','comissao','logistica','caixa','radar')),
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -60,6 +62,9 @@ CREATE TABLE public.ai_usage (
   UNIQUE (user_id, request_id)
 );
 
+REVOKE ALL ON public.ai_conversations, public.ai_messages, public.ai_audit_events, public.ai_usage FROM anon, authenticated;
+GRANT SELECT ON public.ai_conversations, public.ai_messages, public.ai_audit_events, public.ai_usage TO authenticated;
+
 CREATE INDEX ai_conversations_owner_updated_idx ON public.ai_conversations(user_id, org_id, updated_at DESC);
 CREATE INDEX ai_messages_conversation_idx ON public.ai_messages(conversation_id, created_at, id);
 CREATE INDEX ai_messages_owner_rate_idx ON public.ai_messages(user_id, created_at) WHERE role = 'user';
@@ -86,9 +91,6 @@ CREATE POLICY ai_audit_events_read_own ON public.ai_audit_events FOR SELECT TO a
   USING (user_id = (SELECT auth.uid()) AND org_id IN (SELECT public.ai_workers_member_org_ids()));
 CREATE POLICY ai_usage_read_own ON public.ai_usage FOR SELECT TO authenticated
   USING (user_id = (SELECT auth.uid()) AND org_id IN (SELECT public.ai_workers_member_org_ids()));
-
-REVOKE ALL ON public.ai_conversations, public.ai_messages, public.ai_audit_events, public.ai_usage FROM anon, authenticated;
-GRANT SELECT ON public.ai_conversations, public.ai_messages, public.ai_audit_events, public.ai_usage TO authenticated;
 
 CREATE FUNCTION public.ai_workers_redact_text(_text text)
 RETURNS text LANGUAGE plpgsql IMMUTABLE SET search_path = public AS $$
