@@ -10,6 +10,16 @@ const WORKER_IDS = new Set(['agenda', 'arena', 'mapa', 'interesse', 'comissao', 
 const uuid = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const workerId = (value: unknown): WorkerId => WORKER_IDS.has(String(value)) ? value as WorkerId : 'agenda';
 
+/** Question and answer share one transaction timestamp; within a turn the question always comes first. */
+export function chronological<T extends { created_at: string; role: string; request_id?: string | null }>(rows: readonly T[]): T[] {
+  const rank = (role: string) => role === 'user' ? 0 : role === 'assistant' ? 1 : 2;
+  return [...rows].sort((a, b) => {
+    const time = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    if (a.request_id && a.request_id === b.request_id) return rank(a.role) - rank(b.role);
+    return time !== 0 ? time : rank(a.role) - rank(b.role);
+  });
+}
+
 function sourcesFrom(value: unknown): NonNullable<WorkerChatMessage['sources']> {
   if (!Array.isArray(value)) return [];
   return value.slice(0, 30).flatMap(item => {
