@@ -50,6 +50,20 @@
       "when": 1791982259116,
       "tag": "0006_cronograma_delete_permission_align",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792137115380,
+      "tag": "0007_workers_readonly_workspace",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792137157753,
+      "tag": "0008_workers_interest_scoped_reads",
+      "breakpoints": true
     }
   ]
 }

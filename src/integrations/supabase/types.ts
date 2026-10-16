@@ -964,6 +964,197 @@ export type Database = {
           },
         ]
       }
+      ai_audit_events: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          event: string
+          id: string
+          org_id: string
+          request_id: string
+          tool_name: string | null
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          event: string
+          id?: string
+          org_id: string
+          request_id: string
+          tool_name?: string | null
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          event?: string
+          id?: string
+          org_id?: string
+          request_id?: string
+          tool_name?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_audit_events_conversation_id_org_id_user_id_fkey"
+            columns: ["conversation_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+        ]
+      }
+      ai_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          title: string
+          updated_at: string
+          user_id: string
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          title: string
+          updated_at?: string
+          user_id: string
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_conversations_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_messages: {
+        Row: {
+          citations: Json
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          org_id: string
+          request_id: string
+          role: string
+          state: string
+          user_id: string
+          worker_id: string
+        }
+        Insert: {
+          citations?: Json
+          content?: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          org_id: string
+          request_id: string
+          role: string
+          state: string
+          user_id: string
+          worker_id: string
+        }
+        Update: {
+          citations?: Json
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          org_id?: string
+          request_id?: string
+          role?: string
+          state?: string
+          user_id?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_conversation_id_org_id_user_id_fkey"
+            columns: ["conversation_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+        ]
+      }
+      ai_usage: {
+        Row: {
+          conversation_id: string
+          cost_usd: number | null
+          created_at: string
+          id: string
+          input_tokens: number
+          model: string
+          org_id: string
+          outcome: string
+          output_tokens: number
+          provider: string
+          request_id: string
+          telemetry_trust: string
+          usage_complete: boolean
+          user_id: string
+          worker_id: string
+        }
+        Insert: {
+          conversation_id: string
+          cost_usd?: number | null
+          created_at?: string
+          id?: string
+          input_tokens: number
+          model: string
+          org_id: string
+          outcome?: string
+          output_tokens: number
+          provider: string
+          request_id: string
+          telemetry_trust?: string
+          usage_complete?: boolean
+          user_id: string
+          worker_id: string
+        }
+        Update: {
+          conversation_id?: string
+          cost_usd?: number | null
+          created_at?: string
+          id?: string
+          input_tokens?: number
+          model?: string
+          org_id?: string
+          outcome?: string
+          output_tokens?: number
+          provider?: string
+          request_id?: string
+          telemetry_trust?: string
+          usage_complete?: boolean
+          user_id?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_conversation_id_org_id_user_id_fkey"
+            columns: ["conversation_id", "org_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id", "org_id", "user_id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: Database["public"]["Enums"]["audit_action"]
@@ -10810,6 +11001,42 @@ export type Database = {
         }
         Returns: undefined
       }
+      ai_workers_begin_turn: {
+        Args: {
+          _conversation_id?: string
+          _message: string
+          _org_id: string
+          _request_id: string
+          _worker_id: string
+        }
+        Returns: Json
+      }
+      ai_workers_fail_turn: {
+        Args: {
+          _input_tokens?: number
+          _model?: string
+          _org_id: string
+          _output_tokens?: number
+          _request_id: string
+        }
+        Returns: undefined
+      }
+      ai_workers_finish_turn: {
+        Args: {
+          _citations: Json
+          _content: string
+          _input_tokens: number
+          _model: string
+          _org_id: string
+          _output_tokens: number
+          _request_id: string
+          _tool_names?: string[]
+          _usage_complete?: boolean
+        }
+        Returns: undefined
+      }
+      ai_workers_member_org_ids: { Args: never; Returns: string[] }
+      ai_workers_redact_text: { Args: { _text: string }; Returns: string }
       apply_exporural_reference_2026: {
         Args: {
           p_entities: Json
@@ -12241,6 +12468,14 @@ export type Database = {
           _payload: Json
           _stakeholder_id: string
         }
+        Returns: Json
+      }
+      workers_interest_summary: {
+        Args: { _from?: string; _org_id: string; _to?: string }
+        Returns: Json
+      }
+      workers_public_links_overview: {
+        Args: { _org_id: string }
         Returns: Json
       }
     }
