@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Regras de frontend do Mapa Comercial: `src/features/commercial-map/AGENTS.md`.
+Regras de frontend do Mapa Comercial: `src/features/commercial-map/AGENTS.md`. Regras da Equipe Fenasoja (bots): `src/features/workers/AGENTS.md`.
 
 - Mudanças de planta em segmentos do mapa comercial (ex.: Exporural 2028) arquivam lotes antigos (nunca apagam), registram origem em `map_lot_lineage` e snapshot em `map_reference_migration_snapshots` — por quê: rastreabilidade e rollback sem perder vendas/contratos.
 - Lotes novos criados por reparcelamento nascem `BLOCKED` até precificação aprovada (Exporural 2028 já liberada pelo usuário em 26/09/2026) — por quê: não liberar checkout sem preço oficial.
@@ -26,6 +26,3 @@ Regras de frontend do Mapa Comercial: `src/features/commercial-map/AGENTS.md`.
 - Servidor: `npm run dev` escuta em `http://127.0.0.1:8080` (`host` e `port` em `vite.config.ts`).
 - Verificação: `npm run typecheck` e `npm run build`. `npm run lint` reproduz a dívida histórica já descrita no README. `npm test` executa o Vitest; trate falhas atuais da suíte como comportamento do código, separado da instalação do ambiente.
 - Entrada sem sessão: portal em `/`. O login de Mapa Comercial fica em `/login/mapa-comercial`. Abrir `/mapa-comercial` sem sessão mostra o formulário de login. As variáveis públicas do Supabase já estão no `.env` versionado.
-
-- Equipe Fenasoja (bots) só abre para quem `ai_workers_can_access` aprova (admin da organização, CCPF ou Comissão Central) e após reconfirmar a senha da própria conta; o mesmo RPC é exigido no `workers-orchestrator` e nas funções auxiliares — por quê: a tela de senha sozinha não protege dados.
-- Respostas dos bots são montadas no servidor a partir das ferramentas: uma frase direta + blocos `fenasoja-table`/`fenasoja-chart` (JSON) renderizados como tabela/gráfico, sem campos técnicos nem datas ISO — por quê: números vêm só de dados verificados e a tela não enche de texto bruto.
