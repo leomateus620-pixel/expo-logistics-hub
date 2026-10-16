@@ -1,62 +1,38 @@
-# Diagnóstico somente leitura — Workers Fenasoja (Fases 0 e 1)
+# Equipe Fenasoja: acesso com senha, correções do chat e respostas mais humanas
 
-Inspeção de configuração para a PR da equipe de workers (somente leitura). Nenhum arquivo editado, nenhum banco alterado, nenhum conector ativado, nada publicado.
+## 1. Acesso restrito com senha
+- Quem pode usar: administradores da organização, membros ativos do CCPF e membros ativos da Comissão Central. Os demais não veem o botão "Equipe IA" e recebem uma página "acesso restrito" se abrirem o endereço direto.
+- Ao abrir a Equipe (botão, atalho Ctrl/Cmd+K ou as páginas `/equipe-ia`), aparece uma tela pedindo a **senha da própria conta**. A senha é conferida no login real, não comparada no navegador.
+- Desbloqueio vale por 30 minutos sem uso nesta aba; ao sair da conta ou trocar de usuário, pede de novo.
+- A regra também vale no servidor: o serviço dos bots recusa (403) quem não for admin/CCPF/Comissão Central, mesmo que alguém pule a tela.
+- Nenhuma permissão nova é concedida; nada muda nos outros módulos.
 
-## 1. Secrets configurados (somente nomes, valores nunca exibidos)
+## 2. "Failed to fetch"
+- Causa confirmada: o painel do chat consulta dois serviços auxiliares (ações e rotinas da equipe) que **ainda não estão ativos** no backend — o endereço responde 404, e o navegador mostra o erro cru "Failed to fetch".
+- Correção: ativar esses dois serviços já existentes no projeto (sem mudar suas regras) e, enquanto qualquer serviço auxiliar estiver indisponível, esconder o aviso técnico — a conversa continua funcionando e só aparece uma mensagem amigável se o usuário tentar usar ação/rotina.
 
-- **LOVABLE_API_KEY: CONFIGURADO** — presente e gerenciado pela plataforma. É a chave que autentica o Lovable AI Gateway (chat, embeddings, imagem) e o gateway de conectores. Se um dia for rejeitada pelo gateway, a correção é rotação pela ferramenta própria, nunca recriar manualmente.
-- **FIRECRAWL_API_KEY: NÃO CONFIGURADO** — não existe nos secrets do projeto e não há nenhuma conexão Firecrawl no workspace.
+## 3. Resposta aparecendo acima da pergunta
+- Diagnóstico ainda não confirmado. Primeiro passo: reproduzir com uma conta autorizada e comparar a ordem na tela com a ordem gravada no banco (pergunta e resposta podem estar recebendo o mesmo horário, ou a lista sendo recarregada fora de ordem ao terminar a resposta).
+- Correção: ordenar sempre pergunta → resposta, com desempate estável, e manter a resposta em andamento logo abaixo da pergunta.
 
-Outros secrets relevantes já presentes: GOOGLE_MAPS_API_KEY, tokens de workers (AGENDA_MEETING_WORKER_TOKEN, EVENT_REMINDERS_WORKER_TOKEN, GOOGLE_SYNC_WORKER_TOKEN), credenciais Google OAuth/Calendar e a chave do conector Firebase Cloud Messaging.
+## 4. Respostas curtas, humanas e visuais
+Hoje o bot não escreve a resposta: ele copia os registros brutos (datas ISO, "setup start at", "approval status: nao_solicitado"...). Novo formato:
+- **Resposta direta em 1–3 frases**, em português natural, respondendo exatamente o que foi perguntado (ex.: "Há 113 eventos; os próximos 3 são…").
+- **Blocos visuais quando ajudam**: tabela compacta (até 5–8 linhas, só colunas relevantes), gráfico de barras/pizza para contagens e comparações, cartões de destaque com números-chave, e comparação lado a lado. Animação suave de entrada.
+- Datas no formato brasileiro (16/10/2026, 14h), campos internos e códigos técnicos nunca aparecem.
+- "Ver detalhes" recolhido para quem quiser mais, e links "Abrir no módulo" no lugar de listas longas.
+- Fontes da web filtradas: só resultados relevantes à pergunta (descarta lixo como o "Assistir Futebol Ao Vivo").
+- Segurança mantida: os números de tabelas e gráficos vêm somente dos dados verificados; o texto do modelo é conferido e não pode inventar valores.
 
-## 2. Conectores de busca web — situação real
+## Verificação
+- Testes: acesso negado a perfil sem CCPF/Comissão Central/admin; senha errada não desbloqueia; ordem pergunta→resposta; formato da resposta sem campos técnicos.
+- Conferência na prévia (desktop e celular) com conta autorizada: pedir senha, perguntar sobre a Agenda, ver resposta curta com tabela/gráfico abaixo da pergunta e sem "Failed to fetch".
+- Nada de dados de teste, nenhuma publicação do site sem seu pedido.
 
-Conectores de busca/scraping **habilitados no workspace**, mas **nenhum vinculado a este projeto**:
-
-- **Firecrawl** (busca web, scrape, crawl, map) — habilitado, sem conexão criada.
-- **Perplexity** (busca com resposta e citações) — habilitado, sem conexão.
-- **Parallel** (web search/research para IA) — habilitado, sem conexão.
-- **Algolia** (busca/indexação) — habilitado, sem conexão.
-
-Conexões existentes no workspace: Firebase Cloud Messaging (já vinculado ao projeto) e GitHub API (existe, mas **não está vinculada** a este projeto).
-
-**Conclusão:** hoje o app não tem nenhum conector de busca web pronto para uso. Para "pesquisa web citada" nas Fases 0/1, o caminho recomendado é o Firecrawl.
-
-## 3. Caminho correto para habilitar Firecrawl (quando autorizado)
-
-1. Criar a conexão no workspace (você, como admin, em Connectors): https://lovable.dev/connectors/firecrawl/connect?workspace=Zqh0zBul0n1zpXfn9cu9 — preferir a opção gerenciada pela Lovable (modo gateway).
-2. Depois de criada, eu vinculo ao projeto pela ferramenta de conexão — isso injeta `FIRECRAWL_API_KEY` automaticamente nos secrets do backend.
-3. No código (somente em Edge Functions, nunca no navegador): chamadas para `https://connector-gateway.lovable.dev/firecrawl/v2/...` com os cabeçalhos `Authorization: Bearer ${LOVABLE_API_KEY}` e `X-Connection-Api-Key: ${FIRECRAWL_API_KEY}`. Nunca chamar `api.firecrawl.dev` diretamente com a chave do conector.
-4. Após vincular, republicar as Edge Functions que usarem o conector.
-
-Alternativa sem conector: você cria uma chave própria no site do Firecrawl e a salva em Project Settings → Secrets como `FIRECRAWL_API_KEY` (modo direto, chamando `api.firecrawl.dev`). O modo conector é o preferido.
-
-## 4. Lovable AI Gateway — como os workers devem chamar
-
-- Endpoint: `https://ai.gateway.lovable.dev/v1` (chat via `/v1/responses` para modelos OpenAI), autenticado com `LOVABLE_API_KEY` somente no servidor (Edge Function).
-- Modelo padrão de chat sem preferência: `openai/gpt-6-astra`.
-- Uso é cobrado por requisição nos créditos do workspace.
-- Chave já está configurada — nenhuma ação necessária neste ponto.
-
-## 5. Como o projeto recebe migrations e Edge Functions após PR mesclada
-
-O projeto tem sincronização Git com o GitHub (uma branch sincronizada por vez). Comportamento importante:
-
-- **Edge Functions (`supabase/functions/`)**: neste projeto (Lovable Cloud), a sincronização do repositório **não faz deploy automático** das functions. Após mesclar uma PR que altera functions, o deploy precisa ser feito a partir do chat.
-- **Migrations**: a sincronização **nunca aplica migrations** automaticamente. Arquivos de migration que chegam por PR precisam ser aplicados a partir do chat, sob pedido.
-- Ou seja: a PR dos workers pode ser mesclada com segurança — nada muda no banco ou nas functions até uma ação explícita aqui.
-
-## 6. Resumo executivo
-
-| Item | Situação |
-|---|---|
-| LOVABLE_API_KEY | Configurado e gerenciado |
-| FIRECRAWL_API_KEY | Ausente — exige criar conexão Firecrawl no workspace e vincular |
-| Busca web pronta | Nenhuma; Firecrawl/Perplexity/Parallel habilitados no workspace, sem conexão |
-| AI Gateway | Pronto para uso server-side |
-| Pós-merge de PR | Functions e migrations não são aplicadas automaticamente; deploy/aplicação sob pedido no chat |
-
-## Próximos passos possíveis (somente se você autorizar)
-
-1. Você cria a conexão Firecrawl pelo link acima; eu vinculo ao projeto e valido uma chamada de busca.
-2. Após a PR dos workers ser mesclada, eu aplico migrations e faço deploy das functions alteradas, com validação.
+## Detalhes técnicos
+- Gate: novo `WorkersAccessGate` (envolve `WorkersLauncher`, `WorkersRoot` e páginas `/equipe-ia/*`) usando `supabase.auth.signInWithPassword` com o e-mail da sessão para step-up; desbloqueio guardado em `sessionStorage` com user ID + expiração. Elegibilidade via RPC `ai_workers_can_access(_org_id)` (SECURITY DEFINER, STABLE): `org_members.role='admin'` OU vínculo ativo em comissões slug `ccpf` / Comissão Central. Migration incremental nova com GRANT a `authenticated`.
+- Servidor: `workers-orchestrator` chama a mesma RPC após `resolveWorkerAccess` e retorna 403; idem nas funções `workers-actions`/`workers-routines`, depois implantadas.
+- `useWorkerWorkspace`: tratar `TypeError` de rede/404 como "indisponível" silencioso.
+- Ordenação: `order(created_at).order(id)` + inserção otimista estável em `useWorkersChat`.
+- Engine: após as ferramentas, uma chamada de síntese com saída estruturada `{ answer, blocks: [{type:'table'|'bar'|'pie'|'stat'|'compare', ...}] }`; blocos montados no servidor a partir de `ReadResult` (valores nunca vindos do modelo); `answer` validado contra números das evidências, com fallback para resumo determinístico curto. Frontend renderiza blocos com Recharts + tabela shadcn e Motion.
+- Registro em `AGENTS.md` da regra de acesso e do formato de resposta.
