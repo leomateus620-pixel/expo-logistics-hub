@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { executeWorkerTool, listWorkerTools, resolveWorkerAccess } from '../../../src/lib/workers/index.ts';
+import { executeWorkerTool, listWorkerTools, resolveWorkerAccess } from '../_shared/workers/generated/read-tools.js';
 import { isObject, isUuid, parseWorkerRequest, WorkerError } from '../_shared/workers/contracts.ts';
 import { publicWorkerError, runWorkerTurn, type TurnStart, type WorkerTurnDependencies } from '../_shared/workers/engine.ts';
 import { createLovableProvider, readBoundedJson } from '../_shared/workers/provider.ts';
