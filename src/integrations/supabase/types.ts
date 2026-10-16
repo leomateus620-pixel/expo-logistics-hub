@@ -12470,6 +12470,14 @@ export type Database = {
         }
         Returns: Json
       }
+      workers_interest_summary: {
+        Args: { _from?: string; _org_id: string; _to?: string }
+        Returns: Json
+      }
+      workers_public_links_overview: {
+        Args: { _org_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user"

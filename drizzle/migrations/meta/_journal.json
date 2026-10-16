@@ -57,6 +57,13 @@
       "when": 1792137115380,
       "tag": "0007_workers_readonly_workspace",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792137157753,
+      "tag": "0008_workers_interest_scoped_reads",
+      "breakpoints": true
     }
   ]
 }
