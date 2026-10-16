@@ -55,9 +55,15 @@ export function workspacePlanner(client: SupabaseClient, orgId: string) {
       return { kind: 'action', id: action.id, citation: { label: action.target.label, url: action.target.href, source: 'app' } };
     },
     async memory(worker: WorkerId): Promise<string[]> {
-      const { data, error } = await client.from('ai_memory').select('content,worker_id').eq('org_id', orgId).eq('enabled', true).limit(10);
-      if (error) throw new WorkerError('storage_unavailable', 503);
-      return (data ?? []).filter(row => row.worker_id === null || row.worker_id === worker).map(row => String(row.content).slice(0, 1000));
+      // Memory is optional context: a missing table or read failure must never fail the chat turn.
+      try {
+        const { data, error } = await client.from('ai_memory').select('content,worker_id,updated_at')
+          .eq('org_id', orgId).eq('enabled', true)
+          .or(`worker_id.is.null,worker_id.eq.${worker}`)
+          .order('updated_at', { ascending: false }).limit(10);
+        if (error) { console.warn('workers memory unavailable', error.code ?? 'unknown'); return []; }
+        return (data ?? []).map(row => String(row.content).slice(0, 1000));
+      } catch { return []; }
     },
   };
 }
