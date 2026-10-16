@@ -44,6 +44,8 @@ export async function authenticateWorkspace(req: Request, orgId: string) {
   if (req.signal.aborted) throw new WorkerError('request_cancelled', 499);
   try {
     const access = await resolveWorkerAccess(client, data.user.id, orgId);
+    const { data: eligible, error: eligibleError } = await client.rpc('ai_workers_can_access', { _org_id: orgId });
+    if (eligibleError || eligible !== true) throw new WorkerError('forbidden', 403);
     if (req.signal.aborted) throw new WorkerError('request_cancelled', 499);
     return { client, userId: data.user.id, access };
   } catch (failure) {

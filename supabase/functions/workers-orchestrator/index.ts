@@ -77,6 +77,9 @@ Deno.serve(async (req: Request) => {
     const { data: identity, error: authError } = await client.auth.getUser();
     if (authError || !identity.user?.id || identity.user.role === 'service_role') throw new WorkerError('forbidden', 401);
     const access = await resolveWorkerAccess(client, identity.user.id, request.orgId);
+    // Equipe Fenasoja is limited to org admins, CCPF and Comissão Central (DB-side check).
+    const { data: eligible, error: eligibleError } = await client.rpc('ai_workers_can_access', { _org_id: request.orgId });
+    if (eligibleError || eligible !== true) throw new WorkerError('forbidden', 403);
     const provider = createLovableProvider({ apiKey: Deno.env.get('LOVABLE_API_KEY'), model: Deno.env.get('WORKERS_ANALYSIS_MODEL') });
     const dependencies: WorkerTurnDependencies = {
       provider,
