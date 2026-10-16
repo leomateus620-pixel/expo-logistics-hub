@@ -149,7 +149,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
       if (!result.data?.length) { setError('Conversa indisponível ou sem mensagens concluídas.'); return; }
       currentConversation.current = id;
       setConversationId(id);
-      const ordered = [...result.data].reverse();
+      const ordered = chronological(result.data);
       setMessages(ordered.map(row => ({
         id: row.id, role: row.role, content: maskSensitiveText(row.content), workerId: workerId(row.worker_id),
         createdAt: row.created_at, requestId: row.request_id, sources: sourcesFrom(row.citations),
@@ -177,7 +177,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
         .eq('state', 'complete').order('created_at', { ascending: false }).limit(100).abortSignal(controller.signal);
       if (controller.signal.aborted || liveScope.current !== requestScope || generation.current !== requestGeneration || busy.current || currentConversation.current !== id) return;
       if (result.error) return;
-      setMessages([...(result.data ?? [])].reverse().map(row => ({
+      setMessages(chronological(result.data ?? []).map(row => ({
         id: row.id, requestId: row.request_id, role: row.role, content: maskSensitiveText(row.content), workerId: workerId(row.worker_id),
         createdAt: row.created_at, sources: sourcesFrom(row.citations),
       })));
