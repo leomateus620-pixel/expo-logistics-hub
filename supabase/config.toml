@@ -35,3 +35,6 @@ project_id = "btfaumhroqtqzxomqorx"
 
   [functions.mcp]
     verify_jwt = false
+
+  [functions.workers-orchestrator]
+    verify_jwt = true

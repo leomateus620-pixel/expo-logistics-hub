@@ -22,6 +22,7 @@ import AuthGuard from './components/AuthGuard';
 import OrgGuard from './components/OrgGuard';
 import CapabilityGuard from './components/CapabilityGuard';
 import Layout from './components/Layout';
+import WorkersLauncher from './components/WorkersLauncher';
 import CommissionLayout from './components/commissions/CommissionLayout';
 import ModuleAccessGuard from './components/commissions/ModuleAccessGuard';
 import { CronogramaModuleShell } from './components/cronograma-eventos/CronogramaModuleShell';
@@ -45,6 +46,8 @@ import {
 import { COMMISSION_MAP_PORTALS, getCommissionMapPortal } from './modules/commissions/commissionMapPortalRegistry';
 
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
+const WorkersRoot = lazyWithRetry(() => import('./features/workers/WorkersRoot'));
+const WorkersAdminGuard = lazyWithRetry(() => import('./features/workers/WorkersAdminGuard'));
 const VehiclesPage = lazyWithRetry(() => import('./pages/VehiclesPage'));
 const ElectricCartsPage = lazyWithRetry(() => import('./pages/ElectricCartsPage'));
 const ElectricCartsReportPage = lazyWithRetry(() => import('./pages/ElectricCartsReportPage'));
@@ -389,6 +392,7 @@ function AdminRoutes() {
               <Route index element={<AdminPortalPage />} />
               <Route path="geral" element={<AdminOverviewPage />} />
               <Route path="comissoes/:moduleSlug" element={<AdminCommissionPage />} />
+              <Route path="workers/design" element={<WorkersAdminGuard><WorkersRoot /></WorkersAdminGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspended>
@@ -508,6 +512,7 @@ const App = () => (
               <Route path="/login/:moduleSlug" element={<LoginPage />} />
               <Route path="/google-calendar/callback" element={<Suspended><GoogleCalendarCallbackPage /></Suspended>} />
               <Route path="/admin/*" element={<AdminRoutes />} />
+              <Route path="/equipe-ia/*" element={<AuthGuard><OrgGuard><Suspended><WorkersRoot /></Suspended></OrgGuard></AuthGuard>} />
               <Route
                 path="/cronograma-eventos/contagem-oficial"
                 element={<CronogramaCountdownExperienceRoute />}
@@ -537,6 +542,7 @@ const App = () => (
               <Route path="/comissoes/:moduleSlug/*" element={<CommissionModuleRoutes />} />
               <Route path="/*" element={<LegacyLogisticsRoutes />} />
             </Routes>
+            <WorkersLauncher />
             <PushPermissionPrompt />
           </BrowserRouter>
         </TooltipProvider>

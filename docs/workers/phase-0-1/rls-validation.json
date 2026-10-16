@@ -1,0 +1,35 @@
+{
+  "boundary": "Fresh in-memory PostgreSQL WASM, synthetic identities and records only. Existing business RLS is represented by fixture helpers; this validates the new migrations, not the deployed business policies.",
+  "version": "PostgreSQL 18.6 (PGlite 0.5.10) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.5 (1db513782be24469589d7cb8a1f1834e9a33f271), 32-bit",
+  "passed": true,
+  "checks": [
+    {
+      "filename": "scripts/workers/db-fixture.sql",
+      "sha256": "5cb6a5e0316aa3eda2422b331f8a7efa829da38d3b374a30d81f456f84167514",
+      "passed": true,
+      "statements": 27,
+      "milliseconds": 15
+    },
+    {
+      "filename": "supabase/migrations/20261016120000_workers_readonly_workspace.sql",
+      "sha256": "76c7bdbe1a190bd09df78873274893a08df9294ad107aeec91d7af0fe8c99ff7",
+      "passed": true,
+      "statements": 31,
+      "milliseconds": 12
+    },
+    {
+      "filename": "supabase/migrations/20261016120100_workers_interest_scoped_reads.sql",
+      "sha256": "dcfa6f82ac69ef85841fa7fa127185d140e64eb01909161322a49cf9be42f86c",
+      "passed": true,
+      "statements": 4,
+      "milliseconds": 1
+    },
+    {
+      "filename": "scripts/workers/rls-assertions.sql",
+      "sha256": "3a2dd0638444b81cbfa3bfccee4d9d08dd7ef858f2371e02862ed3909ecbfb9c",
+      "passed": true,
+      "statements": 42,
+      "milliseconds": 30
+    }
+  ]
+}

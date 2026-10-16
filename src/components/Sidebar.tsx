@@ -39,6 +39,7 @@ const recursos = [
 ];
 
 const sistema = [
+  { to: '/equipe-ia', icon: (props: React.ImgHTMLAttributes<HTMLImageElement>) => <img {...props} src="/fenasoja-bots.svg" alt="" width={20} height={20} />, label: 'Equipe IA Fenasoja', cap: 'full_access' },
   { to: '/settings', icon: Settings, label: 'Configurações', cap: 'full_access' },
   { to: '/system-report', icon: FileText, label: 'Relatório do Sistema', cap: 'full_access' },
 ];

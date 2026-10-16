@@ -23,4 +23,13 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    files: ["**/*.{ts,tsx}"],
+    ignores: ["src/features/workers/**"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        patterns: [{ group: ["motion", "motion/*", "framer-motion", "framer-motion/*"], message: "Motion deve permanecer nas rotas lazy de src/features/workers para preservar o bundle inicial." }],
+      }],
+    },
+  },
 );

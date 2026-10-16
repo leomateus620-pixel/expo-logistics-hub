@@ -1,0 +1,51 @@
+.workers-scope {
+  --worker-ink:oklch(var(--brand-navy-900));
+  --worker-muted:oklch(var(--muted-foreground));
+  --worker-surface:oklch(var(--brand-soft-white));
+  --worker-paper:#fff;
+  --worker-surface-soft:#F3F5F9;
+  --worker-border:oklch(var(--border)/.7);
+  --worker-frame:linear-gradient(145deg,#EAF3FF 0%,#F9FAFB 62%,#FFF4E8 100%);
+  --worker-primary:oklch(var(--brand-indigo-500));
+  --worker-primary-ink:oklch(var(--brand-soft-white));
+  --worker-accent:oklch(var(--brand-orange-500));
+  --worker-attention:oklch(var(--brand-blue));
+  --worker-color:#1A6CCB;
+  --worker-color-ink:#1458A7;
+  --worker-label-color:var(--worker-color-ink);
+  --worker-color-light:color-mix(in srgb,var(--worker-color) 9%,var(--worker-paper));
+  --worker-color-shadow:color-mix(in srgb,var(--worker-color) 19%,transparent);
+  --worker-space-1:4px;
+  --worker-space-2:8px;
+  --worker-space-3:12px;
+  --worker-space-4:16px;
+  --worker-space-6:24px;
+  --worker-space-8:32px;
+  --worker-space-12:48px;
+  --worker-space-16:64px;
+  --worker-radius-chip:12px;
+  --worker-radius-card:16px;
+  --worker-radius-sheet:24px;
+  --worker-duration-fast:120ms;
+  --worker-duration-base:200ms;
+  --worker-duration-slow:320ms;
+  --worker-ease:cubic-bezier(.2,.8,.2,1);
+  --worker-shadow:0 1px 2px rgb(3 24 52/.04),0 8px 24px rgb(3 24 52/.05);
+  --worker-mascot-shade:#031834;
+  color:var(--worker-ink);
+  font-family:Inter,system-ui,sans-serif
+}
+
+.dark .workers-scope,.workers-scope.dark {
+  --worker-ink:oklch(var(--brand-soft-white));
+  --worker-muted:#A9B6C8;
+  --worker-surface:#0C1C30;
+  --worker-paper:#102238;
+  --worker-surface-soft:#14283F;
+  --worker-border:rgb(195 215 242/.15);
+  --worker-frame:linear-gradient(145deg,#122B4A 0%,#0C1C30 60%,#211E43 100%);
+  --worker-primary:#B8C5FF;
+  --worker-primary-ink:#031834;
+  --worker-color-ink:color-mix(in srgb,var(--worker-color) 55%,white);
+  --worker-shadow:0 1px 2px rgb(0 0 0/.2),0 8px 24px rgb(0 0 0/.16)
+}

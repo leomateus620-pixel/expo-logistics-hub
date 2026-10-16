@@ -1,0 +1,104 @@
+{
+  "baseline": "origin/main fff30ca0 source (f656024d archive + latest previewAuthStorage.ts), same installed dependency tree",
+  "method": "gzip level9 per HTML script/preload/CSS; excludes lazy assets",
+  "before": {
+    "files": [
+      {
+        "file": "/assets/index-ewRbFKmE.js",
+        "bytes": 645453,
+        "gzip": 172143
+      },
+      {
+        "file": "/assets/module-runtime-CEDABylm.js",
+        "bytes": 1244,
+        "gzip": 729
+      },
+      {
+        "file": "/assets/react-vendor-Cze6uWs8.js",
+        "bytes": 192974,
+        "gzip": 64004
+      },
+      {
+        "file": "/assets/data-vendor-C7BNrRAf.js",
+        "bytes": 221627,
+        "gzip": 59505
+      },
+      {
+        "file": "/assets/ui-radix-BRx1kLtn.js",
+        "bytes": 137090,
+        "gzip": 40638
+      },
+      {
+        "file": "/assets/index-g1rUcZVw.css",
+        "bytes": 459254,
+        "gzip": 72181
+      }
+    ],
+    "initial_gzip": 409200
+  },
+  "after": {
+    "files": [
+      {
+        "file": "/assets/index-DnsUmDxv.js",
+        "bytes": 647881,
+        "gzip": 173119
+      },
+      {
+        "file": "/assets/module-runtime-CEDABylm.js",
+        "bytes": 1244,
+        "gzip": 729
+      },
+      {
+        "file": "/assets/react-vendor-Cze6uWs8.js",
+        "bytes": 192974,
+        "gzip": 64004
+      },
+      {
+        "file": "/assets/data-vendor-C7BNrRAf.js",
+        "bytes": 221627,
+        "gzip": 59505
+      },
+      {
+        "file": "/assets/ui-radix-CuOGUe2a.js",
+        "bytes": 137090,
+        "gzip": 40638
+      },
+      {
+        "file": "/assets/index-g1rUcZVw.css",
+        "bytes": 459254,
+        "gzip": 72181
+      }
+    ],
+    "initial_gzip": 410176
+  },
+  "delta_initial_gzip": 976,
+  "initial_budget_pass": true,
+  "mascot_own_code": {
+    "method": "esbuild --bundle --minify external react,react-dom,react/jsx-runtime,motion/react; CSS separate",
+    "bytes": 8365,
+    "gzip": 3251
+  },
+  "lazy_workers": [
+    {
+      "file": "WorkersCopilot-CDbf_Plt.js",
+      "bytes": 2942,
+      "gzip": 1437
+    },
+    {
+      "file": "WorkersRoot-DWTqBiTD.js",
+      "bytes": 23376,
+      "gzip": 6971
+    },
+    {
+      "file": "motionFeatures-Dyw6NZa1.js",
+      "bytes": 41646,
+      "gzip": 16046
+    }
+  ],
+  "bot_mark": {
+    "file": "public/fenasoja-bots.svg",
+    "gzip": 769,
+    "note": "Separate image, requested only when an authenticated launcher or bot view is rendered; not part of initial JS/CSS."
+  },
+  "global_css_byte_identical": true
+}

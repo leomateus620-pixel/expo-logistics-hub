@@ -1,4 +1,5 @@
 # Workers Fenasoja — pré-validação das Fases 0 + 1
+> Registro histórico do preflight. Os bloqueios de conta e regularização do lock foram resolvidos com a autorização posterior do Leonardo. A implementação e o estado atual estão no [relatório conjunto das Fases 0 e 1](../phase-0-1/README.md). Os resultados abaixo preservam a evidência da inspeção inicial.
 
 Data: 16/10/2026 · America/Sao_Paulo.
 

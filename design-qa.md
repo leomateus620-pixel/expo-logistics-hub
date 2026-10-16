@@ -39,3 +39,10 @@ No perfil controlado de produção, 320 × 800, 1,2 s de latência e 30 KB/s por
 Comparações finais e texto ampliado foram inspecionados após as correções. Os 161 testes pertinentes, typecheck, build, lint dos arquivos alterados e integridade dos 52 caminhos passaram. Após o último ajuste de prioridade de carga, 40 testes de história/Alvorada foram repetidos com sucesso. Revisão final do controlador não identificou bloqueio material.
 
 As 13 artes ainda não recuperadas ficam documentadas e não são necessárias à etapa autorizada de 12 peças. Expansão futura mantém o motor. Nenhuma mudança no banco, permissões ou regras de acesso; deploy não foi solicitado nesta entrega. [Relatório completo](docs/portal-history/validation.md).
+
+
+## Equipe de bots Fenasoja — 16/10/2026
+
+**final result: passed.** Fases 0 e 1: símbolo próprio baseado na marca oficial, catálogo, oito perfis, chat e copiloto; nomenclatura visível “bots”.56 capturas em claro/escuro,390×844 e 1280×800;axe AA sem violações, largura 360 sem overflow, 8/8 interações.12 mascotes visíveis com CPU 4×: 60,11 FPS; p95 16,7 ms; CLS 0 em SSE sintético.
+
+O [relatório visual completo](docs/workers/phase-0-1/design-qa.md) registra comparações, correções, fontes, arquivos de evidência e limites da prévia local com dados sintéticos. A [entrega técnica](docs/workers/phase-0-1/README.md) detalha testes, migrations e ativação pendente.
