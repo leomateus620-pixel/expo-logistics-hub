@@ -3565,3 +3565,17 @@
 @media (max-width: 767px) { .workers-scope .worker-designer-shapes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 .workers-scope .worker-team-brand__subtitle { color: var(--worker-muted); opacity: 1; }
+
+/* Respostas visuais da equipe: texto curto + tabela/gráfico */
+.worker-rich { display: grid; gap: 12px; }
+.worker-rich-text { margin: 0; line-height: 1.55; white-space: pre-line; }
+.worker-rich-block { animation: worker-rich-in 360ms cubic-bezier(.2,.8,.2,1) both; border: 1px solid hsl(var(--border)); border-radius: 14px; background: hsl(var(--card)); overflow: hidden; }
+.worker-rich-table { overflow-x: auto; }
+.worker-rich-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.worker-rich-table th { text-align: left; font-weight: 600; color: hsl(var(--muted-foreground)); padding: 8px 12px; background: hsl(var(--muted) / .5); white-space: nowrap; }
+.worker-rich-table td { padding: 8px 12px; border-top: 1px solid hsl(var(--border)); vertical-align: top; }
+.worker-rich-table tbody tr:hover td { background: hsl(var(--muted) / .3); }
+.worker-rich-chart { margin: 0; padding: 10px 12px 6px; }
+.worker-rich-chart figcaption { font-size: 12px; font-weight: 600; color: hsl(var(--muted-foreground)); margin-bottom: 4px; }
+@keyframes worker-rich-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .worker-rich-block { animation: none; } }

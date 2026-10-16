@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Regras de frontend do Mapa Comercial: `src/features/commercial-map/AGENTS.md`.
+Regras de frontend do Mapa Comercial: `src/features/commercial-map/AGENTS.md`. Regras da Equipe Fenasoja (bots): `src/features/workers/AGENTS.md`.
 
 - Mudanças de planta em segmentos do mapa comercial (ex.: Exporural 2028) arquivam lotes antigos (nunca apagam), registram origem em `map_lot_lineage` e snapshot em `map_reference_migration_snapshots` — por quê: rastreabilidade e rollback sem perder vendas/contratos.
 - Lotes novos criados por reparcelamento nascem `BLOCKED` até precificação aprovada (Exporural 2028 já liberada pelo usuário em 26/09/2026) — por quê: não liberar checkout sem preço oficial.
@@ -22,7 +22,5 @@ Regras de frontend do Mapa Comercial: `src/features/commercial-map/AGENTS.md`.
 
 ## Cursor Cloud specific instructions
 
-- Dependências: `npm install` na raiz. `npm ci` falha neste checkout porque `package.json` declara `drizzle-kit`, `drizzle-orm` e `postgres` e esses pacotes estão ausentes do `package-lock.json`. A segunda execução de `npm install` termina com a árvore já atualizada.
-- Servidor: `npm run dev` escuta em `http://127.0.0.1:8080` (`host` e `port` em `vite.config.ts`).
-- Verificação: `npm run typecheck` e `npm run build`. `npm run lint` reproduz a dívida histórica já descrita no README. `npm test` executa o Vitest; trate falhas atuais da suíte como comportamento do código, separado da instalação do ambiente.
-- Entrada sem sessão: portal em `/`. O login de Mapa Comercial fica em `/login/mapa-comercial`. Abrir `/mapa-comercial` sem sessão mostra o formulário de login. As variáveis públicas do Supabase já estão no `.env` versionado.
+- `npm install` (não `npm ci`: lock sem drizzle-kit/drizzle-orm/postgres). `npm run dev` em 127.0.0.1:8080. Verificar com `npm run typecheck`, `npm run build`, `npm test` (lint tem dívida histórica no README).
+- Sem sessão: portal em `/`; login do mapa em `/login/mapa-comercial`; variáveis públicas no `.env` versionado.

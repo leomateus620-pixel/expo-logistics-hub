@@ -10,6 +10,16 @@ const WORKER_IDS = new Set(['agenda', 'arena', 'mapa', 'interesse', 'comissao', 
 const uuid = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const workerId = (value: unknown): WorkerId => WORKER_IDS.has(String(value)) ? value as WorkerId : 'agenda';
 
+/** Question and answer share one transaction timestamp; within a turn the question always comes first. */
+export function chronological<T extends { created_at: string; role: string; request_id?: string | null }>(rows: readonly T[]): T[] {
+  const rank = (role: string) => role === 'user' ? 0 : role === 'assistant' ? 1 : 2;
+  return [...rows].sort((a, b) => {
+    const time = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    if (a.request_id && a.request_id === b.request_id) return rank(a.role) - rank(b.role);
+    return time !== 0 ? time : rank(a.role) - rank(b.role);
+  });
+}
+
 function sourcesFrom(value: unknown): NonNullable<WorkerChatMessage['sources']> {
   if (!Array.isArray(value)) return [];
   return value.slice(0, 30).flatMap(item => {
@@ -149,7 +159,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
       if (!result.data?.length) { setError('Conversa indisponível ou sem mensagens concluídas.'); return; }
       currentConversation.current = id;
       setConversationId(id);
-      const ordered = [...result.data].reverse();
+      const ordered = chronological(result.data);
       setMessages(ordered.map(row => ({
         id: row.id, role: row.role, content: maskSensitiveText(row.content), workerId: workerId(row.worker_id),
         createdAt: row.created_at, requestId: row.request_id, sources: sourcesFrom(row.citations),
@@ -177,7 +187,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
         .eq('state', 'complete').order('created_at', { ascending: false }).limit(100).abortSignal(controller.signal);
       if (controller.signal.aborted || liveScope.current !== requestScope || generation.current !== requestGeneration || busy.current || currentConversation.current !== id) return;
       if (result.error) return;
-      setMessages([...(result.data ?? [])].reverse().map(row => ({
+      setMessages(chronological(result.data ?? []).map(row => ({
         id: row.id, requestId: row.request_id, role: row.role, content: maskSensitiveText(row.content), workerId: workerId(row.worker_id),
         createdAt: row.created_at, sources: sourcesFrom(row.citations),
       })));
