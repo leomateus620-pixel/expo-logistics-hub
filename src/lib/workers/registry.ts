@@ -4,6 +4,8 @@ import { workerToolDefinitions } from './catalog.ts';
 import { pickWorkerFields, sanitizeWorkerData } from './privacy.ts';
 import { READ_RPCS, READ_TABLES, readRows, readRpc, requireProject } from './sources.ts';
 import { WorkerToolError, type AccessPolicy, type ToolResult, type WorkerAccessContext, type WorkerId, type WorkerToolDefinition } from './types.ts';
+import { parseWorkerAnalytics } from './analytics.ts';
+import { parseQuestionAnalytics } from './question-analytics.ts';
 
 const ACCESS_SOURCES = ['agenda_meeting_sessions','cronograma_evento_comissoes','org_members','user_capabilities','commission_responsibles'];
 const allowedSources = new Set([...Object.keys(READ_TABLES), ...READ_RPCS, ...ACCESS_SOURCES]);
@@ -68,6 +70,7 @@ async function requireEvent(ctx: WorkerAccessContext, id: string): Promise<Recor
 async function requireEdition(ctx: WorkerAccessContext, id: string) {
   const result = await readRows(ctx, 'financial_editions', { filters: [['id','eq',id]], limit: 1 });
   if (!result.records.length) throw new WorkerToolError('NOT_FOUND', 'Edição não encontrada ou sem acesso.');
+  return pickWorkerFields(result.records[0], ['id', 'code', 'label', 'period_start', 'period_end']);
 }
 const moneyFields = ['count','cap_cents','uncapped_count','planned_cents','line_count','committed_cents','projected_cents','confirmed_cents','declared_cents','in_kind_cents','paid_cents','payable_open_cents','overdue_count','received_cents','receivable_open_cents','inconsistent_count','inflow_cents','outflow_cents','expense_planned_cents','open_cents','deviation_cents','deviation_pct','comparison_state','overdue_cents','realized_without_plan_count'];
 
@@ -75,6 +78,26 @@ async function dispatch(def: WorkerToolDefinition, input: Record<string, unknown
   const size = Number(input.limit ?? 20);
   const text = (key: string) => String(input[key]);
   switch (def.name) {
+    case 'agenda_query':
+    case 'map_inventory_summary': {
+      const args:Record<string,unknown>={_org_id:ctx.orgId};
+      for(const [key,value] of Object.entries(input))args[`_${key==='date_from'?'from_date':key==='date_to'?'to_date':key}`]=value;
+      const rpc=def.name==='agenda_query'?'workers_agenda_query':'workers_map_inventory_summary';
+      return output(def,[parseQuestionAnalytics(def.name,await readRpc(ctx,rpc,args))],{summary:'Consulta atual calculada sobre todos os registros autorizados, antes do limite visual dos detalhes.'});
+    }
+    case 'map_sales_overview': {
+      if(Boolean(input.date_from)!==Boolean(input.date_to))throw new WorkerToolError('INVALID_INPUT','Informe o início e o fim do período.');
+      const response=await readRpc(ctx,'workers_map_sales_overview',{_org_id:ctx.orgId,_project_id:input.project_id??null,_edition_year:input.edition_year??null,
+        _from_date:input.date_from??null,_to_date:input.date_to??null});
+      return output(def,[parseWorkerAnalytics(def.name,response)],{summary:'Panorama calculado sobre todos os registros autorizados da edição e do projeto.'});
+    }
+    case 'agenda_personal_summary':
+    case 'agenda_people_ranking': {
+      const rpc=def.name==='agenda_personal_summary'?'workers_agenda_personal_summary':'workers_agenda_people_ranking';
+      const response=await readRpc(ctx,rpc,{_org_id:ctx.orgId,_from_date:input.date_from,_to_date:input.date_to,
+        ...(def.name==='agenda_personal_summary'?{_relationship:input.relationship??'linked'}:{_limit:input.limit})});
+      return output(def,[parseWorkerAnalytics(def.name,response)],{summary:'Resultado calculado sobre todo o período autorizado; vínculos não comprovam presença.'});
+    }
     case 'list_events': {
       const result = await readRows(ctx,'cronograma_eventos_full',{ limit: size, order:'start_date', filters: [
         ...(input.from_date ? [['start_date','gte',input.from_date] as const] : []),
@@ -227,17 +250,17 @@ async function dispatch(def: WorkerToolDefinition, input: Record<string, unknown
     case 'financial_edition_summary':
     case 'financial_budget_execution':
     case 'financial_expense_comparison': {
-      await requireEdition(ctx,text('edition_id'));
+      const edition = await requireEdition(ctx,text('edition_id'));
       const response=object(await readRpc(ctx,def.name,{_org_id:ctx.orgId,_edition_id:input.edition_id}));
       if(def.name==='financial_edition_summary') {
-        const result: Record<string,unknown>={};
+        const result: Record<string,unknown>={edition};
         for(const group of ['budget','revenue','sponsorship','expenses','revenues','obligations','movements']) result[group]=pickWorkerFields(response[group],moneyFields);
         return output(def,[result]);
       }
       if(def.name==='financial_budget_execution') {
-        return output(def,[{budgets:rows(response.budgets).slice(0,100).map((row)=>pickWorkerFields(row,['budget_id',...moneyFields])),lines:rows(response.lines).slice(0,100).map((row)=>pickWorkerFields(row,['line_id',...moneyFields]))}],{truncated:rows(response.budgets).length>100||rows(response.lines).length>100});
+        return output(def,[{edition,budgets:rows(response.budgets).slice(0,100).map((row)=>pickWorkerFields(row,['budget_id',...moneyFields])),lines:rows(response.lines).slice(0,100).map((row)=>pickWorkerFields(row,['line_id',...moneyFields]))}],{truncated:rows(response.budgets).length>100||rows(response.lines).length>100});
       }
-      return output(def,[{totals:pickWorkerFields(response.totals,moneyFields),by_category:rows(response.by_category).slice(0,100).map((row)=>pickWorkerFields(row,['id','name',...moneyFields])),by_commission:rows(response.by_commission).slice(0,100).map((row)=>pickWorkerFields(row,['id','name',...moneyFields]))}],{truncated:rows(response.by_category).length>100||rows(response.by_commission).length>100});
+      return output(def,[{edition,totals:pickWorkerFields(response.totals,moneyFields),by_category:rows(response.by_category).slice(0,100).map((row)=>pickWorkerFields(row,['id','name',...moneyFields])),by_commission:rows(response.by_commission).slice(0,100).map((row)=>pickWorkerFields(row,['id','name',...moneyFields]))}],{truncated:rows(response.by_category).length>100||rows(response.by_commission).length>100});
     }
     default: throw new WorkerToolError('TOOL_NOT_ALLOWED','Ferramenta não disponível nesta fase.');
   }

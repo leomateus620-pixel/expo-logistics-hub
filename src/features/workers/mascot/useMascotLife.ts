@@ -23,11 +23,19 @@ function subscribePointer(subscriber: PointerSubscriber) {
   return () => { pointerSubscribers.delete(subscriber); if (!pointerSubscribers.size) { window.removeEventListener('pointermove', dispatchPointer); window.removeEventListener('pointerdown', dispatchPointer); if (pointerFrame) cancelAnimationFrame(pointerFrame); pointerFrame = 0; } };
 }
 
-export function useMascotActive(ref: RefObject<Element>, paused = false) {
+export function useMascotActive(ref: RefObject<Element>, paused = false, explicitMotionOverride = false) {
+  const [reducedMotion, setReducedMotion] = useState(() => typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches));
   const [inView, setInView] = useState(true);
   const [hidden, setHidden] = useState(() => typeof document !== 'undefined' && document.hidden);
   const [withinBudget, setWithinBudget] = useState(false);
   const instance = useRef(Symbol('worker-mascot'));
+  useEffect(() => {
+    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (!media) return;
+    const update = () => setReducedMotion(media.matches);
+    update(); media.addEventListener?.('change', update);
+    return () => media.removeEventListener?.('change', update);
+  }, []);
   useEffect(() => {
     const update = () => setHidden(document.hidden);
     document.addEventListener('visibilitychange', update);
@@ -36,7 +44,7 @@ export function useMascotActive(ref: RefObject<Element>, paused = false) {
     observer.observe(ref.current);
     return () => { observer.disconnect(); document.removeEventListener('visibilitychange', update); };
   }, [ref]);
-  const eligible = inView && !hidden && !paused;
+  const eligible = inView && !hidden && !paused && (!reducedMotion || explicitMotionOverride);
   useEffect(() => {
     if (!eligible) { setWithinBudget(false); return; }
     const key = instance.current; animationCandidates.set(key, setWithinBudget); allocateAnimationBudget();

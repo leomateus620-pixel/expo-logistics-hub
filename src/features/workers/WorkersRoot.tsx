@@ -24,7 +24,7 @@ export default function WorkersRoot() {
   const profileWorker = !isTeam ? getWorker(slug) : undefined; const chatWorker = getWorker(params.get('worker'));
   const isChat = !isUsage && !isDesign && !isTeam && !slug;
   useEffect(() => {
-    const previous = document.title; document.title = `${isUsage ? 'Uso da equipe' : isDesign ? 'Revisão visual' : isTeam ? 'Conheça a equipe' : profileWorker?.name ?? 'Equipe IA'} · Fenasoja`;
+    const previous = document.title; document.title = `${isUsage ? 'Uso da equipe' : isDesign ? 'Revisão visual' : isTeam ? 'Conheça a equipe' : profileWorker?.name ?? 'BOT FENASOJA'} · Fenasoja`;
     return () => { document.title = previous; };
   }, [isDesign, isTeam, isUsage, profileWorker]);
   useEffect(() => {

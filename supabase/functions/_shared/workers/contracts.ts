@@ -148,6 +148,7 @@ export function routeWorker(request: WorkerRequest): WorkerId {
 }
 
 export function asksForMutation(message: string): boolean {
-  const text = message.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const text = message.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/^\s*(?:atualize|refaca|repita|recarregue)\s+(?:(?:a|o|as|os|essa|esta)\s+)?(?:consulta|dados|resposta|disponibilidade|indicadores)\b/,'');
   return /\b(apag[ae]|exclu[ai]|delet[ae]|remov[ae]|cancele?|confirm[ae]|public[ao]r?|publique|envie?|mande|dispar[ae]|alter[ae]|edit[ae]|adicion[ae]|crie|cria|cri[ao]r|salv[ae]|reserv[ae]|registr[ae]|atualiz[ae]|mude|pague|pag[au]r|rotacion[ae])\b/.test(text);
 }

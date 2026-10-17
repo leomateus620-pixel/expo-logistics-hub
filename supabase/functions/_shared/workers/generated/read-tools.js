@@ -2,25 +2,27 @@
 // AUTO-GENERATED. Do not edit; canonical source: src/lib/workers/index.ts.
 // Regenerate: node scripts/workers/build-edge-registry.mjs
 // Verify without writing: node scripts/workers/build-edge-registry.mjs --check
-// Source inputs + generator SHA256: e1c4f6d3fdf6988526ede48adf7605831d709272a7e312dc58a9ab8a31639544
+// Source inputs + generator SHA256: a0c81ce1a09eb5a3aa2a0152cad8690b2da493d4c9e72886374a04aeb35acf9d
 // esbuild: 0.21.5; ESM JavaScript; external runtime dependency: zod.
-// Input src/lib/workers/access.ts SHA256 f41ad9816a52e57d67ca57bfbbbd08736ef3a508b8e0dca1078addd43619307a
-// Input src/lib/workers/catalog.ts SHA256 b7a40864279ee0f1308651b42b0c9fafc66e4e311390732e8411f449b3dd52af
-// Input src/lib/workers/index.ts SHA256 658986def892b6cd32d73c89a1a94ea6877a623694bc151d46af8ba651e80a7c
-// Input src/lib/workers/inventory.ts SHA256 68e24327d4120f412fcac87ede4721163c405b93be2a42ed56bb5d784bdbea82
-// Input src/lib/workers/privacy.ts SHA256 1f5fcc2d31575238767494eb18f8fdb6bbd8b685c6b3ce9ffa39b2fc99a26a7c
-// Input src/lib/workers/registry.ts SHA256 dd821c6dc80499cd56bf7af09a6038258160fe09632a1b09acaa998cec2da250
-// Input src/lib/workers/schema.ts SHA256 86bc5f371ae14416e79688b9a6029291fb8db1abe0d59c97a1d15f9eeca6e35f
-// Input src/lib/workers/sources.ts SHA256 af245859f8481999a02ea16fd0c03382eafff9ff32e6ede8d74a0ef0a7f971cd
-// Input src/lib/workers/tools/agenda/index.ts SHA256 3b4d5b0e0f583e0edbd136d683cd8f385746ca2fde6f62fc6aa7b57db2b4173f
-// Input src/lib/workers/tools/arena/index.ts SHA256 200c83ae297c0fc81c6b11d0b04c7f4442bd3f71c298d7000c63c40cd551c29e
-// Input src/lib/workers/tools/caixa/index.ts SHA256 38a118eb2924901d1695fea37e1b7dd6fd889860e22f8836dd6aed3f5d857c4a
-// Input src/lib/workers/tools/comissao/index.ts SHA256 b3f38078138b02993d5b1bc6dda18a03a24a3833505b3270e75ed1bc3050d1ad
-// Input src/lib/workers/tools/definition.ts SHA256 a6b7ca50a6c33e22ad28fea8422b7333a73fc5021f4fdada53e6a3c33ee5dd69
-// Input src/lib/workers/tools/interesse/index.ts SHA256 a7786eab88fca2eed15c896cc677c581245f0ad2cbdfd97bb4a511204cda21be
-// Input src/lib/workers/tools/logistica/index.ts SHA256 368ec161b47faf07bf5966f264c14b529e16a04fac4290ade7674236eb92538c
-// Input src/lib/workers/tools/mapa/index.ts SHA256 9cce562b2078fbd9f322eba34523365c806559664c820e9a911640cca7a5cd2f
-// Input src/lib/workers/types.ts SHA256 c75e201077db938b62e345990ea796ce2576d9b49da6d9f943abc18587f99819
+// Input src/lib/workers/access.ts SHA256 ab0bf84c9bef0046405506976ac1a4007903c7e895beea5c73b19d1708a61f1f
+// Input src/lib/workers/analytics.ts SHA256 af9860f90957e3385b2d780d3fc0c331db0625755e64ebf54829794dc0958d9b
+// Input src/lib/workers/catalog.ts SHA256 7a7504cecb20e93ad8c808223e97ace716e66c9e7ad02ce8a8fc40cf53c3fbc7
+// Input src/lib/workers/index.ts SHA256 2fa79117eedc25ba75753e083ecfcf157bc5a7a8c95e76336415c727ddb1ba6c
+// Input src/lib/workers/inventory.ts SHA256 5d8439dae12033d055e2abd5a5231129523bc12d916901104939418b9b7b4238
+// Input src/lib/workers/privacy.ts SHA256 d83164f29a8a8aea08ad8a505edeead0ae043a04c4b894099cf66f88bff1ddb4
+// Input src/lib/workers/question-analytics.ts SHA256 8fac26f8def1e20ac6ffa33bc841c4e980169d09af7c11c5d6038100a5ed1bbe
+// Input src/lib/workers/registry.ts SHA256 c95ac233725c2ce487897af6eadcad1d0c6541ca0970d1bc996721139b498158
+// Input src/lib/workers/schema.ts SHA256 d070db42b887316a51f9bb614fd0f5cfc4be30864e43c9bc9a1f0729f7ff326d
+// Input src/lib/workers/sources.ts SHA256 504b1dcb5952ec918fe9179223dbfdd32ba6189590936cb5fc9e957da4fedd13
+// Input src/lib/workers/tools/agenda/index.ts SHA256 ca2d79511bb2d2fcba1ccf4dc6315f42ed65d2b86d084dde9706a379c4f5109b
+// Input src/lib/workers/tools/arena/index.ts SHA256 4677b0d57cff3416c20d86058ec107d4a9783fe5a3bc23fa1b18f75c61865f09
+// Input src/lib/workers/tools/caixa/index.ts SHA256 510a3372f4c67e668061ad4cbe90ab6b83896af6eed65db4e14ccd9448770f90
+// Input src/lib/workers/tools/comissao/index.ts SHA256 c7235490123d41aad2fe915f893d15528f1b5043a469acd9c38d016ef828a070
+// Input src/lib/workers/tools/definition.ts SHA256 2a36a32096260194ec64fc26cef3fb136a385c1e7753bc114a75266496d2adac
+// Input src/lib/workers/tools/interesse/index.ts SHA256 e7dfea93f45fb1dc810c9cb3124cf5c2986c4553ad73323cd054feffab250573
+// Input src/lib/workers/tools/logistica/index.ts SHA256 fae629cfa4c54b8ca67b33c06198a2df7167a894035a6cadf2ee978d915d70a6
+// Input src/lib/workers/tools/mapa/index.ts SHA256 edfa6ea4b074e44e9c156a5ae152d51d7a5e3c6b3b7d0670c6f2b4fbacf3fadd
+// Input src/lib/workers/types.ts SHA256 ce127a8d02b0b1851952f835179858f66d00fd3f5b561f3033af26f4cbdfd1e2
 
 // src/lib/workers/types.ts
 var WorkerToolError = class extends Error {
@@ -51,20 +53,20 @@ function hasWorkerPolicy(policy, ctx) {
   const elevated = ctx.role === "admin" || ctx.role === "gestor";
   const operator = ctx.role === "operador" && !caps.has("restricted_scope");
   const full = elevated || operator || caps.has("full_access");
-  const map = (cap) => elevated || caps.has(cap) || caps.has("map.admin") || caps.has("full_access");
+  const map2 = (cap) => elevated || caps.has(cap) || caps.has("map.admin") || caps.has("full_access");
   switch (policy) {
     case "member":
       return true;
     case "commission":
       return true;
     case "map":
-      return operator || map("map.view");
+      return operator || map2("map.view");
     case "map_sales":
-      return map("map.manage_sales");
+      return map2("map.manage_sales");
     case "map_contracts":
-      return map("map.manage_sales") && map("map.manage_contracts");
+      return map2("map.manage_sales") && map2("map.manage_contracts");
     case "analytics":
-      return (full || caps.has("map.analytics.view")) && map("map.manage_sales");
+      return (full || caps.has("map.analytics.view")) && map2("map.manage_sales");
     case "venue":
       return full || caps.has("venue_events_access") || caps.has("venue_events_full_access");
     case "venue_reports":
@@ -97,6 +99,9 @@ async function authorizeWorkerPolicy(policy, ctx) {
   }
   return true;
 }
+
+// src/lib/workers/tools/agenda/index.ts
+import { z as z3 } from "zod";
 
 // src/lib/workers/schema.ts
 import { z } from "zod";
@@ -193,6 +198,9 @@ function tool(name, worker, title, description, inputSchema, policy, deepLink, s
 
 // src/lib/workers/tools/agenda/index.ts
 var agendaTools = [
+  tool("agenda_query", "agenda", "Consulta analítica da Agenda", "Consulta todos os eventos autorizados do período, agrega antes de limitar os detalhes e aceita variações de pergunta. Filtra título/local/categoria/prioridade/situação, vínculos autenticados e comissão persistida. Agrupamentos completos permitem pizza, barras, tabela e comparação entre duas consultas. Vínculo e duração prevista não comprovam presença.", input({ date_from: date(), date_to: date(), group_by: z3.enum(["status", "location", "category", "weekday", "day"]).default("status"), relationship: z3.enum(["all", "linked", "created", "responsible"]).default("all"), status: z3.enum(["planejado", "em_andamento", "aguardando_definicao", "aguardando_responsavel", "concluido", "cancelado"]).optional(), search: z3.string().max(120).optional(), location: z3.string().max(120).optional(), category: z3.string().max(120).optional(), priority: z3.enum(["baixa", "media", "alta", "critica"]).optional(), weekday: z3.number().int().min(0).max(6).optional(), commission_id: uuid().optional(), missing_time: z3.boolean().optional(), missing_location: z3.boolean().optional(), missing_category: z3.boolean().optional(), cross_midnight: z3.boolean().optional(), cross_period: z3.boolean().optional(), start_in_period: z3.boolean().optional() }), "member", "/cronograma-eventos", ["workers_agenda_query"]),
+  tool("agenda_personal_summary", "agenda", "Sua Agenda no período", "Calcula todos os eventos autorizados vinculados à conta autenticada, sem duplicar vínculos ou subeventos. Distingue criação, responsabilidade, situação concluída e duração agendada; não comprova presença.", input({ date_from: date(), date_to: date(), relationship: z3.enum(["linked", "created", "responsible"]).optional() }), "member", "/cronograma-eventos", ["workers_agenda_personal_summary"]),
+  tool("agenda_people_ranking", "agenda", "Pessoas com mais eventos", "Ranking agregado no servidor sobre o período autorizado completo. Conta eventos distintos por identidade persistida; limite visual não limita a agregação.", input({ date_from: date(), date_to: date(), limit: z3.number().int().min(1).max(30).default(10) }), "member", "/cronograma-eventos", ["workers_agenda_people_ranking"]),
   tool("list_events", "agenda", "Agenda Fenasoja", "Consulta eventos visíveis no período. Descrições privadas e contatos são omitidos.", listEventsInput, "member", "/cronograma-eventos", ["cronograma_eventos_full"]),
   tool("get_event", "agenda", "Detalhe do evento", "Consulta dados operacionais seguros de um evento visível.", getEventInput, "member", "/cronograma-eventos", ["cronograma_eventos_full"]),
   tool("list_subevents", "agenda", "Subeventos", "Consulta subeventos visíveis do evento informado.", input({ event_id: uuid(), limit: limit() }), "member", "/cronograma-eventos", ["cronograma_eventos_full", "cronograma_subeventos"]),
@@ -201,25 +209,27 @@ var agendaTools = [
 ];
 
 // src/lib/workers/tools/arena/index.ts
-import { z as z3 } from "zod";
+import { z as z4 } from "zod";
 var arenaTools = [
   tool("list_venue_events", "arena", "Eventos da Arena e Restaurante", "Consulta datas, estado e público de eventos; omite notas internas, contatos e pagamentos.", input({ from_datetime: timestamp().optional(), to_datetime: timestamp().optional(), limit: limit() }), "venue", "/eventos-restaurante-arena", ["venue_events"]),
-  tool("venue_availability", "arena", "Disponibilidade de espaços", "Consulta conflitos em espaços persistidos; não reserva nem altera ocupações.", input({ space_ids: z3.array(uuid()).min(1).max(10), setup_start_at: timestamp(), teardown_end_at: timestamp() }), "venue", "/eventos-restaurante-arena", ["venue_spaces", "venue_check_availability"]),
+  tool("venue_availability", "arena", "Disponibilidade de espaços", "Consulta conflitos em espaços persistidos; não reserva nem altera ocupações.", input({ space_ids: z4.array(uuid()).min(1).max(10), setup_start_at: timestamp(), teardown_end_at: timestamp() }), "venue", "/eventos-restaurante-arena", ["venue_spaces", "venue_check_availability"]),
   tool("venue_occupancy", "arena", "Ocupação", "Consulta períodos de ocupações ativas.", input({ limit: limit() }), "venue", "/eventos-restaurante-arena", ["venue_occupancies"]),
   tool("venue_counterparts", "arena", "Saldos de contrapartida", "Consulta somente quantidades agregadas autorizadas.", input({ limit: limit() }), "venue_reports", "/eventos-restaurante-arena", ["venue_counterpart_balances"]),
   tool("restaurant_alert", "arena", "Conflitos Restaurante × Agenda", "Consulta alerta de conflito no intervalo. Não altera agenda nem reservas.", input({ from_date: date(), to_date: date() }), "venue", "/cronograma-eventos", ["cronograma_restaurant_alert"])
 ];
 
 // src/lib/workers/tools/mapa/index.ts
-import { z as z4 } from "zod";
+import { z as z5 } from "zod";
 var mapaTools = [
+  tool("map_inventory_summary", "mapa", "Espaços e infraestrutura", "Calcula sobre todos os lotes ativos autorizados do projeto. Filtra situação, quadra, área oficial e infraestrutura persistida. Agrupa por situação ou quadra, com Outros calculado no servidor se necessário. Não confundir disponibilidade com vendas, preços ou recebimentos. Projeto/edição ambíguos pedem esclarecimento.", input({ project_id: uuid().optional(), edition_year: z5.number().int().min(2e3).max(2200).optional(), status: z5.enum(["AVAILABLE", "BLOCKED", "RESERVED", "IN_NEGOTIATION", "SALE_OPEN", "SOLD"]).optional(), block: z5.string().max(120).optional(), min_area: z5.number().min(0).max(1e9).optional(), max_area: z5.number().min(0).max(1e9).optional(), covered: z5.boolean().optional(), electricity: z5.boolean().optional(), water: z5.boolean().optional(), internet: z5.boolean().optional(), group_by: z5.enum(["status", "block"]).default("status"), missing_number: z5.boolean().optional(), missing_area: z5.boolean().optional() }), "map", "/mapa-comercial", ["workers_map_inventory_summary"]),
+  tool("map_sales_overview", "mapa", "Panorama de vendas comerciais", "Agrega todo o conjunto autorizado por projeto/edição persistidos. Período opcional exige as duas datas: confirmados usam assinatura; itens atualmente em aberto usam criação. Não representa posição histórica nem recebimentos.", input({ project_id: uuid().optional(), edition_year: z5.number().int().min(2e3).max(2200).optional(), date_from: date().optional(), date_to: date().optional() }), "map_sales", "/mapa-comercial", ["workers_map_sales_overview"]),
   tool("map_projects", "mapa", "Projetos comerciais", "Lista projetos ativos visíveis.", input({ limit: limit() }), "map", "/mapa-comercial", ["map_projects"]),
   tool("map_segments", "mapa", "Segmentos do mapa", "Consulta segmentos ativos do projeto autorizado.", input(project()), "map", "/mapa-comercial", ["map_projects", "map_segments"]),
   tool("map_entities", "mapa", "Identificação de pavilhões", "Consulta entidades persistidas para relacionar lote, pavilhão e segmento. Não retorna geometria.", input({ ...project(), segment_id: uuid().optional() }), "map", "/mapa-comercial", ["map_projects", "map_entities"]),
-  tool("map_inventory", "mapa", "Inventário comercial", "Lista lotes ativos com identidade persistida; distingue SALE_OPEN de SOLD. Total refere-se ao filtro e registros podem ser parciais.", input({ ...project(), status: z4.enum(["AVAILABLE", "BLOCKED", "RESERVED", "IN_NEGOTIATION", "SALE_OPEN", "SOLD"]).optional() }), "map", "/mapa-comercial", ["map_projects", "commercial_lots"]),
-  tool("map_prices", "mapa", "Preços autorizados", "Consulta preços oficiais sob RLS; nunca altera valores.", input({ ...project(), pavilion: z4.string().max(80).optional() }), "map", "/mapa-comercial", ["map_projects", "commercial_lot_pricing_2028"]),
+  tool("map_inventory", "mapa", "Inventário comercial", "Lista lotes ativos com identidade persistida; distingue SALE_OPEN de SOLD. Total refere-se ao filtro e registros podem ser parciais.", input({ ...project(), status: z5.enum(["AVAILABLE", "BLOCKED", "RESERVED", "IN_NEGOTIATION", "SALE_OPEN", "SOLD"]).optional() }), "map", "/mapa-comercial", ["map_projects", "commercial_lots"]),
+  tool("map_prices", "mapa", "Preços autorizados", "Consulta preços oficiais sob RLS; nunca altera valores.", input({ ...project(), pavilion: z5.string().max(80).optional() }), "map", "/mapa-comercial", ["map_projects", "commercial_lot_pricing_2028"]),
   tool("map_segment_inventory", "mapa", "Completude do segmento", "Retorna contagens estruturais, sem inferir inventário comercial.", input({ project_id: uuid(), segment_id: uuid() }), "map", "/mapa-comercial", ["map_projects", "map_segments", "get_commission_map_segment_inventory"]),
-  tool("list_sale_orders", "mapa", "Vendas em aberto e confirmadas", "Consulta estados e quantidade de itens; omite comprador, contatos, valores e pagamentos.", input({ ...project(), status: z4.enum(["PENDING", "SIGNED", "PARTIAL", "CANCELLED_PARTIAL", "LEGACY"]).optional(), has_document: z4.boolean().optional() }), "map_sales", "/mapa-comercial", ["map_projects", "list_commercial_sale_orders"]),
+  tool("list_sale_orders", "mapa", "Vendas em aberto e confirmadas", "Consulta estados e quantidade de itens; omite comprador, contatos, valores e pagamentos.", input({ ...project(), status: z5.enum(["PENDING", "SIGNED", "PARTIAL", "CANCELLED_PARTIAL", "LEGACY"]).optional(), has_document: z5.boolean().optional() }), "map_sales", "/mapa-comercial", ["map_projects", "list_commercial_sale_orders"]),
   tool("sale_order_detail", "mapa", "Itens de uma venda", "Consulta itens e estado de assinatura. Não confirma, cancela ou revisa venda; não retorna dados pessoais nem parcelas.", input({ project_id: uuid(), order_id: uuid() }), "map_sales", "/mapa-comercial", ["map_projects", "lot_sale_orders", "get_commercial_sale_order_detail"]),
   tool("sale_order_contract_summary", "mapa", "Abrangência dos contratos", "Consulta somente quantidade e lotes abrangidos pelos contratos autorizados de uma venda; sem arquivos, contatos ou pagamentos.", input({ project_id: uuid(), order_id: uuid() }), "map_contracts", "/mapa-comercial", ["map_projects", "lot_sale_orders", "get_commercial_sale_order_detail"])
 ];
@@ -269,8 +279,8 @@ var workerToolDefinitions = Object.freeze([
 
 // src/lib/workers/privacy.ts
 var PRIVATE_KEYS = /(?:token|secret|password|authorization|document(?:number|_number)?|cpf|cnpj|telefone|phone|email|e_mail|pix|renavam|storage.?path|raw_payload|internal.?notes|observa[cç][oõ]es|description|descricao|evidence|contact|buyer_?name|buyer_?trade_?name|responsible_?text)/i;
-function maskWorkerText(text) {
-  return text.replace(/\b(?:Bearer\s+)?eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gi, "[token protegido]").replace(/\b(?:sb_secret_|sb_publishable_|sk-)[A-Za-z0-9_-]+\b/g, "[chave protegida]").replace(/\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, "[e-mail protegido]").replace(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g, "[CPF protegido]").replace(/\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g, "[documento protegido]").replace(/(?:\+?55[\s.-]*)?\(?\b\d{2}\)?[\s.-]*9?\d{4}[\s.-]*\d{4}\b/g, "[telefone protegido]").replace(/\b(?:PIX|chave\s+pix)\s*[:=]\s*[^\s,;]+/gi, "PIX: [protegido]").replace(/https?:\/\/[^\s]+/gi, "[link externo omitido]");
+function maskWorkerText(text3) {
+  return text3.replace(/\b(?:Bearer\s+)?eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gi, "[token protegido]").replace(/\b(?:sb_secret_|sb_publishable_|sk-)[A-Za-z0-9_-]+\b/g, "[chave protegida]").replace(/\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, "[e-mail protegido]").replace(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g, "[CPF protegido]").replace(/\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g, "[documento protegido]").replace(/(?:\+?55[\s.-]*)?\(?\b\d{2}\)?[\s.-]*9?\d{4}[\s.-]*\d{4}\b/g, "[telefone protegido]").replace(/\b(?:PIX|chave\s+pix)\s*[:=]\s*[^\s,;]+/gi, "PIX: [protegido]").replace(/https?:\/\/[^\s]+/gi, "[link externo omitido]");
 }
 function sanitizeWorkerData(value, depth = 0) {
   if (depth > 8) return null;
@@ -338,7 +348,12 @@ var READ_RPCS = [
   "financial_budget_execution",
   "financial_expense_comparison",
   "workers_interest_summary",
-  "workers_public_links_overview"
+  "workers_public_links_overview",
+  "workers_map_sales_overview",
+  "workers_agenda_personal_summary",
+  "workers_agenda_people_ranking",
+  "workers_agenda_query",
+  "workers_map_inventory_summary"
 ];
 async function requireProject(ctx, id) {
   const { data, error } = await ctx.supabase.from("map_projects").select("id,org_id,is_archived").eq("org_id", ctx.orgId).eq("id", id).eq("is_archived", false).maybeSingle();
@@ -366,10 +381,10 @@ async function readRows(ctx, table, options = {}) {
     if (operation === "is") query = query.is(column, value);
   }
   if (options.order) query = query.order(options.order, { ascending: true });
-  const { data, error, count } = await query.limit(size + 1);
+  const { data, error, count: count3 } = await query.limit(size + 1);
   if (error) throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível consultar os dados autorizados.");
   const rows2 = data ?? [];
-  return { records: rows2.slice(0, size).map((row) => pickWorkerFields(row, spec.fields)), total: count ?? rows2.length, truncated: count != null ? count > size : rows2.length > size };
+  return { records: rows2.slice(0, size).map((row) => pickWorkerFields(row, spec.fields)), total: count3 ?? rows2.length, truncated: count3 != null ? count3 > size : rows2.length > size };
 }
 async function readRpc(ctx, rpc, args) {
   if (!READ_RPCS.includes(rpc)) throw new WorkerToolError("TOOL_NOT_ALLOWED", "RPC fora da allowlist de leitura.");
@@ -377,6 +392,109 @@ async function readRpc(ctx, rpc, args) {
   const { data, error } = await ctx.supabase.rpc(rpc, args);
   if (error) throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível consultar os dados autorizados.");
   return data;
+}
+
+// src/lib/workers/analytics.ts
+import { z as z6 } from "zod";
+var count = z6.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
+var finite = z6.number().finite().nonnegative().max(Number.MAX_SAFE_INTEGER);
+var text = z6.string().min(1).max(500);
+var scope = z6.object({
+  timezone: z6.literal("America/Sao_Paulo"),
+  complete: z6.literal(true),
+  as_of: z6.string().datetime({ offset: true }),
+  period: z6.object({ from: z6.string().regex(/^\d{4}-\d{2}-\d{2}$/), to: z6.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).strict().optional(),
+  project_id: z6.string().uuid().optional(),
+  project_name: text.optional(),
+  edition_year: z6.number().int().min(2e3).max(2200).optional(),
+  edition_label: text.optional(),
+  unit: z6.enum(["BRL_cents", "events"]).optional(),
+  relationship: z6.enum(["linked", "created", "responsible"]).optional(),
+  duration_basis: z6.literal("full_scheduled_event").optional(),
+  subevents: z6.literal("deduplicated_parent").optional(),
+  cancelled: z6.literal("excluded").optional()
+}).strict();
+var notes = z6.array(text).max(8);
+var map = z6.object({ scope, notes, metrics: z6.object({
+  confirmed_value_cents: count,
+  open_value_cents: count,
+  confirmed_orders: count,
+  open_orders: count,
+  confirmed_lots: count,
+  open_lots: count,
+  legacy_lots: count,
+  cancelled_lots: count,
+  unverified_lots: count,
+  missing_value_lots: count,
+  unallocated_lots: count,
+  unknown_period_lots: count
+}).strict() }).strict();
+var personal = z6.object({ scope, notes, metrics: z6.object({
+  events: count,
+  created_events: count,
+  responsible_events: count,
+  linked_events: count,
+  completed_events: count,
+  past_events: count,
+  scheduled_events: count,
+  valid_duration_events: count,
+  average_duration_minutes: finite.nullable(),
+  weekday_counts: z6.array(z6.object({ weekday: z6.number().int().min(0).max(6), events: count }).strict()).max(7)
+}).strict() }).strict();
+var ranking = z6.object({
+  scope,
+  notes,
+  metrics: z6.object({
+    people_count: count,
+    event_count: count,
+    unidentified_links: count,
+    shown_people: z6.number().int().min(1).max(30),
+    tie_break: z6.literal("name_then_id")
+  }).strict(),
+  people: z6.array(z6.object({ person_id: z6.string().uuid(), name: text, events: count, position: count }).strict()).max(30)
+}).strict();
+var clarification = z6.object({ needs_clarification: z6.literal(true), question: text, options: z6.array(text).max(100) }).strict();
+function parseWorkerAnalytics(tool2, value) {
+  const schema = tool2 === "map_sales_overview" ? z6.union([map, clarification]) : tool2 === "agenda_personal_summary" ? personal : ranking;
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível verificar o resultado desta consulta.");
+  if (tool2 === "map_sales_overview" && "metrics" in parsed.data) {
+    const result = map.parse(parsed.data);
+    if (!result.scope.project_id || !result.scope.edition_year || !result.scope.edition_label || !result.scope.project_name)
+      throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível verificar a edição deste resultado.");
+  }
+  if (tool2 === "agenda_personal_summary") {
+    const result = personal.parse(parsed.data), metrics = result.metrics;
+    if (!result.scope.period || metrics.events > metrics.linked_events || metrics.valid_duration_events > metrics.events || metrics.completed_events > metrics.events || metrics.past_events > metrics.events || metrics.scheduled_events > metrics.events || metrics.valid_duration_events === 0 !== (metrics.average_duration_minutes === null) || metrics.weekday_counts.reduce((sum, row) => sum + row.events, 0) !== metrics.events || new Set(metrics.weekday_counts.map((row) => row.weekday)).size !== metrics.weekday_counts.length)
+      throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível verificar os totais da sua Agenda.");
+  }
+  if (tool2 === "agenda_people_ranking" && "people" in parsed.data) {
+    const result = ranking.parse(parsed.data), people = result.people;
+    if (!result.scope.period || result.metrics.people_count < people.length || people.length > result.metrics.shown_people || people.some((person, index) => person.position !== index + 1 || person.events > result.metrics.event_count || index > 0 && person.events > people[index - 1].events) || new Set(people.map((person) => person.person_id)).size !== people.length || new Set(people.map((person) => person.name)).size !== people.length)
+      throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível distinguir as pessoas deste resultado.");
+  }
+  return parsed.data;
+}
+
+// src/lib/workers/question-analytics.ts
+import { z as z7 } from "zod";
+var count2 = z7.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
+var amount = z7.number().finite().nonnegative().max(Number.MAX_SAFE_INTEGER);
+var text2 = z7.string().max(500);
+var filters = z7.object({ relationship: z7.enum(["all", "linked", "created", "responsible"]).optional(), status: text2.optional(), search: text2.optional(), location: text2.optional(), category: text2.optional(), priority: text2.optional(), weekday: z7.number().int().min(0).max(6).optional(), commission_id: z7.string().uuid().optional(), block: text2.optional(), min_area: amount.optional(), max_area: amount.optional(), covered: z7.boolean().optional(), electricity: z7.boolean().optional(), water: z7.boolean().optional(), internet: z7.boolean().optional(), missing_number: z7.boolean().optional(), missing_area: z7.boolean().optional(), missing_time: z7.boolean().optional(), missing_location: z7.boolean().optional(), missing_category: z7.boolean().optional(), cross_midnight: z7.boolean().optional(), cross_period: z7.boolean().optional(), start_in_period: z7.boolean().optional() }).strict();
+var scope2 = z7.object({ complete: z7.literal(true), as_of: z7.string().datetime({ offset: true }), timezone: z7.literal("America/Sao_Paulo"), period: z7.object({ from: text2, to: text2 }).strict().optional(), project_id: z7.string().uuid().optional(), project_name: text2.optional(), edition_year: z7.number().int().optional(), edition_label: text2.optional(), group_by: z7.enum(["status", "block", "location", "category", "weekday", "day"]), filters }).strict();
+var common = { scope: scope2, groups: z7.array(z7.object({ label: z7.string().min(1).max(180), count: count2 }).strict()).max(20) };
+var inventory = z7.object({ ...common, metrics: z7.object({ total: count2, area_sqm: amount, missing_area: count2 }).strict(), rows: z7.array(z7.object({ name: text2, number: text2.nullable(), block: text2.nullable(), status: text2, area_sqm: amount.nullable(), covered: z7.boolean(), electricity: z7.boolean(), water: z7.boolean(), internet: z7.boolean() }).strict()).max(20) }).strict();
+var agenda = z7.object({ ...common, metrics: z7.object({ total: count2, valid_duration_events: count2, average_duration_minutes: amount.nullable() }).strict(), rows: z7.array(z7.object({ title: text2, status: text2, start_date: text2.nullable(), end_date: text2.nullable(), start_time: text2.nullable(), end_time: text2.nullable(), location: text2.nullable(), category: text2, priority: text2 }).strict()).max(20) }).strict();
+var clarification2 = z7.object({ needs_clarification: z7.literal(true), question: text2, options: z7.array(text2).max(100) }).strict();
+function parseQuestionAnalytics(tool2, value) {
+  const parsed = (tool2 === "map_inventory_summary" ? z7.union([inventory, clarification2]) : agenda).safeParse(value);
+  if (!parsed.success) throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível verificar os dados solicitados.");
+  if ("metrics" in parsed.data) {
+    const data = parsed.data;
+    if (data.groups.reduce((sum, group) => sum + group.count, 0) !== data.metrics.total || new Set(data.groups.map((group) => group.label)).size !== data.groups.length || data.rows.length > data.metrics.total || "valid_duration_events" in data.metrics && (data.metrics.valid_duration_events > data.metrics.total || data.metrics.valid_duration_events === 0 !== (data.metrics.average_duration_minutes === null))) throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível verificar a abrangência da consulta.");
+  }
+  return parsed.data;
 }
 
 // src/lib/workers/registry.ts
@@ -438,12 +556,42 @@ async function requireEvent(ctx, id) {
 async function requireEdition(ctx, id) {
   const result = await readRows(ctx, "financial_editions", { filters: [["id", "eq", id]], limit: 1 });
   if (!result.records.length) throw new WorkerToolError("NOT_FOUND", "Edição não encontrada ou sem acesso.");
+  return pickWorkerFields(result.records[0], ["id", "code", "label", "period_start", "period_end"]);
 }
 var moneyFields = ["count", "cap_cents", "uncapped_count", "planned_cents", "line_count", "committed_cents", "projected_cents", "confirmed_cents", "declared_cents", "in_kind_cents", "paid_cents", "payable_open_cents", "overdue_count", "received_cents", "receivable_open_cents", "inconsistent_count", "inflow_cents", "outflow_cents", "expense_planned_cents", "open_cents", "deviation_cents", "deviation_pct", "comparison_state", "overdue_cents", "realized_without_plan_count"];
 async function dispatch(def, input2, ctx) {
   const size = Number(input2.limit ?? 20);
-  const text = (key) => String(input2[key]);
+  const text3 = (key) => String(input2[key]);
   switch (def.name) {
+    case "agenda_query":
+    case "map_inventory_summary": {
+      const args = { _org_id: ctx.orgId };
+      for (const [key, value] of Object.entries(input2)) args[`_${key === "date_from" ? "from_date" : key === "date_to" ? "to_date" : key}`] = value;
+      const rpc = def.name === "agenda_query" ? "workers_agenda_query" : "workers_map_inventory_summary";
+      return output(def, [parseQuestionAnalytics(def.name, await readRpc(ctx, rpc, args))], { summary: "Consulta atual calculada sobre todos os registros autorizados, antes do limite visual dos detalhes." });
+    }
+    case "map_sales_overview": {
+      if (Boolean(input2.date_from) !== Boolean(input2.date_to)) throw new WorkerToolError("INVALID_INPUT", "Informe o início e o fim do período.");
+      const response = await readRpc(ctx, "workers_map_sales_overview", {
+        _org_id: ctx.orgId,
+        _project_id: input2.project_id ?? null,
+        _edition_year: input2.edition_year ?? null,
+        _from_date: input2.date_from ?? null,
+        _to_date: input2.date_to ?? null
+      });
+      return output(def, [parseWorkerAnalytics(def.name, response)], { summary: "Panorama calculado sobre todos os registros autorizados da edição e do projeto." });
+    }
+    case "agenda_personal_summary":
+    case "agenda_people_ranking": {
+      const rpc = def.name === "agenda_personal_summary" ? "workers_agenda_personal_summary" : "workers_agenda_people_ranking";
+      const response = await readRpc(ctx, rpc, {
+        _org_id: ctx.orgId,
+        _from_date: input2.date_from,
+        _to_date: input2.date_to,
+        ...def.name === "agenda_personal_summary" ? { _relationship: input2.relationship ?? "linked" } : { _limit: input2.limit }
+      });
+      return output(def, [parseWorkerAnalytics(def.name, response)], { summary: "Resultado calculado sobre todo o período autorizado; vínculos não comprovam presença." });
+    }
     case "list_events": {
       const result = await readRows(ctx, "cronograma_eventos_full", { limit: size, order: "start_date", filters: [
         ...input2.from_date ? [["start_date", "gte", input2.from_date]] : [],
@@ -454,15 +602,15 @@ async function dispatch(def, input2, ctx) {
       return output(def, result.records, result);
     }
     case "get_event":
-      return output(def, [await requireEvent(ctx, text("event_id"))], { link: `/cronograma-eventos?event=${encodeURIComponent(text("event_id"))}` });
+      return output(def, [await requireEvent(ctx, text3("event_id"))], { link: `/cronograma-eventos?event=${encodeURIComponent(text3("event_id"))}` });
     case "list_subevents": {
-      await requireEvent(ctx, text("event_id"));
+      await requireEvent(ctx, text3("event_id"));
       const result = await readRows(ctx, "cronograma_subeventos", { limit: size, order: "sort_order", filters: [["parent_event_id", "eq", input2.event_id]] });
       return output(def, result.records, result);
     }
     case "commission_agenda":
     case "commission_metrics": {
-      await requireCommission(ctx, text("commission_id"));
+      await requireCommission(ctx, text3("commission_id"));
       const rpc = def.name === "commission_agenda" ? "cronograma_unit_agenda" : "cronograma_unit_metrics";
       const result = rows(await readRpc(ctx, rpc, { _commission_id: input2.commission_id }));
       const fields = def.name === "commission_agenda" ? READ_TABLES.cronograma_eventos_full.fields : ["completed", "documents", "in_month", "total", "upcoming"];
@@ -476,7 +624,7 @@ async function dispatch(def, input2, ctx) {
       return output(def, result.records, result);
     }
     case "venue_availability": {
-      if (text("teardown_end_at") <= text("setup_start_at")) throw new WorkerToolError("INVALID_INPUT", "O fim precisa ocorrer após o início.");
+      if (text3("teardown_end_at") <= text3("setup_start_at")) throw new WorkerToolError("INVALID_INPUT", "O fim precisa ocorrer após o início.");
       const ids = input2.space_ids;
       const spaces = await readRows(ctx, "venue_spaces", { limit: 100, filters: [["id", "in", ids], ["active", "eq", true]] });
       if (new Set(spaces.records.map((space) => space.id)).size !== new Set(ids).size) throw new WorkerToolError("NOT_FOUND", "Espaço não encontrado ou fora da organização.");
@@ -504,7 +652,7 @@ async function dispatch(def, input2, ctx) {
     case "map_inventory":
     case "map_prices": {
       const table = def.name === "map_segments" ? "map_segments" : def.name === "map_entities" ? "map_entities" : def.name === "map_prices" ? "commercial_lot_pricing_2028" : "commercial_lots";
-      const result = await readRows(ctx, table, { projectId: text("project_id"), limit: size, filters: [
+      const result = await readRows(ctx, table, { projectId: text3("project_id"), limit: size, filters: [
         ...def.name === "map_segments" ? [["is_active", "eq", true]] : [],
         ...def.name === "map_inventory" ? [["archived_at", "is", null]] : [],
         ...def.name === "map_entities" ? [["is_archived", "eq", false]] : [],
@@ -515,13 +663,13 @@ async function dispatch(def, input2, ctx) {
       return output(def, result.records, result);
     }
     case "map_segment_inventory": {
-      const segment = await readRows(ctx, "map_segments", { projectId: text("project_id"), limit: 1, filters: [["id", "eq", input2.segment_id], ["is_active", "eq", true]] });
+      const segment = await readRows(ctx, "map_segments", { projectId: text3("project_id"), limit: 1, filters: [["id", "eq", input2.segment_id], ["is_active", "eq", true]] });
       if (!segment.records.length) throw new WorkerToolError("NOT_FOUND", "Segmento fora do projeto autorizado.");
       const result = rows(await readRpc(ctx, "get_commission_map_segment_inventory", { p_segment_id: input2.segment_id }));
       return output(def, result.map((row) => pickWorkerFields(row, ["expected_entity_count", "expected_lot_count", "lineage_delta"])));
     }
     case "list_sale_orders": {
-      await requireProject(ctx, text("project_id"));
+      await requireProject(ctx, text3("project_id"));
       if (input2.has_document !== void 0 && !await authorizeWorkerPolicy("map_contracts", ctx)) throw new WorkerToolError("PERMISSION_DENIED", "Consulta de contratos requer permissão de contratos.");
       const response = object(await readRpc(ctx, "list_commercial_sale_orders", { p_project_id: input2.project_id, p_limit: size, ...input2.status ? { p_status: input2.status } : {}, ...input2.has_document !== void 0 ? { p_has_document: input2.has_document } : {} }));
       const result = rows(response.rows).map((row) => pickWorkerFields(row, ["record_id", "kind", "order_id", "sale_id", "reference", "created_at", "status", "item_count", "active_count", "signed_count", "pending_count", "cancelled_count", "legacy_count", "lot_ids"]));
@@ -529,7 +677,7 @@ async function dispatch(def, input2, ctx) {
     }
     case "sale_order_detail":
     case "sale_order_contract_summary": {
-      const order = await readRows(ctx, "lot_sale_orders", { projectId: text("project_id"), limit: 1, filters: [["id", "eq", input2.order_id]] });
+      const order = await readRows(ctx, "lot_sale_orders", { projectId: text3("project_id"), limit: 1, filters: [["id", "eq", input2.order_id]] });
       if (!order.records.length) throw new WorkerToolError("NOT_FOUND", "Pedido fora do projeto autorizado.");
       const response = object(await readRpc(ctx, "get_commercial_sale_order_detail", { p_order_id: input2.order_id }));
       const header = object(response.header);
@@ -557,24 +705,24 @@ async function dispatch(def, input2, ctx) {
       return output(def, result.records, result);
     }
     case "commission_responsibles": {
-      await requireCommission(ctx, text("commission_id"), true);
+      await requireCommission(ctx, text3("commission_id"), true);
       const result = await readRows(ctx, "commission_responsibles", { limit: size, filters: [["commission_id", "eq", input2.commission_id], ["active", "eq", true]] });
       return output(def, result.records, result);
     }
     case "meeting_sessions":
     case "meeting_actions": {
-      await requireCommission(ctx, text("commission_id"), true);
-      await requireEvent(ctx, text("event_id"));
+      await requireCommission(ctx, text3("commission_id"), true);
+      await requireEvent(ctx, text3("event_id"));
       const { data: link, error: linkError } = await ctx.supabase.from("cronograma_evento_comissoes").select("event_id").eq("org_id", ctx.orgId).eq("event_id", input2.event_id).eq("commission_id", input2.commission_id).limit(1).maybeSingle();
       if (linkError || !link) throw new WorkerToolError("NOT_FOUND", "Evento não vinculado à comissão.");
       if (def.name === "meeting_sessions") {
         const result2 = await readRows(ctx, "agenda_meeting_sessions", { limit: size, order: "started_at", filters: [["event_id", "eq", input2.event_id], ["consent_confirmed", "eq", true], ["deleted_at", "is", null]] });
-        return output(def, result2.records, { ...result2, link: `/cronograma-eventos?event=${encodeURIComponent(text("event_id"))}` });
+        return output(def, result2.records, { ...result2, link: `/cronograma-eventos?event=${encodeURIComponent(text3("event_id"))}` });
       }
       const { data: session, error } = await ctx.supabase.from("agenda_meeting_sessions").select("id,consent_confirmed").eq("org_id", ctx.orgId).eq("event_id", input2.event_id).eq("id", input2.session_id).eq("consent_confirmed", true).is("deleted_at", null).maybeSingle();
       if (error || !session?.consent_confirmed) throw new WorkerToolError("PERMISSION_DENIED", "Sessão sem acesso ou consentimento confirmado.");
       const result = await readRows(ctx, "agenda_meeting_action_items", { limit: size, filters: [["session_id", "eq", input2.session_id], ["event_id", "eq", input2.event_id]] });
-      return output(def, result.records, { ...result, link: `/cronograma-eventos?event=${encodeURIComponent(text("event_id"))}` });
+      return output(def, result.records, { ...result, link: `/cronograma-eventos?event=${encodeURIComponent(text3("event_id"))}` });
     }
     case "list_transports": {
       const result = await readRows(ctx, "transports", { limit: size, order: "inicio_em", filters: [
@@ -597,17 +745,17 @@ async function dispatch(def, input2, ctx) {
     case "financial_edition_summary":
     case "financial_budget_execution":
     case "financial_expense_comparison": {
-      await requireEdition(ctx, text("edition_id"));
+      const edition = await requireEdition(ctx, text3("edition_id"));
       const response = object(await readRpc(ctx, def.name, { _org_id: ctx.orgId, _edition_id: input2.edition_id }));
       if (def.name === "financial_edition_summary") {
-        const result = {};
+        const result = { edition };
         for (const group of ["budget", "revenue", "sponsorship", "expenses", "revenues", "obligations", "movements"]) result[group] = pickWorkerFields(response[group], moneyFields);
         return output(def, [result]);
       }
       if (def.name === "financial_budget_execution") {
-        return output(def, [{ budgets: rows(response.budgets).slice(0, 100).map((row) => pickWorkerFields(row, ["budget_id", ...moneyFields])), lines: rows(response.lines).slice(0, 100).map((row) => pickWorkerFields(row, ["line_id", ...moneyFields])) }], { truncated: rows(response.budgets).length > 100 || rows(response.lines).length > 100 });
+        return output(def, [{ edition, budgets: rows(response.budgets).slice(0, 100).map((row) => pickWorkerFields(row, ["budget_id", ...moneyFields])), lines: rows(response.lines).slice(0, 100).map((row) => pickWorkerFields(row, ["line_id", ...moneyFields])) }], { truncated: rows(response.budgets).length > 100 || rows(response.lines).length > 100 });
       }
-      return output(def, [{ totals: pickWorkerFields(response.totals, moneyFields), by_category: rows(response.by_category).slice(0, 100).map((row) => pickWorkerFields(row, ["id", "name", ...moneyFields])), by_commission: rows(response.by_commission).slice(0, 100).map((row) => pickWorkerFields(row, ["id", "name", ...moneyFields])) }], { truncated: rows(response.by_category).length > 100 || rows(response.by_commission).length > 100 });
+      return output(def, [{ edition, totals: pickWorkerFields(response.totals, moneyFields), by_category: rows(response.by_category).slice(0, 100).map((row) => pickWorkerFields(row, ["id", "name", ...moneyFields])), by_commission: rows(response.by_commission).slice(0, 100).map((row) => pickWorkerFields(row, ["id", "name", ...moneyFields])) }], { truncated: rows(response.by_category).length > 100 || rows(response.by_commission).length > 100 });
     }
     default:
       throw new WorkerToolError("TOOL_NOT_ALLOWED", "Ferramenta não disponível nesta fase.");

@@ -3,6 +3,7 @@ import { buildPlannerMessages, renderToolEvidence, runWorkerTurn, type WorkerTur
 import { parseWorkerRequest, redactWorkerText, routeWorker, type ReadResult, type ToolCall, type WorkerRequest } from '../../supabase/functions/_shared/workers/contracts';
 import { createLovableProvider, LOVABLE_GATEWAY_URL, readBoundedJson } from '../../supabase/functions/_shared/workers/provider';
 import { FIRECRAWL_SEARCH_URL, searchWorkersWeb } from '../../supabase/functions/_shared/workers/web-search';
+import { decodeWorkerResponse } from '../../supabase/functions/_shared/workers/response-contract';
 
 const request: WorkerRequest = { orgId: '10000000-0000-4000-8000-000000000001', requestId: '20000000-0000-4000-8000-000000000001', message: 'Quais eventos amanhã?' };
 const conversationId = '30000000-0000-4000-8000-000000000001';
@@ -64,15 +65,20 @@ describe('workers request and trust boundaries', () => {
 describe('workers orchestrator fail-closed execution', () => {
   it('admits and saves checked evidence before streaming facts, with exact text and citations', async () => {
     const { deps, events, emit } = setup();
+    vi.mocked(deps.listTools).mockResolvedValue([{...readTool,name:'agenda_query'}]);
+    vi.mocked(deps.provider.complete).mockReset().mockResolvedValueOnce({calls:[call('agenda_query')],inputTokens:20,outputTokens:5}).mockResolvedValue({calls:[],inputTokens:10,outputTokens:2});
+    vi.mocked(deps.executeTool).mockResolvedValue({...evidence,records:[{scope:{complete:true,period:{from:'2026-10-17',to:'2026-10-17'},group_by:'status',filters:{relationship:'all'}},metrics:{total:1,valid_duration_events:0,average_duration_minutes:null},groups:[{label:'Planejado',count:1}],rows:[{title:'Reunião Fenasoja',status:'Planejado',start_date:'2026-10-17',start_time:null,end_time:null,location:null}]}]});
     vi.mocked(deps.finish).mockImplementation(async () => { expect(events.some(item => item.event === 'delta')).toBe(false); });
     await runWorkerTurn(request, deps, emit);
     expect(events[0]).toEqual({ event: 'conversation', data: { conversationId } });
     const rendered = events.filter(item => item.event === 'delta').map(item => (item.data as { text: string }).text).join('');
-    expect(rendered).toBe(renderToolEvidence([evidence]).content);
+    expect(decodeWorkerResponse(rendered)).toMatchObject({ version: 1, worker: 'agenda', intent: 'agenda_query', summary: '1 evento no recorte consultado — 17/10/2026.', metadata: { organizationId: request.orgId, completeness: 'complete' } });
+    expect(rendered).toBe(vi.mocked(deps.finish).mock.calls[0][1].content);
+    expect(decodeWorkerResponse(rendered)?.blocks).toContainEqual({ type: 'table', columns: ['Evento','Data','Horário','Local','Situação'], rows: [['Reunião Fenasoja','17/10/2026','Não informado','—','Planejado']] });
     expect(rendered).toContain('Reunião Fenasoja');
     expect(events.some(item => item.event === 'citations')).toBe(true);
     expect(events[events.length - 1]?.event).toBe('done');
-    expect(deps.finish).toHaveBeenCalledWith(request, expect.objectContaining({ inputTokens: 30, outputTokens: 7, tools: ['list_events'] }));
+    expect(deps.finish).toHaveBeenCalledWith(request, expect.objectContaining({ inputTokens: 30, outputTokens: 7, tools: ['agenda_query'] }));
   });
 
   it('refuses deletion without calling the provider or any business tool', async () => {
@@ -164,7 +170,9 @@ describe('workers orchestrator fail-closed execution', () => {
     vi.mocked(deps.provider.complete).mockReset().mockResolvedValue({ calls: [], inputTokens: 1, outputTokens: 1 });
     await runWorkerTurn(request, deps, emit);
     expect(deps.executeTool).not.toHaveBeenCalled();
-    expect(events.filter(item => item.event === 'delta').map(item => (item.data as { text: string }).text).join('')).toContain('Não obtive dados verificáveis');
+    const response=decodeWorkerResponse(events.filter(item=>item.event==='delta').map(item=>(item.data as {text:string}).text).join(''))!;
+    expect(response.metadata.completeness).toBe('unavailable');
+    expect(response.blocks.some(block=>block.type==='indicators'||block.type==='bar_chart'||block.type==='pie_chart')).toBe(false);
   });
 
   it('replays an admitted completed request without provider usage or duplicate persistence', async () => {
@@ -223,5 +231,12 @@ describe('bounded provider and primary-source web adapter', () => {
     await expect(searchWorkersWeb({ query: 'Fenasoja' }, { fetcher })).rejects.toThrow('web_search_not_configured');
     expect(fetcher).not.toHaveBeenCalled();
     await expect(searchWorkersWeb({ query: 'Fenasoja', url: 'http://169.254.169.254' }, { apiKey: 'test-only', fetcher })).rejects.toThrow('invalid_web_query');
+  });
+  it('reconstructs public research from closed topics without sending private names or record details', async () => {
+    const fetcher = vi.fn().mockResolvedValue(Response.json({ success: true, data: { web: [] } }));
+    await searchWorkersWeb({ query: 'Fenasoja contrato interno reunião de Ana Segredo empresa Privada 2028' }, { apiKey: 'test', gatewayKey: 'test', fetcher });
+    const body = JSON.parse(fetcher.mock.calls[0][1].body);
+    expect(body.query).toBe('Fenasoja notícias programação institucional oficial 2028');
+    expect(body.query).not.toMatch(/Ana|Segredo|Privada|contrato|reunião/);
   });
 });

@@ -1,6 +1,7 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useWorkersChat } from '../useWorkersChat';
+import { safeWorkerMessageContent, useWorkersChat } from '../useWorkersChat';
+import { encodeWorkerResponse } from '../../../../supabase/functions/_shared/workers/response-contract';
 import type { WorkersStreamEvent, WorkersTurnRequest } from '../api';
 
 const USER_A = '00000000-0000-4000-8000-000000000001';
@@ -9,10 +10,10 @@ const ORG_A = '10000000-0000-4000-8000-000000000001';
 const ORG_B = '10000000-0000-4000-8000-000000000002';
 const CHAT_A = '20000000-0000-4000-8000-000000000001';
 const CHAT_B = '20000000-0000-4000-8000-000000000002';
-const mocks = vi.hoisted(() => ({ user: { id: '00000000-0000-4000-8000-000000000001' } as { id: string } | null, orgId: '10000000-0000-4000-8000-000000000001' as string | null, from: vi.fn(), stream: vi.fn() }));
+const mocks = vi.hoisted(() => ({ user: { id: '00000000-0000-4000-8000-000000000001' } as { id: string } | null, orgId: '10000000-0000-4000-8000-000000000001' as string | null, from: vi.fn(), rpc: vi.fn(), stream: vi.fn() }));
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: mocks.user }) }));
 vi.mock('@/hooks/useCurrentOrg', () => ({ useCurrentOrg: () => ({ orgId: mocks.orgId }) }));
-vi.mock('../database', () => ({ workersDatabase: { from: mocks.from } }));
+vi.mock('../database', () => ({ workersDatabase: { from: mocks.from, rpc: mocks.rpc } }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { auth: { getSession: vi.fn() } } }));
 vi.mock('../api', async importOriginal => ({ ...await importOriginal<typeof import('../api')>(), streamWorkersTurn: mocks.stream }));
 
@@ -50,6 +51,11 @@ beforeEach(() => {
   queries = []; streams = [];
   queryResolver = async () => ({ data: [], error: null });
   mocks.from.mockImplementation((table: string) => new TestQuery(table));
+  mocks.rpc.mockImplementation((name: string, args: { _org_id: string; _conversation_id: string; _turn_limit: number }) => {
+    expect(name).toBe('ai_workers_read_history');
+    expect(args._turn_limit).toBe(50);
+    return new TestQuery('ai_messages').eq('org_id', args._org_id).eq('conversation_id', args._conversation_id).eq('user_id', mocks.user?.id);
+  });
   mocks.stream.mockImplementation((request: WorkersTurnRequest, onEvent: (event: WorkersStreamEvent) => void, signal: AbortSignal) => new Promise<void>(resolve => { streams.push({ request, onEvent, signal, resolve }); }));
 });
 afterEach(() => { cleanup(); streams.forEach(stream => stream.resolve()); });
@@ -74,14 +80,15 @@ describe('bots chat request lifecycle', () => {
     expect(result.current.messages[1].content).toBe('1 evento visível');
   });
 
-  it('removes a blank assistant placeholder when stopped and ignores every later frame', async () => {
+  it('keeps the answer slot with an interruption state and ignores every later frame', async () => {
     const { result } = renderHook(() => useWorkersChat());
     act(() => { void result.current.sendMessage('Agenda amanhã'); });
     await waitFor(() => expect(streams).toHaveLength(1));
     act(() => result.current.stop());
     expect(streams[0].signal.aborted).toBe(true);
     expect(result.current.isStreaming).toBe(false);
-    expect(result.current.messages).toHaveLength(1);
+    expect(result.current.messages).toHaveLength(2);
+    expect(result.current.messages[1].content).toContain('interrompida');
     act(() => streams[0].onEvent({ event: 'delta', data: { text: 'must not appear' } }));
     expect(result.current.messages.some(message => message.content.includes('must not appear'))).toBe(false);
   });
@@ -100,6 +107,44 @@ describe('bots chat request lifecycle', () => {
 });
 
 describe('bots history and identity isolation', () => {
+  it('uses the reopened conversation specialist for follow-ups and the route specialist for a new conversation', async () => {
+    queryResolver = async query => ({ data: query.table === 'ai_messages' ? [
+      { ...row('Como estão as vendas do mapa comercial?', 'map-question'), role: 'user', worker_id: 'mapa', request_id: 'map-turn', message_seq: 1 },
+      { ...row('Valores comerciais consultados.', 'map-answer'), worker_id: 'mapa', request_id: 'map-turn', message_seq: 2 },
+    ] : [], error: null });
+    const { result } = renderHook(() => useWorkersChat({ workerId: 'agenda', context: { route: '/cronograma-eventos' } }));
+    await act(async () => result.current.selectConversation(CHAT_A));
+    expect(result.current.conversationId).toBe(CHAT_A);
+    expect(result.current.activeWorkerId).toBe('mapa');
+    act(() => { void result.current.sendMessage('E no mês anterior?'); });
+    await waitFor(() => expect(streams).toHaveLength(1));
+    expect(streams[0].request).toMatchObject({ orgId: ORG_A, conversationId: CHAT_A, worker: 'mapa', message: 'E no mês anterior?' });
+    expect(result.current.messages[result.current.messages.length - 1]).toMatchObject({ role: 'assistant', workerId: 'mapa' });
+    await act(async () => { streams[0].onEvent({ event: 'delta', data: { text: 'Valores do mês anterior consultados.' } }); streams[0].resolve(); });
+    act(() => result.current.newConversation());
+    expect(result.current.activeWorkerId).toBe('agenda');
+    act(() => { void result.current.sendMessage('Quais eventos estão programados hoje?'); });
+    await waitFor(() => expect(streams).toHaveLength(2));
+    expect(streams[1].request.worker).toBe('agenda');
+    expect(streams[1].request).not.toHaveProperty('conversationId');
+  });
+
+  it('reopens equal timestamps as complete ordered turns and pages by sequence', async () => {
+    const rows = Array.from({ length: 50 }, (_, turn) => ['user', 'assistant'].map((role, index) => ({
+      ...row(`${role} ${turn}`, `${turn}-${role}`), role, request_id: `turn-${turn}`, message_seq: 101 + turn * 2 + index,
+    }))).flat();
+    queryResolver = async query => ({ data: query.table === 'ai_messages' ? [...rows].reverse() : [], error: null });
+    const { result } = renderHook(() => useWorkersChat());
+    await act(async () => result.current.selectConversation(CHAT_A));
+    expect(result.current.messages.slice(0, 4).map(message => message.content)).toEqual(['user 0', 'assistant 0', 'user 1', 'assistant 1']);
+    expect(result.current.hasEarlierMessages).toBe(true);
+    queryResolver = async query => ({ data: query.table === 'ai_messages' ? [{ ...row('older question', 'older-u'), role: 'user', request_id: 'older', message_seq: 99 }, { ...row('older reply', 'older-a'), request_id: 'older', message_seq: 100 }] : [], error: null });
+    await act(async () => result.current.loadEarlierMessages());
+    expect(mocks.rpc).toHaveBeenLastCalledWith('ai_workers_read_history', expect.objectContaining({ _before_sequence: 101 }));
+    expect(result.current.messages.slice(0, 4).map(message => message.content)).toEqual(['older question', 'older reply', 'user 0', 'assistant 0']);
+    expect(result.current.hasEarlierMessages).toBe(false);
+  });
+
   it.each(['user', 'org'])('clears immediately and rejects stale stream frames when the %s changes', async changed => {
     const { result, rerender } = renderHook(() => useWorkersChat());
     act(() => { void result.current.sendMessage('Primeira identidade'); });
@@ -192,6 +237,17 @@ describe('bots history and identity isolation', () => {
     await waitFor(() => expect(result.current.error).toContain('Não foi possível carregar'));
     expect(result.current.error).not.toContain('private transport details');
   });
+});
+
+it('never masks typed numbers, IDs or verified URLs as text and hides incomplete envelopes', () => {
+  const content = encodeWorkerResponse({ version: 1, worker: 'mapa', intent: 'map_sales', summary: 'Valores consultados.',
+    metadata: { organizationId: ORG_A, timezone: 'America/Sao_Paulo', scope: 'Autorizado', updatedAt: '2026-10-17T00:00:00Z', completeness: 'complete', notes: [] },
+    blocks: [{ type: 'indicators', items: [{ label: 'Vendas realizadas', value: 12345678901, unit: 'BRL' }] },
+      { type: 'sources', items: [{ label: 'Fonte oficial', url: 'https://fenasoja.com.br/portal-oficial/', source: 'web', date: '2026-10-16' }] }],
+  });
+  expect(safeWorkerMessageContent(content)).toBe(content);
+  expect(safeWorkerMessageContent(content.slice(0, -5))).toBe('');
+  expect(safeWorkerMessageContent('Contato ana@example.com')).not.toContain('ana@example.com');
 });
 
 describe('bots background routine results and proposal metadata', () => {

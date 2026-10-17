@@ -1,8 +1,10 @@
 import { z } from 'zod';
-import { uuid, limit } from '../../schema.ts';
+import { uuid, date, limit } from '../../schema.ts';
 import { tool, input, project } from '../definition.ts';
 
 export const mapaTools = [
+  tool('map_inventory_summary','mapa','Espaços e infraestrutura','Calcula sobre todos os lotes ativos autorizados do projeto. Filtra situação, quadra, área oficial e infraestrutura persistida. Agrupa por situação ou quadra, com Outros calculado no servidor se necessário. Não confundir disponibilidade com vendas, preços ou recebimentos. Projeto/edição ambíguos pedem esclarecimento.',input({project_id:uuid().optional(),edition_year:z.number().int().min(2000).max(2200).optional(),status:z.enum(['AVAILABLE','BLOCKED','RESERVED','IN_NEGOTIATION','SALE_OPEN','SOLD']).optional(),block:z.string().max(120).optional(),min_area:z.number().min(0).max(1000000000).optional(),max_area:z.number().min(0).max(1000000000).optional(),covered:z.boolean().optional(),electricity:z.boolean().optional(),water:z.boolean().optional(),internet:z.boolean().optional(),group_by:z.enum(['status','block']).default('status'),missing_number:z.boolean().optional(),missing_area:z.boolean().optional()}),'map','/mapa-comercial',['workers_map_inventory_summary']),
+  tool('map_sales_overview','mapa','Panorama de vendas comerciais','Agrega todo o conjunto autorizado por projeto/edição persistidos. Período opcional exige as duas datas: confirmados usam assinatura; itens atualmente em aberto usam criação. Não representa posição histórica nem recebimentos.',input({ project_id: uuid().optional(), edition_year: z.number().int().min(2000).max(2200).optional(), date_from: date().optional(), date_to: date().optional() }),'map_sales','/mapa-comercial',['workers_map_sales_overview']),
   tool('map_projects','mapa','Projetos comerciais','Lista projetos ativos visíveis.',input({ limit: limit() }),'map','/mapa-comercial',['map_projects']),
   tool('map_segments','mapa','Segmentos do mapa','Consulta segmentos ativos do projeto autorizado.',input(project()),'map','/mapa-comercial',['map_projects','map_segments']),
   tool('map_entities','mapa','Identificação de pavilhões','Consulta entidades persistidas para relacionar lote, pavilhão e segmento. Não retorna geometria.',input({ ...project(), segment_id: uuid().optional() }),'map','/mapa-comercial',['map_projects','map_entities']),
