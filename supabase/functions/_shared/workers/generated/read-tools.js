@@ -2,27 +2,27 @@
 // AUTO-GENERATED. Do not edit; canonical source: src/lib/workers/index.ts.
 // Regenerate: node scripts/workers/build-edge-registry.mjs
 // Verify without writing: node scripts/workers/build-edge-registry.mjs --check
-// Source inputs + generator SHA256: a0c81ce1a09eb5a3aa2a0152cad8690b2da493d4c9e72886374a04aeb35acf9d
+// Source inputs + generator SHA256: 879b1151a975186a5ccf2e7920996a6f2d861de6cb8e7f51fa00bff2ba965949
 // esbuild: 0.21.5; ESM JavaScript; external runtime dependency: zod.
-// Input src/lib/workers/access.ts SHA256 ab0bf84c9bef0046405506976ac1a4007903c7e895beea5c73b19d1708a61f1f
+// Input src/lib/workers/access.ts SHA256 f41ad9816a52e57d67ca57bfbbbd08736ef3a508b8e0dca1078addd43619307a
 // Input src/lib/workers/analytics.ts SHA256 af9860f90957e3385b2d780d3fc0c331db0625755e64ebf54829794dc0958d9b
-// Input src/lib/workers/catalog.ts SHA256 7a7504cecb20e93ad8c808223e97ace716e66c9e7ad02ce8a8fc40cf53c3fbc7
-// Input src/lib/workers/index.ts SHA256 2fa79117eedc25ba75753e083ecfcf157bc5a7a8c95e76336415c727ddb1ba6c
-// Input src/lib/workers/inventory.ts SHA256 5d8439dae12033d055e2abd5a5231129523bc12d916901104939418b9b7b4238
-// Input src/lib/workers/privacy.ts SHA256 d83164f29a8a8aea08ad8a505edeead0ae043a04c4b894099cf66f88bff1ddb4
+// Input src/lib/workers/catalog.ts SHA256 b7a40864279ee0f1308651b42b0c9fafc66e4e311390732e8411f449b3dd52af
+// Input src/lib/workers/index.ts SHA256 658986def892b6cd32d73c89a1a94ea6877a623694bc151d46af8ba651e80a7c
+// Input src/lib/workers/inventory.ts SHA256 68e24327d4120f412fcac87ede4721163c405b93be2a42ed56bb5d784bdbea82
+// Input src/lib/workers/privacy.ts SHA256 1f5fcc2d31575238767494eb18f8fdb6bbd8b685c6b3ce9ffa39b2fc99a26a7c
 // Input src/lib/workers/question-analytics.ts SHA256 8fac26f8def1e20ac6ffa33bc841c4e980169d09af7c11c5d6038100a5ed1bbe
-// Input src/lib/workers/registry.ts SHA256 c95ac233725c2ce487897af6eadcad1d0c6541ca0970d1bc996721139b498158
-// Input src/lib/workers/schema.ts SHA256 d070db42b887316a51f9bb614fd0f5cfc4be30864e43c9bc9a1f0729f7ff326d
-// Input src/lib/workers/sources.ts SHA256 504b1dcb5952ec918fe9179223dbfdd32ba6189590936cb5fc9e957da4fedd13
+// Input src/lib/workers/registry.ts SHA256 41a8cfb5a19172daeda5169c4d1de8bd75af2ba185b083f29510ba1606f83616
+// Input src/lib/workers/schema.ts SHA256 86bc5f371ae14416e79688b9a6029291fb8db1abe0d59c97a1d15f9eeca6e35f
+// Input src/lib/workers/sources.ts SHA256 e514d3ded9ca81fafc95d8d296dc9d78a96a4a5d08cae4261c999f6b19a8fed2
 // Input src/lib/workers/tools/agenda/index.ts SHA256 ca2d79511bb2d2fcba1ccf4dc6315f42ed65d2b86d084dde9706a379c4f5109b
-// Input src/lib/workers/tools/arena/index.ts SHA256 4677b0d57cff3416c20d86058ec107d4a9783fe5a3bc23fa1b18f75c61865f09
-// Input src/lib/workers/tools/caixa/index.ts SHA256 510a3372f4c67e668061ad4cbe90ab6b83896af6eed65db4e14ccd9448770f90
-// Input src/lib/workers/tools/comissao/index.ts SHA256 c7235490123d41aad2fe915f893d15528f1b5043a469acd9c38d016ef828a070
-// Input src/lib/workers/tools/definition.ts SHA256 2a36a32096260194ec64fc26cef3fb136a385c1e7753bc114a75266496d2adac
-// Input src/lib/workers/tools/interesse/index.ts SHA256 e7dfea93f45fb1dc810c9cb3124cf5c2986c4553ad73323cd054feffab250573
-// Input src/lib/workers/tools/logistica/index.ts SHA256 fae629cfa4c54b8ca67b33c06198a2df7167a894035a6cadf2ee978d915d70a6
+// Input src/lib/workers/tools/arena/index.ts SHA256 200c83ae297c0fc81c6b11d0b04c7f4442bd3f71c298d7000c63c40cd551c29e
+// Input src/lib/workers/tools/caixa/index.ts SHA256 38a118eb2924901d1695fea37e1b7dd6fd889860e22f8836dd6aed3f5d857c4a
+// Input src/lib/workers/tools/comissao/index.ts SHA256 b3f38078138b02993d5b1bc6dda18a03a24a3833505b3270e75ed1bc3050d1ad
+// Input src/lib/workers/tools/definition.ts SHA256 a6b7ca50a6c33e22ad28fea8422b7333a73fc5021f4fdada53e6a3c33ee5dd69
+// Input src/lib/workers/tools/interesse/index.ts SHA256 a7786eab88fca2eed15c896cc677c581245f0ad2cbdfd97bb4a511204cda21be
+// Input src/lib/workers/tools/logistica/index.ts SHA256 368ec161b47faf07bf5966f264c14b529e16a04fac4290ade7674236eb92538c
 // Input src/lib/workers/tools/mapa/index.ts SHA256 edfa6ea4b074e44e9c156a5ae152d51d7a5e3c6b3b7d0670c6f2b4fbacf3fadd
-// Input src/lib/workers/types.ts SHA256 ce127a8d02b0b1851952f835179858f66d00fd3f5b561f3033af26f4cbdfd1e2
+// Input src/lib/workers/types.ts SHA256 c75e201077db938b62e345990ea796ce2576d9b49da6d9f943abc18587f99819
 
 // src/lib/workers/types.ts
 var WorkerToolError = class extends Error {

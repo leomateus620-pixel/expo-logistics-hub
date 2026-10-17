@@ -12,6 +12,9 @@ const sourceFile = 'workers-edge-entry.ts';
 const entry = 'export { executeWorkerTool, listWorkerTools, resolveWorkerAccess } from "./src/lib/workers/index.ts";';
 const exportsExpected = ['executeWorkerTool', 'listWorkerTools', 'resolveWorkerAccess'];
 const sha256 = value => createHash('sha256').update(value).digest('hex');
+// Git may check out the same source as CRLF on Windows and LF on CI. Source
+// provenance follows canonical UTF-8 text, not the workstation's line endings.
+export const normalizedSourceHash = value => sha256(String(value).replace(/\r\n/g, '\n'));
 
 // Vite already declares esbuild. Resolve through Vite instead of adding a package.
 const require = createRequire(import.meta.url);
@@ -64,12 +67,12 @@ export async function renderEdgeRegistry() {
     if (!filename.startsWith('src/lib/workers/') || filename.includes('..')) {
       throw new Error(`Unexpected registry source: ${filename}`);
     }
-    inputs.push({ path: filename, sha256: sha256(await readFile(path.join(repositoryRoot, filename))) });
+    inputs.push({ path: filename, sha256: normalizedSourceHash(await readFile(path.join(repositoryRoot, filename), 'utf8')) });
   }
   if (!inputs.some(input => input.path === 'src/lib/workers/index.ts')) throw new Error('Canonical registry entry is missing.');
   const sourceHash = sha256(JSON.stringify({
     generator: 'scripts/workers/build-edge-registry.mjs',
-    generatorSha256: sha256(await readFile(scriptFile)), esbuildVersion: esbuild.version, typescriptVersion: ts.version,
+    generatorSha256: normalizedSourceHash(await readFile(scriptFile, 'utf8')), esbuildVersion: esbuild.version, typescriptVersion: ts.version,
     entry, options, inputs,
   }));
   const content = [
@@ -93,7 +96,7 @@ export async function synchronizeEdgeRegistry({ check = false, outputFile = gene
   for (const output of outputs) {
     try { output.current = await readFile(output.file, 'utf8'); }
     catch (error) { if (error.code !== 'ENOENT') throw error; }
-    if (output.current !== output.content) changed = true;
+    if (output.current?.replace(/\r\n/g, '\n') !== output.content) changed = true;
   }
   if (check) {
     if (changed) {
