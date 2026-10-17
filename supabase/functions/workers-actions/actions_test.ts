@@ -16,7 +16,7 @@ const request=(command:unknown,options:{signal?:AbortSignal;auth?:boolean;conten
   method:'POST',headers:{'Content-Type':options.contentType??'application/json',...(options.auth===false?{}:{Authorization:'Bearer synthetic.caller.jwt.for.tests'})},body:JSON.stringify(command),signal:options.signal,
 });
 
-async function httpFixture(fn:(requests:Array<{url:string;body:string}>)=>Promise<void>,options:{authFailure?:boolean;noMember?:boolean;rpcError?:{code:string;message:string};beforeAuthReturn?:()=>void;rpcValue?:unknown}={}) {
+async function httpFixture(fn:(requests:Array<{url:string;body:string}>)=>Promise<void>,options:{authFailure?:boolean;noMember?:boolean;ineligible?:boolean;rpcError?:{code:string;message:string};beforeAuthReturn?:()=>void;rpcValue?:unknown}={}) {
   const original=globalThis.fetch;
   const keys=['SUPABASE_URL','SUPABASE_PUBLISHABLE_KEY','SUPABASE_ANON_KEY','SUPABASE_PUBLISHABLE_KEYS'] as const;
   const previous=keys.map(key=>Deno.env.get(key));
@@ -29,6 +29,7 @@ async function httpFixture(fn:(requests:Array<{url:string;body:string}>)=>Promis
     if(url.includes('/auth/v1/user')){options.beforeAuthReturn?.();if(options.authFailure){result={message:'synthetic denied'};status=401;}else result={id:userId,role:'authenticated',aud:'authenticated',app_metadata:{},user_metadata:{},created_at:new Date().toISOString()};}
     else if(url.includes('/rest/v1/org_members'))result=options.noMember?[]:[{role:'admin',org_id:orgId,user_id:userId}];
     else if(url.includes('/rest/v1/user_capabilities'))result=[];
+    else if(url.includes('/rest/v1/rpc/ai_workers_can_access'))result=!options.ineligible;
     else if(url.includes('/rest/v1/rpc/')){if(options.rpcError){status=400;result=options.rpcError;}else result=options.rpcValue??view;}
     else throw new Error('Unexpected synthetic URL');
     return new Response(JSON.stringify(result),{status,headers:{'Content-Type':'application/json'}});
@@ -59,15 +60,15 @@ Deno.test('actions HTTP: strict commands reject forged receipt/caps, manual PII 
 Deno.test('actions HTTP: user JWT auth and active membership precede a fixed scoped RPC',async()=>{
   await httpFixture(async calls=>{
     const response=await handleWorkersActions(request({command:'get',orgId,actionId}));assert.equal(response.status,200);assert.deepEqual(await response.json(),view);
-    const storage=calls.filter(call=>call.url.includes('/rpc/'));assert.equal(storage.length,1);assert.ok(storage[0].url.endsWith('/rpc/ai_workers_get_action'));
+    const storage=calls.filter(call=>call.url.includes('/rpc/')&&!call.url.endsWith('/ai_workers_can_access'));assert.equal(storage.length,1);assert.ok(storage[0].url.endsWith('/rpc/ai_workers_get_action'));
     assert.deepEqual(JSON.parse(storage[0].body),{_org_id:orgId,_action_id:actionId});
     assert.ok(calls.some(call=>call.url.includes('/org_members')));
   });
 });
 
 Deno.test('actions HTTP: auth failure/inactive association cannot call action RPC',async()=>{
-  for(const fixture of [{authFailure:true},{noMember:true}])await httpFixture(async calls=>{
-    const response=await handleWorkersActions(request({command:'list',orgId}));assert.ok([401,403].includes(response.status));assert.equal(calls.filter(call=>call.url.includes('/rpc/')).length,0);
+  for(const fixture of [{authFailure:true},{noMember:true},{ineligible:true}])await httpFixture(async calls=>{
+    const response=await handleWorkersActions(request({command:'list',orgId}));assert.ok([401,403].includes(response.status));assert.equal(calls.filter(call=>call.url.includes('/rpc/')&&!call.url.endsWith('/ai_workers_can_access')).length,0);
   },fixture);
 });
 

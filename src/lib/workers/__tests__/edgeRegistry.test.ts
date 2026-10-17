@@ -14,7 +14,7 @@ const scriptUrl = pathToFileURL(path.resolve('scripts/workers/build-edge-registr
 // Run native esbuild in Node's own realm; the shared test setup requires jsdom.
 function generatorCall(expression: string) {
   const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e',
-    `const {renderEdgeRegistry,synchronizeEdgeRegistry}=await import(${JSON.stringify(scriptUrl)}); try { console.log(JSON.stringify({value:${expression}})); } catch(error) { console.log(JSON.stringify({error:error.message})); }`,
+    `const {renderEdgeRegistry,synchronizeEdgeRegistry,normalizedSourceHash}=await import(${JSON.stringify(scriptUrl)}); try { console.log(JSON.stringify({value:${expression}})); } catch(error) { console.log(JSON.stringify({error:error.message})); }`,
   ], { encoding: 'utf8' }));
   if (result.error) throw new Error(result.error);
   return result.value;
@@ -59,6 +59,10 @@ function context(options: { authenticated?: boolean; authRole?: string; caps?: s
 }
 
 describe('generated deployable Edge registry', () => {
+  it('keeps source provenance identical across Windows and Linux line endings without ignoring source changes',()=>{
+    const hashes=generatorCall(`['const value = 1;\\n','const value = 1;\\r\\n','const value = 2;\\n'].map(normalizedSourceHash)`);
+    expect(hashes[0]).toBe(hashes[1]);expect(hashes[0]).not.toBe(hashes[2]);
+  });
   it('has exactly the deployment exports and is synchronized with canonical inputs', async () => {
     expect(Object.keys(artifact).sort()).toEqual(['executeWorkerTool', 'listWorkerTools', 'resolveWorkerAccess']);
     const before = await readFile(generatedFile, 'utf8');
