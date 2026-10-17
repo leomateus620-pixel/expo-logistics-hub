@@ -49,11 +49,13 @@ jobs:
       - name: Canonical registry and scoped lint
         run: |
           node scripts/workers/build-edge-registry.mjs --check
+          node scripts/workers/export-question-bank.mjs --check
           npx eslint src/features/workers src/lib/workers src/components/WorkersLauncher.tsx src/features/commercial-map/components/MapLotDeepLink.tsx supabase/functions/_shared/workers supabase/functions/workers-orchestrator supabase/functions/workers-actions supabase/functions/workers-routines scripts/workers
       - name: Bot, privacy, transport and existing integration contracts
         run: >-
           npx vitest run --maxWorkers=2
           src/features/workers src/lib/workers src/test/workersOrchestrator.test.ts
+          src/test/workersResponses.test.ts src/test/workersQuestionBank.test.ts
           src/test/workersProposals.test.ts src/test/workersRoutines.test.ts src/test/mapLotDeepLink.test.tsx
           src/lib/__tests__/cronogramaRpc.test.ts src/test/publicMapHost.test.ts
           src/test/eventAssignmentPush.test.ts src/test/pushDeviceRevocation.test.ts src/test/eventPushMessage.test.ts
@@ -68,6 +70,12 @@ jobs:
           npm install --prefix /tmp/workers-pg-client --no-save --package-lock=false --ignore-scripts pg@8.16.3
           node scripts/workers/actions-qa.mjs --pg-module /tmp/workers-pg-client/node_modules/pg/lib/index.js
           node scripts/workers/routines-db-qa.mjs --pg-module /tmp/workers-pg-client/node_modules/pg/lib/index.js
+      - name: Verified aggregates, turn order and visual response persistence
+        run: |
+          npm install --prefix /tmp/workers-pglite --no-save --package-lock=false --ignore-scripts @electric-sql/pglite@0.5.10
+          node scripts/workers/analytics-db-qa.mjs --pglite-module /tmp/workers-pglite/node_modules/@electric-sql/pglite/dist/index.js
+          node scripts/workers/question-analytics-db-qa.mjs --pglite-module /tmp/workers-pglite/node_modules/@electric-sql/pglite/dist/index.js
+          node scripts/workers/response-db-qa.mjs --pglite-module /tmp/workers-pglite/node_modules/@electric-sql/pglite/dist/index.js
       - run: npm run build
       - uses: actions/upload-artifact@v4
         if: always()
@@ -76,3 +84,5 @@ jobs:
           path: |
             docs/workers/phase-2-3/actions-validation.json
             /tmp/fenasoja-routines-db-validation.json
+            docs/workers/bot-fenasoja/*validation.json
+            docs/workers/bot-fenasoja/evidence/response-persistence-qa.json

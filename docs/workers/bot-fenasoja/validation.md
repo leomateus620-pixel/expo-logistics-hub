@@ -6,7 +6,10 @@ Data: 17/10/2026, America/Sao_Paulo. Escopo: implementação local na branch `co
 
 | Verificação | Resultado | Evidência |
 | --- | --- | --- |
-| Testes de workers, registry, respostas, catálogo, propostas e rotinas | 308 testes aprovados, zero falhas | scoped-tests.json |
+| Testes de workers, registry, respostas, catálogo, propostas e rotinas | 309 testes aprovados, zero falhas | scoped-tests.json |
+| Lint específico dos workers e integrações do CI | zero erros; 7 avisos de Fast Refresh | comando do workflow Fenasoja Bots |
+| Deno 2.9.6: orquestrador e rotinas | verificação de tipos aprovada | mesmos configs do CI |
+| Deno: proteção das ações existentes | 11 testes aprovados | actions_test.ts, incluindo elegibilidade negada |
 | UI e hook após último ajuste de contexto | 39 testes aprovados (subconjunto, não somar ao total) | workerUi 23 + workersChat 16 |
 | Verificação de tipos | `npm run typecheck` aprovado | execução com saída zero antes do build |
 | Build de produção | `npm run build` aprovado | build.log; avisos de chunks e Browserslist registrados |
@@ -20,6 +23,8 @@ Data: 17/10/2026, America/Sao_Paulo. Escopo: implementação local na branch `co
 A execução global de `npm test` realizada durante o trabalho terminou com **52 arquivos falhando, 373 aprovados; 91 testes falhando, 3466 aprovados**. Há falhas em suítes de Agenda, Comissão, Mapa e apresentação de módulos fora das alterações deste trabalho. Não foi executada uma comparação integral em checkout limpo do commit de origem; portanto, este relatório não atribui todas essas falhas à baseline nem declara a suíte global aprovada. O conjunto pertinente ao BOT FENASOJA passou separadamente.
 
 O plugin MCP do build local em Windows reescreve seu arquivo gerado com import absoluto da máquina. Esse efeito externo ao escopo foi revertido em `supabase/functions/mcp/index.ts` após o build; o arquivo não integra a PR. O `package-lock.json` já alterado e `.worktrees/` foram preservados e excluídos da entrega.
+
+A primeira execução de CI da PR identificou hashes do registro dependentes de CRLF/LF. O gerador agora normaliza o texto de origem e o próprio script antes de calcular proveniência, com regressão para Windows/Linux, e os artefatos foram regenerados. A fixture Deno de ações retornava um objeto de ação para a verificação booleana de elegibilidade; foi corrigida para representar a barreira já existente, sem alterar autorização em produção. O workflow inclui agora os dois novos arquivos de testes e as 34 verificações SQL isoladas. O resultado remoto da nova execução deve ser consultado na PR; aprovação local não é apresentada como CI concluído.
 
 ## Perguntas e dados de teste identificados
 
