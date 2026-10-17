@@ -1,0 +1,24 @@
+{
+  "samples": 228,
+  "active": true,
+  "distinctPoses": 217,
+  "blink": true,
+  "first": {
+    "active": "true",
+    "styles": [
+      "transform-origin: 50% 50%; transform: translateY(-1.4521px) scale(1.00968); transform-box: fill-box;",
+      "transform-origin: 50% 50%; transform: rotate(1.39377deg); transform-box: fill-box;",
+      "transform-origin: 50% 50%; transform: none; transform-box: fill-box;",
+      "transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+    ]
+  },
+  "last": {
+    "active": "true",
+    "styles": [
+      "transform-origin: 50% 50%; transform: translateY(-2.66528px) scale(1.01777); transform-box: fill-box;",
+      "transform-origin: 50% 50%; transform: rotate(-1.96692deg); transform-box: fill-box;",
+      "transform-origin: 50% 50%; transform: scaleY(0.936303); transform-box: fill-box;",
+      "transform: none; transform-origin: 50% 50%; transform-box: fill-box;"
+    ]
+  }
+}

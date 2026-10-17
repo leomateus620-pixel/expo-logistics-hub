@@ -127,6 +127,13 @@
       "when": 1792214766560,
       "tag": "0017_workers_identity_responses",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792216800000,
+      "tag": "0018_workers_knowledge_base",
+      "breakpoints": true
     }
   ]
 }

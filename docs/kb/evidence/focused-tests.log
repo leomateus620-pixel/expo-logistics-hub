@@ -1,0 +1,213 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/.codex/worktrees/workers-knowledge-base/expo-logistics-hub
+
+Browserslist: browsers data (caniuse-lite) is 16 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+stderr | src/features/workers/__tests__/workerUi.test.tsx > bots UI de leitura > apresenta os oito bots e links reais sem ações de marketplace
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/features/workers/__tests__/workerUi.test.tsx (29 tests) 12965ms
+   ✓ bots UI de leitura > apresenta os oito bots e links reais sem ações de marketplace  2696ms
+   ✓ bots UI de leitura > apresenta três sugestões temáticas no agenda sem enviar a escolha automaticamente  1112ms
+   ✓ bots UI de leitura > apresenta três sugestões temáticas no mapa sem enviar a escolha automaticamente  843ms
+   ✓ bots UI de leitura > mantém os cinco atalhos do administrador acessíveis com dicas de teclado e os destinos reais  320ms
+   ✓ bots UI de leitura > mantém a pausa manual disponível após a primeira resposta  813ms
+   ✓ bots UI de leitura > envia o texto digitado e mantém a seleção de @bot explícita  1497ms
+   ✓ bots UI de leitura > atualiza a resposta no lugar reservado abaixo da pergunta e preserva a leitura anterior  349ms
+   ✓ bots UI de leitura > identifica a interrupção sem anunciar a consulta como concluída  345ms
+   ✓ bots UI de leitura > mostra uma falha na tentativa, encerra os indicadores e preserva o próximo texto digitado  393ms
+   ✓ bots UI de leitura > reexecuta só a tentativa escolhida sem enviar nem apagar o novo rascunho  350ms
+   ✓ bots UI de leitura > usa o mascote personalizado só no bot e mostra a abertura como mensagem compacta à esquerda  667ms
+   ✓ bots UI de leitura > pede consentimento antes de iniciar voz e nunca envia a transcrição sozinha  474ms
+   ✓ bots UI de leitura > monta a navegação no portal com sua viewport e retorna foco ao fechar  803ms
+   ✓ bots UI de leitura > abre o painel real pelo link de memória sem enviar mensagem  446ms
+ ✓ src/test/workersKnowledgeBase.test.ts (32 tests) 36421ms
+   ✓ public KB: selection policy and exact reviewed composition > validates every reviewed display string, all statuses and literal summaries without truncation  36185ms
+ ❯ src/features/workers/__tests__/knowledgeSource.test.tsx (6 tests | 1 failed) 1675ms
+   ✓ Fonte KB no chat existente > compacta a fonte em ícone e mantém rótulo/data na dica, período e ressalvas visíveis  1064ms
+   ✓ Fonte KB no chat existente > expõe link externo seguro com nome identificável e foco de teclado  368ms
+   ✓ Fonte KB no chat existente > mantém web e app como ícones com nome acessível e comportamento de abertura próprio 112ms
+   × Fonte KB no chat existente > preserva fontes legadas sem kind e infere o destino externo pelo endereço 17ms
+     → Unable to find an accessible element with the role "link" and name "Fonte na web · Fonte legada"
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+   ✓ Fonte KB no chat existente > não apresenta chips, data inválida ou rótulos de atualização em informação sem confirmação 27ms
+   ✓ Fonte KB no chat existente > aplica o mesmo validador público no transporte e no chip 84ms
+ ✓ src/features/workers/__tests__/richResponse.test.tsx (12 tests) 1555ms
+   ✓ BOT FENASOJA: resposta estruturada > mostra a alternativa acessível com os mesmos valores e nomes completos do gráfico  471ms
+   ✓ BOT FENASOJA: resposta estruturada > apresenta pizza com categorias completas, legenda e tabela com os mesmos valores  322ms
+ ✓ src/features/workers/__tests__/workspaceUi.test.tsx (8 tests) 3186ms
+   ✓ ações confirmadas da equipe > confirma somente ID e versão e não anuncia sucesso antes do receipt  683ms
+   ✓ ações confirmadas da equipe > envia campos pessoais somente pelo comando manual e limpa o formulário ao fechar  1020ms
+   ✓ ações confirmadas da equipe > restaura o foco ao botão de edição quando o formulário fecha  446ms
+   ✓ rotinas e memória explícitas > só grava uma memória depois de preencher e salvar explicitamente  528ms
+ ✓ src/features/workers/__tests__/workerWelcome.test.tsx (4 tests) 387ms
+   ✓ Sugestões de abertura > mantém três perguntas completas, personaliza pelo bot e apenas entrega a seleção ao campo  343ms
+ ✓ src/features/workers/__tests__/workersChat.test.tsx (19 tests) 1035ms
+ ❯ src/test/workersKbSources.test.ts (49 tests | 1 failed) 130ms
+   ✓ Fontes KB: contrato público e evidências > aceita a fonte pública registrada sem ampliar os domínios da pesquisa web 14ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: http://www.emater.tche.br/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://user:pass@www.emater.tche.br/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br:8443/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://localhost/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://machine.local/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://api.internal/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://127.1/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://2130706433/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://0x7f000001/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://10.1.1.1/ 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://172.20.1.1/ 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://192.168.0.1/ 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://[::1]/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://[fc00::1]/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/areas/lote/token 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/%61reas/lote/token 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/%2561reas/lote/token 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/x/../areas/token 3ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br//areas/token 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/?%74oken=secret 2ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/?cpf=123 2ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/?api_key=secret 2ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/?pix=secret 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/white space 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/%0a 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/%invalid 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/` 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/?q=%0a 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/#%00 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://host.localdomain/ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br./ 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/x/areas/token 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/?signature=secret 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/?sig=secret 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/?q="text" 0ms
+   ✓ Fontes KB: contrato público e evidências > rejeita endereço inseguro: https://www.emater.tche.br/?%69tem=123 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita data civil inválida: 2026-02-29 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita data civil inválida: 2026-04-31 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita data civil inválida: 2026-00-10 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita data civil inválida: 2026-13-10 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita data civil inválida: 0000-01-01 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita data civil inválida: 2026-10-17T12:00:00Z 11ms
+   ✓ Fontes KB: contrato público e evidências > rejeita data civil inválida: s.d. 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita data civil inválida: null 1ms
+   ✓ Fontes KB: contrato público e evidências > rejeita data civil inválida: undefined 1ms
+   ✓ Fontes KB: contrato público e evidências > preserva datas civis reais e o limite das fontes ao codificar e reabrir 29ms
+   ✓ Fontes KB: contrato público e evidências > recusa divergência de URL, tipo, data ou quantidade entre bloco e transporte 5ms
+   × Fontes KB: contrato público e evidências > preserva o limite legado de rótulos app/web ao reabrir documentos anteriores 30ms
+     → [
+  {
+    "code": "custom",
+    "message": "Source label too long",
+    "path": [
+      "blocks",
+      0,
+      "items",
+      0,
+      "label"
+    ]
+  },
+  {
+    "code": "custom",
+    "message": "Source label too long",
+    "path": [
+      "blocks",
+      0,
+      "items",
+      1,
+      "label"
+    ]
+  }
+]
+ ✓ src/features/workers/__tests__/workspaceHook.test.tsx (3 tests) 351ms
+ ✓ src/test/workersResponses.test.ts (25 tests) 425ms
+ ✓ src/features/workers/__tests__/workersSessionRunner.test.tsx (3 tests) 110ms
+ ✓ src/test/workersOrchestrator.test.ts (22 tests) 357ms
+ ✓ src/test/workersReliability.test.ts (17 tests) 206ms
+ ✓ src/features/workers/__tests__/workersApi.test.ts (19 tests) 61ms
+ ✓ src/features/workers/__tests__/mascotLife.test.tsx (6 tests) 177ms
+ ✓ src/features/workers/__tests__/workspaceApi.test.ts (9 tests) 84ms
+ ✓ src/features/workers/__tests__/identityResponse.test.tsx (5 tests) 384ms
+ ✓ src/features/workers/__tests__/workersAccessAndFormat.test.ts (5 tests) 47ms
+ ✓ src/features/workers/__tests__/messageOrder.test.ts (6 tests) 8ms
+ ✓ src/features/workers/__tests__/workerViewport.test.tsx (4 tests) 156ms
+ ✓ src/features/workers/__tests__/workerFailures.test.ts (8 tests) 12ms
+ ✓ src/features/workers/__tests__/workspaceDegradation.test.ts (2 tests) 4ms
+ ✓ src/test/workersKnowledgeBaseEngine.test.ts (39 tests) 29115ms
+   ✓ Acervo revisado: composição integral sem truncamento > compõe todas as 2.786 entradas e conserva texto, ressalvas, datas e fonte no documento serializado  26855ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/workersKbSources.test.ts > Fontes KB: contrato público e evidências > preserva o limite legado de rótulos app/web ao reabrir documentos anteriores
+ZodError: [
+  {
+    "code": "custom",
+    "message": "Source label too long",
+    "path": [
+      "blocks",
+      0,
+      "items",
+      0,
+      "label"
+    ]
+  },
+  {
+    "code": "custom",
+    "message": "Source label too long",
+    "path": [
+      "blocks",
+      0,
+      "items",
+      1,
+      "label"
+    ]
+  }
+]
+ ❯ Object.get error [as error] ../../../../Desktop/expo-logistics-hub/node_modules/zod/v3/types.js:39:31
+ ❯ ZodEffects.parse ../../../../Desktop/expo-logistics-hub/node_modules/zod/v3/types.js:114:22
+ ❯ Module.encodeWorkerResponse supabase/functions/_shared/workers/response-contract.ts:86:73
+     85| }
+     86| export function encodeWorkerResponse(value: WorkerResponse): string {
+     87|   return '```fenasoja-response\n' + JSON.stringify(workerResponseSchem…
+       |  ^
+     88| }
+     89| export function decodeWorkerResponse(content: string): WorkerResponse …
+ ❯ src/test/workersKbSources.test.ts:63:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/features/workers/__tests__/knowledgeSource.test.tsx > Fonte KB no chat existente > preserva fontes legadas sem kind e infere o destino externo pelo endereço
+TestingLibraryElementError: Unable to find an accessible element with the role "link" and name "Fonte na web · Fonte legada"
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+</body>
+ ❯ Object.getElementError ../../../../Desktop/expo-logistics-hub/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../../../Desktop/expo-logistics-hub/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../../../Desktop/expo-logistics-hub/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ getByRole ../../../../Desktop/expo-logistics-hub/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/features/workers/__tests__/knowledgeSource.test.tsx:61:19
+     59|   it('preserva fontes legadas sem kind e infere o destino externo pelo…
+     60|     render(<WorkerSourceIcon label="Fonte legada" url="https://fenasoj…
+     61|     expect(screen.getByRole('link', { name: 'Fonte na web · Fonte lega…
+       |                   ^
+     62|   });
+     63|   it('não apresenta chips, data inválida ou rótulos de atualização em …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 21 passed (23)
+      Tests  2 failed | 330 passed (332)
+   Start at  05:19:54
+   Duration  107.94s (transform 2.95s, setup 7.17s, collect 44.18s, tests 88.85s, environment 47.36s, prepare 7.15s)
+

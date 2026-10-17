@@ -1,0 +1,439 @@
+{
+  "environment": "isolated PGlite PostgreSQL; real schema, full seed, SQL search, server engine and persistence; synthetic auth claims; no remote JWT",
+  "now": "2026-10-17T15:00:00.000Z",
+  "checks": [
+    {
+      "question": "Quem foi o presidente da Fenasoja 2024?",
+      "expected": "ED24-PRES",
+      "actual": "ED24-PRES",
+      "score": 1,
+      "milliseconds": 218.94,
+      "passed": true
+    },
+    {
+      "question": "Qual edição da Fenasoja teve o maior público?",
+      "expected": "REC-001",
+      "actual": "REC-001",
+      "score": 1,
+      "milliseconds": 207.9,
+      "passed": true
+    },
+    {
+      "question": "Quando foi a décima Fenasoja?",
+      "expected": "ED10-DATAS",
+      "actual": "ED10-DATAS",
+      "score": 0.9285714,
+      "milliseconds": 182.23,
+      "passed": true
+    },
+    {
+      "question": "Quem presidiu a 10ª edição?",
+      "expected": "ED10-PRES",
+      "actual": "ED10-PRES",
+      "score": 0.71794873,
+      "milliseconds": 205.91,
+      "passed": true
+    },
+    {
+      "question": "Quem presidiu a oitava Fenasoja?",
+      "expected": "HIS-013",
+      "actual": "HIS-013",
+      "score": 0.84375,
+      "milliseconds": 201.34,
+      "passed": true
+    },
+    {
+      "question": "Quem presidiu a Fenasoja 1990?",
+      "expected": "HIS-013",
+      "actual": "HIS-013",
+      "score": 0.78125,
+      "milliseconds": 187.97,
+      "passed": true
+    },
+    {
+      "question": "Quem foi o vice-presidente da Fenasoja 2026?",
+      "expected": "ED25-VICE",
+      "actual": "ED25-VICE",
+      "score": 1,
+      "milliseconds": 212.02,
+      "passed": true
+    },
+    {
+      "question": "Quanto dinheiro tem o Plano Safra 2025/26?",
+      "expected": "MERC-PS-002",
+      "actual": "MERC-PS-002",
+      "score": 0.60294116,
+      "milliseconds": 205.71,
+      "passed": true
+    },
+    {
+      "question": "Quanto tem o Plano Safra da Agricultura Familiar 2025/2026?",
+      "expected": "MERC-PS-005",
+      "actual": "MERC-PS-005",
+      "score": 1,
+      "milliseconds": 226.83,
+      "passed": true
+    },
+    {
+      "question": "Quanto tem o Pronaf esse ano?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 3.82,
+      "passed": true
+    },
+    {
+      "question": "Qual o percentual de Reserva Legal no RS?",
+      "expected": "SUST-LEG-004",
+      "actual": "SUST-LEG-004",
+      "score": 0.6486486,
+      "milliseconds": 215.91,
+      "passed": true
+    },
+    {
+      "question": "Quem é o presidente da Fenasoja?",
+      "expected": "F28-002",
+      "actual": "F28-002",
+      "score": 0.8333333,
+      "milliseconds": 200.91,
+      "passed": true
+    },
+    {
+      "question": "Quem será o presidente da Fenasoja 2030?",
+      "expected": "F28-003",
+      "actual": "F28-003",
+      "score": 1,
+      "milliseconds": 200.07,
+      "passed": true
+    },
+    {
+      "question": "Qual o preço da soja hoje?",
+      "expected": "MERC-DYN-001",
+      "actual": "MERC-DYN-001",
+      "score": 1,
+      "milliseconds": 182.74,
+      "passed": true
+    },
+    {
+      "question": "Qual foi o volume de negócios da Fenasoja 2018?",
+      "expected": "ED22-NEG",
+      "actual": "ED22-NEG",
+      "score": 1,
+      "milliseconds": 208.96,
+      "passed": true
+    },
+    {
+      "question": "Qual foi o público da Fenasoja 1966?",
+      "expected": "ED01-PUB",
+      "actual": "ED01-PUB",
+      "score": 1,
+      "milliseconds": 193.89,
+      "passed": true
+    },
+    {
+      "question": "Quando foi a Fenasoja 2024?",
+      "expected": "ED24-DATAS",
+      "actual": "ED24-DATAS",
+      "score": 1,
+      "milliseconds": 177.47,
+      "passed": true
+    },
+    {
+      "question": "Teve Fenasoja em 2020?",
+      "expected": "GER-006",
+      "actual": "GER-006",
+      "score": 1,
+      "milliseconds": 166.65,
+      "passed": true
+    },
+    {
+      "question": "Quanto custa o estacionamento da próxima Fenasoja?",
+      "expected": "FAQ-GER-004",
+      "actual": "FAQ-GER-004",
+      "score": 0.75,
+      "milliseconds": 218.96,
+      "passed": true
+    },
+    {
+      "question": "Qual a altura de pastejo para ovelhas?",
+      "expected": "clarification",
+      "actual": "clarification",
+      "score": null,
+      "milliseconds": 0.33,
+      "passed": true
+    },
+    {
+      "question": "Quantos lotes vendemos em 2026?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 0.09,
+      "passed": true
+    },
+    {
+      "question": "Quais eventos tenho amanhã na agenda?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 0.08,
+      "passed": true
+    },
+    {
+      "question": "O que é Pix?",
+      "expected": "TEC-WK-0041",
+      "actual": "TEC-WK-0041",
+      "score": 1,
+      "milliseconds": 174.93,
+      "passed": true
+    },
+    {
+      "question": "Quem será o presidente da Fenasoja seguinte à de 2026?",
+      "expected": "F28-002",
+      "actual": "F28-002",
+      "score": 0.78431374,
+      "milliseconds": 234.01,
+      "passed": true
+    },
+    {
+      "question": "Quem foi a primeira mulher presidente da Fenasoja?",
+      "expected": "HIS-009",
+      "actual": "HIS-009",
+      "score": 0.7446808,
+      "milliseconds": 212.19,
+      "passed": true
+    },
+    {
+      "question": "Qual é a população de Santa Rosa em 1990?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 7.85,
+      "passed": true
+    },
+    {
+      "question": "Qual é a população de Santa Rosa em 2025?",
+      "expected": "SR-002",
+      "actual": "SR-002",
+      "score": 0.7380952,
+      "milliseconds": 210.53,
+      "passed": true
+    },
+    {
+      "question": "Quanto tem o Plano Safra da Agricultura Familiar em 2024?",
+      "expected": "clarification",
+      "actual": "clarification",
+      "score": null,
+      "milliseconds": 0.19,
+      "passed": true
+    },
+    {
+      "question": "Qual o PIB do Rio Grande do Sul em 2022?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 10.47,
+      "passed": true
+    },
+    {
+      "question": "Qual o PIB do Rio Grande do Sul?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 367.22,
+      "passed": true
+    },
+    {
+      "question": "Quem não foi o presidente da Fenasoja 2024?",
+      "expected": "clarification",
+      "actual": "clarification",
+      "score": null,
+      "milliseconds": 208.05,
+      "passed": true
+    },
+    {
+      "question": "Quem presidiu a 10ª e a 11ª edição?",
+      "expected": "clarification",
+      "actual": "clarification",
+      "score": null,
+      "milliseconds": 0.15,
+      "passed": true
+    },
+    {
+      "question": "Quem presidiu a décima e a décima primeira Fenasoja?",
+      "expected": "clarification",
+      "actual": "clarification",
+      "score": null,
+      "milliseconds": 0.12,
+      "passed": true
+    },
+    {
+      "question": "2028",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 0.09,
+      "passed": true
+    },
+    {
+      "question": "Refiro-me à Fenasoja 2028",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 0.07,
+      "passed": true
+    },
+    {
+      "question": "início da gestação",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 0.06,
+      "passed": true
+    },
+    {
+      "question": "Por que a Fenasoja não aconteceu em 2020?",
+      "expected": "GER-006",
+      "actual": "GER-006",
+      "score": 1,
+      "milliseconds": 197.29,
+      "passed": true
+    },
+    {
+      "question": "Quantos habitantes tem Alegria em 2025?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 15.22,
+      "passed": true
+    },
+    {
+      "question": "Quantos habitantes tem Alegria em 2022?",
+      "expected": "RS-IBGE-POP-4300455",
+      "actual": "RS-IBGE-POP-4300455",
+      "score": 0.75,
+      "milliseconds": 209.59,
+      "passed": true
+    },
+    {
+      "question": "Quando ocorreu a Fenasoja?",
+      "expected": "ED25-DATAS",
+      "actual": "ED25-DATAS",
+      "score": 0.6764706,
+      "milliseconds": 179.38,
+      "passed": true
+    },
+    {
+      "question": "Quem presidia a Fenasoja?",
+      "expected": "ED25-PRES",
+      "actual": "ED25-PRES",
+      "score": 0.7058824,
+      "milliseconds": 184.64,
+      "passed": true
+    },
+    {
+      "question": "Quantos habitantes?",
+      "expected": "clarification",
+      "actual": "clarification",
+      "score": null,
+      "milliseconds": 0.19,
+      "passed": true
+    },
+    {
+      "integration": "Quem foi o presidente da Fenasoja 2024?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Qual foi o volume de negócios da Fenasoja 2018?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Qual foi o público da Fenasoja 1966?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Qual o preço da soja hoje?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Qual a altura de pastejo para ovelhas?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Quem será o presidente da Fenasoja seguinte à de 2026?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Quem foi a primeira mulher presidente da Fenasoja?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Quanto tem o Plano Safra da Agricultura Familiar em 2024?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Qual o PIB do Rio Grande do Sul em 2022?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": false,
+      "outcome": "miss",
+      "stubProviderCalls": 1,
+      "inputTokens": 31,
+      "outputTokens": 7,
+      "noBusinessData": true,
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "passed": true
+}

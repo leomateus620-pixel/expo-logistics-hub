@@ -1,0 +1,242 @@
+{
+  "environment": "isolated PGlite PostgreSQL; real schema, full seed, SQL search, server engine and persistence; synthetic auth claims; no remote JWT",
+  "now": "2026-10-17T15:00:00.000Z",
+  "checks": [
+    {
+      "question": "Quem foi o presidente da Fenasoja 2024?",
+      "expected": "ED24-PRES",
+      "actual": "ED24-PRES",
+      "score": 1,
+      "milliseconds": 309.88,
+      "passed": true
+    },
+    {
+      "question": "Qual edição da Fenasoja teve o maior público?",
+      "expected": "REC-001",
+      "actual": "REC-001",
+      "score": 1,
+      "milliseconds": 337.59,
+      "passed": true
+    },
+    {
+      "question": "Quando foi a décima Fenasoja?",
+      "expected": "ED10-DATAS",
+      "actual": "ED10-DATAS",
+      "score": 0.9285714,
+      "milliseconds": 289.55,
+      "passed": true
+    },
+    {
+      "question": "Quem presidiu a 10ª edição?",
+      "expected": "ED10-PRES",
+      "actual": "ED10-PRES",
+      "score": 0.71794873,
+      "milliseconds": 299.37,
+      "passed": true
+    },
+    {
+      "question": "Quem presidiu a oitava Fenasoja?",
+      "expected": "HIS-013",
+      "actual": "HIS-013",
+      "score": 0.84375,
+      "milliseconds": 319.37,
+      "passed": true
+    },
+    {
+      "question": "Quem presidiu a Fenasoja 1990?",
+      "expected": "HIS-013",
+      "actual": "HIS-013",
+      "score": 0.78125,
+      "milliseconds": 271.97,
+      "passed": true
+    },
+    {
+      "question": "Quem foi o vice-presidente da Fenasoja 2026?",
+      "expected": "ED25-VICE",
+      "actual": "ED25-VICE",
+      "score": 1,
+      "milliseconds": 281.21,
+      "passed": true
+    },
+    {
+      "question": "Quanto dinheiro tem o Plano Safra 2025/26?",
+      "expected": "MERC-PS-002",
+      "actual": "MERC-PS-002",
+      "score": 0.60294116,
+      "milliseconds": 271.57,
+      "passed": true
+    },
+    {
+      "question": "Quanto tem o Plano Safra da Agricultura Familiar 2025/2026?",
+      "expected": "MERC-PS-005",
+      "actual": "MERC-PS-005",
+      "score": 1,
+      "milliseconds": 296.22,
+      "passed": true
+    },
+    {
+      "question": "Quanto tem o Pronaf esse ano?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 5.34,
+      "passed": true
+    },
+    {
+      "question": "Qual o percentual de Reserva Legal no RS?",
+      "expected": "SUST-LEG-004",
+      "actual": "SUST-LEG-004",
+      "score": 0.6486486,
+      "milliseconds": 267.96,
+      "passed": true
+    },
+    {
+      "question": "Quem é o presidente da Fenasoja?",
+      "expected": "F28-002",
+      "actual": "F28-002",
+      "score": 0.8333333,
+      "milliseconds": 328.22,
+      "passed": true
+    },
+    {
+      "question": "Quem será o presidente da Fenasoja 2030?",
+      "expected": "F28-003",
+      "actual": "F28-003",
+      "score": 1,
+      "milliseconds": 280.01,
+      "passed": true
+    },
+    {
+      "question": "Qual o preço da soja hoje?",
+      "expected": "MERC-DYN-001",
+      "actual": "MERC-DYN-001",
+      "score": 1,
+      "milliseconds": 233.17,
+      "passed": true
+    },
+    {
+      "question": "Qual foi o volume de negócios da Fenasoja 2018?",
+      "expected": "ED22-NEG",
+      "actual": "ED22-NEG",
+      "score": 1,
+      "milliseconds": 273.58,
+      "passed": true
+    },
+    {
+      "question": "Qual foi o público da Fenasoja 1966?",
+      "expected": "ED01-PUB",
+      "actual": "ED01-PUB",
+      "score": 1,
+      "milliseconds": 241.16,
+      "passed": true
+    },
+    {
+      "question": "Quando foi a Fenasoja 2024?",
+      "expected": "ED24-DATAS",
+      "actual": "ED24-DATAS",
+      "score": 1,
+      "milliseconds": 264.21,
+      "passed": true
+    },
+    {
+      "question": "Teve Fenasoja em 2020?",
+      "expected": "GER-006",
+      "actual": "GER-006",
+      "score": 1,
+      "milliseconds": 224.2,
+      "passed": true
+    },
+    {
+      "question": "Quanto custa o estacionamento da próxima Fenasoja?",
+      "expected": "FAQ-GER-004",
+      "actual": "FAQ-GER-004",
+      "score": 0.75,
+      "milliseconds": 274.41,
+      "passed": true
+    },
+    {
+      "question": "Qual a altura de pastejo para ovelhas?",
+      "expected": "clarification",
+      "actual": "clarification",
+      "score": null,
+      "milliseconds": 0.37,
+      "passed": true
+    },
+    {
+      "question": "Quantos lotes vendemos em 2026?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 0.09,
+      "passed": true
+    },
+    {
+      "question": "Quais eventos tenho amanhã na agenda?",
+      "expected": null,
+      "actual": null,
+      "score": null,
+      "milliseconds": 0.07,
+      "passed": true
+    },
+    {
+      "question": "O que é Pix?",
+      "expected": "TEC-WK-0041",
+      "actual": "TEC-WK-0041",
+      "score": 1,
+      "milliseconds": 194.87,
+      "passed": true
+    },
+    {
+      "integration": "Quem foi o presidente da Fenasoja 2024?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Qual foi o volume de negócios da Fenasoja 2018?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Qual foi o público da Fenasoja 1966?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Qual o preço da soja hoje?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    },
+    {
+      "integration": "Qual a altura de pastejo para ovelhas?",
+      "persistence": true,
+      "reopen": true,
+      "usage": true,
+      "audit": true,
+      "telemetry": true,
+      "noModel": true,
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "passed": true
+}

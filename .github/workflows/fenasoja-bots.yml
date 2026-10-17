@@ -13,6 +13,9 @@ on:
       - 'supabase/functions/workers-*/**'
       - 'supabase/migrations/*workers*.sql'
       - 'scripts/workers/**'
+      - 'scripts/kb/**'
+      - 'data/kb/**'
+      - 'drizzle/migrations/*workers_knowledge_base.sql'
       - '.github/workflows/fenasoja-bots.yml'
 permissions:
   contents: read
@@ -50,12 +53,17 @@ jobs:
         run: |
           node scripts/workers/build-edge-registry.mjs --check
           node scripts/workers/export-question-bank.mjs --check
+          node scripts/kb/build-kb-seed.mjs --check
+          node scripts/kb/test-kb-generator.mjs
+          node scripts/kb/test-migration-hash.mjs
           npx eslint src/features/workers src/lib/workers src/components/WorkersLauncher.tsx src/features/commercial-map/components/MapLotDeepLink.tsx supabase/functions/_shared/workers supabase/functions/workers-orchestrator supabase/functions/workers-actions supabase/functions/workers-routines scripts/workers
+          npx eslint scripts/kb
       - name: Bot, privacy, transport and existing integration contracts
         run: >-
           npx vitest run --maxWorkers=2
           src/features/workers src/lib/workers src/test/workersOrchestrator.test.ts
           src/test/workersResponses.test.ts src/test/workersQuestionBank.test.ts src/test/workersReliability.test.ts src/test/workersDeadline.test.ts
+          src/test/workersKnowledgeBase.test.ts src/test/workersKnowledgeBaseEngine.test.ts src/test/workersKbSources.test.ts src/test/workersPreviewMotion.test.ts
           src/test/workersProposals.test.ts src/test/workersRoutines.test.ts src/test/mapLotDeepLink.test.tsx
           src/lib/__tests__/cronogramaRpc.test.ts src/test/publicMapHost.test.ts
           src/test/eventAssignmentPush.test.ts src/test/pushDeviceRevocation.test.ts src/test/eventPushMessage.test.ts
@@ -70,12 +78,18 @@ jobs:
           npm install --prefix /tmp/workers-pg-client --no-save --package-lock=false --ignore-scripts pg@8.16.3
           node scripts/workers/actions-qa.mjs --pg-module /tmp/workers-pg-client/node_modules/pg/lib/index.js
           node scripts/workers/routines-db-qa.mjs --pg-module /tmp/workers-pg-client/node_modules/pg/lib/index.js
+      - name: Public KB native PostgreSQL 16 lifecycle
+        run: node scripts/kb/run-integration-qa.mjs --pg-module /tmp/workers-pg-client/node_modules/pg/lib/index.js
       - name: Verified aggregates, turn order and visual response persistence
         run: |
           npm install --prefix /tmp/workers-pglite --no-save --package-lock=false --ignore-scripts @electric-sql/pglite@0.5.10
           node scripts/workers/analytics-db-qa.mjs --pglite-module /tmp/workers-pglite/node_modules/@electric-sql/pglite/dist/index.js
           node scripts/workers/question-analytics-db-qa.mjs --pglite-module /tmp/workers-pglite/node_modules/@electric-sql/pglite/dist/index.js
           node scripts/workers/response-db-qa.mjs --pglite-module /tmp/workers-pglite/node_modules/@electric-sql/pglite/dist/index.js
+      - name: Public KB corpus, SQL security and deterministic lifecycle
+        run: |
+          node scripts/kb/db-qa.mjs --pglite /tmp/workers-pglite/node_modules/@electric-sql/pglite/dist
+          node scripts/kb/run-integration-qa.mjs --pglite-module /tmp/workers-pglite/node_modules/@electric-sql/pglite/dist/index.js
       - run: npm run build
       - uses: actions/upload-artifact@v4
         if: always()
@@ -86,3 +100,4 @@ jobs:
             /tmp/fenasoja-routines-db-validation.json
             docs/workers/bot-fenasoja/*validation.json
             docs/workers/bot-fenasoja/evidence/response-persistence-qa.json
+            docs/kb/evidence/*.json

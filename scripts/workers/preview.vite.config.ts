@@ -51,9 +51,11 @@ export default defineConfig({
           response.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store' });
           const emit = (event: string, data: unknown) => response.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
           emit('conversation', { conversationId }); emit('worker', { workerId: worker });
-          const progressLabel = `Consultando ${worker === 'mapa' ? 'o Mapa Comercial' : worker === 'radar' ? 'a fonte institucional' : 'a Agenda'} · dados de teste…`;
+          const progressLabel = fixture?.content.includes('"intent":"knowledge_base"') ? 'Consultando a base de conhecimento…'
+            : `Consultando ${worker === 'mapa' ? 'o Mapa Comercial' : worker === 'radar' ? 'a fonte institucional' : 'a Agenda'} · dados de teste…`;
           emit('progress', { label: progressLabel, status: 'running' });
-          await new Promise(resolve => setTimeout(resolve, 180));
+          // Local fixture delay makes the pending mascot/dots observable during visual QA.
+          await new Promise(resolve => setTimeout(resolve, 1800));
           if (failureCode) { emit('error', { ...publicWorkerError(new WorkerError(failureCode)), requestId: input.requestId }); response.end(); return; }
           emit('progress', { label: progressLabel, status: 'complete' });
           emit('citations', { citations });

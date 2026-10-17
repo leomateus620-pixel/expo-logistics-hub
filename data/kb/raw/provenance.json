@@ -1,0 +1,169 @@
+{
+  "revision": "2026-10-17",
+  "original_versions": {
+    "fenasoja": "2026-10-17",
+    "expandida": "1.0"
+  },
+  "inputs": [
+    {
+      "name": "fenasoja-kb.json",
+      "sha256": "1bce6b6077c391c22ba2c56c96ea855af29ad546c0ba538674eb30d3768232a6",
+      "bytes": 526296,
+      "source_path": "C:\\Users\\Leonardo\\Downloads\\fenasoja-kb.json"
+    },
+    {
+      "name": "fenasoja-kb.csv",
+      "sha256": "468b400de071c96949ebf37a674e2c5158278b31b1f5c08b6c3ecffa44e89a2d",
+      "bytes": 557545,
+      "source_path": "C:\\Users\\Leonardo\\Downloads\\fenasoja-kb.csv"
+    },
+    {
+      "name": "fenasoja-kb.md",
+      "sha256": "a23b1f1398573da3d9e32fd3711bd875fb3899af74c3fb7f823f2c6c2f158e21",
+      "bytes": 154830,
+      "source_path": "C:\\Users\\Leonardo\\Downloads\\fenasoja-kb.md"
+    },
+    {
+      "name": "kb-expandida-fenasoja.zip",
+      "sha256": "f8909502189b2110479a115fca9c54e322dff0b990f69a7b4277c504049289af",
+      "bytes": 2762090,
+      "source_path": "C:\\Users\\Leonardo\\Downloads\\kb-expandida-fenasoja.zip"
+    }
+  ],
+  "archive_members": [
+    {
+      "name": "kb-expandida.json",
+      "sha256": "326121e0e7d4c5ef3b6dcd2ffcbb438122b02c82f39881f01f8940a2190d1f36",
+      "bytes": 5274438,
+      "lines": 102785
+    },
+    {
+      "name": "kb-expandida.csv",
+      "sha256": "0e921bcb37104f9255fd4fc7409b5360c66c87d3ba8705718b4dc0e2929a2202",
+      "bytes": 15201227,
+      "lines": 10890
+    },
+    {
+      "name": "kb-expandida.md",
+      "sha256": "15ad8ecfb41fe83f8c2141760ba2b01e9b459dea7efd73f5bb842dd08b147b82",
+      "bytes": 33387,
+      "lines": 292
+    },
+    {
+      "name": "lacunas-expandida.md",
+      "sha256": "5ec46595e934908384789592e3aa4ffd5cc550a5117fadac66c5d2024e80e1a9",
+      "bytes": 24423,
+      "lines": 161
+    },
+    {
+      "name": "por-area/agro.json",
+      "sha256": "65ed7191e1e769120b85c27e8abaa402be4fc829b9f25513afe4cdee56cda806",
+      "bytes": 3253580,
+      "lines": 65240
+    },
+    {
+      "name": "por-area/feiras.json",
+      "sha256": "22bb2470f58d0b549ab1731c6455c21a3bd9cf1ef06b6796fbbf84e1875f3fc4",
+      "bytes": 52190,
+      "lines": 1262
+    },
+    {
+      "name": "por-area/agtech.json",
+      "sha256": "14704b260ac7dceebb97ac7336de9b546ae9dcf40e401dd708ff64b06b9bec78",
+      "bytes": 537175,
+      "lines": 10420
+    },
+    {
+      "name": "por-area/tecnologia.json",
+      "sha256": "60122ff7dc7569f23050d464c10c34112e7f482aef0c1bf6d2790cb8c0a79425",
+      "bytes": 109353,
+      "lines": 2341
+    },
+    {
+      "name": "por-area/mercado.json",
+      "sha256": "18699fa56e2e1f02929e54169aa853646b59d0b9b520edb32433cf879dedb5fd",
+      "bytes": 185543,
+      "lines": 4116
+    },
+    {
+      "name": "por-area/sustentabilidade.json",
+      "sha256": "f9f6810ab3a238a5eb30fc78e2f50c132da57cff2f343e4dc1fd2652e3cbb41f",
+      "bytes": 489382,
+      "lines": 9061
+    },
+    {
+      "name": "por-area/rs-regiao.json",
+      "sha256": "5c556f1ba56a722f3f8532a81572c243145ef25f9e596593189d4b15514a5cf6",
+      "bytes": 636010,
+      "lines": 10002
+    },
+    {
+      "name": "por-area/faq-visitante.json",
+      "sha256": "287dc11e4aec65dd209d08acd3b0ac41cea4bcc81d4534477646890d41e3c58c",
+      "bytes": 9845,
+      "lines": 312
+    },
+    {
+      "name": "por-area/agro.md",
+      "sha256": "f4d3bc12367ebf4509a53a7efc170491e2dd2356d0d5d996c4366a92a9848461",
+      "bytes": 2349450,
+      "lines": 15452
+    },
+    {
+      "name": "por-area/feiras.md",
+      "sha256": "8a2db8c8320afe791fa74231c7a09db591013f30f6dff77e136fd60ba1b09e20",
+      "bytes": 35129,
+      "lines": 378
+    },
+    {
+      "name": "por-area/agtech.md",
+      "sha256": "2e871228fc13844f04dd91303c4c3b8eefebdd81b6208c2c54eeb4f8a9fd56c0",
+      "bytes": 379930,
+      "lines": 2525
+    },
+    {
+      "name": "por-area/tecnologia.md",
+      "sha256": "497350bb98e02404ad5930b3e6f5d641545e1d4c7314e61994b286d9267febe9",
+      "bytes": 75923,
+      "lines": 640
+    },
+    {
+      "name": "por-area/mercado.md",
+      "sha256": "ab60a746707035884f0ccf233c8a5cfdd7371fdf0e5beaf0f62b5eaeae34e00c",
+      "bytes": 125755,
+      "lines": 1099
+    },
+    {
+      "name": "por-area/sustentabilidade.md",
+      "sha256": "2224c305ee2b6ee0c135082d5805e0286d68d0543f1b11c41a9306a884f78e94",
+      "bytes": 354064,
+      "lines": 2203
+    },
+    {
+      "name": "por-area/rs-regiao.md",
+      "sha256": "2fe322a620dce3e0d5087fe32df3e5c8ea2837617a51f2dd90893465bdb067ca",
+      "bytes": 493109,
+      "lines": 2338
+    },
+    {
+      "name": "por-area/faq-visitante.md",
+      "sha256": "27e4cf29ccd787f3fdcfedced87d706763f6d516121d38742345518a094275e0",
+      "bytes": 6347,
+      "lines": 108
+    }
+  ],
+  "review_scope": "All four supplied files and all 20 archive members parsed/read. JSON main files are the sole import sources; CSV/Markdown/area copies are verification evidence.",
+  "source_access_dates": "Declared by supplied archives; not represented as freshly verified.",
+  "live_evidence": [
+    {
+      "url": "https://fenasoja.com.br/edicoes-anteriores/",
+      "reviewed_on": "2026-10-17",
+      "finding": "24th edition page gives 29/11–08/12/2024; existing divergent opening date retained."
+    },
+    {
+      "url": "https://fenasoja.com.br/portal-oficial/geral/definidas-data-e-comissao-central-da-fenasoja-2028/",
+      "reviewed_on": "2026-10-17",
+      "finding": "28/04–07/05/2028, president Fabiano Soltis, vice Djeison Drey; does not confirm edition number."
+    }
+  ]
+}

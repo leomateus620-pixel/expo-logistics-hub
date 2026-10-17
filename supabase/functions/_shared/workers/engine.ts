@@ -1,7 +1,7 @@
 import {
   asksForMutation, type EmitWorkerEvent, isObject, type PlannerTool, type ProviderMessage,
   type ReadResult, type ReadTool, redactWorkerData, redactWorkerText, validateCitations,
-  type WorkerCitation, WorkerError, type WorkerId, type WorkerProvider, type WorkerRequest, workersForRequest,
+  type WorkerCitation, WorkerError, type WorkerId, type WorkerProvider, type WorkerRequest, workersForRequest, routeWorker,
 } from './contracts.ts';
 import { webSearchTool } from './web-search.ts';
 import { proposalIntent, type ProposalIntent } from './proposal-policy.ts';
@@ -10,6 +10,8 @@ import { composeWorkerResponse, validateToolEvidence, type ToolEvidence } from '
 import { institutionalTool } from './institutional.ts';
 import { decodeWorkerResponse } from './response-contract.ts';
 import { plannerPlaybooks } from './question-bank.ts';
+import { composeKbResponse, interpretKbQuery, isPublicKbQuestion, KB_TOOL_NAME, type KbSelection } from './knowledge-base.ts';
+import { workerFailureDiagnostic } from './failures.ts';
 
 export interface TurnStart {
   conversationId: string;
@@ -33,6 +35,8 @@ export interface WorkerTurnDependencies {
   executeTool(name: string, input: unknown): Promise<ReadResult>;
   searchWeb?(input: unknown, signal?: AbortSignal): Promise<ReadResult>;
   institutionalPresident?(input: unknown, signal?: AbortSignal): Promise<ReadResult>;
+  searchKb?(message: string, now: Date, signal?: AbortSignal): Promise<KbSelection | null>;
+  logKb?(request: WorkerRequest, selection: KbSelection | null): Promise<void>;
   begin(request: WorkerRequest, worker: WorkerId): Promise<TurnStart>;
   finish(request: WorkerRequest, completion: TurnCompletion): Promise<void>;
   fail(request: WorkerRequest, usage?: { model: string; inputTokens: number; outputTokens: number }): Promise<void>;
@@ -116,7 +120,8 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
   // History is read only through the authenticated conversation scope, before beginning a new turn.
   const history = request.conversationId ? await deps.history?.(request.conversationId) ?? [] : [];
   const queryIntent = interpretWorkerIntent(request, now, history);
-  const worker = queryIntent.worker;
+  const kbCandidate = Boolean(deps.searchKb && isPublicKbQuestion(request.message));
+  const worker = kbCandidate ? routeWorker(request) : queryIntent.worker;
   const admitted = await deps.begin(request, worker);
   emit('conversation', { conversationId: admitted.conversationId });
   emit('worker', { workerId: admitted.workerId ?? worker });
@@ -130,6 +135,8 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
     const usage = { model: deps.provider.model, inputTokens: 0, outputTokens: 0 };
     let providerAttempted = false;
     let usageComplete = true;
+    let kbSelection: KbSelection | null = null;
+    let kbQueried = false;
     try {
       if (deps.signal?.aborted) throw new WorkerError('request_cancelled', 499);
       const intent = proposalIntent(request.message);
@@ -142,12 +149,33 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
           inputTokens: 0, outputTokens: 0, model: deps.provider.model, tools: [],
         };
       } else {
-        const relatedWorkers = workersForRequest(request, worker);
+        if (!intent && kbCandidate) {
+          emit('progress', { label: 'Consultando a base de conhecimento…', status: 'running' });
+          try {
+            kbSelection = await deps.searchKb!(request.message, now, deps.signal);
+            kbQueried = true;
+          } catch (error) {
+            if (deps.signal?.aborted || error instanceof WorkerError && (error.status === 401 || error.status === 403 || error.status === 499 || error.code.startsWith('invalid_kb'))) throw error;
+            console.error(JSON.stringify({ ...workerFailureDiagnostic(error, request.requestId), stage: 'kb_search' }));
+          }
+          if (deps.signal?.aborted) throw new WorkerError('request_cancelled', 499);
+          emit('progress', { label: 'Consulta concluída', status: 'complete' });
+        }
+        if (kbSelection) {
+          completion = { ...composeKbResponse(request, kbSelection, now, admitted.workerId ?? worker),
+            model: kbSelection.type === 'answer' ? `deterministic/kb.${kbSelection.hit.kb_version}.${kbSelection.hit.entry_id}` : 'deterministic/kb.clarification',
+            inputTokens: 0, outputTokens: 0, usageComplete: true, tools: [KB_TOOL_NAME] };
+        } else {
+        // Public KB preserves the selected bot's identity. A miss still uses the
+        // existing intent routing to discover authorized fallback tools.
+        const relatedWorkers = workersForRequest(request, intent ? worker : queryIntent.worker);
         const toolGroups = await Promise.all(relatedWorkers.map(id => deps.listTools(id)));
         const available = [...new Map(toolGroups.flat().map(tool => [tool.name, tool])).values()];
         if (available.some(tool => tool.readOnly !== true || forbiddenTool(tool.name))) throw new WorkerError('unsafe_tool_registry', 503);
+        const publicContext = interpretKbQuery(request.message, now);
+        const institutionalEligible = publicContext.editionYear === 2028 && publicContext.role === 'president' && !publicContext.clarification && !publicContext.unresolvedEdition;
         const readTools = [...available, ...(relatedWorkers.includes('radar') && deps.searchWeb ? [webSearchTool] : []),
-          ...(relatedWorkers.includes('radar') && deps.institutionalPresident ? [institutionalTool] : [])];
+          ...(relatedWorkers.includes('radar') && deps.institutionalPresident && institutionalEligible ? [institutionalTool] : [])];
         const tools: PlannerTool[] = [...readTools, ...proposalTools];
         if (!tools.length) {
           completion = { content: 'Seu acesso atual não permite consultar os dados deste especialista. Abra o módulo ou solicite a liberação de acesso ao responsável.', citations: [], inputTokens: 0, outputTokens: 0, model: deps.provider.model, tools: [] };
@@ -283,9 +311,26 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
           } : composeWorkerResponse(request, queryIntent, results, now)), ...usage, usageComplete, tools: executed };
           if (proposed) emit('workspace', { kind: proposed.kind, id: proposed.id });
         }
+        }
       }
       if (deps.signal?.aborted) throw new WorkerError('request_cancelled', 499);
-      await deps.finish(request, completion);
+      // A successful lookup is audited even when its miss continues through existing tools.
+      if (kbQueried && !completion.tools.includes(KB_TOOL_NAME)) completion.tools = [KB_TOOL_NAME, ...completion.tools];
+      try { await deps.finish(request, completion); }
+      catch (error) {
+        if (!kbSelection || !deps.searchKb || !(error instanceof WorkerError) || error.code !== 'kb_version_changed' || deps.signal?.aborted) throw error;
+        // One complete re-selection, with the exact same civil clock. Never mix old text and new sources.
+        kbSelection = await deps.searchKb(request.message, now, deps.signal);
+        if (!kbSelection || deps.signal?.aborted) throw error;
+        completion = { ...composeKbResponse(request, kbSelection, now, admitted.workerId ?? worker),
+          model: kbSelection.type === 'answer' ? `deterministic/kb.${kbSelection.hit.kb_version}.${kbSelection.hit.entry_id}` : 'deterministic/kb.clarification',
+          inputTokens: 0, outputTokens: 0, usageComplete: true, tools: [KB_TOOL_NAME] };
+        await deps.finish(request, completion);
+      }
+      if (kbQueried && deps.logKb) {
+        try { await deps.logKb(request, kbSelection); }
+        catch (error) { console.error(JSON.stringify({ ...workerFailureDiagnostic(error, request.requestId), stage: 'kb_telemetry' })); }
+      }
     } catch (error) {
       // Do not leak exceptions, SQL, tool arguments or personal data into logs.
       await deps.fail(request, providerAttempted ? usage : undefined).catch(() => undefined);

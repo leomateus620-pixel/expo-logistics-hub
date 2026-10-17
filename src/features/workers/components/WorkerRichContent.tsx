@@ -1,9 +1,9 @@
 import { memo } from 'react';
-import { ChevronDown, ExternalLink } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { z } from 'zod';
 import { Bar, BarChart, Cell, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { decodeWorkerResponse, type WorkerResponse, type WorkerResponseBlock } from '../../../../supabase/functions/_shared/workers/response-contract';
-import { safeSourceUrl } from '../ui-utils';
+import { WorkerSourceIcon } from './WorkerKnowledgeSource';
 import '../styles/entity-ranking.css';
 import { PersonAvatar } from '@/components/cronograma-eventos/PersonAvatar';
 import { OrgUnitIdentityBadge, resolveOrgUnitIdentity } from '@/components/cronograma-eventos/org-unit-identity';
@@ -60,7 +60,9 @@ function blockText(block: WorkerResponseBlock): string {
     case 'comparison': return `${block.title}\n${block.items.map(item => `${item.label}: ${block.currentLabel ?? 'Período atual'} ${formatResponseValue(item.current, block.unit)}; ${block.previousLabel ?? 'Período anterior'} ${formatResponseValue(item.previous, block.unit)}`).join('\n')}`;
     case 'profile': return [block.name, block.role, block.edition, ...block.details.map(item => `${item.label}: ${item.value}`)].join('\n');
     case 'entity_ranking': return `${block.title}\n${block.items.map(item => `${item.position}. ${item.label ?? item.name}: ${item.events} eventos vinculados`).join('\n')}`;
-    case 'sources': return block.items.map(item => `${item.label}: ${item.url}`).join('\n');
+    case 'sources': return block.items.map(item => item.source === 'kb'
+      ? `Base de conhecimento · ${item.label} · Acesso declarado em ${dateLabel(item.date!)}: ${item.url}`
+      : `${item.label}: ${item.url}`).join('\n');
     case 'empty': return block.message;
     case 'clarification': return [block.question, ...clarificationOptions(block)].join('\n');
   }
@@ -75,7 +77,7 @@ export function richContentToText(content: string): string {
   return parseRichContent(content).map(segment => segment.kind === 'text' ? segment.text.replace(/\*\*/g, '')
     : segment.kind === 'table' ? tableText(segment.table)
       : segment.kind === 'chart' ? `${segment.chart.title}: ${segment.chart.data.map(item => `${item.label} ${item.value}`).join(', ')}`
-        : [segment.response.summary, ...segment.response.blocks.map(blockText), ...segment.response.metadata.notes].join('\n\n')).join('\n\n');
+        : [segment.response.summary, ...(segment.response.intent === 'knowledge_base' ? [segment.response.metadata.edition, segment.response.metadata.period?.label].filter(Boolean) : []), ...segment.response.blocks.map(blockText), ...segment.response.metadata.notes].join('\n\n')).join('\n\n');
 }
 function Text({ text }: { text: string }) {
   return <p className="worker-rich-text">{text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => part.startsWith('**') && part.endsWith('**') ? <strong key={index}>{part.slice(2, -2)}</strong> : <span key={index}>{part}</span>)}</p>;
@@ -128,13 +130,20 @@ function ResponseBlock({ block }: { block: WorkerResponseBlock }) {
       {block.population > block.items.length && <p className="worker-rich-note">Exibindo {block.items.length} de {block.population} {block.entityKind === 'person' ? 'pessoas' : 'comissões'}. Contagem sobre todos os eventos autorizados do período.</p>}
     </section>;
     case 'profile': return <section className="worker-response-profile">{block.photoUrl && <img src={block.photoUrl} alt={`Fotografia oficial de ${block.name}`} loading="lazy" referrerPolicy="no-referrer" />}<div><h3>{block.name}</h3><p>{block.role} · {block.edition}</p><dl>{block.details.map((item, index) => <div key={index}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl><small>Verificado em {dateLabel(block.verifiedOn)}{block.publishedOn ? ` · Publicado em ${dateLabel(block.publishedOn)}` : ''}</small></div></section>;
-    case 'sources': return <div className="worker-response-sources" aria-label="Fontes verificadas">{block.items.map((item, index) => { const url = safeSourceUrl(item.url); return url ? <a key={index} href={url} target={item.source === 'web' ? '_blank' : undefined} rel={item.source === 'web' ? 'noopener noreferrer' : undefined}><ExternalLink size={12} />{item.label}{item.date ? ` · ${dateLabel(item.date)}` : ''}</a> : null; })}</div>;
+    case 'sources': return <div className="worker-response-sources worker-source-icons" aria-label="Fontes da resposta"><span className="worker-source-icons__label">Fontes</span>{block.items.map((item, index) => <WorkerSourceIcon key={index} label={item.label} url={item.url} date={item.date} source={item.source} />)}</div>;
     case 'empty': return <p className="worker-response-notice">{block.message}</p>;
     case 'clarification': return <div className="worker-response-notice"><Text text={block.question} />{clarificationOptions(block).length > 0 && <ul>{clarificationOptions(block).map((option, index) => <li key={index}>{option}</li>)}</ul>}</div>;
   }
 }
 function StructuredResponse({ response }: { response: WorkerResponse }) {
   const { metadata } = response;
+  if (response.intent === 'knowledge_base') return <div className="worker-response worker-response--knowledge">
+    <div className="worker-response-lead"><Text text={response.summary} /></div>
+    {(metadata.edition || metadata.period?.label) && <p className="worker-knowledge-period">{[metadata.edition, metadata.period?.label].filter(Boolean).join(' · ')}</p>}
+    {metadata.notes.length > 0 && <div className="worker-knowledge-notes" aria-label="Contexto e ressalvas">{metadata.notes.map((note, index) => <p key={index}>{note}</p>)}</div>}
+    {response.blocks.map((block, index) => <ResponseBlock key={index} block={block} />)}
+    <footer className="worker-knowledge-scope">{metadata.scope}</footer>
+  </div>;
   return <div className="worker-response"><div className="worker-response-lead"><Text text={response.summary} /></div>{response.blocks.map((block, index) => <ResponseBlock key={index} block={block} />)}<footer className="worker-response-context">{metadata.completeness === 'partial' && <p className="worker-response-coverage">Consulta parcial. Os registros exibidos não representam um total.</p>}{response.intent === 'map_sales' && metadata.completeness === 'complete' && <p className="worker-response-essential">Valores das vendas. Pagamentos recebidos são apurados separadamente.</p>}<div className="worker-response-stamp"><span>{[metadata.edition, metadata.period?.label].filter(Boolean).join(' · ')}</span><small>Atualizado em {new Date(metadata.updatedAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' })}</small></div>{metadata.notes.length > 0 && <details className="worker-response-details"><summary>Como interpretar estes dados <ChevronDown size={13} /></summary><div>{metadata.notes.map((note, index) => <p key={index}>{note}</p>)}<span>{metadata.scope} · Horário de Brasília</span></div></details>}</footer></div>;
 }
 export default function WorkerRichContent({ content, streaming }: { content: string; streaming?: boolean }) {

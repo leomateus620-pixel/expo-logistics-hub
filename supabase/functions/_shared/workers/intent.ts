@@ -1,5 +1,6 @@
 import { routeWorker, type WorkerId, type WorkerRequest } from './contracts.ts';
 import { decodeWorkerResponse, type WorkerQueryFilters } from './response-contract.ts';
+import { interpretKbQuery } from './knowledge-base.ts';
 
 export interface WorkerIntent {
   kind: 'map_sales' | 'map_inventory' | 'map_contracts' | 'map_documents' | 'map_receipts' | 'agenda_query' | 'agenda_personal' | 'agenda_ranking' | 'agenda_commission_ranking' | 'agenda_person' | 'agenda_commission' | 'institutional_president' | 'domain_query';
@@ -39,6 +40,7 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
   const answeringClarification = Boolean(prior?.blocks.some(block => block.type === 'clarification'));
   const continuation = answeringClarification || /^(?:e\b|tambem\b|agora\b|no mes anterior|mes anterior|e quanto)/.test(text);
   const subject = text;
+  const publicContext = interpretKbQuery(request.message, now);
   const routedWorker = routeWorker(request);
   const explicitAgenda = /eventos?|agenda|programacao|compromissos/.test(text);
   const mapContext = !explicitAgenda && (routedWorker === 'mapa' || /\bmapa\b|comercial|lotes|espacos|vendas?|contrat|assinatura|documentos anexados/.test(subject));
@@ -53,7 +55,7 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
   const commissionName = /(?:comiss[aã]o|assessoria)\s+(.+?)(?:\s+(?:teve|tem|possui|em|no mes|neste|durante)\b|[?!.]|$)/i.exec(request.message)?.[1]?.trim();
   let entitySearch = nominalPerson ?? (commissionName && !/^(?:teve|tem|com mais|mais|selecionada|identificada|teve mais)/i.test(commissionName) ? commissionName : undefined);
   let commercialMetric: WorkerIntent['commercialMetric'];
-  if (/presidente/.test(subject) && /fenasoja/.test(subject)) kind = 'institutional_president';
+  if (publicContext.fenasoja && publicContext.role) kind = 'institutional_president';
   else if (commissionMention && ranking) kind = 'agenda_commission_ranking';
   else if ((explicitAgenda || routedWorker === 'agenda' || /pessoas?|quem/.test(text)) && ranking && !commissionMention) kind = 'agenda_ranking';
   else if (explicitAgenda && commissionMention && entitySearch) kind = 'agenda_commission';
@@ -71,7 +73,7 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
   else if ((routedWorker === 'agenda' || /eventos?|agenda|programacao|compromissos/.test(subject)) && !mapContext && !/subevento|detalhe/.test(subject)) kind = 'agenda_query';
   const worker: WorkerId = kind.startsWith('map_') ? 'mapa' : kind === 'institutional_president' ? 'radar'
     : kind.startsWith('agenda_') ? 'agenda' : continuation && prior ? prior.worker : routeWorker(request);
-  const explicitYear = /\b(20\d{2})\b/.exec(text)?.[1];
+  const explicitYear = /\b((?:19|20)\d{2}|2100)\b/.exec(text)?.[1];
   if (continuation && previousIntent && !entitySearch && !explicitAgenda) entitySearch = previousIntent.entitySearch;
   const entityId = continuation && !nominalPerson && !commissionName
     ? kind==='agenda_person'?prior?.metadata.filters?.personId:kind==='agenda_commission'?prior?.metadata.filters?.commissionId:undefined
@@ -84,7 +86,7 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
     else if(/firmad|assinad|confirmad/.test(text))commercialMetric='signed_records';
   }
   const priorYear = prior?.metadata.edition?.match(/20\d{2}/)?.[0] ?? previousIntent?.editionYear?.toString();
-  const editionYear = /projeto inteiro|todas as edicoes/.test(text) ? undefined : explicitYear && (!kind.startsWith('agenda_') || /fenasoja|edicao/.test(text)) ? Number(explicitYear) : continuation && priorYear ? Number(priorYear) : undefined;
+  const editionYear = kind === 'institutional_president' ? publicContext.editionYear : /projeto inteiro|todas as edicoes/.test(text) ? undefined : explicitYear && (!kind.startsWith('agenda_') || /fenasoja|edicao/.test(text)) ? Number(explicitYear) : continuation && priorYear ? Number(priorYear) : undefined;
   const projectId = continuation && prior?.metadata.projectId && (!explicitYear || !priorYear || explicitYear === priorYear) ? prior.metadata.projectId : undefined;
   const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(now).map(item => [item.type, item.value]));
   let year = Number(parts.year), month = Number(parts.month) - 1;

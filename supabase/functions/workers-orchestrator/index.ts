@@ -6,6 +6,7 @@ import { createLovableProvider, readBoundedJson } from '../_shared/workers/provi
 import { searchWorkersWeb } from '../_shared/workers/web-search.ts';
 import { workspacePlanner } from '../_shared/workers/workspace-planner.ts';
 import { readInstitutionalPresident } from '../_shared/workers/institutional.ts';
+import { searchKnowledgeBase } from '../_shared/workers/knowledge-base.ts';
 import { boundedWorkerCleanup, raceWorkerSignal, workerAuthFailureCode, workerFailureDiagnostic } from '../_shared/workers/failures.ts';
 
 const corsHeaders = {
@@ -34,6 +35,7 @@ function publicKey(): string {
 }
 
 function databaseError(error: { code?: string; message?: string } | null, stage = 'persistence'): WorkerError {
+  if (error?.message?.includes('KB_VERSION_CHANGED')) return new WorkerError('kb_version_changed', 409, { stage: 'kb_persistence', technicalCode: 'KB_VERSION_CHANGED' });
   if (error?.message?.includes('WORKERS_RATE_LIMITED')) return new WorkerError('rate_limited', 429);
   if (error?.message?.includes('WORKERS_REQUEST_IN_PROGRESS_OR_FAILED')) return new WorkerError('request_in_progress', 409);
   if (error?.code === '42501' || error?.message?.includes('FORBIDDEN')) return new WorkerError('forbidden', 403);
@@ -106,6 +108,15 @@ Deno.serve(async (req: Request) => {
       executeTool: (name, input) => raceWorkerSignal(() => executeWorkerTool(name, input, access), abort.signal),
       searchWeb: (input, signal) => searchWorkersWeb(input, { apiKey: Deno.env.get('FIRECRAWL_API_KEY'), gatewayKey: Deno.env.get('LOVABLE_API_KEY'), signal }),
       institutionalPresident: (input, signal) => readInstitutionalPresident(input, { signal }),
+      searchKb: (message, now, signal) => searchKnowledgeBase((name, args) => scopedRpc(client, name, args, signal ?? abort.signal), message, now),
+      logKb: async (value, selection) => {
+        await scopedRpc(client, 'workers_log_kb_answer', {
+          _org_id: value.orgId, _request_id: value.requestId,
+          _entry_id: selection?.type === 'answer' ? selection.hit.entry_id : null,
+          _score: selection?.type === 'answer' ? selection.hit.score : null,
+          _outcome: selection?.outcome ?? 'miss', _kb_version: selection?.type === 'answer' ? selection.hit.kb_version : null,
+        }, abort.signal);
+      },
       begin: async (value, worker) => {
         const result = await scopedRpc(client, 'ai_workers_begin_turn', {
           _org_id: value.orgId, _request_id: value.requestId, _worker_id: worker,

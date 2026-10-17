@@ -1,13 +1,16 @@
 import { z } from 'zod';
-import { isPrimaryWebUrl, isSafeAppUrl, WORKER_IDS } from './contracts.ts';
+import { isPrimaryWebUrl, isSafeAppUrl, validateCitations, WorkerError, WORKER_IDS, type WorkerCitation } from './contracts.ts';
+import { isKbSourceDate, isSafeKbSourceUrl } from './kb-source.ts';
 
 // This is a data format, not a component/chart configuration language.
 const text = z.string().trim().min(1).max(1200).refine(value => !/[<>`]/.test(value), 'Plain text required');
 const label = text.refine(value => value.length <= 180, 'Label too long');
 const finite = z.number().finite();
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
-const source = z.object({ label, url: z.string().max(1200), source: z.enum(['app', 'web']), date: date.optional() }).strict()
-  .refine(value => value.source === 'app' ? isSafeAppUrl(value.url) : isPrimaryWebUrl(value.url) && Boolean(value.date), 'Invalid source');
+const source = z.object({ label, url: z.string().max(1200), source: z.enum(['app', 'web', 'kb']), date: date.optional() }).strict()
+  .refine(value => value.source !== 'kb' || value.label.length <= 160, 'KB source label too long')
+  .refine(value => value.source === 'app' ? isSafeAppUrl(value.url) : value.source === 'kb'
+    ? isSafeKbSourceUrl(value.url) && isKbSourceDate(value.date) : isPrimaryWebUrl(value.url) && Boolean(value.date), 'Invalid source');
 const table = z.object({ type: z.literal('table'), title: label.optional(), columns: z.array(label).min(1).max(8), rows: z.array(z.array(z.string().max(400).refine(value => !/[<>`]/.test(value)))).max(30) }).strict();
 const indicators = z.object({ type: z.literal('indicators'), items: z.array(z.object({ label, value: finite, unit: z.enum(['count', 'BRL', 'percent', 'minutes']), description: text.optional() }).strict()).min(1).max(8) }).strict();
 const barChart = z.object({ type: z.literal('bar_chart'), title: label, unit: z.enum(['count', 'BRL', 'percent', 'minutes']), data: z.array(z.object({ label, value: finite }).strict()).min(1).max(20), population: z.number().int().nonnegative(), complete: z.literal(true) }).strict();
@@ -46,6 +49,10 @@ export const workerResponseSchema = z.object({
     notes: z.array(text).max(8),
   }).strict(), blocks: z.array(workerResponseBlockSchema).max(12),
 }).strict().superRefine((response, ctx) => {
+  const kbSources = response.blocks.flatMap(block => block.type === 'sources' ? block.items.filter(item => item.source === 'kb') : []);
+  if (kbSources.length > 3 || new Set(kbSources.map(item => item.url)).size !== kbSources.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocks'], message: 'Invalid KB source count' });
+  }
   for (const [index, block] of response.blocks.entries()) {
     if (block.type === 'clarification' && block.choices && (new Set(block.choices.map(choice => choice.id)).size !== block.choices.length
       || block.options && block.options.length !== block.choices.length)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocks', index], message: 'Invalid identity choices' });
@@ -66,6 +73,16 @@ export const workerResponseSchema = z.object({
 });
 export type WorkerResponse = z.infer<typeof workerResponseSchema>;
 export type WorkerResponseBlock = z.infer<typeof workerResponseBlockSchema>;
+/** Check transport and document together before finalization, including source access dates. */
+export function validateWorkerResponseCitations(response: WorkerResponse, values: unknown): WorkerCitation[] {
+  const citations = validateCitations(values);
+  const sources = response.blocks.flatMap(block => block.type === 'sources' ? block.items : []);
+  const key = (value: WorkerCitation) => JSON.stringify([value.url, value.source, value.date ?? null]);
+  const expected = sources.map(key).sort();
+  const actual = citations.map(key).sort();
+  if (expected.length !== actual.length || expected.some((value, index) => value !== actual[index])) throw new WorkerError('invalid_citations', 502);
+  return citations;
+}
 export function encodeWorkerResponse(value: WorkerResponse): string {
   return '```fenasoja-response\n' + JSON.stringify(workerResponseSchema.parse(value)) + '\n```';
 }

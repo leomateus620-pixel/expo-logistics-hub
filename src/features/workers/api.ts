@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { WorkerAttachment } from './types';
 import { WorkerError } from '../../../supabase/functions/_shared/workers/contracts';
 import { publicWorkerError } from '../../../supabase/functions/_shared/workers/failures';
+import { isSafeKbSourceUrl } from '../../../supabase/functions/_shared/workers/kb-source';
 
 /** Public, allowlisted text only. Upstream SQL, tokens and stacks never enter the chat. */
 export class WorkerTurnError extends Error {
@@ -43,7 +44,7 @@ export type WorkersStreamEvent =
   | { event: 'workspace'; data: { kind: 'action' | 'routine'; id: string } }
   | { event: 'progress'; data: { label: string; status: 'running' | 'complete' } }
   | { event: 'delta'; data: { text: string } }
-  | { event: 'citations'; data: { citations: Array<{ label: string; url: string; source: 'app' | 'web'; date?: string }> } }
+  | { event: 'citations'; data: { citations: Array<{ label: string; url: string; source: 'app' | 'web' | 'kb'; date?: string }> } }
   | { event: 'usage'; data: { inputTokens: number; outputTokens: number } }
   | { event: 'done'; data: Record<string, unknown> }
   | { event: 'error'; data: { code: string; message: string; retryable?: boolean; requestId?: string } };
@@ -168,8 +169,10 @@ export async function streamWorkersTurn(
 }
 
 /** Only navigable app destinations or HTTPS sources; public-link tokens never leave the server. */
-export function safeWorkerSourceUrl(raw: unknown, kind: 'app' | 'web'): string | null {
+export function safeWorkerSourceUrl(raw: unknown, kind: 'app' | 'web' | 'kb'): string | null {
   if (typeof raw !== 'string' || raw.length > 2_048 || [...raw].some(character => character.charCodeAt(0) <= 32 || character === '\\')) return null;
+  // Preserve the registered spelling, which is checked against the persisted sources.
+  if (kind === 'kb') return isSafeKbSourceUrl(raw) ? raw : null;
   if (kind === 'app') {
     if (!/^\/(cronograma-eventos|eventos-restaurante-arena|mapa-comercial|comissoes|admin|transports|vehicles|electric-carts|scooters|ver-escala|checklist|portal|dashboard|equipe-ia)(\/|\?|$)/.test(raw)) return null;
     const parsed = new URL(raw, 'https://workers.invalid');

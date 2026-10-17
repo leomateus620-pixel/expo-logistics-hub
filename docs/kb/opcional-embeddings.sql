@@ -1,0 +1,14 @@
+-- PROPOSTA OPCIONAL. NÃO É MIGRATION E NÃO DEVE SER EXECUTADA NO DEPLOY ATUAL.
+-- A busca entregue usa pg_trgm/unaccent e não depende de pgvector, embeddings,
+-- provedor externo, chaves, modelo ou novas variáveis de ambiente.
+--
+-- Uma futura experiência de embeddings exige decisão separada, corpus revisado,
+-- avaliações de relevância/ambiguidade, custo, retenção e segurança. Ela não pode
+-- reescrever respostas nem contornar elegibilidade temporal, status ou fontes.
+--
+-- Se aprovada futuramente, usar tabela derivada separada, vinculada a
+-- (entry_id, kb_version, embedding_model, embedding_version), sem texto de
+-- perguntas de usuários. Dimensão e índices dependem do modelo escolhido.
+-- Atualizações devem ser atômicas e excluir vetores incompatíveis com a revisão.
+-- Nunca misturar a escala de distância vetorial com KB_THRESHOLDS de trigramas.
+-- Nenhuma extensão, tabela, função ou privilégio é criado por este arquivo.

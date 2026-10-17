@@ -1,0 +1,25 @@
+{
+  "version": "2026-10-17",
+  "initial_baseline": {
+    "fenasoja": {
+      "entries": 372,
+      "questions": 1245
+    },
+    "expandida": {
+      "entries": 2414,
+      "questions": 10889
+    }
+  },
+  "expected": {
+    "fenasoja": {
+      "entries": 372,
+      "questions": 1245
+    },
+    "expandida": {
+      "entries": 2414,
+      "questions": 10889
+    }
+  },
+  "retired_ids": [],
+  "change_reason": "Initial complete import; original counts are immutable baseline."
+}

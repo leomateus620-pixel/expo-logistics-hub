@@ -1,0 +1,89 @@
+{"mode":"check","version":"2026-10-17","entries":2786,"questions":12134,"collisions":17,"seed":"supabase/migrations/20261017080000_workers_kb_seed.sql","sha256":"a891edadfc9464e00cd10354595b935c691b6b2952c7e4bf64c0e51903761e26"}
+(node:29412) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "environment": "Node v24.15.0; isolated temporary copy",
+  "tests": [
+    {
+      "name": "reproducible outputs",
+      "result": "PASS"
+    },
+    {
+      "name": "identical regeneration",
+      "result": "PASS"
+    },
+    {
+      "name": "identical migration bytes and mtime preserved",
+      "result": "PASS"
+    },
+    {
+      "name": "downgrade rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "old timestamp rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "published version cannot be silently rewritten",
+      "result": "PASS"
+    },
+    {
+      "name": "entry count mismatch rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "empty normalized question rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "unsafe source rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "invalid source date rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "redaction changes rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "public notes exceeding complete response budget rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "initial question occurrences protected",
+      "result": "PASS"
+    },
+    {
+      "name": "entry provenance revision protected",
+      "result": "PASS"
+    },
+    {
+      "name": "editorial reason required",
+      "result": "PASS"
+    },
+    {
+      "name": "editorial previous value required",
+      "result": "PASS"
+    },
+    {
+      "name": "editorial ID validated",
+      "result": "PASS"
+    },
+    {
+      "name": "editorial evidence date validated",
+      "result": "PASS"
+    },
+    {
+      "name": "raw provenance revision protected",
+      "result": "PASS"
+    },
+    {
+      "name": "unreviewed collision rejected",
+      "result": "PASS"
+    }
+  ]
+}
+{"result":"PASS","checks":7,"predecessor":"0017_workers_identity_responses","hashes":{"lf":"1b1996aeb55853bc2f900bbff773c278a7161d30d5a076fa74f5aced9f621cf5","crlf":"6a676421401a67c6e4942a18cb4a853c7aef58834f24ce4bafc4a69fef67d35f"},"mutation":"none"}

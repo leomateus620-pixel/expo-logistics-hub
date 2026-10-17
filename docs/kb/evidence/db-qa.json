@@ -1,0 +1,748 @@
+{
+  "environment": "Isolated PostgreSQL WASM, real roles/RLS with simulated auth.uid claims; no remote JWT or production access",
+  "checks": [
+    {
+      "name": "schema and unchanged current sanitizers applied",
+      "result": "OK"
+    },
+    {
+      "name": "all generated seed migrations applied",
+      "result": "OK"
+    },
+    {
+      "name": "2786 entries / 12134 question occurrences",
+      "result": "OK"
+    },
+    {
+      "name": "same seed version reapplies idempotently",
+      "result": "OK"
+    },
+    {
+      "name": "all final answers unchanged by SQL redactor ()",
+      "result": "OK"
+    },
+    {
+      "name": "all public notes/labels/areas unchanged by redactor ()",
+      "result": "OK"
+    },
+    {
+      "name": "all 2786 response documents pass current SQL sanitizers with literal summary",
+      "result": "OK"
+    },
+    {
+      "name": "SQL and generator normalizer agree for all occurrences ()",
+      "result": "OK"
+    },
+    {
+      "name": "canonical cannot be removed without replacement",
+      "result": "OK"
+    },
+    {
+      "name": "smoke cases all pass ()",
+      "result": "OK"
+    },
+    {
+      "name": "authenticated public content readable",
+      "result": "OK"
+    },
+    {
+      "name": "search groups distinct entries",
+      "result": "OK"
+    },
+    {
+      "name": "default RPC context preserves explicit text edition candidates",
+      "result": "OK"
+    },
+    {
+      "name": "current request without known edition cannot recycle edition facts",
+      "result": "OK"
+    },
+    {
+      "name": "population in absent 1990 period cannot return 2025 data",
+      "result": "OK"
+    },
+    {
+      "name": "GDP in 2022 cannot return general geography",
+      "result": "OK"
+    },
+    {
+      "name": "explicit absent Plano Safra period cannot fall back to general or dynamic",
+      "result": "OK"
+    },
+    {
+      "name": "matching population period retained before candidate cut",
+      "result": "OK"
+    },
+    {
+      "name": "female presidency keeps the relevant historical entry",
+      "result": "OK"
+    },
+    {
+      "name": "mayor role and explicit reference period remain eligible",
+      "result": "OK"
+    },
+    {
+      "name": "uncovered municipality/year cannot borrow Santa Rosa population",
+      "result": "OK"
+    },
+    {
+      "name": "exact municipality with covered year survives before candidate cut",
+      "result": "OK"
+    },
+    {
+      "name": "unknown municipality does not receive another city population",
+      "result": "OK"
+    },
+    {
+      "name": "matching mayor municipality remains eligible",
+      "result": "OK"
+    },
+    {
+      "name": "direct DML denied",
+      "result": "OK"
+    },
+    {
+      "name": "oversized query rejected",
+      "result": "OK"
+    },
+    {
+      "name": "invalid limit rejected",
+      "result": "OK"
+    },
+    {
+      "name": "unknown factual attribute rejected",
+      "result": "OK"
+    },
+    {
+      "name": "noncanonical municipality name rejected",
+      "result": "OK"
+    },
+    {
+      "name": "invalid reference year 1799 rejected",
+      "result": "OK"
+    },
+    {
+      "name": "invalid reference year 2101 rejected",
+      "result": "OK"
+    },
+    {
+      "name": "invalid reference year 2025.5 rejected",
+      "result": "OK"
+    },
+    {
+      "name": "invalid reference year \"2025\" rejected",
+      "result": "OK"
+    },
+    {
+      "name": "invalid reference year null rejected",
+      "result": "OK"
+    },
+    {
+      "name": "empty normalized query has no matches",
+      "result": "OK"
+    },
+    {
+      "name": "unsafe source URL variants rejected",
+      "result": "OK"
+    },
+    {
+      "name": "log before successful finish rejected",
+      "result": "OK"
+    },
+    {
+      "name": "KB document requires deterministic model even without citations",
+      "result": "OK"
+    },
+    {
+      "name": "unregistered citation with matching block rejected",
+      "result": "OK"
+    },
+    {
+      "name": "invalid civil date with matching block rejected",
+      "result": "OK"
+    },
+    {
+      "name": "source block mismatch rejected",
+      "result": "OK"
+    },
+    {
+      "name": "version swapped before completion rejected",
+      "result": "OK"
+    },
+    {
+      "name": "persisted complete and citation dates retained",
+      "result": "OK"
+    },
+    {
+      "name": "reopened summary and sources equal reviewed response",
+      "result": "OK"
+    },
+    {
+      "name": "central usage remains 0/0 and idempotent",
+      "result": "OK"
+    },
+    {
+      "name": "central audit records tool and turn completed once",
+      "result": "OK"
+    },
+    {
+      "name": "telemetry idempotent",
+      "result": "OK"
+    },
+    {
+      "name": "other authenticated account can read public KB",
+      "result": "OK"
+    },
+    {
+      "name": "other account cannot read usage event",
+      "result": "OK"
+    },
+    {
+      "name": "other organization/user log denied",
+      "result": "OK"
+    },
+    {
+      "name": "anon content access denied",
+      "result": "OK"
+    },
+    {
+      "name": "anon RPC denied",
+      "result": "OK"
+    },
+    {
+      "name": "base update preserves prior event",
+      "result": "OK"
+    },
+    {
+      "name": "version swapped after finish produces observable auxiliary failure",
+      "result": "OK"
+    },
+    {
+      "name": "older seed cannot downgrade newer managed entry",
+      "result": "OK"
+    },
+    {
+      "name": "entry retirement preserves prior event",
+      "result": "OK"
+    },
+    {
+      "name": "incompatible persisted answer rejected",
+      "result": "OK"
+    },
+    {
+      "name": "sem_fonte cannot log answered",
+      "result": "OK"
+    },
+    {
+      "name": "sem_fonte persists and logs honestly without citations",
+      "result": "OK"
+    },
+    {
+      "name": "legacy text completion and real token counters remain unchanged",
+      "result": "OK"
+    },
+    {
+      "name": "preexisting extension schemas preserved",
+      "result": "OK"
+    },
+    {
+      "name": "fixed dictionary works with preexisting public extension",
+      "result": "OK"
+    }
+  ],
+  "measurements": [
+    {
+      "query": "Quem foi o presidente da Fenasoja 2024?",
+      "engine": "local WASM",
+      "median_ms": 501.13,
+      "p95_ms": 635.94,
+      "explain": [
+        {
+          "QUERY PLAN": [
+            {
+              "Plan": {
+                "Node Type": "Function Scan",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Function Name": "workers_search_kb",
+                "Alias": "workers_search_kb",
+                "Startup Cost": 0.25,
+                "Total Cost": 10.25,
+                "Plan Rows": 1000,
+                "Plan Width": 520,
+                "Actual Startup Time": 507.324,
+                "Actual Total Time": 507.344,
+                "Actual Rows": 3,
+                "Actual Loops": 1,
+                "Disabled": false,
+                "Shared Hit Blocks": 977,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 606,
+                "Temp Written Blocks": 606
+              },
+              "Planning": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "Planning Time": 0.305,
+              "Triggers": [],
+              "Execution Time": 507.573
+            }
+          ]
+        }
+      ],
+      "index_explain": [
+        {
+          "QUERY PLAN": [
+            {
+              "Plan": {
+                "Node Type": "Seq Scan",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "kb_questions",
+                "Alias": "q",
+                "Startup Cost": 0.02,
+                "Total Cost": 440.69,
+                "Plan Rows": 121,
+                "Plan Width": 16,
+                "Actual Startup Time": 406.418,
+                "Actual Total Time": 566.501,
+                "Actual Rows": 534,
+                "Actual Loops": 1,
+                "Disabled": false,
+                "Filter": "(((InitPlan 1).col1 IS NOT NULL) AND (question_norm OPERATOR(extensions.%) 'quem foi o presidente da fenasoja 2024'::text))",
+                "Rows Removed by Filter": 11600,
+                "Shared Hit Blocks": 289,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Result",
+                    "Parent Relationship": "InitPlan",
+                    "Subplan Name": "InitPlan 1",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 0,
+                    "Total Cost": 0.02,
+                    "Plan Rows": 1,
+                    "Plan Width": 16,
+                    "Actual Startup Time": 0.011,
+                    "Actual Total Time": 0.013,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Disabled": false,
+                    "Shared Hit Blocks": 0,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0
+                  }
+                ]
+              },
+              "Planning": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "Planning Time": 0.589,
+              "Triggers": [],
+              "Execution Time": 593.116
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "Qual o preço da soja hoje?",
+      "engine": "local WASM",
+      "median_ms": 429.56,
+      "p95_ms": 622.87,
+      "explain": [
+        {
+          "QUERY PLAN": [
+            {
+              "Plan": {
+                "Node Type": "Function Scan",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Function Name": "workers_search_kb",
+                "Alias": "workers_search_kb",
+                "Startup Cost": 0.25,
+                "Total Cost": 10.25,
+                "Plan Rows": 1000,
+                "Plan Width": 520,
+                "Actual Startup Time": 407.25,
+                "Actual Total Time": 407.255,
+                "Actual Rows": 6,
+                "Actual Loops": 1,
+                "Disabled": false,
+                "Shared Hit Blocks": 977,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 606,
+                "Temp Written Blocks": 606
+              },
+              "Planning": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "Planning Time": 0.083,
+              "Triggers": [],
+              "Execution Time": 407.466
+            }
+          ]
+        }
+      ],
+      "index_explain": [
+        {
+          "QUERY PLAN": [
+            {
+              "Plan": {
+                "Node Type": "Seq Scan",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "kb_questions",
+                "Alias": "q",
+                "Startup Cost": 0.02,
+                "Total Cost": 440.69,
+                "Plan Rows": 121,
+                "Plan Width": 16,
+                "Actual Startup Time": 29.118,
+                "Actual Total Time": 347.284,
+                "Actual Rows": 117,
+                "Actual Loops": 1,
+                "Disabled": false,
+                "Filter": "(((InitPlan 1).col1 IS NOT NULL) AND (question_norm OPERATOR(extensions.%) 'qual o preco da soja hoje'::text))",
+                "Rows Removed by Filter": 12017,
+                "Shared Hit Blocks": 289,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Result",
+                    "Parent Relationship": "InitPlan",
+                    "Subplan Name": "InitPlan 1",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 0,
+                    "Total Cost": 0.02,
+                    "Plan Rows": 1,
+                    "Plan Width": 16,
+                    "Actual Startup Time": 0.01,
+                    "Actual Total Time": 0.012,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Disabled": false,
+                    "Shared Hit Blocks": 0,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0
+                  }
+                ]
+              },
+              "Planning": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "Planning Time": 0.421,
+              "Triggers": [],
+              "Execution Time": 347.653
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "query": "Qual o percentual de Reserva Legal no RS?",
+      "engine": "local WASM",
+      "median_ms": 490.94,
+      "p95_ms": 601.78,
+      "explain": [
+        {
+          "QUERY PLAN": [
+            {
+              "Plan": {
+                "Node Type": "Function Scan",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Function Name": "workers_search_kb",
+                "Alias": "workers_search_kb",
+                "Startup Cost": 0.25,
+                "Total Cost": 10.25,
+                "Plan Rows": 1000,
+                "Plan Width": 520,
+                "Actual Startup Time": 451.401,
+                "Actual Total Time": 451.406,
+                "Actual Rows": 2,
+                "Actual Loops": 1,
+                "Disabled": false,
+                "Shared Hit Blocks": 977,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 606,
+                "Temp Written Blocks": 606
+              },
+              "Planning": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "Planning Time": 0.085,
+              "Triggers": [],
+              "Execution Time": 451.456
+            }
+          ]
+        }
+      ],
+      "index_explain": [
+        {
+          "QUERY PLAN": [
+            {
+              "Plan": {
+                "Node Type": "Seq Scan",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "kb_questions",
+                "Alias": "q",
+                "Startup Cost": 0.02,
+                "Total Cost": 440.69,
+                "Plan Rows": 121,
+                "Plan Width": 16,
+                "Actual Startup Time": 341.686,
+                "Actual Total Time": 352.917,
+                "Actual Rows": 10,
+                "Actual Loops": 1,
+                "Disabled": false,
+                "Filter": "(((InitPlan 1).col1 IS NOT NULL) AND (question_norm OPERATOR(extensions.%) 'qual o percentual de reserva legal no rs'::text))",
+                "Rows Removed by Filter": 12124,
+                "Shared Hit Blocks": 289,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Result",
+                    "Parent Relationship": "InitPlan",
+                    "Subplan Name": "InitPlan 1",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 0,
+                    "Total Cost": 0.02,
+                    "Plan Rows": 1,
+                    "Plan Width": 16,
+                    "Actual Startup Time": 0.016,
+                    "Actual Total Time": 0.017,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Disabled": false,
+                    "Shared Hit Blocks": 0,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0
+                  }
+                ]
+              },
+              "Planning": {
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              "Planning Time": 0.545,
+              "Triggers": [],
+              "Execution Time": 352.976
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "postgres": "PostgreSQL 18.6 (PGlite 0.5.10) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.5 (1db513782be24469589d7cb8a1f1834e9a33f271), 32-bit",
+  "schema_sha256": "14ddd57cc6a0396c9334ada24dff62b5f9f58b713f561f00681b1a7fea687e1a",
+  "seed_hashes": [
+    {
+      "name": "20261017080000_workers_kb_seed.sql",
+      "sha256": "a891edadfc9464e00cd10354595b935c691b6b2952c7e4bf64c0e51903761e26"
+    }
+  ],
+  "seed_apply_ms": 34076,
+  "counts": [
+    {
+      "kb": "expandida",
+      "entries": 2414,
+      "questions": 10889
+    },
+    {
+      "kb": "fenasoja",
+      "entries": 372,
+      "questions": 1245
+    }
+  ],
+  "smoke": [
+    {
+      "check_name": "entry counts",
+      "result": "OK"
+    },
+    {
+      "check_name": "question occurrences",
+      "result": "OK"
+    },
+    {
+      "check_name": "exactly one matching canonical per entry",
+      "result": "OK"
+    },
+    {
+      "check_name": "question versions match",
+      "result": "OK"
+    },
+    {
+      "check_name": "safe public sources",
+      "result": "OK"
+    },
+    {
+      "check_name": "normalizer ordinal/safra",
+      "result": "OK"
+    },
+    {
+      "check_name": "presidência 2024",
+      "result": "OK"
+    },
+    {
+      "check_name": "décima edição",
+      "result": "OK"
+    },
+    {
+      "check_name": "presidência décima",
+      "result": "OK"
+    },
+    {
+      "check_name": "negócios conflitantes",
+      "result": "OK"
+    },
+    {
+      "check_name": "público não confirmado",
+      "result": "OK"
+    },
+    {
+      "check_name": "Plano Safra empresarial",
+      "result": "OK"
+    },
+    {
+      "check_name": "Plano Safra familiar",
+      "result": "OK"
+    },
+    {
+      "check_name": "população 1990 não recicla 2025",
+      "result": "OK"
+    },
+    {
+      "check_name": "PIB 2022 não responde geografia",
+      "result": "OK"
+    },
+    {
+      "check_name": "Plano Safra sem período coberto",
+      "result": "OK"
+    },
+    {
+      "check_name": "município não substituído por Santa Rosa",
+      "result": "OK"
+    }
+  ]
+}

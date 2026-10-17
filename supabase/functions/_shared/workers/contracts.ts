@@ -1,6 +1,8 @@
+import { isKbSourceDate, isSafeKbSourceUrl } from './kb-source.ts';
+
 export const WORKER_IDS = ['agenda', 'arena', 'mapa', 'interesse', 'comissao', 'logistica', 'caixa', 'radar'] as const;
 export type WorkerId = typeof WORKER_IDS[number];
-export interface WorkerCitation { label: string; url: string; source: 'app' | 'web'; date?: string }
+export interface WorkerCitation { label: string; url: string; source: 'app' | 'web' | 'kb'; date?: string }
 export interface WorkerRequest {
   orgId: string;
   requestId: string;
@@ -89,10 +91,11 @@ export function validateCitations(values: unknown): WorkerCitation[] {
   if (!Array.isArray(values) || values.length > 30) throw new WorkerError('invalid_citations', 502);
   return values.map(value => {
     if (!isObject(value) || typeof value.label !== 'string' || !value.label.trim() || value.label.length > 160
-      || typeof value.url !== 'string' || !['app', 'web'].includes(String(value.source))
-      || (value.source === 'app' ? !isSafeAppUrl(value.url) : !isPrimaryWebUrl(value.url))
-      || (value.source === 'web' && (typeof value.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value.date)))) throw new WorkerError('invalid_citations', 502);
-    return { label: redactWorkerText(value.label), url: value.url, source: value.source as WorkerCitation['source'], ...(value.source === 'web' ? { date: String(value.date) } : {}) };
+      || typeof value.url !== 'string' || !['app', 'web', 'kb'].includes(String(value.source))
+      || (value.source === 'app' ? !isSafeAppUrl(value.url) : value.source === 'kb' ? !isSafeKbSourceUrl(value.url) : !isPrimaryWebUrl(value.url))
+      || (value.source === 'web' && (typeof value.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value.date)))
+      || (value.source === 'kb' && !isKbSourceDate(value.date))) throw new WorkerError('invalid_citations', 502);
+    return { label: redactWorkerText(value.label), url: value.url, source: value.source as WorkerCitation['source'], ...(value.source !== 'app' ? { date: String(value.date) } : {}) };
   });
 }
 
@@ -150,6 +153,16 @@ export function routeWorker(request: WorkerRequest): WorkerId {
 
 export function asksForMutation(message: string): boolean {
   const text = message.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    // "Reserva Legal" is the legal/environmental concept, not an imperative to reserve a lot.
+    .replace(/\breserva\s+legal\b/g, '')
+    // These are public husbandry/cooperative questions; imperative verbs and app objects remain protected.
+    .replace(/\bovelhas?\s+(?:de\s+)?cria\b/g, 'ovelhas')
+    .replace(/\b((?:como|maneira)(?:\s+de)?|necessar(?:ia|a)s?(?:\s+(?:para|pra))?)\s+criar(?=\s+(?:(?:o|os|a|as|um|uma)\s+)?(?:bezerros?|suinos?|cooperativas?)\b)/g, '$1')
+    .replace(/^(\s*)criar(?=\s+bezerros?\s+saudaveis\s+cuidados\b)/, '$1')
+    // Asking about a past entry fee or a carbon obligation does not initiate a payment.
+    .replace(/\b(precisava|era preciso)\s+pagar(?=\s+para\s+entrar\b)/g, '$1')
+    .replace(/\b(vai ter que|e preciso)\s+pagar(?=\s+pelo\s+carbono\b)/g, '$1')
     .replace(/^\s*(?:atualize|refaca|repita|recarregue)\s+(?:(?:a|o|as|os|essa|esta)\s+)?(?:consulta|dados|resposta|disponibilidade|indicadores)\b/,'');
-  return /\b(apag[ae]|exclu[ai]|delet[ae]|remov[ae]|cancele?|confirm[ae]|public[ao]r?|publique|envie?|mande|dispar[ae]|alter[ae]|edit[ae]|adicion[ae]|crie|cria|cri[ao]r|salv[ae]|reserv[ae]|registr[ae]|atualiz[ae]|mude|pague|pag[au]r|rotacion[ae])\b/.test(text);
+  // "Público" is an audience noun; the commands are publica/publicar/publique.
+  return /\b(apag[ae]|exclu[ai]|delet[ae]|remov[ae]|cancele?|confirm[ae]|publicar?|publique|envie?|mande|dispar[ae]|alter[ae]|edit[ae]|adicion[ae]|crie|cria|cri[ao]r|salv[ae]|reserv[ae]|registr[ae]|atualiz[ae]|mude|pague|pag[au]r|rotacion[ae])\b/.test(text);
 }

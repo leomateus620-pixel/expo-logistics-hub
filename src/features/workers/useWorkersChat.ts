@@ -7,6 +7,7 @@ import { workersDatabase } from './database';
 import type { WorkerAttachment, WorkerChatMessage, WorkerConversation, WorkerId, WorkerProgressStep } from './types';
 import { chronological } from './message-order';
 import { decodeWorkerResponse } from '../../../supabase/functions/_shared/workers/response-contract';
+import { isKbSourceDate } from '../../../supabase/functions/_shared/workers/kb-source';
 export { chronological } from './message-order';
 
 const WORKER_IDS = new Set(['agenda', 'arena', 'mapa', 'interesse', 'comissao', 'logistica', 'caixa', 'radar']);
@@ -28,9 +29,10 @@ function sourcesFrom(value: unknown): NonNullable<WorkerChatMessage['sources']> 
   return value.slice(0, 30).flatMap(item => {
     if (!item || typeof item !== 'object') return [];
     const source = item as Record<string, unknown>;
-    const kind = source.source === 'web' ? 'web' : 'app';
+    const kind = source.source === 'kb' ? 'kb' : source.source === 'web' ? 'web' : 'app';
     const url = safeWorkerSourceUrl(source.url, kind);
     if (!url || typeof source.label !== 'string') return [];
+    if (kind === 'kb' && (!source.label.trim() || source.label.length > 160 || !isKbSourceDate(source.date))) return [];
     return [{ title: maskSensitiveText(source.label).slice(0, 160), url, kind, ...(typeof source.date === 'string' ? { date: source.date.slice(0, 30) } : {}) }];
   });
 }

@@ -1,0 +1,17 @@
+{
+  "run_id": 39017775353,
+  "job_id": 117353297248,
+  "run_url": "https://github.com/leomateus620-pixel/expo-logistics-hub/actions/runs/39017775353",
+  "conclusion": "success",
+  "head_sha": "2fd968e617695c63f1a115c3d2e0a0a0cd4f0b38",
+  "artifact": {
+    "id": 12095159651,
+    "name": "fenasoja-bots-database-validation",
+    "digest": "sha256:28b9b3faafa550cae85e74be019d18307b0b24b29d304b45342e9d4c9267dbd8"
+  },
+  "source_name": "integration-pg-qa.json",
+  "copied_as": "ci-39017775353-integration-pg-qa.json",
+  "file_sha256": "2603f6c6f337b73f32a43e201a0edfe42b2066a6aca81cd25e169f03f11db511",
+  "downloaded_at": "2026-10-17T08:39:02.012Z",
+  "local_evidence_overwritten": false
+}

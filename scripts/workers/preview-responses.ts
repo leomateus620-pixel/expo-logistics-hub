@@ -2,9 +2,12 @@
 import { composeWorkerResponse, type ToolEvidence } from '../../supabase/functions/_shared/workers/response-composer';
 import { interpretWorkerIntent } from '../../supabase/functions/_shared/workers/intent';
 import type { WorkerRequest } from '../../supabase/functions/_shared/workers/contracts';
+import { kbResponseFixture } from './preview-kb';
 
 export function responseFixture(input: { orgId: string; requestId: string; conversationId?: string; worker?: string; message: string }, history: Array<{ role: string; content: string }>) {
   const request = input as WorkerRequest;
+  const kbFixture = kbResponseFixture(request);
+  if (kbFixture) return kbFixture;
   const now = new Date('2026-10-16T21:00:00-03:00');
   const intent = interpretWorkerIntent(request, now, history);
   const scope = { complete: true, timezone: 'America/Sao_Paulo', ...(intent.kind.startsWith('map_')?{edition_year:2028,project_id:'50000000-0000-4000-8000-000000000001',project_name:'Mapa sintético · Fenasoja 2028'}:{}), as_of: now.toISOString(),...(intent.period?{period:{from:intent.period.from,to:intent.period.to}}:{}) };

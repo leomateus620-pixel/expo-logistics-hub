@@ -1,0 +1,3 @@
+{"mode":"check","version":"2026-10-17","entries":2786,"questions":12134,"collisions":17,"seed":"supabase/migrations/20261017080000_workers_kb_seed.sql","sha256":"a891edadfc9464e00cd10354595b935c691b6b2952c7e4bf64c0e51903761e26"}
+(node:11092) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

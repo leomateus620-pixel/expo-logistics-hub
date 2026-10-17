@@ -283,6 +283,29 @@ it('never masks typed numbers, IDs or verified URLs as text and hides incomplete
   expect(safeWorkerMessageContent('Contato ana@example.com')).not.toContain('ana@example.com');
 });
 
+it('preserva fonte KB, data e conteúdo ao transmitir e reabrir a conversa', async () => {
+  const citation = { label: 'Emater/RS · referência do acervo', url: 'https://www.emater.tche.br/site/servicos/precos-agropecuarios.php', source: 'kb' as const, date: '2026-10-17' };
+  const content = encodeWorkerResponse({ version: 1, worker: 'radar', intent: 'knowledge_base', summary: 'Consulte a referência indicada para o valor atualizado.',
+    metadata: { organizationId: ORG_A, timezone: 'America/Sao_Paulo', scope: 'Base de conhecimento pública · Mercado', updatedAt: '2026-10-17T12:00:00Z', completeness: 'partial', notes: ['Este dado muda com frequência.'] },
+    blocks: [{ type: 'sources', items: [citation] }],
+  });
+  const { result } = renderHook(() => useWorkersChat({ workerId: 'radar' }));
+  act(() => { void result.current.sendMessage('Qual o preço da soja hoje?'); });
+  await waitFor(() => expect(streams).toHaveLength(1));
+  act(() => {
+    streams[0].onEvent({ event: 'conversation', data: { conversationId: CHAT_A } });
+    streams[0].onEvent({ event: 'citations', data: { citations: [citation] } });
+    streams[0].onEvent({ event: 'delta', data: { text: content } });
+  });
+  await act(async () => streams[0].resolve());
+  const expected = [{ title: citation.label, url: citation.url, kind: 'kb', date: citation.date }];
+  expect(result.current.messages[1]).toMatchObject({ content, sources: expected, workerId: 'radar' });
+  queryResolver = async query => ({ data: query.table === 'ai_messages' ? [{ ...row(content), citations: [citation], worker_id: 'radar' }] : [], error: null });
+  act(() => result.current.newConversation());
+  await act(async () => result.current.selectConversation(CHAT_A));
+  expect(result.current.messages[0]).toMatchObject({ content, sources: expected, workerId: 'radar' });
+});
+
 describe('bots background routine results and proposal metadata', () => {
   it('adds stable request IDs to both streamed messages and refreshes completed routine history', async () => {
     const { result } = renderHook(() => useWorkersChat());

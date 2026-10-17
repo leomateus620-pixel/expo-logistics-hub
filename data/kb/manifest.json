@@ -1,0 +1,180 @@
+{
+  "version": "2026-10-17",
+  "migration_stamp": "20261017080000",
+  "normalizer_version": "1",
+  "source_hash": "918a81ce44b9c6a73eb80bb0052858299f9e1e0e43feb5fac46aa1070a20e659",
+  "expected_counts": {
+    "fenasoja": {
+      "entries": 372,
+      "questions": 1245
+    },
+    "expandida": {
+      "entries": 2414,
+      "questions": 10889
+    }
+  },
+  "totals": {
+    "entries": 2786,
+    "questions": 12134,
+    "unique_questions": 12098,
+    "source_occurrences": 4964,
+    "unique_source_urls": 677
+  },
+  "by_base": {
+    "fenasoja": {
+      "entries": 372,
+      "questions": 1245,
+      "status": {
+        "confirmado": 258,
+        "conflito": 12,
+        "parcial": 47,
+        "sem_fonte": 55
+      },
+      "kind": {
+        "fato": 372
+      },
+      "area": {
+        "FENASOJA": 372
+      },
+      "area_questions": {
+        "FENASOJA": 1245
+      },
+      "source_occurrences": 576,
+      "unique_source_urls": 76
+    },
+    "expandida": {
+      "entries": 2414,
+      "questions": 10889,
+      "status": {
+        "confirmado": 2337,
+        "dinamico": 11,
+        "parcial": 63,
+        "sem_fonte": 3
+      },
+      "kind": {
+        "conceito": 1847,
+        "dado": 371,
+        "orientacao": 196
+      },
+      "area": {
+        "AGRO": 1527,
+        "AGTECH": 247,
+        "FAQ": 7,
+        "FEIRAS": 31,
+        "MERC": 105,
+        "RS": 225,
+        "SUST": 212,
+        "TEC": 60
+      },
+      "area_questions": {
+        "AGRO": 6549,
+        "AGTECH": 1103,
+        "FAQ": 34,
+        "FEIRAS": 165,
+        "MERC": 572,
+        "RS": 1166,
+        "SUST": 959,
+        "TEC": 341
+      },
+      "source_occurrences": 4388,
+      "unique_source_urls": 610
+    }
+  },
+  "editorial_changes": 2564,
+  "collisions_reviewed": 17,
+  "edition_records": 27,
+  "notes": [
+    "Source access dates are archive declarations unless explicitly rechecked in raw/factual-review.json.",
+    "The seven SIDRA moving-period endpoints were independently checked and pinned to 2025.",
+    "priority 1/2 does not replace score threshold rules.",
+    "Only explicit retired_ids can prune entries; obsolete variants can be removed only within the managed input IDs."
+  ],
+  "inputs": [
+    {
+      "name": "data/kb/raw/fenasoja-kb.json",
+      "sha256": "1bce6b6077c391c22ba2c56c96ea855af29ad546c0ba538674eb30d3768232a6",
+      "bytes": 526296
+    },
+    {
+      "name": "data/kb/raw/fenasoja-kb.csv",
+      "sha256": "468b400de071c96949ebf37a674e2c5158278b31b1f5c08b6c3ecffa44e89a2d",
+      "bytes": 557545
+    },
+    {
+      "name": "data/kb/raw/fenasoja-kb.md",
+      "sha256": "a23b1f1398573da3d9e32fd3711bd875fb3899af74c3fb7f823f2c6c2f158e21",
+      "bytes": 154830
+    },
+    {
+      "name": "data/kb/raw/kb-expandida-fenasoja.zip",
+      "sha256": "f8909502189b2110479a115fca9c54e322dff0b990f69a7b4277c504049289af",
+      "bytes": 2762090
+    },
+    {
+      "name": "data/kb/fenasoja-kb.json",
+      "sha256": "265b7a79da08bbe60837339a7aceb3a25c10b397e37e4806a89b1b39bd993835"
+    },
+    {
+      "name": "data/kb/kb-expandida.json",
+      "sha256": "14f1b4612c37b0dcfb3565780db3ea3f8d68a4043f87fd672306b1c3b9d2c76c"
+    },
+    {
+      "name": "data/kb/editions.json",
+      "sha256": "871bd17a047d0c8c2f2954594bf2cfc7ba6082220f43b4f8ccd8ec222f7e59ad"
+    },
+    {
+      "name": "data/kb/query-policies.json",
+      "sha256": "068b9515de7af19fe02bfb7688e9bde5931455a1fffef34f8eee80bd3829c2d5"
+    },
+    {
+      "name": "data/kb/curation-log.json",
+      "sha256": "d0f0e85a8a03dbe6e66a8cba41d6fc51dbf17bbc5e43a53375e8a82435935047"
+    },
+    {
+      "name": "data/kb/expected-counts.json",
+      "sha256": "2c43444bcc4ae3c671d0ead684c83bdd73a5afedde47b3396701ea8e24ea17df"
+    },
+    {
+      "name": "data/kb/raw/provenance.json",
+      "sha256": "c2f0a6deb34f4cc434b568b804bbe6f4dee1fc614e4c663c2e65fd6c14e7d9ba"
+    },
+    {
+      "name": "data/kb/raw/factual-review.json",
+      "sha256": "67b8b2920167b7cd18e6da1a380cc6fb93e6f31b254ecdc3d401404f94a6100d"
+    },
+    {
+      "name": "data/kb/raw/period-source-checks.json",
+      "sha256": "6c112832232119fb7b7dee31ce1d281852137b243ef0eea031fc0a90f1116187"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "supabase/migrations/20261017080000_workers_kb_seed.sql",
+      "sha256": "a891edadfc9464e00cd10354595b935c691b6b2952c7e4bf64c0e51903761e26",
+      "bytes": 10189997
+    },
+    {
+      "name": "supabase/functions/_shared/workers/kb-editions.ts",
+      "sha256": "7f7823a6fe1bc5f4470cdc18aa234e79df70305eab542e07476251806203f9c7",
+      "bytes": 32076
+    },
+    {
+      "name": "supabase/functions/_shared/workers/kb-policies.ts",
+      "sha256": "f8d3efdb6d598ebf7357e984ab2056beb564fb291e609654d6edeb1ee3707617",
+      "bytes": 13529
+    },
+    {
+      "name": "supabase/functions/_shared/workers/kb-normalization.ts",
+      "sha256": "8b12454c3dcd6093cfcdb32c515d319e48394d78caffab3d36bbd52ff805544f",
+      "bytes": 1264
+    }
+  ],
+  "publication": {
+    "transactional": true,
+    "files": 1,
+    "entry_batches": 56,
+    "question_batches": 49,
+    "entry_batch_size": 50,
+    "question_batch_size": 250
+  }
+}
