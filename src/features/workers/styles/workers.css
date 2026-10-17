@@ -975,17 +975,26 @@
 }
 
 .workers-scope.workers-root--chat {
+  position:fixed;
+  inset-inline:0;
+  top:var(--worker-viewport-top,0px);
   padding:12px;
   background:var(--worker-frame);
-  height:100dvh;
-  min-height:0
+  height:var(--worker-visible-height,100dvh);
+  min-height:0;
+  overflow:clip;
+  overscroll-behavior:none
 }
 
+/* These owners must never become focus-scroll ancestors. The conversation below
+   is the only scroll container; hidden would still allow browser focus to pan it. */
 .workers-scope .worker-chat-workspace {
   display:flex;
+  min-width:0;
   min-height:0;
   height:100%;
-  overflow:hidden;
+  max-height:100%;
+  overflow:clip;
   border-radius:24px;
   border:1px solid var(--worker-border);
   background:var(--worker-paper);
@@ -1229,6 +1238,8 @@
   flex:1;
   min-width:0;
   min-height:0;
+  max-height:100%;
+  overflow:clip;
   background:linear-gradient(180deg,var(--worker-paper),var(--worker-surface))
 }
 
@@ -1984,12 +1995,14 @@
 }
 
 .workers-scope.worker-copilot-sheet {
+  top:var(--worker-viewport-top,0px);
+  bottom:auto;
   padding:0;
   width:min(520px,100vw);
   max-width:520px;
-  max-height:100dvh;
-  height:100dvh;
-  overflow:hidden;
+  max-height:var(--worker-visible-height,100dvh);
+  height:var(--worker-visible-height,100dvh);
+  overflow:clip;
   border-left:1px solid var(--worker-border);
   background:var(--worker-paper);
   gap:0
@@ -2075,18 +2088,31 @@
 }
 
 .workers-scope.worker-mobile-nav-sheet {
+  top:var(--worker-viewport-top,0px);
+  bottom:auto;
+  height:var(--worker-visible-height,100dvh);
+  max-height:var(--worker-visible-height,100dvh);
   width:280px;
   max-width:85vw;
+  min-width:0;
   padding:0;
   background:var(--worker-surface);
-  overflow-y:auto
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  touch-action:pan-y pinch-zoom;
+  border-right:1px solid var(--worker-border);
+  box-shadow:12px 0 40px rgb(3 24 52/.12)
 }
 
 .workers-scope .worker-mobile-nav-content {
   display:flex;
   flex-direction:column;
   min-height:100%;
-  padding:24px 16px
+  min-width:0;
+  max-width:100%;
+  padding:24px 16px max(24px,env(safe-area-inset-bottom));
+  overflow-x:hidden
 }
 
 .workers-scope .worker-design-review {
@@ -3616,7 +3642,6 @@
 .workers-scope .worker-composer textarea { height:54px;min-height:48px;max-height:140px;resize:none }
 .workers-scope .worker-chat-scroll { overflow-anchor:none;scroll-padding-block:12px }
 @media(max-width:767px) {
-  .workers-scope .worker-chat-workspace { max-height:var(--worker-visible-height,100dvh) }
   .workers-scope .worker-chat-header,.workers-scope .worker-chat-workspace--compact .worker-chat-header { padding:8px 10px;min-height:64px;gap:4px }
   .workers-scope .worker-chat-header__actions { gap:0 }
   .workers-scope .worker-thread,.workers-scope .worker-chat-workspace--compact .worker-thread { padding:12px 12px 4px }
@@ -3744,7 +3769,7 @@
 .workers-scope .worker-composer__topline { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 2px 3px;font-size:10px;line-height:18px;color:var(--worker-muted) }
 .workers-scope .worker-composer__topline>span:first-child { display:flex;align-items:center;gap:6px;font-weight:500 }
 .workers-scope .worker-composer__destination { padding:1px 7px;border:1px solid var(--worker-border);border-radius:6px;font-size:10px;line-height:16px;max-width:45%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
-.workers-scope .worker-composer textarea { padding:10px 2px 8px;min-height:56px;height:auto;max-height:144px;font-size:15px;line-height:23px;letter-spacing:-.01em;font-weight:450;overflow-y:auto;scrollbar-width:thin;background:transparent }
+.workers-scope .worker-composer textarea { padding:10px 2px 8px;min-height:56px;height:auto;max-height:min(144px,calc(var(--worker-visible-height,100dvh) / 4));font-size:16px;line-height:24px;letter-spacing:-.01em;font-weight:450;overflow-y:auto;scrollbar-width:thin;background:transparent }
 .workers-scope .worker-composer textarea::placeholder { color:var(--worker-muted);font-weight:400;opacity:.85 }
 .workers-scope .worker-composer__toolbar { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 0;border-top:1px solid var(--worker-border) }
 .workers-scope .worker-composer__toolbar>div { display:flex;align-items:center;gap:6px;min-width:0 }
@@ -3817,3 +3842,29 @@
   .workers-scope .worker-comparison-versus { text-align:center }
   .workers-scope .worker-comparison-items dd { font-size:24px;line-height:30px }
 }
+
+/* Stable navigation uses the existing Sheet focus trap and body scroll lock. */
+.workers-scope :is(.worker-workspace-nav,.worker-workspace-workers,.worker-conversation-list) { min-width:0;max-width:100% }
+.workers-scope :is(.worker-workspace-nav,.worker-workspace-workers,.worker-conversation-list)>:is(a,button) { min-width:0;max-width:100%;transform:none;transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease }
+.workers-scope :is(.worker-workspace-nav,.worker-workspace-workers,.worker-conversation-list)>:is(a,button):is(:hover,:active) { transform:none;box-shadow:inset 0 0 0 1px var(--worker-border) }
+.workers-scope .worker-workspace-workers>button>span:not(.worker-mascot),.workers-scope .worker-conversation-list>button>span { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+.workers-scope .worker-mobile-nav-content .worker-workspace-brand { padding:0 42px 24px 4px }
+.workers-scope .worker-mobile-nav-content .worker-team-brand { gap:8px }
+.workers-scope .worker-mobile-nav-content .worker-team-brand__subtitle { white-space:normal;font-size:10px;line-height:15px }
+.workers-scope .worker-mobile-nav-content .worker-team-brand__name { font-size:12px;white-space:nowrap }
+.workers-scope .worker-mobile-nav-content .worker-workspace-nav { padding-block:12px 22px }
+.workers-scope .worker-mobile-nav-content .worker-new-chat { box-shadow:0 2px 4px rgb(3 24 52/.035) }
+.workers-scope .worker-turn-failure { display:grid;gap:12px;min-width:0 }
+.workers-scope .worker-turn-failure p { margin:0;font-size:14px;line-height:22px;color:var(--worker-ink) }
+.workers-scope .worker-turn-failure>div { display:flex;flex-wrap:wrap;gap:6px 12px }
+.workers-scope .worker-turn-failure :is(button,a) { display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:6px 10px;border:1px solid var(--worker-border);border-radius:10px;font-size:12px;line-height:18px;color:var(--worker-primary);background:var(--worker-surface-soft) }
+.workers-scope .worker-turn-failure a { background:transparent }
+.workers-scope .worker-turn-failure:not(:first-child) { margin-top:14px;padding-top:14px;border-top:1px solid var(--worker-border) }
+.workers-scope .worker-message__author+.worker-turn-failure { margin-top:0;padding-top:0;border-top:0 }
+.workers-scope .worker-retry-label { display:block;padding:0 4px 5px;font-size:11px;line-height:16px;color:var(--worker-muted) }
+.workers-scope[data-worker-keyboard="open"] .worker-composer-disclaimer { display:none }
+.workers-scope[data-worker-keyboard="open"] .worker-composer__topline { display:none }
+.workers-scope[data-worker-keyboard="open"] .worker-composer { padding-block:6px }
+.workers-scope[data-worker-keyboard="open"] .worker-composer textarea { min-height:40px;max-height:min(72px,calc(var(--worker-visible-height,100dvh) / 4));padding-block:6px }
+.workers-scope[data-worker-keyboard="open"] .worker-composer-area { padding-block:6px }
+.workers-scope[data-worker-keyboard="open"] .worker-attachment-list { max-height:58px;overflow-y:auto;overscroll-behavior:contain }

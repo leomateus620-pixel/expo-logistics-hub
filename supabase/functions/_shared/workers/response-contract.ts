@@ -13,6 +13,12 @@ const indicators = z.object({ type: z.literal('indicators'), items: z.array(z.ob
 const barChart = z.object({ type: z.literal('bar_chart'), title: label, unit: z.enum(['count', 'BRL', 'percent', 'minutes']), data: z.array(z.object({ label, value: finite }).strict()).min(1).max(20), population: z.number().int().nonnegative(), complete: z.literal(true) }).strict();
 const pieChart = barChart.extend({ type: z.literal('pie_chart') });
 const comparison = z.object({ type: z.literal('comparison'), title: label, currentLabel: label.optional(), previousLabel: label.optional(), unit: z.enum(['count', 'BRL', 'percent', 'minutes']), items: z.array(z.object({ label, current: finite, previous: finite }).strict()).min(1).max(8) }).strict();
+const entityRanking = z.object({ type: z.literal('entity_ranking'), title: label,
+  entityKind: z.enum(['person', 'commission']), population: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+  items: z.array(z.object({ id: z.string().uuid(), name: label, label: label.optional(),
+    visualKey: z.string().regex(/^[a-z][a-z0-9-]{0,100}$/).optional(),
+    events: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER), position: z.number().int().positive() }).strict()).min(1).max(30),
+}).strict();
 export const workerQueryFiltersSchema = z.object({
   group_by: z.enum(['status','block','location','category','weekday','day']).optional(),
   relationship: z.enum(['all','linked','created','responsible']).optional(), status: z.string().max(60).optional(),
@@ -25,10 +31,11 @@ export const workerQueryFiltersSchema = z.object({
 export type WorkerQueryFilters = z.infer<typeof workerQueryFiltersSchema>;
 const profile = z.object({ type: z.literal('profile'), name: label, role: label, edition: label, verifiedOn: date, publishedOn: date.optional(), photoUrl: z.string().refine(isPrimaryWebUrl).optional(), details: z.array(z.object({ label, value: text }).strict()).max(6) }).strict();
 export const workerResponseBlockSchema = z.union([
-  z.object({ type: z.literal('summary'), text }).strict(), indicators, barChart, pieChart, table, comparison, profile,
+  z.object({ type: z.literal('summary'), text }).strict(), indicators, barChart, pieChart, table, comparison, profile, entityRanking,
   z.object({ type: z.literal('sources'), items: z.array(source).min(1).max(8) }).strict(),
   z.object({ type: z.literal('empty'), message: text }).strict(),
-  z.object({ type: z.literal('clarification'), question: text, options: z.array(label).max(8).optional() }).strict(),
+  z.object({ type: z.literal('clarification'), question: text, options: z.array(label).max(8).optional(),
+    choices: z.array(z.object({ id: z.string().uuid(), name: label }).strict()).min(1).max(8).optional() }).strict(),
 ]);
 export const workerResponseSchema = z.object({
   version: z.literal(1), worker: z.enum(WORKER_IDS), intent: label, summary: text,
@@ -40,6 +47,15 @@ export const workerResponseSchema = z.object({
   }).strict(), blocks: z.array(workerResponseBlockSchema).max(12),
 }).strict().superRefine((response, ctx) => {
   for (const [index, block] of response.blocks.entries()) {
+    if (block.type === 'clarification' && block.choices && (new Set(block.choices.map(choice => choice.id)).size !== block.choices.length
+      || block.options && block.options.length !== block.choices.length)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocks', index], message: 'Invalid identity choices' });
+    if (block.type === 'entity_ranking') {
+      if (block.population < block.items.length || new Set(block.items.map(item => item.id)).size !== block.items.length
+        || block.items.some((item, position) => item.position !== position + 1 || (position > 0 && item.events > block.items[position - 1].events))
+        || (block.entityKind === 'person' && block.items.some(item => item.visualKey !== undefined))) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocks', index], message: 'Invalid identity ranking' });
+      }
+    }
     if (block.type === 'table' && block.rows.some(row => row.length !== block.columns.length)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocks', index], message: 'Invalid row width' });
     if (block.type === 'bar_chart' || block.type === 'pie_chart') {
       if (response.metadata.completeness !== 'complete' || block.population < block.data.length || block.data.some(item => item.value < 0)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocks', index], message: 'Incomplete chart evidence' });

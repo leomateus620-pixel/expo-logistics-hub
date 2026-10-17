@@ -1,22 +1,30 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { WorkerToolError, type AccessPolicy, type WorkerAccessContext, type WorkerRole } from './types.ts';
+import { WorkerToolError, workerDataError, type AccessPolicy, type WorkerAccessContext, type WorkerRole } from './types.ts';
+import { workerAuthFailureCode } from './auth-failure.ts';
 
 const roles: readonly string[] = ['admin', 'gestor', 'operador', 'leitura'];
 
 /** Re-check identity with Auth, then fetch only the caller's active membership/grants. */
 export async function resolveWorkerAccess(client: SupabaseClient, userId: string, orgId: string): Promise<WorkerAccessContext> {
   const { data: auth, error: authError } = await client.auth.getUser();
-  if (authError || !auth?.user || auth.user.id !== userId || auth.user.role === 'service_role') {
+  if (authError) {
+    const cause = workerAuthFailureCode(authError);
+    const technicalCode = /^[A-Z0-9_]{1,40}$/i.test(authError.code ?? '') ? authError.code : undefined;
+    throw new WorkerToolError(cause === 'network_error' ? 'NETWORK_ERROR' : cause === 'timeout' ? 'TIMEOUT'
+      : cause === 'forbidden' ? 'AUTH_REQUIRED' : 'DATA_UNAVAILABLE', 'Não foi possível verificar a sessão.', { stage: 'authentication', technicalCode });
+  }
+  if (!auth?.user || auth.user.id !== userId || auth.user.role === 'service_role') {
     throw new WorkerToolError('AUTH_REQUIRED', 'Sessão de usuário necessária.');
   }
   const { data: member, error: memberError } = await client.from('org_members')
     .select('role,org_id,user_id').eq('user_id', userId).eq('org_id', orgId).eq('is_active', true).maybeSingle();
-  if (memberError || !member || member.org_id !== orgId || member.user_id !== userId || !roles.includes(member.role)) {
+  if (memberError) throw workerDataError(memberError, 'authorization');
+  if (!member || member.org_id !== orgId || member.user_id !== userId || !roles.includes(member.role)) {
     throw new WorkerToolError('PERMISSION_DENIED', 'Organização sem vínculo ativo.');
   }
   const { data: grants, error: grantsError } = await client.from('user_capabilities')
     .select('capability').eq('user_id', userId).eq('org_id', orgId);
-  if (grantsError) throw new WorkerToolError('PERMISSION_DENIED', 'Não foi possível verificar as permissões.');
+  if (grantsError) throw workerDataError(grantsError, 'authorization');
   return { userId, orgId, role: member.role as WorkerRole, capabilities: new Set((grants ?? []).map((item) => item.capability)), supabase: client };
 }
 
@@ -44,20 +52,24 @@ export async function authorizeWorkerPolicy(policy: AccessPolicy, ctx: WorkerAcc
   if (!hasWorkerPolicy(policy, ctx)) return false;
   if (policy === 'financial') {
     const { data, error } = await ctx.supabase.rpc('financial_can', { _org_id: ctx.orgId, _capability: 'financial_access' });
-    return !error && data === true;
+    if (error) throw workerDataError(error, 'authorization');
+    return data === true;
   }
   if (policy === 'venue' || policy === 'venue_reports') {
     const { data, error } = await ctx.supabase.rpc('venue_get_permissions', { _org_id: ctx.orgId });
-    if (error || !data || typeof data !== 'object') return false;
+    if (error) throw workerDataError(error, 'authorization');
+    if (!data || typeof data !== 'object') return false;
     const permissions = data as Record<string, boolean>;
     return permissions.venue_events_access === true && (policy !== 'venue_reports' || permissions.venue_reports_view === true || permissions.venue_counterparts_manage === true);
   }
   if (policy === 'map_sales' || policy === 'map_contracts' || policy === 'analytics') {
     const { data, error } = await ctx.supabase.rpc('map_has_explicit_capability', { _org_id: ctx.orgId, _capability: 'map.manage_sales' });
-    if (error || data !== true) return false;
+    if (error) throw workerDataError(error, 'authorization');
+    if (data !== true) return false;
     if (policy === 'map_contracts') {
       const result = await ctx.supabase.rpc('map_has_explicit_capability', { _org_id: ctx.orgId, _capability: 'map.manage_contracts' });
-      return !result.error && result.data === true;
+      if (result.error) throw workerDataError(result.error, 'authorization');
+      return result.data === true;
     }
   }
   return true;

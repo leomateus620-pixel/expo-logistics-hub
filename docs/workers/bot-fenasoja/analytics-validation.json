@@ -3,6 +3,10 @@
   "passed": true,
   "checks": [
     {
+      "name": "observed schema excludes obsolete responsible column and reproduces previous reader failure",
+      "passed": true
+    },
+    {
       "name": "complete commercial aggregation exceeds 100-row list, one multi-lot partial order, cancelled/legacy/other edition excluded",
       "passed": true
     },
@@ -49,6 +53,30 @@
     {
       "name": "reopening failed turns retains question and response slot; null page limits cannot become unbounded",
       "passed": true
+    },
+    {
+      "name": "nominal identity lookup keeps persisted homonyms separate and resolves an unambiguous person",
+      "passed": true
+    },
+    {
+      "name": "named person count uses that identity instead of authenticated caller and matches official relation selection",
+      "passed": true
+    },
+    {
+      "name": "authorized historical snapshot identity resolves when the current member display name is blank",
+      "passed": true
+    },
+    {
+      "name": "creator-only events remain created metrics without becoming linked participation or ranked identities",
+      "passed": true
+    },
+    {
+      "name": "commission rankings use principal additional and subevent links once per event, preserve multi-commission totals",
+      "passed": true
+    },
+    {
+      "name": "all corrected and new Agenda readers preserve invoker execution and deny anonymous execution",
+      "passed": true
     }
   ],
   "files": [
@@ -66,11 +94,15 @@
     },
     {
       "name": "supabase/migrations/20261017010000_workers_message_order.sql",
-      "sha256": "a678f0b93e5ab0c91d7f88e84b7ff527013349947f5d8a15bb4a1557573e8681"
+      "sha256": "489dea53cf930f90f518c4f66a3513ccbeea3d72aed40323c1a47dd4efbb59b9"
     },
     {
       "name": "supabase/migrations/20261017020000_workers_verified_analytics.sql",
-      "sha256": "f99c8dfb4c5fc4b125c443756f150189070e4bbd33b2acbecbecfa5ef23c9d57"
+      "sha256": "0a971ce64e561b545684a878cdcdf6ee907e49c83f116446fc7d1d4df14bc947"
+    },
+    {
+      "name": "supabase/migrations/20261017050000_workers_agenda_relationships.sql",
+      "sha256": "037c9c6f5e970fd0c326dffa89dd418fd04285d826844cf38d42b3e7544f1364"
     }
   ],
   "examples": {
@@ -83,7 +115,7 @@
       ],
       "scope": {
         "unit": "BRL_cents",
-        "as_of": "2026-10-17T00:01:32.053-03:00",
+        "as_of": "2026-10-17T01:52:18.658-03:00",
         "complete": true,
         "timezone": "America/Sao_Paulo",
         "project_id": "20000000-0000-4000-8000-000000000001",
@@ -108,12 +140,12 @@
     },
     "agenda": {
       "notes": [
-        "Vínculos diretos e de subeventos são reunidos por evento principal; criação e responsabilidade são identificadas pela conta autenticada.",
+        "Vínculos diretos e de subeventos são reunidos por evento principal; criação é uma métrica separada e não presume participação.",
         "Vínculo e horário passado não comprovam presença. Concluído descreve a situação registrada do evento.",
         "A duração considera o intervalo agendado completo dos eventos com horários válidos, inclusive quando atravessam o período."
       ],
       "scope": {
-        "as_of": "2026-10-17T00:01:32.142-03:00",
+        "as_of": "2026-10-17T01:52:18.696-03:00",
         "period": {
           "to": "2026-10-31",
           "from": "2026-10-01"
@@ -151,11 +183,11 @@
       "notes": [
         "Contagem distinta de eventos principais por pessoa identificada, calculada sobre todo o período autorizado; o limite afeta somente a apresentação.",
         "Vínculos externos sem identificação persistida de pessoa não entram no ranking. Vínculo não comprova presença.",
-        "Empates são ordenados pelo nome. Pessoas homônimas permanecem separadas e recebem identificação de vínculo."
+        "Empates são ordenados pelo nome. Pessoas homônimas permanecem separadas pela identidade persistida."
       ],
       "scope": {
         "unit": "events",
-        "as_of": "2026-10-17T00:01:32.209-03:00",
+        "as_of": "2026-10-17T01:52:18.736-03:00",
         "period": {
           "to": "2026-10-31",
           "from": "2026-10-01"
@@ -165,7 +197,7 @@
       },
       "people": [
         {
-          "name": "Ana da Silva · vínculo 1",
+          "name": "Ana da Silva",
           "events": 124,
           "position": 1,
           "person_id": "00000000-0000-4000-8000-000000000001"
@@ -178,6 +210,87 @@
         "shown_people": 1,
         "unidentified_links": 1
       }
+    },
+    "resolvedPerson": {
+      "complete": true,
+      "identities": [
+        {
+          "id": "00000000-0000-4000-8000-000000000003",
+          "kind": "person",
+          "name": "Fabiano Souza"
+        }
+      ]
+    },
+    "namedPerson": {
+      "notes": [
+        "Eventos principais distintos com vínculo pessoal na Agenda, inclusive por subevento não cancelado.",
+        "Criar um registro, pertencer à comissão e ter vínculo não comprovam presença."
+      ],
+      "scope": {
+        "unit": "events",
+        "as_of": "2026-10-17T01:52:19.013-03:00",
+        "period": {
+          "to": "2026-10-31",
+          "from": "2026-10-01"
+        },
+        "complete": true,
+        "timezone": "America/Sao_Paulo",
+        "relationship": "linked"
+      },
+      "person": {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "kind": "person",
+        "name": "Ana da Silva"
+      },
+      "metrics": {
+        "events": 123
+      }
+    },
+    "commissionRanking": {
+      "notes": [
+        "Comissões principais, adicionais e de subeventos não cancelados; cada evento principal entra uma vez por comissão.",
+        "Um evento pode pertencer a várias comissões: a soma do ranking pode superar o total de eventos distintos.",
+        "Agrupamento completo antes do limite de apresentação. Empates conservam nomes e identidades distintos."
+      ],
+      "scope": {
+        "unit": "events",
+        "as_of": "2026-10-17T01:52:19.239-03:00",
+        "period": {
+          "to": "2026-10-31",
+          "from": "2026-10-01"
+        },
+        "complete": true,
+        "timezone": "America/Sao_Paulo"
+      },
+      "metrics": {
+        "tie_break": "name_then_id",
+        "event_count": 124,
+        "commission_count": 3,
+        "shown_commissions": 30
+      },
+      "commissions": [
+        {
+          "name": "Comissão Central",
+          "slug": "central",
+          "events": 124,
+          "position": 1,
+          "commission_id": "a0000000-0000-4000-8000-000000000001"
+        },
+        {
+          "name": "Expo Rural",
+          "slug": "expo-rural",
+          "events": 2,
+          "position": 2,
+          "commission_id": "a0000000-0000-4000-8000-000000000002"
+        },
+        {
+          "name": "Apoio",
+          "slug": "apoio",
+          "events": 1,
+          "position": 3,
+          "commission_id": "a0000000-0000-4000-8000-000000000003"
+        }
+      ]
     }
   }
 }

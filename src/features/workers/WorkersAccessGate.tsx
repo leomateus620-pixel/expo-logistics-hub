@@ -69,7 +69,7 @@ export function PasswordPrompt({ onUnlock, compact }: { onUnlock: () => void; co
     <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-2xl border bg-card p-6 shadow-lg">
       <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><Lock size={18} /></div>
         <div><h2 className="text-lg font-semibold">BOT FENASOJA</h2><p className="text-sm text-muted-foreground">Confirme sua senha para continuar.</p></div></div>
-      <Input type="password" autoFocus autoComplete="current-password" placeholder="Sua senha" value={password}
+      <Input className="text-base md:text-base" type="password" autoFocus autoComplete="current-password" placeholder="Sua senha" value={password}
         onChange={event => setPassword(event.target.value)} aria-label="Senha" aria-invalid={!!error} />
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       <Button type="submit" className="h-11 w-full rounded-xl" disabled={busy || !password}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Entrar'}</Button>

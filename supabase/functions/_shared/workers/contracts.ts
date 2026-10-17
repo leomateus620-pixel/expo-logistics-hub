@@ -40,7 +40,8 @@ export interface WorkerProvider {
 export type EmitWorkerEvent = (event: 'worker' | 'progress' | 'delta' | 'citations' | 'conversation' | 'workspace' | 'usage' | 'done' | 'error', data: unknown) => void;
 
 export class WorkerError extends Error {
-  constructor(public readonly code: string, public readonly status = 400) { super(code); }
+  constructor(public readonly code: string, public readonly status = 400,
+    public readonly diagnostic?: { stage: string; technicalCode?: string }) { super(code); }
 }
 export const isObject = (value: unknown): value is Record<string, unknown> => Boolean(value && typeof value === 'object' && !Array.isArray(value));
 export const isUuid = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);

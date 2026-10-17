@@ -32,6 +32,14 @@
     {
       "name": "pie partitions, explicit comparison labels and closed query context persist without partial JSON",
       "passed": true
+    },
+    {
+      "name": "identity rankings persist and reopen with UUIDs, ties, official icon keys and zero; URLs and duplicate IDs fail",
+      "passed": true
+    },
+    {
+      "name": "structured identity choices survive SQL redaction and history reopening without technical labels",
+      "passed": true
     }
   ]
 }

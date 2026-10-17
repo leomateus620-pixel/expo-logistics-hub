@@ -36,11 +36,11 @@ describe('verified aggregate output contracts',()=>{
     const data=personal();data.metrics.weekday_counts=[{weekday:1,events:12}];
     expect(()=>parseWorkerAnalytics('agenda_personal_summary',data)).toThrow();
   });
-  it('rejects duplicate identities or indistinguishable chart labels',()=>{
+  it('rejects duplicate identities while keeping people with the same name separate',()=>{
     const data=ranking();data.metrics.shown_people=2;data.people.push({...data.people[0],position:2});
     expect(()=>parseWorkerAnalytics('agenda_people_ranking',data)).toThrow();
     data.people[1].person_id='10000000-0000-4000-8000-000000000002';
-    expect(()=>parseWorkerAnalytics('agenda_people_ranking',data)).toThrow();
+    expect(parseWorkerAnalytics('agenda_people_ranking',data)).toEqual(data);
   });
   it('fails closed on arbitrary fields, incomplete blocks, or free chart configuration',()=>{
     expect(()=>parseWorkerAnalytics('agenda_personal_summary',{...personal(),html:'<script/>'})).toThrow();
@@ -49,6 +49,20 @@ describe('verified aggregate output contracts',()=>{
   });
   it('accepts a specific clarification instead of guessing the edition/project',()=>{
     expect(parseWorkerAnalytics('map_sales_overview',{needs_clarification:true,question:'Qual edição deseja consultar?',options:['Fenasoja 2028']})).toMatchObject({needs_clarification:true});
+  });
+  it('validates named people, commission ranking and identity lookup using actual corrected PostgreSQL outputs',()=>{
+    const {examples}=JSON.parse(readFileSync(`${process.cwd()}/docs/workers/bot-fenasoja/analytics-validation.json`,'utf8'));
+    for(const [tool,example]of [['agenda_resolve_identity','resolvedPerson'],['agenda_person_events','namedPerson'],['agenda_commission_ranking','commissionRanking']])
+      expect(parseWorkerAnalytics(tool,examples[example])).toEqual(examples[example]);
+  });
+  it('validates created-only events independently of linked participation',()=>{
+    const data=personal();data.scope={...scope,relationship:'created'} as typeof data.scope;
+    data.metrics.created_events=124;data.metrics.linked_events=0;data.metrics.responsible_events=0;
+    expect(parseWorkerAnalytics('agenda_personal_summary',data)).toEqual(data);
+  });
+  it('reports invalid output as response validation rather than an access restriction',()=>{
+    try{parseWorkerAnalytics('agenda_people_ranking',{...ranking(),scope:{...scope,complete:false}});throw new Error('expected failure');}
+    catch(error){expect(error).toMatchObject({code:'INVALID_RESPONSE',diagnostic:{stage:'validation'}});}
   });
   it('keeps read-only tools closed and accepts only dates, explicit project scope and known relationship types',()=>{
     const personal=agendaTools.find(tool=>tool.name==='agenda_personal_summary')!;

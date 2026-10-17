@@ -100,9 +100,42 @@ describe('bots chat request lifecycle', () => {
     });
     const { result } = renderHook(() => useWorkersChat());
     await act(async () => { await result.current.sendMessage('Agenda amanhã'); });
-    expect(result.current.error).toContain('interrompida');
+    expect(result.current.messages[1].failure).toMatchObject({ code: 'network_error', retryable: true });
     expect(result.current.isStreaming).toBe(false);
     expect(result.current.messages[1].content).toBe('Resultado parcial autorizado');
+  });
+
+  it('encerra cálculo em falha SQL, conserva a pergunta e não oferece repetição de consulta inválida', async () => {
+    mocks.stream.mockImplementation(async (_request: WorkersTurnRequest, onEvent: (event: WorkersStreamEvent) => void) => {
+      onEvent({ event: 'progress', data: { label: 'Calculando sobre os dados autorizados…', status: 'running' } });
+      onEvent({ event: 'error', data: { code: 'rpc_incompatible', message: 'SQL privado com token secreto', retryable: false } });
+    });
+    const { result } = renderHook(() => useWorkersChat());
+    await act(async () => { await result.current.sendMessage('Qual pessoa teve mais eventos em outubro?'); });
+    expect(result.current.isStreaming).toBe(false);
+    expect(result.current.progress).toEqual([]);
+    expect(result.current.messages[0]).toMatchObject({ role: 'user', content: 'Qual pessoa teve mais eventos em outubro?' });
+    expect(result.current.messages[1].failure).toMatchObject({ code: 'rpc_incompatible', retryable: false, requestId: result.current.messages[0].requestId });
+    expect(JSON.stringify(result.current.messages)).not.toMatch(/SQL privado|token secreto/);
+    await act(async () => result.current.retryMessage(result.current.messages[0].requestId!));
+    expect(mocks.stream).toHaveBeenCalledTimes(1);
+  });
+
+  it('reexecuta somente por ação explícita e associa nova tentativa à pergunta e anexos originais', async () => {
+    mocks.stream.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockImplementationOnce(async (_request: WorkersTurnRequest, onEvent: (event: WorkersStreamEvent) => void) => { onEvent({ event: 'delta', data: { text: '3 eventos vinculados' } }); });
+    const { result } = renderHook(() => useWorkersChat());
+    const files = [{ name: 'recorte.md', text: 'outubro', trust: 'untrusted' as const }];
+    await act(async () => { await result.current.sendMessage('Quantos eventos em outubro?', files); });
+    const original = result.current.messages[0].requestId!;
+    expect(mocks.stream).toHaveBeenCalledTimes(1);
+    expect(result.current.messages[1].failure).toMatchObject({ code: 'network_error', requestId: original, retryable: true });
+    await act(async () => result.current.retryMessage(original));
+    const second = result.current.messages[2];
+    expect(second.requestId).not.toBe(original);
+    expect(second.retryOfRequestId).toBe(original);
+    expect(result.current.messages[3]).toMatchObject({ requestId: second.requestId, retryOfRequestId: original, content: '3 eventos vinculados' });
+    expect(mocks.stream.mock.calls[1][0]).toMatchObject({ message: 'Quantos eventos em outubro?', attachments: [{ name: 'recorte.md', text: 'outubro' }] });
   });
 });
 

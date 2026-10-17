@@ -28,7 +28,7 @@ export default function WorkersRoot() {
     return () => { document.title = previous; };
   }, [isDesign, isTeam, isUsage, profileWorker]);
   useEffect(() => {
-    const key = (event: globalThis.KeyboardEvent) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { if (document.querySelector('[role="dialog"][data-state="open"]')) return; event.preventDefault(); if (isChat) document.getElementById('worker-chat-input')?.focus(); else { navigate('/equipe-ia'); requestAnimationFrame(() => document.getElementById('worker-chat-input')?.focus()); } } };
+    const key = (event: globalThis.KeyboardEvent) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { if (document.querySelector('[role="dialog"][data-state="open"]')) return; event.preventDefault(); if (isChat) document.getElementById('worker-chat-input')?.focus({ preventScroll: true }); else { navigate('/equipe-ia'); requestAnimationFrame(() => document.getElementById('worker-chat-input')?.focus({ preventScroll: true })); } } };
     window.addEventListener('keydown', key); return () => window.removeEventListener('keydown', key);
   }, [isChat, navigate]);
   return <WorkersAccessGate><WorkersMotionProvider><div className={`workers-scope workers-root ${isChat ? 'workers-root--chat' : ''}`}>

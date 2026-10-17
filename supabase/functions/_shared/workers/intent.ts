@@ -2,7 +2,7 @@ import { routeWorker, type WorkerId, type WorkerRequest } from './contracts.ts';
 import { decodeWorkerResponse, type WorkerQueryFilters } from './response-contract.ts';
 
 export interface WorkerIntent {
-  kind: 'map_sales' | 'map_inventory' | 'agenda_query' | 'agenda_personal' | 'agenda_ranking' | 'institutional_president' | 'domain_query';
+  kind: 'map_sales' | 'map_inventory' | 'map_contracts' | 'map_documents' | 'map_receipts' | 'agenda_query' | 'agenda_personal' | 'agenda_ranking' | 'agenda_commission_ranking' | 'agenda_person' | 'agenda_commission' | 'institutional_president' | 'domain_query';
   worker: WorkerId;
   editionYear?: number;
   projectId?: string;
@@ -10,6 +10,10 @@ export interface WorkerIntent {
   period?: { from: string; to: string; label: string };
   presentation: 'direct' | 'table' | 'bar_chart' | 'pie_chart' | 'comparison';
   queryFilters?: WorkerQueryFilters;
+  entitySearch?: string;
+  entityId?: string;
+  entityName?: string;
+  commercialMetric?: 'signed_records' | 'pending_records' | 'total_records' | 'sold_lots' | 'sales_value' | 'documents' | 'document_versions' | 'receipts';
   previousPeriod?: { from: string; to: string; label: string };
   relationship: 'linked' | 'created' | 'responsible' | 'attendance';
   continuation: boolean;
@@ -26,29 +30,61 @@ function monthPeriod(year: number, month: number): NonNullable<WorkerIntent['per
 export function interpretWorkerIntent(request: WorkerRequest, now: Date, history: Array<{ role: string; content: string }> = []): WorkerIntent {
   const text = normalize(request.message);
   const prior = [...history].reverse().filter(item => item.role === 'assistant').map(item => decodeWorkerResponse(item.content)).find(Boolean);
-  const previousQuestion = [...history].reverse().find(item => item.role === 'user' && item.content !== request.message)?.content ?? '';
+  const previousIndex = history.map(item => item.role).lastIndexOf('user');
+  const previousQuestion = previousIndex >= 0 ? history[previousIndex].content : '';
+  // Failed turns still contain an explicit user period. Reconstruct it from the
+  // question instead of requiring a successful assistant response.
+  const previousIntent = previousQuestion && history.length <= 40
+    ? interpretWorkerIntent({ ...request, message: previousQuestion }, now, history.slice(0, previousIndex)) : undefined;
   const answeringClarification = Boolean(prior?.blocks.some(block => block.type === 'clarification'));
   const continuation = answeringClarification || /^(?:e\b|tambem\b|agora\b|no mes anterior|mes anterior|e quanto)/.test(text);
-  const inherited = continuation ? normalize(previousQuestion) : '';
-  const subject = `${inherited} ${text}`;
+  const subject = text;
   const routedWorker = routeWorker(request);
-  const mapContext = routedWorker === 'mapa' || /\bmapa\b|comercial|lotes|espacos|vendas?/.test(subject);
+  const explicitAgenda = /eventos?|agenda|programacao|compromissos/.test(text);
+  const mapContext = !explicitAgenda && (routedWorker === 'mapa' || /\bmapa\b|comercial|lotes|espacos|vendas?|contrat|assinatura|documentos anexados/.test(subject));
   const mapDetail = /contrat|assinatura|documento|precos?|renovacao|pavilh|segment|estrutura|recebid|pagament/.test(subject);
   const inventory = /\bdisponive(?:l|is)\b|\blivres?\b|\breservad[oa]s?\b|\bbloquead[oa]s?\b|\bnegociacao\b|\barea\b|\bareas\b|metragem|quadras?|cobert|eletric|energia|agua|internet|inventario|situacao dos (?:lotes|espacos)|distribuicao dos (?:lotes|espacos)/.test(subject);
   let kind: WorkerIntent['kind'] = 'domain_query';
+  const ranking = /ranking|mais vinculos|quem.*mais|mais eventos|maior quantidade de eventos/.test(text);
+  const commissionMention = /comiss(?:ao|oes)|assessorias?/.test(text);
+  const nominal = /\beventos?\s+(?:(?:do|da|de)\s+)?(.+?)(?:\s+(?:teve|tem|possui|tiveram|em|no mes|neste|nesse|durante)\b|[?!.]|$)/i.exec(request.message)?.[1]?.trim();
+  const nominalPerson = nominal && !/^(?:eu|meus?|minhas?|existem|ha|foram|estao|acontecem|vinculados?|criados?|sob|concluidos?|cancelados?|planejados?|de |da |do |neste|nesse|no |na |com |em |por |sem |para |deste|dessa|dessa|desta|que |se )/i.test(nominal)
+    && !commissionMention && !ranking && !/local|categoria|prioridade|duracao|horario|distribuicao/i.test(text) && /\p{L}+(?:\s+\p{L}+)+/u.test(nominal) ? nominal : undefined;
+  const commissionName = /(?:comiss[aã]o|assessoria)\s+(.+?)(?:\s+(?:teve|tem|possui|em|no mes|neste|durante)\b|[?!.]|$)/i.exec(request.message)?.[1]?.trim();
+  let entitySearch = nominalPerson ?? (commissionName && !/^(?:teve|tem|com mais|mais|selecionada|identificada|teve mais)/i.test(commissionName) ? commissionName : undefined);
+  let commercialMetric: WorkerIntent['commercialMetric'];
   if (/presidente/.test(subject) && /fenasoja/.test(subject)) kind = 'institutional_president';
+  else if (commissionMention && ranking) kind = 'agenda_commission_ranking';
+  else if ((explicitAgenda || routedWorker === 'agenda' || /pessoas?|quem/.test(text)) && ranking && !commissionMention) kind = 'agenda_ranking';
+  else if (explicitAgenda && commissionMention && entitySearch) kind = 'agenda_commission';
+  else if (explicitAgenda && nominalPerson) kind = 'agenda_person';
+  else if (mapContext && /recebid|recebiment|pagamentos? recebidos/.test(text)) { kind = 'map_receipts'; commercialMetric = 'receipts'; }
+  else if (mapContext && /documentos?|anexos?|versoes/.test(text) && /quant[oa]s|quantidade|total/.test(text) && !/quantos.*contratos.*(?:firmad|assinad|confirmad)/.test(text)) { kind = 'map_documents'; commercialMetric = /versoes/.test(text)?'document_versions':'documents'; }
+  else if (mapContext && /contrat|assinatura|registros? (?:comerciais|de venda)|agrupamentos?/.test(text) && /quantos|quantidade|total|firmad|assinad|confirmad/.test(text) && !/\bquais\b|situacao|desse pedido|deste pedido|\bvalor\b|\bquanto\b|\blotes?\b|\bespacos?\b/.test(text)) {
+    kind = 'map_contracts'; commercialMetric = /aguard|penden|abert/.test(text) ? 'pending_records' : /total|registros?|agrupamentos?/.test(text) && !/firmad|assinad|confirmad/.test(text) ? 'total_records' : 'signed_records';
+  }
   else if (mapContext && inventory && !mapDetail) kind = 'map_inventory';
   else if (mapContext && /venda|vendemos|vendidos|confirmados/.test(subject) && !mapDetail) kind = 'map_sales';
-  else if ((/event/.test(subject) || routedWorker==='agenda') && /ranking|pessoas.*mais vinculos|quem.*mais|mais eventos/.test(subject)) kind = 'agenda_ranking';
-  else if (/event/.test(subject) && /\beu\b|\bmeus\b|\bminha\b|vinculad|responsab|criei|criados por mim|\bfiz\b/.test(subject)
+  else if (/event/.test(subject) && /\beu\b|\bmeus\b|\bminha\b|\bmim\b|criei|criados por mim|\bfiz\b/.test(subject)
     && /quantos|quantidade|duracao|media|\bfiz\b/.test(subject) && !/situacao|concluid|cancelad|local|categoria|prioridade|hoje|amanha|semana|compare|versus/.test(subject)) kind = 'agenda_personal';
-  else if (continuation && prior && !mapDetail && !/subevento|detalhe|presenca/.test(text) && ['map_sales', 'map_inventory', 'agenda_query', 'agenda_personal', 'agenda_ranking', 'institutional_president'].includes(prior.intent)) kind = prior.intent as WorkerIntent['kind'];
+  else if (continuation && !explicitAgenda && !mapDetail && !/subevento|detalhe|presenca/.test(text) && (previousIntent || prior)) kind = previousIntent?.kind ?? prior!.intent as WorkerIntent['kind'];
   else if ((routedWorker === 'agenda' || /eventos?|agenda|programacao|compromissos/.test(subject)) && !mapContext && !/subevento|detalhe/.test(subject)) kind = 'agenda_query';
   const worker: WorkerId = kind.startsWith('map_') ? 'mapa' : kind === 'institutional_president' ? 'radar'
     : kind.startsWith('agenda_') ? 'agenda' : continuation && prior ? prior.worker : routeWorker(request);
   const explicitYear = /\b(20\d{2})\b/.exec(text)?.[1];
-  const priorYear = prior?.metadata.edition?.match(/20\d{2}/)?.[0];
-  const editionYear = explicitYear && (!kind.startsWith('agenda_') || /fenasoja|edicao/.test(text)) ? Number(explicitYear) : continuation && priorYear ? Number(priorYear) : undefined;
+  if (continuation && previousIntent && !entitySearch && !explicitAgenda) entitySearch = previousIntent.entitySearch;
+  const entityId = continuation && !nominalPerson && !commissionName
+    ? kind==='agenda_person'?prior?.metadata.filters?.personId:kind==='agenda_commission'?prior?.metadata.filters?.commissionId:undefined
+    : undefined;
+  commercialMetric ??= kind === 'map_sales' ? /quantos|quantidade/.test(text) && !/valor/.test(text) ? 'sold_lots' : 'sales_value'
+    : continuation ? previousIntent?.commercialMetric : undefined;
+  if(kind==='map_contracts'&&continuation){
+    if(/aguard|penden|abert/.test(text))commercialMetric='pending_records';
+    else if(/total|registros?/.test(text))commercialMetric='total_records';
+    else if(/firmad|assinad|confirmad/.test(text))commercialMetric='signed_records';
+  }
+  const priorYear = prior?.metadata.edition?.match(/20\d{2}/)?.[0] ?? previousIntent?.editionYear?.toString();
+  const editionYear = /projeto inteiro|todas as edicoes/.test(text) ? undefined : explicitYear && (!kind.startsWith('agenda_') || /fenasoja|edicao/.test(text)) ? Number(explicitYear) : continuation && priorYear ? Number(priorYear) : undefined;
   const projectId = continuation && prior?.metadata.projectId && (!explicitYear || !priorYear || explicitYear === priorYear) ? prior.metadata.projectId : undefined;
   const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(now).map(item => [item.type, item.value]));
   let year = Number(parts.year), month = Number(parts.month) - 1;
@@ -79,19 +115,19 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
     year=explicitYear?Number(explicitYear):year;period={from:`${year}-01-01`,to:`${year}-12-31`,label:`ano de ${year}`};
   }
   else if (/mes anterior|mes passado/.test(text) && !/compar.*(?:neste|deste|este|atual).*mes/.test(text)) {
-    const previous = continuation && prior?.metadata.period ? prior.metadata.period.from : `${year}-${String(month + 1).padStart(2, '0')}-01`;
+    const previous = continuation ? previousIntent?.period?.from ?? prior?.metadata.period?.from ?? `${year}-${String(month + 1).padStart(2, '0')}-01` : `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const date = new Date(`${previous}T12:00:00Z`); date.setUTCMonth(date.getUTCMonth() - 1);
     period = monthPeriod(date.getUTCFullYear(), date.getUTCMonth());
   } else if (/proximo mes|mes seguinte/.test(text)) {
     civil.setUTCMonth(civil.getUTCMonth()+1,1); period = monthPeriod(civil.getUTCFullYear(),civil.getUTCMonth());
   } else if (/neste mes|nesse mes|este mes|mes atual/.test(text) || kind.startsWith('agenda_') && !continuation) {
     period = monthPeriod(explicitYear ? Number(explicitYear) : year, month);
-  } else if (continuation && prior?.metadata.period) period = prior.metadata.period as NonNullable<WorkerIntent['period']>;
+  } else if (continuation) period = previousIntent?.period ?? prior?.metadata.period as WorkerIntent['period'];
   if (!period && kind.startsWith('agenda_')) period = monthPeriod(year, month);
   const relationship: WorkerIntent['relationship'] = /presenca|presente|compareci|participei efetivamente|horas.*(?:efetiv|trabalh)/.test(subject) ? 'attendance'
     : /criei|criados por mim|eu criei|meus eventos criados/.test(subject) ? 'created' : /responsab/.test(subject) ? 'responsible'
-      : continuation && prior?.metadata.filters?.relationship ? prior.metadata.filters.relationship : 'linked';
-  const presentation = /pizza|rosca/.test(text) ? 'pie_chart' : /compar|versus|\bvs\b/.test(text) ? 'comparison' : /grafico|barras/.test(text) || kind === 'agenda_ranking' ? 'bar_chart' : /tabela/.test(text) ? 'table' : 'direct';
+      : continuation ? previousIntent?.relationship ?? prior?.metadata.filters?.relationship ?? 'linked' : 'linked';
+  const presentation = /pizza|rosca/.test(text) ? 'pie_chart' : /compar|versus|\bvs\b/.test(text) ? 'comparison' : /tabela/.test(text) ? 'table' : /grafico|barras/.test(text) ? 'bar_chart' : 'direct';
   let previousPeriod: WorkerIntent['previousPeriod'];
   if (presentation === 'comparison' && period && /anterior|passad/.test(text)) {
     const previous = new Date(`${period.from}T12:00:00Z`);
@@ -104,6 +140,7 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
     }
   }
   return { kind, worker, resolveProject: kind.startsWith('map_') && (answeringClarification || /projeto|parque/.test(text)), ...(projectId ? { projectId } : {}), ...(editionYear ? { editionYear } : {}), ...(period ? { period } : {}), ...(previousPeriod ? { previousPeriod } : {}),
+    ...(entitySearch ? { entitySearch } : {}), ...(entityId ? { entityId } : {}), ...(commercialMetric ? { commercialMetric } : {}),
     ...(continuation && prior?.metadata.filters?.query ? { queryFilters: prior.metadata.filters.query } : {}),
     presentation, relationship, continuation };
 }

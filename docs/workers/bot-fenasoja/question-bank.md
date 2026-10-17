@@ -179,7 +179,7 @@ Status explícito fechado; cancelados apenas se pedidos. Concluído é estado ca
 
 ### Pessoas e vínculos (agenda)
 
-Eventos distintos por identidade persistida e RLS. Ranking agregado completo antes do top. Pessoa nominal exige resolução de identidade sem escolher homônimo; indisponível pedir identificador autorizado.
+Ranking de pessoas usa eventos distintos por identidade persistida e RLS, agregado completo antes do limite visual. Pessoa nominal primeiro usa agenda_resolve_identity(kind=person), depois agenda_person_events por UUID; homônimos exigem escolha objetiva. Criação não é participação e vínculo não comprova presença.
 
 ### Locais da programação (agenda)
 
@@ -203,7 +203,7 @@ Prioridade persistida, detalhes só campos operacionais permitidos. Subeventos p
 
 ### Comparações e limites de evidência (agenda)
 
-Comparar duas consultas completas com mesmos filtros e unidades. Comissões e pessoas precisam de UUID persistido resolvido por fonte autorizada. Presença não existe no vínculo. Pedido fora de catálogo continua por ferramentas, sem resposta memorizada.
+Ranking de comissões usa agenda_commission_ranking, nunca ranking de pessoas. Comissão nominal usa agenda_resolve_identity(kind=commission) e agenda_query por commission_id. Comparar duas consultas completas com mesmos filtros. Preservar período explicitado inclusive após falha. Presença não existe no vínculo; o catálogo não limita perguntas.
 
 ### Valores de vendas (mapa)
 
@@ -239,7 +239,7 @@ Usar regra/preço persistido e edição comprovada. Ausência de preço é pend�
 
 ### Pedidos e documentos (mapa)
 
-Revalidar permissão de contratos para presença de documento. Documento anexado não comprova assinatura. Detalhe exige pedido resolvido; não expor arquivos privados.
+Contratos firmados, aguardando assinatura e total de registros usam map_sales_records_summary, exatamente os totais SIGNED/PENDING da API da Dashboard. Lotes, documentos/versões e pagamentos são unidades distintas. Listas usam list_sale_orders; detalhes de documentos exigem pedido resolvido e permissão de contratos. Anexo não comprova assinatura nem recebimento.
 
 ### Edição, comparação e atualização (mapa)
 

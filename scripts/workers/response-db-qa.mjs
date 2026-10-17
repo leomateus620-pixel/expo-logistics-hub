@@ -28,6 +28,7 @@ try {
   for (const file of ['scripts/workers/db-fixture.sql', 'supabase/migrations/20261016120000_workers_readonly_workspace.sql']) await db.exec(await fs.readFile(path.join(root, file), 'utf8'));
   await db.exec('CREATE SCHEMA workers_private');
   await db.exec(await fs.readFile(path.join(root, 'supabase/migrations/20261017030000_workers_response_persistence.sql'), 'utf8'));
+  await db.exec(await fs.readFile(path.join(root, 'supabase/migrations/20261017060000_workers_identity_responses.sql'), 'utf8'));
   await db.exec(`SET ROLE authenticated; SELECT set_config('request.jwt.claim.sub','${user}',false);`);
   await check('numeric facts and validated institutional URLs survive persistence while textual personal data is redacted', async () => {
     const id = await begin(1); await finish(id, encode(envelope()));
@@ -83,6 +84,48 @@ try {
     assert.equal(stored.blocks[0].data[0].value,100);assert.equal(stored.blocks[1].currentLabel,'Outubro de 2026');assert.equal(stored.metadata.filters.query.weekday,5);
     const invalid=await begin(11);document.blocks[0].population=3;
     await assert.rejects(()=>finish(invalid,encode(document)),error=>error.code==='22023');await fail(invalid);
+  });
+  await check('identity rankings persist and reopen with UUIDs, ties, official icon keys and zero; URLs and duplicate IDs fail', async () => {
+    await db.exec(`RESET ROLE;UPDATE ai_messages SET created_at=now()-interval '2 minutes';SET ROLE authenticated;`);
+    const document=envelope();
+    document.blocks=[{type:'entity_ranking',title:'Comissões autorizadas',entityKind:'commission',population:2,items:[
+      {id:'00000000-0000-4000-8000-000000000011',name:'Segurança',visualKey:'seguranca',events:12,position:1},
+      {id:'00000000-0000-4000-8000-000000000012',name:'Segurança',visualKey:'unidade-nova',events:0,position:2}
+    ]}];
+    const id=await begin(20); await finish(id,encode(document));
+    const stored=JSON.parse((await sql("SELECT content FROM ai_messages WHERE request_id=$1 AND role='assistant'",[id]))[0].content.slice(21,-4));
+    assert.deepEqual(stored.blocks,document.blocks);
+    for(const [i,mutate] of [
+      d=>{d.blocks[0].items[0].photoUrl='https://arbitrary.test/picture'},
+      d=>{d.blocks[0].items[1].id=d.blocks[0].items[0].id},
+      d=>{d.blocks[0].items[0].visualKey='https://arbitrary.test/picture'},
+      d=>{d.blocks[0].items[1].position=1},
+      d=>{d.blocks[0].items[1].events=14},
+    ].entries()){
+      const invalid=structuredClone(document);mutate(invalid);const request=await begin(21+i);
+      await assert.rejects(()=>finish(request,encode(invalid)),error=>error.code==='22023');await fail(request);
+    }
+    const person=structuredClone(document);person.blocks[0].entityKind='person';person.blocks[0].items.forEach(x=>{delete x.visualKey;x.events=12});
+    const personRequest=await begin(26);await finish(personRequest,encode(person));
+    assert.ok((await sql("SELECT content FROM ai_messages WHERE request_id=$1 AND role='assistant'",[personRequest]))[0].content.includes('entity_ranking'));
+  });
+  await check('structured identity choices survive SQL redaction and history reopening without technical labels', async () => {
+    await db.exec(`RESET ROLE;UPDATE ai_messages SET created_at=now()-interval '2 minutes';SET ROLE authenticated;`);
+    const document=envelope();document.blocks=[{type:'clarification',question:'Qual pessoa deseja consultar?',options:['Ana da Silva · identidade 1','Ana da Silva · identidade 2'],choices:[
+      {id:'00000000-0000-4000-8000-000000000011',name:'Ana da Silva'},
+      {id:'00000000-0000-4000-8000-000000000012',name:'Ana da Silva'}
+    ]}];
+    const id=await begin(30);await finish(id,encode(document));
+    const stored=JSON.parse((await sql("SELECT content FROM ai_messages WHERE request_id=$1 AND role='assistant'",[id]))[0].content.slice(21,-4));
+    assert.deepEqual(stored.blocks,document.blocks);
+    for(const [i,mutate] of [
+      d=>{d.blocks[0].choices[1].id=d.blocks[0].choices[0].id},
+      d=>{d.blocks[0].choices[0].url='https://arbitrary.test'},
+      d=>{d.blocks[0].options.pop()},
+    ].entries()){
+      const invalid=structuredClone(document);mutate(invalid);const request=await begin(31+i);
+      await assert.rejects(()=>finish(request,encode(invalid)),error=>error.code==='22023');await fail(request);
+    }
   });
   const output = { environment: 'isolated PGlite PostgreSQL; synthetic records only', checks };
   const directory = path.join(root, 'docs/workers/bot-fenasoja/evidence'); await fs.mkdir(directory, { recursive: true });

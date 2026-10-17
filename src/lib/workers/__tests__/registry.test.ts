@@ -44,7 +44,7 @@ function fakeClient(options: { role?: WorkerRole; caps?: string[]; tables?: Reco
     };
     return query;
   });
-  const rpc=vi.fn(async(name:string)=>({data:options.rpc?.[name]??true,error:options.rpcError?{message:'secret database details'}:null}));
+  const rpc=vi.fn(async(name:string,_args?:Record<string,unknown>)=>({data:options.rpc?.[name]??true,error:options.rpcError?{message:'secret database details'}:null}));
   const getUser=vi.fn(async()=>({data:{user:state.authenticatedId?{id:state.authenticatedId,role:'authenticated'}:null},error:state.authenticatedId?null:{message:'No session'}}));
   const client={auth:{getUser},from,rpc,functions:{invoke:mutations}} as unknown as SupabaseClient;
   const context:WorkerAccessContext={userId,orgId,role:'admin',capabilities:new Set(['full_access']),supabase:client};
@@ -185,6 +185,36 @@ describe('scoping, minimization and untrusted content',()=>{
     const f=fakeClient({tables:{cronograma_eventos_full:Array.from({length:3},(_,i)=>({id:`event-${i}`,org_id:orgId,title:`Evento ${i}`}))}});
     const result=await executeWorkerTool('list_events',{limit:1},f.context);
     expect(result.records).toHaveLength(1);expect(result.total).toBe(3);expect(result.truncated).toBe(true);expect(result.summary).toMatch(/parcial/);
+  });
+  it('reuses the Dashboard API totals for all, pending and signed records without counting rows or items',async()=>{
+    const f=fakeClient({caps:['map.view','map.manage_sales'],tables:{map_projects:[{id:projectId,org_id:orgId,is_archived:false,name:'Projeto sintético'}]}});
+    f.rpc.mockImplementation(async(name:string,args?:Record<string,unknown>)=>({error:null,data:name==='list_commercial_sale_orders'
+      ? {total:args?.p_status==='SIGNED'?64:args?.p_status==='PENDING'?60:124,rows:[{item_count:999,signed_count:800,document_count:700}],documentsAccessible:true}:true}));
+    const answer=await executeWorkerTool('map_sales_records_summary',{},f.context);
+    expect(answer.records[0]).toMatchObject({scope:{project_id:projectId,complete:true},metrics:{total_records:124,pending_records:60,signed_records:64}});
+    const calls=f.rpc.mock.calls.filter(([name])=>name==='list_commercial_sale_orders');
+    expect(calls).toHaveLength(3);
+    expect(calls.map(call=>(call[1] as Record<string,unknown>).p_status)).toEqual([null,'PENDING','SIGNED']);
+    for(const call of calls)expect(call[1]).toMatchObject({p_project_id:projectId,p_has_document:null,p_from:null,p_to:null,p_limit:1,p_offset:0});
+    expect(JSON.stringify(answer)).not.toContain('999');
+  });
+  it('keeps contract counts available without contract-document permission and rejects unavailable totals',async()=>{
+    const f=fakeClient({caps:['map.view','map.manage_sales'],tables:{map_projects:[{id:projectId,org_id:orgId,is_archived:false}]},rpc:{list_commercial_sale_orders:{rows:[]}}});
+    await expect(executeWorkerTool('map_sales_records_summary',{project_id:projectId},f.context)).rejects.toMatchObject({code:'INVALID_RESPONSE',diagnostic:{stage:'validation'}});
+  });
+  it('does not label project-wide Dashboard counts as an edition-filtered total',async()=>{
+    const f=fakeClient({caps:['map.view','map.manage_sales']});
+    expect((await executeWorkerTool('map_sales_records_summary',{edition_year:2028},f.context)).records[0]).toMatchObject({needs_clarification:true,options:['Consultar o projeto inteiro']});
+    expect(f.rpc.mock.calls.some(([name])=>name==='list_commercial_sale_orders')).toBe(false);
+  });
+  it('preserves document_count only under contract permission, while private document identifiers remain protected',async()=>{
+    const setup={caps:['map.view','map.manage_sales','map.manage_contracts'],tables:{map_projects:[{id:projectId,org_id:orgId,is_archived:false}]},rpc:{list_commercial_sale_orders:{total:1,documentsAccessible:true,rows:[{record_id:eventId,document_count:3,document_number:'private',lot_ids:[eventId]}]}}};
+    const authorized=fakeClient(setup);const result=await executeWorkerTool('list_sale_orders',{project_id:projectId},authorized.context);
+    expect(result.records[0]).toMatchObject({document_count:3,lot_ids:[eventId]});
+    const limited=fakeClient({...setup,caps:['map.view','map.manage_sales']});
+    expect((await executeWorkerTool('list_sale_orders',{project_id:projectId},limited.context)).records[0]).not.toHaveProperty('document_count');
+    expect(sanitizeWorkerData({document_count:3,document_number:'private',document:'private',storage_path:'private'})).toEqual({document_count:3});
+    expect(sanitizeWorkerData({document_count:'private',document_number:'private'})).toEqual({});
   });
   it('reads commission data only for the persisted membership',async()=>{
     const f=fakeClient({tables:{commissions:[{id:eventId,org_id:orgId,is_active:true,nome:'Outra comissão'}]}});

@@ -55,7 +55,7 @@ jobs:
         run: >-
           npx vitest run --maxWorkers=2
           src/features/workers src/lib/workers src/test/workersOrchestrator.test.ts
-          src/test/workersResponses.test.ts src/test/workersQuestionBank.test.ts
+          src/test/workersResponses.test.ts src/test/workersQuestionBank.test.ts src/test/workersReliability.test.ts src/test/workersDeadline.test.ts
           src/test/workersProposals.test.ts src/test/workersRoutines.test.ts src/test/mapLotDeepLink.test.tsx
           src/lib/__tests__/cronogramaRpc.test.ts src/test/publicMapHost.test.ts
           src/test/eventAssignmentPush.test.ts src/test/pushDeviceRevocation.test.ts src/test/eventPushMessage.test.ts

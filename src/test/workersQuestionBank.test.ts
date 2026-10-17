@@ -41,9 +41,10 @@ describe('Reviewed live-query question bank',()=>{
   });
   it('does not inherit sales overview across an explicit contracts or receipts follow-up',()=>{
     const prior=compose('Quantos eventos eu fiz neste mês?');prior.intent='map_sales';prior.worker='mapa';
-    for(const message of ['E quais vendas estão sem contrato?','E quanto já foi recebido?'])expect(interpretWorkerIntent({...request,worker:'mapa',message},now,[{role:'assistant',content:encodeWorkerResponse(prior)}]).kind).toBe('domain_query');
+    expect(interpretWorkerIntent({...request,worker:'mapa',message:'E quais vendas estão sem contrato?'},now,[{role:'assistant',content:encodeWorkerResponse(prior)}]).kind).toBe('domain_query');
+    expect(interpretWorkerIntent({...request,worker:'mapa',message:'E quanto já foi recebido?'},now,[{role:'assistant',content:encodeWorkerResponse(prior)}]).kind).toBe('map_receipts');
   });
-  it.each(['Quais vendas em aberto estão sem contrato?','Qual o preço do lote?','Quanto das vendas foi recebido?','Quais estruturas existem no mapa comercial?'])('does not replace distinct map queries with the sales overview: %s',message=>{
+  it.each(['Quais vendas em aberto estão sem contrato?','Qual o preço do lote?','Quais estruturas existem no mapa comercial?'])('does not replace distinct map queries with the sales overview: %s',message=>{
     expect(interpretWorkerIntent({...request,worker:'mapa',message},now).kind).toBe('domain_query');
   });
   it('uses word boundaries: indisponível is not available, and explicit availability chooses inventory',()=>{

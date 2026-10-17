@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { consumeWorkersStream, safeWorkerSourceUrl, streamWorkersTurn, type WorkersStreamEvent } from '../api';
+import { consumeWorkersStream, safeWorkerSourceUrl, streamWorkersTurn, WorkerTurnError, type WorkersStreamEvent } from '../api';
 
 const mocks = vi.hoisted(() => ({ getSession: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { auth: { getSession: mocks.getSession } } }));
@@ -63,6 +63,12 @@ describe('incremental bots SSE transport', () => {
     expect(cancel).toHaveBeenCalledTimes(1);
   });
 
+  it('retém código e correlação da falha sem expor mensagem técnica nem permitir repetir SQL inválido', async () => {
+    const body = closedStream([encoder.encode('event: error\ndata: {"code":"sql_error","message":"SELECT segredo token privado","retryable":true,"requestId":"request-1"}\n\n')]);
+    await expect(consumeWorkersStream(body, () => undefined)).rejects.toMatchObject({ name: 'WorkerTurnError', code: 'sql_error', requestId: 'request-1', retryable: false });
+    expect(new WorkerTurnError('sql_error').message).not.toMatch(/SELECT segredo|token privado|segurança/);
+  });
+
   it('cancels an already aborted stream and an abort while waiting for bytes', async () => {
     const firstCancel = vi.fn();
     const first = new AbortController(); first.abort();
@@ -113,6 +119,16 @@ describe('authenticated bots fetch', () => {
   it.each([[401, 'expirou'], [403, 'permissão'], [409, 'processada'], [429, 'Muitas consultas']])('maps HTTP %s without exposing a raw upstream body', async (status, message) => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('private upstream payload', { status })));
     await expect(streamWorkersTurn(request, () => undefined, new AbortController().signal)).rejects.toThrow(String(message));
+  });
+
+  it('preserva a causa de falha JSON anterior ao SSE sem ecoar detalhes da resposta', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: { code: 'rpc_incompatible', message: 'SQL privado e token', retryable: true } }), { status: 503, headers: { 'Content-Type': 'application/json' } })));
+    await expect(streamWorkersTurn(request, () => undefined, new AbortController().signal)).rejects.toMatchObject({ code: 'rpc_incompatible', retryable: false, requestId: request.requestId });
+  });
+
+  it('identifica falha de conexão sem vazar URL ou conteúdo interno do fetch', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch private?token=secret')));
+    await expect(streamWorkersTurn(request, () => undefined, new AbortController().signal)).rejects.toMatchObject({ code: 'network_error', retryable: true, requestId: request.requestId });
   });
 });
 
