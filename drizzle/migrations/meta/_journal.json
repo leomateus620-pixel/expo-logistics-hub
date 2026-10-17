@@ -131,8 +131,22 @@
     {
       "idx": 18,
       "version": "7",
-      "when": 1792216800000,
+      "when": 1792227953455,
       "tag": "0018_workers_knowledge_base",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792227997754,
+      "tag": "0019_workers_kb_seed_staging",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792228192261,
+      "tag": "0020_workers_kb_seed_staging_revoke_loader",
       "breakpoints": true
     }
   ]

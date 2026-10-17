@@ -1,0 +1,57 @@
+{
+ "engine": "pglite (local, simulated claims)",
+ "results": [
+  {
+   "name": "corrupt part rejected by trigger",
+   "ok": true
+  },
+  {
+   "name": "incomplete stage refuses promotion",
+   "ok": true
+  },
+  {
+   "name": "nothing published while incomplete",
+   "ok": true
+  },
+  {
+   "name": "all parts staged once",
+   "ok": true
+  },
+  {
+   "name": "promotion returns counts",
+   "ok": true
+  },
+  {
+   "name": "fenasoja 372/1245",
+   "ok": true
+  },
+  {
+   "name": "expandida 2414/10889",
+   "ok": true
+  },
+  {
+   "name": "identical rows to monolithic seed",
+   "ok": true
+  },
+  {
+   "name": "publication registered",
+   "ok": true
+  },
+  {
+   "name": "staging cleared after promotion",
+   "ok": true
+  },
+  {
+   "name": "re-promotion is idempotent",
+   "ok": true
+  },
+  {
+   "name": "downgrade blocked",
+   "ok": true
+  },
+  {
+   "name": "rows unchanged after failed promotion",
+   "ok": true
+  }
+ ]
+}

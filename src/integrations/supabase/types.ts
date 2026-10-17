@@ -5217,6 +5217,188 @@ export type Database = {
         }
         Relationships: []
       }
+      kb_answer_events: {
+        Row: {
+          created_at: string
+          entry_id: string | null
+          id: string
+          kb: string | null
+          kb_version: string | null
+          org_id: string
+          outcome: string
+          request_id: string
+          score: number | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_id?: string | null
+          id?: string
+          kb?: string | null
+          kb_version?: string | null
+          org_id: string
+          outcome: string
+          request_id: string
+          score?: number | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entry_id?: string | null
+          id?: string
+          kb?: string | null
+          kb_version?: string | null
+          org_id?: string
+          outcome?: string
+          request_id?: string
+          score?: number | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      kb_entries: {
+        Row: {
+          answer: string
+          area: string
+          area_name: string
+          as_of: string | null
+          canonical_question: string
+          citation_template: string | null
+          context: Json
+          created_at: string
+          dynamic_instructions: string | null
+          edition_number: number | null
+          edition_year: number | null
+          editorial_metadata: Json
+          fenasoja_links: Json
+          fts: unknown
+          gaps: Json
+          id: string
+          kb: string
+          kb_version: string
+          kind: string
+          managed_by: string
+          priority: number
+          provenance: Json
+          public_notes: Json
+          query_policy: Json
+          related_ids: Json
+          relevance: string | null
+          sources: Json
+          status: string
+          subcategory: string | null
+          tags: Json
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          area: string
+          area_name: string
+          as_of?: string | null
+          canonical_question: string
+          citation_template?: string | null
+          context: Json
+          created_at?: string
+          dynamic_instructions?: string | null
+          edition_number?: number | null
+          edition_year?: number | null
+          editorial_metadata?: Json
+          fenasoja_links?: Json
+          fts?: unknown
+          gaps?: Json
+          id: string
+          kb: string
+          kb_version: string
+          kind: string
+          managed_by?: string
+          priority: number
+          provenance?: Json
+          public_notes?: Json
+          query_policy?: Json
+          related_ids?: Json
+          relevance?: string | null
+          sources?: Json
+          status: string
+          subcategory?: string | null
+          tags?: Json
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          area?: string
+          area_name?: string
+          as_of?: string | null
+          canonical_question?: string
+          citation_template?: string | null
+          context?: Json
+          created_at?: string
+          dynamic_instructions?: string | null
+          edition_number?: number | null
+          edition_year?: number | null
+          editorial_metadata?: Json
+          fenasoja_links?: Json
+          fts?: unknown
+          gaps?: Json
+          id?: string
+          kb?: string
+          kb_version?: string
+          kind?: string
+          managed_by?: string
+          priority?: number
+          provenance?: Json
+          public_notes?: Json
+          query_policy?: Json
+          related_ids?: Json
+          relevance?: string | null
+          sources?: Json
+          status?: string
+          subcategory?: string | null
+          tags?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      kb_questions: {
+        Row: {
+          entry_id: string
+          id: string
+          is_canonical: boolean
+          kb: string
+          kb_version: string
+          question: string
+          question_norm: string | null
+        }
+        Insert: {
+          entry_id: string
+          id: string
+          is_canonical: boolean
+          kb: string
+          kb_version: string
+          question: string
+          question_norm?: string | null
+        }
+        Update: {
+          entry_id?: string
+          id?: string
+          is_canonical?: boolean
+          kb?: string
+          kb_version?: string
+          question?: string
+          question_norm?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kb_questions_entry_id_kb_fkey"
+            columns: ["entry_id", "kb"]
+            isOneToOne: false
+            referencedRelation: "kb_entries"
+            referencedColumns: ["id", "kb"]
+          },
+        ]
+      }
       lot_contract_lots: {
         Row: {
           contract_id: string
@@ -12262,6 +12444,36 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      kb_candidate_questions_v1: {
+        Args: { _normalized: string }
+        Returns: {
+          entry_id: string
+          id: string
+          is_canonical: boolean
+          kb: string
+          kb_version: string
+          question: string
+          question_norm: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "kb_questions"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      kb_normalize: { Args: { _text: string }; Returns: string }
+      kb_public_source_url: { Args: { _value: string }; Returns: boolean }
+      kb_similarity_v1: {
+        Args: { _left: string; _right: string }
+        Returns: number
+      }
+      kb_unaccent_v1: { Args: { _text: string }; Returns: string }
+      kb_valid_civil_date: { Args: { _value: string }; Returns: boolean }
+      kb_valid_sources: {
+        Args: { _sources: Json; _status: string }
+        Returns: boolean
+      }
       list_commercial_sale_orders: {
         Args: {
           p_from?: string
@@ -13183,6 +13395,17 @@ export type Database = {
         Args: { _from?: string; _org_id: string; _to?: string }
         Returns: Json
       }
+      workers_log_kb_answer: {
+        Args: {
+          _entry_id: string
+          _kb_version?: string
+          _org_id: string
+          _outcome: string
+          _request_id: string
+          _score: number
+        }
+        Returns: undefined
+      }
       workers_map_inventory_summary: {
         Args: {
           _block?: string
@@ -13219,6 +13442,36 @@ export type Database = {
       workers_require_read_scope: {
         Args: { _org_id: string }
         Returns: undefined
+      }
+      workers_search_kb: {
+        Args: {
+          _context?: Json
+          _edition_year?: number
+          _kb?: string
+          _limit?: number
+          _query: string
+        }
+        Returns: {
+          answer: string
+          area: string
+          area_name: string
+          as_of: string
+          canonical_question: string
+          context: Json
+          dynamic_instructions: string
+          edition_number: number
+          edition_year: number
+          entry_id: string
+          kb: string
+          kb_version: string
+          kind: string
+          matched_question: string
+          public_notes: Json
+          query_policy: Json
+          score: number
+          sources: Json
+          status: string
+        }[]
       }
     }
     Enums: {
