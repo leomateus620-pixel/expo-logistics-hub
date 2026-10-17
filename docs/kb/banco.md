@@ -33,3 +33,11 @@ O script `scripts/kb/db-qa.mjs` usa runtime PostgreSQL WASM externo, sem adicion
 ## Recuperação
 
 Para reverter a integração, implante o motor anterior e mantenha a ampliação de citações no banco e na interface enquanto existirem mensagens com fonte KB. Não restaure uma finalização que rejeite `kb` antes de cessar o tráfego do motor novo. Recuperar conteúdo anterior exige uma nova versão de revisão e nova migration, geradas a partir dos dados rastreados; nunca reaplicar uma publicação antiga por cima de uma nova. Eventos, mensagens, auditoria e uso não devem ser apagados. Embeddings não fazem parte desse caminho.
+
+## Publicação efetiva em 2026-10-17 (executor oficial do Lovable)
+
+O ambiente usa o histórico Drizzle aplicado pela ferramenta oficial de migrations, que executa as migrations pendentes dentro de uma transação (`drizzle-orm/pg-core/dialect.js`, `session.transaction`). A 0018 pendente original (com `BEGIN`/`COMMIT`, nunca aplicada) foi retirada do journal e reaplicada pela ferramenta como `0018_workers_knowledge_base.sql`, com conteúdo idêntico ao de `20261017070000` sem as duas linhas de transação. Não há outro caminho de esquema pendente.
+
+A carga não cabe numa chamada. `0019_workers_kb_seed_staging.sql` cria `workers_private.kb_seed_stage_parts` (sem acesso de `anon`/`authenticated`, trigger que confere o SHA-256 de cada parte) e `kb_promote_staged_seed`. As partes são exatamente os 109 comandos do seed `20261017080000` (índice em `data/kb/seed-parts/2026-10-17.json`, gerado por `build-kb-seed.mjs`). `stage-kb-seed.mjs` é idempotente e retomável. A promoção reconstrói o arquivo, exige o SHA-256 `a891edad…1e26` e o hash de origem, e executa o seed revisado (guardas de downgrade/imutabilidade, upserts, poda controlada, contagens, registro) numa única transação; ao final apaga a preparação. `0020` revoga o acesso temporário do carregador. `deploy-kb.mjs` não implementa esse formato e continua dependente de `LOVABLE_DB_MIGRATION_URL`.
+
+Validação local (PGlite, claims simulados): `scripts/kb/test-kb-staged-seed.mjs`, evidência em `evidence/staged-seed-local.json` — linhas idênticas ao seed monolítico, parte corrompida rejeitada, carga incompleta não publica, repetição idempotente, downgrade bloqueado.
