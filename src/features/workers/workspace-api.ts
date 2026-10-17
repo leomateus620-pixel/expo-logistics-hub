@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { safeWorkerSourceUrl } from './api';
+import { isKbSourceDate } from '../../../supabase/functions/_shared/workers/kb-source';
 import {
   actionCommandSchema, actionKinds, routineConfigSchema, workspaceCommandSchema,
   type ActionCommand, type ActionView, type WorkspaceCommand, type WorkspaceResponse,
@@ -12,8 +13,8 @@ const safeText = (max: number) => z.string().max(max);
 const worker = z.enum(['agenda', 'arena', 'mapa', 'interesse', 'comissao', 'logistica', 'caixa', 'radar']);
 const href = z.string().refine(value => Boolean(safeWorkerSourceUrl(value, 'app')), 'Destino inválido');
 const target = z.object({ recordId: uuid, label: safeText(200), href }).strict();
-const citation = z.object({ label: safeText(160), url: z.string(), source: z.enum(['app', 'web']), date: z.string().optional() }).strict()
-  .refine(value => Boolean(safeWorkerSourceUrl(value.url, value.source)), 'Fonte inválida');
+const citation = z.object({ label: safeText(160), url: z.string(), source: z.enum(['app', 'web', 'kb']), date: z.string().optional() }).strict()
+  .refine(value => Boolean(safeWorkerSourceUrl(value.url, value.source)) && (value.source !== 'kb' || isKbSourceDate(value.date)), 'Fonte inválida');
 const diff = z.object({ field: safeText(80), label: safeText(160), beforeDisplay: safeText(2200).nullable(), afterDisplay: safeText(2200).nullable(), redacted: z.boolean() }).strict();
 const action = z.object({
   id: uuid, orgId: uuid, conversationId: uuid, workerId: worker, kind: z.enum(actionKinds), version: z.number().int().positive(),

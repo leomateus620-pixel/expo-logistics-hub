@@ -1,0 +1,16 @@
+/** Versioned counterpart of public.kb_normalize; database tests compare every question. */
+export const KB_NORMALIZER_VERSION = '1';
+const units = ['primeir', 'segund', 'terceir', 'quart', 'quint', 'sext', 'setim', 'oitav', 'non'];
+export function normalizeKbQuestion(value) {
+  let text = String(value ?? '').normalize('NFKC').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  text = text.replace(/\b((?:19|20)\d{2})\s*\/\s*(\d{2})(?!\d)/g, (_, year, end) => `${year}/${year.endsWith('99') && end === '00' ? String(Number(year) + 1) : year.slice(0, 2) + end}`);
+  for (const base of [20, 10]) {
+    const prefix = base === 20 ? 'vigesim' : 'decim';
+    for (let n = 8; n >= 0; n--) text = text.replace(new RegExp(`\\b${prefix}[ao]\\s+${units[n]}[ao]\\b`, 'g'), String(base + n + 1));
+  }
+  for (const n of [30, 20, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+    const word = n === 30 ? 'trigesim' : n === 20 ? 'vigesim' : n === 10 ? 'decim' : units[n - 1];
+    text = text.replace(new RegExp(`\\b${word}[ao]\\b`, 'g'), String(n));
+  }
+  return text.replace(/\b(\d+)[ao]\b/g, '$1').replace(/[^a-z0-9]+/g, ' ').trim();
+}

@@ -1,14 +1,16 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import WorkersRoot from '../WorkersRoot';
+import { WorkersChat } from '../components/WorkersChat';
 import { safeSourceUrl } from '../ui-utils';
 import { workerCatalog } from '../workerCatalog';
-import type { WorkerChatMessage, WorkerProgressStep } from '../types';
+import type { WorkerChatMessage, WorkerId, WorkerProgressStep } from '../types';
 
 const state = vi.hoisted(() => ({
   role: 'leitura', caps: new Set<string>(), messages: [] as WorkerChatMessage[], sendMessage: vi.fn().mockResolvedValue(undefined),
   isStreaming: false, stop: vi.fn(), error: null as string | null, progress: [] as WorkerProgressStep[], retryMessage: vi.fn(),
+  activeWorkerId: 'agenda' as WorkerId,
 }));
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: { id: 'reader', user_metadata: { name: 'Leonardo' } } }) }));
 vi.mock('@/hooks/useCurrentOrg', () => ({ useCurrentOrg: () => ({ orgId: 'org', myRole: state.role }) }));
@@ -16,10 +18,10 @@ vi.mock('@/hooks/useCapabilities', () => ({ useCapabilities: () => ({ hasCapabil
 vi.mock('../WorkersAccessGate', () => ({ default: ({ children }: { children: unknown }) => children }));
 vi.mock('../workspace-api', () => ({ callWorkerAction: vi.fn().mockResolvedValue([]), callWorkerWorkspace: vi.fn().mockResolvedValue({ serverNow: '2026-10-16T12:00:00Z', routines: [], runs: [], events: [], memories: [], alerts: [] }) }));
 vi.mock('../workspace/useWorkerWorkspace', () => ({ workspaceDate: () => 'Não informado', useWorkerWorkspace: () => ({ scope: 'user:org', orgId: 'org', actions: [], conversationActions: [], pendingActions: [], snapshot: { serverNow: '2026-10-16T12:00:00Z', routines: [], runs: [], events: [], memories: [], alerts: [] }, loading: false, error: null, busyId: null, refresh: vi.fn(), clearError: vi.fn(), mutateAction: vi.fn(), mutateWorkspace: vi.fn() }) }));
-vi.mock('../useWorkersChat', () => ({ useWorkersChat: () => ({ messages: state.messages, conversations: [], conversationId: null, isStreaming: state.isStreaming, progress: state.progress, error: state.error, sendMessage: state.sendMessage, retryMessage: state.retryMessage, stop: state.stop, selectConversation: vi.fn(), newConversation: vi.fn(), isLoadingHistory: false, clearError: vi.fn(), activeWorkerId: 'agenda' }) }));
+vi.mock('../useWorkersChat', () => ({ useWorkersChat: () => ({ messages: state.messages, conversations: [], conversationId: null, isStreaming: state.isStreaming, progress: state.progress, error: state.error, sendMessage: state.sendMessage, retryMessage: state.retryMessage, stop: state.stop, selectConversation: vi.fn(), newConversation: vi.fn(), isLoadingHistory: false, clearError: vi.fn(), activeWorkerId: state.activeWorkerId }) }));
 
 beforeEach(() => {
-  state.role = 'leitura'; state.caps = new Set(); state.messages = []; state.isStreaming = false; state.error = null; state.progress = []; state.sendMessage.mockClear(); state.retryMessage.mockClear();
+  state.role = 'leitura'; state.caps = new Set(); state.messages = []; state.isStreaming = false; state.error = null; state.progress = []; state.activeWorkerId = 'agenda'; state.sendMessage.mockClear(); state.retryMessage.mockClear();
   vi.stubGlobal('IntersectionObserver', class { observe() {} unobserve() {} disconnect() {} });
   HTMLElement.prototype.scrollTo = vi.fn();
 });
@@ -43,14 +45,20 @@ describe('bots UI de leitura', () => {
     expect(HTMLElement.prototype.scrollTo).not.toHaveBeenCalled();
   });
 
-  it.each(['agenda', 'mapa'])('mantém abertura e compositor do %s sem sugestões fixas visíveis', workerId => {
+  it.each(['agenda', 'mapa'])('apresenta três sugestões temáticas no %s sem enviar a escolha automaticamente', async workerId => {
     const { container } = page(`/equipe-ia?worker=${workerId}`);
     const selected = workerCatalog.find(worker => worker.id === workerId)!;
     expect(screen.getByRole('article', { name: 'Mensagem inicial do BOT FENASOJA' })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: `Mensagem para ${selected.name}` })).toHaveValue('');
     expect(container.querySelector('.worker-chat-suggestions')).toBeNull();
-    for (const question of selected.examples) expect(screen.queryByRole('button', { name: question })).not.toBeInTheDocument();
+    expect(container.querySelectorAll('.worker-welcome-card')).toHaveLength(3);
     expect(screen.getByRole('button', { name: 'Enviar mensagem' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: selected.examples[0] }));
+    const input = screen.getByRole('textbox', { name: `Mensagem para ${selected.name}` });
+    expect(input).toHaveValue(selected.examples[0]);
+    await waitFor(() => expect(input).toHaveFocus());
+    expect(state.sendMessage).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Enviar mensagem' })).toBeEnabled();
   });
 
   it('preserva as sugestões dos demais especialistas', () => {
@@ -59,13 +67,112 @@ describe('bots UI de leitura', () => {
     expect(screen.getByRole('button', { name: arena.examples[0] })).toBeInTheDocument();
   });
 
+  it('remove o aviso visual de contexto também no painel compacto sem alterar o campo', () => {
+    render(<MemoryRouter><div className="workers-scope"><WorkersChat compact context={{ route: '/cronograma-eventos' }} /></div></MemoryRouter>);
+    expect(screen.queryByText('Consultando com o contexto da tela atual')).not.toBeInTheDocument();
+    expect(screen.queryByText('Informação da feira, com contexto.')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Da história da feira ao seu próximo compromisso.')).toHaveLength(2);
+    expect(screen.getByRole('textbox')).toHaveValue('');
+    expect(state.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('mantém os cinco atalhos do administrador acessíveis com dicas de teclado e os destinos reais', () => {
+    state.role = 'admin';
+    page('/equipe-ia');
+    const nav = screen.getByRole('navigation', { name: 'Atalhos do BOT FENASOJA' });
+    expect(within(nav).getAllByRole('button')).toHaveLength(3);
+    expect(within(nav).getAllByRole('link')).toHaveLength(2);
+    expect(within(nav).getByRole('link', { name: 'Conheça a equipe' })).toHaveAttribute('href', '/equipe-ia/conheca');
+    expect(within(nav).getByRole('link', { name: 'Uso da equipe' })).toHaveAttribute('href', '/admin/workers/uso');
+    const memory = within(nav).getByRole('button', { name: 'Memória' });
+    expect(memory.textContent).toBe('');
+    fireEvent.focus(memory);
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Memória');
+    fireEvent.keyDown(memory, { key: 'Escape' });
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    fireEvent.click(memory);
+    expect(screen.getByRole('dialog')).toHaveTextContent('O que a equipe lembra');
+    expect(state.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('preserva a restrição do atalho de uso para quem não administra', () => {
+    page('/equipe-ia');
+    expect(screen.queryByRole('link', { name: 'Uso da equipe' })).not.toBeInTheDocument();
+  });
+
   it('mantém a pausa manual disponível após a primeira resposta', () => {
     state.messages = [{ id: 'assistant', role: 'assistant', content: 'Resultado consultado.', workerId: 'agenda', createdAt: '2026-10-16T12:00:00Z' }];
     const { container } = page('/equipe-ia?worker=agenda');
     expect(screen.queryByRole('article', { name: 'Mensagem inicial do BOT FENASOJA' })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Pausar animação do mascote' }));
     expect(container.querySelector('.worker-bot-mark')).toHaveAttribute('data-animated', 'false');
+    expect(within(screen.getByRole('article', { name: 'Resposta de Agenda' })).getByRole('img', { name: 'Agenda' })).toHaveAttribute('data-active', 'false');
     fireEvent.click(screen.getByRole('button', { name: 'Animar o mascote do bot' }));
+    expect(within(screen.getByRole('article', { name: 'Resposta de Agenda' })).getByRole('img', { name: 'Agenda' })).toHaveAttribute('data-active', 'true');
+  });
+
+  it('identifica cada resposta pelo próprio mascote ao reabrir sem alterar mensagens do usuário', () => {
+    const at = '2026-10-16T12:00:00Z';
+    state.messages = [{ id: 'question', role: 'user', content: 'Pergunta preservada.', createdAt: at }, ...workerCatalog.map(worker => ({ id: worker.id, role: 'assistant' as const, content: `Resposta registrada ${worker.id}.`, workerId: worker.id, createdAt: at }))];
+    const verify = () => {
+      for (const worker of workerCatalog) {
+        const answer = screen.getByRole('article', { name: `Resposta de ${worker.name}` });
+        const icon = within(answer).getByRole('img', { name: worker.name });
+        expect(icon.style.getPropertyValue('--worker-mascot-color')).toBe(worker.color);
+        expect(icon.closest('.worker-response-identity')).toHaveAttribute('data-worker-id', worker.id);
+        expect(icon.closest('.worker-response-identity')).toHaveAttribute('data-state', 'settled');
+        expect(answer.querySelector('.worker-message__author strong')).toBeNull();
+        expect(answer.querySelector('.worker-response-dots')).toBeNull();
+      }
+      const question = screen.getByRole('article', { name: 'Sua pergunta' });
+      expect(question).toHaveTextContent('Pergunta preservada.');
+      expect(within(question).queryByRole('img')).not.toBeInTheDocument();
+    };
+    const first = page('/equipe-ia?worker=agenda'); verify(); first.unmount();
+    page('/equipe-ia?worker=agenda'); verify();
+  });
+
+  it('exibe o bot e três pontos antes do primeiro texto, mantém durante o stream e retira ao concluir', () => {
+    const at = '2026-10-16T12:00:00Z'; state.isStreaming = true; state.activeWorkerId = 'mapa';
+    state.messages = [{ id: 'question', role: 'user', content: 'Pergunta para Mapa.', createdAt: at }];
+    const { rerender } = page('/equipe-ia?worker=agenda');
+    const checkWorking = () => {
+      const answer = screen.getByRole('article', { name: 'Resposta de Mapa' });
+      expect(within(answer).getByRole('img', { name: 'Mapa' })).toBeInTheDocument();
+      expect(within(answer).getByRole('status')).toHaveTextContent('Mapa está preparando a resposta.');
+      expect(answer.querySelectorAll('.worker-response-dots>span')).toHaveLength(3);
+      expect(answer.querySelector('.worker-response-identity')).toHaveAttribute('data-state', 'working');
+      return answer;
+    };
+    checkWorking();
+    state.messages = [...state.messages, { id: 'reply', role: 'assistant', content: '', workerId: 'mapa', createdAt: at }];
+    rerender(<MemoryRouter><WorkersRoot /></MemoryRouter>); checkWorking();
+    state.messages = [state.messages[0], { ...state.messages[1], content: 'Resultado em andamento.' }];
+    rerender(<MemoryRouter><WorkersRoot /></MemoryRouter>);
+    const answer = checkWorking(); expect(answer).toHaveTextContent('Resultado em andamento.');
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar animação do mascote' }));
+    expect(within(answer).getByRole('img', { name: 'Mapa' })).toHaveAttribute('data-active', 'false');
+    checkWorking();
+    fireEvent.click(screen.getByRole('button', { name: 'Animar o mascote do bot' }));
+    state.isStreaming = false;
+    rerender(<MemoryRouter><WorkersRoot /></MemoryRouter>);
+    expect(screen.getByRole('article', { name: 'Resposta de Mapa' })).toBe(answer);
+    expect(answer.querySelector('.worker-response-dots')).toBeNull();
+    expect(within(answer).queryByRole('status')).not.toBeInTheDocument();
+    expect(answer.querySelector('.worker-response-identity')).toHaveAttribute('data-state', 'settled');
+    expect(within(answer).getByRole('img', { name: 'Mapa' })).toHaveAttribute('data-active', 'true');
+  });
+
+  it('preserva o indicador estático e a identidade quando o sistema reduz movimento', () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('prefers-reduced-motion'), media: query, addEventListener: vi.fn(), removeEventListener: vi.fn(), addListener: vi.fn(), removeListener: vi.fn() }));
+    state.isStreaming = true; state.activeWorkerId = 'mapa';
+    state.messages = [{ id: 'reply', role: 'assistant', content: '', workerId: 'mapa', createdAt: '2026-10-16T12:00:00Z' }];
+    page('/equipe-ia?worker=mapa');
+    const answer = screen.getByRole('article', { name: 'Resposta de Mapa' });
+    expect(within(answer).getByRole('img', { name: 'Mapa' })).toHaveAttribute('data-active', 'false');
+    expect(answer.querySelectorAll('.worker-response-dots>span')).toHaveLength(3);
+    expect(within(answer).getByRole('status')).toHaveTextContent('Mapa está preparando a resposta.');
+    expect(screen.getByRole('button', { name: 'Parar resposta' })).toBeEnabled();
   });
 
   it('mantém a página pública no contexto autenticado mesmo sem capability do módulo', () => {
@@ -112,7 +219,7 @@ describe('bots UI de leitura', () => {
     const { container } = page('/equipe-ia?worker=agenda');
     expect(container.querySelector('script')).toBeNull();
     expect(screen.getByText(/<script>apagaTudo/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Agenda' })).toHaveAttribute('href', '/cronograma-eventos');
+    expect(screen.getByRole('link', { name: 'Dados do aplicativo · Agenda' })).toHaveAttribute('href', '/cronograma-eventos');
     expect(screen.queryByRole('link', { name: 'Fonte inválida' })).not.toBeInTheDocument();
     expect(state.sendMessage).not.toHaveBeenCalled();
   });
@@ -138,7 +245,7 @@ describe('bots UI de leitura', () => {
     const { container, rerender } = page('/equipe-ia?worker=agenda');
     const answer = screen.getByRole('article', { name: 'Resposta de Agenda' });
     expect(screen.getAllByRole('article').map(node => node.getAttribute('aria-label'))).toEqual(['Sua pergunta', 'Resposta de Agenda']);
-    expect(answer).toHaveTextContent('Consultando as informações');
+    expect(within(answer).getByRole('status')).toHaveTextContent('Agenda está preparando a resposta.');
     const scroll = container.querySelector('.worker-chat-scroll')!;
     Object.defineProperties(scroll, { scrollHeight: { configurable: true, value: 2000 }, clientHeight: { configurable: true, value: 500 }, scrollTop: { configurable: true, value: 100, writable: true } });
     fireEvent.scroll(scroll); vi.mocked(HTMLElement.prototype.scrollTo).mockClear();
@@ -199,7 +306,9 @@ describe('bots UI de leitura', () => {
     const { container } = page('/equipe-ia?worker=mapa');
     expect(container.querySelector('img[src="/bot-fenasoja/mascot-open.webp"]')).toBeInTheDocument();
     expect(container.querySelector('img[src="/fenasoja-bots.svg"]')).toBeNull();
-    expect(screen.getAllByText('BOT FENASOJA').length).toBeGreaterThan(0);
+    const wordmarks = container.querySelectorAll('.worker-wordmark');
+    expect(wordmarks.length).toBeGreaterThan(0);
+    wordmarks.forEach(wordmark => { expect(wordmark).toHaveTextContent('BOT FENASOJA'); expect(wordmark.querySelector('.worker-wordmark__fenasoja')).toHaveTextContent('FENASOJA'); });
     expect(screen.queryByText('Equipe IA')).not.toBeInTheDocument();
     expect(container.querySelector('img[src="/bot-fenasoja/mascot-blink.webp"]')).toBeInTheDocument();
     const greeting = screen.getByRole('article', { name: 'Mensagem inicial do BOT FENASOJA' });

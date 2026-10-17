@@ -2,7 +2,7 @@ export type WorkerId = 'agenda' | 'arena' | 'mapa' | 'interesse' | 'comissao' | 
 export type MascotShape = 'mochi' | 'cubo' | 'onigiri' | 'favo' | 'hexagono' | 'nuvem' | 'triangulo' | 'paralelogramo';
 export type MascotMood = 'idle' | 'happy' | 'thinking' | 'needsYou' | 'talking' | 'sad' | 'sleeping';
 export interface WorkerContext { route: string; recordId?: string }
-export interface WorkerSource { title: string; url: string; date?: string; kind?: 'app' | 'web' }
+export interface WorkerSource { title: string; url: string; date?: string; kind?: 'app' | 'web' | 'kb' }
 export interface WorkerTurnFailure { code: string; message: string; retryable: boolean; requestId: string }
 export interface WorkerChatMessage { id: string; requestId?: string; retryOfRequestId?: string; failure?: WorkerTurnFailure; sequence?: number; role: 'user' | 'assistant' | 'system'; content: string; workerId?: WorkerId; createdAt: string; sources?: WorkerSource[]; chips?: { label: string; href: string }[] }
 export interface WorkerConversation { id: string; title: string; workerId?: WorkerId; updatedAt: string }

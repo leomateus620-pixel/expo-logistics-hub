@@ -5,7 +5,7 @@ export const PRESIDENT_2028_SOURCE = 'https://fenasoja.com.br/portal-oficial/ger
 export const institutionalTool = {
   name: 'workers_institutional_president', title: 'publicação institucional', readOnly: true as const,
   description: 'Consulta o conteúdo integral da publicação institucional revisada que nomeia a presidência da Fenasoja 2028. Preserva data, edição e data de verificação. Não comprova biografia nem presença em fotos.',
-  inputJsonSchema: { type: 'object', properties: { edition_year: { type: 'integer', minimum: 2000, maximum: 2100 } }, additionalProperties: false },
+  inputJsonSchema: { type: 'object', properties: { edition_year: { type: 'integer', minimum: 1966, maximum: 2100 } }, required: ['edition_year'], additionalProperties: false },
 };
 
 async function readHtml(response: Response): Promise<string> {
@@ -40,9 +40,9 @@ export function extractPresident2028(html: string, verifiedOn: string): Record<s
 }
 
 export async function readInstitutionalPresident(input: unknown, options: { fetcher?: typeof fetch; signal?: AbortSignal; now?: Date } = {}): Promise<ReadResult> {
-  if (!isObject(input) || Object.keys(input).some(key => key !== 'edition_year') || input.edition_year !== undefined && (!Number.isInteger(input.edition_year) || Number(input.edition_year) < 2000 || Number(input.edition_year) > 2100)) throw new WorkerError('invalid_tool_arguments');
+  if (!isObject(input) || Object.keys(input).some(key => key !== 'edition_year') || input.edition_year !== undefined && (!Number.isInteger(input.edition_year) || Number(input.edition_year) < 1966 || Number(input.edition_year) > 2100)) throw new WorkerError('invalid_tool_arguments');
   const now = options.now ?? new Date();
-  if (input.edition_year !== undefined && input.edition_year !== 2028 || input.edition_year === undefined && now.getUTCFullYear() > 2028) return { summary: 'A fonte revisada não comprova a presidência da edição solicitada.', records: [], citations: [], total: 0 };
+  if (input.edition_year !== 2028) return { summary: 'A fonte revisada não comprova a presidência da edição solicitada.', records: [], citations: [], total: 0 };
   let response: Response;
   try { response = await (options.fetcher ?? fetch)(PRESIDENT_2028_SOURCE, { redirect: 'error', signal: options.signal, headers: { Accept: 'text/html' } }); }
   catch { throw new WorkerError(options.signal?.aborted ? 'request_cancelled' : 'institutional_source_unavailable', 503); }

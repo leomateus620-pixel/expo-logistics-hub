@@ -64,4 +64,13 @@ describe('bots action/workspace transport boundary', () => {
     respond({ ...usage, rows: [{ ...usage.rows[0], costUsd: 0 }] });
     await expect(callWorkerWorkspace({ command: 'usage', orgId, from: instant, to: instant })).rejects.toMatchObject({ code: 'invalid_response' });
   });
+  it('conserva a união de citações no transporte de resultados e rejeita URL/data KB inválida', async () => {
+    const run = { id: actionId, routineId: actionId, conversationId: actionId, requestId: actionId, routineVersion: 1, scheduledFor: instant, referenceDate: '2026-10-16', startedAt: instant, finishedAt: instant, state: 'succeeded', catchUp: false, failureCode: null, resultTrust: 'user_scoped_reported' };
+    const source = { source: 'kb', label: 'Fonte pública registrada', url: 'https://fenasoja.com.br/edicoes-anteriores/', date: '2026-10-17' };
+    const response = (citation = source) => ({ serverNow: instant, results: [{ run, content: 'Resposta persistida.', citations: [citation], chips: [] }] });
+    const command = { command: 'executeDue' as const, orgId, requestId: actionId };
+    respond(response()); expect(await callWorkerWorkspace(command)).toEqual(response());
+    respond(response({ ...source, date: '2026-02-30' })); await expect(callWorkerWorkspace(command)).rejects.toMatchObject({ code: 'invalid_response' });
+    respond(response({ ...source, url: 'https://localhost/areas/private' })); await expect(callWorkerWorkspace(command)).rejects.toMatchObject({ code: 'invalid_response' });
+  });
 });

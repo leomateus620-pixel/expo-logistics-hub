@@ -2,6 +2,8 @@ import { cn } from '@/lib/utils';
 import { useRef, useSyncExternalStore } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { useMascotActive } from '../mascot/useMascotLife';
+import { WorkerMascot } from '../mascot/WorkerMascot';
+import type { WorkerDefinition } from '../types';
 
 let botMotionPaused = false;
 const motionListeners = new Set<() => void>();
@@ -12,6 +14,19 @@ export function WorkerBotMotionToggle() {
   const label = paused ? 'Animar o mascote do bot' : 'Pausar animação do mascote';
   return <button type="button" className="worker-bot-motion-toggle" title={label} aria-label={label} aria-pressed={!paused}
     onClick={() => { botMotionPaused = !botMotionPaused; motionListeners.forEach(listener => listener()); }}>{paused ? <Play size={13} /> : <Pause size={13} />}</button>;
+}
+
+/** One identity for a pending turn, streamed text and reopened messages. */
+export function WorkerResponseHeader({ worker, working = false }: { worker: WorkerDefinition; working?: boolean }) {
+  const paused = useSyncExternalStore(subscribeMotion, motionSnapshot, motionSnapshot);
+  return <div className="worker-message__author">
+    <span className="worker-response-identity" data-worker-id={worker.id} data-state={working ? 'working' : 'settled'} title={worker.name}>
+      <WorkerMascot shape={worker.shape} color={worker.color} size={32} seed={`response-${worker.id}`} paused={paused} ariaLabel={worker.name} />
+      {working && <span className="worker-response-dots" aria-hidden="true"><span /><span /><span /></span>}
+    </span>
+    <span className="worker-response-brand">BOT FENASOJA</span>
+    {working && <span className="sr-only" role="status">{worker.name} está preparando a resposta.</span>}
+  </div>;
 }
 
 export interface WorkerTeamMarkProps {
@@ -52,6 +67,10 @@ export interface WorkerTeamBrandProps {
   subtitle?: string;
 }
 
+export function WorkerTeamWordmark() {
+  return <span className="worker-wordmark"><span className="worker-wordmark__bot">BOT</span>{' '}<span className="worker-wordmark__fenasoja">FENASOJA</span></span>;
+}
+
 export function WorkerTeamBrand({
   size = 32,
   className,
@@ -71,7 +90,7 @@ export function WorkerTeamBrand({
   >
     <WorkerTeamMark size={size} />
     {showWordmark && <span className="worker-team-brand__copy">
-      <span className="worker-team-brand__name">BOT FENASOJA</span>
+      <span className="worker-team-brand__name"><WorkerTeamWordmark /></span>
       <span className="worker-team-brand__subtitle">{subtitle}</span>
     </span>}
   </span>;

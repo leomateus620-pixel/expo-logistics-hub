@@ -5,3 +5,12 @@ docs/portal-history/continuous/evidence/** linguist-generated=true
 # Preserve the supplied archive bytes (including CRLF/EOF) for SHA-256 verification.
 docs/portal-history/source/catalogo-25-edicoes.csv -text whitespace=cr-at-eol
 docs/portal-history/source/documentacao/FONTES.md -text whitespace=-blank-at-eof
+
+# KB hashes are byte contracts: reviewed/generated text is LF, supplied evidence keeps original bytes.
+data/kb/** text eol=lf
+scripts/kb/** text eol=lf
+supabase/functions/_shared/workers/kb-*.ts text eol=lf
+supabase/migrations/*_workers_kb_seed*.sql text eol=lf
+supabase/migrations/20261017070000_workers_knowledge_base.sql text eol=lf
+drizzle/migrations/0018_workers_knowledge_base.sql text eol=lf
+data/kb/raw/** -text whitespace=cr-at-eol,-blank-at-eof
