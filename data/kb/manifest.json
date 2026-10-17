@@ -154,6 +154,11 @@
       "bytes": 10189997
     },
     {
+      "name": "data/kb/seed-parts/2026-10-17.json",
+      "sha256": "954fa7211e8e3cb14c82e8ed5841759bdc1247977d4b47a847752b2629dea599",
+      "bytes": 15528
+    },
+    {
       "name": "supabase/functions/_shared/workers/kb-editions.ts",
       "sha256": "7f7823a6fe1bc5f4470cdc18aa234e79df70305eab542e07476251806203f9c7",
       "bytes": 32076
@@ -172,6 +177,11 @@
   "publication": {
     "transactional": true,
     "files": 1,
+    "staged_parts": {
+      "index": "data/kb/seed-parts/2026-10-17.json",
+      "part_count": 109,
+      "promotion": "workers_private.kb_promote_staged_seed"
+    },
     "entry_batches": 56,
     "question_batches": 49,
     "entry_batch_size": 50,

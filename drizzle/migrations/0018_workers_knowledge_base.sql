@@ -1,6 +1,5 @@
 -- Public, shared, reviewed KB. Additive schema; only finish_turn is extended.
 -- Normalizer v1: NFKC, fixed unaccent dictionary, ordinals, harvest periods.
-BEGIN;
 
 CREATE SCHEMA IF NOT EXISTS extensions;
 DO $extension$
@@ -411,5 +410,3 @@ BEGIN
   INSERT INTO public.ai_audit_events(org_id,user_id,conversation_id,request_id,event)
     VALUES (_org_id,actor,msg.conversation_id,_request_id,'turn_completed');
 END $$;
-
-COMMIT;
