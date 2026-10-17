@@ -1,6 +1,7 @@
 import { isObject, WorkerError } from './contracts.ts';
 
-export { workerAuthFailureCode } from '../../../../src/lib/workers/auth-failure.ts';
+// Bundled copy of src/lib/workers/auth-failure.ts (edge bundles only include supabase/functions); kept identical by src/test/workersAuthFailureCopy.test.ts.
+export { workerAuthFailureCode } from './auth-failure.ts';
 
 /** Settle immediately on cancellation even when a reader does not honor abort.
  * Its eventual rejection remains observed; no late result escapes this race. */
