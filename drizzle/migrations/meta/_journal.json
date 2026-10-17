@@ -99,6 +99,13 @@
       "when": 1792208845400,
       "tag": "0013_workers_verified_analytics",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792208930097,
+      "tag": "0014_workers_response_persistence",
+      "breakpoints": true
     }
   ]
 }
