@@ -53,7 +53,7 @@ function fakeClient(options: { role?: WorkerRole; caps?: string[]; tables?: Reco
 
 describe('closed read-only registry',()=>{
   it('uses only table/view columns present in the checked-in Supabase schema',()=>{
-    const schema=readFileSync(`${process.cwd()}/src/integrations/supabase/types.ts`,'utf8');
+    const schema=readFileSync(`${process.cwd()}/src/integrations/supabase/types.ts`,'utf8').replace(/\r\n/g,'\n');
     for (const [name,spec] of Object.entries(READ_TABLES)) {
       const block=schema.match(new RegExp('^      '+name+': \\{\\n([\\s\\S]*?)(?=^      \\w|^    \\})','m'))?.[1].split('        Insert:')[0];
       expect(block,`missing relation ${name}`).toBeTruthy();

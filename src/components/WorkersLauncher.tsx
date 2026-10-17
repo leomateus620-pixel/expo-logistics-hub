@@ -37,18 +37,18 @@ export default function WorkersLauncher() {
   if (!enabled) return runner;
   return <>
     {runner}
-    <button type="button" data-workers-launcher aria-label="Abrir copiloto da equipe Fenasoja"
+    <button type="button" data-workers-launcher aria-label="Abrir BOT FENASOJA"
       aria-keyshortcuts="Control+k Meta+k" aria-expanded={open} onClick={() => setOpen(true)}
       className="focus-ring"
       style={{ position: 'fixed', right: 20, bottom: 'max(24px, env(safe-area-inset-bottom))', zIndex: 39,
         display: 'flex', alignItems: 'center', gap: 8, minHeight: 48,
         padding: '12px 16px', borderRadius: 999, border: 0,
         background: '#121D85', color: '#fff', boxShadow: 'var(--shadow-md)', fontSize: 13, fontWeight: 600 }}>
-      <img src="/fenasoja-bots.svg" alt="" width={24} height={24} /><span>Equipe IA</span>
+      <img src="/bot-fenasoja/mascot-open.webp" alt="" width={28} height={28} /><span>BOT FENASOJA</span>
     </button>
     {open && !unlocked && <Dialog open onOpenChange={value => { if (!value) setOpen(false); }}>
       <DialogContent className="max-w-sm border-0 bg-transparent p-0 shadow-none">
-        <DialogTitle className="sr-only">Senha da Equipe Fenasoja</DialogTitle><DialogDescription className="sr-only">Confirme sua senha</DialogDescription>
+        <DialogTitle className="sr-only">Senha do BOT FENASOJA</DialogTitle><DialogDescription className="sr-only">Confirme sua senha</DialogDescription>
         <PasswordPrompt compact onUnlock={() => { if (user) { writeUnlock(user.id); setUnlocked(true); } }} />
       </DialogContent></Dialog>}
     {open && unlocked && <Suspense fallback={null}><Copilot open={open} onOpenChange={setOpen} showTrigger={false}

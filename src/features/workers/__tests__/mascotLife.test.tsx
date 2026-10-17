@@ -8,7 +8,7 @@ vi.mock('motion/react', () => ({ useMotionValue: () => ({ set: vi.fn() }), useSp
 
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); Object.defineProperty(document, 'hidden', { configurable: true, value: false }); });
 
-function ActivityProbe({ paused = false }: { paused?: boolean }) { const ref = useRef<HTMLDivElement>(null); const active = useMascotActive(ref, paused); return <div ref={ref} data-testid="active">{String(active)}</div>; }
+function ActivityProbe({ paused = false, explicitOverride = false }: { paused?: boolean; explicitOverride?: boolean }) { const ref = useRef<HTMLDivElement>(null); const active = useMascotActive(ref, paused, explicitOverride); return <div ref={ref} data-testid="active">{String(active)}</div>; }
 function LifeProbe() { const ref = useRef<HTMLSpanElement>(null); const { blinking } = useMascotLife(ref, { seed: 'agenda', paused: false, interactive: false }); return <span ref={ref} data-testid="blink">{String(blinking)}</span>; }
 
 describe('vida dos mascotes', () => {
@@ -31,6 +31,20 @@ describe('vida dos mascotes', () => {
     act(() => { Object.defineProperty(document, 'hidden', { configurable: true, value: false }); document.dispatchEvent(new Event('visibilitychange')); });
     expect(screen.getByTestId('active')).toHaveTextContent('true');
     rerender(<ActivityProbe paused />); expect(screen.getByTestId('active')).toHaveTextContent('false');
+  });
+  it('não inicia o ciclo quando a preferência do usuário reduz movimento', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    vi.stubGlobal('IntersectionObserver', class { observe() {} disconnect() {} });
+    render(<ActivityProbe />);
+    expect(screen.getByTestId('active')).toHaveTextContent('false');
+  });
+  it('limita a exceção explícita ao bot e preserva a pausa manual', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    vi.stubGlobal('IntersectionObserver', class { observe() {} disconnect() {} });
+    const { rerender } = render(<ActivityProbe explicitOverride />);
+    expect(screen.getByTestId('active')).toHaveTextContent('true');
+    rerender(<ActivityProbe explicitOverride paused />);
+    expect(screen.getByTestId('active')).toHaveTextContent('false');
   });
   it('primeira piscada fica entre três e seis segundos e limpa seus timers', () => {
     vi.useFakeTimers(); vi.stubGlobal('IntersectionObserver', class { observe() {} disconnect() {} });

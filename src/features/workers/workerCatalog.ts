@@ -8,7 +8,7 @@ export const workerCatalog: readonly WorkerDefinition[] = [
     skills: [{ title: 'Seu próximo compromisso', description: 'Consulte eventos e subeventos da Agenda Fenasoja.' }, { title: 'Uma visão do dia', description: 'Reúna horários, responsáveis e compromissos acessíveis.' }, { title: 'Conexões importantes', description: 'Investigue conflitos entre a agenda e os espaços de eventos.' }],
     data: ['Agenda Fenasoja', 'Subeventos', 'Responsáveis'], access: 'Pessoas que podem consultar a agenda. Cada consulta respeita o seu escopo.', capabilities: [],
     futureActions: [],
-    examples: ['Quais são os eventos de amanhã?', 'Quais eventos da minha comissão têm conflito com o Restaurante?', 'Me mostre os próximos compromissos da agenda.'],
+    examples: ['Quantos eventos eu fiz neste mês?', 'Mostre um gráfico de barras das pessoas com mais eventos neste mês.', 'Quais são os eventos de amanhã?'],
     routines: [{ title: 'Amanhã, sem surpresas', schedule: 'Dias úteis · 08:00', prompt: '@agenda Todo dia útil às 8h, prepare um briefing dos eventos de amanhã e dos conflitos com o Restaurante.' }],
   },
   {
@@ -26,7 +26,7 @@ export const workerCatalog: readonly WorkerDefinition[] = [
     skills: [{ title: 'Inventário em contexto', description: 'Consulte lotes e segmentos que você pode acessar.' }, { title: 'Venda em aberto', description: 'Diferencie vendas abertas de vendas confirmadas.' }, { title: 'Detalhes comerciais', description: 'Consulte pedidos e vínculos de contratos com a permissão adequada.' }],
     data: ['Mapa Comercial', 'Inventário', 'Vendas e contratos'], access: 'Quem pode consultar o Mapa Comercial. Detalhes de venda exigem a permissão comercial correspondente.', capabilities: ['map.view'],
     futureActions: ['Iniciar uma negociação', 'Reservar um lote'],
-    examples: ['Quantos lotes estão em venda em aberto no Pavilhão 13?', 'Quais vendas em aberto estão sem contrato?', 'Me mostre o inventário que posso consultar.'],
+    examples: ['Como estão as vendas do mapa comercial?', 'Quais vendas em aberto estão sem contrato?', 'Me mostre o inventário que posso consultar.'],
     routines: [{ title: 'Panorama comercial', schedule: 'Dias úteis · 08:00', prompt: '@mapa Todo dia útil às 8h, consulte vendas em aberto há mais de 7 dias. Pergunte qual projeto comercial usar.' }],
   },
   {
@@ -66,7 +66,7 @@ export const workerCatalog: readonly WorkerDefinition[] = [
     tagline: 'Um olhar atento ao que vem de fora.', description: 'Pesquise informações externas relevantes para a Fenasoja, com fonte, data e caminho para conferir.',
     skills: [{ title: 'Pesquisa com fontes', description: 'Busque informações externas com título, URL e data.' }, { title: 'Contexto do agro', description: 'Explore assuntos que ajudam a preparar a feira.' }, { title: 'Informação verificável', description: 'Separe dados encontrados de conteúdo que ainda precisa de confirmação.' }],
     data: ['Pesquisa web', 'Fontes públicas'], access: 'Todas as pessoas autenticadas na Fenasoja. A pesquisa externa depende da conexão do serviço de busca.', capabilities: [],
-    futureActions: [], examples: ['Pesquise notícias recentes sobre a Fenasoja, com fontes.', 'Quais tendências do agro podem ser relevantes para a feira?', 'Pesquise informações públicas sobre eventos agropecuários da região.'],
+    futureActions: [], examples: ['Qual é o presidente atual da Fenasoja?', 'Pesquise notícias recentes sobre a Fenasoja, com fontes.', 'Quais tendências do agro podem ser relevantes para a feira?'],
     routines: [{ title: 'Fique por dentro', schedule: 'Segundas · 08:00', prompt: '@radar Quero planejar um briefing com fontes sobre a feira e o agro.' }],
   },
 ];

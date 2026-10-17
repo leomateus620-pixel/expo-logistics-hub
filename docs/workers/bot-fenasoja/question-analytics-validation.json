@@ -1,0 +1,588 @@
+{
+  "boundary": "Fresh PostgreSQL WASM and synthetic identities/data only. Actual RPC bodies run under authenticated role and fixture business RLS. No deployed backend or real session is exercised.",
+  "passed": true,
+  "checks": [
+    {
+      "name": "map totals and status groups cover all 200 active rows; list20 is only an illustration",
+      "passed": true
+    },
+    {
+      "name": "map filters apply before aggregation, including false booleans and zero area",
+      "passed": true
+    },
+    {
+      "name": "map block distribution aggregates 25 groups into 19 plus Others without losing or duplicating counts",
+      "passed": true
+    },
+    {
+      "name": "map uses persisted commercial edition, clarifies wrong/ambiguous editions, never parses project name",
+      "passed": true
+    },
+    {
+      "name": "Agenda complete count and valid scheduled duration do not depend on illustrative rows",
+      "passed": true
+    },
+    {
+      "name": "Agenda location distribution remains complete beyond chart and list limits",
+      "passed": true
+    },
+    {
+      "name": "Agenda explicit cancellation and combined category/priority/title/location/commission filters are exact",
+      "passed": true
+    },
+    {
+      "name": "Agenda UUID relationship dedup and overlap weekday respect RLS, without matching names",
+      "passed": true
+    },
+    {
+      "name": "wrong org/profile/access and invalid filters fail closed; queries remain invoker readers",
+      "passed": true
+    },
+    {
+      "name": "next authenticated read sees fixture status changes and a newly inserted event without cached totals",
+      "passed": true
+    },
+    {
+      "name": "an explicit zero area remains a value and passes inclusive zero filters",
+      "passed": true
+    },
+    {
+      "name": "closed Agenda time and boundary filters partition the complete authorized set before aggregation",
+      "passed": true
+    },
+    {
+      "name": "Agenda missing fields, zero duration and outgoing overnight boundaries are honored together",
+      "passed": true
+    },
+    {
+      "name": "missing map identifiers and invalid or absent areas filter before totals, while false filters are retained",
+      "passed": true
+    }
+  ],
+  "files": [
+    {
+      "name": "scripts/workers/db-fixture.sql",
+      "sha256": "2e491fdb22f158ada71bebfde5d32051b7ce04c414c45822cc2b9397febd7567"
+    },
+    {
+      "name": "supabase/migrations/20261016120000_workers_readonly_workspace.sql",
+      "sha256": "9a79d2baa586cac5bb76c858663130102eaafcc3c6bc7ed9f88550f18c78fa37"
+    },
+    {
+      "name": "drizzle/migrations/0009_migration.sql",
+      "sha256": "190a85b52857d72e24c2b7f1e15e8625ce91e2088df9e6e834631535664772d7"
+    },
+    {
+      "name": "supabase/migrations/20261017020000_workers_verified_analytics.sql",
+      "sha256": "f99c8dfb4c5fc4b125c443756f150189070e4bbd33b2acbecbecfa5ef23c9d57"
+    },
+    {
+      "name": "supabase/migrations/20261017040000_workers_question_analytics.sql",
+      "sha256": "a319035a53501a5a9f8f1a1e71197f690176d358700ed6fd15de77369fb0d9f1"
+    }
+  ],
+  "examples": {
+    "inventory": {
+      "rows": [
+        {
+          "name": "Espaço comercial 1",
+          "block": "Quadra 01",
+          "water": false,
+          "number": "1",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 101",
+          "block": "Quadra 01",
+          "water": false,
+          "number": "101",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 126",
+          "block": "Quadra 01",
+          "water": true,
+          "number": "126",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        },
+        {
+          "name": "Espaço comercial 151",
+          "block": "Quadra 01",
+          "water": false,
+          "number": "151",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 176",
+          "block": "Quadra 01",
+          "water": false,
+          "number": "176",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        },
+        {
+          "name": "Espaço comercial 26",
+          "block": "Quadra 01",
+          "water": false,
+          "number": "26",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        },
+        {
+          "name": "Espaço comercial 51",
+          "block": "Quadra 01",
+          "water": true,
+          "number": "51",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 76",
+          "block": "Quadra 01",
+          "water": false,
+          "number": "76",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        },
+        {
+          "name": "Espaço comercial 102",
+          "block": "Quadra 02",
+          "water": true,
+          "number": "102",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        },
+        {
+          "name": "Espaço comercial 127",
+          "block": "Quadra 02",
+          "water": false,
+          "number": "127",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 152",
+          "block": "Quadra 02",
+          "water": false,
+          "number": "152",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        },
+        {
+          "name": "Espaço comercial 177",
+          "block": "Quadra 02",
+          "water": true,
+          "number": "177",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 2",
+          "block": "Quadra 02",
+          "water": false,
+          "number": "2",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        },
+        {
+          "name": "Espaço comercial 27",
+          "block": "Quadra 02",
+          "water": true,
+          "number": "27",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 52",
+          "block": "Quadra 02",
+          "water": false,
+          "number": "52",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        },
+        {
+          "name": "Espaço comercial 77",
+          "block": "Quadra 02",
+          "water": false,
+          "number": "77",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 103",
+          "block": "Quadra 03",
+          "water": false,
+          "number": "103",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 128",
+          "block": "Quadra 03",
+          "water": false,
+          "number": "128",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        },
+        {
+          "name": "Espaço comercial 153",
+          "block": "Quadra 03",
+          "water": true,
+          "number": "153",
+          "status": "Vendido",
+          "covered": false,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": false
+        },
+        {
+          "name": "Espaço comercial 178",
+          "block": "Quadra 03",
+          "water": false,
+          "number": "178",
+          "status": "Disponível",
+          "covered": true,
+          "area_sqm": 10,
+          "internet": false,
+          "electricity": true
+        }
+      ],
+      "scope": {
+        "as_of": "2026-10-17T00:07:53.407-03:00",
+        "filters": {},
+        "complete": true,
+        "group_by": "status",
+        "timezone": "America/Sao_Paulo",
+        "project_id": "20000000-0000-4000-8000-000000000001",
+        "edition_year": 2028,
+        "project_name": "Referência geométrica 2026",
+        "edition_label": "Fenasoja 2028"
+      },
+      "groups": [
+        {
+          "count": 100,
+          "label": "Disponível"
+        },
+        {
+          "count": 100,
+          "label": "Vendido"
+        }
+      ],
+      "metrics": {
+        "total": 200,
+        "area_sqm": 1990,
+        "missing_area": 1
+      }
+    },
+    "agenda": {
+      "rows": [
+        {
+          "title": "Reunião operacional 1",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": "2026-10-01",
+          "end_time": "01h00",
+          "location": "Sala 1",
+          "priority": "Média",
+          "start_date": "2026-09-30",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 10",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 10",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 100",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 25",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 101",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 1",
+          "priority": "Média",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 102",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 2",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 103",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 3",
+          "priority": "Média",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 104",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 4",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 105",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 5",
+          "priority": "Média",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 106",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 6",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 107",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 7",
+          "priority": "Média",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 108",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 8",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 109",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 9",
+          "priority": "Média",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 11",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 11",
+          "priority": "Média",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 110",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 10",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 111",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 11",
+          "priority": "Média",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 112",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 12",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 113",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 13",
+          "priority": "Média",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 114",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 14",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 115",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 15",
+          "priority": "Média",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        },
+        {
+          "title": "Reunião operacional 116",
+          "status": "Planejado",
+          "category": "Operação",
+          "end_date": null,
+          "end_time": "01h00",
+          "location": "Sala 16",
+          "priority": "Alta",
+          "start_date": "2026-10-15",
+          "start_time": "22h00"
+        }
+      ],
+      "scope": {
+        "as_of": "2026-10-17T00:07:53.551-03:00",
+        "period": {
+          "to": "2026-10-31",
+          "from": "2026-10-01"
+        },
+        "filters": {
+          "relationship": "all"
+        },
+        "complete": true,
+        "group_by": "status",
+        "timezone": "America/Sao_Paulo"
+      },
+      "groups": [
+        {
+          "count": 123,
+          "label": "Planejado"
+        },
+        {
+          "count": 1,
+          "label": "Concluído"
+        }
+      ],
+      "metrics": {
+        "total": 124,
+        "valid_duration_events": 123,
+        "average_duration_minutes": 180
+      }
+    }
+  }
+}

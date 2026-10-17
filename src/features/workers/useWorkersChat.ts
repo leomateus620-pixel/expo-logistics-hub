@@ -5,20 +5,23 @@ import { maskSensitiveText } from '@/lib/workers/privacy';
 import { safeWorkerSourceUrl, streamWorkersTurn, type WorkerRequestContext, type WorkersStreamEvent } from './api';
 import { workersDatabase } from './database';
 import type { WorkerAttachment, WorkerChatMessage, WorkerConversation, WorkerId, WorkerProgressStep } from './types';
+import { chronological } from './message-order';
+import { decodeWorkerResponse } from '../../../supabase/functions/_shared/workers/response-contract';
+export { chronological } from './message-order';
 
 const WORKER_IDS = new Set(['agenda', 'arena', 'mapa', 'interesse', 'comissao', 'logistica', 'caixa', 'radar']);
 const uuid = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const workerId = (value: unknown): WorkerId => WORKER_IDS.has(String(value)) ? value as WorkerId : 'agenda';
 
-/** Question and answer share one transaction timestamp; within a turn the question always comes first. */
-export function chronological<T extends { created_at: string; role: string; request_id?: string | null }>(rows: readonly T[]): T[] {
-  const rank = (role: string) => role === 'user' ? 0 : role === 'assistant' ? 1 : 2;
-  return [...rows].sort((a, b) => {
-    const time = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-    if (a.request_id && a.request_id === b.request_id) return rank(a.role) - rank(b.role);
-    return time !== 0 ? time : rank(a.role) - rank(b.role);
-  });
+/** Structured facts were sanitized by the server. Never run phone/URL regex over JSON numbers or source URLs. */
+export function safeWorkerMessageContent(content: string): string {
+  if (content.trimStart().startsWith('```fenasoja-response')) return decodeWorkerResponse(content) ? content : '';
+  return maskSensitiveText(content);
 }
+const historyContent = (row: { role: string; state?: string; content: string }) => row.role === 'assistant' && row.state && row.state !== 'complete'
+  ? row.state === 'pending' ? 'Esta resposta ainda não foi concluída. Reabra a conversa em instantes ou envie uma nova pergunta.'
+    : 'A consulta não foi concluída. Envie a pergunta novamente para tentar.'
+  : safeWorkerMessageContent(row.content);
 
 function sourcesFrom(value: unknown): NonNullable<WorkerChatMessage['sources']> {
   if (!Array.isArray(value)) return [];
@@ -51,6 +54,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
   const [activeWorkerId, setActiveWorkerId] = useState<WorkerId>(options.workerId ?? 'agenda');
   const [isStreaming, setIsStreaming] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [hasEarlierMessages, setHasEarlierMessages] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [workspaceRevision, setWorkspaceRevision] = useState(0);
   const [progress, setProgress] = useState<WorkerProgressStep[]>([]);
@@ -69,7 +73,8 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     busy.current = false;
     setIsStreaming(false);
     setProgress([]);
-    setMessages(current => current.filter(item => item.role !== 'assistant' || item.content.trim()));
+    setMessages(current => current.map(item => item.role === 'assistant' && !item.content.trim()
+      ? { ...item, content: 'Resposta interrompida. Envie a pergunta novamente para continuar.' } : item));
   }, []);
 
   const newConversation = useCallback(() => {
@@ -82,6 +87,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     setError(null);
     setActiveWorkerId(options.workerId ?? 'agenda');
     setIsLoadingHistory(false);
+    setHasEarlierMessages(false);
   }, [options.workerId, stop]);
 
   const refreshConversations = useCallback(async () => {
@@ -121,6 +127,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     setError(null);
     setIsStreaming(false);
     setIsLoadingHistory(false);
+    setHasEarlierMessages(false);
     if (user?.id && orgId) void refreshConversations();
     return () => {
       generation.current += 1;
@@ -148,10 +155,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     setMessages([]);
     setError(null);
     try {
-      const result = await workersDatabase.from('ai_messages')
-        .select('id,request_id,role,content,worker_id,citations,created_at,state')
-        .eq('conversation_id', id).eq('org_id', orgId).eq('user_id', user.id)
-        .eq('state', 'complete').order('created_at', { ascending: false }).limit(100)
+      const result = await workersDatabase.rpc('ai_workers_read_history', { _org_id: orgId, _conversation_id: id, _turn_limit: 50 })
         .abortSignal(controller.signal);
       if (controller.signal.aborted || liveScope.current !== requestScope) return;
       setIsLoadingHistory(false);
@@ -160,9 +164,10 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
       currentConversation.current = id;
       setConversationId(id);
       const ordered = chronological(result.data);
+      setHasEarlierMessages(new Set(ordered.map(row => row.request_id)).size === 50);
       setMessages(ordered.map(row => ({
-        id: row.id, role: row.role, content: maskSensitiveText(row.content), workerId: workerId(row.worker_id),
-        createdAt: row.created_at, requestId: row.request_id, sources: sourcesFrom(row.citations),
+        id: row.id, role: row.role, content: historyContent(row), workerId: workerId(row.worker_id),
+        createdAt: row.created_at, requestId: row.request_id, sequence: row.message_seq, sources: sourcesFrom(row.citations),
       })));
       setActiveWorkerId(workerId(ordered[ordered.length - 1]?.worker_id));
     } catch {
@@ -173,6 +178,31 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     }
   }, [orgId, user?.id, scope, stop]);
 
+  const loadEarlierMessages = useCallback(async () => {
+    const id = currentConversation.current;
+    const cursor = Math.min(...messages.map(row => row.sequence ?? Infinity));
+    if (!id || !Number.isFinite(cursor) || busy.current || isLoadingHistory || !hasEarlierMessages || !orgId) return;
+    const requestScope = scope; const requestGeneration = generation.current;
+    const controller = new AbortController(); history.current?.abort(); history.current = controller;
+    setIsLoadingHistory(true);
+    try {
+      const { data, error: readError } = await workersDatabase.rpc('ai_workers_read_history', {
+        _org_id: orgId, _conversation_id: id, _before_sequence: cursor, _turn_limit: 50,
+      }).abortSignal(controller.signal);
+      if (controller.signal.aborted || liveScope.current !== requestScope || generation.current !== requestGeneration || currentConversation.current !== id) return;
+      if (readError) { setError('Não foi possível carregar as mensagens anteriores. Tente novamente.'); return; }
+      const rows = chronological(data ?? []);
+      setHasEarlierMessages(new Set(rows.map(row => row.request_id)).size === 50);
+      const older: WorkerChatMessage[] = rows.map(row => ({ id: row.id, requestId: row.request_id, sequence: row.message_seq,
+        role: row.role, content: historyContent(row), workerId: workerId(row.worker_id), createdAt: row.created_at, sources: sourcesFrom(row.citations) }));
+      setMessages(current => [...older.filter(row => !current.some(item => item.id === row.id)), ...current]);
+    } catch {
+      if (!controller.signal.aborted && liveScope.current === requestScope) setError('Não foi possível carregar as mensagens anteriores. Tente novamente.');
+    } finally {
+      if (!controller.signal.aborted && liveScope.current === requestScope) setIsLoadingHistory(false);
+    }
+  }, [messages, orgId, scope, isLoadingHistory, hasEarlierMessages]);
+
   // Refresh background routine results without interrupting a live human turn.
   const refreshMessages = useCallback(async () => {
     const id = currentConversation.current;
@@ -181,16 +211,15 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     const controller = new AbortController(); history.current = controller;
     const requestScope = scope; const requestGeneration = generation.current;
     try {
-      const result = await workersDatabase.from('ai_messages')
-        .select('id,request_id,role,content,worker_id,citations,created_at,state')
-        .eq('conversation_id', id).eq('org_id', orgId).eq('user_id', user.id)
-        .eq('state', 'complete').order('created_at', { ascending: false }).limit(100).abortSignal(controller.signal);
+      const result = await workersDatabase.rpc('ai_workers_read_history', { _org_id: orgId, _conversation_id: id, _turn_limit: 50 }).abortSignal(controller.signal);
       if (controller.signal.aborted || liveScope.current !== requestScope || generation.current !== requestGeneration || busy.current || currentConversation.current !== id) return;
       if (result.error) return;
-      setMessages(chronological(result.data ?? []).map(row => ({
-        id: row.id, requestId: row.request_id, role: row.role, content: maskSensitiveText(row.content), workerId: workerId(row.worker_id),
-        createdAt: row.created_at, sources: sourcesFrom(row.citations),
-      })));
+      const refreshed = chronological(result.data ?? []).map(row => ({
+        id: row.id, requestId: row.request_id, role: row.role, content: historyContent(row), workerId: workerId(row.worker_id),
+        createdAt: row.created_at, sequence: row.message_seq, sources: sourcesFrom(row.citations),
+      }));
+      const first = Math.min(...refreshed.map(row => row.sequence ?? Infinity));
+      setMessages(current => [...current.filter(row => row.sequence !== undefined && row.sequence < first), ...refreshed]);
       void refreshConversations();
     } catch { /* The next active-session refresh may retry; never erase visible history. */ }
   }, [user?.id, orgId, scope, refreshConversations]);
@@ -229,10 +258,12 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     setProgress([]);
     const requestId = crypto.randomUUID();
     const assistantId = `assistant-${requestId}`;
+    const turnWorker = currentConversation.current ? activeWorkerId : options.workerId;
+    let rawResponse = '';
     setMessages(current => [...current, {
       id: `user-${requestId}`, requestId, role: 'user', content: maskSensitiveText(message), createdAt: new Date().toISOString(),
     }, {
-      id: assistantId, requestId, role: 'assistant', content: '', workerId: options.workerId ?? activeWorkerId,
+      id: assistantId, requestId, role: 'assistant', content: '', workerId: turnWorker ?? activeWorkerId,
       createdAt: new Date().toISOString(), sources: [],
     }]);
     const alive = () => !controller.signal.aborted && requestGeneration === generation.current && liveScope.current === requestScope;
@@ -252,8 +283,9 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
         const step = { label: maskSensitiveText(event.data.label).slice(0, 160), status: event.data.status };
         setProgress(current => [...current.filter(item => item.label !== step.label), step].slice(-12));
       } else if (event.event === 'delta' && typeof event.data.text === 'string') {
+        rawResponse = (rawResponse + event.data.text).slice(0, 32_000);
         setMessages(current => current.map(item => item.id === assistantId
-          ? { ...item, content: maskSensitiveText((item.content + event.data.text).slice(0, 32_000)) } : item));
+          ? { ...item, content: safeWorkerMessageContent(rawResponse) } : item));
       } else if (event.event === 'citations') {
         const sources = sourcesFrom(event.data.citations);
         setMessages(current => current.map(item => item.id === assistantId ? { ...item, sources } : item));
@@ -265,7 +297,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
       await streamWorkersTurn({
         orgId, requestId, message,
         ...(currentConversation.current ? { conversationId: currentConversation.current } : {}),
-        ...(options.workerId ? { worker: options.workerId } : {}),
+        ...(turnWorker ? { worker: turnWorker } : {}),
         ...(options.context ? { context: options.context } : {}),
         ...(attachments.length ? { attachments: attachments.map(file => ({ name: maskSensitiveText(file.name).slice(0, 100), text: file.text })) } : {}),
       }, onEvent, controller.signal);
@@ -276,7 +308,8 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
       if (requestGeneration === generation.current && liveScope.current === requestScope) {
         busy.current = false;
         setIsStreaming(false);
-        setMessages(current => current.filter(item => item.id !== assistantId || item.content.trim()));
+        setMessages(current => current.map(item => item.id === assistantId && !item.content.trim()
+          ? { ...item, content: 'A consulta não foi concluída. Envie a pergunta novamente para tentar.' } : item));
         if (workspaceRefreshPending.current) { workspaceRefreshPending.current = false; void refreshMessages(); }
       }
     }
@@ -287,6 +320,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     messages: visible ? messages : [], conversations: visible ? conversations : [],
     conversationId: visible ? conversationId : null, activeWorkerId,
     isStreaming: visible && isStreaming, isLoadingHistory: visible && isLoadingHistory,
+    hasEarlierMessages: visible && hasEarlierMessages, loadEarlierMessages,
     progress: visible ? progress : [], error: visible ? error : null,
     workspaceRevision, refreshMessages, sendMessage, stop, selectConversation, newConversation, clearError: () => setError(null),
   };

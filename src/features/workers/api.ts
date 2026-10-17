@@ -53,9 +53,9 @@ export async function consumeWorkersStream(
     if (!parts.length || !EVENT_NAMES.has(event)) return;
     let data: unknown;
     try { data = JSON.parse(parts.join('\n')); }
-    catch { throw new Error('A resposta da equipe chegou incompleta. Tente novamente.'); }
+    catch { throw new Error('A resposta do BOT FENASOJA chegou incompleta. Tente novamente.'); }
     if (!data || typeof data !== 'object' || Array.isArray(data)) {
-      throw new Error('Não foi possível interpretar a resposta da equipe.');
+      throw new Error('Não foi possível interpretar a resposta do BOT FENASOJA.');
     }
     if (event === 'done') completed = true;
     onEvent({ event, data } as WorkersStreamEvent);
@@ -120,11 +120,11 @@ export async function streamWorkersTurn(
     if (response.status === 403) throw new Error('Você não tem permissão para essa consulta.');
     if (response.status === 429) throw new Error('Muitas consultas em pouco tempo. Aguarde um momento.');
     if (response.status === 409) throw new Error('Esta mensagem já está sendo processada. Aguarde a resposta.');
-    throw new Error('A equipe está indisponível no momento. Tente novamente em instantes.');
+    throw new Error('O BOT FENASOJA está indisponível no momento. Tente novamente em instantes.');
   }
   if (!response.body || !response.headers.get('Content-Type')?.includes('text/event-stream')) {
     await response.body?.cancel().catch(() => undefined);
-    throw new Error('O serviço da equipe não retornou uma conversa válida.');
+    throw new Error('O BOT FENASOJA não conseguiu concluir a conversa. Tente novamente.');
   }
   await consumeWorkersStream(response.body, onEvent, signal);
 }

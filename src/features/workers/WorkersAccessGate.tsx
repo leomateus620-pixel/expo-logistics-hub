@@ -68,7 +68,7 @@ export function PasswordPrompt({ onUnlock, compact }: { onUnlock: () => void; co
   return <div className={`flex ${compact ? 'h-full' : 'min-h-[100dvh]'} items-center justify-center bg-background p-6`}>
     <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-2xl border bg-card p-6 shadow-lg">
       <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><Lock size={18} /></div>
-        <div><h2 className="text-lg font-semibold">Equipe Fenasoja</h2><p className="text-sm text-muted-foreground">Confirme sua senha para continuar.</p></div></div>
+        <div><h2 className="text-lg font-semibold">BOT FENASOJA</h2><p className="text-sm text-muted-foreground">Confirme sua senha para continuar.</p></div></div>
       <Input type="password" autoFocus autoComplete="current-password" placeholder="Sua senha" value={password}
         onChange={event => setPassword(event.target.value)} aria-label="Senha" aria-invalid={!!error} />
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
@@ -81,7 +81,7 @@ export function PasswordPrompt({ onUnlock, compact }: { onUnlock: () => void; co
 export function WorkersRestricted() {
   return <main className="mx-auto max-w-lg p-8 text-center"><Lock className="mx-auto mb-4 text-muted-foreground" />
     <h1 className="text-xl font-semibold">Acesso restrito</h1>
-    <p className="my-4 text-muted-foreground">A Equipe Fenasoja está disponível, por enquanto, apenas para administradores, CCPF e Comissão Central.</p>
+    <p className="my-4 text-muted-foreground">O BOT FENASOJA está disponível, por enquanto, apenas para administradores, CCPF e Comissão Central.</p>
     <Link to="/portal" className="underline">Voltar ao portal</Link></main>;
 }
 

@@ -32,7 +32,7 @@ function seed(readOnly: boolean, timeoutOnce: boolean): Fixture {
     state, scheduleLabel: 'Dias úteis às 08:00', nextScheduledAt: instant(86400000), createdAt: ago(9), updatedAt: ago(9), expiresAt: state === 'proposed' ? instant(900000) : null, serverNow: instant(), lastRunAt: state === 'active' ? ago(7) : null, waitingForSession: true, canConfirm: !readOnly && state === 'proposed', canEdit: !readOnly, canRunNow: false, unavailableReason: null,
   });
   const routines = [makeRoutine('Briefing de amanhã', 'active', 'agenda'), makeRoutine('Vendas em acompanhamento', 'proposed', 'mapa'), makeRoutine('Clima dos transportes', 'paused', 'logistica')];
-  const requestId = randomUUID(); const runId = randomUUID();
+  const introRequestId = randomUUID(); const requestId = randomUUID(); const runId = randomUUID();
   const sources = [{ label: '14 eventos · Agenda de teste', url: '/cronograma-eventos', source: 'app' }, { label: '2 conflitos · Restaurante de teste', url: '/eventos-restaurante-arena', source: 'app' }];
   const snapshot: WorkspaceSnapshot = { serverNow: instant(), routines,
     runs: [{ id: runId, routineId: routines[0].id, conversationId, requestId, routineVersion: 1, scheduledFor: ago(10), referenceDate: '2026-10-17', startedAt: ago(8), finishedAt: ago(7), state: 'succeeded', catchUp: true, failureCode: null, resultTrust: 'user_scoped_reported' }],
@@ -41,11 +41,11 @@ function seed(readOnly: boolean, timeoutOnce: boolean): Fixture {
     alerts: [{ id: randomUUID(), workerId: 'arena', kind: 'restaurantConflict', title: 'Confira 2 conflitos entre a Agenda e o Restaurante.', href: '/cronograma-eventos', routineId: routines[0].id, runId, createdAt: ago(7), expiresAt: instant(86400000), seenAt: null }],
   };
   const messages: HistoryRow[] = [
-    { id: randomUUID(), request_id: randomUUID(), role: 'user', content: 'Me ajude a preparar a operação e os briefings da feira.', worker_id: 'arena', created_at: ago(14) },
-    { id: randomUUID(), request_id: randomUUID(), role: 'assistant', content: 'Separei as propostas para você revisar. Nenhuma alteração foi executada. Os campos comerciais são preenchidos somente no formulário protegido.', worker_id: 'arena', created_at: ago(13), citations: [{ label: 'Eventos da Arena', url: '/eventos-restaurante-arena', source: 'app' }] },
+    { id: randomUUID(), request_id: introRequestId, role: 'user', content: 'Me ajude a preparar a operação e os briefings da feira.', worker_id: 'arena', created_at: ago(14) },
+    { id: randomUUID(), request_id: introRequestId, role: 'assistant', content: 'Separei as propostas para você revisar. Nenhuma alteração foi executada. Os campos comerciais são preenchidos somente no formulário protegido.', worker_id: 'arena', created_at: ago(13), citations: [{ label: 'Eventos da Arena', url: '/eventos-restaurante-arena', source: 'app' }] },
     { id: randomUUID(), request_id: requestId, role: 'user', content: 'Execução de rotina — contexto de sistema', worker_id: 'agenda', created_at: ago(8) },
     { id: randomUUID(), request_id: requestId, role: 'assistant', content: 'Na agenda sintética, encontrei 14 eventos para amanhã e 2 conflitos com o Restaurante. Confira os registros para preparar os próximos passos.', worker_id: 'agenda', created_at: ago(7), citations: sources },
-  ].map(row => ({ org_id: orgId, user_id: userId, conversation_id: conversationId, citations: [], state: 'complete', ...row }));
+  ].map((row, index) => ({ message_seq: index + 1, org_id: orgId, user_id: userId, conversation_id: conversationId, citations: [], state: 'complete', ...row }));
   const actions = [makeAction('arena_note', 6), makeAction('commercial_reserve', 5), makeAction('commercial_negotiate', 4)];
   actions.push({ ...makeAction('arena_note', 3), id: randomUUID(), summary: 'Proposta anterior de nota', status: 'expired', expiresAt: ago(2), permissions: { canConfirm: false, canEdit: false, canCancel: false, reason: 'expired' } });
   return { userId, readOnly, timeoutOnce, actions, snapshot, messages, conversations: [{ id: conversationId, title: 'Operação da feira · revisão local', user_id: userId, org_id: orgId, worker_id: 'arena', updated_at: ago(1) }] };

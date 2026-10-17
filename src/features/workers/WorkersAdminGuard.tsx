@@ -6,6 +6,6 @@ import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 export default function WorkersAdminGuard({ children }: { children: ReactNode }) {
   const { myRole, isLoading } = useCurrentOrg();
   if (isLoading) return <div role="status" className="p-8">Verificando acesso…</div>;
-  if (myRole !== 'admin') return <main className="mx-auto max-w-lg p-8"><h1 className="text-xl font-semibold">Revisão disponível para administradores</h1><p style={{ margin: '16px 0' }}>Você pode conhecer a equipe e conversar com os bots usando suas permissões.</p><Link to="/equipe-ia/conheca" className="underline">Conheça a equipe Fenasoja</Link></main>;
+  if (myRole !== 'admin') return <main className="mx-auto max-w-lg p-8"><h1 className="text-xl font-semibold">Revisão disponível para administradores</h1><p style={{ margin: '16px 0' }}>Você pode conhecer a equipe e conversar com os bots usando suas permissões.</p><Link to="/equipe-ia/conheca" className="underline">Conheça o BOT FENASOJA</Link></main>;
   return <>{children}</>;
 }

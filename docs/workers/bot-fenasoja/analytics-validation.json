@@ -1,0 +1,183 @@
+{
+  "boundary": "Fresh PostgreSQL WASM with synthetic identities and fixtures. Actual new SQL and workers persistence run as authenticated role. Fixture policies model existing business RLS; this is not deployed database, live data or physical device evidence.",
+  "passed": true,
+  "checks": [
+    {
+      "name": "complete commercial aggregation exceeds 100-row list, one multi-lot partial order, cancelled/legacy/other edition excluded",
+      "passed": true
+    },
+    {
+      "name": "Agenda identity and distinct parent events, cancel excluded, cross-month and missing duration handled",
+      "passed": true
+    },
+    {
+      "name": "ranking aggregates before presentation limit, distinguishes homonyms, deterministic ties, does not add links",
+      "passed": true
+    },
+    {
+      "name": "persisted explicit edition beats current commercial configuration without mixing years",
+      "passed": true
+    },
+    {
+      "name": "sales period uses local signature dates and open-item creation without claiming historical status",
+      "passed": true
+    },
+    {
+      "name": "ambiguous configured editions require clarification and unsafe currency totals fail closed",
+      "passed": true
+    },
+    {
+      "name": "invalid Agenda periods fail before reading and anonymous sessions cannot aggregate",
+      "passed": true
+    },
+    {
+      "name": "wrong organization, unapproved profile and missing sales capability denied",
+      "passed": true
+    },
+    {
+      "name": "authorized Agenda profile receives only caller-visible events even when aggregate exceeds a page",
+      "passed": true
+    },
+    {
+      "name": "legacy equal timestamp backfill and whole-turn keyset pagination",
+      "passed": true
+    },
+    {
+      "name": "pending response has a fixed sequence; completion/replay does not move or duplicate a turn",
+      "passed": true
+    },
+    {
+      "name": "reopening failed turns retains question and response slot; null page limits cannot become unbounded",
+      "passed": true
+    }
+  ],
+  "files": [
+    {
+      "name": "scripts/workers/db-fixture.sql",
+      "sha256": "2e491fdb22f158ada71bebfde5d32051b7ce04c414c45822cc2b9397febd7567"
+    },
+    {
+      "name": "supabase/migrations/20261016120000_workers_readonly_workspace.sql",
+      "sha256": "9a79d2baa586cac5bb76c858663130102eaafcc3c6bc7ed9f88550f18c78fa37"
+    },
+    {
+      "name": "drizzle/migrations/0009_migration.sql",
+      "sha256": "190a85b52857d72e24c2b7f1e15e8625ce91e2088df9e6e834631535664772d7"
+    },
+    {
+      "name": "supabase/migrations/20261017010000_workers_message_order.sql",
+      "sha256": "a678f0b93e5ab0c91d7f88e84b7ff527013349947f5d8a15bb4a1557573e8681"
+    },
+    {
+      "name": "supabase/migrations/20261017020000_workers_verified_analytics.sql",
+      "sha256": "f99c8dfb4c5fc4b125c443756f150189070e4bbd33b2acbecbecfa5ef23c9d57"
+    }
+  ],
+  "examples": {
+    "map": {
+      "notes": [
+        "Valores dos espaços com confirmação registrada; taxas adicionais e pagamentos não integram estes indicadores.",
+        "Quando há período, confirmados usam a data da assinatura registrada; em andamento usam a criação do item que permanece aberto. Não é uma posição histórica de como o mapa estava naquele mês.",
+        "Um pedido pode conter vários espaços. Pedidos parciais aparecem nas contagens de confirmados e em andamento; essas contagens não devem ser somadas.",
+        "Anexar contrato não confirma assinatura. Registros históricos, inconsistentes ou sem edição comprovada ficam fora dos valores confirmados."
+      ],
+      "scope": {
+        "unit": "BRL_cents",
+        "as_of": "2026-10-17T00:01:32.053-03:00",
+        "complete": true,
+        "timezone": "America/Sao_Paulo",
+        "project_id": "20000000-0000-4000-8000-000000000001",
+        "edition_year": 2028,
+        "project_name": "Mapa sintético",
+        "edition_label": "Fenasoja 2028"
+      },
+      "metrics": {
+        "open_lots": 1,
+        "legacy_lots": 1,
+        "open_orders": 1,
+        "cancelled_lots": 1,
+        "confirmed_lots": 151,
+        "unverified_lots": 1,
+        "confirmed_orders": 1,
+        "open_value_cents": 10000,
+        "unallocated_lots": 2,
+        "missing_value_lots": 1,
+        "unknown_period_lots": 0,
+        "confirmed_value_cents": 1500000
+      }
+    },
+    "agenda": {
+      "notes": [
+        "Vínculos diretos e de subeventos são reunidos por evento principal; criação e responsabilidade são identificadas pela conta autenticada.",
+        "Vínculo e horário passado não comprovam presença. Concluído descreve a situação registrada do evento.",
+        "A duração considera o intervalo agendado completo dos eventos com horários válidos, inclusive quando atravessam o período."
+      ],
+      "scope": {
+        "as_of": "2026-10-17T00:01:32.142-03:00",
+        "period": {
+          "to": "2026-10-31",
+          "from": "2026-10-01"
+        },
+        "complete": true,
+        "timezone": "America/Sao_Paulo",
+        "cancelled": "excluded",
+        "subevents": "deduplicated_parent",
+        "relationship": "linked",
+        "duration_basis": "full_scheduled_event"
+      },
+      "metrics": {
+        "events": 124,
+        "past_events": 124,
+        "linked_events": 124,
+        "created_events": 124,
+        "weekday_counts": [
+          {
+            "events": 1,
+            "weekday": 3
+          },
+          {
+            "events": 123,
+            "weekday": 4
+          }
+        ],
+        "completed_events": 1,
+        "scheduled_events": 123,
+        "responsible_events": 124,
+        "valid_duration_events": 123,
+        "average_duration_minutes": 180
+      }
+    },
+    "ranking": {
+      "notes": [
+        "Contagem distinta de eventos principais por pessoa identificada, calculada sobre todo o período autorizado; o limite afeta somente a apresentação.",
+        "Vínculos externos sem identificação persistida de pessoa não entram no ranking. Vínculo não comprova presença.",
+        "Empates são ordenados pelo nome. Pessoas homônimas permanecem separadas e recebem identificação de vínculo."
+      ],
+      "scope": {
+        "unit": "events",
+        "as_of": "2026-10-17T00:01:32.209-03:00",
+        "period": {
+          "to": "2026-10-31",
+          "from": "2026-10-01"
+        },
+        "complete": true,
+        "timezone": "America/Sao_Paulo"
+      },
+      "people": [
+        {
+          "name": "Ana da Silva · vínculo 1",
+          "events": 124,
+          "position": 1,
+          "person_id": "00000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "metrics": {
+        "tie_break": "name_then_id",
+        "event_count": 124,
+        "people_count": 2,
+        "shown_people": 1,
+        "unidentified_links": 1
+      }
+    }
+  }
+}

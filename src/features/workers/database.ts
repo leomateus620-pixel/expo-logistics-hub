@@ -19,6 +19,7 @@ export type WorkerMessageRow = {
   user_id: string;
   conversation_id: string;
   request_id: string;
+  message_seq: number;
   role: 'user' | 'assistant';
   worker_id: string;
   content: string;
@@ -29,7 +30,10 @@ export type WorkerMessageRow = {
 
 type ReadTable<Row> = { Row: Row; Insert: never; Update: never; Relationships: [] };
 type WorkersDatabase = Omit<Database, 'public'> & {
-  public: Omit<Database['public'], 'Tables'> & {
+  public: Omit<Database['public'], 'Tables' | 'Functions'> & {
+    Functions: Database['public']['Functions'] & {
+      ai_workers_read_history: { Args: { _org_id: string; _conversation_id: string; _before_sequence?: number; _turn_limit?: number }; Returns: WorkerMessageRow[] };
+    };
     Tables: Database['public']['Tables'] & {
       ai_conversations: ReadTable<WorkerConversationRow>;
       ai_messages: ReadTable<WorkerMessageRow>;

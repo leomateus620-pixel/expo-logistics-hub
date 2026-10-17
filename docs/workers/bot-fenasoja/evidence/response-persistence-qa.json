@@ -1,0 +1,37 @@
+{
+  "environment": "isolated PGlite PostgreSQL; synthetic records only",
+  "checks": [
+    {
+      "name": "numeric facts and validated institutional URLs survive persistence while textual personal data is redacted",
+      "passed": true
+    },
+    {
+      "name": "invalid table shape cannot be persisted as an apparently valid response",
+      "passed": true
+    },
+    {
+      "name": "structured sources cannot bypass the separately checked citation boundary",
+      "passed": true
+    },
+    {
+      "name": "cross-organization metadata is rejected",
+      "passed": true
+    },
+    {
+      "name": "legacy plain content keeps the existing privacy redactor",
+      "passed": true
+    },
+    {
+      "name": "private JSON sanitizers cannot be invoked directly by authenticated clients",
+      "passed": true
+    },
+    {
+      "name": "missing version, worker or completeness fails closed instead of passing through SQL NULL logic",
+      "passed": true
+    },
+    {
+      "name": "pie partitions, explicit comparison labels and closed query context persist without partial JSON",
+      "passed": true
+    }
+  ]
+}

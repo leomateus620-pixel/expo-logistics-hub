@@ -5,6 +5,7 @@ import { publicWorkerError, runWorkerTurn, type TurnStart, type WorkerTurnDepend
 import { createLovableProvider, readBoundedJson } from '../_shared/workers/provider.ts';
 import { searchWorkersWeb } from '../_shared/workers/web-search.ts';
 import { workspacePlanner } from '../_shared/workers/workspace-planner.ts';
+import { readInstitutionalPresident } from '../_shared/workers/institutional.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -88,6 +89,7 @@ Deno.serve(async (req: Request) => {
       listTools: worker => listWorkerTools(worker, access),
       executeTool: (name, input) => executeWorkerTool(name, input, access),
       searchWeb: (input, signal) => searchWorkersWeb(input, { apiKey: Deno.env.get('FIRECRAWL_API_KEY'), gatewayKey: Deno.env.get('LOVABLE_API_KEY'), signal }),
+      institutionalPresident: (input, signal) => readInstitutionalPresident(input, { signal }),
       begin: async (value, worker) => {
         const result = await scopedRpc(client, 'ai_workers_begin_turn', {
           _org_id: value.orgId, _request_id: value.requestId, _worker_id: worker,
@@ -97,10 +99,13 @@ Deno.serve(async (req: Request) => {
         return result as unknown as TurnStart;
       },
       history: async conversationId => {
-        const { data, error } = await client.from('ai_messages').select('role,content').eq('conversation_id', conversationId)
-          .eq('org_id', request.orgId).eq('user_id', identity.user!.id).eq('state', 'complete').order('created_at', { ascending: false }).limit(6);
+        const { data, error } = await client.rpc('ai_workers_read_history', {
+          _org_id: request.orgId, _conversation_id: conversationId, _turn_limit: 3,
+        });
         if (error) throw databaseError(error);
-        return (data ?? []).reverse();
+        // The RPC returns complete turns in admission order; the current prompt is supplied separately.
+        return (data ?? []).filter((row: { request_id: string; state: string }) => row.request_id !== request.requestId && row.state === 'complete')
+          .map((row: { role: 'user' | 'assistant'; content: string }) => ({ role: row.role, content: row.content }));
       },
       finish: async (value, completion) => {
         await scopedRpc(client, 'ai_workers_finish_turn', {

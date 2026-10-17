@@ -31,11 +31,12 @@ describe('Equipe Fenasoja: formato da resposta', () => {
     ] };
   it('resposta curta sem campos técnicos nem datas ISO', () => {
     const { content } = renderToolEvidence([result as never]);
-    expect(content).toContain('Encontrei **113** resultados');
+    expect(content).toContain('113 registros no escopo solicitado');
     expect(content).not.toMatch(/setup|approval|nao_solicitado|2025-03-26T/);
     const segments = parseRichContent(content);
     expect(segments.some(s => s.kind === 'table')).toBe(true);
-    expect(segments.some(s => s.kind === 'chart')).toBe(true);
+    expect(segments.some(s => s.kind === 'chart')).toBe(false);
+    expect(content).toContain('Não foram calculados totais, percentuais ou gráficos a partir dessa amostra');
   });
   it('datas em formato brasileiro (horário de Brasília)', () => expect(humanValue('2025-03-26T14:00:00+00:00')).toBe('26/03/2025 11h00'));
 });

@@ -34,6 +34,8 @@ export const READ_RPCS = [
   'get_commission_map_segment_inventory','list_commercial_sale_orders','get_commercial_sale_order_detail',
   'financial_edition_summary','financial_budget_execution','financial_expense_comparison',
   'workers_interest_summary','workers_public_links_overview',
+  'workers_map_sales_overview','workers_agenda_personal_summary','workers_agenda_people_ranking',
+  'workers_agenda_query','workers_map_inventory_summary',
 ] as const;
 export type ReadRpc = typeof READ_RPCS[number];
 

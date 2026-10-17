@@ -2,13 +2,14 @@ import { useEffect, useState, type CSSProperties, type ReactNode, type MouseEven
 import { Link, useNavigate } from 'react-router-dom';
 import { flushSync } from 'react-dom';
 import { ArrowUpRight, Check, ChevronDown, Circle, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
-import { m, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WorkerMascot } from '../mascot/WorkerMascot';
 import { getWorker, workerCatalog } from '../workerCatalog';
 import type { WorkerDefinition, WorkerProgressStep } from '../types';
 import { workerStyle } from '../ui-utils';
 import { useWorkerAccess } from '../useWorkerAccess';
+import { WorkerTeamMark, WorkerBotMotionToggle } from './WorkerTeamBrand';
 
 export function WorkerLink({ to, children, className, style, onClick, ...props }: { to: string; children: ReactNode; className?: string; style?: CSSProperties; onClick?: () => void; 'aria-label'?: string }) {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export function WorkerLink({ to, children, className, style, onClick, ...props }
     onClick?.();
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
     const doc = document as Document & { startViewTransition?: (update: () => void) => unknown };
-    if (!doc.startViewTransition) return;
+    if (!doc.startViewTransition || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
     event.preventDefault(); doc.startViewTransition(() => flushSync(() => navigate(to)));
   };
   return <Link to={to} className={className} style={style} onClick={transition} {...props}>{children}</Link>;
@@ -31,13 +32,15 @@ export function WorkerCluster({ compact = false, fullTeam = false }: { compact?:
 }
 
 export function TeamChatter() {
+  const reducedMotion = useReducedMotion();
   const [phrase, setPhrase] = useState<string | null>(null);
   useEffect(() => {
+    if (reducedMotion) return;
     let hide: ReturnType<typeof setTimeout>; let next: ReturnType<typeof setTimeout>; let count = 0;
     const phrases = ['Vamos preparar a feira?', 'Cada detalhe conta.', 'Tudo começa com uma boa conversa.'];
-    const show = () => { setPhrase(phrases[count++ % phrases.length]); hide = setTimeout(() => setPhrase(null), 3200); next = setTimeout(show, 6000 + Math.random() * 4000); };
+    const show = () => { if (!document.hidden) setPhrase(phrases[count++ % phrases.length]); hide = setTimeout(() => setPhrase(null), 3200); next = setTimeout(show, 6000 + Math.random() * 4000); };
     next = setTimeout(show, 6500); return () => { clearTimeout(hide); clearTimeout(next); };
-  }, []);
+  }, [reducedMotion]);
   return <AnimatePresence>{phrase && <m.div aria-hidden="true" className="worker-chatter-group" initial={{ opacity: 0, y: 4, scale: .9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: .2 }}><span className="worker-chatter">{phrase}</span><span className="worker-chatter worker-chatter--reply">Estou por aqui.</span></m.div>}</AnimatePresence>;
 }
 
@@ -58,8 +61,8 @@ export function WorkerChip({ worker, onClick, selected = false }: { worker: Work
   return <button className={`worker-chip ${selected ? 'is-selected' : ''}`} style={workerStyle(worker)} type="button" onClick={onClick} aria-pressed={selected}><WorkerMascot shape={worker.shape} color={worker.color} size={29} paused /><span>{worker.name}</span></button>;
 }
 
-export function WorkerEmptyState({ title = 'Com quem vamos trabalhar hoje?', description = 'Uma equipe que conhece a Fenasoja. Uma conversa para encontrar o que você precisa.', children }: { title?: string; description?: string; children?: ReactNode }) {
-  return <div className="worker-empty"><WorkerCluster compact /><p className="worker-eyebrow"><Sparkles size={14} /> Sua equipe Fenasoja</p><h1>{title}</h1><p className="worker-empty__description">{description}</p>{children}</div>;
+export function WorkerEmptyState({ title = 'O que você quer saber?', description = 'Consulte os dados da feira com o especialista certo. O BOT FENASOJA considera o contexto e respeita o seu acesso.', children }: { title?: string; description?: string; children?: ReactNode }) {
+  return <div className="worker-empty worker-empty--conversation"><article className="worker-intro-message" aria-label="Mensagem inicial do BOT FENASOJA"><div className="worker-intro-message__avatar"><WorkerTeamMark size={56} /></div><div className="worker-intro-message__body"><div className="worker-intro-message__author"><span>BOT FENASOJA</span><WorkerBotMotionToggle /></div><p className="worker-intro-message__greeting">{title}</p><p className="worker-empty__description">{description}</p>{children}</div></article></div>;
 }
 
 export function WorkerSkeletons({ rows = 3 }: { rows?: number }) { return <div className="worker-skeletons" role="status" aria-label="Carregando conversas">{Array.from({ length: rows }, (_, index) => <div className="worker-skeleton-row" key={index}><Skeleton className="h-11 w-11 rounded-2xl" /><div><Skeleton className="h-4 w-28" /><Skeleton className="mt-3 h-3 w-44" /></div></div>)}</div>; }
