@@ -8,7 +8,6 @@ Isso fica disponível após aplicar as migrations e publicar o código. O deploy
 - [Curadoria e atualização](atualizacao.md)
 - [Banco, contratos, executor e recuperação](banco.md)
 - [Evidências e limites da validação](validacao.md)
-- [Prompt de publicação após o merge](prompt-pos-merge.md)
 - [Manifesto gerado](../../data/kb/manifest.json)
 
 ## Conteúdo e proveniência
