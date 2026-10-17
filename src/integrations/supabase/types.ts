@@ -13084,6 +13084,24 @@ export type Database = {
         }
         Returns: Json
       }
+      workers_agenda_commission_links: {
+        Args: { _org_id: string }
+        Returns: {
+          commission_id: string
+          event_id: string
+          name: string
+          slug: string
+        }[]
+      }
+      workers_agenda_commission_ranking: {
+        Args: {
+          _from_date: string
+          _limit?: number
+          _org_id: string
+          _to_date: string
+        }
+        Returns: Json
+      }
       workers_agenda_event_scope: {
         Args: { _from_date: string; _org_id: string; _to_date: string }
         Returns: {
@@ -13106,6 +13124,24 @@ export type Database = {
           _to_date: string
         }
         Returns: Json
+      }
+      workers_agenda_person_events: {
+        Args: {
+          _from_date: string
+          _org_id: string
+          _person_id: string
+          _to_date: string
+        }
+        Returns: Json
+      }
+      workers_agenda_person_links: {
+        Args: { _org_id: string }
+        Returns: {
+          event_id: string
+          name_snapshot: string
+          person_id: string
+          responsible: boolean
+        }[]
       }
       workers_agenda_personal_summary: {
         Args: {
@@ -13137,6 +13173,10 @@ export type Database = {
           _to_date: string
           _weekday?: number
         }
+        Returns: Json
+      }
+      workers_agenda_resolve_identity: {
+        Args: { _kind: string; _org_id: string; _search: string }
         Returns: Json
       }
       workers_interest_summary: {
