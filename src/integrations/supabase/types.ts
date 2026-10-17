@@ -1258,6 +1258,7 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
+          message_seq: number
           org_id: string
           request_id: string
           role: string
@@ -1271,6 +1272,7 @@ export type Database = {
           conversation_id: string
           created_at?: string
           id?: string
+          message_seq?: number
           org_id: string
           request_id: string
           role: string
@@ -1284,6 +1286,7 @@ export type Database = {
           conversation_id?: string
           created_at?: string
           id?: string
+          message_seq?: number
           org_id?: string
           request_id?: string
           role?: string
@@ -11502,6 +11505,34 @@ export type Database = {
           _request_id: string
         }
         Returns: Json
+      }
+      ai_workers_read_history: {
+        Args: {
+          _before_sequence?: number
+          _conversation_id: string
+          _org_id: string
+          _turn_limit?: number
+        }
+        Returns: {
+          citations: Json
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          message_seq: number
+          org_id: string
+          request_id: string
+          role: string
+          state: string
+          user_id: string
+          worker_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "ai_messages"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       ai_workers_redact_text: { Args: { _text: string }; Returns: string }
       ai_workers_visible_action_ids: { Args: never; Returns: string[] }
