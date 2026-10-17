@@ -1,5 +1,5 @@
 import { pickWorkerFields } from './privacy.ts';
-import { WorkerToolError, type WorkerAccessContext } from './types.ts';
+import { WorkerToolError, workerDataError, type WorkerAccessContext } from './types.ts';
 
 /** Positive allowlist. Never accept relation/column/RPC names from model input. */
 export const READ_TABLES = {
@@ -36,6 +36,7 @@ export const READ_RPCS = [
   'workers_interest_summary','workers_public_links_overview',
   'workers_map_sales_overview','workers_agenda_personal_summary','workers_agenda_people_ranking',
   'workers_agenda_query','workers_map_inventory_summary',
+  'workers_agenda_resolve_identity','workers_agenda_person_events','workers_agenda_commission_ranking',
 ] as const;
 export type ReadRpc = typeof READ_RPCS[number];
 
@@ -49,7 +50,8 @@ export interface ReadOptions {
 export async function requireProject(ctx: WorkerAccessContext, id: string) {
   const { data, error } = await ctx.supabase.from('map_projects').select('id,org_id,is_archived')
     .eq('org_id', ctx.orgId).eq('id', id).eq('is_archived', false).maybeSingle();
-  if (error || !data || data.org_id !== ctx.orgId) throw new WorkerToolError('NOT_FOUND', 'Projeto não encontrado ou sem acesso.');
+  if (error) throw workerDataError(error,'authorization');
+  if (!data || data.org_id !== ctx.orgId) throw new WorkerToolError('NOT_FOUND', 'Projeto não encontrado ou sem acesso.');
 }
 export async function readRows(ctx: WorkerAccessContext, table: ReadTable, options: ReadOptions = {}) {
   if (!Object.prototype.hasOwnProperty.call(READ_TABLES, table)) throw new WorkerToolError('TOOL_NOT_ALLOWED', 'Fonte de leitura não permitida.');
@@ -74,7 +76,7 @@ export async function readRows(ctx: WorkerAccessContext, table: ReadTable, optio
   }
   if (options.order) query = query.order(options.order, { ascending: true });
   const { data, error, count } = await query.limit(size + 1);
-  if (error) throw new WorkerToolError('DATA_UNAVAILABLE', 'Não foi possível consultar os dados autorizados.');
+  if (error) throw workerDataError(error);
   const rows = (data ?? []) as unknown as Record<string, unknown>[];
   return { records: rows.slice(0, size).map((row) => pickWorkerFields(row, spec.fields)), total: count ?? rows.length, truncated: count != null ? count > size : rows.length > size };
 }
@@ -83,6 +85,6 @@ export async function readRpc(ctx: WorkerAccessContext, rpc: ReadRpc, args: Reco
   if (!(READ_RPCS as readonly string[]).includes(rpc)) throw new WorkerToolError('TOOL_NOT_ALLOWED', 'RPC fora da allowlist de leitura.');
   if ('_org_id' in args && args._org_id !== ctx.orgId) throw new WorkerToolError('PERMISSION_DENIED', 'Organização inválida.');
   const { data, error } = await ctx.supabase.rpc(rpc, args);
-  if (error) throw new WorkerToolError('DATA_UNAVAILABLE', 'Não foi possível consultar os dados autorizados.');
+  if (error) throw workerDataError(error);
   return data;
 }

@@ -2,50 +2,75 @@
 // AUTO-GENERATED. Do not edit; canonical source: src/lib/workers/index.ts.
 // Regenerate: node scripts/workers/build-edge-registry.mjs
 // Verify without writing: node scripts/workers/build-edge-registry.mjs --check
-// Source inputs + generator SHA256: 879b1151a975186a5ccf2e7920996a6f2d861de6cb8e7f51fa00bff2ba965949
+// Source inputs + generator SHA256: eec471a1babbd01dfbfce9a3cc74c2c8edfd10df902aaaa0c5383e07f329b55b
 // esbuild: 0.21.5; ESM JavaScript; external runtime dependency: zod.
-// Input src/lib/workers/access.ts SHA256 f41ad9816a52e57d67ca57bfbbbd08736ef3a508b8e0dca1078addd43619307a
-// Input src/lib/workers/analytics.ts SHA256 af9860f90957e3385b2d780d3fc0c331db0625755e64ebf54829794dc0958d9b
+// Input src/lib/workers/access.ts SHA256 e831e76d097707346be3b82114890dc5608aa95532255847c76ab46d77aa0aea
+// Input src/lib/workers/analytics.ts SHA256 d6c3fa36d36347ef5a7d3200615ed933dbd4095727cd45c0f7671edad65fc6a2
+// Input src/lib/workers/auth-failure.ts SHA256 468a11683d18687c7d3d92753ed8a2e0866532e5b5a7dec797051f7990b6a687
 // Input src/lib/workers/catalog.ts SHA256 b7a40864279ee0f1308651b42b0c9fafc66e4e311390732e8411f449b3dd52af
 // Input src/lib/workers/index.ts SHA256 658986def892b6cd32d73c89a1a94ea6877a623694bc151d46af8ba651e80a7c
 // Input src/lib/workers/inventory.ts SHA256 68e24327d4120f412fcac87ede4721163c405b93be2a42ed56bb5d784bdbea82
-// Input src/lib/workers/privacy.ts SHA256 1f5fcc2d31575238767494eb18f8fdb6bbd8b685c6b3ce9ffa39b2fc99a26a7c
+// Input src/lib/workers/privacy.ts SHA256 92eae6d36abb1f3cdaef896b2a6152ff2c8c037ab011f8d22b3b05b31e6b6c2e
 // Input src/lib/workers/question-analytics.ts SHA256 8fac26f8def1e20ac6ffa33bc841c4e980169d09af7c11c5d6038100a5ed1bbe
-// Input src/lib/workers/registry.ts SHA256 41a8cfb5a19172daeda5169c4d1de8bd75af2ba185b083f29510ba1606f83616
+// Input src/lib/workers/registry.ts SHA256 02bd0899a568ccf7f83a787f4fd153e2234d35f925658b259767fcab7436aec3
 // Input src/lib/workers/schema.ts SHA256 86bc5f371ae14416e79688b9a6029291fb8db1abe0d59c97a1d15f9eeca6e35f
-// Input src/lib/workers/sources.ts SHA256 e514d3ded9ca81fafc95d8d296dc9d78a96a4a5d08cae4261c999f6b19a8fed2
-// Input src/lib/workers/tools/agenda/index.ts SHA256 ca2d79511bb2d2fcba1ccf4dc6315f42ed65d2b86d084dde9706a379c4f5109b
+// Input src/lib/workers/sources.ts SHA256 e2861a01cd9ad3fcf2d44c25adace2bc1908ed3f9c48fee99974f110030643d9
+// Input src/lib/workers/tools/agenda/index.ts SHA256 bc70e2a6d38c63f1b146f60aa2ee87e60aadfe72b8d9e249ccdbe222b3b29c59
 // Input src/lib/workers/tools/arena/index.ts SHA256 200c83ae297c0fc81c6b11d0b04c7f4442bd3f71c298d7000c63c40cd551c29e
 // Input src/lib/workers/tools/caixa/index.ts SHA256 38a118eb2924901d1695fea37e1b7dd6fd889860e22f8836dd6aed3f5d857c4a
 // Input src/lib/workers/tools/comissao/index.ts SHA256 b3f38078138b02993d5b1bc6dda18a03a24a3833505b3270e75ed1bc3050d1ad
 // Input src/lib/workers/tools/definition.ts SHA256 a6b7ca50a6c33e22ad28fea8422b7333a73fc5021f4fdada53e6a3c33ee5dd69
 // Input src/lib/workers/tools/interesse/index.ts SHA256 a7786eab88fca2eed15c896cc677c581245f0ad2cbdfd97bb4a511204cda21be
 // Input src/lib/workers/tools/logistica/index.ts SHA256 368ec161b47faf07bf5966f264c14b529e16a04fac4290ade7674236eb92538c
-// Input src/lib/workers/tools/mapa/index.ts SHA256 edfa6ea4b074e44e9c156a5ae152d51d7a5e3c6b3b7d0670c6f2b4fbacf3fadd
-// Input src/lib/workers/types.ts SHA256 c75e201077db938b62e345990ea796ce2576d9b49da6d9f943abc18587f99819
+// Input src/lib/workers/tools/mapa/index.ts SHA256 dda42ec2a0922f9f0255f3d07ac06db29a0462dc9bdd77a848aaff251ec1f344
+// Input src/lib/workers/types.ts SHA256 4367bbef7492e62bfd06ee7dd0630787f2a8f3c8b50f7c4b2a2d3e164a51cf73
 
 // src/lib/workers/types.ts
 var WorkerToolError = class extends Error {
-  constructor(code, message) {
+  constructor(code, message, diagnostic) {
     super(message);
     this.code = code;
+    this.diagnostic = diagnostic;
     this.name = "WorkerToolError";
   }
 };
+function workerDataError(error, stage = "query") {
+  const technicalCode = /^[A-Z0-9_]{1,40}$/i.test(error.code ?? "") ? error.code : void 0;
+  const code = error.code === "42501" ? "PERMISSION_DENIED" : ["PGRST202", "PGRST203", "42883", "42703"].includes(error.code ?? "") ? "RPC_INCOMPATIBLE" : error.code === "57014" || /timeout|timed out/i.test(error.message ?? "") ? "TIMEOUT" : /^(?:08|PGRST00)/.test(error.code ?? "") || /fetch failed|failed to fetch|network/i.test(error.message ?? "") ? "NETWORK_ERROR" : error.code ? "SQL_ERROR" : "DATA_UNAVAILABLE";
+  return new WorkerToolError(code, "Não foi possível concluir a consulta.", { stage, technicalCode });
+}
+
+// src/lib/workers/auth-failure.ts
+function workerAuthFailureCode(error) {
+  const value = error && typeof error === "object" ? error : {};
+  const status = typeof value.status === "number" ? value.status : void 0;
+  const name = typeof value.name === "string" ? value.name : "";
+  const message = typeof value.message === "string" ? value.message : "";
+  if (status === 408 || status === 504 || /timeout|timed out/i.test(message)) return "timeout";
+  if (name === "AuthRetryableFetchError" || status === 0 || status !== void 0 && status >= 500 || /fetch failed|failed to fetch|network|connection|load failed/i.test(message)) return "network_error";
+  if (status === 401 || status === 403 || /AuthSessionMissingError|AuthInvalidJwtError/.test(name) || /session.*missing|no session|invalid.*(?:jwt|token)|jwt.*expired/i.test(message)) return "forbidden";
+  return "query_failed";
+}
 
 // src/lib/workers/access.ts
 var roles = ["admin", "gestor", "operador", "leitura"];
 async function resolveWorkerAccess(client, userId, orgId) {
   const { data: auth, error: authError } = await client.auth.getUser();
-  if (authError || !auth?.user || auth.user.id !== userId || auth.user.role === "service_role") {
+  if (authError) {
+    const cause = workerAuthFailureCode(authError);
+    const technicalCode = /^[A-Z0-9_]{1,40}$/i.test(authError.code ?? "") ? authError.code : void 0;
+    throw new WorkerToolError(cause === "network_error" ? "NETWORK_ERROR" : cause === "timeout" ? "TIMEOUT" : cause === "forbidden" ? "AUTH_REQUIRED" : "DATA_UNAVAILABLE", "Não foi possível verificar a sessão.", { stage: "authentication", technicalCode });
+  }
+  if (!auth?.user || auth.user.id !== userId || auth.user.role === "service_role") {
     throw new WorkerToolError("AUTH_REQUIRED", "Sessão de usuário necessária.");
   }
   const { data: member, error: memberError } = await client.from("org_members").select("role,org_id,user_id").eq("user_id", userId).eq("org_id", orgId).eq("is_active", true).maybeSingle();
-  if (memberError || !member || member.org_id !== orgId || member.user_id !== userId || !roles.includes(member.role)) {
+  if (memberError) throw workerDataError(memberError, "authorization");
+  if (!member || member.org_id !== orgId || member.user_id !== userId || !roles.includes(member.role)) {
     throw new WorkerToolError("PERMISSION_DENIED", "Organização sem vínculo ativo.");
   }
   const { data: grants, error: grantsError } = await client.from("user_capabilities").select("capability").eq("user_id", userId).eq("org_id", orgId);
-  if (grantsError) throw new WorkerToolError("PERMISSION_DENIED", "Não foi possível verificar as permissões.");
+  if (grantsError) throw workerDataError(grantsError, "authorization");
   return { userId, orgId, role: member.role, capabilities: new Set((grants ?? []).map((item) => item.capability)), supabase: client };
 }
 function hasWorkerPolicy(policy, ctx) {
@@ -81,20 +106,24 @@ async function authorizeWorkerPolicy(policy, ctx) {
   if (!hasWorkerPolicy(policy, ctx)) return false;
   if (policy === "financial") {
     const { data, error } = await ctx.supabase.rpc("financial_can", { _org_id: ctx.orgId, _capability: "financial_access" });
-    return !error && data === true;
+    if (error) throw workerDataError(error, "authorization");
+    return data === true;
   }
   if (policy === "venue" || policy === "venue_reports") {
     const { data, error } = await ctx.supabase.rpc("venue_get_permissions", { _org_id: ctx.orgId });
-    if (error || !data || typeof data !== "object") return false;
+    if (error) throw workerDataError(error, "authorization");
+    if (!data || typeof data !== "object") return false;
     const permissions = data;
     return permissions.venue_events_access === true && (policy !== "venue_reports" || permissions.venue_reports_view === true || permissions.venue_counterparts_manage === true);
   }
   if (policy === "map_sales" || policy === "map_contracts" || policy === "analytics") {
     const { data, error } = await ctx.supabase.rpc("map_has_explicit_capability", { _org_id: ctx.orgId, _capability: "map.manage_sales" });
-    if (error || data !== true) return false;
+    if (error) throw workerDataError(error, "authorization");
+    if (data !== true) return false;
     if (policy === "map_contracts") {
       const result = await ctx.supabase.rpc("map_has_explicit_capability", { _org_id: ctx.orgId, _capability: "map.manage_contracts" });
-      return !result.error && result.data === true;
+      if (result.error) throw workerDataError(result.error, "authorization");
+      return result.data === true;
     }
   }
   return true;
@@ -198,6 +227,9 @@ function tool(name, worker, title, description, inputSchema, policy, deepLink, s
 
 // src/lib/workers/tools/agenda/index.ts
 var agendaTools = [
+  tool("agenda_resolve_identity", "agenda", "Identidades da Agenda", "Resolve pessoa ou comissão entre identidades autorizadas. Nunca substitui a pessoa mencionada pela conta autenticada; homônimos exigem escolha por identidade.", input({ kind: z3.enum(["person", "commission"]), search: z3.string().trim().min(1).max(120) }), "member", "/cronograma-eventos", ["workers_agenda_resolve_identity"]),
+  tool("agenda_person_events", "agenda", "Eventos de uma pessoa", "Conta eventos distintos vinculados ao UUID persistido e autorizado da pessoa, incluindo vínculos de subeventos no pai; não infere presença nem criação como participação.", input({ person_id: uuid(), date_from: date(), date_to: date() }), "member", "/cronograma-eventos", ["workers_agenda_person_events"]),
+  tool("agenda_commission_ranking", "agenda", "Comissões com mais eventos", "Ranking completo no servidor por comissão persistida. Conta o evento uma vez por comissão, incluindo vínculos principais, adicionais e de subeventos; um evento pode pertencer a várias comissões.", input({ date_from: date(), date_to: date(), limit: z3.number().int().min(1).max(30).default(10) }), "member", "/cronograma-eventos", ["workers_agenda_commission_ranking"]),
   tool("agenda_query", "agenda", "Consulta analítica da Agenda", "Consulta todos os eventos autorizados do período, agrega antes de limitar os detalhes e aceita variações de pergunta. Filtra título/local/categoria/prioridade/situação, vínculos autenticados e comissão persistida. Agrupamentos completos permitem pizza, barras, tabela e comparação entre duas consultas. Vínculo e duração prevista não comprovam presença.", input({ date_from: date(), date_to: date(), group_by: z3.enum(["status", "location", "category", "weekday", "day"]).default("status"), relationship: z3.enum(["all", "linked", "created", "responsible"]).default("all"), status: z3.enum(["planejado", "em_andamento", "aguardando_definicao", "aguardando_responsavel", "concluido", "cancelado"]).optional(), search: z3.string().max(120).optional(), location: z3.string().max(120).optional(), category: z3.string().max(120).optional(), priority: z3.enum(["baixa", "media", "alta", "critica"]).optional(), weekday: z3.number().int().min(0).max(6).optional(), commission_id: uuid().optional(), missing_time: z3.boolean().optional(), missing_location: z3.boolean().optional(), missing_category: z3.boolean().optional(), cross_midnight: z3.boolean().optional(), cross_period: z3.boolean().optional(), start_in_period: z3.boolean().optional() }), "member", "/cronograma-eventos", ["workers_agenda_query"]),
   tool("agenda_personal_summary", "agenda", "Sua Agenda no período", "Calcula todos os eventos autorizados vinculados à conta autenticada, sem duplicar vínculos ou subeventos. Distingue criação, responsabilidade, situação concluída e duração agendada; não comprova presença.", input({ date_from: date(), date_to: date(), relationship: z3.enum(["linked", "created", "responsible"]).optional() }), "member", "/cronograma-eventos", ["workers_agenda_personal_summary"]),
   tool("agenda_people_ranking", "agenda", "Pessoas com mais eventos", "Ranking agregado no servidor sobre o período autorizado completo. Conta eventos distintos por identidade persistida; limite visual não limita a agregação.", input({ date_from: date(), date_to: date(), limit: z3.number().int().min(1).max(30).default(10) }), "member", "/cronograma-eventos", ["workers_agenda_people_ranking"]),
@@ -221,6 +253,7 @@ var arenaTools = [
 // src/lib/workers/tools/mapa/index.ts
 import { z as z5 } from "zod";
 var mapaTools = [
+  tool("map_sales_records_summary", "mapa", "Contratos e registros comerciais", "Reutiliza exatamente os totais da API da Dashboard: total global, PENDING (inclui parciais) e SIGNED. Unidade é agrupamento/registro comercial, não lote, documento ou recebimento. A API não filtra edição: peça escopo de projeto inteiro quando uma edição for solicitada.", input({ project_id: uuid().optional(), edition_year: z5.number().int().min(2e3).max(2200).optional(), date_from: date().optional(), date_to: date().optional() }), "map_sales", "/mapa-comercial", ["map_projects", "list_commercial_sale_orders"]),
   tool("map_inventory_summary", "mapa", "Espaços e infraestrutura", "Calcula sobre todos os lotes ativos autorizados do projeto. Filtra situação, quadra, área oficial e infraestrutura persistida. Agrupa por situação ou quadra, com Outros calculado no servidor se necessário. Não confundir disponibilidade com vendas, preços ou recebimentos. Projeto/edição ambíguos pedem esclarecimento.", input({ project_id: uuid().optional(), edition_year: z5.number().int().min(2e3).max(2200).optional(), status: z5.enum(["AVAILABLE", "BLOCKED", "RESERVED", "IN_NEGOTIATION", "SALE_OPEN", "SOLD"]).optional(), block: z5.string().max(120).optional(), min_area: z5.number().min(0).max(1e9).optional(), max_area: z5.number().min(0).max(1e9).optional(), covered: z5.boolean().optional(), electricity: z5.boolean().optional(), water: z5.boolean().optional(), internet: z5.boolean().optional(), group_by: z5.enum(["status", "block"]).default("status"), missing_number: z5.boolean().optional(), missing_area: z5.boolean().optional() }), "map", "/mapa-comercial", ["workers_map_inventory_summary"]),
   tool("map_sales_overview", "mapa", "Panorama de vendas comerciais", "Agrega todo o conjunto autorizado por projeto/edição persistidos. Período opcional exige as duas datas: confirmados usam assinatura; itens atualmente em aberto usam criação. Não representa posição histórica nem recebimentos.", input({ project_id: uuid().optional(), edition_year: z5.number().int().min(2e3).max(2200).optional(), date_from: date().optional(), date_to: date().optional() }), "map_sales", "/mapa-comercial", ["workers_map_sales_overview"]),
   tool("map_projects", "mapa", "Projetos comerciais", "Lista projetos ativos visíveis.", input({ limit: limit() }), "map", "/mapa-comercial", ["map_projects"]),
@@ -291,6 +324,10 @@ function sanitizeWorkerData(value, depth = 0) {
   if (value && typeof value === "object") {
     const result = {};
     for (const [key, item] of Object.entries(value)) {
+      if (key === "document_count") {
+        if (item === null || typeof item === "number" && Number.isSafeInteger(item) && item >= 0) result[key] = item;
+        continue;
+      }
       if (PRIVATE_KEYS.test(key) || key === "__proto__" || key === "constructor" || key === "prototype") continue;
       if (/^(?:id|.*_id|.*Id|lot_ids)$/.test(key) && (typeof item === "string" || Array.isArray(item))) {
         const ids = Array.isArray(item) ? item : [item];
@@ -353,11 +390,15 @@ var READ_RPCS = [
   "workers_agenda_personal_summary",
   "workers_agenda_people_ranking",
   "workers_agenda_query",
-  "workers_map_inventory_summary"
+  "workers_map_inventory_summary",
+  "workers_agenda_resolve_identity",
+  "workers_agenda_person_events",
+  "workers_agenda_commission_ranking"
 ];
 async function requireProject(ctx, id) {
   const { data, error } = await ctx.supabase.from("map_projects").select("id,org_id,is_archived").eq("org_id", ctx.orgId).eq("id", id).eq("is_archived", false).maybeSingle();
-  if (error || !data || data.org_id !== ctx.orgId) throw new WorkerToolError("NOT_FOUND", "Projeto não encontrado ou sem acesso.");
+  if (error) throw workerDataError(error, "authorization");
+  if (!data || data.org_id !== ctx.orgId) throw new WorkerToolError("NOT_FOUND", "Projeto não encontrado ou sem acesso.");
 }
 async function readRows(ctx, table, options = {}) {
   if (!Object.prototype.hasOwnProperty.call(READ_TABLES, table)) throw new WorkerToolError("TOOL_NOT_ALLOWED", "Fonte de leitura não permitida.");
@@ -382,7 +423,7 @@ async function readRows(ctx, table, options = {}) {
   }
   if (options.order) query = query.order(options.order, { ascending: true });
   const { data, error, count: count3 } = await query.limit(size + 1);
-  if (error) throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível consultar os dados autorizados.");
+  if (error) throw workerDataError(error);
   const rows2 = data ?? [];
   return { records: rows2.slice(0, size).map((row) => pickWorkerFields(row, spec.fields)), total: count3 ?? rows2.length, truncated: count3 != null ? count3 > size : rows2.length > size };
 }
@@ -390,7 +431,7 @@ async function readRpc(ctx, rpc, args) {
   if (!READ_RPCS.includes(rpc)) throw new WorkerToolError("TOOL_NOT_ALLOWED", "RPC fora da allowlist de leitura.");
   if ("_org_id" in args && args._org_id !== ctx.orgId) throw new WorkerToolError("PERMISSION_DENIED", "Organização inválida.");
   const { data, error } = await ctx.supabase.rpc(rpc, args);
-  if (error) throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível consultar os dados autorizados.");
+  if (error) throw workerDataError(error);
   return data;
 }
 
@@ -453,25 +494,53 @@ var ranking = z6.object({
   }).strict(),
   people: z6.array(z6.object({ person_id: z6.string().uuid(), name: text, events: count, position: count }).strict()).max(30)
 }).strict();
+var identity = z6.object({ id: z6.string().uuid(), name: text, kind: z6.enum(["person", "commission"]), visual_key: z6.string().regex(/^[a-z0-9_-]{1,100}$/).optional() }).strict();
+var identities = z6.object({ complete: z6.literal(true), identities: z6.array(identity) }).strict();
+var personEvents = z6.object({ scope, notes, person: identity.extend({ kind: z6.literal("person") }), metrics: z6.object({ events: count }).strict() }).strict();
+var commissionRanking = z6.object({
+  scope,
+  notes,
+  metrics: z6.object({
+    commission_count: count,
+    event_count: count,
+    shown_commissions: z6.number().int().min(1).max(30),
+    tie_break: z6.literal("name_then_id")
+  }).strict(),
+  commissions: z6.array(z6.object({ commission_id: z6.string().uuid(), name: text, slug: z6.string().regex(/^[a-z0-9_-]{1,100}$/), events: count, position: count }).strict()).max(30)
+}).strict();
 var clarification = z6.object({ needs_clarification: z6.literal(true), question: text, options: z6.array(text).max(100) }).strict();
 function parseWorkerAnalytics(tool2, value) {
-  const schema = tool2 === "map_sales_overview" ? z6.union([map, clarification]) : tool2 === "agenda_personal_summary" ? personal : ranking;
+  const schema = tool2 === "map_sales_overview" ? z6.union([map, clarification]) : tool2 === "agenda_personal_summary" ? personal : tool2 === "agenda_people_ranking" ? ranking : tool2 === "agenda_commission_ranking" ? commissionRanking : tool2 === "agenda_resolve_identity" ? identities : tool2 === "agenda_person_events" ? personEvents : void 0;
+  if (!schema) throw new WorkerToolError("INVALID_RESPONSE", "Resultado de consulta não reconhecido.", { stage: "validation" });
   const parsed = schema.safeParse(value);
-  if (!parsed.success) throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível verificar o resultado desta consulta.");
+  if (!parsed.success) throw new WorkerToolError("INVALID_RESPONSE", "Não foi possível verificar o resultado desta consulta.", { stage: "validation" });
   if (tool2 === "map_sales_overview" && "metrics" in parsed.data) {
     const result = map.parse(parsed.data);
     if (!result.scope.project_id || !result.scope.edition_year || !result.scope.edition_label || !result.scope.project_name)
-      throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível verificar a edição deste resultado.");
+      throw new WorkerToolError("INVALID_RESPONSE", "Não foi possível verificar a edição deste resultado.", { stage: "validation" });
   }
   if (tool2 === "agenda_personal_summary") {
     const result = personal.parse(parsed.data), metrics = result.metrics;
-    if (!result.scope.period || metrics.events > metrics.linked_events || metrics.valid_duration_events > metrics.events || metrics.completed_events > metrics.events || metrics.past_events > metrics.events || metrics.scheduled_events > metrics.events || metrics.valid_duration_events === 0 !== (metrics.average_duration_minutes === null) || metrics.weekday_counts.reduce((sum, row) => sum + row.events, 0) !== metrics.events || new Set(metrics.weekday_counts.map((row) => row.weekday)).size !== metrics.weekday_counts.length)
-      throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível verificar os totais da sua Agenda.");
+    const selected = result.scope.relationship === "created" ? metrics.created_events : result.scope.relationship === "responsible" ? metrics.responsible_events : metrics.linked_events;
+    if (!result.scope.period || metrics.events !== selected || metrics.valid_duration_events > metrics.events || metrics.completed_events > metrics.events || metrics.past_events > metrics.events || metrics.scheduled_events > metrics.events || metrics.valid_duration_events === 0 !== (metrics.average_duration_minutes === null) || metrics.weekday_counts.reduce((sum, row) => sum + row.events, 0) !== metrics.events || new Set(metrics.weekday_counts.map((row) => row.weekday)).size !== metrics.weekday_counts.length)
+      throw new WorkerToolError("INVALID_RESPONSE", "Não foi possível verificar os totais da sua Agenda.", { stage: "validation" });
   }
   if (tool2 === "agenda_people_ranking" && "people" in parsed.data) {
     const result = ranking.parse(parsed.data), people = result.people;
-    if (!result.scope.period || result.metrics.people_count < people.length || people.length > result.metrics.shown_people || people.some((person, index) => person.position !== index + 1 || person.events > result.metrics.event_count || index > 0 && person.events > people[index - 1].events) || new Set(people.map((person) => person.person_id)).size !== people.length || new Set(people.map((person) => person.name)).size !== people.length)
-      throw new WorkerToolError("DATA_UNAVAILABLE", "Não foi possível distinguir as pessoas deste resultado.");
+    if (!result.scope.period || result.metrics.people_count < people.length || people.length > result.metrics.shown_people || people.some((person, index) => person.position !== index + 1 || person.events > result.metrics.event_count || index > 0 && person.events > people[index - 1].events) || new Set(people.map((person) => person.person_id)).size !== people.length)
+      throw new WorkerToolError("INVALID_RESPONSE", "Não foi possível distinguir as pessoas deste resultado.", { stage: "validation" });
+  }
+  if (tool2 === "agenda_commission_ranking") {
+    const result = commissionRanking.parse(parsed.data), rows2 = result.commissions;
+    if (!result.scope.period || result.metrics.commission_count < rows2.length || rows2.length > result.metrics.shown_commissions || new Set(rows2.map((row) => row.commission_id)).size !== rows2.length || rows2.some((row, index) => row.position !== index + 1 || row.events > result.metrics.event_count || index > 0 && row.events > rows2[index - 1].events))
+      throw new WorkerToolError("INVALID_RESPONSE", "Não foi possível verificar o ranking das comissões.", { stage: "validation" });
+  }
+  if (tool2 === "agenda_person_events" && !personEvents.parse(parsed.data).scope.period)
+    throw new WorkerToolError("INVALID_RESPONSE", "Não foi possível verificar o período da consulta.", { stage: "validation" });
+  if (tool2 === "agenda_resolve_identity") {
+    const result = identities.parse(parsed.data);
+    if (new Set(result.identities.map((row) => row.id)).size !== result.identities.length)
+      throw new WorkerToolError("INVALID_RESPONSE", "Identidades duplicadas no resultado.", { stage: "validation" });
   }
   return parsed.data;
 }
@@ -537,7 +606,8 @@ function output(definition, records, options = {}) {
 }
 async function requireCommission(ctx, id, ownOnly = false) {
   const { data, error } = await ctx.supabase.from("commissions").select("id,org_id").eq("org_id", ctx.orgId).eq("id", id).eq("is_active", true).maybeSingle();
-  if (error || !data || data.org_id !== ctx.orgId) throw new WorkerToolError("NOT_FOUND", "Comissão não encontrada ou sem acesso.");
+  if (error) throw workerDataError(error, "authorization");
+  if (!data || data.org_id !== ctx.orgId) throw new WorkerToolError("NOT_FOUND", "Comissão não encontrada ou sem acesso.");
   if (ownOnly && ctx.role !== "admin" && !(await ownCommissionIds(ctx)).includes(id)) throw new WorkerToolError("PERMISSION_DENIED", "Comissão fora do seu vínculo.");
 }
 async function ownCommissionIds(ctx) {
@@ -545,7 +615,7 @@ async function ownCommissionIds(ctx) {
     ctx.supabase.from("org_members").select("commission_id").eq("org_id", ctx.orgId).eq("user_id", ctx.userId).eq("is_active", true).maybeSingle(),
     ctx.supabase.from("commission_responsibles").select("commission_id").eq("org_id", ctx.orgId).eq("user_id", ctx.userId).eq("active", true).limit(100)
   ]);
-  if (memberResult.error || responsibleResult.error) throw new WorkerToolError("PERMISSION_DENIED", "Não foi possível validar o vínculo da comissão.");
+  if (memberResult.error || responsibleResult.error) throw workerDataError(memberResult.error ?? responsibleResult.error, "authorization");
   return [...new Set([memberResult.data?.commission_id, ...(responsibleResult.data ?? []).map((row) => row.commission_id)].filter((id) => typeof id === "string"))];
 }
 async function requireEvent(ctx, id) {
@@ -563,6 +633,66 @@ async function dispatch(def, input2, ctx) {
   const size = Number(input2.limit ?? 20);
   const text3 = (key) => String(input2[key]);
   switch (def.name) {
+    case "agenda_resolve_identity": {
+      const response = await readRpc(ctx, "workers_agenda_resolve_identity", { _org_id: ctx.orgId, _kind: input2.kind, _search: input2.search });
+      return output(def, [parseWorkerAnalytics(def.name, response)], { summary: "Identidades persistidas visíveis para esta consulta." });
+    }
+    case "agenda_person_events":
+    case "agenda_commission_ranking": {
+      const response = await readRpc(ctx, def.name === "agenda_person_events" ? "workers_agenda_person_events" : "workers_agenda_commission_ranking", {
+        _org_id: ctx.orgId,
+        _from_date: input2.date_from,
+        _to_date: input2.date_to,
+        ...def.name === "agenda_person_events" ? { _person_id: input2.person_id } : { _limit: input2.limit ?? 10 }
+      });
+      return output(def, [parseWorkerAnalytics(def.name, response)], { summary: "Eventos distintos agregados no servidor sobre todos os vínculos autorizados do período." });
+    }
+    case "map_sales_records_summary": {
+      if (Boolean(input2.date_from) !== Boolean(input2.date_to)) throw new WorkerToolError("INVALID_INPUT", "Informe o início e o fim do período.");
+      if (input2.edition_year) return output(def, [{ needs_clarification: true, question: "A API da Dashboard conta os registros do projeto inteiro e não filtra pela edição. Deseja consultar o projeto inteiro?", options: ["Consultar o projeto inteiro"] }]);
+      let projectId = input2.project_id;
+      let projectName;
+      if (!projectId) {
+        const projects = await readRows(ctx, "map_projects", { limit: 100, filters: [["is_archived", "eq", false]] });
+        if (projects.truncated || projects.records.length !== 1) return output(def, [{
+          needs_clarification: true,
+          question: projects.records.length ? "Qual projeto comercial deseja consultar?" : "Não encontrei um projeto comercial autorizado. Qual projeto deseja consultar?",
+          options: projects.records.map((project2) => String(project2.name)).slice(0, 8)
+        }]);
+        projectId = String(projects.records[0].id);
+        projectName = String(projects.records[0].name);
+      }
+      await requireProject(ctx, projectId);
+      const pages = await Promise.all([null, "PENDING", "SIGNED"].map((status) => readRpc(ctx, "list_commercial_sale_orders", {
+        p_project_id: projectId,
+        p_search: null,
+        p_status: status,
+        p_has_document: null,
+        p_payment_method: null,
+        p_from: input2.date_from ?? null,
+        p_to: input2.date_to ?? null,
+        p_limit: 1,
+        p_offset: 0
+      })));
+      const totals = pages.map((page) => {
+        const value = object(page).total;
+        const number = typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value) : NaN;
+        if (!Number.isSafeInteger(number) || number < 0) throw new WorkerToolError("INVALID_RESPONSE", "A API comercial não retornou um total verificável.", { stage: "validation" });
+        return number;
+      });
+      return output(
+        def,
+        [{ scope: {
+          project_id: projectId,
+          ...projectName ? { project_name: projectName } : {},
+          complete: true,
+          as_of: (/* @__PURE__ */ new Date()).toISOString(),
+          timezone: "America/Sao_Paulo",
+          ...input2.date_from ? { period: { from: input2.date_from, to: input2.date_to } } : {}
+        }, metrics: { total_records: totals[0], pending_records: totals[1], signed_records: totals[2] }, notes: [] }],
+        { summary: "Totais oficiais da Dashboard por classificação de assinatura do agrupamento comercial." }
+      );
+    }
     case "agenda_query":
     case "map_inventory_summary": {
       const args = { _org_id: ctx.orgId };
@@ -672,7 +802,8 @@ async function dispatch(def, input2, ctx) {
       await requireProject(ctx, text3("project_id"));
       if (input2.has_document !== void 0 && !await authorizeWorkerPolicy("map_contracts", ctx)) throw new WorkerToolError("PERMISSION_DENIED", "Consulta de contratos requer permissão de contratos.");
       const response = object(await readRpc(ctx, "list_commercial_sale_orders", { p_project_id: input2.project_id, p_limit: size, ...input2.status ? { p_status: input2.status } : {}, ...input2.has_document !== void 0 ? { p_has_document: input2.has_document } : {} }));
-      const result = rows(response.rows).map((row) => pickWorkerFields(row, ["record_id", "kind", "order_id", "sale_id", "reference", "created_at", "status", "item_count", "active_count", "signed_count", "pending_count", "cancelled_count", "legacy_count", "lot_ids"]));
+      const canReadDocuments = response.documentsAccessible === true && await authorizeWorkerPolicy("map_contracts", ctx);
+      const result = rows(response.rows).map((row) => pickWorkerFields(row, ["record_id", "kind", "order_id", "sale_id", "reference", "created_at", "status", "item_count", "active_count", "signed_count", "pending_count", "cancelled_count", "legacy_count", "lot_ids", ...canReadDocuments ? ["document_count"] : []]));
       return output(def, result, { total: Number(response.total ?? result.length), truncated: Number(response.total ?? 0) > size });
     }
     case "sale_order_detail":
@@ -685,7 +816,10 @@ async function dispatch(def, input2, ctx) {
       if (def.name === "sale_order_contract_summary") {
         if (response.documentsAccessible !== true) throw new WorkerToolError("PERMISSION_DENIED", "Contratos sem permissão de leitura.");
         const contracts = rows(response.contracts);
-        return output(def, contracts.slice(0, 100).map((row) => pickWorkerFields(row, ["contractId", "scope", "lotIds"])), { total: contracts.length, truncated: contracts.length > 100 });
+        return output(def, contracts.slice(0, 100).map((row) => ({
+          ...pickWorkerFields(row, ["contractId", "scope", "lotIds", "activeVersion"]),
+          ...Array.isArray(row.versions) ? { version_count: row.versions.length } : {}
+        })), { total: contracts.length, truncated: contracts.length > 100 });
       }
       const result = rows(response.items).slice(0, 100).map((item) => pickWorkerFields(item, ["itemId", "lotId", "entityId", "publicIdentifier", "lotNumber", "displayName", "areaSnapshot", "contractState", "lotStatus"]));
       return output(def, result, { truncated: rows(response.items).length > 100 });

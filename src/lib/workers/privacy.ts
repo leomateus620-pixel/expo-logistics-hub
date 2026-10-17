@@ -23,6 +23,9 @@ export function sanitizeWorkerData(value: unknown, depth = 0): unknown {
   if (value && typeof value === 'object') {
     const result: Record<string, unknown> = {};
     for (const [key, item] of Object.entries(value)) {
+      // A document count is operational metadata, never a document number or
+      // private file. Keep only the validated numerical field.
+      if (key === 'document_count') { if (item === null || typeof item === 'number' && Number.isSafeInteger(item) && item >= 0) result[key] = item; continue; }
       if (PRIVATE_KEYS.test(key) || key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
       if (/^(?:id|.*_id|.*Id|lot_ids)$/.test(key) && (typeof item === 'string' || Array.isArray(item))) {
         const ids = Array.isArray(item) ? item : [item];

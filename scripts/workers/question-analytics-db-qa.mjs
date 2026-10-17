@@ -39,10 +39,10 @@ try{
     INSERT INTO commercial_lots VALUES('${id('5',201)}','${project}','AVAILABLE',now(),'Arquivado','201','Arquivo',999,false,false,false,false),
       ('${id('5',999)}','${id('2',2)}','AVAILABLE',NULL,'Outra organização','999','Outra',999,false,false,false,false);
     CREATE TABLE cronograma_eventos(id uuid PRIMARY KEY,org_id uuid,title text,status text,priority text,category text,location text,
-      start_date date,end_date date,start_time time,end_time time,created_by_user_id uuid,responsible_user_id uuid,
+      start_date date,end_date date,start_time time,end_time time,created_by_user_id uuid,
       has_exact_date boolean DEFAULT true,visible_to uuid);
     CREATE TABLE cronograma_evento_responsaveis(event_id uuid,org_id uuid,org_member_user_id uuid,name_snapshot text,is_primary boolean);
-    CREATE TABLE cronograma_subeventos(id uuid PRIMARY KEY,parent_event_id uuid,status text);
+    CREATE TABLE cronograma_subeventos(id uuid PRIMARY KEY,parent_event_id uuid,status text,org_id uuid DEFAULT '${org}',commission_slug text);
     CREATE TABLE cronograma_subevento_responsaveis(subevent_id uuid,org_id uuid,org_member_user_id uuid,name_snapshot text,is_primary boolean);
     CREATE TABLE cronograma_evento_comissoes(org_id uuid,event_id uuid,commission_id uuid);
     INSERT INTO cronograma_eventos SELECT ('80000000-0000-4000-8000-'||lpad(n::text,12,'0'))::uuid,'${org}',
@@ -51,9 +51,9 @@ try{
       CASE WHEN n=1 THEN date '2026-09-30' ELSE date '2026-10-15' END,
       CASE WHEN n=1 THEN date '2026-10-01' ELSE NULL END,
       CASE WHEN n=2 THEN NULL ELSE time '22:00' END,CASE WHEN n=2 THEN NULL ELSE time '01:00' END,
-      '${user(1)}','${user(1)}',true,CASE WHEN n=124 THEN '${user(1)}'::uuid ELSE NULL END FROM generate_series(1,125)n;
+      '${user(1)}',true,CASE WHEN n=124 THEN '${user(1)}'::uuid ELSE NULL END FROM generate_series(1,125)n;
     INSERT INTO cronograma_eventos VALUES('${id('8',999)}','${otherOrg}','Evento de outra org','planejado','alta','Operação','Sala 1',
-      '2026-10-15',NULL,'10:00','12:00','${user(6)}',NULL,true,NULL);
+      '2026-10-15',NULL,'10:00','12:00','${user(6)}',true,NULL);
     INSERT INTO cronograma_evento_responsaveis SELECT id,'${org}','${user(1)}','Ana',true FROM cronograma_eventos WHERE org_id='${org}';
     INSERT INTO cronograma_evento_responsaveis SELECT id,'${org}','${user(1)}','Ana duplicada',false FROM cronograma_eventos WHERE org_id='${org}';
     INSERT INTO cronograma_subeventos VALUES('${id('d',1)}','${id('8',1)}','planejado');
@@ -72,6 +72,17 @@ try{
   await file('drizzle/migrations/0009_migration.sql');
   await file('supabase/migrations/20261017020000_workers_verified_analytics.sql');
   await file('supabase/migrations/20261017040000_workers_question_analytics.sql');
+  await db.exec(`ALTER TABLE cronograma_eventos ADD COLUMN linked_commissions jsonb DEFAULT '[]'::jsonb,ADD COLUMN commission_slug text;
+    ALTER TABLE cronograma_evento_comissoes ADD COLUMN commission_slug text;
+    CREATE TABLE cronograma_subevento_comissoes(org_id uuid,subevent_id uuid,commission_id uuid,commission_slug text);
+    GRANT SELECT ON cronograma_evento_comissoes,cronograma_subevento_comissoes TO authenticated;`);
+  await as(1);
+  await check('observed schema excludes obsolete responsible column and reproduces previous reader failure',async()=>{
+    assert.deepEqual(await query("SELECT column_name FROM information_schema.columns WHERE table_name='cronograma_eventos' AND column_name='responsible_user_id'"),[]);
+    await assert.rejects(()=>value("SELECT workers_agenda_event_scope($1,'2026-10-01','2026-10-31') value",[org]),error=>error.code==='42703');
+  });
+  await db.exec('RESET ROLE');
+  await file('supabase/migrations/20261017050000_workers_agenda_relationships.sql');
   await as(1);
   const map=()=>value('SELECT workers_map_inventory_summary($1) value',[org]);
   const agenda=()=>value("SELECT workers_agenda_query($1,'2026-10-01','2026-10-31') value",[org]);

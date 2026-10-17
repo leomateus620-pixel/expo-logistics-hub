@@ -5,6 +5,8 @@ import { randomUUID } from 'node:crypto';
 import type { IncomingMessage } from 'node:http';
 import { handleWorkspacePreview } from './preview-workspace';
 import { responseFixture } from './preview-responses';
+import { publicWorkerError } from '../../supabase/functions/_shared/workers/failures';
+import { WorkerError } from '../../supabase/functions/_shared/workers/contracts';
 
 const harness = path.resolve('scripts/workers');
 const messages: Array<Record<string, unknown>> = [];
@@ -30,6 +32,9 @@ export default defineConfig({
       if (url.pathname === '/functions/v1/workers-orchestrator' && request.method === 'POST') {
         try {
           const input = await collect(request);
+          // Explicitly synthetic error scenarios; this entrypoint only binds loopback.
+          const failureCode = input.message === 'Falha de consulta · teste local' ? 'rpc_incompatible'
+            : input.message === 'Falha de conexão · teste local' && !messages.some(row => row.content === input.message) ? 'network_error' : null;
           let worker = /@(agenda|arena|mapa|interesse|comissao|logistica|caixa|radar)\b/.exec(input.message)?.[1] ?? input.worker ?? 'agenda';
           const conversationId = input.conversationId ?? randomUUID();
           const createdAt = new Date().toISOString();
@@ -42,12 +47,14 @@ export default defineConfig({
           const citations = fixture?.citations ?? [{ label: '2 eventos · Agenda de teste', url: '/cronograma-eventos', source: 'app' }, { label: '1 conflito · Restaurante de teste', url: '/eventos-restaurante-arena', source: 'app' }];
           if (!conversations.some(row => row.id === conversationId)) conversations.unshift({ id: conversationId, title: input.message.slice(0, 80), user_id: userId, org_id: input.orgId, worker_id: worker, updated_at: createdAt });
           messages.push({ id: randomUUID(), role: 'user', content: input.message, user_id: userId, org_id: input.orgId, conversation_id: conversationId, state: 'complete', worker_id: worker, citations: [], created_at: createdAt, request_id: input.requestId, message_seq: messages.length + 1 }, { id: randomUUID(), role: 'assistant', content, user_id: userId, org_id: input.orgId, conversation_id: conversationId, state: 'complete', worker_id: worker, citations, created_at: createdAt, request_id: input.requestId, message_seq: messages.length + 2 });
+          if (failureCode) Object.assign(messages[messages.length - 1], { content: '', citations: [], state: 'failed' });
           response.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store' });
           const emit = (event: string, data: unknown) => response.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
           emit('conversation', { conversationId }); emit('worker', { workerId: worker });
           const progressLabel = `Consultando ${worker === 'mapa' ? 'o Mapa Comercial' : worker === 'radar' ? 'a fonte institucional' : 'a Agenda'} · dados de teste…`;
           emit('progress', { label: progressLabel, status: 'running' });
           await new Promise(resolve => setTimeout(resolve, 180));
+          if (failureCode) { emit('error', { ...publicWorkerError(new WorkerError(failureCode)), requestId: input.requestId }); response.end(); return; }
           emit('progress', { label: progressLabel, status: 'complete' });
           emit('citations', { citations });
           for (let start = 0; start < content.length; start += fixture ? content.length : 32) { emit('delta', { text: content.slice(start, start + (fixture ? content.length : 32)) }); await new Promise(resolve => setTimeout(resolve, 12)); }

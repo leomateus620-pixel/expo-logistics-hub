@@ -3,7 +3,7 @@ import { authorizeWorkerPolicy, resolveWorkerAccess } from './access.ts';
 import { workerToolDefinitions } from './catalog.ts';
 import { pickWorkerFields, sanitizeWorkerData } from './privacy.ts';
 import { READ_RPCS, READ_TABLES, readRows, readRpc, requireProject } from './sources.ts';
-import { WorkerToolError, type AccessPolicy, type ToolResult, type WorkerAccessContext, type WorkerId, type WorkerToolDefinition } from './types.ts';
+import { WorkerToolError, workerDataError, type AccessPolicy, type ToolResult, type WorkerAccessContext, type WorkerId, type WorkerToolDefinition } from './types.ts';
 import { parseWorkerAnalytics } from './analytics.ts';
 import { parseQuestionAnalytics } from './question-analytics.ts';
 
@@ -51,7 +51,8 @@ function output(definition: WorkerToolDefinition, records: Record<string, unknow
 async function requireCommission(ctx: WorkerAccessContext, id: string, ownOnly = false): Promise<void> {
   const { data, error } = await ctx.supabase.from('commissions').select('id,org_id')
     .eq('org_id', ctx.orgId).eq('id', id).eq('is_active', true).maybeSingle();
-  if (error || !data || data.org_id !== ctx.orgId) throw new WorkerToolError('NOT_FOUND', 'Comissão não encontrada ou sem acesso.');
+  if (error) throw workerDataError(error,'authorization');
+  if (!data || data.org_id !== ctx.orgId) throw new WorkerToolError('NOT_FOUND', 'Comissão não encontrada ou sem acesso.');
   if (ownOnly && ctx.role !== 'admin' && !(await ownCommissionIds(ctx)).includes(id)) throw new WorkerToolError('PERMISSION_DENIED', 'Comissão fora do seu vínculo.');
 }
 async function ownCommissionIds(ctx: WorkerAccessContext): Promise<string[]> {
@@ -59,7 +60,7 @@ async function ownCommissionIds(ctx: WorkerAccessContext): Promise<string[]> {
     ctx.supabase.from('org_members').select('commission_id').eq('org_id', ctx.orgId).eq('user_id', ctx.userId).eq('is_active', true).maybeSingle(),
     ctx.supabase.from('commission_responsibles').select('commission_id').eq('org_id', ctx.orgId).eq('user_id', ctx.userId).eq('active', true).limit(100),
   ]);
-  if (memberResult.error || responsibleResult.error) throw new WorkerToolError('PERMISSION_DENIED', 'Não foi possível validar o vínculo da comissão.');
+  if (memberResult.error || responsibleResult.error) throw workerDataError((memberResult.error??responsibleResult.error)!,'authorization');
   return [...new Set([memberResult.data?.commission_id, ...(responsibleResult.data ?? []).map((row) => row.commission_id)].filter((id): id is string => typeof id === 'string'))];
 }
 async function requireEvent(ctx: WorkerAccessContext, id: string): Promise<Record<string, unknown>> {
@@ -78,6 +79,43 @@ async function dispatch(def: WorkerToolDefinition, input: Record<string, unknown
   const size = Number(input.limit ?? 20);
   const text = (key: string) => String(input[key]);
   switch (def.name) {
+    case 'agenda_resolve_identity': {
+      const response = await readRpc(ctx,'workers_agenda_resolve_identity',{_org_id:ctx.orgId,_kind:input.kind,_search:input.search});
+      return output(def,[parseWorkerAnalytics(def.name,response)],{summary:'Identidades persistidas visíveis para esta consulta.'});
+    }
+    case 'agenda_person_events':
+    case 'agenda_commission_ranking': {
+      const response = await readRpc(ctx,def.name==='agenda_person_events'?'workers_agenda_person_events':'workers_agenda_commission_ranking',{
+        _org_id:ctx.orgId,_from_date:input.date_from,_to_date:input.date_to,
+        ...(def.name==='agenda_person_events'?{_person_id:input.person_id}:{_limit:input.limit??10}),
+      });
+      return output(def,[parseWorkerAnalytics(def.name,response)],{summary:'Eventos distintos agregados no servidor sobre todos os vínculos autorizados do período.'});
+    }
+    case 'map_sales_records_summary': {
+      if(Boolean(input.date_from)!==Boolean(input.date_to))throw new WorkerToolError('INVALID_INPUT','Informe o início e o fim do período.');
+      if(input.edition_year)return output(def,[{needs_clarification:true,question:'A API da Dashboard conta os registros do projeto inteiro e não filtra pela edição. Deseja consultar o projeto inteiro?',options:['Consultar o projeto inteiro']}]);
+      let projectId = input.project_id as string | undefined;
+      let projectName: string | undefined;
+      if(!projectId){
+        const projects=await readRows(ctx,'map_projects',{limit:100,filters:[['is_archived','eq',false]]});
+        if(projects.truncated||projects.records.length!==1)return output(def,[{needs_clarification:true,
+          question:projects.records.length?'Qual projeto comercial deseja consultar?':'Não encontrei um projeto comercial autorizado. Qual projeto deseja consultar?',
+          options:projects.records.map(project=>String(project.name)).slice(0,8)}]);
+        projectId=String(projects.records[0].id);projectName=String(projects.records[0].name);
+      }
+      await requireProject(ctx,projectId);
+      // These are the same API filters used by useCommercialSalesSummary.
+      // Never reconstruct SIGNED/PENDING from items or document presence.
+      const pages=await Promise.all([null,'PENDING','SIGNED'].map(status=>readRpc(ctx,'list_commercial_sale_orders',{
+        p_project_id:projectId,p_search:null,p_status:status,p_has_document:null,p_payment_method:null,
+        p_from:input.date_from??null,p_to:input.date_to??null,p_limit:1,p_offset:0,
+      })));
+      const totals=pages.map(page=>{const value=object(page).total;const number=typeof value==='number'?value:typeof value==='string'&&value.trim()?Number(value):NaN;
+        if(!Number.isSafeInteger(number)||number<0)throw new WorkerToolError('INVALID_RESPONSE','A API comercial não retornou um total verificável.',{stage:'validation'});return number;});
+      return output(def,[{scope:{project_id:projectId,...(projectName?{project_name:projectName}:{}),complete:true,as_of:new Date().toISOString(),timezone:'America/Sao_Paulo',
+        ...(input.date_from?{period:{from:input.date_from,to:input.date_to}}:{})},metrics:{total_records:totals[0],pending_records:totals[1],signed_records:totals[2]},notes:[]}],
+        {summary:'Totais oficiais da Dashboard por classificação de assinatura do agrupamento comercial.'});
+    }
     case 'agenda_query':
     case 'map_inventory_summary': {
       const args:Record<string,unknown>={_org_id:ctx.orgId};
@@ -177,7 +215,8 @@ async function dispatch(def: WorkerToolDefinition, input: Record<string, unknown
       await requireProject(ctx,text('project_id'));
       if (input.has_document !== undefined && !(await authorizeWorkerPolicy('map_contracts',ctx))) throw new WorkerToolError('PERMISSION_DENIED','Consulta de contratos requer permissão de contratos.');
       const response = object(await readRpc(ctx,'list_commercial_sale_orders',{p_project_id:input.project_id,p_limit:size,...(input.status ? {p_status:input.status}:{}),...(input.has_document !== undefined ? {p_has_document:input.has_document}:{})}));
-      const result = rows(response.rows).map((row) => pickWorkerFields(row,['record_id','kind','order_id','sale_id','reference','created_at','status','item_count','active_count','signed_count','pending_count','cancelled_count','legacy_count','lot_ids']));
+      const canReadDocuments=response.documentsAccessible===true&&await authorizeWorkerPolicy('map_contracts',ctx);
+      const result = rows(response.rows).map((row) => pickWorkerFields(row,['record_id','kind','order_id','sale_id','reference','created_at','status','item_count','active_count','signed_count','pending_count','cancelled_count','legacy_count','lot_ids',...(canReadDocuments?['document_count']:[])]));
       return output(def,result,{total:Number(response.total ?? result.length),truncated:Number(response.total ?? 0)>size});
     }
     case 'sale_order_detail':
@@ -190,7 +229,8 @@ async function dispatch(def: WorkerToolDefinition, input: Record<string, unknown
       if (def.name === 'sale_order_contract_summary') {
         if (response.documentsAccessible !== true) throw new WorkerToolError('PERMISSION_DENIED','Contratos sem permissão de leitura.');
         const contracts = rows(response.contracts);
-        return output(def,contracts.slice(0,100).map((row) => pickWorkerFields(row,['contractId','scope','lotIds'])),{total:contracts.length,truncated:contracts.length>100});
+        return output(def,contracts.slice(0,100).map((row) => ({...pickWorkerFields(row,['contractId','scope','lotIds','activeVersion']),
+          ...(Array.isArray(row.versions)?{version_count:row.versions.length}:{})})),{total:contracts.length,truncated:contracts.length>100});
       }
       const result = rows(response.items).slice(0,100).map((item) => pickWorkerFields(item,['itemId','lotId','entityId','publicIdentifier','lotNumber','displayName','areaSnapshot','contractState','lotStatus']));
       return output(def,result,{truncated:rows(response.items).length>100});

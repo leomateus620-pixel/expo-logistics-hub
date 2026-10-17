@@ -74,15 +74,15 @@ const unavailable = 'Não obtive dados verificáveis para esse pedido. Informe o
 
 export function composeWorkerResponse(request: WorkerRequest, intent: WorkerIntent, evidence: ToolEvidence[], now: Date): { content: string; citations: WorkerCitation[] } {
   if(intent.kind==='domain_query'){
-    const specialized=[...evidence].reverse().find(item=>['map_sales_overview','map_inventory_summary','agenda_query','agenda_personal_summary','agenda_people_ranking'].includes(item.tool));
-    const kind= specialized ? ({map_sales_overview:'map_sales',map_inventory_summary:'map_inventory',agenda_query:'agenda_query',agenda_personal_summary:'agenda_personal',agenda_people_ranking:'agenda_ranking'} as const)[specialized.tool] : undefined;
+    const specialized=[...evidence].reverse().find(item=>['map_inventory_summary','agenda_query','agenda_personal_summary','agenda_people_ranking'].includes(item.tool));
+    const kind= specialized ? ({map_inventory_summary:'map_inventory',agenda_query:'agenda_query',agenda_personal_summary:'agenda_personal',agenda_people_ranking:'agenda_ranking'} as const)[specialized.tool] : undefined;
     if(kind)return composeWorkerResponse(request,{...intent,kind,worker:kind.startsWith('map_')?'mapa':'agenda'},evidence,now);
   }
   const sources = evidence.flatMap(item => validateToolEvidence(item.result));
   const citations = [...new Map(sources.map(source => [source.url, source])).values()].slice(0, 8);
   const response: WorkerResponse = { version: 1, worker: intent.worker, intent: intent.kind, summary: unavailable,
     metadata: { organizationId: request.orgId, timezone: 'America/Sao_Paulo', scope: 'Dados autorizados para seu usuário', updatedAt: now.toISOString(), completeness: 'unavailable', notes: [], ...(intent.kind === 'agenda_personal' ? { filters: { relationship: intent.relationship } } : {}), ...(intent.period ? { period: intent.period } : {}), ...(intent.editionYear ? { edition: `Fenasoja ${intent.editionYear}` } : {}) }, blocks: [] };
-  const expected = { map_sales: 'map_sales_overview', map_inventory: 'map_inventory_summary', agenda_query: 'agenda_query', agenda_personal: 'agenda_personal_summary', agenda_ranking: 'agenda_people_ranking', institutional_president: 'workers_institutional_president', domain_query: '' }[intent.kind];
+  const expected = { map_sales: 'map_sales_overview', map_contracts:'map_sales_records_summary', map_documents:'sale_order_contract_summary', map_receipts:'', map_inventory: 'map_inventory_summary', agenda_query: 'agenda_query', agenda_personal: 'agenda_personal_summary', agenda_ranking: 'agenda_people_ranking', agenda_commission_ranking:'agenda_commission_ranking', agenda_person:'agenda_person_events', agenda_commission:'agenda_query', institutional_president: 'workers_institutional_president', domain_query: '' }[intent.kind];
   const candidates = evidence.filter(item => item.tool === expected);
   const main = [...candidates].reverse().find(item => {
     if(!intent.previousPeriod)return true;
@@ -104,12 +104,24 @@ export function composeWorkerResponse(request: WorkerRequest, intent: WorkerInte
     response.blocks.push({ type: 'empty', message: 'Abra o Financeiro para conferir o intervalo. Os totais da edição não foram apresentados como valores do período.' });
   } else if (record?.needs_clarification === true || record?.needsClarification === true) {
     response.summary = clean(record.question) || 'Qual edição ou projeto você deseja consultar?';
-    response.blocks.push({ type: 'clarification', question: response.summary, options: Array.isArray(record.options) ? record.options.map(clean).filter(Boolean).slice(0, 8) : [] });
+    response.blocks.push({ type: 'clarification', question: response.summary, options: Array.isArray(record.options) ? record.options.map(clean).filter(Boolean).slice(0, 8) : [],
+      ...(Array.isArray(record.choices)?{choices:record.choices.filter(isObject).slice(0,8).map(choice=>({id:String(choice.id),name:clean(choice.name)}))}:{}) });
   } else if (record && intent.kind === 'institutional_president' && record.evidence_kind === 'official_content') {
     response.metadata.completeness = 'complete'; response.metadata.edition = clean(record.edition);
     response.summary = `${clean(record.name)} é o presidente da ${clean(record.edition)}, conforme a publicação oficial consultada.`;
     response.blocks.push({ type: 'profile', name: clean(record.name), role: clean(record.role), edition: clean(record.edition), verifiedOn: clean(record.verified_on), publishedOn: clean(record.published_on), details: [] });
     response.metadata.notes.push('Informação vinculada à edição e à publicação indicada. A fonte não comprova nascimento, ocupação profissional ou duração do mandato.');
+  } else if(intent.kind==='map_documents'&&main&&main.result.truncated!==true&&main.result.total!==undefined){
+    const documents=main.result.records.filter(isObject);
+    const versions=intent.commercialMetric==='document_versions';
+    const count=versions?documents.reduce((sum,row)=>sum+integer(row.version_count),0):integer(main.result.total);
+    response.metadata.completeness='complete';
+    response.summary=`${count.toLocaleString('pt-BR')} ${versions?count===1?'versão de documento':'versões de documentos':count===1?'documento anexado':'documentos anexados'} ${versions?'no':'ao'} pedido consultado.`;
+    response.blocks.push({type:'indicators',items:[{label:versions?'Versões de documentos':'Documentos anexados',value:count,unit:'count'}]});
+    if(documents.length)response.blocks.push({type:'table',columns:['Documento','Lotes abrangidos','Versão ativa','Versões'],rows:documents.slice(0,20).map((row,index)=>[
+      `Documento ${index+1}`,Array.isArray(row.lotIds)?new Set(row.lotIds).size.toLocaleString('pt-BR'):'Não informado',humanValue(row.activeVersion),humanValue(row.version_count),
+    ])});
+    response.metadata.notes.push('Documentos anexados e suas versões não comprovam assinatura do agrupamento nem pagamento recebido. A abrangência permanece vinculada aos lotes explícitos do documento.');
   } else if (record && intent.kind !== 'domain_query') {
     const scope = isObject(record.scope) ? record.scope : {};
     const metrics = isObject(record.metrics) ? record.metrics : record;
@@ -121,7 +133,7 @@ export function composeWorkerResponse(request: WorkerRequest, intent: WorkerInte
     if (typeof scope.edition_label === 'string') response.metadata.edition = clean(scope.edition_label);
     if (typeof scope.project_id === 'string') response.metadata.projectId = scope.project_id;
     if (typeof scope.as_of === 'string') response.metadata.updatedAt = scope.as_of;
-    if (intent.kind === 'map_inventory' || intent.kind === 'agenda_query') {
+    if (intent.kind === 'map_inventory' || intent.kind === 'agenda_query' || intent.kind==='agenda_commission') {
       const total=integer(metrics.total), filters=isObject(scope.filters)?scope.filters:{};
       const parsedFilters=workerQueryFiltersSchema.safeParse({...filters,group_by:scope.group_by});
       if(!parsedFilters.success)throw new WorkerError('invalid_tool_result',502);
@@ -136,6 +148,10 @@ export function composeWorkerResponse(request: WorkerRequest, intent: WorkerInte
       const singular=isMap?'espaço comercial':'evento';
       const context=[isMap?clean(scope.project_name):intent.period?.label,filters.status?humanValue(filters.status):'',filters.location?clean(filters.location):'',filters.block?`quadra ${clean(filters.block)}`:''].filter(Boolean).join(' · ');
       response.summary=`${total.toLocaleString('pt-BR')} ${total===1?singular:unitName} no recorte consultado${context?` — ${context}`:''}.`;
+      if(intent.kind==='agenda_commission'){
+        response.summary=`${intent.entityName??'A comissão consultada'} tem ${total.toLocaleString('pt-BR')} ${total===1?'evento vinculado':'eventos vinculados'} em ${intent.period?.label??'seu período de consulta'}.`;
+        response.metadata.filters={...response.metadata.filters,commissionId:intent.entityId};
+      }
       if(!total){response.blocks.push({type:'empty',message:'Nenhum registro atende aos filtros informados no seu acesso atual. Tente outro período ou ajuste o recorte.'});}
       else if(intent.presentation==='comparison'){
         const previous=candidates.find(item=>{
@@ -179,6 +195,17 @@ export function composeWorkerResponse(request: WorkerRequest, intent: WorkerInte
         const valid=integer(metrics.valid_duration_events);
         if(valid<total&&/duracao|media|horas/.test(question))response.metadata.notes.push(`Duração disponível em ${valid} de ${total} eventos; os demais não têm horários válidos.`);
       }
+    } else if(intent.kind==='map_contracts'){
+      const total=integer(metrics.total_records),pending=integer(metrics.pending_records),signed=integer(metrics.signed_records);
+      const metric=intent.commercialMetric??'signed_records';
+      const value=metric==='pending_records'?pending:metric==='total_records'?total:signed;
+      const label=metric==='pending_records'?'Contratos aguardando assinatura':metric==='total_records'?'Registros comerciais':'Contratos com assinatura confirmada';
+      response.summary=`${value.toLocaleString('pt-BR')} ${label.toLocaleLowerCase('pt-BR')}${intent.period?` em ${intent.period.label}`:''}.`;
+      response.blocks.push({type:'indicators',items:[{label,value,unit:'count'}]});
+      response.blocks.push({type:'table',title:'Contexto da Dashboard',columns:['Classificação','Registros'],rows:[['Assinatura confirmada',signed.toLocaleString('pt-BR')],['Aguardando assinatura',pending.toLocaleString('pt-BR')],['Total de registros',total.toLocaleString('pt-BR')]]});
+      response.metadata.notes.push('Cada contrato nesta resposta é um agrupamento comercial. Os totais usam as mesmas classificações da Dashboard: pendentes incluem agrupamentos parciais. Outros estados podem impedir que os subtotais somem o total.');
+      response.metadata.notes.push('Lotes abrangidos, documentos anexados e versões são unidades distintas. Assinatura confirmada não significa pagamento recebido.');
+      if(intent.period)response.metadata.notes.push('O período usa a data de criação do registro comercial, exatamente como o filtro da Dashboard; não representa a data da assinatura.');
     } else if (intent.kind === 'map_sales') {
       response.summary = `Na ${response.metadata.edition ?? 'edição consultada'}${intent.period ? `, em ${intent.period.label}` : ''}, o mapa comercial apresenta:`;
       const missingValues = metrics.missing_value_lots === undefined ? 0 : integer(metrics.missing_value_lots);
@@ -240,24 +267,50 @@ export function composeWorkerResponse(request: WorkerRequest, intent: WorkerInte
       const most = Math.max(0, ...weekdays.map(day => day.events));
       const labels = ['domingos', 'segundas-feiras', 'terças-feiras', 'quartas-feiras', 'quintas-feiras', 'sextas-feiras', 'sábados'];
       if (most) response.metadata.notes.push(`Maior concentração por início do evento: ${weekdays.filter(day => day.events === most).map(day => labels[day.weekday]).join(' e ')}.`);
-    } else if (intent.kind === 'agenda_ranking') {
-      const people = Array.isArray(record.people) ? record.people : Array.isArray(metrics.people) ? metrics.people : [];
-      const data = people.filter(isObject).slice(0, 20).map(person => ({ label: clean(person.name), value: integer(person.events) }));
-      const population = integer(record.people_count ?? metrics.people_count);
-      response.summary = `Pessoas com mais eventos em ${intent.period?.label ?? 'seu período de consulta'}.`;
+    } else if(intent.kind==='agenda_person'){
+      const person=isObject(record.person)?record.person:{};
+      if(typeof person.id!=='string'||person.id!==intent.entityId&&intent.entityId)throw new WorkerError('scope_mismatch',502);
+      const count=integer(metrics.events),name=clean(person.name);
+      response.metadata.filters={personId:String(person.id),relationship:'linked'};
+      response.summary=`${name} tem ${count.toLocaleString('pt-BR')} ${count===1?'evento vinculado':'eventos vinculados'} em ${intent.period?.label??'seu período de consulta'}.`;
+      response.blocks.push({type:'entity_ranking',title:'Eventos vinculados',entityKind:'person',population:1,items:[{id:String(person.id),name,events:count,position:1}]});
+      response.metadata.notes.push('Eventos principais distintos vinculados à identidade consultada. Vínculo não comprova presença; múltiplos vínculos e subeventos não duplicam a contagem.');
+    } else if (intent.kind === 'agenda_ranking'||intent.kind==='agenda_commission_ranking') {
+      const commission=intent.kind==='agenda_commission_ranking';
+      const entities = commission ? Array.isArray(record.commissions)?record.commissions:[] : Array.isArray(record.people) ? record.people : Array.isArray(metrics.people) ? metrics.people : [];
+      const population = integer(commission?metrics.commission_count:record.people_count ?? metrics.people_count);
+      const items=entities.filter(isObject).slice(0,30).map(entity=>({id:String(entity[commission?'commission_id':'person_id']),name:clean(entity.name),events:integer(entity.events),position:integer(entity.position),
+        ...(commission&&typeof entity.slug==='string'&&/^[a-z][a-z0-9-]{0,100}$/.test(entity.slug)?{visualKey:entity.slug}:{})}));
+      const displayItems=items.map(entity=>{
+        const sameName=items.filter(other=>other.name===entity.name).sort((a,b)=>a.id.localeCompare(b.id));
+        return {...entity,...(sameName.length>1?{label:`${entity.name.slice(0,155)} · identidade ${sameName.findIndex(other=>other.id===entity.id)+1}`}:{})};
+      });
+      const data=displayItems.slice(0,20).map(entity=>({label:entity.label??entity.name,value:entity.events}));
+      const leaders=displayItems.filter(entity=>entity.events===displayItems[0]?.events);
+      response.summary = leaders.length===1 ? `${leaders[0].name} foi ${commission?'a comissão':'a pessoa'} com mais eventos vinculados em ${intent.period?.label??'seu período de consulta'}: ${leaders[0].events.toLocaleString('pt-BR')}.`
+        : leaders.length>1?`Empate na liderança em ${intent.period?.label??'seu período de consulta'}: ${leaders.map(entity=>entity.label??entity.name).join(', ')}, com ${leaders[0].events.toLocaleString('pt-BR')} eventos vinculados cada.`
+          : `Nenhum vínculo de ${commission?'comissão':'pessoa'} encontrado no período autorizado.`;
       if(/quantas pessoas|quantidade de pessoas/i.test(request.message)){
         response.summary=`${population.toLocaleString('pt-BR')} pessoas estão vinculadas aos eventos do período autorizado.`;
         response.blocks.push({type:'indicators',items:[{label:'Pessoas distintas',value:population,unit:'count'}]});
-      }else if(intent.presentation==='table'){
-        response.blocks.push({type:'table',columns:['Pessoa','Eventos distintos'],rows:data.map(item=>[item.label,item.value.toLocaleString('pt-BR')])});
       }else if (data.length) {
-        response.blocks.push({ type: intent.presentation==='pie_chart'&&population===data.length?'pie_chart':'bar_chart', title: `Eventos por pessoa · ${intent.period?.label ?? 'período consultado'}`, unit: 'count', data, population, complete: true });
-      } else response.blocks.push({ type: 'empty', message: 'Nenhuma pessoa vinculada a eventos no período autorizado.' });
-      response.metadata.notes.push(`Ranking calculado sobre todo o conjunto autorizado, com ${population.toLocaleString('pt-BR')} pessoas. Empates seguem o nome e a identidade persistida. Vínculo não comprova presença.`);
+        response.blocks.push({type:'entity_ranking',title:commission?'Eventos por comissão':'Eventos por pessoa',entityKind:commission?'commission':'person',population,items:displayItems});
+        if(intent.presentation==='table')response.blocks.push({type:'table',columns:[commission?'Comissão':'Pessoa','Eventos distintos'],rows:data.map(item=>[item.label,item.value.toLocaleString('pt-BR')])});
+        else if(intent.presentation==='bar_chart'||intent.presentation==='pie_chart')response.blocks.push({ type:'bar_chart', title: `Eventos por ${commission?'comissão':'pessoa'} · ${intent.period?.label ?? 'período consultado'}`, unit: 'count', data, population, complete: true });
+      } else response.blocks.push({ type: 'empty', message: `Nenhuma ${commission?'comissão':'pessoa'} vinculada a eventos no período autorizado.` });
+      response.metadata.notes.push(`Ranking calculado sobre todo o conjunto autorizado, com ${population.toLocaleString('pt-BR')} ${commission?'comissões':'pessoas'}. Empates compartilham a quantidade; a ordem visual usa nome e identidade persistida. Vínculo não comprova presença.`);
+      if(population>displayItems.length)response.metadata.notes.push(`A lista mostra as primeiras ${displayItems.length} identidades. Podem existir outros empates fora do limite visual.`);
+      if(commission)response.metadata.notes.push('Um evento pode pertencer a mais de uma comissão. As quantidades por comissão não compõem uma partição do total de eventos.');
     }
   } else if (intent.kind === 'institutional_president') {
     response.summary = 'Não encontrei evidência institucional suficiente para confirmar a presidência da edição solicitada.';
     response.blocks.push({ type: 'empty', message: 'Consulte a publicação oficial da edição ou informe a edição que deseja verificar.' });
+  } else if(intent.kind==='map_documents'){
+    response.summary='De qual registro comercial deseja consultar os documentos anexados?';
+    response.blocks.push({type:'clarification',question:'Informe o pedido para consultar documentos e lotes abrangidos com a permissão de contratos.'});
+  } else if(intent.kind==='map_receipts'){
+    response.summary='Recebimentos precisam ser consultados no Financeiro para preservar a classificação de pagamento recebido.';
+    response.blocks.push({type:'empty',message:'A confirmação de assinatura e o valor de venda não comprovam recebimento. Abra o Financeiro para conferir os pagamentos registrados.'});
   } else if (intent.kind !== 'domain_query') {
     response.summary = 'Não foi possível calcular esse indicador sobre todo o conjunto autorizado.';
     response.blocks.push({ type: 'empty', message: 'Abra o módulo para conferir os dados ou informe o período e a edição. Uma listagem parcial não foi usada como total.' });

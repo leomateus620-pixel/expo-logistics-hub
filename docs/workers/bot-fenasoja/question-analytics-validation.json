@@ -3,6 +3,10 @@
   "passed": true,
   "checks": [
     {
+      "name": "observed schema excludes obsolete responsible column and reproduces previous reader failure",
+      "passed": true
+    },
+    {
       "name": "map totals and status groups cover all 200 active rows; list20 is only an illustration",
       "passed": true
     },
@@ -74,11 +78,15 @@
     },
     {
       "name": "supabase/migrations/20261017020000_workers_verified_analytics.sql",
-      "sha256": "f99c8dfb4c5fc4b125c443756f150189070e4bbd33b2acbecbecfa5ef23c9d57"
+      "sha256": "0a971ce64e561b545684a878cdcdf6ee907e49c83f116446fc7d1d4df14bc947"
     },
     {
       "name": "supabase/migrations/20261017040000_workers_question_analytics.sql",
-      "sha256": "a319035a53501a5a9f8f1a1e71197f690176d358700ed6fd15de77369fb0d9f1"
+      "sha256": "db2f7c70a6e6ac3f973f4ba9504058fc025c9fffa13c47fd056bda8da7e51539"
+    },
+    {
+      "name": "supabase/migrations/20261017050000_workers_agenda_relationships.sql",
+      "sha256": "037c9c6f5e970fd0c326dffa89dd418fd04285d826844cf38d42b3e7544f1364"
     }
   ],
   "examples": {
@@ -306,7 +314,7 @@
         }
       ],
       "scope": {
-        "as_of": "2026-10-17T00:07:53.407-03:00",
+        "as_of": "2026-10-17T01:52:19.094-03:00",
         "filters": {},
         "complete": true,
         "group_by": "status",
@@ -556,7 +564,7 @@
         }
       ],
       "scope": {
-        "as_of": "2026-10-17T00:07:53.551-03:00",
+        "as_of": "2026-10-17T01:52:19.177-03:00",
         "period": {
           "to": "2026-10-31",
           "from": "2026-10-01"

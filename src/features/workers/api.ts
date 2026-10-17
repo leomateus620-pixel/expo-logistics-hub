@@ -1,5 +1,26 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { WorkerAttachment } from './types';
+import { WorkerError } from '../../../supabase/functions/_shared/workers/contracts';
+import { publicWorkerError } from '../../../supabase/functions/_shared/workers/failures';
+
+/** Public, allowlisted text only. Upstream SQL, tokens and stacks never enter the chat. */
+export class WorkerTurnError extends Error {
+  readonly code: string;
+  readonly retryable: boolean;
+  constructor(code: string, publicMessage?: string, public readonly requestId?: string, retryable?: boolean) {
+    const safe = publicWorkerError(new WorkerError(code));
+    super(publicMessage ?? safe.message);
+    this.name = 'WorkerTurnError'; this.code = safe.code; this.retryable = safe.retryable && retryable !== false;
+  }
+}
+
+export function workerTurnError(cause: unknown, requestId?: string): WorkerTurnError {
+  if (cause instanceof WorkerTurnError) return cause;
+  if (cause instanceof DOMException && cause.name === 'AbortError') return new WorkerTurnError('request_cancelled', undefined, requestId);
+  if (cause instanceof Error && /timeout|tempo excedido/i.test(cause.message)) return new WorkerTurnError('timeout', undefined, requestId);
+  if (cause instanceof TypeError || cause instanceof Error && /network|fetch|conex[aã]o|interrompida/i.test(cause.message)) return new WorkerTurnError('network_error', undefined, requestId);
+  return new WorkerTurnError('query_failed', undefined, requestId, false);
+}
 
 export interface WorkerRequestContext {
   route: string;
@@ -25,7 +46,7 @@ export type WorkersStreamEvent =
   | { event: 'citations'; data: { citations: Array<{ label: string; url: string; source: 'app' | 'web'; date?: string }> } }
   | { event: 'usage'; data: { inputTokens: number; outputTokens: number } }
   | { event: 'done'; data: Record<string, unknown> }
-  | { event: 'error'; data: { code: string; message: string } };
+  | { event: 'error'; data: { code: string; message: string; retryable?: boolean; requestId?: string } };
 
 const EVENT_NAMES = new Set(['worker', 'conversation', 'workspace', 'progress', 'delta', 'citations', 'usage', 'done', 'error']);
 
@@ -53,13 +74,17 @@ export async function consumeWorkersStream(
     if (!parts.length || !EVENT_NAMES.has(event)) return;
     let data: unknown;
     try { data = JSON.parse(parts.join('\n')); }
-    catch { throw new Error('A resposta do BOT FENASOJA chegou incompleta. Tente novamente.'); }
+    catch { throw new WorkerTurnError('invalid_response', 'A resposta do BOT FENASOJA chegou incompleta. Consulte o módulo.'); }
     if (!data || typeof data !== 'object' || Array.isArray(data)) {
-      throw new Error('Não foi possível interpretar a resposta do BOT FENASOJA.');
+      throw new WorkerTurnError('invalid_response');
     }
     if (event === 'done') completed = true;
     onEvent({ event, data } as WorkersStreamEvent);
-    if (event === 'error') throw new Error('A consulta não pôde ser concluída. Tente novamente.');
+    if (event === 'error') {
+      const failure = data as Record<string, unknown>;
+      throw new WorkerTurnError(typeof failure.code === 'string' ? failure.code : 'query_failed', undefined,
+        typeof failure.requestId === 'string' ? failure.requestId : undefined, failure.retryable === true);
+    }
   };
 
   try {
@@ -79,7 +104,7 @@ export async function consumeWorkersStream(
       if (done) break;
     }
     if (buffer.trim()) emit(buffer);
-    if (!completed) throw new Error('A conexão foi interrompida. A conversa foi preservada; tente novamente.');
+    if (!completed) throw new WorkerTurnError('network_error', 'A conexão foi interrompida. A conversa foi preservada; tente novamente.');
   } finally {
     signal?.removeEventListener('abort', abort);
     await reader.cancel().catch(() => undefined);
@@ -95,11 +120,12 @@ export async function streamWorkersTurn(
   if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
   const { data, error } = await supabase.auth.getSession();
   if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-  if (error || !data.session) throw new Error('Entre novamente para conversar com a equipe.');
+  if (error || !data.session) throw new WorkerTurnError('forbidden', 'Entre novamente para conversar com a equipe.', request.requestId, false);
   const baseUrl = import.meta.env.VITE_SUPABASE_URL;
   const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  if (!baseUrl || !publishableKey) throw new Error('A conexão da equipe ainda não foi configurada.');
-  const response = await fetch(`${baseUrl}/functions/v1/workers-orchestrator`, {
+  if (!baseUrl || !publishableKey) throw new WorkerTurnError('query_failed', 'A conexão da equipe ainda não foi configurada.', request.requestId, false);
+  let response: Response;
+  try { response = await fetch(`${baseUrl}/functions/v1/workers-orchestrator`, {
     method: 'POST',
     signal,
     headers: {
@@ -109,22 +135,34 @@ export async function streamWorkersTurn(
       Accept: 'text/event-stream',
     },
     body: JSON.stringify(request),
-  });
+  }); } catch (cause) { throw workerTurnError(cause, request.requestId); }
   if (signal.aborted) {
     await response.body?.cancel().catch(() => undefined);
     throw new DOMException('Aborted', 'AbortError');
   }
   if (!response.ok) {
-    await response.body?.cancel().catch(() => undefined);
-    if (response.status === 401) throw new Error('Sua sessão expirou. Entre novamente para continuar.');
-    if (response.status === 403) throw new Error('Você não tem permissão para essa consulta.');
-    if (response.status === 429) throw new Error('Muitas consultas em pouco tempo. Aguarde um momento.');
-    if (response.status === 409) throw new Error('Esta mensagem já está sendo processada. Aguarde a resposta.');
-    throw new Error('O BOT FENASOJA está indisponível no momento. Tente novamente em instantes.');
+    if (response.headers.get('Content-Type')?.includes('application/json')) {
+      // A failure before SSE starts carries the same safe code contract.
+      let payload: unknown;
+      try { payload = await response.json(); } catch { /* Fall back to HTTP status. */ }
+      if (payload && typeof payload === 'object' && 'error' in payload) {
+        const failure = (payload as { error: unknown }).error;
+        if (failure && typeof failure === 'object' && 'code' in failure && typeof failure.code === 'string') {
+          throw new WorkerTurnError(failure.code, undefined, request.requestId,
+            'retryable' in failure && failure.retryable === true);
+        }
+      }
+    } else await response.body?.cancel().catch(() => undefined);
+    if (response.status === 401) throw new WorkerTurnError('forbidden', 'Sua sessão expirou. Entre novamente para continuar.', request.requestId, false);
+    if (response.status === 403) throw new WorkerTurnError('forbidden', 'Você não tem permissão para essa consulta.', request.requestId, false);
+    if (response.status === 429) throw new WorkerTurnError('rate_limited', 'Muitas consultas em pouco tempo. Aguarde um momento.', request.requestId);
+    if (response.status === 409) throw new WorkerTurnError('request_in_progress', 'Esta mensagem já está sendo processada. Aguarde a resposta.', request.requestId, false);
+    if ([408, 504].includes(response.status)) throw new WorkerTurnError('timeout', undefined, request.requestId);
+    throw new WorkerTurnError('query_failed', undefined, request.requestId);
   }
   if (!response.body || !response.headers.get('Content-Type')?.includes('text/event-stream')) {
     await response.body?.cancel().catch(() => undefined);
-    throw new Error('O BOT FENASOJA não conseguiu concluir a conversa. Tente novamente.');
+    throw new WorkerTurnError('invalid_response', undefined, request.requestId);
   }
   await consumeWorkersStream(response.body, onEvent, signal);
 }

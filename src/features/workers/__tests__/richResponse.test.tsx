@@ -21,7 +21,7 @@ describe('BOT FENASOJA: resposta estruturada', () => {
     render(<WorkerRichContent content={content} />);
     expect(screen.getByRole('table', { name: 'Valores do gráfico' })).toHaveTextContent('Ana Maria de Souza Santos115');
     expect(screen.getByRole('table', { name: 'Valores do gráfico' })).toHaveTextContent('Ana Maria de Souza120');
-    expect(screen.getByText(/Exibindo 2 de 125 pessoas/)).toBeInTheDocument();
+    expect(screen.getByText(/Exibindo 2 de 125 identidades/)).toBeInTheDocument();
     expect(richContentToText(content)).toContain('Ana Maria de Souza Santos: 115');
   });
   it('mantém os valores em destaque e as explicações disponíveis em uma seção recolhida', () => {

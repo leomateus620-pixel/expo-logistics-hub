@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { maskSensitiveText } from '@/lib/workers/privacy';
-import { safeWorkerSourceUrl, streamWorkersTurn, type WorkerRequestContext, type WorkersStreamEvent } from './api';
+import { safeWorkerSourceUrl, streamWorkersTurn, workerTurnError, WorkerTurnError, type WorkerRequestContext, type WorkersStreamEvent } from './api';
 import { workersDatabase } from './database';
 import type { WorkerAttachment, WorkerChatMessage, WorkerConversation, WorkerId, WorkerProgressStep } from './types';
 import { chronological } from './message-order';
@@ -65,6 +65,8 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
   const workspaceRefreshPending = useRef(false);
   const currentConversation = useRef<string | null>(null);
   const previousWorker = useRef(options.workerId);
+  const activeRequest = useRef<string | null>(null);
+  const retryInputs = useRef(new Map<string, { text: string; attachments: WorkerAttachment[] }>());
 
   const stop = useCallback(() => {
     generation.current += 1;
@@ -73,8 +75,11 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     busy.current = false;
     setIsStreaming(false);
     setProgress([]);
-    setMessages(current => current.map(item => item.role === 'assistant' && !item.content.trim()
-      ? { ...item, content: 'Resposta interrompida. Envie a pergunta novamente para continuar.' } : item));
+    const requestId = activeRequest.current;
+    activeRequest.current = null;
+    setMessages(current => current.map(item => item.role === 'assistant' && item.requestId === requestId
+      ? { ...item, ...(!item.content.trim() ? { content: 'Resposta interrompida. Você pode reformular a pergunta para continuar.' } : {}),
+        failure: { code: 'request_cancelled', message: 'Resposta interrompida. Você pode reformular a pergunta para continuar.', retryable: false, requestId: requestId! } } : item));
   }, []);
 
   const newConversation = useCallback(() => {
@@ -88,6 +93,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     setActiveWorkerId(options.workerId ?? 'agenda');
     setIsLoadingHistory(false);
     setHasEarlierMessages(false);
+    retryInputs.current.clear();
   }, [options.workerId, stop]);
 
   const refreshConversations = useCallback(async () => {
@@ -116,6 +122,8 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     stream.current?.abort();
     history.current?.abort();
     busy.current = false;
+    activeRequest.current = null;
+    retryInputs.current.clear();
     currentConversation.current = null;
     setOwnerScope(scope);
     setMessages([]);
@@ -154,6 +162,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     setConversationId(null);
     setMessages([]);
     setError(null);
+    retryInputs.current.clear();
     try {
       const result = await workersDatabase.rpc('ai_workers_read_history', { _org_id: orgId, _conversation_id: id, _turn_limit: 50 })
         .abortSignal(controller.signal);
@@ -219,7 +228,10 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
         createdAt: row.created_at, sequence: row.message_seq, sources: sourcesFrom(row.citations),
       }));
       const first = Math.min(...refreshed.map(row => row.sequence ?? Infinity));
-      setMessages(current => [...current.filter(row => row.sequence !== undefined && row.sequence < first), ...refreshed]);
+      setMessages(current => [...current.filter(row => row.sequence !== undefined && row.sequence < first), ...refreshed.map(row => {
+        const local = current.find(item => item.role === 'assistant' && item.requestId === row.requestId && item.failure);
+        return local && row.role === 'assistant' ? { ...row, content: local.content, failure: local.failure, retryOfRequestId: local.retryOfRequestId } : row;
+      })]);
       void refreshConversations();
     } catch { /* The next active-session refresh may retry; never erase visible history. */ }
   }, [user?.id, orgId, scope, refreshConversations]);
@@ -238,13 +250,13 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     if (options.conversationId) void selectConversation(options.conversationId);
   }, [options.conversationId, selectConversation]);
 
-  const sendMessage = useCallback(async (text: string, attachments: WorkerAttachment[] = []) => {
+  const sendMessage = useCallback(async (text: string, attachments: WorkerAttachment[] = [], retryOfRequestId?: string) => {
     const message = text.trim();
-    if (!message || busy.current) return;
-    if (!user?.id || !orgId) { setError('Entre na sua organização para conversar com a equipe.'); return; }
-    if (message.length > 6_000) { setError('Escreva uma mensagem de até 6.000 caracteres.'); return; }
+    if (!message || busy.current) return { accepted: false };
+    if (!user?.id || !orgId) { setError('Entre na sua organização para conversar com a equipe.'); return { accepted: false }; }
+    if (message.length > 6_000) { setError('Escreva uma mensagem de até 6.000 caracteres.'); return { accepted: false }; }
     if (attachments.length > 3 || attachments.some(file => file.text.length > 6_000) || attachments.reduce((total, file) => total + file.text.length, 0) > 12_000) {
-      setError('Anexe até três arquivos de até 6.000 caracteres, somando no máximo 12.000 caracteres.'); return;
+      setError('Anexe até três arquivos de até 6.000 caracteres, somando no máximo 12.000 caracteres.'); return { accepted: false };
     }
     history.current?.abort();
     const controller = new AbortController();
@@ -257,13 +269,14 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     setError(null);
     setProgress([]);
     const requestId = crypto.randomUUID();
+    activeRequest.current = requestId;
     const assistantId = `assistant-${requestId}`;
     const turnWorker = currentConversation.current ? activeWorkerId : options.workerId;
     let rawResponse = '';
     setMessages(current => [...current, {
-      id: `user-${requestId}`, requestId, role: 'user', content: maskSensitiveText(message), createdAt: new Date().toISOString(),
+      id: `user-${requestId}`, requestId, ...(retryOfRequestId ? { retryOfRequestId } : {}), role: 'user', content: maskSensitiveText(message), createdAt: new Date().toISOString(),
     }, {
-      id: assistantId, requestId, role: 'assistant', content: '', workerId: turnWorker ?? activeWorkerId,
+      id: assistantId, requestId, ...(retryOfRequestId ? { retryOfRequestId } : {}), role: 'assistant', content: '', workerId: turnWorker ?? activeWorkerId,
       createdAt: new Date().toISOString(), sources: [],
     }]);
     const alive = () => !controller.signal.aborted && requestGeneration === generation.current && liveScope.current === requestScope;
@@ -290,7 +303,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
         const sources = sourcesFrom(event.data.citations);
         setMessages(current => current.map(item => item.id === assistantId ? { ...item, sources } : item));
       } else if (event.event === 'error') {
-        throw new Error(typeof event.data.message === 'string' ? maskSensitiveText(event.data.message).slice(0, 300) : 'A consulta não pôde ser concluída.');
+        throw new WorkerTurnError(event.data.code, undefined, requestId, event.data.retryable);
       }
     };
     try {
@@ -301,19 +314,42 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
         ...(options.context ? { context: options.context } : {}),
         ...(attachments.length ? { attachments: attachments.map(file => ({ name: maskSensitiveText(file.name).slice(0, 100), text: file.text })) } : {}),
       }, onEvent, controller.signal);
-      if (alive()) void refreshConversations();
+      if (alive()) {
+        if (!safeWorkerMessageContent(rawResponse).trim()) throw new WorkerTurnError('invalid_response', undefined, requestId, false);
+        if (retryOfRequestId) {
+          retryInputs.current.delete(retryOfRequestId);
+          setMessages(current => current.map(item => item.failure?.requestId === retryOfRequestId ? { ...item, failure: { ...item.failure, retryable: false } } : item));
+        }
+        void refreshConversations();
+      }
     } catch (cause) {
-      if (alive()) setError(cause instanceof Error ? cause.message : 'A consulta não pôde ser concluída.');
+      if (alive()) {
+        const failure = workerTurnError(cause, requestId);
+        setError(failure.message);
+        if (failure.retryable) {
+          retryInputs.current.set(requestId, { text: message, attachments });
+          if (retryInputs.current.size > 20) retryInputs.current.delete(retryInputs.current.keys().next().value!);
+        }
+        setMessages(current => current.map(item => item.id === assistantId ? { ...item,
+          ...(!item.content.trim() ? { content: failure.message } : {}),
+          failure: { code: failure.code, message: failure.message, retryable: failure.retryable, requestId } } : item));
+      }
     } finally {
       if (requestGeneration === generation.current && liveScope.current === requestScope) {
         busy.current = false;
+        activeRequest.current = null;
         setIsStreaming(false);
-        setMessages(current => current.map(item => item.id === assistantId && !item.content.trim()
-          ? { ...item, content: 'A consulta não foi concluída. Envie a pergunta novamente para tentar.' } : item));
+        setProgress([]);
         if (workspaceRefreshPending.current) { workspaceRefreshPending.current = false; void refreshMessages(); }
       }
     }
+    return { accepted: true, requestId };
   }, [user?.id, orgId, scope, options.workerId, options.context, activeWorkerId, refreshConversations, refreshMessages]);
+
+  const retryMessage = useCallback(async (requestId: string) => {
+    const original = retryInputs.current.get(requestId);
+    if (original && !busy.current) await sendMessage(original.text, original.attachments, requestId);
+  }, [sendMessage]);
 
   const visible = ownerScope === scope;
   return {
@@ -322,6 +358,6 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     isStreaming: visible && isStreaming, isLoadingHistory: visible && isLoadingHistory,
     hasEarlierMessages: visible && hasEarlierMessages, loadEarlierMessages,
     progress: visible ? progress : [], error: visible ? error : null,
-    workspaceRevision, refreshMessages, sendMessage, stop, selectConversation, newConversation, clearError: () => setError(null),
+    workspaceRevision, refreshMessages, sendMessage, retryMessage, stop, selectConversation, newConversation, clearError: () => setError(null),
   };
 }

@@ -60,8 +60,8 @@ Ferramentas aplicam o JWT e a RLS do usuário; recusa não deve ser contornada.
 Para referências ambíguas, consulte antes de selecionar um ID; não adivinhe.
 Interprete o pedido e preserve métrica, pessoa, comissão, filtros e período nas perguntas de continuidade.
 A referência explícita da mensagem prevalece sobre a tela, a edição atual e o histórico. Organização é sempre a organização autenticada desta requisição.
-Perguntas analíticas de vendas usam map_sales_overview; disponibilidade/área/infraestrutura usam map_inventory_summary. Contratos, preços e estruturas têm ferramentas próprias.
-Agenda: quantidade pessoal sem outros filtros usa agenda_personal_summary; ranking de pessoas usa agenda_people_ranking; listas, situações, locais, categorias, prioridades e distribuições usam agenda_query. Não troque uma lista solicitada por um total pessoal.
+Valores de vendas e lotes usam map_sales_overview; contratos firmados, aguardando assinatura e total de registros comerciais usam map_sales_records_summary (mesma classificação SIGNED/PENDING da Dashboard). Documentos anexados não são contratos assinados. Recebimento exige fonte financeira; nunca substitua a métrica por vendas.
+Agenda: quantidade pessoal usa agenda_personal_summary; ranking de pessoas usa agenda_people_ranking; ranking de comissões usa agenda_commission_ranking. Pessoa nominal exige agenda_resolve_identity e depois agenda_person_events com UUID autorizado; comissão nominal exige resolução e agenda_query com commission_id. Nunca use a conta autenticada no lugar de outra pessoa. Listas, situações, locais, categorias, prioridades e distribuições usam agenda_query.
 O catálogo de perguntas contém referências sem respostas fixas. Interprete sinônimos, palavras novas e perguntas fora do catálogo por sua intenção; não exija correspondência literal.
 Use interpretedIntent.period e previousPeriod. Comparação temporal exige uma consulta completa para cada período com os MESMOS filtros. A primeira é o período atual solicitado e a segunda o anterior. Nunca compare amostras.
 Nas continuações preserve interpretedIntent.queryFilters salvo alteração explícita. Para pizza consulte a partição completa; Outros deve vir do agregado no servidor. Para distribuição use group_by pertinente.
@@ -160,10 +160,13 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
           const allowed = new Set(tools.map(tool => tool.name));
           const proposals = new Set(proposalTools.map(tool => tool.name));
           let proposed: { kind: 'action' | 'routine'; id: string; citation: WorkerCitation } | undefined;
-          const directName = intent ? '' : { map_sales: 'map_sales_overview', map_inventory: '', agenda_query: '', agenda_personal: 'agenda_personal_summary', agenda_ranking: 'agenda_people_ranking', institutional_president: institutionalTool.name, domain_query: '' }[queryIntent.kind];
+          const directName = intent ? '' : { map_sales: 'map_sales_overview', map_contracts:'map_sales_records_summary', map_documents:'', map_receipts:'', map_inventory: '', agenda_query: '', agenda_personal: 'agenda_personal_summary', agenda_ranking: 'agenda_people_ranking', agenda_commission_ranking:'agenda_commission_ranking', agenda_person:'agenda_person_events', agenda_commission:'agenda_query', institutional_president: institutionalTool.name, domain_query: '' }[queryIntent.kind];
           const attendanceUnavailable = queryIntent.kind.startsWith('agenda_') && queryIntent.relationship === 'attendance';
-          const rankingFilterUnavailable=queryIntent.kind==='agenda_ranking'&&/conclu[ií]d|cancelad|planejad|prioridade|por local|na comiss[aã]o|do restaurante/i.test(request.message);
-          if (directName && allowed.has(directName) && !intent && !attendanceUnavailable && !rankingFilterUnavailable) {
+          const receiptSourceUnavailable=queryIntent.kind==='map_receipts';
+          const rankingFilterUnavailable=['agenda_ranking','agenda_commission_ranking','agenda_person'].includes(queryIntent.kind)&&(/conclu[ií]d|cancelad|planejad|prioridade|por local|na comiss[aã]o|do restaurante/i.test(request.message)
+            ||Object.keys(queryIntent.queryFilters??{}).some(key=>!['group_by','relationship'].includes(key)));
+          const contractScopeUnavailable=queryIntent.kind==='map_contracts'&&/pavilh[aã]o|segmento|quadra|comprador|cliente|empresa|sem (?:contrato|documento)|com documento/i.test(request.message);
+          if (directName && allowed.has(directName) && !intent && !attendanceUnavailable && !rankingFilterUnavailable && !contractScopeUnavailable) {
             if (queryIntent.resolveProject && allowed.has('map_projects')) {
               const projects = await deps.executeTool('map_projects', { limit: 100 });
               validateToolEvidence(projects); executed.push('map_projects');
@@ -173,12 +176,46 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
               if (matches.length === 1 && !projects.truncated) queryIntent.projectId = String(matches[0].id);
               // Discovery remains internal: only the specialized aggregate can produce the answer.
             }
-            const input: Record<string, unknown> = queryIntent.kind === 'map_sales' || queryIntent.kind === 'institutional_president'
-              ? { ...(queryIntent.editionYear ? { edition_year: queryIntent.editionYear } : {}), ...(queryIntent.kind === 'map_sales' && queryIntent.projectId ? { project_id: queryIntent.projectId } : {}),
-                ...(queryIntent.kind === 'map_sales' && queryIntent.period ? { date_from: queryIntent.period.from, date_to: queryIntent.period.to } : {}) }
+            const commercial = queryIntent.kind === 'map_sales' || queryIntent.kind === 'map_contracts';
+            const input: Record<string, unknown> = commercial || queryIntent.kind === 'institutional_president'
+              ? { ...(queryIntent.editionYear ? { edition_year: queryIntent.editionYear } : {}), ...(commercial && queryIntent.projectId ? { project_id: queryIntent.projectId } : {}),
+                ...(commercial && queryIntent.period ? { date_from: queryIntent.period.from, date_to: queryIntent.period.to } : {}) }
               : { date_from: queryIntent.period!.from, date_to: queryIntent.period!.to, ...(queryIntent.kind === 'agenda_personal' ? { relationship: queryIntent.relationship } : { limit: 10 }) };
             emit('progress', { label: 'Calculando sobre os dados autorizados…', status: 'running' });
-            const result = directName === institutionalTool.name ? await deps.institutionalPresident!(input, deps.signal) : await deps.executeTool(directName, input);
+            let identityClarification: ReadResult | undefined;
+            if(queryIntent.kind==='agenda_person'||queryIntent.kind==='agenda_commission'){
+              delete input.limit;
+              if(!allowed.has('agenda_resolve_identity'))throw new WorkerError('forbidden',403);
+              const identityKind=queryIntent.kind==='agenda_person'?'person':'commission';
+              const identityResult=await deps.executeTool('agenda_resolve_identity',{kind:identityKind,search:queryIntent.entitySearch??request.message});
+              validateToolEvidence(identityResult);executed.push('agenda_resolve_identity');
+              const identityRecord=identityResult.records.find(isObject);
+              const identities=Array.isArray(identityRecord?.identities)?identityRecord.identities.filter(isObject):[];
+              const priorAnswer=[...history].reverse().filter(item=>item.role==='assistant').map(item=>decodeWorkerResponse(item.content)).find(Boolean);
+              const priorChoice=priorAnswer?.blocks.find(block=>block.type==='clarification');
+              const choiceText=request.message.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+              const ordinal=/^(?:a |o |opcao |pessoa |comissao )?(1|2|3|4|5|6|7|8|primeir[oa]|segund[oa]|terceir[oa]|quart[oa]|quint[oa]|sext[oa]|setim[oa]|oitav[oa])(?:[.ªº])?$/.exec(choiceText)?.[1];
+              const ordinalNames=['primeir','segund','terceir','quart','quint','sext','setim','oitav'];
+              const choiceIndex=ordinal?/^[1-8]$/.test(ordinal)?Number(ordinal)-1:ordinalNames.findIndex(prefix=>ordinal.startsWith(prefix)):-1;
+              const choiceOption=priorChoice?.type==='clarification'&&choiceIndex>=0?priorChoice.options?.[choiceIndex]:undefined;
+              const ordinalId=(priorChoice?.type==='clarification'&&choiceIndex>=0?priorChoice.choices?.[choiceIndex]?.id:undefined)
+                ?? choiceOption?.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)?.[0];
+              // A selected option is only a hint: revalidate its UUID against
+              // the current authorized resolver output before querying it.
+              const selected=identities.filter(identity=>typeof identity.id==='string'&&(request.message.includes(identity.id)||identity.id===ordinalId||identity.id===queryIntent.entityId||identities.length===1));
+              if(selected.length===1&&identityRecord?.complete===true){
+                queryIntent.entityId=String(selected[0].id);
+                queryIntent.entityName=String(selected[0].name);
+                input[identityKind==='person'?'person_id':'commission_id']=queryIntent.entityId;
+                if(identityKind==='commission'){input.group_by='status';input.relationship='all';}
+              }else{
+                identityClarification={summary:'É necessário escolher a identidade autorizada.',citations:identityResult.citations,records:[{needs_clarification:true,
+                  question:identities.length?'Encontrei mais de uma identidade. Qual delas deseja consultar?':'Não encontrei essa identidade no escopo autorizado. Confira o nome ou informe outra pessoa ou comissão.',
+                  options:identities.slice(0,8).map((identity,index)=>`${String(identity.name).slice(0,155)} · identidade ${index+1}`),
+                  choices:identities.slice(0,8).map(identity=>({id:String(identity.id),name:String(identity.name).slice(0,180)}))}],total:1};
+              }
+            }
+            const result = identityClarification ?? (directName === institutionalTool.name ? await deps.institutionalPresident!(input, deps.signal) : await deps.executeTool(directName, input));
             validateToolEvidence(result); results.push({ tool: directName, input, result }); executed.push(directName);
             if(queryIntent.previousPeriod && queryIntent.kind==='map_sales') {
               const previousInput={...input,date_from:queryIntent.previousPeriod.from,date_to:queryIntent.previousPeriod.to};
@@ -187,7 +224,7 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
             }
             emit('progress', { label: 'Consulta concluída', status: 'complete' });
           }
-          for (let round = 0; round < MAX_ROUNDS && (!directName || !allowed.has(directName)) && !attendanceUnavailable && !rankingFilterUnavailable; round++) {
+          for (let round = 0; round < MAX_ROUNDS && (!directName || !allowed.has(directName)) && !attendanceUnavailable && !rankingFilterUnavailable && !receiptSourceUnavailable && !contractScopeUnavailable; round++) {
             if (deps.signal?.aborted) throw new WorkerError('request_cancelled', 499);
             emit('progress', { label: round === 0 ? 'Entendendo seu pedido…' : 'Conferindo as fontes…', status: 'running' });
             providerAttempted = true;
@@ -234,8 +271,11 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
           completion = { ...(proposed ? {
             content: proposed.kind === 'routine' ? 'Rotina proposta. Revise o horário e os dados no card para confirmar. Ela executará com sua sessão ativa; pendências do mesmo dia serão recuperadas ao entrar.' : 'Proposta pronta para sua revisão. Nenhuma alteração foi executada. Confira o diff e confirme no card.',
             citations: [proposed.citation],
+          } : contractScopeUnavailable ? {
+            content:'A contagem global usa o recorte de projeto da Dashboard. O filtro adicional solicitado ainda não está disponível nessa contagem. Abra Vendas para conferir esse recorte.',
+            citations:[{label:'Abrir Vendas',url:'/mapa-comercial',source:'app' as const}],
           } : rankingFilterUnavailable ? {
-            content:'O ranking disponível considera todos os eventos autorizados do período. O filtro adicional solicitado ainda não está disponível para esse ranking. Posso consultar os eventos com esse filtro ou mostrar o ranking geral do período.',
+            content:'Esta contagem de vínculos considera os eventos autorizados do período. O filtro adicional solicitado ainda não está disponível para essa consulta. Abra a Agenda para conferir esse recorte.',
             citations:[{label:'Abrir Agenda',url:'/cronograma-eventos',source:'app' as const}],
           } : attendanceUnavailable ? {
             content: 'Os vínculos da Agenda não comprovam presença. Posso consultar os eventos criados por você, sob sua responsabilidade ou aos quais você está vinculado. Para confirmar participação efetiva, confira um registro de presença no módulo, quando disponível.',
@@ -263,22 +303,4 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
   emit('done', {});
 }
 
-export function publicWorkerError(error: unknown): { code: string; message: string } {
-  const registryCodes: Record<string, string> = { AUTH_REQUIRED: 'forbidden', PERMISSION_DENIED: 'forbidden', INVALID_INPUT: 'invalid_tool_arguments', NOT_FOUND: 'not_found', TOOL_NOT_ALLOWED: 'tool_not_allowed', DATA_UNAVAILABLE: 'data_unavailable' };
-  const code = error instanceof WorkerError ? error.code : isObject(error) && typeof error.code === 'string' ? registryCodes[error.code] ?? 'request_failed' : 'request_failed';
-  const messages: Record<string, string> = {
-    provider_not_configured: 'A consulta está temporariamente indisponível. Tente novamente mais tarde.',
-    web_search_not_configured: 'A pesquisa pública está temporariamente indisponível. Consulte o portal oficial da Fenasoja.',
-    provider_rate_limited: 'A IA atingiu o limite temporário. Tente novamente mais tarde.',
-    provider_credits_required: 'A consulta está temporariamente indisponível. Tente novamente mais tarde.',
-    institutional_source_unavailable: 'Não consegui verificar a publicação institucional agora. Consulte o portal oficial da Fenasoja.',
-    rate_limited: 'Você atingiu o limite temporário de consultas. Aguarde antes de tentar novamente.',
-    request_in_progress: 'Este pedido já está em andamento ou falhou. Consulte o histórico ou envie um novo pedido.',
-    forbidden: 'Seu usuário não tem acesso a esta consulta.',
-    not_found: 'O registro não foi encontrado ou não está disponível para o seu usuário.',
-    invalid_tool_arguments: 'Não consegui identificar os filtros ou o registro. Detalhe seu pedido e tente novamente.',
-    invalid_request: 'Confira a mensagem e tente novamente.',
-    request_cancelled: 'Consulta interrompida.',
-  };
-  return { code, message: messages[code] ?? 'Não foi possível concluir a consulta com segurança. Tente novamente.' };
-}
+export { publicWorkerError } from './failures.ts';

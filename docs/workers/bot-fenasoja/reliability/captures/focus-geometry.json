@@ -1,0 +1,56 @@
+{
+  "containers": [
+    {
+      "bottom": 844.73681640625,
+      "clientHeight": 845,
+      "overflow": "clip",
+      "scrollHeight": 845,
+      "scrollTop": 0,
+      "selector": ".worker-copilot-sheet",
+      "top": 0
+    },
+    {
+      "bottom": 844.73681640625,
+      "clientHeight": 845,
+      "overflow": "clip",
+      "scrollHeight": 845,
+      "scrollTop": 0,
+      "selector": ".worker-chat-workspace",
+      "top": 0
+    },
+    {
+      "bottom": 844.73681640625,
+      "clientHeight": 845,
+      "overflow": "clip",
+      "scrollHeight": 1127,
+      "scrollTop": 0,
+      "selector": ".worker-chat-main",
+      "top": 0
+    },
+    {
+      "bottom": 63.99396896362305,
+      "clientHeight": 63,
+      "overflow": "visible",
+      "scrollHeight": 63,
+      "scrollTop": 0,
+      "selector": ".worker-chat-header",
+      "top": 0
+    },
+    {
+      "bottom": 844.7368316650391,
+      "clientHeight": 199,
+      "overflow": "visible",
+      "scrollHeight": 199,
+      "scrollTop": 0,
+      "selector": ".worker-composer-area",
+      "top": 645.4632568359375
+    }
+  ],
+  "fieldFont": "16px",
+  "viewport": {
+    "height": 845,
+    "offsetTop": 0,
+    "scale": 1,
+    "width": 389
+  }
+}

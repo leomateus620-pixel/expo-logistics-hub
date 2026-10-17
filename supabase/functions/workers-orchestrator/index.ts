@@ -6,6 +6,7 @@ import { createLovableProvider, readBoundedJson } from '../_shared/workers/provi
 import { searchWorkersWeb } from '../_shared/workers/web-search.ts';
 import { workspacePlanner } from '../_shared/workers/workspace-planner.ts';
 import { readInstitutionalPresident } from '../_shared/workers/institutional.ts';
+import { boundedWorkerCleanup, raceWorkerSignal, workerAuthFailureCode, workerFailureDiagnostic } from '../_shared/workers/failures.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,22 +33,26 @@ function publicKey(): string {
   throw new WorkerError('backend_not_configured', 503);
 }
 
-function databaseError(error: { code?: string; message?: string } | null): WorkerError {
+function databaseError(error: { code?: string; message?: string } | null, stage = 'persistence'): WorkerError {
   if (error?.message?.includes('WORKERS_RATE_LIMITED')) return new WorkerError('rate_limited', 429);
   if (error?.message?.includes('WORKERS_REQUEST_IN_PROGRESS_OR_FAILED')) return new WorkerError('request_in_progress', 409);
   if (error?.code === '42501' || error?.message?.includes('FORBIDDEN')) return new WorkerError('forbidden', 403);
-  return new WorkerError('storage_unavailable', 503);
+  const technicalCode = /^[A-Z0-9_]{1,40}$/i.test(error?.code ?? '') ? error?.code : undefined;
+  const code = ['PGRST202','PGRST203','42883','42703'].includes(error?.code ?? '') ? 'rpc_incompatible'
+    : error?.code === '57014' ? 'timeout' : /^(?:08|PGRST00)/.test(error?.code ?? '') ? 'network_error'
+    : error?.message?.includes('WORKERS_INVALID_RESPONSE') ? 'invalid_response' : error?.code ? 'sql_error' : 'query_failed';
+  return new WorkerError(code, 503, { stage, technicalCode });
 }
 
-async function scopedRpc(client: SupabaseClient, name: string, args: Record<string, unknown>): Promise<unknown> {
-  const { data, error } = await client.rpc(name, args);
+async function scopedRpc(client: SupabaseClient, name: string, args: Record<string, unknown>, signal: AbortSignal): Promise<unknown> {
+  const { data, error } = await raceWorkerSignal(() => client.rpc(name, args).abortSignal(signal), signal);
   if (error) throw databaseError(error);
   return data;
 }
 
-function jsonError(error: unknown): Response {
+function jsonError(error: unknown, requestId?: string): Response {
   const details = publicWorkerError(error);
-  return new Response(JSON.stringify({ error: details }), {
+  return new Response(JSON.stringify({ error: { ...details, ...(requestId ? { requestId } : {}) } }), {
     status: error instanceof WorkerError ? Math.min(error.status, 599) : details.code === 'forbidden' ? 403 : 500,
     headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
   });
@@ -58,16 +63,20 @@ Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') return jsonError(new WorkerError('method_not_allowed', 405));
   const abort = new AbortController();
   let consumerCancelled = false;
-  const onConsumerAbort = () => { consumerCancelled = true; abort.abort(); };
+  const onConsumerAbort = () => { consumerCancelled = true; abort.abort(new WorkerError('request_cancelled', 499)); };
   req.signal.addEventListener('abort', onConsumerAbort, { once: true });
   if (req.signal.aborted) onConsumerAbort();
   let deadline: ReturnType<typeof setTimeout> | undefined;
+  let timedOut = false;
+  let requestId: string | undefined;
   try {
+    deadline = setTimeout(() => { timedOut = true; abort.abort(new WorkerError('timeout', 504, { stage: 'orchestration' })); }, 55000);
     if (abort.signal.aborted) throw new WorkerError('request_cancelled', 499);
     if (!req.headers.get('content-type')?.includes('application/json')) throw new WorkerError('invalid_request', 415);
     const bearer = req.headers.get('authorization');
     if (!bearer || !/^Bearer [A-Za-z0-9._-]{20,8192}$/i.test(bearer)) throw new WorkerError('forbidden', 401);
-    const request = parseWorkerRequest(await readBoundedJson(req, 32000));
+    const request = parseWorkerRequest(await raceWorkerSignal(() => readBoundedJson(req, 32000), abort.signal));
+    requestId = request.requestId;
     const url = Deno.env.get('SUPABASE_URL')?.trim();
     if (!url) throw new WorkerError('backend_not_configured', 503);
     // This client is the sole database client: all reads/RPCs carry the caller JWT.
@@ -75,36 +84,43 @@ Deno.serve(async (req: Request) => {
       global: { headers: { Authorization: bearer } },
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     });
-    const { data: identity, error: authError } = await client.auth.getUser();
-    if (authError || !identity.user?.id || identity.user.role === 'service_role') throw new WorkerError('forbidden', 401);
-    const access = await resolveWorkerAccess(client, identity.user.id, request.orgId);
+    const { data: identity, error: authError } = await raceWorkerSignal(() => client.auth.getUser(), abort.signal);
+    if (authError) {
+      const code = workerAuthFailureCode(authError);
+      throw new WorkerError(code, code === 'forbidden' ? 401 : code === 'timeout' ? 504 : 503, { stage: 'authentication' });
+    }
+    if (!identity.user?.id || identity.user.role === 'service_role') throw new WorkerError('forbidden', 401);
+    const callerId = identity.user.id;
+    const access = await raceWorkerSignal(() => resolveWorkerAccess(client, callerId, request.orgId), abort.signal);
     // Equipe Fenasoja is limited to org admins, CCPF and Comissão Central (DB-side check).
-    const { data: eligible, error: eligibleError } = await client.rpc('ai_workers_can_access', { _org_id: request.orgId });
-    if (eligibleError || eligible !== true) throw new WorkerError('forbidden', 403);
+    const { data: eligible, error: eligibleError } = await raceWorkerSignal(() => client.rpc('ai_workers_can_access', { _org_id: request.orgId }).abortSignal(abort.signal), abort.signal);
+    if (eligibleError) throw databaseError(eligibleError, 'authorization');
+    if (eligible !== true) throw new WorkerError('forbidden', 403);
     const provider = createLovableProvider({ apiKey: Deno.env.get('LOVABLE_API_KEY'), model: Deno.env.get('WORKERS_ANALYSIS_MODEL') });
+    let cleanup: Promise<void> | undefined;
     const dependencies: WorkerTurnDependencies = {
       provider,
       ...workspacePlanner(client, request.orgId),
       signal: abort.signal,
-      listTools: worker => listWorkerTools(worker, access),
-      executeTool: (name, input) => executeWorkerTool(name, input, access),
+      listTools: worker => raceWorkerSignal(() => listWorkerTools(worker, access), abort.signal),
+      executeTool: (name, input) => raceWorkerSignal(() => executeWorkerTool(name, input, access), abort.signal),
       searchWeb: (input, signal) => searchWorkersWeb(input, { apiKey: Deno.env.get('FIRECRAWL_API_KEY'), gatewayKey: Deno.env.get('LOVABLE_API_KEY'), signal }),
       institutionalPresident: (input, signal) => readInstitutionalPresident(input, { signal }),
       begin: async (value, worker) => {
         const result = await scopedRpc(client, 'ai_workers_begin_turn', {
           _org_id: value.orgId, _request_id: value.requestId, _worker_id: worker,
           _message: redactWorkerText(value.message), _conversation_id: value.conversationId ?? null,
-        });
+        }, abort.signal);
         if (!isObject(result) || !isUuid(result.conversationId) || typeof result.replayed !== 'boolean') throw new WorkerError('invalid_storage_response', 503);
         return result as unknown as TurnStart;
       },
       history: async conversationId => {
-        const { data, error } = await client.rpc('ai_workers_read_history', {
+        const { data, error } = await raceWorkerSignal(() => client.rpc('ai_workers_read_history', {
           _org_id: request.orgId, _conversation_id: conversationId, _turn_limit: 3,
-        });
-        if (error) throw databaseError(error);
+        }).abortSignal(abort.signal), abort.signal);
+        if (error) throw databaseError(error, 'history');
         // The RPC returns complete turns in admission order; the current prompt is supplied separately.
-        return (data ?? []).filter((row: { request_id: string; state: string }) => row.request_id !== request.requestId && row.state === 'complete')
+        return (data ?? []).filter((row: { request_id: string; state: string; role: string }) => row.request_id !== request.requestId && (row.role === 'user' || row.state === 'complete'))
           .map((row: { role: 'user' | 'assistant'; content: string }) => ({ role: row.role, content: row.content }));
       },
       finish: async (value, completion) => {
@@ -113,33 +129,46 @@ Deno.serve(async (req: Request) => {
           _citations: completion.citations, _model: completion.model,
           _input_tokens: completion.inputTokens, _output_tokens: completion.outputTokens, _tool_names: completion.tools,
           _usage_complete: completion.usageComplete ?? true,
-        });
+        }, abort.signal);
       },
-      fail: async (value, usage) => { await scopedRpc(client, 'ai_workers_fail_turn', {
-        _org_id: value.orgId, _request_id: value.requestId,
-        _model: usage?.model ?? null, _input_tokens: usage?.inputTokens ?? 0, _output_tokens: usage?.outputTokens ?? 0,
-      }); },
+      fail: (value, usage) => cleanup ??= boundedWorkerCleanup(async cleanupSignal => {
+        await scopedRpc(client, 'ai_workers_fail_turn', {
+          _org_id: value.orgId, _request_id: value.requestId,
+          _model: usage?.model ?? null, _input_tokens: usage?.inputTokens ?? 0, _output_tokens: usage?.outputTokens ?? 0,
+        }, cleanupSignal);
+      }),
     };
     if (abort.signal.aborted) throw new WorkerError('request_cancelled', 499);
-    deadline = setTimeout(() => abort.abort(), 55000);
     const encoder = new TextEncoder();
+    let streamClosed = false;
     const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
         const emit: Parameters<typeof runWorkerTurn>[2] = (event, data) => {
-          if (!consumerCancelled) controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+          if (!consumerCancelled && !streamClosed) controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
         };
-        try { await runWorkerTurn(request, dependencies, emit); }
-        catch (error) { emit('error', publicWorkerError(error)); }
+        try { await raceWorkerSignal(() => runWorkerTurn(request, dependencies, emit), abort.signal); }
+        catch (error) {
+          const failure = timedOut ? new WorkerError('timeout', 504, { stage: 'orchestration' }) : error;
+          console.error(JSON.stringify(workerFailureDiagnostic(failure, requestId)));
+          emit('error', { ...publicWorkerError(failure), requestId });
+        }
         finally {
           if (deadline) clearTimeout(deadline);
+          streamClosed = true;
           try { controller.close(); } catch { /* Consumer already disconnected. */ }
+          req.signal.removeEventListener('abort', onConsumerAbort);
+          // Close SSE first. This independent budget also clears a pending
+          // admission when the aborted worker never reaches its own catch.
+          if (abort.signal.aborted) await dependencies.fail(request).catch(() => undefined);
         }
       },
-      cancel() { consumerCancelled = true; abort.abort(); if (deadline) clearTimeout(deadline); },
+      cancel() { consumerCancelled = true; streamClosed = true; abort.abort(new WorkerError('request_cancelled', 499)); if (deadline) clearTimeout(deadline); },
     });
     return new Response(stream, { headers: { ...corsHeaders, 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-cache, no-store', 'X-Accel-Buffering': 'no' } });
   } catch (error) {
     if (deadline) clearTimeout(deadline);
-    return jsonError(error);
+    req.signal.removeEventListener('abort', onConsumerAbort);
+    console.error(JSON.stringify(workerFailureDiagnostic(error, requestId)));
+    return jsonError(error, requestId);
   }
 });

@@ -1,0 +1,197 @@
+{
+  "checkedAt": "2026-10-17",
+  "projectRef": "btfaumhroqtqzxomqorx",
+  "readOnly": true,
+  "productionRowsRead": 0,
+  "credentials": "existing versioned publishable key only; no session or admin credential",
+  "confirmed": {
+    "missingColumn": {
+      "table": "cronograma_eventos",
+      "column": "responsible_user_id",
+      "http": 400,
+      "code": "42703"
+    },
+    "zeroRowProjections": [
+      {
+        "table": "cronograma_eventos",
+        "columns": [
+          "id",
+          "org_id",
+          "status",
+          "start_date",
+          "end_date",
+          "start_time",
+          "end_time",
+          "created_by_user_id",
+          "has_exact_date",
+          "commission_slug",
+          "origin_commission_id",
+          "linked_commissions",
+          "responsible_name"
+        ],
+        "http": 200,
+        "rowLimit": 0
+      },
+      {
+        "table": "cronograma_evento_responsaveis",
+        "columns": [
+          "event_id",
+          "org_id",
+          "org_member_user_id",
+          "name_snapshot",
+          "is_primary",
+          "responsible_type"
+        ],
+        "http": 200,
+        "rowLimit": 0
+      },
+      {
+        "table": "cronograma_subeventos",
+        "columns": [
+          "id",
+          "org_id",
+          "parent_event_id",
+          "status",
+          "commission_slug",
+          "commission_name_snapshot"
+        ],
+        "http": 200,
+        "rowLimit": 0
+      },
+      {
+        "table": "cronograma_subevento_responsaveis",
+        "columns": [
+          "subevent_id",
+          "org_id",
+          "org_member_user_id",
+          "name_snapshot",
+          "is_primary",
+          "responsible_type"
+        ],
+        "http": 200,
+        "rowLimit": 0
+      },
+      {
+        "table": "cronograma_evento_comissoes",
+        "columns": [
+          "event_id",
+          "org_id",
+          "commission_id",
+          "commission_slug",
+          "commission_name_snapshot",
+          "relation_role"
+        ],
+        "http": 200,
+        "rowLimit": 0
+      },
+      {
+        "table": "cronograma_subevento_comissoes",
+        "columns": [
+          "subevent_id",
+          "org_id",
+          "commission_id",
+          "commission_slug",
+          "commission_name_snapshot",
+          "relation_role"
+        ],
+        "http": 200,
+        "rowLimit": 0
+      }
+    ],
+    "rpcResolution": [
+      {
+        "rpc": "workers_agenda_event_scope(_org_id,_from_date,_to_date)",
+        "http": 401,
+        "code": "42501",
+        "result": "permission denied for function: exact supplied argument set resolves, anonymous access denied"
+      },
+      {
+        "rpc": "workers_agenda_query(_org_id,_from_date,_to_date)",
+        "http": 401,
+        "code": "42501",
+        "result": "permission denied for function: exact supplied argument set resolves, anonymous access denied"
+      },
+      {
+        "rpc": "workers_agenda_people_ranking(_org_id,_from_date,_to_date,_limit)",
+        "http": 401,
+        "code": "42501",
+        "result": "permission denied for function: exact supplied argument set resolves, anonymous access denied"
+      },
+      {
+        "rpc": "workers_agenda_personal_summary(_org_id,_from_date,_to_date,_relationship)",
+        "http": 401,
+        "code": "42501",
+        "result": "permission denied for function: exact supplied argument set resolves, anonymous access denied"
+      },
+      {
+        "rpc": "workers_require_read_scope(_org_id)",
+        "http": 401,
+        "code": "42501",
+        "result": "permission denied for function: exact supplied argument set resolves, anonymous access denied"
+      }
+    ],
+    "rls": [
+      {
+        "table": "ai_messages",
+        "enabled": true,
+        "policyCount": 1
+      },
+      {
+        "table": "commissions",
+        "enabled": true,
+        "policyCount": 4
+      },
+      {
+        "table": "org_members",
+        "enabled": true,
+        "policyCount": 4
+      },
+      {
+        "table": "cronograma_eventos",
+        "enabled": true,
+        "policyCount": 4
+      },
+      {
+        "table": "cronograma_evento_comissoes",
+        "enabled": true,
+        "policyCount": 3
+      },
+      {
+        "table": "cronograma_evento_responsaveis",
+        "enabled": true,
+        "policyCount": 3
+      },
+      {
+        "table": "cronograma_subeventos",
+        "enabled": true,
+        "policyCount": 2
+      },
+      {
+        "table": "cronograma_subevento_comissoes",
+        "enabled": true,
+        "policyCount": 2
+      },
+      {
+        "table": "cronograma_subevento_responsaveis",
+        "enabled": true,
+        "policyCount": 2
+      }
+    ],
+    "publishedEdge": {
+      "name": "workers-orchestrator",
+      "method": "POST",
+      "body": "empty object",
+      "http": 400,
+      "code": "invalid_request",
+      "message": "Confira a mensagem e tente novamente.",
+      "scope": "Reached published application validation; did not start a conversation or query business data"
+    }
+  },
+  "limitations": [
+    "OpenAPI schema root denied HTTP 401; exact remote SQL types, bodies, dependencies and full grants/policy expressions cannot be retrieved with public key.",
+    "Lovable get_database_status for connected historical project returned 404 project_not_found.",
+    "Supabase CLI authenticated management access unavailable; no published source download or deployed registry hash verified.",
+    "No authenticated Agenda/Dashboard business metrics compared; 124/60/64 remains pending live homologation.",
+    "These probes establish the concrete missing-column drift and guarded RPC presence, not equality of published source with repository."
+  ]
+}

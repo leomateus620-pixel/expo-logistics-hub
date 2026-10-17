@@ -4,6 +4,9 @@ import { z } from 'zod';
 import { Bar, BarChart, Cell, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { decodeWorkerResponse, type WorkerResponse, type WorkerResponseBlock } from '../../../../supabase/functions/_shared/workers/response-contract';
 import { safeSourceUrl } from '../ui-utils';
+import '../styles/entity-ranking.css';
+import { PersonAvatar } from '@/components/cronograma-eventos/PersonAvatar';
+import { OrgUnitIdentityBadge, resolveOrgUnitIdentity } from '@/components/cronograma-eventos/org-unit-identity';
 
 const legacyLabel = z.string().min(1).max(180);
 const legacyTableSchema = z.object({ columns: z.array(legacyLabel).min(1).max(8), rows: z.array(z.array(z.string().max(400))).max(100) }).strict().refine(value => value.rows.every(row => row.length === value.columns.length));
@@ -56,10 +59,16 @@ function blockText(block: WorkerResponseBlock): string {
     case 'pie_chart': return `${block.title}\n${block.data.map(item => `${item.label}: ${formatResponseValue(item.value, block.unit)}`).join('\n')}`;
     case 'comparison': return `${block.title}\n${block.items.map(item => `${item.label}: ${block.currentLabel ?? 'Período atual'} ${formatResponseValue(item.current, block.unit)}; ${block.previousLabel ?? 'Período anterior'} ${formatResponseValue(item.previous, block.unit)}`).join('\n')}`;
     case 'profile': return [block.name, block.role, block.edition, ...block.details.map(item => `${item.label}: ${item.value}`)].join('\n');
+    case 'entity_ranking': return `${block.title}\n${block.items.map(item => `${item.position}. ${item.label ?? item.name}: ${item.events} eventos vinculados`).join('\n')}`;
     case 'sources': return block.items.map(item => `${item.label}: ${item.url}`).join('\n');
     case 'empty': return block.message;
-    case 'clarification': return block.question;
+    case 'clarification': return [block.question, ...clarificationOptions(block)].join('\n');
   }
+}
+function clarificationOptions(block: Extract<WorkerResponseBlock, { type?: 'clarification' }>): string[] {
+  if (block.choices) return block.choices.map((choice, index) => `${index + 1}. ${choice.name} · identidade ${index + 1}`);
+  return (block.options ?? []).map((option, index) => / · [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(option)
+    ? `${index + 1}. ${option.replace(/ · [0-9a-f-]{36}$/i, '')} · identidade ${index + 1}` : option);
 }
 /** Copying remains useful and includes every value visible in the visual answer. */
 export function richContentToText(content: string): string {
@@ -81,7 +90,7 @@ function WrappedLabel({ x, y, payload }: { x?: number; y?: number; payload?: { v
 }
 const ResponseChart = memo(function ResponseChart({ chart, unit = 'count', population, legacy = false }: { chart: Chart; unit?: 'count' | 'BRL' | 'percent' | 'minutes'; population?: number; legacy?: boolean }) {
   const data = chart.data.slice(0, 20);
-  return <figure className="worker-rich-chart"><figcaption>{chart.title}</figcaption>{legacy && <p className="worker-rich-note">Visualização de uma conversa antiga. A abrangência da consulta não foi registrada.</p>}{population !== undefined && population > data.length && <p className="worker-rich-note">Exibindo {data.length} de {population.toLocaleString('pt-BR')} pessoas; cálculo sobre todos os eventos autorizados do período.</p>}<div aria-hidden="true" className="worker-chart-canvas"><ResponsiveContainer width="100%" height={Math.max(140, data.length * 64)}><BarChart data={data} layout="vertical" margin={{ left: 0, right: 50, top: 8, bottom: 8 }}><XAxis type="number" hide allowDecimals={unit !== 'count'} /><YAxis type="category" dataKey="label" width={150} tick={<WrappedLabel />} axisLine={false} tickLine={false} /><Tooltip cursor={{ fill: 'var(--worker-surface-soft)' }} formatter={(value: number) => [formatResponseValue(value, unit), '']} /><Bar dataKey="value" radius={[0, 5, 5, 0]} isAnimationActive={false}>{data.map((_, index) => <Cell key={index} fill="var(--worker-primary)" />)}<LabelList dataKey="value" position="right" formatter={(value: number) => formatResponseValue(value, unit)} fill="var(--worker-ink)" fontSize={12} /></Bar></BarChart></ResponsiveContainer></div><ResponseTable table={{ columns: ['Pessoa ou categoria', unit === 'BRL' ? 'Valor em reais' : unit === 'minutes' ? 'Duração' : unit === 'percent' ? 'Percentual' : 'Quantidade'], rows: data.map(item => [item.label, formatResponseValue(item.value, unit)]) }} title="Valores do gráfico" /></figure>;
+  return <figure className="worker-rich-chart"><figcaption>{chart.title}</figcaption>{legacy && <p className="worker-rich-note">Visualização de uma conversa antiga. A abrangência da consulta não foi registrada.</p>}{population !== undefined && population > data.length && <p className="worker-rich-note">Exibindo {data.length} de {population.toLocaleString('pt-BR')} identidades ou categorias; cálculo sobre todos os eventos autorizados do período.</p>}<div aria-hidden="true" className="worker-chart-canvas"><ResponsiveContainer width="100%" height={Math.max(140, data.length * 64)}><BarChart data={data} layout="vertical" margin={{ left: 0, right: 50, top: 8, bottom: 8 }}><XAxis type="number" hide allowDecimals={unit !== 'count'} /><YAxis type="category" dataKey="label" width={150} tick={<WrappedLabel />} axisLine={false} tickLine={false} /><Tooltip cursor={{ fill: 'var(--worker-surface-soft)' }} formatter={(value: number) => [formatResponseValue(value, unit), '']} /><Bar dataKey="value" radius={[0, 5, 5, 0]} isAnimationActive={false}>{data.map((_, index) => <Cell key={index} fill="var(--worker-primary)" />)}<LabelList dataKey="value" position="right" formatter={(value: number) => formatResponseValue(value, unit)} fill="var(--worker-ink)" fontSize={12} /></Bar></BarChart></ResponsiveContainer></div><ResponseTable table={{ columns: ['Pessoa ou categoria', unit === 'BRL' ? 'Valor em reais' : unit === 'minutes' ? 'Duração' : unit === 'percent' ? 'Percentual' : 'Quantidade'], rows: data.map(item => [item.label, formatResponseValue(item.value, unit)]) }} title="Valores do gráfico" /></figure>;
 });
 const pieColors = ['var(--worker-primary)', 'var(--worker-attention)', 'oklch(var(--brand-green))', 'var(--worker-accent)', 'oklch(var(--brand-gold-500))', 'var(--worker-color)'];
 const ResponsePieChart = memo(function ResponsePieChart({ chart, unit, population }: { chart: Chart; unit: ChartUnit; population: number }) {
@@ -102,10 +111,26 @@ function ResponseBlock({ block }: { block: WorkerResponseBlock }) {
     case 'bar_chart': return <ResponseChart chart={{ title: block.title, data: block.data }} unit={block.unit} population={block.population} />;
     case 'pie_chart': return <ResponsePieChart chart={{ title: block.title, data: block.data }} unit={block.unit} population={block.population} />;
     case 'comparison': return <ResponseComparison comparison={{ title: block.title, unit: block.unit, currentLabel: block.currentLabel, previousLabel: block.previousLabel, items: block.items.map(item => ({ label: item.label, current: item.current, previous: item.previous })) }} />;
+    case 'entity_ranking': return <section className="worker-entity-ranking" aria-label={block.title}>
+      <h3>{block.title}</h3>
+      <ol>{block.items.map(item => {
+        const initials = item.name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('');
+        const identity = block.entityKind === 'commission' ? resolveOrgUnitIdentity({ slug: item.visualKey }) : null;
+        return <li key={item.id} data-position={item.position}>
+          <span className="worker-entity-ranking__position" aria-label={`${item.position}ª posição`}>{item.position}</span>
+          <span className="worker-entity-ranking__avatar">{block.entityKind === 'person'
+            ? <PersonAvatar userId={item.id} size="lg" fallback={<span className="worker-entity-ranking__initials" aria-hidden="true">{initials}</span>} />
+            : <OrgUnitIdentityBadge identityId={identity?.id} kind="comissao" />}</span>
+          <span className="worker-entity-ranking__name">{item.name}{item.label && item.label !== item.name && <small>{item.label}</small>}</span>
+          <span className="worker-entity-ranking__count"><strong>{formatResponseValue(item.events)}</strong><small>{item.events === 1 ? 'evento vinculado' : 'eventos vinculados'}</small></span>
+        </li>;
+      })}</ol>
+      {block.population > block.items.length && <p className="worker-rich-note">Exibindo {block.items.length} de {block.population} {block.entityKind === 'person' ? 'pessoas' : 'comissões'}. Contagem sobre todos os eventos autorizados do período.</p>}
+    </section>;
     case 'profile': return <section className="worker-response-profile">{block.photoUrl && <img src={block.photoUrl} alt={`Fotografia oficial de ${block.name}`} loading="lazy" referrerPolicy="no-referrer" />}<div><h3>{block.name}</h3><p>{block.role} · {block.edition}</p><dl>{block.details.map((item, index) => <div key={index}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl><small>Verificado em {dateLabel(block.verifiedOn)}{block.publishedOn ? ` · Publicado em ${dateLabel(block.publishedOn)}` : ''}</small></div></section>;
     case 'sources': return <div className="worker-response-sources" aria-label="Fontes verificadas">{block.items.map((item, index) => { const url = safeSourceUrl(item.url); return url ? <a key={index} href={url} target={item.source === 'web' ? '_blank' : undefined} rel={item.source === 'web' ? 'noopener noreferrer' : undefined}><ExternalLink size={12} />{item.label}{item.date ? ` · ${dateLabel(item.date)}` : ''}</a> : null; })}</div>;
     case 'empty': return <p className="worker-response-notice">{block.message}</p>;
-    case 'clarification': return <div className="worker-response-notice"><Text text={block.question} />{block.options && <ul>{block.options.map(option => <li key={option}>{option}</li>)}</ul>}</div>;
+    case 'clarification': return <div className="worker-response-notice"><Text text={block.question} />{clarificationOptions(block).length > 0 && <ul>{clarificationOptions(block).map((option, index) => <li key={index}>{option}</li>)}</ul>}</div>;
   }
 }
 function StructuredResponse({ response }: { response: WorkerResponse }) {

@@ -91,8 +91,10 @@ describe('BOT FENASOJA: facts and specific presentation', () => {
     expect(response.blocks.find(block => block.type === 'indicators' && block.items[0].unit === 'minutes')).toMatchObject({ items: [{ value: 150 }] });
   });
   it('renders ranking from the complete authorized aggregation and keeps exact labels and values', () => {
-    const response = compose({ ...request, message: 'Mostre um gráfico de barras das pessoas com mais eventos neste mês.' }, [proof('agenda_people_ranking', { scope: personal.scope, metrics: { people_count: 150, event_count: 800 }, people: [{ name: 'Pessoa de Teste A', events: 140 }, { name: 'Pessoa de Teste B', events: 140 }] })]);
-    expect(response.blocks[0]).toMatchObject({ type: 'bar_chart', population: 150, complete: true, data: [{ label: 'Pessoa de Teste A', value: 140 }, { label: 'Pessoa de Teste B', value: 140 }] });
+    const response = compose({ ...request, message: 'Mostre um gráfico de barras das pessoas com mais eventos neste mês.' }, [proof('agenda_people_ranking', { scope: personal.scope, metrics: { people_count: 150, event_count: 800 }, people: [{ person_id:'10000000-0000-4000-8000-000000000001',position:1,name: 'Pessoa de Teste A', events: 140 }, { person_id:'10000000-0000-4000-8000-000000000002',position:2,name: 'Pessoa de Teste B', events: 140 }] })]);
+    expect(response.blocks[0]).toMatchObject({type:'entity_ranking',entityKind:'person'});
+    expect(response.blocks[1]).toMatchObject({ type: 'bar_chart', population: 150, complete: true, data: [{ label: 'Pessoa de Teste A', value: 140 }, { label: 'Pessoa de Teste B', value: 140 }] });
+    expect(response.summary).toContain('Empate na liderança');
   });
   it('maps domain terms explicitly and refuses unknown machine-state translations', () => {
     expect(humanValue('SALE_OPEN')).toBe('Venda em andamento');

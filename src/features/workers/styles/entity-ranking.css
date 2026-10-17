@@ -1,0 +1,16 @@
+.workers-scope .worker-entity-ranking { min-width: 0; margin-block: 1.2rem; }
+.workers-scope .worker-entity-ranking h3 { margin: 0 0 .75rem; font-size: .88rem; font-weight: 650; color: var(--worker-ink); }
+.workers-scope .worker-entity-ranking ol { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+.workers-scope .worker-entity-ranking li { display: grid; grid-template-columns: 1.25rem 2.65rem minmax(0, 1fr) auto; align-items: center; gap: .65rem; min-width: 0; padding: .8rem; border: 1px solid var(--worker-border); border-radius: 1rem; background: var(--worker-paper); }
+.workers-scope .worker-entity-ranking li[data-position="1"] { background: var(--worker-surface-soft); border-color: color-mix(in oklab, var(--worker-primary) 26%, var(--worker-border)); }
+.workers-scope .worker-entity-ranking__position { font-size: .75rem; font-weight: 700; color: var(--worker-muted); font-variant-numeric: tabular-nums; }
+.workers-scope .worker-entity-ranking__avatar, .workers-scope .worker-entity-ranking__initials { width: 2.65rem; height: 2.65rem; border-radius: 50%; display: inline-grid; place-items: center; overflow: hidden; background: var(--worker-surface-soft); color: var(--worker-primary); }
+.workers-scope .worker-entity-ranking__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.workers-scope .worker-entity-ranking__avatar .org-unit-identity { width: 2.5rem; height: 2.5rem; }
+.workers-scope .worker-entity-ranking__initials { font-size: .85rem; font-weight: 700; }
+.workers-scope .worker-entity-ranking__name { min-width: 0; overflow-wrap: anywhere; font-size: .88rem; font-weight: 600; line-height: 1.35; }
+.workers-scope .worker-entity-ranking__name small { display: block; font-size: .7rem; color: var(--worker-muted); font-weight: 400; margin-top: .2rem; }
+.workers-scope .worker-entity-ranking__count { display: grid; text-align: right; gap: .15rem; color: var(--worker-ink); font-variant-numeric: tabular-nums; }
+.workers-scope .worker-entity-ranking__count strong { font-size: 1.25rem; line-height: 1.1; }
+.workers-scope .worker-entity-ranking__count small { color: var(--worker-muted); font-size: .65rem; max-width: 5.5rem; }
+@media (max-width: 430px) { .workers-scope .worker-entity-ranking li { grid-template-columns: 1rem 2.25rem minmax(0,1fr) auto; gap: .45rem; padding: .65rem; } .workers-scope .worker-entity-ranking__avatar, .workers-scope .worker-entity-ranking__initials { width: 2.25rem; height: 2.25rem; } }

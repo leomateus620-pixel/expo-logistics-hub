@@ -4,11 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import WorkersRoot from '../WorkersRoot';
 import { safeSourceUrl } from '../ui-utils';
 import { workerCatalog } from '../workerCatalog';
-import type { WorkerChatMessage } from '../types';
+import type { WorkerChatMessage, WorkerProgressStep } from '../types';
 
 const state = vi.hoisted(() => ({
   role: 'leitura', caps: new Set<string>(), messages: [] as WorkerChatMessage[], sendMessage: vi.fn().mockResolvedValue(undefined),
-  isStreaming: false, stop: vi.fn(),
+  isStreaming: false, stop: vi.fn(), error: null as string | null, progress: [] as WorkerProgressStep[], retryMessage: vi.fn(),
 }));
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: { id: 'reader', user_metadata: { name: 'Leonardo' } } }) }));
 vi.mock('@/hooks/useCurrentOrg', () => ({ useCurrentOrg: () => ({ orgId: 'org', myRole: state.role }) }));
@@ -16,10 +16,10 @@ vi.mock('@/hooks/useCapabilities', () => ({ useCapabilities: () => ({ hasCapabil
 vi.mock('../WorkersAccessGate', () => ({ default: ({ children }: { children: unknown }) => children }));
 vi.mock('../workspace-api', () => ({ callWorkerAction: vi.fn().mockResolvedValue([]), callWorkerWorkspace: vi.fn().mockResolvedValue({ serverNow: '2026-10-16T12:00:00Z', routines: [], runs: [], events: [], memories: [], alerts: [] }) }));
 vi.mock('../workspace/useWorkerWorkspace', () => ({ workspaceDate: () => 'Não informado', useWorkerWorkspace: () => ({ scope: 'user:org', orgId: 'org', actions: [], conversationActions: [], pendingActions: [], snapshot: { serverNow: '2026-10-16T12:00:00Z', routines: [], runs: [], events: [], memories: [], alerts: [] }, loading: false, error: null, busyId: null, refresh: vi.fn(), clearError: vi.fn(), mutateAction: vi.fn(), mutateWorkspace: vi.fn() }) }));
-vi.mock('../useWorkersChat', () => ({ useWorkersChat: () => ({ messages: state.messages, conversations: [], conversationId: null, isStreaming: state.isStreaming, progress: [], error: null, sendMessage: state.sendMessage, stop: state.stop, selectConversation: vi.fn(), newConversation: vi.fn(), isLoadingHistory: false, clearError: vi.fn(), activeWorkerId: 'agenda' }) }));
+vi.mock('../useWorkersChat', () => ({ useWorkersChat: () => ({ messages: state.messages, conversations: [], conversationId: null, isStreaming: state.isStreaming, progress: state.progress, error: state.error, sendMessage: state.sendMessage, retryMessage: state.retryMessage, stop: state.stop, selectConversation: vi.fn(), newConversation: vi.fn(), isLoadingHistory: false, clearError: vi.fn(), activeWorkerId: 'agenda' }) }));
 
 beforeEach(() => {
-  state.role = 'leitura'; state.caps = new Set(); state.messages = []; state.isStreaming = false; state.sendMessage.mockClear();
+  state.role = 'leitura'; state.caps = new Set(); state.messages = []; state.isStreaming = false; state.error = null; state.progress = []; state.sendMessage.mockClear(); state.retryMessage.mockClear();
   vi.stubGlobal('IntersectionObserver', class { observe() {} unobserve() {} disconnect() {} });
   HTMLElement.prototype.scrollTo = vi.fn();
 });
@@ -162,6 +162,39 @@ describe('bots UI de leitura', () => {
     expect(screen.queryByText('Consulta concluída')).not.toBeInTheDocument();
   });
 
+  it('mostra uma falha na tentativa, encerra os indicadores e preserva o próximo texto digitado', () => {
+    const at = '2026-10-16T12:00:00Z'; const message = 'Esta consulta precisa de uma atualização do sistema. Consulte o módulo enquanto ela é corrigida.';
+    state.messages = [{ id: 'question', role: 'user', requestId: 'attempt-1', content: 'Qual pessoa teve mais eventos em outubro?', createdAt: at },
+      { id: 'reply', role: 'assistant', requestId: 'attempt-1', content: message, createdAt: at, failure: { code: 'rpc_incompatible', message, retryable: false, requestId: 'attempt-1' } }];
+    state.error = message; state.progress = [{ label: 'Calculando sobre os dados autorizados…', status: 'running' }];
+    const { container, rerender } = page('/equipe-ia?worker=agenda');
+    const input = screen.getByRole('textbox', { name: 'Mensagem para Agenda' });
+    fireEvent.change(input, { target: { value: 'E qual comissão em outubro?' } });
+    rerender(<MemoryRouter initialEntries={['/equipe-ia?worker=agenda']}><WorkersRoot /></MemoryRouter>);
+    expect(screen.getAllByText(message)).toHaveLength(1);
+    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    expect(screen.queryByText('Calculando sobre os dados autorizados…')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Tentar novamente' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Consultar o módulo' })).toHaveAttribute('href', '/cronograma-eventos');
+    expect(input).toHaveValue('E qual comissão em outubro?');
+    expect([...container.querySelectorAll('.worker-message')].map(node => node.getAttribute('aria-label'))).toEqual(['Sua pergunta', 'Resposta de Agenda']);
+  });
+
+  it('reexecuta só a tentativa escolhida sem enviar nem apagar o novo rascunho', () => {
+    const message = 'A conexão falhou. Confira sua internet e tente novamente.';
+    state.error = message;
+    state.messages = [{ id: 'question', role: 'user', requestId: 'attempt-1', content: 'Eventos de outubro?', createdAt: '2026-10-16T12:00:00Z' },
+      { id: 'reply', role: 'assistant', requestId: 'attempt-1', content: message, createdAt: '2026-10-16T12:00:00Z', failure: { code: 'network_error', message, retryable: true, requestId: 'attempt-1' } }];
+    page('/equipe-ia?worker=agenda');
+    const input = screen.getByRole('textbox', { name: 'Mensagem para Agenda' });
+    fireEvent.change(input, { target: { value: 'Nova pergunta ainda não enviada' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(state.retryMessage).toHaveBeenCalledOnce();
+    expect(state.retryMessage).toHaveBeenCalledWith('attempt-1');
+    expect(state.sendMessage).not.toHaveBeenCalled();
+    expect(input).toHaveValue('Nova pergunta ainda não enviada');
+  });
+
   it('usa o mascote personalizado só no bot e mostra a abertura como mensagem compacta à esquerda', () => {
     const { container } = page('/equipe-ia?worker=mapa');
     expect(container.querySelector('img[src="/bot-fenasoja/mascot-open.webp"]')).toBeInTheDocument();
@@ -197,6 +230,18 @@ describe('bots UI de leitura', () => {
     fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
     expect(screen.getByRole('textbox', { name: 'Mensagem para Agenda' })).toHaveFocus();
     expect(state.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('monta a navegação no portal com sua viewport e retorna foco ao fechar', async () => {
+    page('/equipe-ia?worker=agenda');
+    const trigger = screen.getByRole('button', { name: 'Abrir navegação do BOT FENASOJA' });
+    fireEvent.click(trigger);
+    const panel = await screen.findByRole('dialog', { name: 'Navegação do BOT FENASOJA' });
+    await waitFor(() => expect((panel as HTMLElement).style.getPropertyValue('--worker-visible-height')).not.toBe(''));
+    expect(panel).toHaveTextContent('SEUS BOTS');
+    fireEvent.click(screen.getByRole('button', { name: 'Fechar painel' }));
+    await waitFor(() => expect(trigger).toHaveFocus());
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('abre o painel real pelo link de memória sem enviar mensagem', () => {

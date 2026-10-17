@@ -1,5 +1,7 @@
 # BOT FENASOJA — implementação e evidências
 
+> Correções posteriores às PRs #206/#207: [diagnóstico, banco incremental e homologação](reliability/README.md). A seção de implantação abaixo registra o estado daquela implementação; não é instrução para reaplicar migrations já executadas.
+
 Diagnóstico iniciado na branch `main`, commit `725f57342b0fdbc1344b5590121af6543afff3f2`. Implementação na branch `codex/bot-fenasoja`. Lidos os AGENTS da raiz e de workers antes das alterações. A alteração preexistente de `package-lock.json` e os worktrees locais não fazem parte da entrega.
 
 ## Causas confirmadas
