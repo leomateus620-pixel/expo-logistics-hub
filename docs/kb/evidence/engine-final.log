@@ -1,0 +1,14 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/.codex/worktrees/workers-knowledge-base/expo-logistics-hub
+
+ ✓ src/test/workersResponses.test.ts (25 tests) 202ms
+ ✓ src/test/workersOrchestrator.test.ts (22 tests) 248ms
+ ✓ src/test/workersReliability.test.ts (17 tests) 186ms
+ ✓ src/test/workersKnowledgeBaseEngine.test.ts (39 tests) 20804ms
+   ✓ Acervo revisado: composição integral sem truncamento > compõe todas as 2.786 entradas e conserva texto, ressalvas, datas e fonte no documento serializado  19607ms
+
+ Test Files  4 passed (4)
+      Tests  103 passed (103)
+   Start at  05:26:43
+   Duration  24.91s (transform 509ms, setup 1.37s, collect 2.26s, tests 21.44s, environment 6.08s, prepare 953ms)
+

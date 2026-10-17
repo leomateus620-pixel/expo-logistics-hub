@@ -1,0 +1,283 @@
+
+> vite_react_shadcn_ts@0.0.0 build
+> vite build
+
+vite v5.4.19 building for production...
+transforming...
+Browserslist: browsers data (caniuse-lite) is 16 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 6149 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                        2.79 kB │ gzip:   1.06 kB
+dist/assets/hydrologyPreparation.worker-CO2t0A-_.js                    4.19 kB
+dist/assets/celena-Nn1nbfQ3.jpg                                        5.31 kB
+dist/assets/fenasoja-symbol-144-C5yvRGTl.webp                         15.48 kB
+dist/assets/person-fabiano-soltis-DskSu3Fi.jpg                        15.79 kB
+dist/assets/person-djeison-drey-_71M4sjV.jpg                          18.13 kB
+dist/assets/archivo-black-DIejUijb.ttf                                46.89 kB
+dist/assets/fenasoja-vehicle-brand-DQ24MyRj.png                       69.86 kB
+dist/assets/headquartersGeometryWorker-BgQPlSNu.js                   197.77 kB
+dist/assets/hind-semibold-BnVdX7-0.ttf                               273.75 kB
+dist/assets/hind-bold-Bd-QVw-o.ttf                                   278.42 kB
+dist/assets/hind-regular-Labln8mb.ttf                                291.12 kB
+dist/assets/EntityExplorer-CKOdD8Bd.css                                0.82 kB │ gzip:   0.38 kB
+dist/assets/fenasoja-countdown-navigation-Kru7448x.css                 3.18 kB │ gzip:   1.22 kB
+dist/assets/MapPanels-C06rGBwO.css                                     6.21 kB │ gzip:   1.65 kB
+dist/assets/CommercialMapCanvas-B2KyB7Tp.css                           7.36 kB │ gzip:   1.90 kB
+dist/assets/alvorada-BbuiIfT8.css                                      7.80 kB │ gzip:   2.36 kB
+dist/assets/AlvoradaIntro-Dlb9kHrJ.css                                 8.11 kB │ gzip:   2.12 kB
+dist/assets/PublicAreaMapPage-XecS0fU2.css                             9.98 kB │ gzip:   2.48 kB
+dist/assets/CronogramaDashboardBoard-Gwlicy5R.css                     10.56 kB │ gzip:   2.32 kB
+dist/assets/maps-leaflet-Dgihpmma.css                                 15.04 kB │ gzip:   6.38 kB
+dist/assets/FenasojaCountdownExperiencePage-yCD_xnTO.css              18.64 kB │ gzip:   3.85 kB
+dist/assets/FenasojaEcosystemExperience-B0NCpgMj.css                  27.67 kB │ gzip:   6.32 kB
+dist/assets/OrgUnitIdentityBadge-C7-2S6a4.css                         29.51 kB │ gzip:   5.16 kB
+dist/assets/EventRelationshipWorkspace-C1nbY9np.css                   33.97 kB │ gzip:   6.12 kB
+dist/assets/CommissionPortalPage-DrL-dLyp.css                         51.88 kB │ gzip:   9.88 kB
+dist/assets/maps-maplibre-Twyd4PtP.css                                69.96 kB │ gzip:  10.06 kB
+dist/assets/CommissionWorkspacePage-BXfvKGq3.css                      75.71 kB │ gzip:  11.60 kB
+dist/assets/CommercialDashboard-SQgAcSmu.css                         107.77 kB │ gzip:  18.10 kB
+dist/assets/workspace-CEBszRXp.css                                   116.12 kB │ gzip:  17.38 kB
+dist/assets/VenueEventsPage-DbYCLv8-.css                             151.81 kB │ gzip:  23.73 kB
+dist/assets/CronogramaEventosPage-BwM_4E0b.css                       165.69 kB │ gzip:  24.67 kB
+dist/assets/CommercialMapPage-DHPAFrI3.css                           249.55 kB │ gzip:  42.45 kB
+dist/assets/FinancialManagementPage-D35j9gZE.css                     326.82 kB │ gzip:  47.26 kB
+dist/assets/index-Z65aFrmV.css                                       459.54 kB │ gzip:  73.29 kB
+dist/assets/fenasoja-symbol-144-BrliEKTf.js                            0.06 kB │ gzip:   0.08 kB
+dist/assets/subDays-CW2FuwkL.js                                        0.19 kB │ gzip:   0.17 kB
+dist/assets/lotTooltipPresentation-BkQcMZMm.js                         0.23 kB │ gzip:   0.20 kB
+dist/assets/minus-byoqml_x.js                                          0.29 kB │ gzip:   0.24 kB
+dist/assets/circle-DvTeDMis.js                                         0.29 kB │ gzip:   0.24 kB
+dist/assets/chevron-up-VAvL6Fds.js                                     0.30 kB │ gzip:   0.25 kB
+dist/assets/play-D4rSphtu.js                                           0.30 kB │ gzip:   0.25 kB
+dist/assets/plus-C1f339PD.js                                           0.32 kB │ gzip:   0.25 kB
+dist/assets/filter-Bg6SN_aF.js                                         0.33 kB │ gzip:   0.26 kB
+dist/assets/arrow-up-right-Nk9Ql2gb.js                                 0.33 kB │ gzip:   0.26 kB
+dist/assets/ban-DtA3Xuru.js                                            0.34 kB │ gzip:   0.27 kB
+dist/assets/circle-check-j0nydong.js                                   0.34 kB │ gzip:   0.27 kB
+dist/assets/circle-dot-CXu5Zuq0.js                                     0.35 kB │ gzip:   0.25 kB
+dist/assets/user-round-DmkRQSsl.js                                     0.35 kB │ gzip:   0.28 kB
+dist/assets/clock-BFJ5r5xK.js                                          0.35 kB │ gzip:   0.27 kB
+dist/assets/clock-3-CZ6NjrGZ.js                                        0.35 kB │ gzip:   0.27 kB
+dist/assets/BarChart-Ct3gLDTd.js                                       0.35 kB │ gzip:   0.25 kB
+dist/assets/corner-down-left-DpoHjiFl.js                               0.36 kB │ gzip:   0.29 kB
+dist/assets/user-BySWXmao.js                                           0.37 kB │ gzip:   0.29 kB
+dist/assets/skip-forward-DXkCjcIn.js                                   0.37 kB │ gzip:   0.29 kB
+dist/assets/info-JsK1V8hE.js                                           0.37 kB │ gzip:   0.28 kB
+dist/assets/rotate-ccw-CRA_Szll.js                                     0.37 kB │ gzip:   0.29 kB
+dist/assets/rotate-cw-UjgVb6zw.js                                      0.37 kB │ gzip:   0.29 kB
+dist/assets/label-DicvB8IF.js                                          0.37 kB │ gzip:   0.27 kB
+dist/assets/circle-x-C4lRr33j.js                                       0.37 kB │ gzip:   0.28 kB
+dist/assets/trending-up-D0uv8xnf.js                                    0.37 kB │ gzip:   0.28 kB
+dist/assets/credit-card-B-OntnL6.js                                    0.38 kB │ gzip:   0.29 kB
+dist/assets/undo-2-TBKCVonQ.js                                         0.38 kB │ gzip:   0.28 kB
+dist/assets/pause-Biw2L9yN.js                                          0.38 kB │ gzip:   0.27 kB
+dist/assets/ellipsis-Cl72R819.js                                       0.39 kB │ gzip:   0.27 kB
+dist/assets/paperclip-B9XqoHxP.js                                      0.39 kB │ gzip:   0.30 kB
+dist/assets/copy-CuG3Xcnx.js                                           0.40 kB │ gzip:   0.31 kB
+dist/assets/circle-help-bEhW2ncM.js                                    0.40 kB │ gzip:   0.30 kB
+dist/assets/activity-DrB7JZH2.js                                       0.40 kB │ gzip:   0.30 kB
+dist/assets/presentation-mmuhizPe.js                                   0.40 kB │ gzip:   0.30 kB
+dist/assets/history-BsMnbxQw.js                                        0.41 kB │ gzip:   0.30 kB
+dist/assets/link-2-BaT5jiEP.js                                         0.41 kB │ gzip:   0.31 kB
+dist/assets/database-DCJTbcAL.js                                       0.41 kB │ gzip:   0.31 kB
+dist/assets/banknote-REj8-tWo.js                                       0.41 kB │ gzip:   0.31 kB
+dist/assets/search-x-Bnd1bFO8.js                                       0.43 kB │ gzip:   0.30 kB
+dist/assets/upload-JjCrAv9h.js                                         0.43 kB │ gzip:   0.32 kB
+dist/assets/log-in-uWyIcGKk.js                                         0.43 kB │ gzip:   0.32 kB
+dist/assets/download-COTcm8Uk.js                                       0.43 kB │ gzip:   0.32 kB
+dist/assets/mic-RP_gHNor.js                                            0.44 kB │ gzip:   0.32 kB
+dist/assets/shield-ITKXJemd.js                                         0.44 kB │ gzip:   0.33 kB
+dist/assets/pencil-BIYh2ohF.js                                         0.45 kB │ gzip:   0.32 kB
+dist/assets/book-open-aeytoL3V.js                                      0.45 kB │ gzip:   0.31 kB
+dist/assets/wallet-B7U8aR0o.js                                         0.46 kB │ gzip:   0.31 kB
+dist/assets/send-DiRNfZg9.js                                           0.46 kB │ gzip:   0.33 kB
+dist/assets/maximize-2-Co71tlkM.js                                     0.47 kB │ gzip:   0.31 kB
+dist/assets/plane-D3oRKRFr.js                                          0.47 kB │ gzip:   0.35 kB
+dist/assets/file-down-bHfGRUzg.js                                      0.47 kB │ gzip:   0.31 kB
+dist/assets/expand-OZ7sGA4X.js                                         0.48 kB │ gzip:   0.33 kB
+dist/assets/user-plus-kblDc-5O.js                                      0.48 kB │ gzip:   0.33 kB
+dist/assets/badge-check-BzfaWD5K.js                                    0.48 kB │ gzip:   0.31 kB
+dist/assets/move-COVNjoi-.js                                           0.49 kB │ gzip:   0.31 kB
+dist/assets/fenasoja-brand-CYSopaj9.js                                 0.50 kB │ gzip:   0.36 kB
+dist/assets/save-DDM7aT0x.js                                           0.50 kB │ gzip:   0.33 kB
+dist/assets/database-zap-ox9IMRid.js                                   0.51 kB │ gzip:   0.35 kB
+dist/assets/file-image-WXD4XCne.js                                     0.52 kB │ gzip:   0.35 kB
+dist/assets/trash-2-DO-nwQh0.js                                        0.53 kB │ gzip:   0.35 kB
+dist/assets/crown-CDk-n8kz.js                                          0.53 kB │ gzip:   0.36 kB
+dist/assets/grip-vertical-Dgcp_Xag.js                                  0.53 kB │ gzip:   0.30 kB
+dist/assets/textarea-CfRMwhfp.js                                       0.54 kB │ gzip:   0.35 kB
+dist/assets/fuel-CZ8K45W0.js                                           0.54 kB │ gzip:   0.35 kB
+dist/assets/door-open-C5mxQwKE.js                                      0.54 kB │ gzip:   0.35 kB
+dist/assets/file-spreadsheet-Bt4ecQUI.js                               0.54 kB │ gzip:   0.33 kB
+dist/assets/network-WJ8kF1kg.js                                        0.55 kB │ gzip:   0.34 kB
+dist/assets/calendar-off-DhxX0DrV.js                                   0.55 kB │ gzip:   0.35 kB
+dist/assets/phone-YEKHRtH7.js                                          0.56 kB │ gzip:   0.36 kB
+dist/assets/ruler-DCQjCF6i.js                                          0.57 kB │ gzip:   0.35 kB
+dist/assets/square-BX26N91Z.js                                         0.58 kB │ gzip:   0.32 kB
+dist/assets/sunset-BQ0LnwDO.js                                         0.59 kB │ gzip:   0.35 kB
+dist/assets/map-C67Wg6e6.js                                            0.59 kB │ gzip:   0.38 kB
+dist/assets/arrow-up-CrKanC6S.js                                       0.61 kB │ gzip:   0.31 kB
+dist/assets/publicNavigation-CQbZHA7r.js                               0.62 kB │ gzip:   0.38 kB
+dist/assets/NotFound-BOvHbd9Q.js                                       0.67 kB │ gzip:   0.41 kB
+dist/assets/hydrologicalPresentation-CRcBGVqE.js                       0.69 kB │ gzip:   0.35 kB
+dist/assets/checkbox-CVHJBc6r.js                                       0.71 kB │ gzip:   0.41 kB
+dist/assets/circle-dashed-C_qeIhK4.js                                  0.74 kB │ gzip:   0.39 kB
+dist/assets/sliders-horizontal-7yKiUkrq.js                             0.75 kB │ gzip:   0.37 kB
+dist/assets/useMobilityAuthorizations-Co3dl2Qf.js                      0.77 kB │ gzip:   0.45 kB
+dist/assets/WorkersAdminGuard-apSwoonm.js                              0.78 kB │ gzip:   0.51 kB
+dist/assets/badge-DDT98JWc.js                                          0.78 kB │ gzip:   0.43 kB
+dist/assets/timer-7yizuEKC.js                                          0.78 kB │ gzip:   0.39 kB
+dist/assets/slider-CnmX9SW6.js                                         0.79 kB │ gzip:   0.45 kB
+dist/assets/pen-line-D_hec9Lt.js                                       0.84 kB │ gzip:   0.41 kB
+dist/assets/scroll-area-CMrwKD71.js                                    0.85 kB │ gzip:   0.44 kB
+dist/assets/useTransportGuests-DpVM2HNI.js                             0.87 kB │ gzip:   0.51 kB
+dist/assets/warehouse-U22P7niq.js                                      0.90 kB │ gzip:   0.44 kB
+dist/assets/sun-B6BkTFqr.js                                            0.90 kB │ gzip:   0.41 kB
+dist/assets/minimize-2-DSGkT8g4.js                                     0.95 kB │ gzip:   0.47 kB
+dist/assets/commercialMapQueryKey-blkUQKRg.js                          1.03 kB │ gzip:   0.52 kB
+dist/assets/useCommissions-D9QDn1nT.js                                 1.03 kB │ gzip:   0.47 kB
+dist/assets/graphics-suspense-BKIKQNXN.js                              1.05 kB │ gzip:   0.54 kB
+dist/assets/card-BHIMyQfc.js                                           1.06 kB │ gzip:   0.41 kB
+dist/assets/WorkersSessionRunner-BgbIAC4i.js                           1.08 kB │ gzip:   0.62 kB
+dist/assets/HistoryImageViewer-ivlPUnpL.js                             1.09 kB │ gzip:   0.63 kB
+dist/assets/tabs-CL30P0BM.js                                           1.15 kB │ gzip:   0.49 kB
+dist/assets/textNormalize-DKZHA5lK.js                                  1.16 kB │ gzip:   0.58 kB
+dist/assets/useFuelRecords-CfNnKem2.js                                 1.22 kB │ gzip:   0.63 kB
+dist/assets/module-runtime-CEDABylm.js                                 1.24 kB │ gzip:   0.72 kB
+dist/assets/useGuests-CL0lJjGq.js                                      1.40 kB │ gzip:   0.58 kB
+dist/assets/salesMoney-BRhk7nkl.js                                     1.47 kB │ gzip:   0.74 kB
+dist/assets/OperationDistributionChart-BycQuSCN.js                     1.48 kB │ gzip:   0.81 kB
+dist/assets/table-CgnMsf7l.js                                          1.53 kB │ gzip:   0.54 kB
+dist/assets/preloadCanvas-ByuUC09l.js                                  1.75 kB │ gzip:   0.90 kB
+dist/assets/CommissionCommercialMapPage-6eB9vFyE.js                    1.82 kB │ gzip:   0.91 kB
+dist/assets/useVehicleOdometerEvent-CaQjS54m.js                        1.92 kB │ gzip:   0.98 kB
+dist/assets/TransportsByDayChart-By9QKGvZ.js                           2.01 kB │ gzip:   0.94 kB
+dist/assets/useSchedules-D38NeZ22.js                                   2.07 kB │ gzip:   0.66 kB
+dist/assets/CartUsageChart-CdzFhHAp.js                                 2.11 kB │ gzip:   0.99 kB
+dist/assets/commercialPavilionWayfinding-CQwVTShY.js                   2.15 kB │ gzip:   0.99 kB
+dist/assets/fenasoja-countdown-navigation-DeqNFomk.js                  2.29 kB │ gzip:   0.98 kB
+dist/assets/useVehicles-CTo-B5_9.js                                    2.34 kB │ gzip:   1.01 kB
+dist/assets/AmusementParkPhysics-BjgnrG9y.js                           2.38 kB │ gzip:   1.22 kB
+dist/assets/KmRodadosChart-Dxwi61Kh.js                                 2.48 kB │ gzip:   1.15 kB
+dist/assets/TasksProgressChart-B1TunKps.js                             2.48 kB │ gzip:   0.97 kB
+dist/assets/TransportsProgressChart-DBS_mpQ6.js                        2.49 kB │ gzip:   0.97 kB
+dist/assets/AdminFrame-B4pXGXlt.js                                     2.58 kB │ gzip:   1.07 kB
+dist/assets/state-vendor-lP9Fbh91.js                                   3.03 kB │ gzip:   1.33 kB
+dist/assets/select-C3IQYjro.js                                         3.04 kB │ gzip:   1.12 kB
+dist/assets/NavigationMap3D--g67EwCw.js                                3.22 kB │ gzip:   1.41 kB
+dist/assets/useElectricCarts-C8aAA2qZ.js                               3.23 kB │ gzip:   1.05 kB
+dist/assets/useVehicleUsage-DaISi826.js                                3.24 kB │ gzip:   1.23 kB
+dist/assets/UnsubscribePage-CSsu2aEY.js                                3.43 kB │ gzip:   1.53 kB
+dist/assets/dropdown-menu-DB6e8VmM.js                                  3.55 kB │ gzip:   0.98 kB
+dist/assets/useScooters-BAGUc7UJ.js                                    3.60 kB │ gzip:   1.11 kB
+dist/assets/DriverLocationMap-C-KNaFvz.js                              3.69 kB │ gzip:   1.60 kB
+dist/assets/OdometerEventChart-oh8jpP_m.js                             3.96 kB │ gzip:   1.53 kB
+dist/assets/useExpenses-BHyw4xCN.js                                    4.01 kB │ gzip:   1.32 kB
+dist/assets/fenasojaComplexReconstruction-BFCP-SaX.js                  4.05 kB │ gzip:   1.96 kB
+dist/assets/WorkersCopilot-B5TFEOub.js                                 4.08 kB │ gzip:   1.92 kB
+dist/assets/VisitVehicleAssetAdapter-WiphoiSF.js                       4.59 kB │ gzip:   2.12 kB
+dist/assets/constants-B91POVDZ.js                                      4.78 kB │ gzip:   2.37 kB
+dist/assets/SoybeanAtmosphere-CELi-fIQ.js                              5.00 kB │ gzip:   2.27 kB
+dist/assets/AdminOverviewPage-K7OdHPBU.js                              5.13 kB │ gzip:   1.73 kB
+dist/assets/headquartersGeometryPacking-YhhmrvPn.js                    5.21 kB │ gzip:   2.20 kB
+dist/assets/AdminPortalPage-C7ex9pb_.js                                5.28 kB │ gzip:   1.46 kB
+dist/assets/VisitInputManager-BcKdMug0.js                              5.45 kB │ gzip:   1.85 kB
+dist/assets/CommercialMapPage-CaeRaI1B.js                              5.61 kB │ gzip:   2.22 kB
+dist/assets/VisitCartModel-CBvprLwG.js                                 5.70 kB │ gzip:   2.50 kB
+dist/assets/AdminCommissionPage-CPz-tKuS.js                            5.97 kB │ gzip:   1.79 kB
+dist/assets/GoogleCalendarCallbackPage--w5Q4-uD.js                     5.99 kB │ gzip:   2.53 kB
+dist/assets/date-time-picker-B8747Evd.js                               6.82 kB │ gzip:   2.36 kB
+dist/assets/CartesianGrid-D7uJOn9u.js                                  6.89 kB │ gzip:   2.41 kB
+dist/assets/VisitHelicopterModel-D8AKHwAX.js                           7.76 kB │ gzip:   3.21 kB
+dist/assets/useWebGLAvailability-C8jVXzUt.js                           7.79 kB │ gzip:   3.35 kB
+dist/assets/SeatedExecutiveCharacters-DaH5e-Qe.js                      8.23 kB │ gzip:   3.82 kB
+dist/assets/CommissionDashboardPlaceholder-_e4c1HsS.js                 8.35 kB │ gzip:   2.66 kB
+dist/assets/CalibrationPanel-CTrsvYeP.js                               8.56 kB │ gzip:   3.02 kB
+dist/assets/FenasojaCountdownExperiencePage-C7hdi8lV.js                8.75 kB │ gzip:   3.17 kB
+dist/assets/partners-SMph9OUp.js                                       8.94 kB │ gzip:   6.56 kB
+dist/assets/CommercialDashboardPavilion-ZsC5U3sV.js                    9.30 kB │ gzip:   4.03 kB
+dist/assets/RadialBarChart-UuVbG5-L.js                                10.69 kB │ gzip:   3.62 kB
+dist/assets/CommercialHydrologicalInfrastructureLayer-GC8DcX_g.js     10.83 kB │ gzip:   3.66 kB
+dist/assets/Area-uaG4LeTE.js                                          10.87 kB │ gzip:   4.01 kB
+dist/assets/ElectricCartsReportPage-Bkd9O9pB.js                       11.28 kB │ gzip:   4.31 kB
+dist/assets/CommercialMapRainLayer-CX-IZFz4.js                        11.42 kB │ gzip:   5.00 kB
+dist/assets/OrgUnitIdentityBadge-Cug1hHq0.js                          11.49 kB │ gzip:   4.16 kB
+dist/assets/GeometryEditor-t0tZDoXy.js                                11.63 kB │ gzip:   4.51 kB
+dist/assets/PieChart-DHUGuk2g.js                                      11.75 kB │ gzip:   4.37 kB
+dist/assets/LotCreationWorkspace-BFI4bTme.js                          12.25 kB │ gzip:   4.32 kB
+dist/assets/VisitHUD-BR-Dzof0.js                                      12.76 kB │ gzip:   4.44 kB
+dist/assets/GuestsPage-NSVYSFfd.js                                    13.22 kB │ gzip:   3.98 kB
+dist/assets/useCommercialMapStore-5wBfVsk8.js                         13.35 kB │ gzip:   2.63 kB
+dist/assets/ChecklistPage-BMGO_dVR.js                                 13.44 kB │ gzip:   4.03 kB
+dist/assets/VerEscalaPage-C1me6LsK.js                                 13.66 kB │ gzip:   4.72 kB
+dist/assets/PolarAngleAxis-Yforl3nS.js                                14.56 kB │ gzip:   4.06 kB
+dist/assets/FenasojaEventsPage-DL2alMsu.js                            15.08 kB │ gzip:   5.26 kB
+dist/assets/SettingsPage-DtgoKJWL.js                                  15.47 kB │ gzip:   4.85 kB
+dist/assets/TeamPage-C8-xBhUT.js                                      17.40 kB │ gzip:   4.79 kB
+dist/assets/PersonPickerSheet-Sa_1wqfN.js                             17.42 kB │ gzip:   5.62 kB
+dist/assets/YAxis-BYlml_gG.js                                         17.91 kB │ gzip:   4.82 kB
+dist/assets/SystemReportPage-BkXS8c5C.js                              18.70 kB │ gzip:   5.91 kB
+dist/assets/headquartersGeometryPreparation-B1RFw-Bb.js               18.80 kB │ gzip:   7.87 kB
+dist/assets/commercialPavilions-DQEqWFSP.js                           19.59 kB │ gzip:   6.58 kB
+dist/assets/workspace-api-BL-GG7Ib.js                                 20.73 kB │ gzip:   7.41 kB
+dist/assets/PublicAreaMapPage-BOVBuWOL.js                             24.90 kB │ gzip:   8.84 kB
+dist/assets/FuelExpensesChart-0HJpt5pd.js                             25.83 kB │ gzip:   7.55 kB
+dist/assets/personPhotos-CLagNARI.js                                  25.87 kB │ gzip:   7.51 kB
+dist/assets/KmEmissoesPage-Zbr2mFoM.js                                26.45 kB │ gzip:   7.88 kB
+dist/assets/EntityExplorer-CHoZq3_6.js                                27.41 kB │ gzip:   8.93 kB
+dist/assets/purify.es-Csrj9YNg.js                                     28.14 kB │ gzip:  10.69 kB
+dist/assets/MobilityAuthPage-BWnhvz8z.js                              28.95 kB │ gzip:   8.46 kB
+dist/assets/WorkersRoot-B354WKWq.js                                   30.30 kB │ gzip:   9.32 kB
+dist/assets/commercialMapQuery-WQ0sfVMT.js                            32.79 kB │ gzip:  10.23 kB
+dist/assets/AgendaPage-Bu4ZdEmO.js                                    33.68 kB │ gzip:   9.90 kB
+dist/assets/calendar-o6qG-nEI.js                                      34.70 kB │ gzip:  10.94 kB
+dist/assets/MapPanels-B3IUimlh.js                                     35.34 kB │ gzip:  11.40 kB
+dist/assets/EventRelationshipWorkspace-wCyqvgiT.js                    37.92 kB │ gzip:  10.42 kB
+dist/assets/HistoryView-5b8vdmC6.js                                   38.02 kB │ gzip:   9.54 kB
+dist/assets/motionFeatures-WddFF2Co.js                                42.39 kB │ gzip:  16.48 kB
+dist/assets/VehiclesPage-ndLmTLHu.js                                  48.94 kB │ gzip:  12.36 kB
+dist/assets/ExpensesPage-BvY5AyGP.js                                  51.81 kB │ gzip:  13.85 kB
+dist/assets/AlvoradaIntro-Dgz-_riy.js                                 52.80 kB │ gzip:  17.44 kB
+dist/assets/types-zC01htTX.js                                         55.02 kB │ gzip:  12.66 kB
+dist/assets/ScootersPage-CPg6obOu.js                                  57.92 kB │ gzip:  12.96 kB
+dist/assets/Dashboard-DRJFgmcD.js                                     58.37 kB │ gzip:  14.53 kB
+dist/assets/CommissionPortalPage-BAwuktNU.js                          59.67 kB │ gzip:  20.85 kB
+dist/assets/FenasojaEcosystemExperience-cBjl-bJF.js                   65.23 kB │ gzip:  22.46 kB
+dist/assets/ElectricCartsPage-bhOHOr86.js                             65.46 kB │ gzip:  15.80 kB
+dist/assets/CronogramaDashboardBoard-C7A59B06.js                      72.95 kB │ gzip:  20.68 kB
+dist/assets/VisitMode-qpAR1zOV.js                                     85.69 kB │ gzip:  29.93 kB
+dist/assets/CommissionWorkspacePage-iCIqdSGP.js                       98.63 kB │ gzip:  27.64 kB
+dist/assets/fenasojaRestaurant-B2bReSrU.js                           100.49 kB │ gzip:  29.16 kB
+dist/assets/electricalInfrastructure-0gdrXQo_.js                     102.37 kB │ gzip:  35.72 kB
+dist/assets/AgendaMeetingWorkspace-D35HxVqV.js                       102.94 kB │ gzip:  28.02 kB
+dist/assets/TransportsPage-D1yWeSLE.js                               118.00 kB │ gzip:  29.35 kB
+dist/assets/ui-radix-D9_5OLww.js                                     137.09 kB │ gzip:  40.66 kB
+dist/assets/CommercialDashboard-CDNPneoy.js                          139.74 kB │ gzip:  40.26 kB
+dist/assets/maps-leaflet-DZ0gsOp4.js                                 149.59 kB │ gzip:  43.37 kB
+dist/assets/index.es-kVm-hS-G.js                                     150.84 kB │ gzip:  51.65 kB
+dist/assets/workspace-B0JMbVZD.js                                    170.67 kB │ gzip:  57.02 kB
+dist/assets/react-vendor-DTjdp-YJ.js                                 192.97 kB │ gzip:  64.16 kB
+dist/assets/html2canvas.esm-CBrSDip1.js                              201.42 kB │ gzip:  48.03 kB
+dist/assets/VenueEventsPage-BHS6OMrL.js                              219.41 kB │ gzip:  58.63 kB
+dist/assets/data-vendor-CBNA2-i9.js                                  221.62 kB │ gzip:  59.67 kB
+dist/assets/CommercialMapPage-Ll3oy5dl.js                            253.03 kB │ gzip:  75.28 kB
+dist/assets/CronogramaEventosPage-AAIwtQrq.js                        320.35 kB │ gzip:  95.86 kB
+dist/assets/qr-JYzeuzSN.js                                           334.70 kB │ gzip: 100.02 kB
+dist/assets/generateCategoricalChart-CtlHEMVb.js                     350.03 kB │ gzip:  98.13 kB
+dist/assets/profilerDiagnostics-DnsMeHnY.js                          350.17 kB │ gzip: 109.56 kB
+dist/assets/FinancialManagementPage-BeEnNPH6.js                      426.20 kB │ gzip: 114.76 kB
+dist/assets/pdf-eJJ7Zoyj.js                                          446.72 kB │ gzip: 145.87 kB
+dist/assets/index-CIYagnq6.js                                        651.28 kB │ gzip: 176.29 kB
+dist/assets/CommercialMapCanvas-LN79S0TC.js                          992.74 kB │ gzip: 324.97 kB
+dist/assets/maps-maplibre-DaDby1s_.js                              1,053.53 kB │ gzip: 284.76 kB
+dist/assets/maps-three-dzVgiCgI.js                                 1,209.42 kB │ gzip: 362.01 kB
+dist/assets/maps-physics-BP2tOk8W.js                               2,081.49 kB │ gzip: 768.99 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1m 1s

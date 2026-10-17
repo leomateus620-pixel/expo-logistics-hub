@@ -13,7 +13,7 @@ export function configurePreviewMotion(surface: PreviewSurface, params: URLSearc
   if (surface.document.documentElement.dataset.workersPreviewMotion === 'full') return 'full';
   const nativeMatchMedia = surface.matchMedia.bind(surface);
   surface.matchMedia = (query: string): MediaQueryList => {
-    if (query.replace(/\s+/g, '').toLowerCase() !== '(prefers-reduced-motion:reduce)') return nativeMatchMedia(query);
+    if (!/^\(prefers-reduced-motion(?::reduce)?\)$/.test(query.replace(/\s+/g, '').toLowerCase())) return nativeMatchMedia(query);
     // Fixed synthetic preference: there are no preference-change events in this fixture.
     return { matches: false, media: query, onchange: null, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {}, dispatchEvent: () => false };
   };

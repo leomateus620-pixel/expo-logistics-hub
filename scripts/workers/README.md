@@ -8,6 +8,6 @@ Execute `npx vite --config scripts/workers/preview.vite.config.ts`. Este harness
 
 Use `motion=full` somente para inspecionar movimentos no navegador quando o host de QA declara `prefers-reduced-motion`. Recarregue a página sem esse parâmetro para restaurar a preferência real. Não altera a configuração do sistema. A opção não existe nas rotas nem no bundle da aplicação publicada; o guard exige hostname loopback.
 
-A simulação retorna `false` apenas para a media query de redução de movimento, preservando as demais consultas. Como CSS ainda recebe a preferência real, uma folha inserida apenas pela fixture habilita os três pontos laterais com os mesmos keyframes do produto e somente quando o mascote está ativo. Pausa manual, visibilidade e orçamento de animações continuam valendo.
+A simulação retorna `false` apenas para a media query de redução de movimento (`(prefers-reduced-motion: reduce)` e sua forma booleana usada por Motion), preservando as demais consultas. Como CSS ainda recebe a preferência real, uma folha inserida apenas pela fixture habilita os três pontos laterais com os mesmos keyframes do produto e somente quando o mascote está ativo. Pausa manual, visibilidade e orçamento de animações continuam valendo.
 
 Na inspeção, conferir a mudança de transformações do SVG e as piscadas entre quadros, os três pontos durante a resposta, sua remoção ao concluir e a pausa manual. Capturas desse modo comprovam o comportamento visual da fixture sob preferência simulada; não comprovam preferência real do usuário ou publicação.

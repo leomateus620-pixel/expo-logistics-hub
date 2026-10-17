@@ -1,0 +1,4 @@
+warning: in the working copy of 'docs/kb/design-qa.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/workers/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/workers/preview-motion.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/test/workersPreviewMotion.test.ts', LF will be replaced by CRLF the next time Git touches it

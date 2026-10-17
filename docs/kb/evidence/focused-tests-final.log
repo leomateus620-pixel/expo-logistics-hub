@@ -1,0 +1,64 @@
+
+ RUN  v3.2.4 C:/Users/Leonardo/.codex/worktrees/workers-knowledge-base/expo-logistics-hub
+
+ ✓ src/test/workersKnowledgeBaseEngine.test.ts (39 tests) 11323ms
+   ✓ Acervo revisado: composição integral sem truncamento > compõe todas as 2.786 entradas e conserva texto, ressalvas, datas e fonte no documento serializado  10497ms
+ ✓ src/test/workersKnowledgeBase.test.ts (32 tests) 12833ms
+   ✓ public KB: selection policy and exact reviewed composition > validates every reviewed display string, all statuses and literal summaries without truncation  12786ms
+Browserslist: browsers data (caniuse-lite) is 16 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/lib/workers/__tests__/edgeRegistry.test.ts (15 tests) 3506ms
+   ✓ generated deployable Edge registry > keeps source provenance identical across Windows and Linux line endings without ignoring source changes  344ms
+   ✓ generated deployable Edge registry > has exactly the deployment exports and is synchronized with canonical inputs  768ms
+   ✓ generated deployable Edge registry > rejects a stale artifact in check mode without modifying it or creating missing files  908ms
+   ✓ generated deployable Edge registry > renders byte-identical output independently of repeated builds  974ms
+   ✓ generated deployable Edge registry > detects a stale generated declaration independently of the JavaScript runtime  496ms
+stderr | src/features/workers/__tests__/workerUi.test.tsx > bots UI de leitura > apresenta os oito bots e links reais sem ações de marketplace
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/features/workers/__tests__/workspaceUi.test.tsx (8 tests) 903ms
+ ✓ src/features/workers/__tests__/richResponse.test.tsx (12 tests) 392ms
+ ✓ src/features/workers/__tests__/knowledgeSource.test.tsx (6 tests) 643ms
+   ✓ Fonte KB no chat existente > compacta a fonte em ícone e mantém rótulo/data na dica, período e ressalvas visíveis  488ms
+ ✓ src/features/workers/__tests__/workerUi.test.tsx (32 tests) 8686ms
+   ✓ bots UI de leitura > apresenta os oito bots e links reais sem ações de marketplace  1416ms
+   ✓ bots UI de leitura > apresenta três sugestões temáticas no agenda sem enviar a escolha automaticamente  657ms
+   ✓ bots UI de leitura > apresenta três sugestões temáticas no mapa sem enviar a escolha automaticamente  620ms
+   ✓ bots UI de leitura > mantém a pausa manual disponível após a primeira resposta  427ms
+   ✓ bots UI de leitura > identifica cada resposta pelo próprio mascote ao reabrir sem alterar mensagens do usuário  662ms
+   ✓ bots UI de leitura > exibe o bot e três pontos antes do primeiro texto, mantém durante o stream e retira ao concluir  550ms
+   ✓ bots UI de leitura > envia o texto digitado e mantém a seleção de @bot explícita  518ms
+   ✓ bots UI de leitura > usa o mascote personalizado só no bot e mostra a abertura como mensagem compacta à esquerda  351ms
+   ✓ bots UI de leitura > monta a navegação no portal com sua viewport e retorna foco ao fechar  569ms
+ ✓ src/features/workers/__tests__/workersChat.test.tsx (19 tests) 519ms
+ ✓ src/features/workers/__tests__/identityResponse.test.tsx (5 tests) 179ms
+ ✓ src/features/workers/__tests__/workspaceHook.test.tsx (3 tests) 285ms
+ ✓ src/test/workersOrchestrator.test.ts (22 tests) 150ms
+ ✓ src/test/workersResponses.test.ts (25 tests) 128ms
+ ✓ src/features/workers/__tests__/workerWelcome.test.tsx (4 tests) 137ms
+ ✓ src/test/workersReliability.test.ts (17 tests) 99ms
+ ✓ src/features/workers/__tests__/workerViewport.test.tsx (4 tests) 110ms
+ ✓ src/test/workersQuestionBank.test.ts (20 tests) 103ms
+ ✓ src/features/workers/__tests__/mascotLife.test.tsx (6 tests) 65ms
+ ✓ src/features/workers/__tests__/workersSessionRunner.test.tsx (3 tests) 114ms
+ ✓ src/test/workersRoutines.test.ts (20 tests) 53ms
+ ✓ src/lib/workers/__tests__/registry.test.ts (74 tests) 60ms
+ ✓ src/test/workersKbSources.test.ts (49 tests) 73ms
+ ✓ src/test/workersProposals.test.ts (16 tests) 53ms
+ ✓ src/features/workers/__tests__/workersApi.test.ts (19 tests) 60ms
+ ✓ src/features/workers/__tests__/workspaceApi.test.ts (9 tests) 49ms
+ ✓ src/test/workersDeadline.test.ts (9 tests) 38ms
+ ✓ src/lib/workers/__tests__/analytics.test.ts (15 tests) 27ms
+ ✓ src/features/workers/__tests__/workersAccessAndFormat.test.ts (5 tests) 29ms
+ ✓ src/test/workersPreviewMotion.test.ts (3 tests) 31ms
+ ✓ src/features/workers/__tests__/workerFailures.test.ts (8 tests) 10ms
+ ✓ src/features/workers/__tests__/messageOrder.test.ts (6 tests) 8ms
+ ✓ src/features/workers/__tests__/workspaceDegradation.test.ts (2 tests) 5ms
+
+ Test Files  31 passed (31)
+      Tests  507 passed (507)
+   Start at  05:33:15
+   Duration  51.12s (transform 1.75s, setup 4.18s, collect 15.20s, tests 40.67s, environment 26.84s, prepare 4.41s)
+

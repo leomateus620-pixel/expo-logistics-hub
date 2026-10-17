@@ -23,6 +23,7 @@ describe('isolamento da preferência de movimento da prévia', () => {
     const target = surface(); const original = target.matchMedia;
     expect(configurePreviewMotion(target, new URLSearchParams('motion=full'))).toBe('full');
     expect(target.matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(false);
+    expect(target.matchMedia('(prefers-reduced-motion)').matches).toBe(false);
     expect(target.matchMedia('(min-width: 1024px)').matches).toBe(true);
     expect(original).toHaveBeenCalledExactlyOnceWith('(min-width: 1024px)');
     expect(document.documentElement).toHaveAttribute('data-workers-preview-motion', 'full');

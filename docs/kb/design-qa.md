@@ -34,6 +34,12 @@ A rotação de 60 segundos, pausa por interação e preferência de movimento re
 
 ## Complemento de mascote e processamento
 
-Em implementação após a última orientação do usuário. A conferência final deve registrar mascote no início do processamento, três pontos animados, remoção dos pontos ao concluir, animação discreta após conclusão e preservação da identidade ao reabrir.
+Conferido após a última orientação do usuário. O cabeçalho da resposta usa o mascote de 32 px do bot persistido, com nome acessível/tooltip. [Durante o processamento](evidence/mobile-bot-processing-motion.jpg), havia exatamente três pontos e estado `working`; [após concluir](evidence/mobile-bot-complete-motion.jpg), zero pontos e estado `settled`. O avatar permaneceu acima da resposta, sem alterar o texto nem as fontes. [Reabertura](evidence/mobile-bot-reopened.jpg) preservou `worker=mapa`, mascote e três fontes. [Desktop escuro final](evidence/desktop-dark-bot.jpg).
 
-Final result: blocked — somente a conferência do último complemento de mascote está pendente. Os itens anteriores não apresentaram diferenças P0/P1/P2 na comparação final acima.
+O ambiente do navegador tem movimento reduzido ativo: nesse modo o mascote ficou estático, conforme esperado. Para observar o caminho animado, foi usada a preferência simulada `motion=full`, exclusiva da entrada de QA em loopback e identificada na tela. Isso não modifica a preferência do sistema nem adiciona uma flag ao produto. A prévia também usa atraso sintético de 1,8 s para permitir observar o processamento; esse tempo não mede latência da busca nem atrasa respostas de produção.
+
+No modo animado foram observadas rotação leve, deslocamento e piscada no SVG: 228 amostras, 217 posições distintas e `scaleY` da piscada detectado. Os três pontos usaram a mesma animação com atrasos 0 / 0,18 / 0,36 s. O botão de pausa mudou o mascote para `data-active=false` e transformações neutras; retomar reativou o movimento. [Medição de movimento](evidence/browser-motion.json). São animações observadas no navegador, não inferidas de uma imagem estática.
+
+Final result: pass — nenhuma diferença P0/P1/P2 ficou aberta nas superfícies e estados conferidos. A imagem suavizada da captura e a ausência de dispositivo físico permanecem limitações materiais; não se declara homologação iOS.
+
+Checklist final: abertura, cinco atalhos, marca, fontes compactas, nome/data acessíveis, processamento com três pontos, mascote ao concluir, pausa, reabertura, temas e viewports conferidos. A validação de publicação e sessão remota é distinta deste QA visual.

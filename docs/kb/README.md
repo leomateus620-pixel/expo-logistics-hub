@@ -2,12 +2,13 @@
 
 A capacidade integra o chat existente em `/equipe-ia` e o painel já usado nos módulos. Qualquer pessoa com acesso à Equipe pode perguntar a qualquer bot. Uma correspondência elegível recebe o texto revisado, ressalvas, edição/período e fontes. Não existe outro chat, editor administrativo, flag, ativação por organização ou importação manual.
 
-Isso fica disponível após aplicar as migrations e publicar o código. O deploy de frontend sozinho não publica o banco. A entrega foi desenvolvida e verificada localmente; a situação exata de comandos, ambiente remoto e publicação está em [validacao.md](validacao.md).
+Isso fica disponível após aplicar as migrations e publicar o código. O deploy de frontend sozinho não publica o banco. A entrega foi verificada localmente e na CI; a situação exata de comandos, ambiente remoto e publicação está em [validacao.md](validacao.md).
 
 - [Como usar](tutorial-usuario.md)
 - [Curadoria e atualização](atualizacao.md)
 - [Banco, contratos, executor e recuperação](banco.md)
 - [Evidências e limites da validação](validacao.md)
+- [Prompt de publicação após o merge](prompt-pos-merge.md)
 - [Manifesto gerado](../../data/kb/manifest.json)
 
 ## Conteúdo e proveniência
@@ -50,6 +51,8 @@ Uma troca concorrente de versão antes da finalização provoca no máximo uma n
 O checkout vigente continha as migrations de persistência `20261017030000` e identidade `20261017060000`, além do espelho Drizzle `0017`. A migration aditiva usa `20261017070000`; o seed inicial usa `20261017080000`; o espelho é `0018`. A única função antiga substituída é a finalização vigente, ampliada para citações KB. Sanitizadores, tabelas e políticas anteriores são preservados.
 
 O seed gerado é uma transação com lotes internos dimensionados pelo gerador. Ele faz upsert, sincroniza variantes, valida contagens, registra versão/hash, protege contra downgrade e só retira IDs explicitamente gerenciados. Eventos não são apagados. Há um único executor por migration, conforme o histórico real do ambiente; veja [banco.md](banco.md). O checkout não revelou um workflow que publique migrations automaticamente.
+
+O executor remoto ainda não foi confirmado. Se o histórico do ambiente for Supabase, a carga inicial aplica `20261017070000_workers_knowledge_base.sql` e depois `20261017080000_workers_kb_seed.sql`, com as migrations anteriores já aplicadas. Se o histórico for Drizzle, o runner controlado aplica exclusivamente o espelho `0018` após verificar `0017` e publica o mesmo seed pelo registro privado de versões. Não execute os dois caminhos. O smoke exige o papel `authenticated` e um contexto válido de usuário; uma sessão administrativa sem esse contexto não comprova RLS. Os comandos e suas pré-condições estão em [banco.md](banco.md).
 
 O módulo KB é somente servidor. Não entra no registro gerado das ferramentas de dados nem no `readTools` do planejador. JSONs completos ficam fora de `public/` e do bundle de frontend. A prévia local lê o acervo no servidor de teste, sem expô-lo ao navegador. Não foram adicionados provedor, segredo, variável de ambiente, dependência, pgvector ou embeddings. FCM, Google Sync, Agenda Meeting e Mapa Comercial não recebem alterações desta entrega.
 

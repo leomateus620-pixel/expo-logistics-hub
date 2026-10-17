@@ -14,3 +14,5 @@ supabase/migrations/*_workers_kb_seed*.sql text eol=lf
 supabase/migrations/20261017070000_workers_knowledge_base.sql text eol=lf
 drizzle/migrations/0018_workers_knowledge_base.sql text eol=lf
 data/kb/raw/** -text whitespace=cr-at-eol,-blank-at-eof
+# Captured command output is evidence, not formatted source; preserve its bytes.
+docs/kb/evidence/*.log -text -whitespace linguist-generated=true
