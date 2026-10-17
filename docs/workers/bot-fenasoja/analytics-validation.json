@@ -82,23 +82,23 @@
   "files": [
     {
       "name": "scripts/workers/db-fixture.sql",
-      "sha256": "2e491fdb22f158ada71bebfde5d32051b7ce04c414c45822cc2b9397febd7567"
+      "sha256": "5cb6a5e0316aa3eda2422b331f8a7efa829da38d3b374a30d81f456f84167514"
     },
     {
       "name": "supabase/migrations/20261016120000_workers_readonly_workspace.sql",
-      "sha256": "9a79d2baa586cac5bb76c858663130102eaafcc3c6bc7ed9f88550f18c78fa37"
+      "sha256": "a5f5d890c806437c270398e8f0c84b06b33693c9dda2446c8d0c40b98c56056f"
     },
     {
       "name": "drizzle/migrations/0009_migration.sql",
-      "sha256": "190a85b52857d72e24c2b7f1e15e8625ce91e2088df9e6e834631535664772d7"
+      "sha256": "47c7e869e3ffdfeefb904ae560bbc0839e8dd5105f3661d80a94ce1b81064ef7"
     },
     {
       "name": "supabase/migrations/20261017010000_workers_message_order.sql",
-      "sha256": "489dea53cf930f90f518c4f66a3513ccbeea3d72aed40323c1a47dd4efbb59b9"
+      "sha256": "a678f0b93e5ab0c91d7f88e84b7ff527013349947f5d8a15bb4a1557573e8681"
     },
     {
       "name": "supabase/migrations/20261017020000_workers_verified_analytics.sql",
-      "sha256": "0a971ce64e561b545684a878cdcdf6ee907e49c83f116446fc7d1d4df14bc947"
+      "sha256": "f99c8dfb4c5fc4b125c443756f150189070e4bbd33b2acbecbecfa5ef23c9d57"
     },
     {
       "name": "supabase/migrations/20261017050000_workers_agenda_relationships.sql",
@@ -115,7 +115,7 @@
       ],
       "scope": {
         "unit": "BRL_cents",
-        "as_of": "2026-10-17T01:52:18.658-03:00",
+        "as_of": "2026-10-17T05:26:41.335+00:00",
         "complete": true,
         "timezone": "America/Sao_Paulo",
         "project_id": "20000000-0000-4000-8000-000000000001",
@@ -145,7 +145,7 @@
         "A duração considera o intervalo agendado completo dos eventos com horários válidos, inclusive quando atravessam o período."
       ],
       "scope": {
-        "as_of": "2026-10-17T01:52:18.696-03:00",
+        "as_of": "2026-10-17T05:26:41.359+00:00",
         "period": {
           "to": "2026-10-31",
           "from": "2026-10-01"
@@ -187,7 +187,7 @@
       ],
       "scope": {
         "unit": "events",
-        "as_of": "2026-10-17T01:52:18.736-03:00",
+        "as_of": "2026-10-17T05:26:41.385+00:00",
         "period": {
           "to": "2026-10-31",
           "from": "2026-10-01"
@@ -228,7 +228,7 @@
       ],
       "scope": {
         "unit": "events",
-        "as_of": "2026-10-17T01:52:19.013-03:00",
+        "as_of": "2026-10-17T05:26:41.529+00:00",
         "period": {
           "to": "2026-10-31",
           "from": "2026-10-01"
@@ -254,7 +254,7 @@
       ],
       "scope": {
         "unit": "events",
-        "as_of": "2026-10-17T01:52:19.239-03:00",
+        "as_of": "2026-10-17T05:26:41.66+00:00",
         "period": {
           "to": "2026-10-31",
           "from": "2026-10-01"
