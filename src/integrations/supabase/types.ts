@@ -13084,13 +13084,59 @@ export type Database = {
         }
         Returns: Json
       }
+      workers_agenda_event_scope: {
+        Args: { _from_date: string; _org_id: string; _to_date: string }
+        Returns: {
+          created_by_user_id: string
+          duration_minutes: number
+          end_at: string
+          end_date: string
+          id: string
+          responsible_user_id: string
+          start_at: string
+          start_date: string
+          status: string
+        }[]
+      }
+      workers_agenda_people_ranking: {
+        Args: {
+          _from_date: string
+          _limit?: number
+          _org_id: string
+          _to_date: string
+        }
+        Returns: Json
+      }
+      workers_agenda_personal_summary: {
+        Args: {
+          _from_date: string
+          _org_id: string
+          _relationship?: string
+          _to_date: string
+        }
+        Returns: Json
+      }
       workers_interest_summary: {
         Args: { _from?: string; _org_id: string; _to?: string }
+        Returns: Json
+      }
+      workers_map_sales_overview: {
+        Args: {
+          _edition_year?: number
+          _from_date?: string
+          _org_id: string
+          _project_id?: string
+          _to_date?: string
+        }
         Returns: Json
       }
       workers_public_links_overview: {
         Args: { _org_id: string }
         Returns: Json
+      }
+      workers_require_read_scope: {
+        Args: { _org_id: string }
+        Returns: undefined
       }
     }
     Enums: {
