@@ -13116,8 +13116,50 @@ export type Database = {
         }
         Returns: Json
       }
+      workers_agenda_query: {
+        Args: {
+          _category?: string
+          _commission_id?: string
+          _cross_midnight?: boolean
+          _cross_period?: boolean
+          _from_date: string
+          _group_by?: string
+          _location?: string
+          _missing_category?: boolean
+          _missing_location?: boolean
+          _missing_time?: boolean
+          _org_id: string
+          _priority?: string
+          _relationship?: string
+          _search?: string
+          _start_in_period?: boolean
+          _status?: string
+          _to_date: string
+          _weekday?: number
+        }
+        Returns: Json
+      }
       workers_interest_summary: {
         Args: { _from?: string; _org_id: string; _to?: string }
+        Returns: Json
+      }
+      workers_map_inventory_summary: {
+        Args: {
+          _block?: string
+          _covered?: boolean
+          _edition_year?: number
+          _electricity?: boolean
+          _group_by?: string
+          _internet?: boolean
+          _max_area?: number
+          _min_area?: number
+          _missing_area?: boolean
+          _missing_number?: boolean
+          _org_id: string
+          _project_id?: string
+          _status?: string
+          _water?: boolean
+        }
         Returns: Json
       }
       workers_map_sales_overview: {
