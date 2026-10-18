@@ -1,0 +1,229 @@
+/* Responsável, convidados e local nos cards de eventos da Agenda. */
+.cronograma-event-meta {
+  --meta-owner: var(--primary);
+  --meta-commission: var(--brand-muted-indigo);
+  --meta-guests: var(--semantic-green-600);
+  --meta-location: var(--brand-orange-700);
+  --meta-surface: var(--surface-1);
+  display: grid;
+  min-width: 0;
+  text-align: left;
+}
+
+.dark .cronograma-event-meta {
+  --meta-commission: var(--emblem-indigo);
+  --meta-guests: var(--emblem-green);
+  --meta-location: var(--brand-orange-400);
+  --meta-surface: var(--surface-2);
+}
+
+.cronograma-event-meta__item {
+  --meta-tone: var(--meta-owner);
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cronograma-event-meta__item[data-role='commission'] { --meta-tone: var(--meta-commission); }
+.cronograma-event-meta__item[data-role='guests'] { --meta-tone: var(--meta-guests); }
+.cronograma-event-meta__item[data-role='location'] { --meta-tone: var(--meta-location); }
+
+.cronograma-event-meta__glyph {
+  position: relative;
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(var(--meta-tone) / 0.2);
+  border-radius: 0.7rem;
+  background:
+    radial-gradient(120% 90% at 28% 12%, oklch(var(--neutral-0) / 0.9), transparent 60%),
+    linear-gradient(150deg, oklch(var(--meta-tone) / 0.1), oklch(var(--meta-tone) / 0.2));
+  box-shadow:
+    inset 0 1px 0 oklch(var(--neutral-0) / 0.75),
+    0 6px 14px -10px oklch(var(--meta-tone) / 0.85);
+  color: oklch(var(--meta-tone));
+  transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 180ms ease;
+}
+
+.dark .cronograma-event-meta__glyph {
+  background: linear-gradient(150deg, oklch(var(--meta-tone) / 0.16), oklch(var(--meta-tone) / 0.28));
+  box-shadow: inset 0 1px 0 oklch(var(--neutral-0) / 0.08);
+}
+
+.cronograma-event-meta__glyph svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.cronograma-event-meta__item[data-role='owner'] .cronograma-event-meta__glyph::after {
+  position: absolute;
+  top: -0.2rem;
+  right: -0.2rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 2px solid oklch(var(--meta-surface));
+  border-radius: 999px;
+  background: oklch(var(--gold));
+  box-shadow: 0 1px 3px oklch(var(--gold) / 0.6);
+  content: '';
+}
+
+.cronograma-event-meta__text {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 0.05rem;
+}
+
+.cronograma-event-meta__text small {
+  color: oklch(var(--meta-tone) / 0.88);
+  font-size: 0.56rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.cronograma-event-meta__text > span {
+  min-width: 0;
+  overflow: hidden;
+  color: oklch(var(--foreground));
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cronograma-event-meta__count {
+  display: inline-flex;
+  min-width: 1.45rem;
+  height: 1.45rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  background: oklch(var(--meta-tone) / 0.12);
+  color: oklch(var(--meta-tone));
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+/* Painel empilhado (cards mobile). */
+.cronograma-event-meta[data-layout='stacked'] {
+  overflow: hidden;
+  border: 1px solid oklch(var(--border) / 0.7);
+  border-radius: 0.95rem;
+  background:
+    linear-gradient(180deg, oklch(var(--neutral-0) / 0.92), oklch(var(--surface-2) / 0.7));
+  box-shadow: inset 0 1px 0 oklch(var(--neutral-0) / 0.9);
+}
+
+.dark .cronograma-event-meta[data-layout='stacked'] {
+  background: oklch(var(--surface-2) / 0.65);
+  box-shadow: none;
+}
+
+.cronograma-event-meta[data-layout='stacked'] .cronograma-event-meta__item {
+  padding: 0.5rem 0.65rem;
+}
+
+.cronograma-event-meta[data-layout='stacked'] .cronograma-event-meta__item + .cronograma-event-meta__item::before {
+  position: absolute;
+  top: 0;
+  right: 0.65rem;
+  left: 3.25rem;
+  height: 1px;
+  background: linear-gradient(90deg, oklch(var(--border) / 0.85), oklch(var(--border) / 0.15));
+  content: '';
+}
+
+/* Chips em linha (linha do tempo desktop). */
+.cronograma-event-meta[data-layout='inline'] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.cronograma-event-meta[data-layout='inline'] .cronograma-event-meta__item {
+  max-width: 17rem;
+  flex: 0 1 auto;
+  gap: 0.45rem;
+  border: 1px solid oklch(var(--meta-tone) / 0.16);
+  border-radius: 999px;
+  padding: 0.18rem 0.65rem 0.18rem 0.2rem;
+  background: linear-gradient(120deg, oklch(var(--meta-tone) / 0.07), oklch(var(--neutral-0) / 0.6) 70%);
+}
+
+.dark .cronograma-event-meta[data-layout='inline'] .cronograma-event-meta__item {
+  background: oklch(var(--meta-tone) / 0.1);
+}
+
+.cronograma-event-meta[data-layout='inline'] .cronograma-event-meta__glyph {
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+}
+
+.cronograma-event-meta[data-layout='inline'] .cronograma-event-meta__glyph svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.cronograma-event-meta[data-layout='inline'] .cronograma-event-meta__item[data-role='owner'] .cronograma-event-meta__glyph::after {
+  top: -0.15rem;
+  right: -0.15rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-width: 1.5px;
+}
+
+.cronograma-event-meta[data-layout='inline'] .cronograma-event-meta__text small {
+  font-size: 0.5rem;
+}
+
+.cronograma-event-meta[data-layout='inline'] .cronograma-event-meta__text > span {
+  font-size: 0.7rem;
+}
+
+.cronograma-event-meta[data-layout='inline'] .cronograma-event-meta__count {
+  min-width: 1.2rem;
+  height: 1.2rem;
+  margin-right: -0.35rem;
+  font-size: 0.6rem;
+}
+
+/* Integração com o estado do card. */
+.cronograma-mobile-event-card:hover .cronograma-event-meta__glyph,
+.cronograma-operational-event:hover .cronograma-event-meta__glyph {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 oklch(var(--neutral-0) / 0.75),
+    0 8px 16px -10px oklch(var(--meta-tone) / 0.95);
+}
+
+.cronograma-mobile-event-card[data-status='cancelled'] .cronograma-event-meta,
+.cronograma-operational-event[data-status='cancelled'] .cronograma-event-meta,
+.cronograma-mobile-event-card[data-variant='completed'] .cronograma-event-meta,
+.cronograma-operational-event[data-variant='completed'] .cronograma-event-meta {
+  filter: saturate(0.45);
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cronograma-event-meta__glyph {
+    transition: none;
+  }
+
+  .cronograma-mobile-event-card:hover .cronograma-event-meta__glyph,
+  .cronograma-operational-event:hover .cronograma-event-meta__glyph {
+    transform: none;
+  }
+}

@@ -1133,31 +1133,7 @@
 }
 
 .cronograma-mobile-event-metadata {
-  display: grid;
-  min-width: 0;
-  gap: 0.25rem;
-  color: oklch(var(--muted-foreground));
-  font-size: 0.68rem;
-}
-
-.cronograma-mobile-event-metadata > span {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.cronograma-mobile-event-metadata svg {
-  width: 0.8rem;
-  height: 0.8rem;
-  flex: 0 0 auto;
-}
-
-.cronograma-mobile-event-metadata > span > span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin-top: 0.15rem;
 }
 
 .cronograma-mobile-event-progress {

@@ -5,13 +5,9 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
-  Layers3,
   ListChecks,
-  MapPin,
   SearchX,
   Sparkles,
-  UserRound,
-  UsersRound,
 } from 'lucide-react';
 import {
   getHarvestEventKey,
@@ -48,6 +44,7 @@ import {
 import { statusLabels } from '../cronogramaData';
 import { compareEventDates, formatLongDateWithWeekday } from '../dateUtils';
 import { CronogramaDateBadge, getDateBadgeTone } from '../CronogramaDateBadge';
+import { CronogramaEventMeta } from '../CronogramaEventMeta';
 
 import { CronogramaCyclePortal } from '../CronogramaCycleSlot';
 import { MobileCycleSwitcher } from './MobileCycleSwitcher';
@@ -580,26 +577,13 @@ function MobileTimelineEventCard({
           <CronogramaCategoryMarker category={event.category} />
         </span>
 
-        <span className="cronograma-mobile-event-metadata">
-          {(responsible || event.owner || event.commission) && (
-            <span>
-              {(responsible || event.owner) ? <UserRound aria-hidden="true" /> : <Layers3 aria-hidden="true" />}
-              <span>{responsible?.label ?? event.owner ?? event.commission}</span>
-            </span>
-          )}
-          {guests.length > 0 && (
-            <span>
-              <UsersRound aria-hidden="true" />
-              <span>{guests.length === 1 ? guests[0].label : `${guests.length} convidados`}</span>
-            </span>
-          )}
-          {event.location && (
-            <span>
-              <MapPin aria-hidden="true" />
-              <span>{event.location}</span>
-            </span>
-          )}
-        </span>
+        <CronogramaEventMeta
+          owner={responsible?.label ?? event.owner}
+          commission={event.commission}
+          guests={guests}
+          location={event.location}
+          className="cronograma-mobile-event-metadata"
+        />
 
         {progress.total > 0 && (
           <span className="cronograma-mobile-event-progress">
