@@ -1,0 +1,35 @@
+/* Module tone layer shared by emblem, index, action phrase and direction. */
+.portal-tone {
+  --pe-plate: var(--emblem-plate-indigo);
+  --pe-accent: var(--emblem-gold);
+  --pe-accent-deep: var(--emblem-gold-deep);
+  --pe-support: var(--emblem-blue);
+}
+
+.portal-tone[data-plate='indigo'] { --pe-plate: var(--emblem-plate-indigo); }
+.portal-tone[data-plate='blue'] { --pe-plate: var(--emblem-plate-blue); }
+.portal-tone[data-plate='teal'] { --pe-plate: var(--emblem-plate-teal); }
+.portal-tone[data-plate='navy'] { --pe-plate: var(--emblem-plate-navy); }
+
+.portal-tone[data-accent='gold'] {
+  --pe-accent: var(--emblem-gold);
+  --pe-accent-deep: var(--emblem-gold-deep);
+}
+
+.portal-tone[data-accent='orange'] {
+  --pe-accent: var(--emblem-orange);
+  --pe-accent-deep: var(--emblem-orange-deep);
+}
+
+.portal-tone[data-accent='green'] {
+  --pe-accent: var(--emblem-green);
+  --pe-accent-deep: var(--emblem-green-deep);
+}
+
+.portal-tone[data-accent='cream'] {
+  --pe-accent: var(--emblem-cream);
+  --pe-accent-deep: var(--emblem-cream-deep);
+}
+
+.portal-tone[data-support='blue'] { --pe-support: var(--emblem-blue); }
+.portal-tone[data-support='indigo'] { --pe-support: var(--emblem-indigo); }

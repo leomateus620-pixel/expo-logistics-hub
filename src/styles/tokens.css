@@ -65,6 +65,9 @@
   --emblem-blue: 74% 0.125 255.72;
   --emblem-green: 76% 0.125 171.97;
   --emblem-orange: var(--brand-orange-400);
+  --emblem-orange-deep: var(--brand-orange-500);
+  --emblem-green-deep: var(--brand-green);
+  --emblem-cream-deep: 86% 0.060 80.62;
   --emblem-indigo: 74% 0.105 278;
   --emblem-cream: var(--brand-cream);
 

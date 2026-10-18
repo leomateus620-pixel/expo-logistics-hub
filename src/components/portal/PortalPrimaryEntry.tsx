@@ -11,6 +11,9 @@ import {
 import type { PortalPrimaryEntry as PortalPrimaryEntryConfig } from '@/modules/portal/portalRegistry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
 import { PortalModuleEmblem } from '@/components/portal/emblems/PortalModuleEmblem';
+import { getPortalModuleTone } from '@/components/portal/emblems/portalModuleTone';
+import { PortalActionPhrase } from '@/components/portal/actions/PortalActionPhrase';
+import { resolvePortalActionPhrases } from '@/components/portal/actions/portalActionPhrases';
 
 interface PortalPrimaryEntryProps {
   access: PortalAccessPresentation;
@@ -73,6 +76,7 @@ export function PortalPrimaryEntry({
   const isExpandable = entry.kind === 'expandable';
   const actionLabel = getActionLabel(entry, access, expanded);
   const stateDescription = access.detail ?? access.label;
+  const phrases = resolvePortalActionPhrases(entry.id, access.state, expanded, actionLabel);
 
   const content = (
     <>
@@ -94,7 +98,9 @@ export function PortalPrimaryEntry({
         <span className="portal-primary-entry__description">{entry.description}</span>
       </span>
       <span className="portal-primary-entry__action" aria-hidden="true">
-        <span className="portal-primary-entry__action-label">{actionLabel}</span>
+        <span className="portal-primary-entry__action-label">
+          <PortalActionPhrase phrases={phrases} order={index} />
+        </span>
         <span className="portal-primary-entry__direction">
           {isExpandable ? <ChevronDown /> : access.target ? <ArrowRight /> : <AccessIcon state={access.state} />}
         </span>
@@ -110,7 +116,8 @@ export function PortalPrimaryEntry({
 
   return (
     <article
-      className="portal-primary-entry"
+      className="portal-primary-entry portal-tone"
+      {...getPortalModuleTone(entry.id)}
       data-expanded={expanded}
       data-kind={entry.kind}
       data-access-state={access.state}

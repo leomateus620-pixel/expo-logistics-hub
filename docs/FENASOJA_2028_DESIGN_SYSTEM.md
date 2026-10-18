@@ -132,6 +132,23 @@ Cores vêm só dos tokens `--emblem-*` em `tokens.css` (tons das âncoras oficia
 
 Movimento: o ancestral `.portal-emblem-host` liga `--pe-live` em hover (apenas ponteiro fino), `:focus-visible` e estado ativo (`active`, ex.: Comissões expandida). Os gestos usam só `transform` e `opacity` em 210 ms; a pressão reduz a placa para 0,96 em 90 ms. Não há animação contínua, `filter` ou glow. `muted` suaviza o emblema quando o perfil não tem acesso. Movimento reduzido, alto contraste, transparência reduzida e `forced-colors` têm fallback próprio. O emblema é decorativo ao lado do título; `label` cria nome acessível quando ele aparece sozinho.
 
+O tom de cada módulo vem de uma única camada, `.portal-tone` (`getPortalModuleTone`), aplicada ao card. Ela é compartilhada por:
+
+- emblema;
+- índice: placa Navy com rim tonal, zero à esquerda em neutro e traço de acento que se alarga em hover, foco e estado expandido;
+- botão de direção: sólido no acento do módulo, seta Navy, highlight superior e lábio inferior, sem transparência. Perfil negado usa o tom `--access-denied` sólido e carregamento usa neutro.
+
+A frase ao lado do botão (`PortalActionPhrase`) é microcopy de apresentação. Cada módulo tem frases próprias por estado: perfil liberado, visitante e Comissões recolhida. Carregando, negado, configuração e expandido ficam com rótulo fixo. O nome acessível do controle continua sendo o rótulo funcional.
+
+As frases se escrevem caractere a caractere com cursor no acento e trocam a cada ~5,6 s, em ritmo escalonado por card. É a única rotação do portal e fica pausada:
+
+- fora da tela;
+- com a aba oculta;
+- em hover ou foco;
+- com `prefers-reduced-motion`.
+
+Um sizer invisível reserva a frase mais longa, então a troca nunca reflui o card.
+
 ### Formulários e controles
 
 - Labels permanecem visíveis; placeholder não substitui label.

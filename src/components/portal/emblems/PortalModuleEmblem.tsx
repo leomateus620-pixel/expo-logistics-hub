@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import type { PortalEntryId } from '@/modules/portal/portalRegistry';
 import { PORTAL_MODULE_SYMBOLS } from './portalModuleSymbols';
+import { getPortalModuleTone } from './portalModuleTone';
 import '@/styles/portal-module-emblems.css';
 
 interface PortalModuleEmblemProps {
@@ -29,11 +30,9 @@ export function PortalModuleEmblem({
 
   return (
     <span
-      className={cn('portal-emblem', className)}
+      className={cn('portal-emblem portal-tone', className)}
       data-emblem={module}
-      data-plate={symbol.plate}
-      data-accent={symbol.accent}
-      data-support={symbol.support}
+      {...getPortalModuleTone(module)}
       data-active={active || undefined}
       data-muted={muted || undefined}
       role={label ? 'img' : undefined}

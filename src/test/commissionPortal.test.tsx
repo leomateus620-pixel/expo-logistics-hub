@@ -257,7 +257,7 @@ describe('CommissionPortalPage', () => {
     const commercialMapLink = screen.getByRole('link', {
       name: 'Entrar para acessar: Mapa Comercial',
     });
-    expect(commercialMapLink.textContent?.match(/Entrar para acessar/g)).toHaveLength(1);
+    expect(commercialMapLink.textContent?.match(/Entrar no mapa do parque/g)).toHaveLength(1);
     fireEvent.click(commercialMapLink);
     expect(screen.getByTestId('current-location')).toHaveTextContent('/login/mapa-comercial');
     expect(localStorage.getItem(SELECTED_COMMISSION_STORAGE_KEY)).toBe('mapa-comercial');

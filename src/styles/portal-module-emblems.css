@@ -4,12 +4,9 @@
  *    module accent at the bottom-right edge);
  * 2. surface: inset bevel with a soft support-tone light pool;
  * 3. symbol: 32-unit SVG with one stroke weight and selective accent areas.
- * Every color resolves to `--emblem-*` tokens from tokens.css.
+ * Every color resolves to `--emblem-*` tokens through `.portal-tone`.
  */
 .portal-emblem {
-  --pe-plate: var(--emblem-plate-indigo);
-  --pe-accent: var(--emblem-gold);
-  --pe-support: var(--emblem-blue);
   --pe-duration: var(--motion-base, 210ms);
   --pe-duration-press: var(--motion-instant, 90ms);
   --pe-live: 0;
@@ -76,18 +73,6 @@
   stroke-linejoin: round;
   stroke-width: 1.7;
 }
-
-/* Tone variants */
-.portal-emblem[data-plate='indigo'] { --pe-plate: var(--emblem-plate-indigo); }
-.portal-emblem[data-plate='blue'] { --pe-plate: var(--emblem-plate-blue); }
-.portal-emblem[data-plate='teal'] { --pe-plate: var(--emblem-plate-teal); }
-.portal-emblem[data-plate='navy'] { --pe-plate: var(--emblem-plate-navy); }
-.portal-emblem[data-accent='gold'] { --pe-accent: var(--emblem-gold); }
-.portal-emblem[data-accent='orange'] { --pe-accent: var(--emblem-orange); }
-.portal-emblem[data-accent='green'] { --pe-accent: var(--emblem-green); }
-.portal-emblem[data-accent='cream'] { --pe-accent: var(--emblem-cream); }
-.portal-emblem[data-support='blue'] { --pe-support: var(--emblem-blue); }
-.portal-emblem[data-support='indigo'] { --pe-support: var(--emblem-indigo); }
 
 /* Symbol parts */
 .portal-emblem .pe-line { stroke: oklch(var(--emblem-ink)); }
