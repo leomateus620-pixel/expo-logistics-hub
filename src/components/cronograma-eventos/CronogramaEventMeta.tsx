@@ -21,11 +21,8 @@ interface CronogramaEventMetaProps {
 function OwnerGlyph() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M5 20.25c0-3.7 3.13-6.25 7-6.25s7 2.55 7 6.25" fill="currentColor" fillOpacity="0.18" />
-      <circle cx="12" cy="8.25" r="3.75" fill="currentColor" fillOpacity="0.18" />
-      <path d="M5 20.25c0-3.7 3.13-6.25 7-6.25s7 2.55 7 6.25" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-      <circle cx="12" cy="8.25" r="3.75" stroke="currentColor" strokeWidth="1.7" />
-      <path d="m10.4 16.4 1.6 1.9 1.6-1.9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="8" r="4" fill="currentColor" fillOpacity="0.16" stroke="currentColor" strokeWidth="2" />
+      <path d="M4.5 20.5c0-3.9 3.36-6.5 7.5-6.5s7.5 2.6 7.5 6.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -33,9 +30,8 @@ function OwnerGlyph() {
 function CommissionGlyph() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="m12 3.5 8.5 4.25L12 12 3.5 7.75 12 3.5Z" fill="currentColor" fillOpacity="0.18" />
-      <path d="m12 3.5 8.5 4.25L12 12 3.5 7.75 12 3.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
-      <path d="m3.5 12 8.5 4.25L20.5 12M3.5 16.25 12 20.5l8.5-4.25" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m12 3.5 8.5 4.25L12 12 3.5 7.75 12 3.5Z" fill="currentColor" fillOpacity="0.16" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="m3.5 12.5 8.5 4.25 8.5-4.25M3.5 16.75 12 21l8.5-4.25" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -43,13 +39,9 @@ function CommissionGlyph() {
 function GuestsGlyph() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="16.75" cy="7.5" r="2.6" fill="currentColor" fillOpacity="0.14" />
-      <path d="M15.6 13.4c3 .2 5.15 2.2 5.15 5.1" stroke="currentColor" strokeOpacity="0.6" strokeWidth="1.6" strokeLinecap="round" />
-      <circle cx="16.75" cy="7.5" r="2.6" stroke="currentColor" strokeOpacity="0.6" strokeWidth="1.6" />
-      <path d="M3.25 19.75c0-3.3 2.6-5.6 5.75-5.6s5.75 2.3 5.75 5.6" fill="currentColor" fillOpacity="0.2" />
-      <circle cx="9" cy="8.5" r="3.25" fill="currentColor" fillOpacity="0.2" />
-      <path d="M3.25 19.75c0-3.3 2.6-5.6 5.75-5.6s5.75 2.3 5.75 5.6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-      <circle cx="9" cy="8.5" r="3.25" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="9" cy="8.5" r="3.5" fill="currentColor" fillOpacity="0.16" stroke="currentColor" strokeWidth="2" />
+      <path d="M2.75 20c0-3.45 2.8-5.75 6.25-5.75s6.25 2.3 6.25 5.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M15.5 5.25a3.25 3.25 0 0 1 0 6.5M18 14.6c2 .75 3.25 2.6 3.25 5.4" stroke="currentColor" strokeOpacity="0.55" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -57,10 +49,8 @@ function GuestsGlyph() {
 function LocationGlyph() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <ellipse cx="12" cy="20.5" rx="4.5" ry="1.1" fill="currentColor" fillOpacity="0.22" />
-      <path d="M12 19.25s-6.25-5.2-6.25-10.1a6.25 6.25 0 0 1 12.5 0c0 4.9-6.25 10.1-6.25 10.1Z" fill="currentColor" fillOpacity="0.18" />
-      <path d="M12 19.25s-6.25-5.2-6.25-10.1a6.25 6.25 0 0 1 12.5 0c0 4.9-6.25 10.1-6.25 10.1Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
-      <circle cx="12" cy="9.1" r="2.35" fill="currentColor" />
+      <path d="M12 21s-7-5.75-7-11.25a7 7 0 0 1 14 0C19 15.25 12 21 12 21Z" fill="currentColor" fillOpacity="0.16" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <circle cx="12" cy="9.75" r="2.5" fill="currentColor" />
     </svg>
   );
 }
@@ -97,8 +87,8 @@ function MetaItem({
         <Glyph />
       </span>
       <span className="cronograma-event-meta__text">
-        <small>{eyebrows[role]}</small>
-        <span>{value}</span>
+        <span className="sr-only">{eyebrows[role]}: </span>
+        {value}
       </span>
       {trailing}
     </span>
