@@ -6,11 +6,8 @@ import {
   CircleAlert,
   Layers3,
   ListChecks,
-  MapPin,
   SearchX,
   Sparkles,
-  UserRound,
-  UsersRound,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -45,6 +42,7 @@ import {
 import { statusLabels } from './cronogramaData';
 import { formatLongDateWithWeekday } from './dateUtils';
 import { CronogramaDateBadge, getDateBadgeTone } from './CronogramaDateBadge';
+import { CronogramaEventMeta } from './CronogramaEventMeta';
 import { EventHarvestAnimation } from './EventHarvestAnimation';
 import { CronogramaCycleChips } from './CronogramaCycleChips';
 import { CronogramaCyclePortal } from './CronogramaCycleSlot';
@@ -503,26 +501,14 @@ function TimelineEventRow({
         <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
           <CronogramaCategoryMarker category={event.category} />
           {event.commission && <span className="inline-flex items-center gap-1"><Layers3 className="h-3 w-3" />{event.commission}</span>}
-          {(responsible || event.owner) && (
-            <span className="cronograma-event-person" data-role="owner">
-              <UserRound className="h-3 w-3" aria-hidden="true" />
-              <span className="max-w-52 truncate">{responsible?.label ?? event.owner}</span>
-            </span>
-          )}
-          {guests.length > 0 && (
-            <span
-              className="cronograma-event-person"
-              data-role="guest"
-              title={`Convidados: ${guests.map((guest) => guest.label).join(' · ')}`}
-            >
-              <UsersRound className="h-3 w-3" aria-hidden="true" />
-              <span className="max-w-52 truncate">
-                {guests.length === 1 ? guests[0].label : `${guests.length} convidados`}
-              </span>
-            </span>
-          )}
-          {event.location && <span className="inline-flex min-w-0 items-center gap-1"><MapPin className="h-3 w-3" /><span className="max-w-52 truncate">{event.location}</span></span>}
         </span>
+        <CronogramaEventMeta
+          layout="inline"
+          owner={responsible?.label ?? event.owner}
+          guests={guests}
+          location={event.location}
+          className="mt-2"
+        />
         {progress.total > 0 && (
           <span className="mt-2 flex max-w-sm items-center gap-2">
             <span className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-200" aria-hidden="true"><span className="block h-full rounded-full bg-primary" style={{ width: `${progress.percent}%` }} /></span>
