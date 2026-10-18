@@ -305,13 +305,13 @@
 /* Assinatura do menu: faceta inferior na cor da placa do emblema */
 .portal-primary-entry__direction::before {
   position: absolute;
-  inset: auto 22% 3px;
+  inset: auto 32% 3px;
   z-index: -1;
-  height: 2px;
+  height: 1.5px;
   border-radius: 999px;
-  background: color-mix(in oklch, oklch(var(--pe-plate)) 55%, transparent);
+  background: color-mix(in oklch, oklch(var(--pe-plate)) 60%, transparent);
   content: '';
-  opacity: 0.55;
+  opacity: 0.42;
 }
 
 /* Reflexo diagonal que atravessa o botão no hover */
