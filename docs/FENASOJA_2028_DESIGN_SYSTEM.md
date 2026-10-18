@@ -111,6 +111,44 @@ Escalas compartilhadas:
 - Use badges para estados curtos; use alertas ou texto auxiliar quando houver consequência ou ação necessária.
 - Skeletons devem respeitar a geometria do conteúdo e não simular dados.
 
+### Emblemas dos módulos do portal
+
+Os seis módulos principais do portal usam `PortalModuleEmblem` (`src/components/portal/emblems/`), não ícones genéricos de biblioteca. Cada emblema tem três camadas:
+
+- placa: moldura com raio proporcional (29%), gradiente estrutural Navy/Indigo e borda iluminada do canto superior esquerdo, terminando no acento do módulo;
+- superfície: bisel interno com luz suave no tom de apoio, edge highlight e sombra de contato;
+- símbolo: SVG próprio em grade de 32 unidades, margem óptica de 4, traço único de 1,7 (1,45 em detalhes finos) e microáreas de cor.
+
+| Módulo | Placa | Acento | Apoio | Gesto vivo |
+| --- | --- | --- | --- | --- |
+| Agenda Fenasoja | Indigo | Gold (data oficial) | Blue | Argolas sobem; data se destaca |
+| Agenda Restaurante e Arena | Blue | Orange (porta acolhedora) | Blue | Cobertura sobe; porta acende |
+| Mapa Comercial | Teal | Green (pin) | Blue (lote) | Pin sobe; sombra contrai |
+| Comissões | Indigo | Cream (pessoa central) | Indigo | Equipe se aproxima |
+| Financeiro | Navy | Gold (moeda) | Indigo (base) | Moeda sobe sobre a base |
+| Administrador | Navy | Green (estado seguro) | Indigo (controle) | Controle gira 45° |
+
+Cores vêm só dos tokens `--emblem-*` em `tokens.css` (tons das âncoras oficiais clareados para 3:1 sobre Navy). Tons são combinados por `data-plate`, `data-accent` e `data-support`; novos símbolos entram em `PORTAL_MODULE_SYMBOLS` reutilizando as classes `pe-*`.
+
+Movimento: o ancestral `.portal-emblem-host` liga `--pe-live` em hover (apenas ponteiro fino), `:focus-visible` e estado ativo (`active`, ex.: Comissões expandida). Os gestos usam só `transform` e `opacity` em 210 ms; a pressão reduz a placa para 0,96 em 90 ms. Não há animação contínua, `filter` ou glow. `muted` suaviza o emblema quando o perfil não tem acesso. Movimento reduzido, alto contraste, transparência reduzida e `forced-colors` têm fallback próprio. O emblema é decorativo ao lado do título; `label` cria nome acessível quando ele aparece sozinho.
+
+O tom de cada módulo vem de uma única camada, `.portal-tone` (`getPortalModuleTone`), aplicada ao card. Ela é compartilhada por:
+
+- emblema;
+- índice: placa Navy com rim tonal, zero à esquerda em neutro e traço de acento que se alarga em hover, foco e estado expandido;
+- botão de direção: sólido no acento do módulo, seta Navy, highlight superior e lábio inferior, sem transparência. Perfil negado usa o tom `--access-denied` sólido e carregamento usa neutro.
+
+A frase ao lado do botão (`PortalActionPhrase`) é microcopy de apresentação. Cada módulo tem frases próprias por estado: perfil liberado, visitante e Comissões recolhida. Carregando, negado, configuração e expandido ficam com rótulo fixo. O nome acessível do controle continua sendo o rótulo funcional.
+
+As frases se escrevem caractere a caractere com cursor no acento e trocam a cada ~5,6 s, em ritmo escalonado por card. É a única rotação do portal e fica pausada:
+
+- fora da tela;
+- com a aba oculta;
+- em hover ou foco;
+- com `prefers-reduced-motion`.
+
+Um sizer invisível reserva a frase mais longa, então a troca nunca reflui o card.
+
 ### Formulários e controles
 
 - Labels permanecem visíveis; placeholder não substitui label.

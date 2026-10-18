@@ -1,0 +1,114 @@
+/*
+ * Write-on microcopy for portal cards. The hidden sizer reserves the widest
+ * phrase in the same grid cell, so rotation never reflows the card. Only
+ * opacity and transform animate.
+ */
+.portal-action-phrase {
+  --phrase-char-ms: 24ms;
+  --phrase-first-delay: calc(var(--phrase-order, 0) * 90ms + 260ms);
+
+  display: inline-grid;
+  justify-items: end;
+  text-align: right;
+}
+
+.portal-action-phrase > * {
+  grid-area: 1 / 1;
+}
+
+.portal-action-phrase__sizer {
+  visibility: hidden;
+}
+
+/* Generated text keeps the reserved phrase out of the accessible text. */
+.portal-action-phrase__sizer::before {
+  content: attr(data-text);
+}
+
+.portal-action-phrase__text {
+  position: relative;
+  transition:
+    opacity 180ms var(--ease-accelerate, ease-in),
+    transform 180ms var(--ease-accelerate, ease-in);
+}
+
+.portal-action-phrase__text[data-leaving] {
+  opacity: 0;
+  transform: translateY(-0.28em);
+}
+
+.portal-action-phrase__word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.portal-action-phrase__char {
+  display: inline-block;
+  white-space: pre;
+  animation: portal-phrase-char-in 320ms var(--ease-decelerate, ease-out) both;
+  animation-delay: calc(var(--i) * var(--phrase-char-ms));
+}
+
+.portal-action-phrase__text[data-first] .portal-action-phrase__char {
+  animation-delay: calc(var(--phrase-first-delay) + var(--i) * var(--phrase-char-ms));
+}
+
+/* Writing caret in the module accent; it leaves once the phrase is complete. */
+.portal-action-phrase__text::after {
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  width: 2px;
+  height: 1.05em;
+  border-radius: 1px;
+  background: oklch(var(--pe-accent));
+  content: '';
+  opacity: 0;
+  transform: translateY(-50%);
+  animation: portal-phrase-caret calc(var(--phrase-length) * var(--phrase-char-ms) + 520ms) linear both;
+}
+
+.portal-action-phrase__text[data-first]::after {
+  animation-delay: var(--phrase-first-delay);
+}
+
+@keyframes portal-phrase-char-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.34em);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes portal-phrase-caret {
+  0%,
+  82% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .portal-action-phrase {
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-action-phrase__char,
+  .portal-action-phrase__text::after {
+    animation: none;
+  }
+
+  .portal-action-phrase__text {
+    transition: none;
+  }
+}
