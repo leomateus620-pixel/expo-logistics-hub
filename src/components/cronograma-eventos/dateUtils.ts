@@ -11,9 +11,30 @@ const longDateFormatter = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
 });
 
-const weekdayFormatter = new Intl.DateTimeFormat('pt-BR', {
+// Event dates are calendar keys (YYYY-MM-DD) with no time zone. Anchoring them at
+// UTC noon and formatting in UTC keeps day, month and weekday identical for any
+// viewer time zone.
+const calendarWeekdayShortFormatter = new Intl.DateTimeFormat('pt-BR', {
   weekday: 'short',
-  timeZone: 'America/Sao_Paulo',
+  timeZone: 'UTC',
+});
+
+const calendarWeekdayLongFormatter = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'long',
+  timeZone: 'UTC',
+});
+
+const calendarMonthShortFormatter = new Intl.DateTimeFormat('pt-BR', {
+  month: 'short',
+  timeZone: 'UTC',
+});
+
+const calendarLongDateFormatter = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'long',
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
 });
 
 const monthFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -48,9 +69,62 @@ export function formatLongDateRange(date: string | null, endDate?: string | null
   return `${formatLongDate(date)} a ${formatLongDate(endDate)}`;
 }
 
+function toCalendarDate(date: string): Date | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(date);
+  if (!match) return null;
+  const value = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12));
+  return Number.isNaN(value.getTime()) ? null : value;
+}
+
+function stripAbbreviationDot(label: string): string {
+  return label.replace(/\./g, '').trim();
+}
+
+function capitalize(label: string): string {
+  return label.charAt(0).toLocaleUpperCase('pt-BR') + label.slice(1);
+}
+
+export interface CalendarDateParts {
+  iso: string;
+  day: string;
+  /** Ex.: "OUT" */
+  monthShort: string;
+  /** Ex.: "Seg", "Sáb" */
+  weekdayShort: string;
+  /** Ex.: "segunda-feira" */
+  weekdayLong: string;
+  weekdayIndex: number;
+  isWeekend: boolean;
+}
+
+export function getCalendarDateParts(date: string | null | undefined): CalendarDateParts | null {
+  if (!date) return null;
+  const value = toCalendarDate(date);
+  if (!value) return null;
+  const weekdayIndex = value.getUTCDay();
+  return {
+    iso: value.toISOString().slice(0, 10),
+    day: String(value.getUTCDate()).padStart(2, '0'),
+    monthShort: stripAbbreviationDot(calendarMonthShortFormatter.format(value)).toLocaleUpperCase('pt-BR'),
+    weekdayShort: capitalize(stripAbbreviationDot(calendarWeekdayShortFormatter.format(value))),
+    weekdayLong: calendarWeekdayLongFormatter.format(value),
+    weekdayIndex,
+    isWeekend: weekdayIndex === 0 || weekdayIndex === 6,
+  };
+}
+
+export function formatWeekdayShort(date: string | null | undefined): string | null {
+  return getCalendarDateParts(date)?.weekdayShort ?? null;
+}
+
 export function formatWeekday(date: string | null): string {
-  if (!date) return 'pendente';
-  return weekdayFormatter.format(parseDate(date)).replace('.', '');
+  const parts = getCalendarDateParts(date);
+  return parts ? parts.weekdayShort.toLocaleLowerCase('pt-BR') : 'pendente';
+}
+
+export function formatLongDateWithWeekday(date: string | null): string {
+  const value = date ? toCalendarDate(date) : null;
+  return value ? calendarLongDateFormatter.format(value) : 'Data a definir';
 }
 
 export function getMonthLabel(monthIndex: number): string {

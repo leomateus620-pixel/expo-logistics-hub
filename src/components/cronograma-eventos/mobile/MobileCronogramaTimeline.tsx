@@ -46,7 +46,8 @@ import {
   CronogramaStatusIndicator,
 } from '../CronogramaBadges';
 import { statusLabels } from '../cronogramaData';
-import { compareEventDates, formatLongDate } from '../dateUtils';
+import { compareEventDates, formatLongDateWithWeekday } from '../dateUtils';
+import { CronogramaDateBadge, getDateBadgeTone } from '../CronogramaDateBadge';
 
 import { CronogramaCyclePortal } from '../CronogramaCycleSlot';
 import { MobileCycleSwitcher } from './MobileCycleSwitcher';
@@ -62,10 +63,6 @@ const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'UTC',
 });
 
-const monthShortFormatter = new Intl.DateTimeFormat('pt-BR', {
-  month: 'short',
-  timeZone: 'UTC',
-});
 
 const cycleMonths = CRONOGRAMA_CYCLE.flatMap(({ year }) => (
   Array.from({ length: 12 }, (_, index) => `${year}-${String(index + 1).padStart(2, '0')}`)
@@ -493,7 +490,6 @@ function MobileTimelineEventCard({
   const progress = getSubeventProgress(event);
   const { responsible, guests } = splitEventResponsibles(event);
   const date = event.date!;
-  const dateObject = new Date(`${date}T12:00:00Z`);
   const isToday = date === todayKey;
   const completionPending = Boolean(harvestJob);
   const harvesting = harvestJob?.phase === 'harvesting';
@@ -526,13 +522,19 @@ function MobileTimelineEventCard({
         data-reduced-motion={harvestJob?.reducedMotion || undefined}
         aria-busy={completionPending || undefined}
         aria-disabled={completionPending ? 'true' : undefined}
-        aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}${harvesting ? ' Colheita de conclusão em andamento.' : completionPending ? ' Conclusão sendo confirmada.' : ''}`}
+        aria-label={`${event.title}. ${formatLongDateWithWeekday(event.date)}${event.startTime ? `, às ${event.startTime}` : ''}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}${harvesting ? ' Colheita de conclusão em andamento.' : completionPending ? ' Conclusão sendo confirmada.' : ''}`}
       >
-      <span className="cronograma-mobile-event-date">
-        <strong>{String(dateObject.getUTCDate()).padStart(2, '0')}</strong>
-        <span>{monthShortFormatter.format(dateObject).replace('.', '')}</span>
-        <small>{event.startTime || 'A definir'}</small>
-      </span>
+      <CronogramaDateBadge
+        date={date}
+        startTime={event.startTime}
+        size="compact"
+        tone={getDateBadgeTone({
+          status: event.status,
+          isToday,
+          isNext: isNextOfficial,
+          archived: variant === 'completed',
+        })}
+      />
 
       <span className="cronograma-mobile-event-content">
         {(isNextOfficial || (isToday && variant === 'timeline')) && (

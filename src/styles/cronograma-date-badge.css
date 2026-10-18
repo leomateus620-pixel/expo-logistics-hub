@@ -1,0 +1,397 @@
+/* ==========================================================================
+   Agenda Fenasoja — bloco de data premium dos cards de evento
+   Hierarquia: dia do mês > dia da semana > mês > horário.
+   ========================================================================== */
+
+.cronograma-date-badge {
+  --date-badge-radius: 0.82rem;
+  --date-badge-band-height: 1.28rem;
+  --date-badge-band-from: oklch(var(--brand-indigo-500));
+  --date-badge-band-to: oklch(var(--brand-indigo-600));
+  --date-badge-band-ink: oklch(var(--neutral-0));
+  --date-badge-band-accent: transparent;
+  --date-badge-border: oklch(var(--brand-indigo-200) / 0.78);
+  --date-badge-day-ink: oklch(var(--brand-navy-900));
+  --date-badge-month-ink: oklch(var(--brand-indigo-500));
+  --date-badge-chip-bg: oklch(var(--brand-indigo-50));
+  --date-badge-chip-border: oklch(var(--brand-indigo-200) / 0.7);
+  --date-badge-chip-ink: oklch(var(--brand-indigo-700));
+  --date-badge-glow: oklch(var(--brand-indigo-500) / 0);
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-self: start;
+  grid-template-rows: var(--date-badge-band-height) auto;
+  overflow: hidden;
+  border: 1px solid var(--date-badge-border);
+  border-radius: var(--date-badge-radius);
+  background:
+    linear-gradient(180deg, oklch(var(--neutral-0)), oklch(var(--brand-indigo-50) / 0.78));
+  box-shadow:
+    0 1px 0 oklch(var(--neutral-0)) inset,
+    0 1px 2px oklch(var(--brand-navy-900) / 0.06),
+    0 8px 18px -14px oklch(var(--brand-navy-900) / 0.5),
+    0 0 0 3px var(--date-badge-glow);
+  color: var(--date-badge-day-ink);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transform: translateZ(0);
+  transition:
+    transform var(--motion-base) var(--ease-decelerate),
+    box-shadow var(--motion-base) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard);
+  /* backwards: após a entrada, hover/active voltam a controlar o transform */
+  animation: cronograma-date-badge-in var(--motion-slow) var(--ease-decelerate) backwards;
+}
+
+/* Camada 3 — faixa do dia da semana (cabeçalho de folha de calendário) */
+.cronograma-date-badge__weekday {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--date-badge-band-from), var(--date-badge-band-to));
+  box-shadow:
+    inset 0 -2px 0 var(--date-badge-band-accent),
+    inset 0 1px 0 oklch(var(--neutral-0) / 0.18);
+  color: var(--date-badge-band-ink);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  white-space: nowrap;
+  transition: filter var(--motion-fast) var(--ease-standard);
+}
+
+/* Argolas discretas do calendário */
+.cronograma-date-badge__weekday::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 50%, oklch(var(--neutral-0) / 0.42) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 82% 50%, oklch(var(--neutral-0) / 0.42) 0 1.5px, transparent 2px);
+  content: '';
+  pointer-events: none;
+}
+
+/* Brilho que atravessa a faixa no hover/foco */
+.cronograma-date-badge__weekday::after {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 60%;
+  background: linear-gradient(100deg, transparent, oklch(var(--neutral-0) / 0.32), transparent);
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-120%);
+}
+
+/* Camada 2 — folha de informação */
+.cronograma-date-badge__sheet {
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  align-content: start;
+  padding: 0.34rem 0.28rem 0.38rem;
+}
+
+.cronograma-date-badge__day {
+  display: block;
+  color: var(--date-badge-day-ink);
+  font-size: 1.62rem;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.cronograma-date-badge__month {
+  display: block;
+  margin-top: 0.16rem;
+  color: var(--date-badge-month-ink);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  /* Compensa o tracking da última letra para centralização óptica */
+  padding-left: 0.18em;
+}
+
+.cronograma-date-badge__time {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 1.15rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+  margin-top: 0.36rem;
+  overflow: hidden;
+  border: 1px solid var(--date-badge-chip-border);
+  border-radius: 999px;
+  padding: 0 0.34rem;
+  background: var(--date-badge-chip-bg);
+  color: var(--date-badge-chip-ink);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.cronograma-date-badge__time > svg {
+  width: 0.62rem;
+  height: 0.62rem;
+  flex: none;
+  opacity: 0.78;
+}
+
+.cronograma-date-badge__time > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cronograma-date-badge__time[data-empty='true'] {
+  border-style: dashed;
+  background: transparent;
+  color: oklch(var(--neutral-600));
+  font-family: inherit;
+  font-size: 0.58rem;
+  font-weight: 700;
+}
+
+/* Fim de semana: faixa mais profunda com tipografia dourada */
+.cronograma-date-badge[data-weekend] {
+  --date-badge-band-from: oklch(var(--brand-indigo-600));
+  --date-badge-band-to: oklch(var(--brand-indigo-800));
+  --date-badge-band-ink: oklch(var(--brand-gold-400));
+}
+
+/* Tons por estado do evento */
+.cronograma-date-badge[data-tone='today'] {
+  --date-badge-band-from: oklch(var(--brand-gold-400));
+  --date-badge-band-to: oklch(var(--brand-gold-500));
+  --date-badge-band-ink: oklch(var(--brand-navy-900));
+  --date-badge-border: oklch(var(--brand-gold-500) / 0.85);
+  --date-badge-glow: oklch(var(--brand-gold-400) / 0.28);
+}
+
+.cronograma-date-badge[data-tone='today'] .cronograma-date-badge__weekday::before {
+  background:
+    radial-gradient(circle at 18% 50%, oklch(var(--brand-navy-900) / 0.3) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 82% 50%, oklch(var(--brand-navy-900) / 0.3) 0 1.5px, transparent 2px);
+}
+
+.cronograma-date-badge[data-tone='next'] {
+  --date-badge-band-accent: oklch(var(--brand-gold-500));
+  --date-badge-border: oklch(var(--brand-gold-500) / 0.62);
+}
+
+.cronograma-date-badge[data-tone='alert'] {
+  --date-badge-band-accent: oklch(var(--destructive));
+  --date-badge-border: oklch(var(--destructive) / 0.38);
+}
+
+.cronograma-date-badge[data-tone='completed'] {
+  --date-badge-band-from: oklch(var(--success));
+  --date-badge-band-to: oklch(var(--success) / 0.92);
+  --date-badge-band-ink: oklch(var(--neutral-0));
+  --date-badge-border: oklch(var(--success) / 0.32);
+  --date-badge-month-ink: oklch(var(--success));
+  --date-badge-chip-bg: oklch(var(--success) / 0.07);
+  --date-badge-chip-border: oklch(var(--success) / 0.26);
+  --date-badge-chip-ink: oklch(var(--success));
+}
+
+.cronograma-date-badge[data-tone='muted'] {
+  --date-badge-band-from: oklch(var(--neutral-500));
+  --date-badge-band-to: oklch(var(--neutral-600));
+  --date-badge-band-ink: oklch(var(--neutral-0));
+  --date-badge-border: oklch(var(--neutral-300));
+  --date-badge-day-ink: oklch(var(--neutral-600));
+  --date-badge-month-ink: oklch(var(--neutral-600));
+  --date-badge-chip-bg: oklch(var(--neutral-100));
+  --date-badge-chip-border: oklch(var(--neutral-300));
+  --date-badge-chip-ink: oklch(var(--neutral-700));
+}
+
+/* Variante compacta (mobile) */
+.cronograma-date-badge[data-size='compact'] {
+  --date-badge-radius: 0.74rem;
+  --date-badge-band-height: 1.18rem;
+}
+
+.cronograma-date-badge[data-size='compact'] .cronograma-date-badge__weekday {
+  font-size: 0.64rem;
+  letter-spacing: 0.05em;
+}
+
+.cronograma-date-badge[data-size='compact'] .cronograma-date-badge__sheet {
+  padding: 0.3rem 0.18rem 0.34rem;
+}
+
+.cronograma-date-badge[data-size='compact'] .cronograma-date-badge__day {
+  font-size: 1.42rem;
+}
+
+.cronograma-date-badge[data-size='compact'] .cronograma-date-badge__month {
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  padding-left: 0.14em;
+}
+
+.cronograma-date-badge[data-size='compact'] .cronograma-date-badge__time {
+  gap: 0.12rem;
+  margin-top: 0.3rem;
+  padding: 0 0.26rem;
+  font-size: 0.6rem;
+}
+
+.cronograma-date-badge[data-size='compact'] .cronograma-date-badge__time > svg {
+  display: none;
+}
+
+.cronograma-date-badge[data-size='compact'] .cronograma-date-badge__time[data-empty='true'] {
+  font-size: 0.54rem;
+}
+
+/* Integração com os cards: largura das colunas */
+.cronograma-page .cronograma-month-events .cronograma-operational-event {
+  grid-template-columns: 4.6rem 0.76rem minmax(0, 1fr) minmax(7.8rem, auto);
+}
+
+.cronograma-page[data-presentation='mobile'] .cronograma-mobile-event-list .cronograma-mobile-event-card {
+  grid-template-columns: 3.85rem minmax(0, 1fr) 0.95rem;
+}
+
+@media (max-width: 420px) {
+  .cronograma-page[data-presentation='mobile'] .cronograma-mobile-event-list .cronograma-mobile-event-card {
+    grid-template-columns: 3.6rem minmax(0, 1fr) 0.9rem;
+  }
+}
+
+@media (max-width: 359px) {
+  .cronograma-page[data-presentation='mobile'] .cronograma-mobile-event-list .cronograma-mobile-event-card {
+    grid-template-columns: 3.45rem minmax(0, 1fr);
+  }
+
+  .cronograma-date-badge[data-size='compact'] .cronograma-date-badge__day {
+    font-size: 1.3rem;
+  }
+}
+
+/* Microinterações */
+@media (hover: hover) and (pointer: fine) {
+  .cronograma-operational-event:hover .cronograma-date-badge,
+  .cronograma-mobile-event-card:hover .cronograma-date-badge {
+    --date-badge-glow: oklch(var(--brand-indigo-400) / 0.12);
+    border-color: oklch(var(--brand-indigo-400) / 0.7);
+    box-shadow:
+      0 1px 0 oklch(var(--neutral-0)) inset,
+      0 2px 4px oklch(var(--brand-navy-900) / 0.06),
+      0 14px 24px -14px oklch(var(--brand-navy-900) / 0.55),
+      0 0 0 3px var(--date-badge-glow);
+    transform: translateY(-2px);
+  }
+
+  .cronograma-operational-event:hover .cronograma-date-badge[data-tone='today'],
+  .cronograma-mobile-event-card:hover .cronograma-date-badge[data-tone='today'] {
+    --date-badge-glow: oklch(var(--brand-gold-400) / 0.36);
+    border-color: oklch(var(--brand-gold-500));
+  }
+
+  .cronograma-operational-event:hover .cronograma-date-badge__weekday,
+  .cronograma-mobile-event-card:hover .cronograma-date-badge__weekday {
+    filter: brightness(1.12) saturate(1.06);
+  }
+
+  .cronograma-operational-event:hover .cronograma-date-badge__weekday::after,
+  .cronograma-mobile-event-card:hover .cronograma-date-badge__weekday::after {
+    animation: cronograma-date-badge-sheen 720ms var(--ease-standard) 1 both;
+  }
+}
+
+.cronograma-operational-event:focus-visible .cronograma-date-badge,
+.cronograma-mobile-event-card:focus-visible .cronograma-date-badge {
+  border-color: oklch(var(--brand-indigo-500) / 0.8);
+  transform: translateY(-1px);
+}
+
+.cronograma-operational-event[data-selected='true'] .cronograma-date-badge {
+  --date-badge-glow: oklch(var(--brand-orange-500) / 0.18);
+  border-color: oklch(var(--brand-orange-500) / 0.6);
+}
+
+.cronograma-operational-event:active .cronograma-date-badge,
+.cronograma-mobile-event-card:active .cronograma-date-badge {
+  transform: translateY(0) scale(0.96);
+  transition-duration: var(--motion-instant);
+}
+
+.cronograma-operational-event:active .cronograma-date-badge__weekday,
+.cronograma-mobile-event-card:active .cronograma-date-badge__weekday {
+  filter: brightness(1.18);
+}
+
+@keyframes cronograma-date-badge-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateZ(0);
+  }
+}
+
+@keyframes cronograma-date-badge-sheen {
+  0% { opacity: 0; transform: translateX(-120%); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(220%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cronograma-date-badge,
+  .cronograma-date-badge__weekday {
+    animation: none;
+    transition-duration: 0.01ms !important;
+  }
+
+  .cronograma-date-badge__weekday::after {
+    display: none;
+  }
+
+  .cronograma-operational-event:hover .cronograma-date-badge,
+  .cronograma-mobile-event-card:hover .cronograma-date-badge,
+  .cronograma-operational-event:active .cronograma-date-badge,
+  .cronograma-mobile-event-card:active .cronograma-date-badge,
+  .cronograma-operational-event:focus-visible .cronograma-date-badge,
+  .cronograma-mobile-event-card:focus-visible .cronograma-date-badge {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .cronograma-date-badge {
+    border-color: currentColor;
+  }
+
+  .cronograma-date-badge__weekday {
+    filter: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .cronograma-date-badge {
+    border: 1px solid CanvasText;
+  }
+
+  .cronograma-date-badge__weekday {
+    border-bottom: 1px solid CanvasText;
+    forced-color-adjust: auto;
+  }
+}
