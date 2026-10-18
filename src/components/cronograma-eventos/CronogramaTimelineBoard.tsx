@@ -43,7 +43,8 @@ import {
   CronogramaStatusIndicator,
 } from './CronogramaBadges';
 import { statusLabels } from './cronogramaData';
-import { formatLongDate } from './dateUtils';
+import { formatLongDateWithWeekday } from './dateUtils';
+import { CronogramaDateBadge, getDateBadgeTone } from './CronogramaDateBadge';
 import { EventHarvestAnimation } from './EventHarvestAnimation';
 import { CronogramaCycleChips } from './CronogramaCycleChips';
 import { CronogramaCyclePortal } from './CronogramaCycleSlot';
@@ -64,10 +65,6 @@ const NOOP = () => undefined;
 const EMPTY_HARVEST_JOBS: HarvestCompletionJobs = {};
 type TimelineVariant = 'timeline' | 'completed';
 
-const monthShortFormatter = new Intl.DateTimeFormat('pt-BR', {
-  month: 'short',
-  timeZone: 'UTC',
-});
 
 function monthLabel(monthKey: string) {
   const [year, month] = monthKey.split('-').map(Number);
@@ -436,7 +433,6 @@ function TimelineEventRow({
   const progress = getSubeventProgress(event);
   const { responsible, guests } = splitEventResponsibles(event);
   const date = event.date!;
-  const dateObject = new Date(`${date}T12:00:00Z`);
   const isToday = date === todayKey;
   const completionPending = Boolean(harvestJob);
   const harvesting = harvestJob?.phase === 'harvesting';
@@ -471,15 +467,18 @@ function TimelineEventRow({
         aria-busy={completionPending || undefined}
         aria-disabled={completionPending ? 'true' : undefined}
         aria-pressed={selected}
-        aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}${harvesting ? ' Colheita de conclusão em andamento.' : completionPending ? ' Conclusão sendo confirmada.' : ''}`}
+        aria-label={`${event.title}. ${formatLongDateWithWeekday(event.date)}${event.startTime ? `, às ${event.startTime}` : ''}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}${harvesting ? ' Colheita de conclusão em andamento.' : completionPending ? ' Conclusão sendo confirmada.' : ''}`}
       >
-      <span className="cronograma-event-date-block">
-        <strong className="font-mono text-xl leading-none text-foreground">{String(dateObject.getUTCDate()).padStart(2, '0')}</strong>
-        <span className="mt-1 text-[9px] font-extrabold uppercase tracking-[0.13em] text-muted-foreground">
-          {monthShortFormatter.format(dateObject).replace('.', '')}
-        </span>
-        <span className="cronograma-event-time">{event.startTime || '—'}</span>
-      </span>
+      <CronogramaDateBadge
+        date={date}
+        startTime={event.startTime}
+        tone={getDateBadgeTone({
+          status: event.status,
+          isToday,
+          isNext: isNextOfficial,
+          archived: variant === 'completed',
+        })}
+      />
 
       <span className="cronograma-event-rail" aria-hidden="true"><span /></span>
 
