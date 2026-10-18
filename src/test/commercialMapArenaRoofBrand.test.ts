@@ -4,6 +4,14 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { ShapeGeometry, Vector3 } from 'three';
 import { ARENA_CANONICAL_LAYOUT as arena } from '@/features/commercial-map/data/arenaCanonicalLayout';
 import { ARENA_ROOF_BRAND, arenaRoofBrandLayout, arenaRoofHeightAt, createArenaRoofBrand } from '@/features/commercial-map/utils/arenaRoofBrand';
+import {
+  ARENA_SHOW_TIMELINE,
+  createArenaLedPanelMaterial,
+  createArenaShowController,
+  resolveArenaShowStage,
+  sampleArenaShowFrame,
+} from '@/features/commercial-map/utils/arenaRoofShow';
+import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
 
 const typeface = JSON.parse(readFileSync(`public${ARENA_ROOF_BRAND.font}`, 'utf8'));
 const font = new FontLoader().parse(typeface);
@@ -100,5 +108,124 @@ describe('Inscrição horizontal FENASOJA em relevo na cobertura', () => {
       expect(() => arenaRoofBrandLayout(invalid, depth)).toThrow();
       expect(() => arenaRoofBrandLayout(width, invalid)).toThrow();
     }
+  });
+
+  it('aplica azul institucional intenso nas faces das letras FENASOJA e delimita o painel LED curvo na cobertura', () => {
+    const brand = createArenaRoofBrand(width, depth, font);
+    try {
+      const colors = brand.faces.attributes.color;
+      expect(colors).toBeDefined();
+      for (let i = 0; i < colors.count; i++) {
+        const r = colors.getX(i);
+        const g = colors.getY(i);
+        const b = colors.getZ(i);
+        expect(b).toBeGreaterThan(g);
+        expect(g).toBeGreaterThan(r);
+        expect(b).toBeGreaterThan(0.18);
+      }
+
+      const panelPos = brand.panel.attributes.position;
+      let maxPanelX = 0;
+      let maxPanelZ = 0;
+      let minClearance = Infinity;
+      let maxClearance = 0;
+      for (let i = 0; i < panelPos.count; i++) {
+        const x = panelPos.getX(i);
+        const y = panelPos.getY(i);
+        const z = panelPos.getZ(i);
+        maxPanelX = Math.max(maxPanelX, Math.abs(x));
+        maxPanelZ = Math.max(maxPanelZ, Math.abs(z));
+        const clearance = y - arenaRoofHeightAt(x, width);
+        minClearance = Math.min(minClearance, clearance);
+        maxClearance = Math.max(maxClearance, clearance);
+      }
+      expect(maxPanelX).toBeLessThan(width * 0.4);
+      expect(maxPanelZ).toBeLessThan(depth * 0.48);
+      expect(minClearance).toBeGreaterThan(0);
+      expect(maxClearance).toBeLessThan(brand.layout.seating);
+    } finally {
+      brand.dispose();
+    }
+  });
+
+  it('executa a narrativa de 7 segundos em 5 fases e retorna suavemente ao estado idle', () => {
+    expect(ARENA_SHOW_TIMELINE.totalDurationSeconds).toBe(7.0);
+    expect(resolveArenaShowStage(0, false)).toBe('idle');
+    expect(resolveArenaShowStage(0.4, true)).toBe('panel-activation');
+    expect(resolveArenaShowStage(1.6, true)).toBe('horizon-dawn');
+    expect(resolveArenaShowStage(3.5, true)).toBe('sunrise-plains');
+    expect(resolveArenaShowStage(5.2, true)).toBe('institutional-transition');
+    expect(resolveArenaShowStage(6.4, true)).toBe('brand-reveal');
+    expect(resolveArenaShowStage(7.2, true)).toBe('settling');
+    expect(resolveArenaShowStage(7.6, true)).toBe('idle');
+
+    const sunriseFrame = sampleArenaShowFrame(3.5, true);
+    expect(sunriseFrame.status).toBe('playing');
+    expect(sunriseFrame.panelPower).toBeGreaterThan(0.95);
+    expect(sunriseFrame.horizonProgress).toBeGreaterThan(0.9);
+    expect(sunriseFrame.sunElevation).toBeGreaterThan(0.5);
+    expect(sunriseFrame.plainsGoldSpread).toBeGreaterThan(0.6);
+
+    const revealFrame = sampleArenaShowFrame(6.2, true);
+    expect(revealFrame.stage).toBe('brand-reveal');
+    expect(revealFrame.institutionalReveal).toBeGreaterThan(0.9);
+    expect(revealFrame.brandFinale).toBeGreaterThan(0.8);
+    expect(revealFrame.letterGoldBoost).toBeGreaterThan(0.8);
+    expect(revealFrame.sculptedBrandPresence).toBeGreaterThan(0.95);
+    expect(revealFrame.symbolPresence).toBeGreaterThan(0.95);
+
+    const completedFrame = sampleArenaShowFrame(7.5, true);
+    expect(completedFrame.status).toBe('idle');
+    expect(completedFrame.panelPower).toBe(0);
+    expect(completedFrame.sculptedBrandPresence).toBe(1);
+    expect(completedFrame.symbolPresence).toBe(1);
+  });
+
+  it('bloqueia cliques reentrantes durante a animação e permite novo disparo apenas após concluir', () => {
+    const controller = createArenaShowController();
+    expect(controller.status).toBe('idle');
+    expect(controller.sequence).toBe(0);
+
+    // First click starts the show
+    expect(controller.trigger(1000)).toBe(true);
+    expect(controller.status).toBe('playing');
+    expect(controller.stage).toBe('panel-activation');
+    expect(controller.sequence).toBe(1);
+
+    // Repeated clicks during active timeline are ignored
+    expect(controller.trigger(1500)).toBe(false);
+    expect(controller.trigger(4200)).toBe(false);
+    expect(controller.trigger(7100)).toBe(false);
+    expect(controller.sequence).toBe(1);
+
+    const midFrame = controller.sample(4200);
+    expect(midFrame.stage).toBe('sunrise-plains');
+
+    // After 7.0s + 0.45s settling, controller returns to idle automatically
+    const finalFrame = controller.sample(8600);
+    expect(finalFrame.status).toBe('idle');
+    expect(controller.status).toBe('idle');
+
+    // Next click after returning to idle starts a fresh run
+    expect(controller.trigger(9000)).toBe(true);
+    expect(controller.status).toBe('playing');
+    expect(controller.sequence).toBe(2);
+  });
+
+  it('atualiza uniforms do shader do painel LED e incrementa arenaShowSequence na store', () => {
+    const led = createArenaLedPanelMaterial();
+    try {
+      const frame = sampleArenaShowFrame(6.1, true);
+      led.applyFrame(frame, true);
+      expect(led.material.uniforms.uPower.value).toBeCloseTo(frame.panelPower, 5);
+      expect(led.material.uniforms.uFinale.value).toBeCloseTo(frame.brandFinale, 5);
+      expect(led.material.uniforms.uNight.value).toBe(1);
+    } finally {
+      led.dispose();
+    }
+
+    const before = useCommercialMapStore.getState().arenaShowSequence;
+    useCommercialMapStore.getState().requestArenaShow();
+    expect(useCommercialMapStore.getState().arenaShowSequence).toBe(before + 1);
   });
 });

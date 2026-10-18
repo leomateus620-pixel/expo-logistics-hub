@@ -3279,6 +3279,9 @@ export function StrategicLandmarkMesh({
     if (eventIntersectsLunarRocket(event)) return;
     event.stopPropagation();
     if (!isMapSelectionClick(event.delta, event.nativeEvent)) return;
+    if (kind === 'sicredi-arena') {
+      useCommercialMapStore.getState().requestArenaShow();
+    }
     onSelect(entity.id);
   };
   const handleDoubleClick = (event: ThreeEvent<MouseEvent>) => {

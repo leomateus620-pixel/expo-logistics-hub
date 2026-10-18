@@ -134,6 +134,7 @@ interface CommercialMapState {
   sunrisePhase: 'idle' | 'running' | 'complete';
   sunriseSequence: number;
   sunriseStartedAt: number | null;
+  arenaShowSequence: number;
   /** Park-wide Night Mode: darkened atmosphere plus the pole LED network. */
   nightModeActive: boolean;
   /** Weather composes with day/night and never owns navigation or selection. */
@@ -199,6 +200,7 @@ interface CommercialMapState {
   requestSunrise: () => void;
   completeSunrise: (sequence: number) => void;
   resetSunrise: () => void;
+  requestArenaShow: () => void;
   setNightModeActive: (active: boolean) => void;
   toggleNightMode: () => void;
   setRainModeActive: (active: boolean) => void;
@@ -260,6 +262,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   sunrisePhase: 'idle',
   sunriseSequence: 0,
   sunriseStartedAt: null,
+  arenaShowSequence: 0,
   nightModeActive: false,
   rainModeActive: false,
   lunarLaunchPhase: 'idle',
@@ -655,6 +658,9 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     sunrisePhase: 'idle',
     sunriseSequence: state.sunriseSequence + 1,
     sunriseStartedAt: null,
+  })),
+  requestArenaShow: () => set((state) => ({
+    arenaShowSequence: state.arenaShowSequence + 1,
   })),
   setNightModeActive: (nightModeActive) => set((state) => (
     state.nightModeActive === nightModeActive ? state : { nightModeActive }
