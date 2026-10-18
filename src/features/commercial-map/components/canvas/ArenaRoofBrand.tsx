@@ -16,6 +16,7 @@ const NO_RAYCAST = () => undefined;
 interface Props { width: number; depth: number }
 
 const IDLE_FACE_EMISSIVE = new THREE.Color(ARENA_SHOW_PALETTE.idleBlueEmissive);
+const FINALE_FACE_BLUE_EMISSIVE = new THREE.Color('#1348B8');
 const NIGHT_FACE_EMISSIVE = new THREE.Color('#1A56DB');
 const IDLE_RETURN_COLOR = new THREE.Color('#061C47');
 const IDLE_RETURN_EMISSIVE = new THREE.Color(ARENA_SHOW_PALETTE.idleReturnEmissive);
@@ -102,20 +103,20 @@ function MountedArenaRoofBrand({ width, depth }: Props) {
       const symbolOpacity = frame.status === 'idle' ? 1 : frame.symbolPresence;
 
       materials.faces.opacity = letterOpacity;
-      materials.faces.emissive.copy(IDLE_FACE_EMISSIVE).lerp(FINALE_GOLD_COLOR, goldBoost * 0.85);
-      materials.faces.emissiveIntensity = 0.26 + goldBoost * 0.92;
+      materials.faces.emissive.copy(IDLE_FACE_EMISSIVE).lerp(FINALE_FACE_BLUE_EMISSIVE, goldBoost * 0.85);
+      materials.faces.emissiveIntensity = 0.26 + goldBoost * 0.48;
 
       materials.nightFaces.opacity = letterOpacity;
-      materials.nightFaces.emissive.copy(NIGHT_FACE_EMISSIVE).lerp(FINALE_GOLD_COLOR, goldBoost * 0.85);
-      materials.nightFaces.emissiveIntensity = 0.78 + goldBoost * 0.72;
+      materials.nightFaces.emissive.copy(NIGHT_FACE_EMISSIVE).lerp(FINALE_FACE_BLUE_EMISSIVE, goldBoost * 0.85);
+      materials.nightFaces.emissiveIntensity = 0.78 + goldBoost * 0.42;
 
-      materials.returns.opacity = Math.max(letterOpacity, symbolOpacity * 0.85);
-      materials.returns.color.copy(IDLE_RETURN_COLOR).lerp(FINALE_GOLD_COLOR, goldBoost * 0.55);
-      materials.returns.emissive.copy(IDLE_RETURN_EMISSIVE).lerp(FINALE_GOLD_COLOR, goldBoost * 0.9);
-      materials.returns.emissiveIntensity = (isNight ? 0.16 : 0.06) + goldBoost * 0.88;
+      materials.returns.opacity = Math.max(letterOpacity, symbolOpacity * 0.88);
+      materials.returns.color.copy(IDLE_RETURN_COLOR).lerp(FINALE_GOLD_COLOR, goldBoost * 0.85);
+      materials.returns.emissive.copy(IDLE_RETURN_EMISSIVE).lerp(FINALE_GOLD_COLOR, goldBoost * 0.95);
+      materials.returns.emissiveIntensity = (isNight ? 0.16 : 0.06) + goldBoost * 1.15;
 
       materials.symbol.opacity = symbolOpacity;
-      materials.symbol.color.copy(SYMBOL_IDLE_COLOR).lerp(FINALE_LIGHT_GOLD, goldBoost * 0.18);
+      materials.symbol.color.copy(SYMBOL_IDLE_COLOR).lerp(FINALE_LIGHT_GOLD, goldBoost * 0.15);
 
       if (groupRef.current) {
         groupRef.current.userData.showStatus = frame.status;

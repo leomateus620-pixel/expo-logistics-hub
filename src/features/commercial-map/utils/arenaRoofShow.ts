@@ -314,7 +314,9 @@ const ARENA_LED_PANEL_FRAGMENT_SHADER = /* glsl */ `
     // Phase 1: Panel activation wave from center outward
     float activationWave = smoothstep(0.0, 1.0, uPower * 1.25 - length(centered * vec2(0.65, 0.85)) * 0.35);
 
-    // Screen coordinates inside the active display area
+    // Screen coordinates inside the active display area:
+    // uv.x runs left-to-right along the Arena ridge (0 = logo side, 1 = right end of FENASOJA)
+    // uv.y runs bottom-to-top on the viewer's screen (0 = bottom eave, 1 = top eave)
     vec2 uv = clamp((centered + vec2(0.92, 0.81)) / vec2(1.84, 1.62), 0.0, 1.0);
 
     // Subtle curvature shading so the LED display respects the barrel vault 3D volume
@@ -368,20 +370,20 @@ const ARENA_LED_PANEL_FRAGMENT_SHADER = /* glsl */ `
 
     // Phase 4 & 5: Institutional transformation & Ceremonial Royal Blue + Gold reveal
     vec3 institutionalBlue = mix(
-      vec3(0.025, 0.078, 0.26),
-      vec3(0.07, 0.23, 0.62),
+      vec3(0.015, 0.048, 0.19),
+      vec3(0.035, 0.13, 0.42),
       vaultCrown * (0.65 + 0.35 * (1.0 - abs(uv.x - 0.5)))
     );
-    float goldAuraLeft = exp(-length((uv - vec2(0.16, 0.5)) * vec2(2.4, 1.3)) * 2.8);
-    float blueAuraRight = exp(-length((uv - vec2(0.60, 0.5)) * vec2(1.4, 1.8)) * 2.2);
-    institutionalBlue += vec3(0.10, 0.36, 0.85) * blueAuraRight * (0.45 + 0.55 * uFinale);
-    institutionalBlue += vec3(0.98, 0.75, 0.16) * goldAuraLeft * (0.35 + 0.65 * uFinale);
+    float goldAuraLeft = exp(-length((uv - vec2(0.16, 0.5)) * vec2(2.4, 1.3)) * 2.6);
+    float blueAuraRight = exp(-length((uv - vec2(0.60, 0.5)) * vec2(1.4, 1.8)) * 2.4);
+    institutionalBlue += vec3(0.08, 0.28, 0.72) * blueAuraRight * (0.45 + 0.55 * uFinale);
+    institutionalBlue += vec3(0.98, 0.75, 0.16) * goldAuraLeft * (0.42 + 0.58 * uFinale);
 
     // Ceremonial horizontal light sweep and golden frame lines
     float sweepBeam = exp(-pow((uv.x - uSweep) * 6.5, 2.0));
-    float topBottomAccent = exp(-min(uv.y, 1.0 - uv.y) * 28.0);
-    institutionalBlue += vec3(1.0, 0.84, 0.36) * sweepBeam * (0.55 * uInstitutional + 0.45 * uFinale);
-    institutionalBlue += vec3(0.98, 0.78, 0.22) * topBottomAccent * (0.28 * uInstitutional + 0.58 * uFinale);
+    float topBottomAccent = exp(-min(uv.y, 1.0 - uv.y) * 26.0);
+    institutionalBlue += vec3(0.99, 0.80, 0.24) * sweepBeam * (0.50 * uInstitutional + 0.42 * uFinale);
+    institutionalBlue += vec3(0.98, 0.76, 0.18) * topBottomAccent * (0.35 * uInstitutional + 0.65 * uFinale);
 
     // Blend phases smoothly
     vec3 activeContent = mix(cabinetColor, landscapeScene, uHorizon);
