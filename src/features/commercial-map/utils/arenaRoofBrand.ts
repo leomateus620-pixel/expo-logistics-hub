@@ -34,6 +34,9 @@ export function arenaRoofBrandLayout(width: number, depth: number) {
     gap,
     symbolCenterU: -length / 2 + symbolSize / 2,
     wordCenterU: length / 2 - wordWidth / 2,
+    panelSpanX: width * 0.72,
+    panelLengthZ: Math.min(depth * 0.94, length * 1.07),
+    panelSeating: width * 0.0018,
     rotation: Math.PI / 2,
     relief: width * 0.02,
     // Inter's compact UI tracking needs narrow chamfers, especially A–S/O–J.
@@ -122,16 +125,18 @@ export function createArenaRoofBrand(width: number, depth: number, font: Font) {
   const caps = extractMaterial(text, 0), edges = extractMaterial(text, 1);
   text.dispose();
   const faces = conformArenaRoofGeometry(caps, width, layout.seating);
-  // Neutral silver face finish: bright upper edge and a darker lower face.
-  // Vertex colors keep this in the existing face draw, without a texture/atlas.
+  // Intense institutional blue gradient across the letter faces: deep indigo
+  // base, royal blue core and luminous azure crown highlight.
   const facePositions = faces.getAttribute('position');
   const faceBounds = faces.boundingBox!;
-  const silver = new THREE.Color('#959b9f'), pearl = new THREE.Color('#dde1e3'), highlight = new THREE.Color('#ffffff');
+  const deepIndigo = new THREE.Color('#0E2178');
+  const royalBlue = new THREE.Color('#164EC2');
+  const luminousBlue = new THREE.Color('#2B84F0');
   const color = new THREE.Color(), colors: number[] = [];
   for (let i = 0; i < facePositions.count; i++) {
     const height = (faceBounds.max.x - facePositions.getX(i)) / (faceBounds.max.x - faceBounds.min.x);
-    if (height < 0.5) color.copy(silver).lerp(pearl, height * 2);
-    else color.copy(pearl).lerp(highlight, (height - 0.5) * 2);
+    if (height < 0.5) color.copy(deepIndigo).lerp(royalBlue, height * 2);
+    else color.copy(royalBlue).lerp(luminousBlue, (height - 0.5) * 2);
     colors.push(color.r, color.g, color.b);
   }
   faces.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
@@ -148,6 +153,14 @@ export function createArenaRoofBrand(width: number, depth: number, font: Font) {
     .translate(layout.symbolCenterU, 0, layout.relief + width * 0.001).rotateZ(layout.rotation);
   const symbol = conformArenaRoofGeometry(symbolPlane, width, layout.seating);
   symbolPlane.dispose();
-  const geometries = { faces, returns: merge([returns, badgeRelief]), symbol };
+
+  // Conformed architectural LED display surface embedded within the curved white roof.
+  // Before rotation, X is along the horizontal reading axis (-Z on roof) and Y is across the arch (X on roof).
+  const panelPlane = new THREE.PlaneGeometry(layout.panelLengthZ, layout.panelSpanX, 24, 32)
+    .rotateZ(layout.rotation);
+  const panel = conformArenaRoofGeometry(panelPlane, width, layout.panelSeating);
+  panelPlane.dispose();
+
+  const geometries = { faces, returns: merge([returns, badgeRelief]), symbol, panel };
   return { ...geometries, layout, dispose: () => Object.values(geometries).forEach(g => g.dispose()) };
 }
