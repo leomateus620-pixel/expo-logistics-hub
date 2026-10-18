@@ -501,14 +501,13 @@ function TimelineEventRow({
         <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
           <CronogramaCategoryMarker category={event.category} />
           {event.commission && <span className="inline-flex items-center gap-1"><Layers3 className="h-3 w-3" />{event.commission}</span>}
+          <CronogramaEventMeta
+            layout="inline"
+            owner={responsible?.label ?? event.owner}
+            guests={guests}
+            location={event.location}
+          />
         </span>
-        <CronogramaEventMeta
-          layout="inline"
-          owner={responsible?.label ?? event.owner}
-          guests={guests}
-          location={event.location}
-          className="mt-2"
-        />
         {progress.total > 0 && (
           <span className="mt-2 flex max-w-sm items-center gap-2">
             <span className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-200" aria-hidden="true"><span className="block h-full rounded-full bg-primary" style={{ width: `${progress.percent}%` }} /></span>
