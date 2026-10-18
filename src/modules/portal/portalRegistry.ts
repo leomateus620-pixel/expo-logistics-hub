@@ -1,10 +1,7 @@
 import {
-  BadgeDollarSign,
   Building2,
   CalendarRange,
   MapPinned,
-  ShieldCheck,
-  UsersRound,
   type LucideIcon,
 } from 'lucide-react';
 import {
@@ -34,12 +31,12 @@ export interface PortalDestination {
   storageSlug: string;
 }
 
+/** Primary entries render their emblem from `PORTAL_MODULE_SYMBOLS[id]`. */
 export interface PortalPrimaryEntry {
   id: PortalEntryId;
   kind: PortalEntryKind;
   title: string;
   description: string;
-  icon: LucideIcon;
 }
 
 
@@ -96,14 +93,12 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
     kind: 'direct',
     title: agendaFenasojaDestination.title,
     description: agendaFenasojaDestination.description,
-    icon: agendaFenasojaDestination.icon,
   },
   {
     id: 'agenda-restaurante-arena',
     kind: 'direct',
     title: agendaVenueDestination.title,
     description: agendaVenueDestination.description,
-    icon: agendaVenueDestination.icon,
   },
 
   {
@@ -111,28 +106,24 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
     kind: 'direct',
     title: commercialMapDestination.title,
     description: 'Lotes, pavilhões e disponibilidade comercial do parque.',
-    icon: commercialMapDestination.icon,
   },
   {
     id: 'comissoes',
     kind: 'expandable',
     title: 'Comissões',
     description: 'Frentes responsáveis pela operação da Fenasoja.',
-    icon: UsersRound,
   },
   {
     id: 'financeiro',
     kind: 'direct',
     title: 'Financeiro',
     description: 'Orçamento e gestão executiva conforme o perfil.',
-    icon: BadgeDollarSign,
   },
   {
     id: 'administrador',
     kind: 'direct',
     title: 'Administrador',
     description: 'Administração do sistema conforme as permissões do perfil.',
-    icon: ShieldCheck,
   },
 ];
 

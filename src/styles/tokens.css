@@ -51,6 +51,23 @@
   --brand-green: 62.06% 0.1191 171.97; /* #089D7E */
   --brand-muted-indigo: 45.87% 0.1066 285.46; /* #534D90 */
 
+  /* Portal module emblems. Accents are lifted tints of the brand anchors so
+     the symbols keep 3:1 non-text contrast on the navy hub plates. */
+  --emblem-ink: var(--brand-soft-white);
+  --emblem-rim: 82% 0.035 255;
+  --emblem-plate-indigo: 33% 0.115 268.03;
+  --emblem-plate-blue: 35% 0.095 255.72;
+  --emblem-plate-teal: 34% 0.070 215;
+  --emblem-plate-navy: 29% 0.070 260;
+  --emblem-plate-depth: 17% 0.050 258;
+  --emblem-gold: var(--brand-gold-400);
+  --emblem-gold-deep: var(--brand-gold-500);
+  --emblem-blue: 74% 0.125 255.72;
+  --emblem-green: 76% 0.125 171.97;
+  --emblem-orange: var(--brand-orange-400);
+  --emblem-indigo: 74% 0.105 278;
+  --emblem-cream: var(--brand-cream);
+
   /* Neutral and semantic primitives. */
   --neutral-0: 100% 0 0;
   --neutral-50: 98.2% 0.004 266;

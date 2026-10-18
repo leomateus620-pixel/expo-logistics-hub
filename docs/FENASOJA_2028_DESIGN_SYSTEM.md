@@ -111,6 +111,27 @@ Escalas compartilhadas:
 - Use badges para estados curtos; use alertas ou texto auxiliar quando houver consequência ou ação necessária.
 - Skeletons devem respeitar a geometria do conteúdo e não simular dados.
 
+### Emblemas dos módulos do portal
+
+Os seis módulos principais do portal usam `PortalModuleEmblem` (`src/components/portal/emblems/`), não ícones genéricos de biblioteca. Cada emblema tem três camadas:
+
+- placa: moldura com raio proporcional (29%), gradiente estrutural Navy/Indigo e borda iluminada do canto superior esquerdo, terminando no acento do módulo;
+- superfície: bisel interno com luz suave no tom de apoio, edge highlight e sombra de contato;
+- símbolo: SVG próprio em grade de 32 unidades, margem óptica de 4, traço único de 1,7 (1,45 em detalhes finos) e microáreas de cor.
+
+| Módulo | Placa | Acento | Apoio | Gesto vivo |
+| --- | --- | --- | --- | --- |
+| Agenda Fenasoja | Indigo | Gold (data oficial) | Blue | Argolas sobem; data se destaca |
+| Agenda Restaurante e Arena | Blue | Orange (porta acolhedora) | Blue | Cobertura sobe; porta acende |
+| Mapa Comercial | Teal | Green (pin) | Blue (lote) | Pin sobe; sombra contrai |
+| Comissões | Indigo | Cream (pessoa central) | Indigo | Equipe se aproxima |
+| Financeiro | Navy | Gold (moeda) | Indigo (base) | Moeda sobe sobre a base |
+| Administrador | Navy | Green (estado seguro) | Indigo (controle) | Controle gira 45° |
+
+Cores vêm só dos tokens `--emblem-*` em `tokens.css` (tons das âncoras oficiais clareados para 3:1 sobre Navy). Tons são combinados por `data-plate`, `data-accent` e `data-support`; novos símbolos entram em `PORTAL_MODULE_SYMBOLS` reutilizando as classes `pe-*`.
+
+Movimento: o ancestral `.portal-emblem-host` liga `--pe-live` em hover (apenas ponteiro fino), `:focus-visible` e estado ativo (`active`, ex.: Comissões expandida). Os gestos usam só `transform` e `opacity` em 210 ms; a pressão reduz a placa para 0,96 em 90 ms. Não há animação contínua, `filter` ou glow. `muted` suaviza o emblema quando o perfil não tem acesso. Movimento reduzido, alto contraste, transparência reduzida e `forced-colors` têm fallback próprio. O emblema é decorativo ao lado do título; `label` cria nome acessível quando ele aparece sozinho.
+
 ### Formulários e controles
 
 - Labels permanecem visíveis; placeholder não substitui label.
