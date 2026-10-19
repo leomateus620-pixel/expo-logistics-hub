@@ -17,7 +17,7 @@ interface PendingRow {
   event_id: string;
   user_id: string;
   org_id: string;
-  source: "responsible" | "commission";
+  source: "responsible" | "commission" | "location";
 }
 
 interface EventRow {
