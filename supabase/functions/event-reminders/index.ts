@@ -45,6 +45,7 @@ interface ScheduledEventRow extends EventDateFields {
   org_id: string;
   title: string;
   location?: string | null;
+  location_code?: string | null;
   status?: string | null;
   lock_version: number | null;
   has_exact_date: boolean;
@@ -172,7 +173,7 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
   // Sobreposição de intervalo: eventos de vários dias continuam elegíveis
   // depois do primeiro dia (start <= horizonte AND fim >= hoje).
   const { data: events, error: eventsError } = await supa.from("cronograma_eventos")
-    .select("id, org_id, title, location, status, start_date, end_date, start_time, end_time, lock_version, has_exact_date, event_type, notify_all_commission_members")
+    .select("id, org_id, title, location, location_code, status, start_date, end_date, start_time, end_time, lock_version, has_exact_date, event_type, notify_all_commission_members")
     .eq("has_exact_date", true)
     .neq("event_type", "feriado")
     .lte("start_date", horizon)
@@ -316,6 +317,29 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
 
     for (const globalRecipient of globalByOrg.get(event.org_id) ?? []) {
       recipients.set(globalRecipient.user_id, globalRecipient);
+    }
+
+    // Acompanhantes do local oficial (ex.: Casa Fenasoja) recebem todo evento desse local.
+    if (event.location_code) {
+      const { data: watchers } = await supa
+        .from("cronograma_location_watchers")
+        .select("user_id")
+        .eq("org_id", event.org_id)
+        .eq("location_code", event.location_code);
+      const watcherIds = ((watchers ?? []) as Array<{ user_id: string }>).map((w) => w.user_id);
+      if (watcherIds.length) {
+        const { data: activeWatchers } = await supa
+          .from("org_members")
+          .select("user_id, org_id, is_active")
+          .eq("org_id", event.org_id)
+          .eq("is_active", true)
+          .in("user_id", watcherIds);
+        for (const member of (activeWatchers ?? []) as OrgMemberRow[]) {
+          if (member.user_id && member.org_id) {
+            recipients.set(member.user_id, { user_id: member.user_id, org_id: member.org_id });
+          }
+        }
+      }
     }
 
 
