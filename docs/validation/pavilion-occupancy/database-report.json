@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "boundary": "Real PostgreSQL WASM; actual SQL RPC bodies; synthetic auth/eligibility/prices and reduced table schema. No deployed database access or production mutation.",
+  "checks": [
+    "Complete 257-lot snapshot via SECURITY DEFINER while table RLS denies direct sales reads",
+    "Actual checkout RPC creates OPEN/PENDING_SIGNATURE, persistent exhibitor identity and 3 active associations",
+    "Explicit contract scope covers only 2 linked items and never confirms a sale from a document",
+    "Actual confirmation RPC preserves partial states and is idempotent",
+    "Actual cancellation releases inventory and removes the active association without deleting history",
+    "Contradictory active contract from another order is flagged without disclosing or adopting its reference",
+    "map.view alone receives authorized names but no contract references, contacts, prices or private paths",
+    "Cross-organization, missing identity and anonymous execution denied",
+    "Persisted parent cycles terminate without losing the pavilion inventory"
+  ]
+}

@@ -261,7 +261,14 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
       </section>
       </div>
       <CommercialDashboardSpaces key={presentation.scope} snapshot={snapshot} data={data} onViewLot={onViewLot}
-        presentationMemory={spacesMemory} stateMemory={spacesMemory} />
+        presentationMemory={spacesMemory} stateMemory={spacesMemory} projectId={projectId} dataUpdatedAt={dataUpdatedAt} canManageSales={canManageSales}
+        onOpenOrder={salesAvailable && canManageSales ? (order) => {
+          overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
+          const store = useSalesOrdersUiStore.getState();
+          store.setSelectedRecordIdentity({ recordId: order.id, orderId: order.orderId, saleId: order.orderId ? null : order.saleId });
+          store.setExpanded(order.id); store.setArea('sales');
+          scrollContainer?.()?.scrollTo?.({ top: 0 });
+        } : undefined} />
       {snapshot.orphanLots > 0 && <div className="commercial-dashboard-integrity" role="note">
         <span>{snapshot.orphanLots} lotes sem entidade cadastral carregada, fora dos indicadores conforme o contrato atual do mapa.</span>
       </div>}

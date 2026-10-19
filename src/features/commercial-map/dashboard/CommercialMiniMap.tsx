@@ -8,6 +8,9 @@ import { getCommercialMiniMapGeometry, buildCommercialMiniMapViewBox, commercial
 import type { CommercialPavilionWayfindingMarkerKind } from '../utils/commercialPavilionWayfinding';
 import { CommercialDashboardLotContextCard } from './CommercialDashboardLotContextCard';
 import './commercial-dashboard-pavilion-inspection.css';
+import { PavilionAnnotations } from './PavilionAnnotations';
+import type { PavilionAnnotationLayout } from './pavilionAnnotationLayout';
+import { projectPavilionAccessMarkers } from './pavilionAccessGeometry';
 
 export type { CommercialMiniMapItem } from './commercialDashboardGeometry';
 export interface DashboardAccessMarker {
@@ -38,6 +41,13 @@ export interface CommercialMiniMapProps {
   /** Pavilion inspection is opt-in; external maps keep their established presentation. */
   presentation?: 'default' | 'pavilion';
   presentationMemory?: MiniMapPresentationMemory;
+  annotationLayout?: PavilionAnnotationLayout;
+  selectedCompanyId?: string | null;
+  onSelectCompany?: (id: string, scopeId?: string) => void;
+  selectedAnnotationScopeId?: string | null;
+  companyEntityIds?: ReadonlySet<string>;
+  commercialFilter?: 'all' | 'SOLD' | 'SALE_OPEN';
+  showAnnotationConnections?: boolean;
 }
 const EMPTY_OUTLINES: readonly MiniMapOutline[] = [];
 const EMPTY_ACCESSES: readonly DashboardAccessMarker[] = [];
@@ -91,6 +101,7 @@ export const CommercialMiniMap = memo(function CommercialMiniMap({
   items, title, highlightedStatus = null, onViewLot, className = '',
   outlines = EMPTY_OUTLINES, accesses = EMPTY_ACCESSES, numbered = false, hideStatusLegend = false, selection, contentEnvelope, numberLabelPixels = 11,
   presentation: variant = 'default', presentationMemory,
+  annotationLayout, selectedCompanyId = null, selectedAnnotationScopeId = null, onSelectCompany, companyEntityIds, commercialFilter = 'all', showAnnotationConnections = true,
 }: CommercialMiniMapProps) {
   const pavilionPresentation = variant === 'pavilion';
   const selectId = useId();
@@ -220,6 +231,45 @@ export const CommercialMiniMap = memo(function CommercialMiniMap({
   const contextRecord = contextEntityId ? itemsByEntityId.get(contextEntityId) ?? null : null;
   const contextLot = contextEntityId ? geometry.lotsByEntityId.get(contextEntityId) ?? null : null;
   const contextMode = contextEntityId === selectedEntityId && contextEntityId !== dismissedEntityId ? 'selected' : 'preview';
+  const revealPavilionLot = useCallback((id: string) => {
+    const target = geometry.lotsByEntityId.get(id);
+    const viewport = viewportRef.current;
+    const path = target && Array.from(svgRef.current?.querySelectorAll<SVGPathElement>('path[data-entity-id]') ?? [])
+      .find((element) => element.dataset.entityId === id);
+    const planLayout = viewport?.closest<HTMLElement>('.pavilion-plan-layout');
+    if (planLayout && planLayout.scrollTop > 0) planLayout.scrollTop = 0;
+    const matrix = path && typeof path.getScreenCTM === 'function' ? path.getScreenCTM() : null;
+    if (target && viewport && matrix && path) {
+      const bounds = viewport.getBoundingClientRect();
+      const container = viewport.closest('.pavilion-plan-layout')?.getBoundingClientRect();
+      // On a stacked mobile layout the outer panel can clip part of the map.
+      const left = Math.max(bounds.left + viewport.clientLeft, container?.left ?? bounds.left);
+      const top = Math.max(bounds.top + viewport.clientTop, container?.top ?? bounds.top);
+      const width = Math.min(bounds.left + (viewport.clientWidth || bounds.width), container?.right ?? bounds.right) - left;
+      const height = Math.min(bounds.top + (viewport.clientHeight || bounds.height), container?.bottom ?? bounds.bottom) - top;
+      const [x, y] = target.labelPoint;
+      const screenX = matrix.a * x + matrix.c * y + matrix.e;
+      const screenY = matrix.b * x + matrix.d * y + matrix.f;
+      let dx = screenX < left + 12 || screenX > left + width - 12 ? screenX - left - width / 2 : 0;
+      let dy = screenY < top + 12 || screenY > top + height - 12 ? screenY - top - height / 2 : 0;
+      // Keep the nearest selected annotation alongside its lot when both fit.
+      // Distant clusters remain navigable without forcing a smaller zoom.
+      const labels = Array.from(svgRef.current?.querySelectorAll<SVGGraphicsElement>('.pavilion-annotation-label[aria-pressed="true"]') ?? [])
+        .map(label => label.getBoundingClientRect()).filter(rect => rect.width > 0)
+        .sort((a, b) => Math.hypot(a.x + a.width / 2 - screenX, a.y + a.height / 2 - screenY)
+          - Math.hypot(b.x + b.width / 2 - screenX, b.y + b.height / 2 - screenY));
+      if (labels[0]) {
+        const lotBox = path.getBoundingClientRect(), labelBox = labels[0];
+        const minX = Math.min(lotBox.left, labelBox.left), maxX = Math.max(lotBox.right, labelBox.right);
+        const minY = Math.min(lotBox.top, labelBox.top), maxY = Math.max(lotBox.bottom, labelBox.bottom);
+        if (maxX - minX <= width - 24) dx = minX < left + 12 ? minX - left - 12 : maxX > left + width - 12 ? maxX - left - width + 12 : 0;
+        if (maxY - minY <= height - 24) dy = minY < top + 12 ? minY - top - 12 : maxY > top + height - 12 ? maxY - top - height + 12 : 0;
+      }
+      viewport.scrollLeft += dx;
+      viewport.scrollTop += dy;
+      setRevealRevision((value) => value + 1);
+    }
+  }, [geometry.lotsByEntityId]);
   const choosePavilionLot = useCallback((id: string | null, origin: HTMLElement | SVGElement, reveal = false) => {
     contextOriginRef.current = origin;
     pointerPreviewBlockedRef.current = false;
@@ -227,25 +277,13 @@ export const CommercialMiniMap = memo(function CommercialMiniMap({
     setHoveredEntityId(null);
     setFocusedEntityId(null);
     select(id);
-    // Choosing from the list must reveal an offscreen module without resetting
-    // the user's zoom. Later manual scrolling can still hide its anchored card.
-    const target = id && reveal ? geometry.lotsByEntityId.get(id) : null;
-    const viewport = viewportRef.current;
-    const path = target && Array.from(svgRef.current?.querySelectorAll<SVGPathElement>('path[data-entity-id]') ?? [])
-      .find((element) => element.dataset.entityId === id);
-    const matrix = path && typeof path.getScreenCTM === 'function' ? path.getScreenCTM() : null;
-    if (target && viewport && matrix) {
-      const bounds = viewport.getBoundingClientRect();
-      const width = viewport.clientWidth || bounds.width, height = viewport.clientHeight || bounds.height;
-      const left = bounds.left + viewport.clientLeft, top = bounds.top + viewport.clientTop;
-      const [x, y] = target.labelPoint;
-      const screenX = matrix.a * x + matrix.c * y + matrix.e;
-      const screenY = matrix.b * x + matrix.d * y + matrix.f;
-      if (screenX < left + 12 || screenX > left + width - 12) viewport.scrollLeft += screenX - left - width / 2;
-      if (screenY < top + 12 || screenY > top + height - 12) viewport.scrollTop += screenY - top - height / 2;
-      setRevealRevision((value) => value + 1);
-    }
-  }, [select, geometry.lotsByEntityId]);
+    if (id && reveal) revealPavilionLot(id);
+  }, [select, revealPavilionLot]);
+  useLayoutEffect(() => {
+    if (!pavilionPresentation) return;
+    const id = selectedEntityId ?? companyEntityIds?.values().next().value;
+    if (id) revealPavilionLot(id);
+  }, [pavilionPresentation, selectedEntityId, companyEntityIds, revealPavilionLot, zoom]);
   const closeContext = useCallback((restoreOrigin = true) => {
     // Removing the card can expose a path directly beneath the stationary
     // pointer and synthesize mouseenter. Wait for real movement or an explicit
@@ -318,6 +356,10 @@ export const CommercialMiniMap = memo(function CommercialMiniMap({
   }, [items]);
   const presentation = useMemo(() => {
     const decorations: MiniMapBounds[] = [];
+    if (annotationLayout?.annotations.some(a => a.label)) {
+      const [x, y, width, height] = annotationLayout.viewBox.split(' ').map(Number);
+      decorations.push({ minX: x, minY: y, maxX: x + width, maxY: y + height });
+    }
     const labels: typeof geometry.outlines = [];
     for (const outline of geometry.outlines.filter(({ kind }) => kind === 'block')) {
       const [x, y] = outline.labelPoint;
@@ -326,27 +368,10 @@ export const CommercialMiniMap = memo(function CommercialMiniMap({
       const halfWidth = outline.label.length * 8;
       decorations.push({ minX: x - halfWidth - 4, maxX: x + halfWidth + 4, minY: y - 33, maxY: y - 1 });
     }
-    const markers = accesses.map((marker) => {
-      const [x, y] = geometry.project(marker.position);
-      const horizontal = Math.abs(marker.outward[0]) > Math.abs(marker.outward[1]);
-      // Keep the official access anchor. Short local leaders avoid letting an
-      // unrelated far wall dictate the complete plant's fit.
-      const directionLength = Math.hypot(...marker.outward) || 1;
-      const iconX = x + marker.outward[0] / directionLength * 25;
-      const iconY = y + marker.outward[1] / directionLength * 25;
-      return { ...marker, x, y, iconX, iconY, horizontal };
-    });
-    const placed: Array<readonly [number, number]> = [];
-    for (const marker of markers) {
-      while (placed.some(([px, py]) => Math.abs(px - marker.iconX) < 30 && Math.abs(py - marker.iconY) < 30)) {
-        if (marker.horizontal) marker.iconY += 32; else marker.iconX += 32;
-      }
-      placed.push([marker.iconX, marker.iconY]);
-      decorations.push({ minX: Math.min(marker.x - 3, marker.iconX - 14), maxX: Math.max(marker.x + 3, marker.iconX + 14),
-        minY: Math.min(marker.y - 3, marker.iconY - 14), maxY: Math.max(marker.y + 3, marker.iconY + 14) });
-    }
+    const markers = projectPavilionAccessMarkers(geometry, accesses);
+    decorations.push(...markers.map(marker => marker.bounds));
     return { labels, markers, viewBox: buildCommercialMiniMapViewBox(geometry, decorations) };
-  }, [geometry, accesses]);
+  }, [geometry, accesses, annotationLayout]);
   const blocks = geometry.outlines.filter((outline) => outline.kind === 'block');
   const supports = geometry.outlines.filter((outline) => outline.kind === 'support');
   const [, , viewBoxWidth, viewBoxHeight] = presentation.viewBox.split(' ').map(Number);
@@ -511,12 +536,16 @@ export const CommercialMiniMap = memo(function CommercialMiniMap({
           {outlineLayer}
           {geometry.lots.map(({ entity, lot, path }, index) => <MiniMapLotPath key={lot.id}
             entityId={entity.id} path={path} status={lot.status} label={lotLabels.get(lot.id)!.accessible}
-            active={pavilionPresentation ? selectedEntityId === entity.id || contextEntityId === entity.id : activeLot?.entity.id === entity.id}
+            active={pavilionPresentation ? selectedEntityId === entity.id || contextEntityId === entity.id || Boolean(companyEntityIds?.has(entity.id)) : activeLot?.entity.id === entity.id}
             selected={selectedEntityId === entity.id} keyboardStop={keyboardStopId === entity.id}
             describedBy={pavilionPresentation && contextLot?.entity.id === entity.id && contextPosition?.visible ? contextCardId : undefined}
-            dimmed={Boolean(highlightedStatus && displayStatus(highlightedStatus) !== displayStatus(lot.status))}
+            dimmed={Boolean((highlightedStatus && displayStatus(highlightedStatus) !== displayStatus(lot.status))
+              || (commercialFilter !== 'all' && lot.status !== commercialFilter)
+              || (companyEntityIds?.size && !companyEntityIds.has(entity.id)))}
             index={index} onEnter={enterLot} onLeave={leaveLot} onFocusLot={focusLot} onBlurLot={blurLot} onActivate={activateLot} onNavigate={navigateLot} />)}
           {decorationLayer}
+          {annotationLayout && onSelectCompany && <PavilionAnnotations layout={annotationLayout} selectedId={selectedCompanyId}
+            selectedScopeId={selectedAnnotationScopeId} connections={showAnnotationConnections} onSelect={onSelectCompany} />}
         </svg> : <p className="commercial-dashboard-empty">Nenhuma geometria cadastral válida neste recorte.</p>}
       </div>
     </div>

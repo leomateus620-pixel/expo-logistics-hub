@@ -299,12 +299,12 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const dashboardQueryClient = useQueryClient();
   const salesSummaryProjectId = mapQuery.data?.source === 'database' ? mapQuery.data.project?.id : null;
   const refreshDashboardSales = useCallback(async () => {
-    if (!salesSummaryProjectId || !permissions.canManageSales) return;
+    if (!salesSummaryProjectId) return;
     // Reuse the dashboard's existing cycle; document changes need not alter map revision.
     await dashboardQueryClient.invalidateQueries({
       queryKey: ['commercial-sale-orders', salesSummaryProjectId],
     }, { cancelRefetch: false });
-  }, [dashboardQueryClient, salesSummaryProjectId, permissions.canManageSales]);
+  }, [dashboardQueryClient, salesSummaryProjectId]);
   useCommercialDashboardSync({
     open: dashboardOpen,
     enabled: !isPreview && !isCommissionScope && permissions.canViewMapAnalytics,

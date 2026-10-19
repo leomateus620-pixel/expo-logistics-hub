@@ -15,6 +15,7 @@ import { OverviewInfo } from './CommercialDashboardOverviewInfo';
 import { formatDashboardCommercialProgress } from './commercialDashboardProgress';
 import './commercial-dashboard-scope-cards.css';
 import './commercial-dashboard-workspace-analysis.css';
+import type { OccupancyOrder } from './pavilionOccupancy';
 
 const PavilionPlan = lazy(() => import('./CommercialDashboardPavilion'));
 const EMPTY_BOUNDARY = { outlines: [], pending: [] };
@@ -64,12 +65,16 @@ function Verification({ aggregate }: { aggregate: DashboardAggregate }) {
   </details>;
 }
 
-export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentationMemory, stateMemory }: {
+export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentationMemory, stateMemory, projectId, dataUpdatedAt, canManageSales, onOpenOrder }: {
   snapshot: CommercialDashboardSnapshot;
   data: Pick<CommercialMapData, 'entities' | 'lots'>;
   onViewLot: (id: string) => void;
   presentationMemory?: DashboardSpacesPresentationMemory;
   stateMemory?: CommercialDashboardSpacesMemory;
+  projectId?: string;
+  dataUpdatedAt?: number;
+  canManageSales?: boolean;
+  onOpenOrder?: (order: OccupancyOrder) => void;
 }) {
   // Presentation scope only; every element below shares one existing snapshot aggregate.
   const [requestedScopeId, setScopeId] = useState(() => presentationMemory?.scopeId ?? stateMemory?.current?.requestedScopeId ?? 'external:all');
@@ -169,7 +174,8 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
     <div className="commercial-dashboard-integrated-analysis">
       <div className="commercial-dashboard-spatial-card">
         {pavilion ? <Suspense fallback={<p role="status">Preparando planta do pavilhão…</p>}>
-          <PavilionPlan key={scopeId} snapshot={pavilion} onViewLot={onViewLot} highlightedStatus={highlight.highlightedStatus} selection={selection} presentationMemory={miniMapMemory} hideStatusLegend />
+          <PavilionPlan key={scopeId} snapshot={pavilion} onViewLot={onViewLot} highlightedStatus={highlight.highlightedStatus} selection={selection} presentationMemory={miniMapMemory} hideStatusLegend
+            projectId={projectId} dataUpdatedAt={dataUpdatedAt} canManageSales={canManageSales} onOpenOrder={onOpenOrder} />
         </Suspense> : <CommercialMiniMap items={items} title={title} outlines={isInternal ? internalOutlines : isPending ? undefined : boundary.outlines}
           onViewLot={onViewLot} highlightedStatus={highlight.highlightedStatus} selection={selection} presentationMemory={miniMapMemory} hideStatusLegend />}
       </div>
