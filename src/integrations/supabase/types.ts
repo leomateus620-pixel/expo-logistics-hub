@@ -11965,6 +11965,10 @@ export type Database = {
         Args: { p_project_id: string }
         Returns: string
       }
+      commercial_pavilion_occupancy: {
+        Args: { p_pavilion_id: string; p_project_id: string }
+        Returns: Json
+      }
       commercial_sale_logos: { Args: { p_project_id: string }; Returns: Json }
       commission_leadership_user_ids: {
         Args: { _commission_id: string }

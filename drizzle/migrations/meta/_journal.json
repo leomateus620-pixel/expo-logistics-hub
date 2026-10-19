@@ -155,6 +155,13 @@
       "when": 1792436508382,
       "tag": "0021_cronograma_location_watchers",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1792442015988,
+      "tag": "0022_commercial_pavilion_occupancy",
+      "breakpoints": true
     }
   ]
 }
