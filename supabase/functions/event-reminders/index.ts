@@ -45,6 +45,7 @@ interface ScheduledEventRow extends EventDateFields {
   org_id: string;
   title: string;
   location?: string | null;
+  location_code?: string | null;
   status?: string | null;
   lock_version: number | null;
   has_exact_date: boolean;
