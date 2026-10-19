@@ -2780,6 +2780,30 @@ export type Database = {
           },
         ]
       }
+      cronograma_location_watchers: {
+        Row: {
+          created_at: string
+          id: string
+          location_code: string
+          org_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_code: string
+          org_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_code?: string
+          org_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cronograma_planning_viewers: {
         Row: {
           created_at: string
@@ -12021,6 +12045,10 @@ export type Database = {
       }
       cronograma_is_planning_sheet: {
         Args: { _sheet: string }
+        Returns: boolean
+      }
+      cronograma_location_watcher: {
+        Args: { _event_id: string; _user_id: string }
         Returns: boolean
       }
       cronograma_managed_commission_ids: { Args: never; Returns: string[] }
