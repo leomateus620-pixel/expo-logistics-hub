@@ -119,8 +119,8 @@ export interface AssignmentPushInput {
   timeLabel?: string | null;
   location?: string | null;
   eventId: string;
-  /** 'responsible' quando a pessoa foi vinculada diretamente; 'commission' via comissão. */
-  source?: 'responsible' | 'commission';
+  /** 'responsible' vínculo direto; 'commission' via comissão; 'location' acompanhante do local. */
+  source?: 'responsible' | 'commission' | 'location';
 }
 
 export function buildAssignmentPushMessage(input: AssignmentPushInput): EventPushMessage {
@@ -135,7 +135,9 @@ export function buildAssignmentPushMessage(input: AssignmentPushInput): EventPus
   return {
     title: input.source === 'commission'
       ? 'Sua comissão foi vinculada a um evento'
-      : 'Você foi vinculado a um evento',
+      : input.source === 'location'
+        ? `Novo evento ${location ? `na ${location}` : 'no seu local'}`
+        : 'Você foi vinculado a um evento',
     body: parts.filter(Boolean).join(' · '),
     path: `/cronograma?event=${input.eventId}`,
   };
