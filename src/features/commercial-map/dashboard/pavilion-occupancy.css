@@ -1,0 +1,86 @@
+.pavilion-workspace { --occupancy-ink: #213d31; --occupancy-muted: #62766a; --occupancy-line: #d9e3da; color: var(--occupancy-ink); min-width: 0; font-family: inherit; }
+.pavilion-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.pavilion-toolbar > div { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pavilion-toolbar-title { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; }
+.pavilion-workspace button, .pavilion-options summary { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--occupancy-line); border-radius: 8px; padding: 7px 10px; background: white; color: var(--occupancy-ink); font: inherit; font-size: 11px; cursor: pointer; }
+.pavilion-workspace button:disabled { opacity: .5; cursor: default; }
+.pavilion-workspace button:hover:not(:disabled), .pavilion-options summary:hover { background: #edf4ee; }
+.pavilion-workspace button[aria-pressed="true"] { background: #e9f3ec; border-color: #59866b; }
+.pavilion-workspace button:focus-visible, .pavilion-workspace input:focus-visible, .pavilion-workspace summary:focus-visible, .pavilion-annotation-label:focus-visible { outline: 2px solid #397b50; outline-offset: 3px; }
+.pavilion-workspace svg:not(.commercial-dashboard-map-svg) { width: 15px; height: 15px; flex-shrink: 0; }
+.pavilion-options { position: relative; }
+.pavilion-options summary { list-style: none; }
+.pavilion-options summary::-webkit-details-marker { display: none; }
+.pavilion-options > div { position: absolute; right: 0; top: calc(100% + 5px); z-index: 8; display: grid; gap: 13px; width: 250px; max-width: 85vw; padding: 15px; border: 1px solid var(--occupancy-line); border-radius: 12px; background: white; box-shadow: 0 8px 25px #183c2524; }
+.pavilion-options label { display: flex; gap: 8px; align-items: center; font-size: 12px; }
+.pavilion-options label:has(select) { display: grid; }
+.pavilion-options input { accent-color: #315f4c; }
+.pavilion-workspace select, .pavilion-workspace input[type="search"] { min-width: 0; width: 100%; min-height: 40px; padding: 8px; border: 1px solid #cad8cd; border-radius: 7px; background: white; color: var(--occupancy-ink); font: inherit; font-size: 12px; }
+.pavilion-plan-layout, .pavilion-plan-main { min-width: 0; }
+.pavilion-companies { min-width: 0; margin-top: 12px; padding: 14px; border: 1px solid var(--occupancy-line); border-radius: 12px; background: #f8faf7; }
+.pavilion-companies[hidden] { display: none; }
+.pavilion-search { display: grid; gap: 6px; font-size: 11px; color: var(--occupancy-muted); }
+.pavilion-company-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 7px; margin-top: 12px; }
+.pavilion-company-list > button { justify-content: flex-start; align-items: flex-start; padding: 11px; text-align: left; }
+.pavilion-company-list > button > span:last-child { display: grid; gap: 3px; min-width: 0; }
+.pavilion-company-list strong { font-size: 12px; overflow-wrap: anywhere; }
+.pavilion-company-list small { font-size: 10px; font-weight: 400; color: var(--occupancy-muted); }
+.pavilion-company-marker { display: inline-grid; place-items: center; min-width: 23px; height: 23px; border-radius: 7px; background: #244d3c; color: white; font-size: 10px; }
+.pavilion-company-detail { margin-top: 12px; padding: 12px; border: 1px solid #bad0c2; border-radius: 9px; background: white; font-size: 12px; }
+.pavilion-company-detail > header { display: flex; justify-content: space-between; align-items: center; color: var(--occupancy-muted); font-size: 10px; }
+.pavilion-company-detail h4 { margin: 5px 0; font-size: 16px; overflow-wrap: anywhere; }
+.pavilion-company-detail p { margin: 6px 0; color: var(--occupancy-muted); font-size: 11px; }
+.pavilion-order { display: grid; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--occupancy-line); }
+.pavilion-order span { font-size: 10px; color: var(--occupancy-muted); overflow-wrap: anywhere; }
+.pavilion-company-contracts { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--occupancy-line); }
+.pavilion-company-contracts > summary { min-height: 36px; padding: 8px 0; font-size: 11px; font-weight: 650; cursor: pointer; }
+.pavilion-company-contracts > summary:focus-visible { outline: 2px solid #397b50; outline-offset: 2px; }
+.pavilion-linked-lots { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.pavilion-linked-lots button { font-size: 10px; }
+.pavilion-density-note, .pavilion-sync-message { margin: 8px 0; color: var(--occupancy-muted); font-size: 11px; line-height: 1.5; }
+.pavilion-topology-key { display: flex; flex-wrap: wrap; gap: 5px 14px; margin: 6px 0; color: var(--occupancy-muted); font-size: 10px; }
+.pavilion-topology-key span { display: inline-flex; align-items: center; gap: 5px; }
+.pavilion-topology-key i { width: 14px; height: 9px; border: 1.5px solid #17685c; border-radius: 2px; }
+.pavilion-topology-key i.is-unverified { border-style: dashed; }
+.pavilion-company-detail .pavilion-selected-contract { padding: 6px 8px; border-radius: 6px; background: #edf5ef; color: #235746; }
+.pavilion-order .pavilion-contract-choice { justify-content: flex-start; padding: 7px; font-size: 10px; text-align: left; line-height: 1.4; }
+.pavilion-sync-message button { margin-left: 8px; }
+.pavilion-annotation-label { cursor: pointer; }
+.pavilion-annotations > g { transition: opacity 130ms ease; }
+.pavilion-fullscreen-overlay { position: fixed; inset: 0; z-index: 120; background: #18332470; }
+.pavilion-fullscreen { position: fixed; inset: 12px; z-index: 121; display: flex; flex-direction: column; padding: 18px; border: 1px solid #d1dfd4; border-radius: 16px; background: #fafcf9; box-shadow: 0 12px 50px #102c2633; overflow: hidden; }
+.pavilion-fullscreen-header { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; padding-bottom: 13px; margin-bottom: 10px; border-bottom: 1px solid var(--occupancy-line); }
+.pavilion-fullscreen-header h2 { font-size: 20px; font-weight: 700; line-height: 1.25; margin: 5px 0; }
+.pavilion-fullscreen-header p { font-size: 11px; color: var(--occupancy-muted); margin: 0; }
+.pavilion-fullscreen-brand { font-size: 10px; letter-spacing: .18em; color: #3443a1; font-weight: 700; }
+.pavilion-fullscreen-brand b { color: #b84d0e; letter-spacing: .04em; margin-left: 4px; }
+.pavilion-fullscreen .pavilion-toolbar { flex-shrink: 0; }
+.pavilion-fullscreen .pavilion-plan-layout { flex: 1; min-height: 0; overflow: auto; }
+.pavilion-fullscreen .pavilion-plan-layout.has-company-panel { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 14px; }
+.pavilion-fullscreen .pavilion-plan-main { display: flex; flex-direction: column; min-height: 0; }
+.pavilion-fullscreen .commercial-dashboard-minimap--pavilion { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.pavilion-fullscreen .commercial-dashboard-pavilion-frame { flex: 1; min-height: 0; }
+.pavilion-fullscreen .commercial-dashboard-map-scroll { height: 100%; min-height: 230px; aspect-ratio: auto; }
+.pavilion-fullscreen .commercial-dashboard-map-surface { min-width: 100%; min-height: 100%; }
+.pavilion-fullscreen .commercial-dashboard-map-svg { display: block; }
+.pavilion-fullscreen .commercial-dashboard-map-legend { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 9px; font-size: 11px; color: var(--occupancy-muted); }
+.pavilion-fullscreen .commercial-dashboard-map-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.pavilion-fullscreen .commercial-dashboard-map-legend i { width: 8px; height: 8px; border-radius: 50%; }
+.pavilion-fullscreen .commercial-dashboard-module-number { font-weight: 700; fill: #173c2b; stroke: #ffffffc0; paint-order: stroke; pointer-events: none; }
+.pavilion-fullscreen .commercial-dashboard-map-tools { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.pavilion-fullscreen .commercial-dashboard-map-tools label { font-size: 11px; }
+.pavilion-fullscreen .commercial-dashboard-map-tools select { flex: 1; width: auto; max-width: 420px; }
+.pavilion-fullscreen .pavilion-companies { margin: 0; overflow-y: auto; overscroll-behavior: contain; }
+.pavilion-fullscreen .pavilion-company-list { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 760px) {
+  .pavilion-fullscreen { inset: 0; border: 0; border-radius: 0; padding: 12px; }
+  .pavilion-fullscreen-header h2 { font-size: 16px; }
+  .pavilion-fullscreen-header .pavilion-fullscreen-close { font-size: 0; min-width: 44px; padding: 9px; }
+  .pavilion-fullscreen .pavilion-plan-layout.has-company-panel { display: flex; flex-direction: column; }
+  .pavilion-fullscreen .pavilion-plan-main { flex: 1 0 auto; min-height: 52dvh; }
+  .pavilion-fullscreen .pavilion-companies { max-height: 40dvh; flex: 0 0 auto; }
+  .pavilion-toolbar { gap: 7px; }
+  .pavilion-toolbar > div { gap: 4px; }
+  .pavilion-workspace button, .pavilion-options summary { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .pavilion-annotations > g { transition: none; } }

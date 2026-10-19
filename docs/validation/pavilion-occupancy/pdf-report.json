@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "boundary": "Synthetic records exported through the actual jsPDF application function; vector operators, text and source snapshots checked.",
+  "documents": [
+    {
+      "pavilion": 12,
+      "pages": 2,
+      "format": "A3 landscape",
+      "official_numbers": 257,
+      "status_fills_match": {
+        "AVAILABLE": 239,
+        "SOLD": 13,
+        "SALE_OPEN": 5
+      },
+      "authorized_names": [
+        "ALFA MÁQUINAS AGRÍCOLAS",
+        "BETA TECNOLOGIA",
+        "COOPERATIVA HORIZONTE",
+        "EXPOSITOR SEM CADASTRO"
+      ],
+      "authorized_contracts": [
+        "FS28-ALFA-1",
+        "FS28-ALFA-2",
+        "FS28-BETA-1",
+        "FS28-HORIZONTE-1",
+        "FS28-UNVERIFIED"
+      ],
+      "raster_images": 0,
+      "text_positions_within_page": true
+    },
+    {
+      "pavilion": 13,
+      "pages": 2,
+      "format": "A3 portrait",
+      "official_numbers": 104,
+      "status_fills_match": {
+        "AVAILABLE": 97,
+        "SOLD": 5,
+        "SALE_OPEN": 2
+      },
+      "authorized_names": [
+        "ALFA MÁQUINAS AGRÍCOLAS",
+        "COOPERATIVA HORIZONTE"
+      ],
+      "authorized_contracts": [
+        "FS28-ALFA-1",
+        "FS28-HORIZONTE-1"
+      ],
+      "raster_images": 0,
+      "text_positions_within_page": true
+    }
+  ]
+}

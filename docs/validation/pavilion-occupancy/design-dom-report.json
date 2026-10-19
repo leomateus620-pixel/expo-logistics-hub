@@ -1,0 +1,48 @@
+{
+  "branches": 18,
+  "contractContours": 6,
+  "labels": [
+    {
+      "height": 55,
+      "name": "Expositor ALFA MÁQUINAS AGRÍCOLAS, Contrato FS28-ALFA-1, Lotes 41, 42, 43, 44, 4 lotes · Assinatura parcial",
+      "overflow": [],
+      "width": 146
+    },
+    {
+      "height": 55,
+      "name": "Expositor ALFA MÁQUINAS AGRÍCOLAS, Contrato FS28-ALFA-2, Lotes 235, 236, 2 lotes · Assinatura parcial",
+      "overflow": [],
+      "width": 146
+    },
+    {
+      "height": 46,
+      "name": "Expositor BETA TECNOLOGIA, Contrato FS28-BETA-1, Lotes 181, 182, 183, 184, 4 lotes · Assinatura parcial",
+      "overflow": [],
+      "width": 146
+    },
+    {
+      "height": 55,
+      "name": "Expositor COOPERATIVA HORIZONTE, Contrato FS28-HORIZONTE-1, Lotes 58, 59, 60, 3 de 5 lotes · Assinatura parcial",
+      "overflow": [],
+      "width": 146
+    },
+    {
+      "height": 55,
+      "name": "Expositor COOPERATIVA HORIZONTE, Contrato FS28-HORIZONTE-1, Lotes 113, 114, 2 de 5 lotes · Assinatura confirmada",
+      "overflow": [],
+      "width": 146
+    },
+    {
+      "height": 55,
+      "name": "Expositor EXPOSITOR SEM CADASTRO, Contrato FS28-UNVERIFIED, Lotes 200, 201, 2 lotes · Assinatura confirmada",
+      "overflow": [],
+      "width": 146
+    },
+    {
+      "height": 48,
+      "name": "Expositor Vínculo em conferência, , Lotes 215, 1 lote · Vínculo em conferência",
+      "overflow": [],
+      "width": 146
+    }
+  ]
+}

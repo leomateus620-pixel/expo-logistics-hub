@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-10-19T20:09:55.181Z",
+  "url": "http://127.0.0.1:8080/scripts/dashboard/occupancy-qa.html",
+  "viewport": {
+    "width": 662,
+    "height": 768,
+    "density": 1
+  },
+  "boundary": "Browser-rendered application workspace with synthetic commercial records on official fixture geometry.",
+  "checks": {
+    "freshLoad": true,
+    "fullscreen": true,
+    "officialLotCount": 257,
+    "branches": 18,
+    "contractContours": 6,
+    "visibleLabels": 7
+  },
+  "errors": []
+}

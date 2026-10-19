@@ -1,0 +1,32 @@
+{
+  "boundary": "Local browser, synthetic commercial records on official geometry; no production access.",
+  "checks": [
+    {
+      "name": "257 cadastral lots and commercial SVG leaders",
+      "lots": 257,
+      "connections": 7
+    },
+    {
+      "name": "fullscreen selection, mixed contracts, zoom persistence and focus restoration",
+      "passed": true
+    },
+    {
+      "name": "filters and hide/show preserve exact polygon paths",
+      "passed": true
+    },
+    {
+      "name": "high density uses 8 labels and retains all groups",
+      "totalGroups": 68,
+      "labelCount": 8
+    },
+    {
+      "name": "Pavilion 13 has 104 original spaces, mobile fits viewport and Escape closes",
+      "mobile": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 844
+      }
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,2457 @@
+{
+  "projectId": "reference:fenasoja-2026",
+  "pavilionId": "reference:2026:b3",
+  "observedAt": "2026-10-19T18:00:05.000Z",
+  "contractsAccessible": true,
+  "lots": [
+    {
+      "lotId": "reference:2026:lot:b3-m001",
+      "entityId": "reference:2026:b3-m001",
+      "lotNumber": "01",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m002",
+      "entityId": "reference:2026:b3-m002",
+      "lotNumber": "02",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m003",
+      "entityId": "reference:2026:b3-m003",
+      "lotNumber": "03",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m004",
+      "entityId": "reference:2026:b3-m004",
+      "lotNumber": "04",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m005",
+      "entityId": "reference:2026:b3-m005",
+      "lotNumber": "05",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m006",
+      "entityId": "reference:2026:b3-m006",
+      "lotNumber": "06",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m007",
+      "entityId": "reference:2026:b3-m007",
+      "lotNumber": "07",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m008",
+      "entityId": "reference:2026:b3-m008",
+      "lotNumber": "08",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m009",
+      "entityId": "reference:2026:b3-m009",
+      "lotNumber": "09",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m010",
+      "entityId": "reference:2026:b3-m010",
+      "lotNumber": "10",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m011",
+      "entityId": "reference:2026:b3-m011",
+      "lotNumber": "11",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m012",
+      "entityId": "reference:2026:b3-m012",
+      "lotNumber": "12",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m013",
+      "entityId": "reference:2026:b3-m013",
+      "lotNumber": "13",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m014",
+      "entityId": "reference:2026:b3-m014",
+      "lotNumber": "14",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m015",
+      "entityId": "reference:2026:b3-m015",
+      "lotNumber": "15",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m016",
+      "entityId": "reference:2026:b3-m016",
+      "lotNumber": "16",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m017",
+      "entityId": "reference:2026:b3-m017",
+      "lotNumber": "17",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m018",
+      "entityId": "reference:2026:b3-m018",
+      "lotNumber": "18",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m019",
+      "entityId": "reference:2026:b3-m019",
+      "lotNumber": "19",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m020",
+      "entityId": "reference:2026:b3-m020",
+      "lotNumber": "20",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m021",
+      "entityId": "reference:2026:b3-m021",
+      "lotNumber": "21",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m022",
+      "entityId": "reference:2026:b3-m022",
+      "lotNumber": "22",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m023",
+      "entityId": "reference:2026:b3-m023",
+      "lotNumber": "23",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m024",
+      "entityId": "reference:2026:b3-m024",
+      "lotNumber": "24",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m025",
+      "entityId": "reference:2026:b3-m025",
+      "lotNumber": "25",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m026",
+      "entityId": "reference:2026:b3-m026",
+      "lotNumber": "26",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m027",
+      "entityId": "reference:2026:b3-m027",
+      "lotNumber": "27",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m028",
+      "entityId": "reference:2026:b3-m028",
+      "lotNumber": "28",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m029",
+      "entityId": "reference:2026:b3-m029",
+      "lotNumber": "29",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m030",
+      "entityId": "reference:2026:b3-m030",
+      "lotNumber": "30",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m031",
+      "entityId": "reference:2026:b3-m031",
+      "lotNumber": "31",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m032",
+      "entityId": "reference:2026:b3-m032",
+      "lotNumber": "32",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m033",
+      "entityId": "reference:2026:b3-m033",
+      "lotNumber": "33",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m034",
+      "entityId": "reference:2026:b3-m034",
+      "lotNumber": "34",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m035",
+      "entityId": "reference:2026:b3-m035",
+      "lotNumber": "35",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m036",
+      "entityId": "reference:2026:b3-m036",
+      "lotNumber": "36",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m037",
+      "entityId": "reference:2026:b3-m037",
+      "lotNumber": "37",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m038",
+      "entityId": "reference:2026:b3-m038",
+      "lotNumber": "38",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m039",
+      "entityId": "reference:2026:b3-m039",
+      "lotNumber": "39",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m040",
+      "entityId": "reference:2026:b3-m040",
+      "lotNumber": "40",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m041",
+      "entityId": "reference:2026:b3-m041",
+      "lotNumber": "41",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m041",
+          "itemId": "item-reference:2026:lot:b3-m041",
+          "orderId": "alfa-1",
+          "exhibitorId": "alfa",
+          "displayName": "ALFA MÁQUINAS AGRÍCOLAS",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-alfa-1",
+              "number": "FS28-ALFA-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m042",
+      "entityId": "reference:2026:b3-m042",
+      "lotNumber": "42",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m042",
+          "itemId": "item-reference:2026:lot:b3-m042",
+          "orderId": "alfa-1",
+          "exhibitorId": "alfa",
+          "displayName": "ALFA MÁQUINAS AGRÍCOLAS",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-alfa-1",
+              "number": "FS28-ALFA-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m043",
+      "entityId": "reference:2026:b3-m043",
+      "lotNumber": "43",
+      "status": "SALE_OPEN",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m043",
+          "itemId": "item-reference:2026:lot:b3-m043",
+          "orderId": "alfa-1",
+          "exhibitorId": "alfa",
+          "displayName": "ALFA MÁQUINAS AGRÍCOLAS",
+          "saleStatus": "OPEN",
+          "contractState": "PENDING_SIGNATURE",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-alfa-1",
+              "number": "FS28-ALFA-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m044",
+      "entityId": "reference:2026:b3-m044",
+      "lotNumber": "44",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m044",
+          "itemId": "item-reference:2026:lot:b3-m044",
+          "orderId": "alfa-1",
+          "exhibitorId": "alfa",
+          "displayName": "ALFA MÁQUINAS AGRÍCOLAS",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-alfa-1",
+              "number": "FS28-ALFA-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m045",
+      "entityId": "reference:2026:b3-m045",
+      "lotNumber": "45",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m046",
+      "entityId": "reference:2026:b3-m046",
+      "lotNumber": "46",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m047",
+      "entityId": "reference:2026:b3-m047",
+      "lotNumber": "47",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m048",
+      "entityId": "reference:2026:b3-m048",
+      "lotNumber": "48",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m049",
+      "entityId": "reference:2026:b3-m049",
+      "lotNumber": "49",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m050",
+      "entityId": "reference:2026:b3-m050",
+      "lotNumber": "50",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m051",
+      "entityId": "reference:2026:b3-m051",
+      "lotNumber": "51",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m052",
+      "entityId": "reference:2026:b3-m052",
+      "lotNumber": "52",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m053",
+      "entityId": "reference:2026:b3-m053",
+      "lotNumber": "53",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m054",
+      "entityId": "reference:2026:b3-m054",
+      "lotNumber": "54",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m055",
+      "entityId": "reference:2026:b3-m055",
+      "lotNumber": "55",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m056",
+      "entityId": "reference:2026:b3-m056",
+      "lotNumber": "56",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m057",
+      "entityId": "reference:2026:b3-m057",
+      "lotNumber": "57",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m058",
+      "entityId": "reference:2026:b3-m058",
+      "lotNumber": "58",
+      "status": "SALE_OPEN",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m058",
+          "itemId": "item-reference:2026:lot:b3-m058",
+          "orderId": "horizonte-1",
+          "exhibitorId": "horizonte",
+          "displayName": "COOPERATIVA HORIZONTE",
+          "saleStatus": "OPEN",
+          "contractState": "PENDING_SIGNATURE",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-horizonte-1",
+              "number": "FS28-HORIZONTE-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m059",
+      "entityId": "reference:2026:b3-m059",
+      "lotNumber": "59",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m059",
+          "itemId": "item-reference:2026:lot:b3-m059",
+          "orderId": "horizonte-1",
+          "exhibitorId": "horizonte",
+          "displayName": "COOPERATIVA HORIZONTE",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-horizonte-1",
+              "number": "FS28-HORIZONTE-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m060",
+      "entityId": "reference:2026:b3-m060",
+      "lotNumber": "60",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m060",
+          "itemId": "item-reference:2026:lot:b3-m060",
+          "orderId": "horizonte-1",
+          "exhibitorId": "horizonte",
+          "displayName": "COOPERATIVA HORIZONTE",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-horizonte-1",
+              "number": "FS28-HORIZONTE-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m061",
+      "entityId": "reference:2026:b3-m061",
+      "lotNumber": "61",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m062",
+      "entityId": "reference:2026:b3-m062",
+      "lotNumber": "62",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m063",
+      "entityId": "reference:2026:b3-m063",
+      "lotNumber": "63",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m064",
+      "entityId": "reference:2026:b3-m064",
+      "lotNumber": "64",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m065",
+      "entityId": "reference:2026:b3-m065",
+      "lotNumber": "65",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m066",
+      "entityId": "reference:2026:b3-m066",
+      "lotNumber": "66",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m067",
+      "entityId": "reference:2026:b3-m067",
+      "lotNumber": "67",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m068",
+      "entityId": "reference:2026:b3-m068",
+      "lotNumber": "68",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m069",
+      "entityId": "reference:2026:b3-m069",
+      "lotNumber": "69",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m070",
+      "entityId": "reference:2026:b3-m070",
+      "lotNumber": "70",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m071",
+      "entityId": "reference:2026:b3-m071",
+      "lotNumber": "71",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m072",
+      "entityId": "reference:2026:b3-m072",
+      "lotNumber": "72",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m073",
+      "entityId": "reference:2026:b3-m073",
+      "lotNumber": "73",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m074",
+      "entityId": "reference:2026:b3-m074",
+      "lotNumber": "74",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m075",
+      "entityId": "reference:2026:b3-m075",
+      "lotNumber": "75",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m076",
+      "entityId": "reference:2026:b3-m076",
+      "lotNumber": "76",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m077",
+      "entityId": "reference:2026:b3-m077",
+      "lotNumber": "77",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m078",
+      "entityId": "reference:2026:b3-m078",
+      "lotNumber": "78",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m079",
+      "entityId": "reference:2026:b3-m079",
+      "lotNumber": "79",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m080",
+      "entityId": "reference:2026:b3-m080",
+      "lotNumber": "80",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m081",
+      "entityId": "reference:2026:b3-m081",
+      "lotNumber": "81",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m082",
+      "entityId": "reference:2026:b3-m082",
+      "lotNumber": "82",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m083",
+      "entityId": "reference:2026:b3-m083",
+      "lotNumber": "83",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m084",
+      "entityId": "reference:2026:b3-m084",
+      "lotNumber": "84",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m085",
+      "entityId": "reference:2026:b3-m085",
+      "lotNumber": "85",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m086",
+      "entityId": "reference:2026:b3-m086",
+      "lotNumber": "86",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m087",
+      "entityId": "reference:2026:b3-m087",
+      "lotNumber": "87",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m088",
+      "entityId": "reference:2026:b3-m088",
+      "lotNumber": "88",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m089",
+      "entityId": "reference:2026:b3-m089",
+      "lotNumber": "89",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m090",
+      "entityId": "reference:2026:b3-m090",
+      "lotNumber": "90",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m091",
+      "entityId": "reference:2026:b3-m091",
+      "lotNumber": "91",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m092",
+      "entityId": "reference:2026:b3-m092",
+      "lotNumber": "92",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m093",
+      "entityId": "reference:2026:b3-m093",
+      "lotNumber": "93",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m094",
+      "entityId": "reference:2026:b3-m094",
+      "lotNumber": "94",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m095",
+      "entityId": "reference:2026:b3-m095",
+      "lotNumber": "95",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m096",
+      "entityId": "reference:2026:b3-m096",
+      "lotNumber": "96",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m097",
+      "entityId": "reference:2026:b3-m097",
+      "lotNumber": "97",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m098",
+      "entityId": "reference:2026:b3-m098",
+      "lotNumber": "98",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m099",
+      "entityId": "reference:2026:b3-m099",
+      "lotNumber": "99",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m100",
+      "entityId": "reference:2026:b3-m100",
+      "lotNumber": "100",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m101",
+      "entityId": "reference:2026:b3-m101",
+      "lotNumber": "101",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m102",
+      "entityId": "reference:2026:b3-m102",
+      "lotNumber": "102",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m103",
+      "entityId": "reference:2026:b3-m103",
+      "lotNumber": "103",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m104",
+      "entityId": "reference:2026:b3-m104",
+      "lotNumber": "104",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m105",
+      "entityId": "reference:2026:b3-m105",
+      "lotNumber": "105",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m106",
+      "entityId": "reference:2026:b3-m106",
+      "lotNumber": "106",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m107",
+      "entityId": "reference:2026:b3-m107",
+      "lotNumber": "107",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m108",
+      "entityId": "reference:2026:b3-m108",
+      "lotNumber": "108",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m109",
+      "entityId": "reference:2026:b3-m109",
+      "lotNumber": "109",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m110",
+      "entityId": "reference:2026:b3-m110",
+      "lotNumber": "110",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m111",
+      "entityId": "reference:2026:b3-m111",
+      "lotNumber": "111",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m112",
+      "entityId": "reference:2026:b3-m112",
+      "lotNumber": "112",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m113",
+      "entityId": "reference:2026:b3-m113",
+      "lotNumber": "113",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m113",
+          "itemId": "item-reference:2026:lot:b3-m113",
+          "orderId": "horizonte-1",
+          "exhibitorId": "horizonte",
+          "displayName": "COOPERATIVA HORIZONTE",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-horizonte-1",
+              "number": "FS28-HORIZONTE-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m114",
+      "entityId": "reference:2026:b3-m114",
+      "lotNumber": "114",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m114",
+          "itemId": "item-reference:2026:lot:b3-m114",
+          "orderId": "horizonte-1",
+          "exhibitorId": "horizonte",
+          "displayName": "COOPERATIVA HORIZONTE",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-horizonte-1",
+              "number": "FS28-HORIZONTE-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m115",
+      "entityId": "reference:2026:b3-m115",
+      "lotNumber": "115",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m116",
+      "entityId": "reference:2026:b3-m116",
+      "lotNumber": "116",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m117",
+      "entityId": "reference:2026:b3-m117",
+      "lotNumber": "117",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m118",
+      "entityId": "reference:2026:b3-m118",
+      "lotNumber": "118",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m119",
+      "entityId": "reference:2026:b3-m119",
+      "lotNumber": "119",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m120",
+      "entityId": "reference:2026:b3-m120",
+      "lotNumber": "120",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m121",
+      "entityId": "reference:2026:b3-m121",
+      "lotNumber": "121",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m122",
+      "entityId": "reference:2026:b3-m122",
+      "lotNumber": "122",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m123",
+      "entityId": "reference:2026:b3-m123",
+      "lotNumber": "123",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m124",
+      "entityId": "reference:2026:b3-m124",
+      "lotNumber": "124",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m125",
+      "entityId": "reference:2026:b3-m125",
+      "lotNumber": "125",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m126",
+      "entityId": "reference:2026:b3-m126",
+      "lotNumber": "126",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m127",
+      "entityId": "reference:2026:b3-m127",
+      "lotNumber": "127",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m128",
+      "entityId": "reference:2026:b3-m128",
+      "lotNumber": "128",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m129",
+      "entityId": "reference:2026:b3-m129",
+      "lotNumber": "129",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m130",
+      "entityId": "reference:2026:b3-m130",
+      "lotNumber": "130",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m131",
+      "entityId": "reference:2026:b3-m131",
+      "lotNumber": "131",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m132",
+      "entityId": "reference:2026:b3-m132",
+      "lotNumber": "132",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m133",
+      "entityId": "reference:2026:b3-m133",
+      "lotNumber": "133",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m134",
+      "entityId": "reference:2026:b3-m134",
+      "lotNumber": "134",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m135",
+      "entityId": "reference:2026:b3-m135",
+      "lotNumber": "135",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m136",
+      "entityId": "reference:2026:b3-m136",
+      "lotNumber": "136",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m137",
+      "entityId": "reference:2026:b3-m137",
+      "lotNumber": "137",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m138",
+      "entityId": "reference:2026:b3-m138",
+      "lotNumber": "138",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m139",
+      "entityId": "reference:2026:b3-m139",
+      "lotNumber": "139",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m140",
+      "entityId": "reference:2026:b3-m140",
+      "lotNumber": "140",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m141",
+      "entityId": "reference:2026:b3-m141",
+      "lotNumber": "141",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m142",
+      "entityId": "reference:2026:b3-m142",
+      "lotNumber": "142",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m143",
+      "entityId": "reference:2026:b3-m143",
+      "lotNumber": "143",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m144",
+      "entityId": "reference:2026:b3-m144",
+      "lotNumber": "144",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m145",
+      "entityId": "reference:2026:b3-m145",
+      "lotNumber": "145",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m146",
+      "entityId": "reference:2026:b3-m146",
+      "lotNumber": "146",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m147",
+      "entityId": "reference:2026:b3-m147",
+      "lotNumber": "147",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m148",
+      "entityId": "reference:2026:b3-m148",
+      "lotNumber": "148",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m149",
+      "entityId": "reference:2026:b3-m149",
+      "lotNumber": "149",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m150",
+      "entityId": "reference:2026:b3-m150",
+      "lotNumber": "150",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m151",
+      "entityId": "reference:2026:b3-m151",
+      "lotNumber": "151",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m152",
+      "entityId": "reference:2026:b3-m152",
+      "lotNumber": "152",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m153",
+      "entityId": "reference:2026:b3-m153",
+      "lotNumber": "153",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m154",
+      "entityId": "reference:2026:b3-m154",
+      "lotNumber": "154",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m155",
+      "entityId": "reference:2026:b3-m155",
+      "lotNumber": "155",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m156",
+      "entityId": "reference:2026:b3-m156",
+      "lotNumber": "156",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m157",
+      "entityId": "reference:2026:b3-m157",
+      "lotNumber": "157",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m158",
+      "entityId": "reference:2026:b3-m158",
+      "lotNumber": "158",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m159",
+      "entityId": "reference:2026:b3-m159",
+      "lotNumber": "159",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m160",
+      "entityId": "reference:2026:b3-m160",
+      "lotNumber": "160",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m161",
+      "entityId": "reference:2026:b3-m161",
+      "lotNumber": "161",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m162",
+      "entityId": "reference:2026:b3-m162",
+      "lotNumber": "162",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m163",
+      "entityId": "reference:2026:b3-m163",
+      "lotNumber": "163",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m164",
+      "entityId": "reference:2026:b3-m164",
+      "lotNumber": "164",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m165",
+      "entityId": "reference:2026:b3-m165",
+      "lotNumber": "165",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m166",
+      "entityId": "reference:2026:b3-m166",
+      "lotNumber": "166",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m167",
+      "entityId": "reference:2026:b3-m167",
+      "lotNumber": "167",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m168",
+      "entityId": "reference:2026:b3-m168",
+      "lotNumber": "168",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m169",
+      "entityId": "reference:2026:b3-m169",
+      "lotNumber": "169",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m170",
+      "entityId": "reference:2026:b3-m170",
+      "lotNumber": "170",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m171",
+      "entityId": "reference:2026:b3-m171",
+      "lotNumber": "171",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m172",
+      "entityId": "reference:2026:b3-m172",
+      "lotNumber": "172",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m173",
+      "entityId": "reference:2026:b3-m173",
+      "lotNumber": "173",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m174",
+      "entityId": "reference:2026:b3-m174",
+      "lotNumber": "174",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m175",
+      "entityId": "reference:2026:b3-m175",
+      "lotNumber": "175",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m176",
+      "entityId": "reference:2026:b3-m176",
+      "lotNumber": "176",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m177",
+      "entityId": "reference:2026:b3-m177",
+      "lotNumber": "177",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m178",
+      "entityId": "reference:2026:b3-m178",
+      "lotNumber": "178",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m179",
+      "entityId": "reference:2026:b3-m179",
+      "lotNumber": "179",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m180",
+      "entityId": "reference:2026:b3-m180",
+      "lotNumber": "180",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m181",
+      "entityId": "reference:2026:b3-m181",
+      "lotNumber": "181",
+      "status": "SALE_OPEN",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m181",
+          "itemId": "item-reference:2026:lot:b3-m181",
+          "orderId": "beta-1",
+          "exhibitorId": "beta",
+          "displayName": "BETA TECNOLOGIA",
+          "saleStatus": "OPEN",
+          "contractState": "PENDING_SIGNATURE",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-beta-1",
+              "number": "FS28-BETA-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m182",
+      "entityId": "reference:2026:b3-m182",
+      "lotNumber": "182",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m182",
+          "itemId": "item-reference:2026:lot:b3-m182",
+          "orderId": "beta-1",
+          "exhibitorId": "beta",
+          "displayName": "BETA TECNOLOGIA",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-beta-1",
+              "number": "FS28-BETA-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m183",
+      "entityId": "reference:2026:b3-m183",
+      "lotNumber": "183",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m183",
+          "itemId": "item-reference:2026:lot:b3-m183",
+          "orderId": "beta-1",
+          "exhibitorId": "beta",
+          "displayName": "BETA TECNOLOGIA",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-beta-1",
+              "number": "FS28-BETA-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m184",
+      "entityId": "reference:2026:b3-m184",
+      "lotNumber": "184",
+      "status": "SALE_OPEN",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m184",
+          "itemId": "item-reference:2026:lot:b3-m184",
+          "orderId": "beta-1",
+          "exhibitorId": "beta",
+          "displayName": "BETA TECNOLOGIA",
+          "saleStatus": "OPEN",
+          "contractState": "PENDING_SIGNATURE",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-beta-1",
+              "number": "FS28-BETA-1",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m185",
+      "entityId": "reference:2026:b3-m185",
+      "lotNumber": "185",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m186",
+      "entityId": "reference:2026:b3-m186",
+      "lotNumber": "186",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m187",
+      "entityId": "reference:2026:b3-m187",
+      "lotNumber": "187",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m188",
+      "entityId": "reference:2026:b3-m188",
+      "lotNumber": "188",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m189",
+      "entityId": "reference:2026:b3-m189",
+      "lotNumber": "189",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m190",
+      "entityId": "reference:2026:b3-m190",
+      "lotNumber": "190",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m191",
+      "entityId": "reference:2026:b3-m191",
+      "lotNumber": "191",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m192",
+      "entityId": "reference:2026:b3-m192",
+      "lotNumber": "192",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m193",
+      "entityId": "reference:2026:b3-m193",
+      "lotNumber": "193",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m194",
+      "entityId": "reference:2026:b3-m194",
+      "lotNumber": "194",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m195",
+      "entityId": "reference:2026:b3-m195",
+      "lotNumber": "195",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m196",
+      "entityId": "reference:2026:b3-m196",
+      "lotNumber": "196",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m197",
+      "entityId": "reference:2026:b3-m197",
+      "lotNumber": "197",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m198",
+      "entityId": "reference:2026:b3-m198",
+      "lotNumber": "198",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m199",
+      "entityId": "reference:2026:b3-m199",
+      "lotNumber": "199",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m200",
+      "entityId": "reference:2026:b3-m200",
+      "lotNumber": "200",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m200",
+          "itemId": "item-reference:2026:lot:b3-m200",
+          "orderId": "unverified",
+          "exhibitorId": null,
+          "displayName": "EXPOSITOR SEM CADASTRO",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-unverified",
+              "number": "FS28-UNVERIFIED",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m201",
+      "entityId": "reference:2026:b3-m201",
+      "lotNumber": "201",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m201",
+          "itemId": "item-reference:2026:lot:b3-m201",
+          "orderId": "unverified",
+          "exhibitorId": null,
+          "displayName": "EXPOSITOR SEM CADASTRO",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-unverified",
+              "number": "FS28-UNVERIFIED",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m202",
+      "entityId": "reference:2026:b3-m202",
+      "lotNumber": "202",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m203",
+      "entityId": "reference:2026:b3-m203",
+      "lotNumber": "203",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m204",
+      "entityId": "reference:2026:b3-m204",
+      "lotNumber": "204",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m205",
+      "entityId": "reference:2026:b3-m205",
+      "lotNumber": "205",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m206",
+      "entityId": "reference:2026:b3-m206",
+      "lotNumber": "206",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m207",
+      "entityId": "reference:2026:b3-m207",
+      "lotNumber": "207",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m208",
+      "entityId": "reference:2026:b3-m208",
+      "lotNumber": "208",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m209",
+      "entityId": "reference:2026:b3-m209",
+      "lotNumber": "209",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m210",
+      "entityId": "reference:2026:b3-m210",
+      "lotNumber": "210",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m211",
+      "entityId": "reference:2026:b3-m211",
+      "lotNumber": "211",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m212",
+      "entityId": "reference:2026:b3-m212",
+      "lotNumber": "212",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m213",
+      "entityId": "reference:2026:b3-m213",
+      "lotNumber": "213",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m214",
+      "entityId": "reference:2026:b3-m214",
+      "lotNumber": "214",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m215",
+      "entityId": "reference:2026:b3-m215",
+      "lotNumber": "215",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m215",
+          "itemId": "item-reference:2026:lot:b3-m215",
+          "orderId": "review",
+          "exhibitorId": "review",
+          "displayName": "VÍNCULO CONTRADITÓRIO",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": true,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-review",
+              "number": "FS28-REVIEW",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m216",
+      "entityId": "reference:2026:b3-m216",
+      "lotNumber": "216",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m217",
+      "entityId": "reference:2026:b3-m217",
+      "lotNumber": "217",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m218",
+      "entityId": "reference:2026:b3-m218",
+      "lotNumber": "218",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m219",
+      "entityId": "reference:2026:b3-m219",
+      "lotNumber": "219",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m220",
+      "entityId": "reference:2026:b3-m220",
+      "lotNumber": "220",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m221",
+      "entityId": "reference:2026:b3-m221",
+      "lotNumber": "221",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m222",
+      "entityId": "reference:2026:b3-m222",
+      "lotNumber": "222",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m223",
+      "entityId": "reference:2026:b3-m223",
+      "lotNumber": "223",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m224",
+      "entityId": "reference:2026:b3-m224",
+      "lotNumber": "224",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m225",
+      "entityId": "reference:2026:b3-m225",
+      "lotNumber": "225",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m226",
+      "entityId": "reference:2026:b3-m226",
+      "lotNumber": "226",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m227",
+      "entityId": "reference:2026:b3-m227",
+      "lotNumber": "227",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m228",
+      "entityId": "reference:2026:b3-m228",
+      "lotNumber": "228",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m229",
+      "entityId": "reference:2026:b3-m229",
+      "lotNumber": "229",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m230",
+      "entityId": "reference:2026:b3-m230",
+      "lotNumber": "230",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m231",
+      "entityId": "reference:2026:b3-m231",
+      "lotNumber": "231",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m232",
+      "entityId": "reference:2026:b3-m232",
+      "lotNumber": "232",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m233",
+      "entityId": "reference:2026:b3-m233",
+      "lotNumber": "233",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m234",
+      "entityId": "reference:2026:b3-m234",
+      "lotNumber": "234",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m235",
+      "entityId": "reference:2026:b3-m235",
+      "lotNumber": "235",
+      "status": "SALE_OPEN",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m235",
+          "itemId": "item-reference:2026:lot:b3-m235",
+          "orderId": "alfa-2",
+          "exhibitorId": "alfa",
+          "displayName": "ALFA MÁQUINAS AGRÍCOLAS",
+          "saleStatus": "OPEN",
+          "contractState": "PENDING_SIGNATURE",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-alfa-2",
+              "number": "FS28-ALFA-2",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m236",
+      "entityId": "reference:2026:b3-m236",
+      "lotNumber": "236",
+      "status": "SOLD",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": [
+        {
+          "saleId": "sale-reference:2026:lot:b3-m236",
+          "itemId": "item-reference:2026:lot:b3-m236",
+          "orderId": "alfa-2",
+          "exhibitorId": "alfa",
+          "displayName": "ALFA MÁQUINAS AGRÍCOLAS",
+          "saleStatus": "CONFIRMED",
+          "contractState": "SIGNED",
+          "inconsistent": false,
+          "updatedAt": "2026-10-19T18:00:00.000Z",
+          "contracts": [
+            {
+              "id": "contract-alfa-2",
+              "number": "FS28-ALFA-2",
+              "scope": "ORDER_ITEMS",
+              "updatedAt": "2026-10-19T18:00:00.000Z",
+              "verified": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m237",
+      "entityId": "reference:2026:b3-m237",
+      "lotNumber": "237",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m238",
+      "entityId": "reference:2026:b3-m238",
+      "lotNumber": "238",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m239",
+      "entityId": "reference:2026:b3-m239",
+      "lotNumber": "239",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m240",
+      "entityId": "reference:2026:b3-m240",
+      "lotNumber": "240",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m241",
+      "entityId": "reference:2026:b3-m241",
+      "lotNumber": "241",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m242",
+      "entityId": "reference:2026:b3-m242",
+      "lotNumber": "242",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m243",
+      "entityId": "reference:2026:b3-m243",
+      "lotNumber": "243",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m244",
+      "entityId": "reference:2026:b3-m244",
+      "lotNumber": "244",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m245",
+      "entityId": "reference:2026:b3-m245",
+      "lotNumber": "245",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m246",
+      "entityId": "reference:2026:b3-m246",
+      "lotNumber": "246",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m247",
+      "entityId": "reference:2026:b3-m247",
+      "lotNumber": "247",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m248",
+      "entityId": "reference:2026:b3-m248",
+      "lotNumber": "248",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m249",
+      "entityId": "reference:2026:b3-m249",
+      "lotNumber": "249",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m250",
+      "entityId": "reference:2026:b3-m250",
+      "lotNumber": "250",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m251",
+      "entityId": "reference:2026:b3-m251",
+      "lotNumber": "251",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m252",
+      "entityId": "reference:2026:b3-m252",
+      "lotNumber": "252",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m253",
+      "entityId": "reference:2026:b3-m253",
+      "lotNumber": "253",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m254",
+      "entityId": "reference:2026:b3-m254",
+      "lotNumber": "254",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m255",
+      "entityId": "reference:2026:b3-m255",
+      "lotNumber": "255",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m256",
+      "entityId": "reference:2026:b3-m256",
+      "lotNumber": "256",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    },
+    {
+      "lotId": "reference:2026:lot:b3-m257",
+      "entityId": "reference:2026:b3-m257",
+      "lotNumber": "257",
+      "status": "AVAILABLE",
+      "updatedAt": "2026-10-19T18:00:00.000Z",
+      "associations": []
+    }
+  ],
+  "colors": {
+    "AVAILABLE": "#22c55e",
+    "RESERVED": "#f59e0b",
+    "IN_NEGOTIATION": "#0ea5e9",
+    "SALE_OPEN": "#eab308",
+    "SOLD": "#2563eb",
+    "BLOCKED": "#dc2626",
+    "UNAVAILABLE": "#64748b"
+  },
+  "totals": {
+    "lots": 257,
+    "sold": 13,
+    "open": 5,
+    "available": 239
+  }
+}
