@@ -102,6 +102,12 @@ export function EventRelationshipWorkspace({
   onRetryRelationships?: () => Promise<unknown> | unknown;
 }) {
   const [composerOpen, setComposerOpen] = useState(false);
+  // Capture the editing session once. Refetches and tree filters must not remount the form.
+  const [planSession, setPlanSession] = useState<{
+    mode: 'create' | 'edit';
+    initialSubevents?: CronogramaSubevent[];
+    draftKey: string;
+  } | null>(null);
   const [editingMain, setEditingMain] = useState(false);
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
   const [expandedNodeId, setExpandedNodeId] = useState<string | null>(null);
@@ -420,36 +426,28 @@ export function EventRelationshipWorkspace({
                       onView={() => setExpandedNodeId((current) => current === identity ? null : identity)}
                       onEdit={() => {
                         setComposerOpen(false);
-                        setEditingNodeId((current) => current === identity ? null : identity);
+                        if (onSaveSubeventPlan) {
+                          setPlanSession({
+                            mode: 'edit',
+                            initialSubevents: [subevent],
+                            draftKey: `${event.id}:edit:${subevent.id ?? identity}`,
+                          });
+                        } else {
+                          setEditingNodeId((current) => current === identity ? null : identity);
+                        }
                       }}
                       onToggleCompleted={() => handleToggleCompleted(subevent, originalIndex)}
                       onRemove={() => setRemovalTarget(subevent)}
                     />
                     {editing && (
-                      onSaveSubeventPlan ? (
-                        <SubeventPlanBuilder
-                          connectedTo={event.title}
-                          mode="edit"
-                          defaultDate={event.date}
-                          initialSubevents={[subevent]}
-                          draftKey={`${event.id}:edit:${subevent.id ?? identity}`}
-                          onSubmit={async (items) => {
-                            await onSaveSubeventPlan(items);
-                            setEditingNodeId(null);
-                            setAnnouncement(`O planejamento de ${subevent.title} foi atualizado.`);
-                          }}
-                          onCancel={() => setEditingNodeId(null)}
-                        />
-                      ) : (
-                        <SubeventComposer
-                          initialSubevent={subevent}
-                          connectedTo={event.title}
-                          mode="edit"
-                          defaultDate={event.date}
-                          onSubmit={(input) => handleUpdate(subevent, input)}
-                          onCancel={() => setEditingNodeId(null)}
-                        />
-                      )
+                      <SubeventComposer
+                        initialSubevent={subevent}
+                        connectedTo={event.title}
+                        mode="edit"
+                        defaultDate={event.date}
+                        onSubmit={(input) => handleUpdate(subevent, input)}
+                        onCancel={() => setEditingNodeId(null)}
+                      />
                     )}
                   </div>
                 </li>
@@ -463,15 +461,20 @@ export function EventRelationshipWorkspace({
               ref={addBubbleRef}
               type="button"
               className="cronograma-add-thought focus-ring"
-              onClick={() => {
+              onClick={(clickEvent) => {
                 if (!canManage) return;
+                clickEvent.currentTarget.focus({ preventScroll: true });
                 setEditingNodeId(null);
-                setComposerOpen((current) => !current);
+                if (onSaveSubeventPlan) {
+                  setPlanSession({ mode: 'create', draftKey: `${event.id}:new` });
+                } else {
+                  setComposerOpen((current) => !current);
+                }
               }}
               disabled={!canManage}
               aria-label="Adicionar subevento"
-              aria-expanded={composerOpen}
-              aria-controls="cronograma-new-subevent-composer"
+              aria-expanded={composerOpen || planSession?.mode === 'create'}
+              aria-controls={composerOpen ? "cronograma-new-subevent-composer" : undefined}
             >
               <span className="cronograma-add-thought-icon" aria-hidden="true">
                 {canManage ? <Plus /> : <LockKeyhole />}
@@ -491,31 +494,12 @@ export function EventRelationshipWorkspace({
 
             {composerOpen && (
               <div id="cronograma-new-subevent-composer" className="cronograma-add-composer-wrap">
-                {onSaveSubeventPlan ? (
-                  <SubeventPlanBuilder
-                    connectedTo={event.title}
-                    defaultDate={event.date}
-                    draftKey={`${event.id}:new`}
-                    onSubmit={async (items) => {
-                      await onSaveSubeventPlan(items);
-                      setComposerOpen(false);
-                      setAnnouncement(
-                        items.length === 1
-                          ? `${items[0].title} foi adicionado ao evento.`
-                          : `${items.length} subeventos foram adicionados ao evento.`,
-                      );
-                      window.requestAnimationFrame(() => addBubbleRef.current?.focus({ preventScroll: true }));
-                    }}
-                    onCancel={() => setComposerOpen(false)}
-                  />
-                ) : (
-                  <SubeventComposer
-                    connectedTo={event.title}
-                    defaultDate={event.date}
-                    onSubmit={handleCreate}
-                    onCancel={() => setComposerOpen(false)}
-                  />
-                )}
+                <SubeventComposer
+                  connectedTo={event.title}
+                  defaultDate={event.date}
+                  onSubmit={handleCreate}
+                  onCancel={() => setComposerOpen(false)}
+                />
               </div>
             )}
           </div>
@@ -523,6 +507,24 @@ export function EventRelationshipWorkspace({
 
         {actionError && <p className="cronograma-workspace-action-error" role="alert">{actionError}</p>}
       </div>
+
+      {planSession && onSaveSubeventPlan && (
+        <SubeventPlanBuilder
+          connectedTo={event.title}
+          mode={planSession.mode}
+          defaultDate={event.date}
+          initialSubevents={planSession.initialSubevents}
+          draftKey={planSession.draftKey}
+          onSubmit={async (items) => {
+            await onSaveSubeventPlan(items);
+            setPlanSession(null);
+            setAnnouncement(planSession.mode === 'edit'
+              ? 'O planejamento foi atualizado.'
+              : `${items.length} ${items.length === 1 ? 'subevento foi adicionado' : 'subeventos foram adicionados'} ao evento.`);
+          }}
+          onCancel={() => setPlanSession(null)}
+        />
+      )}
 
       <AlertDialog open={Boolean(removalTarget)} onOpenChange={(open) => {
         if (!open && !pendingAction) setRemovalTarget(null);
@@ -626,7 +628,7 @@ function SubeventNode({
         </button>
         {canManage && (
           <>
-            <button type="button" onClick={onEdit} className="focus-ring" aria-label={`Editar subevento ${subevent.title}`}>
+            <button type="button" onClick={(clickEvent) => { clickEvent.currentTarget.focus({ preventScroll: true }); onEdit(); }} className="focus-ring" aria-label={`Editar subevento ${subevent.title}`}>
               <Edit3 aria-hidden="true" /> <span>Editar</span>
             </button>
             <button
