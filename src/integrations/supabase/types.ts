@@ -2966,6 +2966,50 @@ export type Database = {
           },
         ]
       }
+      cronograma_subevento_orcamento_itens: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          item: string
+          org_id: string
+          sort_order: number
+          subevent_id: string
+          supplier: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          item: string
+          org_id: string
+          sort_order?: number
+          subevent_id: string
+          supplier?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          item?: string
+          org_id?: string
+          sort_order?: number
+          subevent_id?: string
+          supplier?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_subevento_orcamento_itens_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cronograma_subevento_providencias: {
         Row: {
           commission_name: string | null
@@ -11314,6 +11358,10 @@ export type Database = {
         Returns: undefined
       }
       _cronograma_apply_subevent_actions: {
+        Args: { _items: Json; _org_id: string; _subevent_id: string }
+        Returns: undefined
+      }
+      _cronograma_apply_subevent_budget: {
         Args: { _items: Json; _org_id: string; _subevent_id: string }
         Returns: undefined
       }

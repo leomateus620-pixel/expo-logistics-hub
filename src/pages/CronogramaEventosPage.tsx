@@ -860,6 +860,12 @@ export default function CronogramaEventosPage() {
             category: guest.category ?? null,
             sort_order: position,
           })),
+          budget: (item.budget ?? []).map((line, position) => ({
+            item: line.item.trim(),
+            supplier: line.supplier?.trim() || null,
+            amount: Math.max(0, Number(line.amount) || 0),
+            sort_order: position,
+          })),
         };
       }),
     });

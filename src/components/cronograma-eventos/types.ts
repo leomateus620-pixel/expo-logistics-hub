@@ -114,6 +114,8 @@ export interface CronogramaEventResponsibleLink {
 }
 
 export interface CronogramaSubeventAction {
+  /** Client-only key for unsaved rows (never persisted). */
+  clientKey?: string;
   id?: string;
   startTime?: string | null;
   title: string;
@@ -135,6 +137,14 @@ export interface CronogramaSubeventProvision {
   commissionName?: string | null;
   note?: string | null;
   isDone?: boolean;
+  sortOrder?: number;
+}
+
+export interface CronogramaSubeventBudgetItem {
+  id?: string;
+  item: string;
+  supplier?: string | null;
+  amount: number;
   sortOrder?: number;
 }
 
@@ -167,6 +177,7 @@ export interface CronogramaSubevent {
   lockVersion?: number | null;
   actions?: CronogramaSubeventAction[];
   provisions?: CronogramaSubeventProvision[];
+  budget?: CronogramaSubeventBudgetItem[];
   guests?: CronogramaSubeventGuest[];
   /** Relational commission links, same contract used by the main event form. */
   commissionsRel?: CronogramaEventCommissionLink[];
@@ -201,6 +212,7 @@ export interface CronogramaSubeventPlanDraft {
   responsiblesRel?: CronogramaEventResponsibleLink[];
   actions: CronogramaSubeventAction[];
   provisions: CronogramaSubeventProvision[];
+  budget: CronogramaSubeventBudgetItem[];
   guests: CronogramaSubeventGuest[];
 }
 

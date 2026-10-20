@@ -311,6 +311,13 @@ export interface CronogramaSubeventPlanProvisionInput {
   sort_order?: number;
 }
 
+export interface CronogramaSubeventPlanBudgetInput {
+  item: string;
+  supplier?: string | null;
+  amount: number;
+  sort_order?: number;
+}
+
 export interface CronogramaSubeventPlanGuestInput {
   name: string;
   category?: string | null;
@@ -321,6 +328,7 @@ export interface CronogramaSubeventPlanItemInput extends Omit<CronogramaSaveSube
   actions?: CronogramaSubeventPlanActionInput[];
   provisions?: CronogramaSubeventPlanProvisionInput[];
   guests?: CronogramaSubeventPlanGuestInput[];
+  budget?: CronogramaSubeventPlanBudgetInput[];
 }
 
 export interface CronogramaSaveSubeventPlanPayload {

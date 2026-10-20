@@ -246,6 +246,7 @@ export function adaptCronogramaSubevent(subevent: CronogramaSubeventSeed): Crono
     responsiblesRel: subevent.responsiblesRel ?? [],
     actions: subevent.actions ?? [],
     provisions: subevent.provisions ?? [],
+    budget: subevent.budget ?? [],
     guests: subevent.guests ?? [],
   };
 }
