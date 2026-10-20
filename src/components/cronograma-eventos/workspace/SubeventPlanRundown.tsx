@@ -1,4 +1,5 @@
-import { CheckCircle2, Circle, ListChecks, Timer, Users } from 'lucide-react';
+import { CheckCircle2, Circle, Coins, ListChecks, Timer, Users } from 'lucide-react';
+import { budgetTotal, formatBRL } from './planBuilderUtils';
 import type { CronogramaSubevent } from '@/components/cronograma-eventos/types';
 
 /** Short operational summary used on cards and headers (ex.: "6 ações · 4 providências · 9 convidados"). */
@@ -6,11 +7,14 @@ export function subeventPlanSummary(subevent: CronogramaSubevent) {
   const actions = subevent.actions?.length ?? 0;
   const provisions = subevent.provisions?.length ?? 0;
   const guests = subevent.guests?.length ?? 0;
-  if (actions + provisions + guests === 0) return null;
+  if (actions + provisions + guests === 0 && !subevent.budget?.length) return null;
   const parts: string[] = [];
   if (actions > 0) parts.push(`${actions} ${actions === 1 ? 'ação' : 'ações'}`);
   if (provisions > 0) parts.push(`${provisions} ${provisions === 1 ? 'providência' : 'providências'}`);
   if (guests > 0) parts.push(`${guests} ${guests === 1 ? 'convidado' : 'convidados'}`);
+  const total = budgetTotal(subevent.budget);
+  if (total > 0) parts.push(formatBRL(total));
+  if (parts.length === 0) return null;
   return parts.join(' · ');
 }
 
@@ -24,7 +28,8 @@ export function SubeventPlanRundown({ subevent }: { subevent: CronogramaSubevent
   const actions = subevent.actions ?? [];
   const provisions = subevent.provisions ?? [];
   const guests = subevent.guests ?? [];
-  if (actions.length === 0 && provisions.length === 0 && guests.length === 0) return null;
+  const budget = subevent.budget ?? [];
+  if (actions.length === 0 && provisions.length === 0 && guests.length === 0 && budget.length === 0) return null;
 
   const actionsDone = actions.filter((action) => action.isDone).length;
   const provisionsDone = provisions.filter((provision) => provision.isDone).length;
@@ -103,6 +108,33 @@ export function SubeventPlanRundown({ subevent }: { subevent: CronogramaSubevent
               );
             })}
           </ul>
+        </section>
+      )}
+
+      {budget.length > 0 && (
+        <section className="cronograma-plan-block" data-kind="budget">
+          <header className="cronograma-plan-block-head">
+            <span className="cronograma-plan-block-icon"><Coins aria-hidden="true" /></span>
+            <h5>Orçamento</h5>
+            <span className="cronograma-plan-block-count">{formatBRL(budgetTotal(budget))}</span>
+          </header>
+          <table className="cronograma-plan-budget-table">
+            <thead>
+              <tr><th scope="col">Produto / serviço</th><th scope="col">Fornecedor</th><th scope="col" className="is-num">Valor</th></tr>
+            </thead>
+            <tbody>
+              {budget.map((line, index) => (
+                <tr key={line.id ?? `budget-${index}`}>
+                  <td>{line.item}</td>
+                  <td>{line.supplier || '—'}</td>
+                  <td className="is-num">{formatBRL(line.amount)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr><th scope="row" colSpan={2}>Valor total</th><td className="is-num">{formatBRL(budgetTotal(budget))}</td></tr>
+            </tfoot>
+          </table>
         </section>
       )}
 

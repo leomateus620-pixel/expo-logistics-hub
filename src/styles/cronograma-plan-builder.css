@@ -382,3 +382,44 @@
   min-width: 0;
 }
 .cronograma-thought-field.cronograma-plan-relations > * { width: 100%; min-width: 0; }
+
+/* Rascunho preservado */
+.cronograma-plan-draft-notice {
+  display: flex; align-items: center; gap: .5rem; padding: .55rem .8rem; margin: .25rem 0 .5rem;
+  border-radius: .75rem; font-size: .8rem;
+  background: hsl(var(--accent) / .12); color: hsl(var(--foreground)); border: 1px solid hsl(var(--accent) / .35);
+}
+.cronograma-plan-draft-notice svg { width: 1rem; height: 1rem; flex: none; }
+.cronograma-plan-draft-notice span { flex: 1; min-width: 0; }
+.cronograma-plan-draft-notice button { font-weight: 700; text-decoration: underline; border-radius: .4rem; }
+
+/* Ação reposicionada por horário */
+@keyframes cronograma-plan-moved { 0% { box-shadow: 0 0 0 2px hsl(var(--primary) / .55); background: hsl(var(--primary) / .08); } 100% { box-shadow: 0 0 0 0 transparent; background: transparent; } }
+.cronograma-plan-row[data-moved] { animation: cronograma-plan-moved 1.4s ease-out; border-radius: .9rem; }
+
+/* Orçamento */
+.cronograma-plan-budget-head, .cronograma-plan-budget-row {
+  display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr) minmax(7.5rem, .8fr) 2.25rem; gap: .5rem; align-items: center;
+}
+.cronograma-plan-budget-head { padding: 0 .25rem .25rem; font-size: .7rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+.cronograma-plan-budget-head .is-num { text-align: right; padding-right: .5rem; }
+.cronograma-plan-budget-amount { position: relative; }
+.cronograma-plan-budget-amount > span { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); font-size: .8rem; color: hsl(var(--muted-foreground)); pointer-events: none; }
+.cronograma-plan-budget-amount input { padding-left: 2.1rem; text-align: right; font-variant-numeric: tabular-nums; }
+.cronograma-plan-budget-foot { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; margin-top: .25rem; }
+.cronograma-plan-budget-total { display: flex; align-items: baseline; gap: .6rem; padding: .5rem .9rem; border-radius: .8rem; background: hsl(var(--primary) / .08); border: 1px solid hsl(var(--primary) / .2); }
+.cronograma-plan-budget-total small { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: hsl(var(--muted-foreground)); }
+.cronograma-plan-budget-total strong { font-size: 1.05rem; font-variant-numeric: tabular-nums; color: hsl(var(--primary)); }
+@media (max-width: 640px) {
+  .cronograma-plan-budget-head { display: none; }
+  .cronograma-plan-budget-row { grid-template-columns: minmax(0, 1fr) 2.25rem; }
+  .cronograma-plan-budget-row > :nth-child(1) { grid-column: 1 / 2; }
+  .cronograma-plan-budget-row > :nth-child(2), .cronograma-plan-budget-row > :nth-child(3) { grid-column: 1 / 2; }
+  .cronograma-plan-budget-row > button { grid-column: 2; grid-row: 1; }
+  .cronograma-plan-budget-foot { flex-direction: column; align-items: stretch; }
+}
+.cronograma-plan-budget-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.cronograma-plan-budget-table th, .cronograma-plan-budget-table td { padding: .4rem .5rem; border-bottom: 1px solid hsl(var(--border)); text-align: left; }
+.cronograma-plan-budget-table thead th { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: hsl(var(--muted-foreground)); }
+.cronograma-plan-budget-table .is-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cronograma-plan-budget-table tfoot th, .cronograma-plan-budget-table tfoot td { border-bottom: 0; font-weight: 800; color: hsl(var(--primary)); }

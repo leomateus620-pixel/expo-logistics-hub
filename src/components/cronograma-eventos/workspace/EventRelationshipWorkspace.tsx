@@ -432,6 +432,7 @@ export function EventRelationshipWorkspace({
                           mode="edit"
                           defaultDate={event.date}
                           initialSubevents={[subevent]}
+                          draftKey={`${event.id}:edit:${subevent.id ?? identity}`}
                           onSubmit={async (items) => {
                             await onSaveSubeventPlan(items);
                             setEditingNodeId(null);
@@ -494,6 +495,7 @@ export function EventRelationshipWorkspace({
                   <SubeventPlanBuilder
                     connectedTo={event.title}
                     defaultDate={event.date}
+                    draftKey={`${event.id}:new`}
                     onSubmit={async (items) => {
                       await onSaveSubeventPlan(items);
                       setComposerOpen(false);
