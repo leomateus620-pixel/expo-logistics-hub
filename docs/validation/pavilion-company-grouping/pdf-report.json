@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "boundary": "Synthetic persisted relationships on official fixture polygons, actual application jsPDF export, vector operators and source snapshot checked.",
+  "documents": [
+    {
+      "pavilion": 12,
+      "pages": 2,
+      "lotNumbers": 257,
+      "uniqueCompanyLabels": 3,
+      "officialFillCounts": {
+        "AVAILABLE": 242,
+        "SOLD": 15
+      },
+      "contractIDsAndExactCoveragePreserved": true,
+      "rasterImagesInPdf": 0,
+      "textWithinPage": true
+    },
+    {
+      "pavilion": 13,
+      "pages": 2,
+      "lotNumbers": 104,
+      "uniqueCompanyLabels": 2,
+      "officialFillCounts": {
+        "AVAILABLE": 94,
+        "SOLD": 10
+      },
+      "contractIDsAndExactCoveragePreserved": true,
+      "rasterImagesInPdf": 0,
+      "textWithinPage": true
+    }
+  ]
+}

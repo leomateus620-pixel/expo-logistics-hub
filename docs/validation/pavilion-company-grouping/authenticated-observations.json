@@ -1,0 +1,122 @@
+{
+  "checkedAt": "2026-10-20",
+  "source": "Authenticated Chrome Leo, production Dashboard DOM; read-only, no database mutations or private documents accessed.",
+  "cases": [
+    {
+      "name": "OTICA DINIZ",
+      "pavilion": 12,
+      "numbers": [
+        58,
+        59,
+        60,
+        61,
+        62,
+        63
+      ],
+      "onePersistentExhibitor": true,
+      "identityFingerprint": "99c89d003e024942b1843c5ea2db2326c806601259f81a8130e1e939c564fd54",
+      "primaryCardsBefore": 2,
+      "distinctContractScopes": 1,
+      "distinctOrderScopes": 1,
+      "parts": [
+        {
+          "kind": "contract",
+          "text": "OTICA DINIZ · Contrato sem número · Lotes 58 · 1 lote · Assinatura confirmada8AOTICA DINIZContrato sem númeroLotes 581 lote · Assinatura confirmada"
+        },
+        {
+          "kind": "order",
+          "text": "OTICA DINIZ · Sem contrato vinculado · Lotes 59, 60, 61, 62, 63 · 5 lotes · Assinatura confirmada8BOTICA DINIZSem contrato vinculadoLotes 59, 60, 61, 62, 635 lotes · Assinatura confirmada"
+        }
+      ]
+    },
+    {
+      "name": "AMERICAN FISIO",
+      "pavilion": 12,
+      "numbers": [
+        247,
+        248,
+        249,
+        250,
+        251
+      ],
+      "onePersistentExhibitor": true,
+      "identityFingerprint": "028e0c2631970bfa4ca219a11b809a409c1cc97dcac0faa84bc9ce06be5cf50e",
+      "primaryCardsBefore": 3,
+      "distinctContractScopes": 1,
+      "distinctOrderScopes": 1,
+      "parts": [
+        {
+          "kind": "contract",
+          "text": "AMERICAN FISIO · Contrato sem número · Lotes 248 · 1 lote · Assinatura confirmada2AAMERICAN FISIOContrato sem númeroLotes 2481 lote · Assinatura confirmada"
+        },
+        {
+          "kind": "order",
+          "text": "AMERICAN FISIO · Sem contrato vinculado · Lotes 249, 250, 251 · 3 de 4 lotes · Assinatura confirmada2BAMERICAN FISIOSem contrato vinculadoLotes 249, 250, 2513 de 4 lotes · Assinatura confirmada"
+        },
+        {
+          "kind": "order",
+          "text": "AMERICAN FISIO · Sem contrato vinculado · Lotes 247 · 1 de 4 lotes · Assinatura confirmada2BAMERICAN FISIOSem contrato vinculadoLotes 2471 de 4 lotes · Assinatura confirmada"
+        }
+      ]
+    },
+    {
+      "name": "ADRI MODAS",
+      "pavilion": 13,
+      "numbers": [
+        85,
+        86,
+        87,
+        88,
+        89
+      ],
+      "onePersistentExhibitor": true,
+      "identityFingerprint": "b0de7403341b9901511d8a4aa47ff27482f31ec4e3b0cf4a6ae9f5fb21a1a384",
+      "primaryCardsBefore": 3,
+      "distinctContractScopes": 1,
+      "distinctOrderScopes": 1,
+      "parts": [
+        {
+          "kind": "contract",
+          "text": "ADRI MODAS · Contrato sem número · Lotes 86 · 1 lote · Assinatura confirmada1AADRI MODASContrato sem númeroLotes 861 lote · Assinatura confirmada"
+        },
+        {
+          "kind": "order",
+          "text": "ADRI MODAS · Sem contrato vinculado · Lotes 87, 88, 89 · 3 de 4 lotes · Assinatura con…1BADRI MODASSem contrato vinculadoLotes 87, 88, 893 de 4 lotes · Assinatura con…"
+        },
+        {
+          "kind": "order",
+          "text": "ADRI MODAS · Sem contrato vinculado · Lotes 85 · 1 de 4 lotes · Assinatura con…1BADRI MODASSem contrato vinculadoLotes 851 de 4 lotes · Assinatura con…"
+        }
+      ]
+    },
+    {
+      "name": "VIA MUNDI",
+      "pavilion": 13,
+      "numbers": [
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56
+      ],
+      "onePersistentExhibitor": true,
+      "identityFingerprint": "22ca4d38aa92f4300702f2b4d80079b55eeecb84c8374cb534d5506e99c638a8",
+      "primaryCardsBefore": 2,
+      "distinctContractScopes": 1,
+      "distinctOrderScopes": 1,
+      "parts": [
+        {
+          "kind": "contract",
+          "text": "VIA MUNDI · Contrato sem número · Lotes 54 · 1 lote · Assinatura confirmada17AVIA MUNDIContrato sem númeroLotes 541 lote · Assinatura confirmada"
+        },
+        {
+          "kind": "order",
+          "text": "VIA MUNDI · Sem contrato vinculado · Lotes 49, 50, 51, 52, 53 +2 · 7 lotes · Assinatura confirma…17BVIA MUNDISem contrato vinculadoLotes 49, 50, 51, 52, 53 +27 lotes · Assinatura confirma…"
+        }
+      ]
+    }
+  ]
+}

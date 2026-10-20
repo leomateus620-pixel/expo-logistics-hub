@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "boundary": "Real PostgreSQL WASM; actual SQL RPC bodies; synthetic auth/eligibility/prices and reduced table schema. No deployed database access or production mutation.",
+  "checks": [
+    "Complete 257-lot snapshot via SECURITY DEFINER while table RLS denies direct sales reads",
+    "Actual checkout RPC creates OPEN/PENDING_SIGNATURE, persistent exhibitor identity and 3 active associations",
+    "Reproduced root cause: old commercial_map_revision does NOT change after attaching an ORDER_ITEMS document with explicit lot links",
+    "Fixed revision observes ORDER_ITEMS reference/active changes and exact coverage changes with unchanged link counts, while excluding another project",
+    "Read-only revision retains LOT documents; 10 checks on 257 lots in 4.26 ms (PostgreSQL WASM)",
+    "Explicit contract scope covers only 2 linked items and never confirms a sale from a document",
+    "Actual confirmation RPC preserves partial states and is idempotent",
+    "Actual cancellation releases inventory and removes the active association without deleting history",
+    "Second actual checkout + distinct persisted document recomposes ONE company, four exact lot IDs, two orders and two independent contracts",
+    "Confirmation and cancellation RPCs update the canonical company automatically, remove only the cancelled pending item, reject cancellation of a signed item, and preserve both documents",
+    "Contradictory active contract from another order is flagged without disclosing or adopting its reference",
+    "map.view alone receives authorized names but no contract references, contacts, prices or private paths",
+    "Cross-organization, missing identity and anonymous execution denied",
+    "Persisted parent cycles terminate without losing the pavilion inventory"
+  ]
+}
