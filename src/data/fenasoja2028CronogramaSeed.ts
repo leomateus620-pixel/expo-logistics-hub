@@ -87,6 +87,7 @@ export interface CronogramaSubeventSeed {
   actions?: CronogramaSubeventActionSeed[];
   provisions?: CronogramaSubeventProvisionSeed[];
   guests?: CronogramaSubeventGuestSeed[];
+  budget?: Array<{ id?: string; item: string; supplier?: string | null; amount: number; sortOrder?: number }>;
   commissionsRel?: Array<{
     commissionId?: string | null;
     commissionSlug?: string | null;

@@ -342,6 +342,19 @@ function mapPlanProvision(item: unknown) {
   };
 }
 
+function mapPlanBudget(item: unknown) {
+  const record = item as Record<string, unknown>;
+  const raw = record.amount;
+  const amount = typeof raw === 'number' ? raw : Number(raw ?? 0);
+  return {
+    id: readString(record, 'id') ?? undefined,
+    item: readString(record, 'item') ?? '',
+    supplier: readString(record, 'supplier'),
+    amount: Number.isFinite(amount) ? amount : 0,
+    sortOrder: readNumber(record, 'sort_order') ?? 0,
+  };
+}
+
 function mapPlanGuest(item: unknown) {
   const record = item as Record<string, unknown>;
   return {
@@ -361,6 +374,7 @@ function fromViewSubevent(item: unknown): CronogramaSubeventSeed {
   return {
     actions: parseJsonArray(record.actions).map(mapPlanAction),
     provisions: parseJsonArray(record.provisions).map(mapPlanProvision),
+    budget: parseJsonArray(record.budget).map(mapPlanBudget),
     guests: parseJsonArray(record.guests).map(mapPlanGuest),
     id: readString(record, 'id') ?? '',
     title: readString(record, 'title') ?? '',

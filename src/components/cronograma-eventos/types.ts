@@ -138,6 +138,14 @@ export interface CronogramaSubeventProvision {
   sortOrder?: number;
 }
 
+export interface CronogramaSubeventBudgetItem {
+  id?: string;
+  item: string;
+  supplier?: string | null;
+  amount: number;
+  sortOrder?: number;
+}
+
 export interface CronogramaSubeventGuest {
   id?: string;
   name: string;
@@ -167,6 +175,7 @@ export interface CronogramaSubevent {
   lockVersion?: number | null;
   actions?: CronogramaSubeventAction[];
   provisions?: CronogramaSubeventProvision[];
+  budget?: CronogramaSubeventBudgetItem[];
   guests?: CronogramaSubeventGuest[];
   /** Relational commission links, same contract used by the main event form. */
   commissionsRel?: CronogramaEventCommissionLink[];
@@ -201,6 +210,7 @@ export interface CronogramaSubeventPlanDraft {
   responsiblesRel?: CronogramaEventResponsibleLink[];
   actions: CronogramaSubeventAction[];
   provisions: CronogramaSubeventProvision[];
+  budget: CronogramaSubeventBudgetItem[];
   guests: CronogramaSubeventGuest[];
 }
 
