@@ -114,6 +114,8 @@ export interface CronogramaEventResponsibleLink {
 }
 
 export interface CronogramaSubeventAction {
+  /** Client-only key for unsaved rows (never persisted). */
+  clientKey?: string;
   id?: string;
   startTime?: string | null;
   title: string;

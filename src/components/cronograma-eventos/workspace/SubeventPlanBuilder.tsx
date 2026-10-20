@@ -593,46 +593,28 @@ function PlanActionsSection({
   onChange: (actions: CronogramaSubeventAction[]) => void;
 }) {
   const [movedKey, setMovedKey] = useState<string | null>(null);
-  const keysRef = useRef<WeakMap<CronogramaSubeventAction, string>>(new WeakMap());
-  const counterRef = useRef(0);
-  const keyOf = (action: CronogramaSubeventAction) => {
-    if (action.id) return action.id;
-    let key = keysRef.current.get(action);
-    if (!key) { key = `new-${counterRef.current++}`; keysRef.current.set(action, key); }
-    return key;
-  };
+  const keyOf = (action: CronogramaSubeventAction, index: number) => action.id ?? action.clientKey ?? `action-${index}`;
   const patch = (index: number, value: Partial<CronogramaSubeventAction>) => {
-    onChange(actions.map((action, position) => {
-      if (position !== index) return action;
-      const next = { ...action, ...value };
-      if (!action.id) keysRef.current.set(next, keyOf(action));
-      return next;
-    }));
+    onChange(actions.map((action, position) => (position === index ? { ...action, ...value } : action)));
   };
   const reorder = (index: number) => {
     const target = actions[index];
     if (!target) return;
-    const key = keyOf(target);
-    const sorted = sortActionsByTime(actions);
-    sorted.forEach((action, position) => {
-      const original = actions.find((candidate) => candidate.title === action.title && candidate.startTime === action.startTime && !sorted.slice(0, position).some((prev) => keysRef.current.get(prev) === keyOf(candidate)));
-      if (original && !original.id) keysRef.current.set(action, keyOf(original));
-    });
-    const newIndex = sorted.findIndex((action) => keyOf(action) === key);
-    if (sorted.some((action, position) => keyOf(action) !== keyOf(actions[position]))) {
-      onChange(sorted);
-      if (newIndex !== index) {
-        setMovedKey(key);
-        window.setTimeout(() => setMovedKey((current) => (current === key ? null : current)), 1400);
-      }
-    }
+    const withKeys = actions.map((action) => (action.id || action.clientKey ? action : { ...action, clientKey: crypto.randomUUID() }));
+    const key = keyOf(withKeys[index], index);
+    const sorted = sortActionsByTime(withKeys);
+    const newIndex = sorted.findIndex((action, position) => keyOf(action, position) === key);
+    if (newIndex === index) return;
+    onChange(sorted);
+    setMovedKey(key);
+    window.setTimeout(() => setMovedKey((current) => (current === key ? null : current)), 1400);
   };
   return (
     <section className="cronograma-plan-section">
       <SectionHeading icon={Clock3} title="Ações programadas" hint="Roteiro por horário (recepção, abertura, encerramento…)" />
       <ul className="cronograma-plan-rows">
         {actions.map((action, index) => (
-          <li key={keyOf(action)} className="cronograma-plan-row" data-moved={movedKey === keyOf(action) || undefined}>
+          <li key={keyOf(action, index)} className="cronograma-plan-row" data-moved={movedKey === keyOf(action, index) || undefined}>
             <Input
               type="time"
               className="cronograma-plan-row-time"
@@ -667,7 +649,7 @@ function PlanActionsSection({
       <button
         type="button"
         className="cronograma-plan-row-add focus-ring"
-        onClick={() => onChange([...actions, { title: '', startTime: '', responsibleName: '', sortOrder: actions.length }])}
+        onClick={() => onChange([...actions, { title: '', startTime: '', responsibleName: '', sortOrder: actions.length, clientKey: crypto.randomUUID() }])}
       >
         <Plus aria-hidden="true" /> Adicionar ação
       </button>
