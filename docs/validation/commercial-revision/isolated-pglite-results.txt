@@ -1,0 +1,14 @@
+ANTIGA | criar ORDER_ITEMS: A mudou=false B mudou=false
+ANTIGA | vincular lote: A mudou=false B mudou=false
+ANTIGA | ampliar abrangência: A mudou=false B mudou=false
+ANTIGA | remover lote: A mudou=false B mudou=false
+ANTIGA | substituir documento: A mudou=false B mudou=false
+ANTIGA | desativar: A mudou=false B mudou=false
+ANTIGA | remover contrato: A mudou=false B mudou=false
+NOVA | criar ORDER_ITEMS: A mudou=true B mudou=false
+NOVA | vincular lote: A mudou=true B mudou=false
+NOVA | ampliar abrangência: A mudou=true B mudou=false
+NOVA | remover lote: A mudou=true B mudou=false
+NOVA | substituir documento: A mudou=true B mudou=false
+NOVA | desativar: A mudou=true B mudou=false
+NOVA | remover contrato: A mudou=true B mudou=false

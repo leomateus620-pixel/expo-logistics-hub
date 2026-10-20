@@ -176,6 +176,13 @@
       "when": 1792494000000,
       "tag": "0024_commercial_revision_order_contracts",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792488048972,
+      "tag": "0025_commercial_revision_order_contracts",
+      "breakpoints": true
     }
   ]
 }
