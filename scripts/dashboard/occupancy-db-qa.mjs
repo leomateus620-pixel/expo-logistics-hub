@@ -3,11 +3,16 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
+import { build } from 'esbuild';
 const modulePath = process.env.PGLITE_MODULE;
 if (!modulePath) throw new Error('Set PGLITE_MODULE to the absolute PGlite module path.');
 const { PGlite } = await import(pathToFileURL(modulePath).href);
 const db = new PGlite();
 const checks = [];
+const output = process.env.OCCUPANCY_QA_OUTPUT || 'docs/validation/pavilion-company-grouping';
+// Exercise the actual pure frontend selector against actual SQL responses.
+const bundled = await build({ entryPoints: ['src/features/commercial-map/dashboard/pavilionOccupancy.ts'], bundle: true, platform: 'node', format: 'esm', write: false });
+const { buildPavilionOccupancyGroups, buildOccupancyContractScopes } = await import('data:text/javascript;base64,' + Buffer.from(bundled.outputFiles[0].text).toString('base64'));
 const id = n => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const org = id(1), project = id(2), pavilion = id(3), user = id(4), exhibitor = id(5);
 const sql = body => db.exec(body);
@@ -62,6 +67,16 @@ try {
     SET ROLE authenticated;
     SELECT set_config('request.jwt.claim.sub','${user}',false),set_config('test.org','${org}',false),
       set_config('test.capabilities','map.view,map.manage_sales,map.manage_contracts',false);`);
+  await sql(`RESET ROLE;
+    ALTER TABLE map_entities ADD updated_at timestamptz DEFAULT now();
+    CREATE TABLE map_entity_geometries(project_id uuid,updated_at timestamptz,is_current boolean);
+    CREATE TABLE commercial_price_rules(project_id uuid,updated_at timestamptz);
+    CREATE TABLE commercial_lot_price_overrides(lot_id uuid,updated_at timestamptz);
+    GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticated;`);
+  const oldRevision = await file('supabase/migrations/20261007115211_7be75c89-627a-46ac-8c54-1b5f1c3ff18e.sql');
+  await sql(oldRevision.slice(oldRevision.indexOf('CREATE OR REPLACE FUNCTION public.commercial_map_revision')));
+  await sql('SET ROLE authenticated');
+  const revision = () => value('SELECT commercial_map_revision($1) value', [project]);
   const occupancy = () => value('SELECT commercial_pavilion_occupancy($1,$2) value', [project, pavilion]);
   let data = await occupancy();
   assert.equal(data.lots.length, 257); assert(data.lots.every(l => !l.associations.length));
@@ -76,8 +91,39 @@ try {
   assert.equal(active.length, 3); assert(active.every(l => l.status === 'SALE_OPEN' && l.associations[0].contractState === 'PENDING_SIGNATURE'));
   assert(active.every(l => l.associations[0].orderId === order && l.associations[0].exhibitorId === exhibitor));
   checks.push('Actual checkout RPC creates OPEN/PENDING_SIGNATURE, persistent exhibitor identity and 3 active associations');
+  const beforeOrderAttachment = await revision();
   await sql(`RESET ROLE; INSERT INTO lot_contracts VALUES('${id(500)}',null,'${order}','ORDER_ITEMS','FS28-TEST',true,now(),now());
     INSERT INTO lot_contract_lots VALUES('${id(500)}','${id(1001)}'),('${id(500)}','${id(1002)}'); SET ROLE authenticated;`);
+  assert.equal(await revision(), beforeOrderAttachment);
+  checks.push('Reproduced root cause: old commercial_map_revision does NOT change after attaching an ORDER_ITEMS document with explicit lot links');
+  await sql('RESET ROLE');
+  await sql(await file('supabase/migrations/20261020110000_commercial_revision_order_contracts.sql'));
+  await sql('SET ROLE authenticated');
+  let previousRevision = await revision();
+  await sql(`RESET ROLE; UPDATE lot_contracts SET contract_number='CHANGED-REFERENCE' WHERE id='${id(500)}'; SET ROLE authenticated;`);
+  assert.notEqual(await revision(), previousRevision); previousRevision = await revision();
+  await sql(`RESET ROLE; UPDATE lot_contracts SET contract_number='FS28-TEST',is_active=false WHERE id='${id(500)}'; SET ROLE authenticated;`);
+  assert.notEqual(await revision(), previousRevision);
+  await sql(`RESET ROLE; UPDATE lot_contracts SET is_active=true WHERE id='${id(500)}'; SET ROLE authenticated;`);
+  previousRevision = await revision();
+  await sql(`RESET ROLE; DELETE FROM lot_contract_lots WHERE contract_id='${id(500)}' AND lot_id='${id(1002)}';
+    INSERT INTO lot_contract_lots VALUES('${id(500)}','${id(1003)}'); SET ROLE authenticated;`);
+  assert.notEqual(await revision(), previousRevision);
+  await sql(`RESET ROLE; DELETE FROM lot_contract_lots WHERE contract_id='${id(500)}' AND lot_id='${id(1003)}';
+    INSERT INTO lot_contract_lots VALUES('${id(500)}','${id(1002)}'); SET ROLE authenticated;`);
+  previousRevision = await revision();
+  await sql(`RESET ROLE; INSERT INTO lot_sale_orders(id,project_id,buyer_name,stage,payment_type,payment_method,salesperson_user_id,idempotency_key)
+    VALUES('${id(800)}','${id(20)}','External test','RENOVACAO','CASH','PIX','${user}','external-revision');
+    INSERT INTO lot_contracts VALUES('${id(801)}',null,'${id(800)}','ORDER_ITEMS','EXTERNAL',true,now(),now()); SET ROLE authenticated;`);
+  assert.equal(await revision(), previousRevision);
+  checks.push('Fixed revision observes ORDER_ITEMS reference/active changes and exact coverage changes with unchanged link counts, while excluding another project');
+  previousRevision = await revision();
+  await sql(`RESET ROLE; INSERT INTO lot_contracts VALUES('${id(802)}','${id(1003)}',null,'LOT','LOT-REVISION',true,now(),now()); SET ROLE authenticated;`);
+  assert.notEqual(await revision(), previousRevision);
+  await sql(`RESET ROLE; DELETE FROM lot_contracts WHERE id='${id(802)}'; SET ROLE authenticated;`);
+  const revisionStart = performance.now();
+  for (let i=0;i<10;i++) await revision();
+  checks.push(`Read-only revision retains LOT documents; 10 checks on 257 lots in ${(performance.now()-revisionStart).toFixed(2)} ms (PostgreSQL WASM)`);
   data = await occupancy(); active = data.lots.filter(l => l.associations.length);
   assert.equal(active.find(l => l.lotId === id(1001)).associations[0].contracts[0].number, 'FS28-TEST');
   assert.equal(active.find(l => l.lotId === id(1003)).associations[0].contracts.length, 0);
@@ -96,6 +142,32 @@ try {
   data = await occupancy(); const released = data.lots.find(l => l.lotId === id(1003));
   assert.equal(released.status, 'AVAILABLE'); assert.equal(released.associations.length, 0);
   checks.push('Actual cancellation releases inventory and removes the active association without deleting history');
+  const secondOrder = await value(`SELECT register_commercial_sale_order(
+    p_idempotency_key=>'occupancy-qa-second',p_stage=>'RENOVACAO',p_lot_ids=>$1::uuid[],p_buyer_name=>'Alfa LTDA',p_document_number=>null,
+    p_phone=>null,p_email=>null,p_payment_type=>'CASH',p_installment_count=>1,p_payment_method=>'PIX',p_first_due_date=>'2026-11-01',
+    p_installments=>'[{"due_date":"2026-11-01","amount":600}]'::jsonb,p_expected_total=>600,p_notes=>'Test only',
+    p_exhibitor_id=>$2,p_buyer_trade_name=>'ALFA') value`, [[id(1004), id(1005)], exhibitor]);
+  await sql(`RESET ROLE; INSERT INTO lot_contracts VALUES('${id(501)}',null,'${secondOrder}','ORDER_ITEMS','FS28-SECOND',true,now(),now());
+    INSERT INTO lot_contract_lots VALUES('${id(501)}','${id(1004)}'),('${id(501)}','${id(1005)}'); SET ROLE authenticated;`);
+  data = await occupancy();
+  let companies = buildPavilionOccupancyGroups(data);
+  assert.equal(companies.length, 1); assert.equal(companies[0].verified, true);
+  assert.deepEqual(companies[0].items.map(i => i.lotId).sort(), [id(1001),id(1002),id(1004),id(1005)]);
+  assert.equal(companies[0].orders.length, 2); assert.equal(companies[0].state, 'PARTIAL');
+  const contractScopes = buildOccupancyContractScopes(companies).filter(s => s.kind === 'CONTRACT');
+  assert.equal(contractScopes.length, 2); assert.deepEqual(contractScopes.map(s => s.items.length), [2,2]);
+  checks.push('Second actual checkout + distinct persisted document recomposes ONE company, four exact lot IDs, two orders and two independent contracts');
+  const secondItems = data.lots.filter(l => [id(1004),id(1005)].includes(l.lotId)).map(l => l.associations[0].itemId);
+  await query('SELECT confirm_sale_order_items($1,$2::uuid[])', [secondOrder, [secondItems[0]]]);
+  data = await occupancy(); companies = buildPavilionOccupancyGroups(data);
+  assert.equal(companies[0].items.filter(i => i.state==='SIGNED').length, 2);
+  await assert.rejects(() => query('SELECT cancel_sale_order_items($1,$2::uuid[],$3)', [secondOrder, [secondItems[0]], 'Cannot cancel signed item']), /ITEM_NOT_PENDING/);
+  await query('SELECT cancel_sale_order_items($1,$2::uuid[],$3)', [secondOrder, [secondItems[1]], 'QA cancelled pending item']);
+  data = await occupancy(); companies = buildPavilionOccupancyGroups(data);
+  assert.deepEqual(companies[0].items.map(i => i.lotId).sort(), [id(1001),id(1002),id(1004)]);
+  assert.equal(companies[0].orders.length, 2);
+  assert.equal(buildOccupancyContractScopes(companies).filter(s => s.kind==='CONTRACT').length, 2);
+  checks.push('Confirmation and cancellation RPCs update the canonical company automatically, remove only the cancelled pending item, reject cancellation of a signed item, and preserve both documents');
   await sql(`RESET ROLE;
     INSERT INTO lot_sale_orders(id,project_id,buyer_name,stage,payment_type,payment_method,salesperson_user_id,idempotency_key)
       VALUES('${id(600)}','${project}','Outra empresa','RENOVACAO','CASH','PIX','${user}','contradictory-contract-fixture');
@@ -117,16 +189,18 @@ try {
   checks.push('map.view alone receives authorized names but no contract references, contacts, prices or private paths');
   await sql(`SELECT set_config('test.org','${id(21)}',false);`);
   await assert.rejects(occupancy, /MAP_PERMISSION_DENIED/);
+  await assert.rejects(revision, /MAP_PERMISSION_DENIED/);
   await sql(`SELECT set_config('test.org','${org}',false),set_config('request.jwt.claim.sub','',false);`);
   await assert.rejects(occupancy, /MAP_PERMISSION_DENIED/);
-  await sql(`SET ROLE anon;`); await assert.rejects(occupancy, /permission denied/);
+  await assert.rejects(revision, /AUTH_REQUIRED/);
+  await sql(`SET ROLE anon;`); await assert.rejects(occupancy, /permission denied/); await assert.rejects(revision, /permission denied/);
   checks.push('Cross-organization, missing identity and anonymous execution denied');
   await sql(`RESET ROLE; SELECT set_config('request.jwt.claim.sub','${user}',false),set_config('test.capabilities','map.view',false);
     UPDATE map_entities SET parent_entity_id='${id(101)}' WHERE id='${pavilion}'; SET ROLE authenticated;`);
   assert.equal((await occupancy()).lots.length, 257);
   checks.push('Persisted parent cycles terminate without losing the pavilion inventory');
   const report = { passed: true, boundary: 'Real PostgreSQL WASM; actual SQL RPC bodies; synthetic auth/eligibility/prices and reduced table schema. No deployed database access or production mutation.', checks };
-  await fs.mkdir('docs/validation/pavilion-occupancy', { recursive: true });
-  await fs.writeFile('docs/validation/pavilion-occupancy/database-report.json', JSON.stringify(report, null, 2));
+  await fs.mkdir(output, { recursive: true });
+  await fs.writeFile(`${output}/database-report.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
 } finally { await db.close(); }

@@ -13,11 +13,15 @@ on:
       - 'src/test/pavilionOccupancy*'
       - 'src/test/pavilionPdf.test.ts'
       - 'src/test/usePavilionOccupancy.test.tsx'
+      - 'src/test/commercialPavilionGroupingMigration.test.ts'
+      - 'scripts/dashboard/occupancy-db-qa.mjs'
       - 'src/test/helpers/pavilionOccupancyFixture.ts'
       - 'src/features/commercial-map/services/commercialMapService.ts'
       - 'src/features/commercial-map/utils/commercialLotFinancialData.ts'
       - 'supabase/migrations/*commercial_dashboard_financial_embed.sql'
       - 'supabase/migrations/*commercial_pavilion_occupancy.sql'
+      - 'supabase/migrations/*commercial_revision_order_contracts.sql'
+      - 'drizzle/migrations/*commercial_revision_order_contracts.sql'
       - '.github/workflows/commercial-dashboard.yml'
 permissions:
   contents: read
@@ -33,6 +37,10 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with: {bun-version: '1.3.0'}
       - run: bun install --frozen-lockfile
-      - run: npx vitest run --maxWorkers=2 src/test/commercialDashboard src/test/pavilionOccupancy src/test/pavilionPdf.test.ts src/test/usePavilionOccupancy.test.tsx src/test/commercialLotFinancialData.test.ts src/test/commercialMapLoadingPipeline.test.ts src/test/commercialMapSharedQuery.test.ts src/test/restrictedScope.test.ts src/test/commercialMapSegments.test.ts src/test/commercialLotIdentity.test.ts src/test/commercialMapPavilionWayfinding.test.ts src/test/commercialMapPavilion7OfficialLayout.test.ts
+      - run: npx vitest run --maxWorkers=2 src/test/commercialDashboard src/test/pavilionOccupancy src/test/pavilionPdf.test.ts src/test/usePavilionOccupancy.test.tsx src/test/commercialPavilionGroupingMigration.test.ts src/test/commercialLotFinancialData.test.ts src/test/commercialMapLoadingPipeline.test.ts src/test/commercialMapSharedQuery.test.ts src/test/restrictedScope.test.ts src/test/commercialMapSegments.test.ts src/test/commercialLotIdentity.test.ts src/test/commercialMapPavilionWayfinding.test.ts src/test/commercialMapPavilion7OfficialLayout.test.ts
+      - name: Pavilion SQL relationships and revision regression
+        run: |
+          npm install --prefix /tmp/pavilion-sql-qa --no-package-lock --ignore-scripts @electric-sql/pglite@0.3.14
+          PGLITE_MODULE=/tmp/pavilion-sql-qa/node_modules/@electric-sql/pglite/dist/index.js OCCUPANCY_QA_OUTPUT=/tmp/pavilion-sql-qa/report node scripts/dashboard/occupancy-db-qa.mjs
       - run: npx eslint src/features/commercial-map/dashboard
       - run: npm run typecheck

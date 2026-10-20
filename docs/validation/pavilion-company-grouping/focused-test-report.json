@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "tests": 45,
+  "files": [
+    {
+      "path": "src/test/commercialPavilionGroupingMigration.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "path": "src/test/pavilionOccupancy.test.ts",
+      "status": "passed",
+      "tests": 20
+    },
+    {
+      "path": "src/test/pavilionOccupancyInteraction.test.tsx",
+      "status": "passed",
+      "tests": 12
+    },
+    {
+      "path": "src/test/pavilionPdf.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "path": "src/test/usePavilionOccupancy.test.tsx",
+      "status": "passed",
+      "tests": 5
+    }
+  ]
+}

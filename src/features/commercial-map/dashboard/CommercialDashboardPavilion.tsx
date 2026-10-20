@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Building2, Download, Maximize2, PanelRightClose, PanelRightOpen, Settings2, X } from 'lucide-react';
 import type { CommercialPavilionDashboardSnapshot } from './commercialDashboardTypes';
@@ -9,7 +9,7 @@ import type { CommercialStatus } from '../types';
 import { OverviewInfo } from './CommercialDashboardOverviewInfo';
 import { usePavilionOccupancy } from './usePavilionOccupancy';
 import { buildPavilionAnnotationLayout } from './pavilionAnnotationLayout';
-import { buildOccupancyVisualScopes, buildPavilionOccupancyGroups, occupancyMatchesInventory, occupancyLotList, OCCUPANCY_STATE_LABEL, type OccupancyOrder, type PavilionOccupancy } from './pavilionOccupancy';
+import { resolvePavilionOccupancySelection, buildPavilionOccupancyGroups, occupancyMatchesInventory, occupancyLotList, OCCUPANCY_STATE_LABEL, type OccupancyOrder, type PavilionOccupancy } from './pavilionOccupancy';
 import './pavilion-occupancy.css';
 import { projectPavilionAccessMarkers } from './pavilionAccessGeometry';
 
@@ -56,25 +56,41 @@ export function PavilionWorkspace({ snapshot, onViewLot, selection, highlightedS
   const [exportError, setExportError] = useState<string | null>(null);
   const memory = useRef<MiniMapPresentationMemory>(presentationMemory ?? {});
   const localEntityId = selection ? selection.entityId : localSelection;
-  const selected = groups.find(group => group.items.some(item => item.entityId === localEntityId)) ?? groups.find(group => group.id === companyId) ?? null;
-  const scopes = useMemo(() => buildOccupancyVisualScopes(groups), [groups]);
-  const selectedScope = scopes.find(scope => localEntityId ? scope.items.some(item => item.entityId === localEntityId) : scope.id === contractScopeId) ?? null;
+  const { company: selected, contract: selectedScope } = useMemo(() => resolvePavilionOccupancySelection(groups, companyId, localEntityId, contractScopeId), [groups, companyId, localEntityId, contractScopeId]);
+  const previousLotCompany = useRef<{ entityId: string } | null>(null);
+  const onExternalSelectionChange = selection?.onChange;
+  useEffect(() => {
+    const previous = previousLotCompany.current;
+    if (!selected && previous?.entityId === localEntityId) {
+      if (onExternalSelectionChange) onExternalSelectionChange(null); else setLocalSelection(null);
+    }
+    previousLotCompany.current = selected && localEntityId ? { entityId: localEntityId } : null;
+  }, [selected, localEntityId, onExternalSelectionChange]);
+  // Clear invalid IDs after a cancellation, transfer, permission loss or scope
+  // change, so a later response cannot resurrect an obsolete selection.
+  useEffect(() => {
+    if (!selected) { setCompanyId(null); setContractScopeId(null); }
+    else if (contractScopeId && !selectedScope) setContractScopeId(null);
+  }, [selected, selectedScope, contractScopeId]);
+  useEffect(() => { setCompanyId(null); setContractScopeId(null); setLocalSelection(null); setSearch(''); }, [snapshot.entity?.id]);
   const selectLot = useCallback((id: string | null) => {
     setCompanyId(null);
     setContractScopeId(null);
+    if (id) setPanelOpen(true);
     if (selection) selection.onChange(id); else setLocalSelection(id);
   }, [selection]);
   const selectCompany = useCallback((id: string, scopeId?: string) => {
     const toggleOff = companyId === id && contractScopeId === (scopeId ?? null) && !localEntityId;
-    setCompanyId(toggleOff ? null : id); setContractScopeId(toggleOff ? null : scopeId ?? null);
+    setCompanyId(toggleOff && !scopeId ? null : id); setContractScopeId(toggleOff ? null : scopeId ?? null);
     if (selection) selection.onChange(null); else setLocalSelection(null);
     setPanelOpen(true);
   }, [selection, companyId, contractScopeId, localEntityId]);
   const visibleGroups = useMemo(() => groups.filter(group => group.name.toLocaleLowerCase('pt-BR').includes(search.trim().toLocaleLowerCase('pt-BR')))
-    .map(group => filter === 'all' ? group : { ...group, items: group.items.filter(item => item.status === filter) }).filter(group => group.items.length), [groups, search, filter]);
-  const layout = useMemo(() => showCompanies ? buildPavilionAnnotationLayout(projected, visibleGroups, selected?.id ?? null, 8, accessBounds, selectedScope?.id ?? null) : undefined,
-    [projected, visibleGroups, selected?.id, selectedScope?.id, showCompanies, accessBounds]);
-  const companyEntityIds = useMemo(() => selected ? new Set((selectedScope?.items ?? selected.items).map(item => item.entityId)) : undefined, [selected, selectedScope]);
+    .filter(group => filter === 'all' || group.items.some(item => item.status === filter)), [groups, search, filter]);
+  const layout = useMemo(() => showCompanies ? buildPavilionAnnotationLayout(projected, visibleGroups, selected?.id ?? null, 8, accessBounds) : undefined,
+    [projected, visibleGroups, selected?.id, showCompanies, accessBounds]);
+  const companyEntityIds = useMemo(() => selected ? new Set(selected.items.map(item => item.entityId)) : undefined, [selected]);
+  const contractEntityIds = useMemo(() => selectedScope ? new Set(selectedScope.items.map(item => item.entityId)) : undefined, [selectedScope]);
   const items = useMemo(() => {
     const byEntity = new Map(groups.flatMap(group => group.items.map(item => [item.entityId, group] as const)));
     return geometry.records.map(record => {
@@ -114,15 +130,16 @@ export function PavilionWorkspace({ snapshot, onViewLot, selection, highlightedS
     {selected && <article className="pavilion-company-detail" aria-live="polite">
       <header><span>Grupo {selected.marker}</span><button type="button" aria-label="Limpar seleção da empresa" onClick={() => { setCompanyId(null); selectLot(null); }}><X aria-hidden="true" /></button></header>
       <h4>{selected.name}</h4><p>{occupancyLotList(selected.items)}</p><strong>{OCCUPANCY_STATE_LABEL[selected.state]}</strong>
-      {selectedScope?.kind === 'CONTRACT' && <p className="pavilion-selected-contract">{selectedScope.marker} · {selectedScope.label} · {selectedScope.items.length} lotes em destaque</p>}
+      {selectedScope?.kind === 'CONTRACT' && <p className="pavilion-selected-contract">{selectedScope.label}{!selectedScope.verified && ' · Abrangência em conferência'} · {occupancyLotList(selectedScope.items)} · Destaque secundário; ocupação completa preservada</p>}
+      {selected.issues.map(issue => <p role="status" className="pavilion-identity-issue" key={issue}>{issue}</p>)}
       {!selected.verified && <p>Identidade não verificada. O agrupamento se limita ao pedido ou registro persistido.</p>}
       <details className="pavilion-company-contracts"><summary>Contratos e lotes vinculados</summary>
       {selected.orders.map(order => <div className="pavilion-order" key={order.id}>
         <strong>{order.orderId ? `Pedido ${order.orderId.slice(0, 8).toUpperCase()}` : 'Venda individual'}</strong>
         <span>{OCCUPANCY_STATE_LABEL[order.state]} · {occupancyLotList(order.items)}</span>
-        {coherentPayload?.contractsAccessible ? order.contracts.length ? order.contracts.map(contract => <button type="button" className="pavilion-contract-choice" key={contract.id}
+        {coherentPayload?.contractsAccessible ? order.contracts.length ? order.contracts.map(contract => <button type="button" className="pavilion-contract-choice" key={contract.id} title={`ID do contrato: ${contract.id}`}
           aria-pressed={selectedScope?.id === `contract:${contract.id}`} onClick={() => selectCompany(selected.id, `contract:${contract.id}`)}>
-          {scopes.find(scope => scope.id === `contract:${contract.id}`)?.marker} · Contrato {contract.number || 'sem número'} · {OCCUPANCY_STATE_LABEL[contract.state]} · {occupancyLotList(contract.items)}
+          Contrato {contract.number || 'sem número'} · Ref. {contract.id.slice(0, 8).toUpperCase()} · {OCCUPANCY_STATE_LABEL[contract.state]} · {occupancyLotList(contract.items)}
         </button>) : <span>Sem contrato vinculado</span> : <span>Referências contratuais restritas</span>}
         {canManageSales && onOpenOrder && <button type="button" onClick={() => { setFullscreen(false); onOpenOrder(order); }}>Consultar venda e contratos</button>}
       </div>)}
@@ -145,10 +162,10 @@ export function PavilionWorkspace({ snapshot, onViewLot, selection, highlightedS
         outlines={geometry.outlines} accesses={geometry.accesses} numbered onViewLot={onViewLot}
         selection={{ entityId: localEntityId, onChange: selectLot }} presentationMemory={memory.current}
         highlightedStatus={highlightedStatus} hideStatusLegend={fullscreen ? false : hideStatusLegend}
-        annotationLayout={layout} selectedCompanyId={selected?.id} selectedAnnotationScopeId={selectedScope?.id} onSelectCompany={selectCompany} companyEntityIds={companyEntityIds}
+        annotationLayout={layout} selectedCompanyId={selected?.id} onSelectCompany={selectCompany} companyEntityIds={companyEntityIds} contractEntityIds={contractEntityIds}
         commercialFilter={filter} showAnnotationConnections={showConnections} />
-      {coherentPayload && <p className="pavilion-topology-key"><span><i />Contorno por contrato</span><span><i className="is-unverified" />Vínculo sem abrangência contratual verificada</span></p>}
-      {layout && layout.hiddenLabels > 0 && <p className="pavilion-density-note">{layout.hiddenLabels} conjuntos adicionais na lista de expositores. Selecione uma empresa ou contrato para identificar seus lotes na planta.</p>}
+      {coherentPayload && <p className="pavilion-topology-key"><span><i />Ocupação da empresa</span><span><i className="is-contract" />Contrato em inspeção</span><span><i className="is-unverified" />Identidade em conferência</span></p>}
+      {layout && layout.hiddenLabels > 0 && <p className="pavilion-density-note">{layout.hiddenLabels} empresas adicionais na lista de expositores. Selecione uma empresa para identificar todos os seus lotes na planta.</p>}
     </div>{panel}
   </div>;
   const actions = <><button type="button" onClick={() => setPanelOpen(open => !open)} aria-expanded={panelOpen}>
@@ -164,10 +181,10 @@ export function PavilionWorkspace({ snapshot, onViewLot, selection, highlightedS
       {exportError && <p role="alert" className="pavilion-sync-message">{exportError}</p>}
       {!fullscreen && content}
       <Dialog.Portal><Dialog.Overlay className="pavilion-fullscreen-overlay" />
-        <Dialog.Content className="pavilion-fullscreen pavilion-workspace" aria-describedby="pavilion-fullscreen-description"
+        <Dialog.Content className="pavilion-fullscreen pavilion-workspace"
           onEscapeKeyDown={event => { if (document.querySelector('.pavilion-fullscreen [data-commercial-map-escape-priority="true"]')) event.preventDefault(); }}>
           <header className="pavilion-fullscreen-header"><div><span className="pavilion-fullscreen-brand">FENASOJA <b>2028</b></span>
-            <Dialog.Title>{snapshot.definition.officialName}</Dialog.Title><Dialog.Description id="pavilion-fullscreen-description">
+            <Dialog.Title>{snapshot.definition.officialName}</Dialog.Title><Dialog.Description>
               {snapshot.totalLots} lotes · {groups.filter(group => group.verified).length} expositores identificados · {groups.length} agrupamentos
             </Dialog.Description></div><Dialog.Close asChild><button type="button" className="pavilion-fullscreen-close"><X aria-hidden="true" />Fechar tela cheia</button></Dialog.Close></header>
           <div className="pavilion-toolbar"><div>{actions}</div></div>

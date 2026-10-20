@@ -2,7 +2,8 @@ import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { pavilionOccupancyKey, usePavilionOccupancy } from '@/features/commercial-map/dashboard/usePavilionOccupancy';
-import { createPavilionOccupancyFixture } from './helpers/pavilionOccupancyFixture';
+import { buildPavilionOccupancyGroups } from '@/features/commercial-map/dashboard/pavilionOccupancy';
+import { createPavilionOccupancyFixture, createPavilionGroupingRegressionFixture } from './helpers/pavilionOccupancyFixture';
 
 const mocks = vi.hoisted(() => ({ rpc: vi.fn(), refresh: vi.fn(async () => undefined) }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: mocks.rpc } }));
@@ -25,6 +26,28 @@ describe('pavilion occupancy shares the dashboard invalidation cycle', () => {
     await waitFor(() => expect(result.current.payload?.observedAt).toBe(response.observedAt));
     expect(mocks.rpc).toHaveBeenCalledTimes(2); expect(mocks.refresh).not.toHaveBeenCalled();
     client.clear();
+  });
+  it('recomposes new and removed contracts through sales invalidation without another company label or per-lot query', async () => {
+    const { snapshot, payload } = createPavilionGroupingRegressionFixture();
+    let response = payload;
+    mocks.rpc.mockImplementation(() => ({ abortSignal: vi.fn(async () => ({ data: response, error: null })) }));
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const { result } = renderHook(() => usePavilionOccupancy(payload.projectId, snapshot, 1), { wrapper: wrapper(client) });
+    await waitFor(() => expect(result.current.ready).toBe(true));
+    const before = buildPavilionOccupancyGroups(result.current.payload!).find(g => g.id === 'exhibitor:diniz')!;
+    const contract = before.orders[0].contracts[0];
+    response = { ...payload, lots: payload.lots.map(row => Number(row.lotNumber) === 59 ? { ...row, associations: row.associations.map(a => ({ ...a,
+      contracts: [{ ...contract, id: 'new-document', number: 'NEW' }] })) } : row) };
+    await act(async () => { await client.invalidateQueries({ queryKey: ['commercial-sale-orders', payload.projectId] }); });
+    await waitFor(() => expect(buildPavilionOccupancyGroups(result.current.payload!).find(g => g.id === before.id)?.orders[0].contracts).toHaveLength(2));
+    let after = buildPavilionOccupancyGroups(result.current.payload!).find(g => g.id === before.id)!;
+    expect(after.items.map(i => i.lotId)).toEqual(before.items.map(i => i.lotId));
+    response = payload;
+    await act(async () => { await client.invalidateQueries({ queryKey: ['commercial-sale-orders', payload.projectId] }); });
+    await waitFor(() => expect(buildPavilionOccupancyGroups(result.current.payload!).find(g => g.id === before.id)?.orders[0].contracts).toHaveLength(1));
+    after = buildPavilionOccupancyGroups(result.current.payload!).find(g => g.id === before.id)!;
+    expect(after.items).toHaveLength(6); expect(mocks.rpc).toHaveBeenCalledTimes(3);
+    expect(mocks.refresh).not.toHaveBeenCalled(); client.clear();
   });
   it('hides mismatched associations and schedules one coalesced recovery until inventory reconciles', async () => {
     const { snapshot, payload } = createPavilionOccupancyFixture();

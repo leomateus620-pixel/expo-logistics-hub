@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "boundary": "Actual SVG emitted from mounted React components in jsdom and rasterized by librsvg. Does not validate browser CSS layout, responsive sizing or screenshots.",
+  "checks": [
+    {
+      "pavilion": 12,
+      "officialLots": 257,
+      "beforeLabels": 7,
+      "afterLabels": 3,
+      "exactLotIdsPathsStatusAndFillsPreserved": true,
+      "uniqueCompanyLabels": true
+    },
+    {
+      "pavilion": 13,
+      "officialLots": 104,
+      "beforeLabels": 5,
+      "afterLabels": 2,
+      "exactLotIdsPathsStatusAndFillsPreserved": true,
+      "uniqueCompanyLabels": true
+    }
+  ]
+}

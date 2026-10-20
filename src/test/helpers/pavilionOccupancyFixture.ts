@@ -38,3 +38,35 @@ export function createPavilionOccupancyFixture(pavilionNumber = 12, dense = fals
     observedAt: '2026-10-19T18:00:05.000Z', contractsAccessible: true, lots: rows.map(r => r.row) };
   return { data, snapshot, payload };
 }
+
+/** Reproduction of the reported numbers/contract splits, not production evidence.
+ * Persistent synthetic IDs prove membership; the name never establishes a link. */
+export function createPavilionGroupingRegressionFixture(pavilionNumber = 12) {
+  const base = createPavilionOccupancyFixture(pavilionNumber);
+  const definitions = pavilionNumber === 12 ? [
+    { id: 'diniz', name: 'ÓTICA DINIZ', numbers: [58, 59, 60, 61, 62, 63], contracted: [58] },
+    { id: 'american', name: 'AMERICAN FISIO', numbers: [248, 249, 250, 251], contracted: [248] },
+    { id: 'sequence', name: 'VIA MUNDI', numbers: [50, 51, 52, 53, 54], contracted: [52] },
+  ] : [
+    { id: 'adri', name: 'ADRI MODAS', numbers: [85, 86, 87, 88, 89], contracted: [86] },
+    { id: 'exito', name: 'EXITO CONFECCAO', numbers: [68, 69, 70, 71, 72], contracted: [72] },
+  ];
+  const rows = base.payload.lots.map(row => {
+    const definition = definitions.find(d => d.numbers.includes(Number(row.lotNumber)));
+    const association: OccupancyAssociation | null = definition ? {
+      saleId: `sale-${row.lotId}`, orderId: `order-${definition.id}`, itemId: `item-${row.lotId}`,
+      exhibitorId: definition.id, displayName: definition.name, saleStatus: 'CONFIRMED', contractState: 'SIGNED',
+      inconsistent: false, updatedAt: row.updatedAt!, contracts: definition.contracted.includes(Number(row.lotNumber)) ? [
+        { id: `contract-${definition.id}`, number: `FS28-${definition.id.toUpperCase()}`, scope: 'LOT', verified: true, updatedAt: row.updatedAt! },
+      ] : [],
+    } : null;
+    return { ...row, status: definition ? 'SOLD' : 'AVAILABLE', associations: association ? [association] : [] };
+  });
+  const byId = new Map(rows.map(row => [row.lotId, row]));
+  const data = { ...base.data, lots: base.data.lots.map(lot => {
+    const row = byId.get(lot.id);
+    return row ? { ...lot, status: row.status as CommercialLot['status'] } : lot;
+  }) };
+  const snapshot = buildCommercialDashboardSnapshot(data).pavilions.find(p => p.definition.pavilionNumber === pavilionNumber)!;
+  return { data, snapshot, payload: { ...base.payload, lots: rows } };
+}

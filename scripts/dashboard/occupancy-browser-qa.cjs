@@ -13,6 +13,8 @@ const base = process.env.OCCUPANCY_QA_URL || 'http://127.0.0.1:8080/scripts/dash
   page.on('pageerror', e => errors.push(e.message));
   await page.route('**/rest/v1/**', route => route.abort());
   await page.goto(base); await page.locator('[data-module-number]').first().waitFor();
+  // The preview now opens reported regressions by default; retain this suite's original mixed-order fixture.
+  await page.getByRole('checkbox', { name: 'Casos dos anexos' }).uncheck();
   assert.equal(await page.locator('[data-module-number]').count(), 257);
   const geometry = await page.locator('path[data-entity-id]').evaluateAll(els => els.map(e => [e.dataset.entityId, e.getAttribute('d')]));
   const connections = await page.locator('[data-group-connection]').count();

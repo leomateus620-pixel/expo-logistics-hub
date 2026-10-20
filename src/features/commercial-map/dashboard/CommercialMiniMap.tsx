@@ -44,7 +44,7 @@ export interface CommercialMiniMapProps {
   annotationLayout?: PavilionAnnotationLayout;
   selectedCompanyId?: string | null;
   onSelectCompany?: (id: string, scopeId?: string) => void;
-  selectedAnnotationScopeId?: string | null;
+  contractEntityIds?: ReadonlySet<string>;
   companyEntityIds?: ReadonlySet<string>;
   commercialFilter?: 'all' | 'SOLD' | 'SALE_OPEN';
   showAnnotationConnections?: boolean;
@@ -72,10 +72,11 @@ interface ContextPosition { left: number; top: number; anchorX?: number; anchorY
 
 /** Transient interaction changes only the affected SVG paths. */
 const MiniMapLotPath = memo(function MiniMapLotPath({
-  entityId, path, status, label, active, selected, keyboardStop, dimmed, describedBy, index,
+  entityId, path, status, label, active, selected, keyboardStop, dimmed, describedBy, index, companyMember, contractMember, lightStroke,
   onEnter, onLeave, onFocusLot, onBlurLot, onActivate, onNavigate,
 }: {
   entityId: string; path: string; status: CommercialStatus; label: string;
+  companyMember?: boolean; contractMember?: boolean; lightStroke?: boolean;
   active: boolean; selected: boolean; keyboardStop: boolean; dimmed: boolean; describedBy?: string; index: number;
   onEnter: (id: string, event: ReactMouseEvent<SVGPathElement>) => void;
   onLeave: () => void; onFocusLot: (id: string, origin: SVGPathElement) => void; onBlurLot: () => void;
@@ -83,10 +84,12 @@ const MiniMapLotPath = memo(function MiniMapLotPath({
   onNavigate: (event: ReactKeyboardEvent<SVGPathElement>, index: number) => void;
 }) {
   const config = STATUS_CONFIG[displayStatus(status)];
-  return <path d={path} fill={config.color} fillRule="evenodd" stroke={active ? '#172e20' : config.border}
-    strokeWidth={active ? 3.5 : 1.3} vectorEffect="non-scaling-stroke" opacity={dimmed && !active ? 0.16 : 0.92}
+  const lineWidth = lightStroke ? (contractMember ? 1.5 : active ? 1.2 : .6) : (active ? 3.5 : 1.3);
+  const opacity = dimmed && !active && !companyMember ? (lightStroke ? .4 : .16) : .92;
+  return <path d={path} fill={config.color} fillRule="evenodd" stroke={contractMember ? '#9a652c' : active ? '#172e20' : config.border}
+    strokeWidth={lineWidth} strokeDasharray={contractMember ? '3 2' : undefined} vectorEffect="non-scaling-stroke" opacity={opacity}
     role="button" tabIndex={keyboardStop ? 0 : -1} aria-pressed={selected} aria-label={label} aria-describedby={describedBy}
-    data-entity-id={entityId} data-status={status}
+    data-entity-id={entityId} data-status={status} data-company-selected={companyMember || undefined} data-contract-selected={contractMember || undefined}
     onMouseEnter={(event) => onEnter(entityId, event)} onMouseLeave={onLeave}
     onFocus={(event) => onFocusLot(entityId, event.currentTarget)} onBlur={onBlurLot}
     onClick={(event) => onActivate(entityId, event.currentTarget, selected)} onKeyDown={(event) => {
@@ -101,7 +104,7 @@ export const CommercialMiniMap = memo(function CommercialMiniMap({
   items, title, highlightedStatus = null, onViewLot, className = '',
   outlines = EMPTY_OUTLINES, accesses = EMPTY_ACCESSES, numbered = false, hideStatusLegend = false, selection, contentEnvelope, numberLabelPixels = 11,
   presentation: variant = 'default', presentationMemory,
-  annotationLayout, selectedCompanyId = null, selectedAnnotationScopeId = null, onSelectCompany, companyEntityIds, commercialFilter = 'all', showAnnotationConnections = true,
+  annotationLayout, selectedCompanyId = null, contractEntityIds, onSelectCompany, companyEntityIds, commercialFilter = 'all', showAnnotationConnections = true,
 }: CommercialMiniMapProps) {
   const pavilionPresentation = variant === 'pavilion';
   const selectId = useId();
@@ -536,7 +539,8 @@ export const CommercialMiniMap = memo(function CommercialMiniMap({
           {outlineLayer}
           {geometry.lots.map(({ entity, lot, path }, index) => <MiniMapLotPath key={lot.id}
             entityId={entity.id} path={path} status={lot.status} label={lotLabels.get(lot.id)!.accessible}
-            active={pavilionPresentation ? selectedEntityId === entity.id || contextEntityId === entity.id || Boolean(companyEntityIds?.has(entity.id)) : activeLot?.entity.id === entity.id}
+            active={pavilionPresentation ? selectedEntityId === entity.id || contextEntityId === entity.id : activeLot?.entity.id === entity.id}
+            companyMember={companyEntityIds?.has(entity.id)} contractMember={contractEntityIds?.has(entity.id)} lightStroke={pavilionPresentation}
             selected={selectedEntityId === entity.id} keyboardStop={keyboardStopId === entity.id}
             describedBy={pavilionPresentation && contextLot?.entity.id === entity.id && contextPosition?.visible ? contextCardId : undefined}
             dimmed={Boolean((highlightedStatus && displayStatus(highlightedStatus) !== displayStatus(lot.status))
@@ -545,7 +549,7 @@ export const CommercialMiniMap = memo(function CommercialMiniMap({
             index={index} onEnter={enterLot} onLeave={leaveLot} onFocusLot={focusLot} onBlurLot={blurLot} onActivate={activateLot} onNavigate={navigateLot} />)}
           {decorationLayer}
           {annotationLayout && onSelectCompany && <PavilionAnnotations layout={annotationLayout} selectedId={selectedCompanyId}
-            selectedScopeId={selectedAnnotationScopeId} connections={showAnnotationConnections} onSelect={onSelectCompany} />}
+            connections={showAnnotationConnections} onSelect={onSelectCompany} />}
         </svg> : <p className="commercial-dashboard-empty">Nenhuma geometria cadastral válida neste recorte.</p>}
       </div>
     </div>

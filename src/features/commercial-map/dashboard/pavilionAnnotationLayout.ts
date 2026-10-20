@@ -1,18 +1,19 @@
 import polygonClipping from 'polygon-clipping';
 import { buildCommercialMiniMapViewBox, type CommercialMiniMapGeometry, type MiniMapBounds } from './commercialDashboardGeometry';
-import { buildOccupancyVisualScopes, occupancyLotList, OCCUPANCY_STATE_LABEL, summarizeOccupancyState, type OccupancyGroup } from './pavilionOccupancy';
+import { occupancyLotSummary, OCCUPANCY_STATE_LABEL, type OccupancyGroup } from './pavilionOccupancy';
 
 export type AnnotationPoint = [number, number];
-export interface AnnotationCluster { rings: AnnotationPoint[][]; path: string; anchor: AnnotationPoint; route: AnnotationPoint[] | null; branches: AnnotationPoint[][]; anchors: AnnotationPoint[] }
+export interface AnnotationCluster {
+  rings: AnnotationPoint[][]; path: string; anchor: AnnotationPoint;
+  route: AnnotationPoint[] | null; marker: AnnotationPoint | null;
+}
 export interface PavilionAnnotation {
   id: string; group: OccupancyGroup; clusters: AnnotationCluster[];
-  scopeId: string; scopeKind: 'CONTRACT' | 'ORDER' | 'REVIEW'; scopeMarker: string; scopeLabel: string | null; scopeLotIds: string[];
-  label: (MiniMapBounds & { lines: string[]; lotLine: string; stateLine: string; referenceLine: string | null }) | null;
+  label: (MiniMapBounds & { lines: string[]; lotLine: string; stateLine: string }) | null;
 }
 export interface PavilionAnnotationLayout { annotations: PavilionAnnotation[]; viewBox: string; hiddenLabels: number }
-const spatialCache = new WeakMap<CommercialMiniMapGeometry, WeakMap<readonly OccupancyGroup[], {
-  annotations: PavilionAnnotation[]; members: Map<string, CommercialMiniMapGeometry['lots']>;
-}>>();
+const spatialCache = new WeakMap<CommercialMiniMapGeometry, WeakMap<readonly OccupancyGroup[], PavilionAnnotation[]>>();
+const layoutCache = new WeakMap<CommercialMiniMapGeometry, WeakMap<readonly OccupancyGroup[], Map<string, PavilionAnnotationLayout>>>();
 const round = (v: number) => Math.round(v * 10000) / 10000;
 export const annotationPath = (rings: readonly (readonly AnnotationPoint[])[]) => rings.map(ring => `M ${ring.map(p => p.join(' ')).join(' L ')} Z`).join(' ');
 export const annotationLine = (points: readonly AnnotationPoint[]) => `M ${points.map(p => p.join(' ')).join(' L ')}`;
@@ -112,11 +113,22 @@ function edgeAnchors(ring: AnnotationPoint[]) {
   });
 }
 
-/** Labels occupy nearby empty floor first. Disconnected spatial sets repeat the
- * same company marker locally, avoiding a remote label with long crossing lines.
- * Each local tree has one trunk, a shared bus and a branch to every actual lot. */
-export function buildPavilionAnnotationLayout(geometry: CommercialMiniMapGeometry, groups: readonly OccupancyGroup[], selectedId: string | null = null, maxLabels = 8, reservedBounds: readonly MiniMapBounds[] = [], selectedScopeId: string | null = null): PavilionAnnotationLayout {
+/** One primary annotation per company, irrespective of contracts or connected
+ * components. All expensive work is cached independently from hover/contract
+ * selection. A remote component uses the same small marker instead of a card. */
+export function buildPavilionAnnotationLayout(geometry: CommercialMiniMapGeometry, groups: readonly OccupancyGroup[], selectedId: string | null = null, maxLabels = 8, reservedBounds: readonly MiniMapBounds[] = []): PavilionAnnotationLayout {
   if (!geometry.bounds || !groups.length) return { annotations: [], viewBox: buildCommercialMiniMapViewBox(geometry), hiddenLabels: 0 };
+  let layouts = layoutCache.get(geometry);
+  if (!layouts) { layouts = new WeakMap(); layoutCache.set(geometry, layouts); }
+  let variants = layouts.get(groups);
+  if (!variants) { variants = new Map(); layouts.set(groups, variants); }
+  // Selection only changes the layout if a company outside the progressive
+  // default label set needs a label. Existing labels never jump on selection.
+  const defaults = [...groups].sort((a, b) => b.items.length - a.items.length || a.marker - b.marker).slice(0, maxLabels);
+  const promoted = selectedId && !defaults.some(group => group.id === selectedId) ? selectedId : null;
+  const key = JSON.stringify([promoted, maxLabels, reservedBounds]);
+  const cached = variants.get(key);
+  if (cached) return cached;
   const [x1, y1] = geometry.project([geometry.bounds.minX, geometry.bounds.minY]);
   const [x2, y2] = geometry.project([geometry.bounds.maxX, geometry.bounds.maxY]);
   const floor: MiniMapBounds = { minX: x1, minY: y1, maxX: x2, maxY: y2 };
@@ -126,36 +138,34 @@ export function buildPavilionAnnotationLayout(geometry: CommercialMiniMapGeometr
   if (!cache) { cache = new WeakMap(); spatialCache.set(geometry, cache); }
   let spatial = cache.get(groups);
   if (!spatial) {
-    const annotations: PavilionAnnotation[] = [];
-    const members = new Map<string, typeof geometry.lots>();
-    for (const scope of buildOccupancyVisualScopes(groups)) {
-      const group = scope.group;
-      const lots = scope.items.flatMap(item => { const lot = geometry.lotsByEntityId.get(item.entityId); return lot ? [lot] : []; });
-      if (!lots.length) continue;
+    spatial = groups.flatMap(group => {
+      const lots = group.items.flatMap(item => {
+        const lot = geometry.lotsByEntityId.get(item.entityId);
+        // Matching entity IDs alone must never adopt a different cadastral lot.
+        return lot?.lot.id === item.lotId ? [lot] : [];
+      });
+      if (!lots.length) return [];
       const polygons = lots.map(l => l.entity.geometry.coordinates.map(ring => ring.map(p => geometry.project(p).map(round) as AnnotationPoint)));
       const union = polygonClipping.union(polygons[0], ...polygons.slice(1));
-      union.forEach((rings, index) => {
-        const id = `${scope.id}:spatial:${index}`;
-        const ownLots = lots.filter((_, lotIndex) => polygonClipping.intersection(polygons[lotIndex], rings).length > 0);
+      const clusters = union.map(rings => {
         const box = bounds(rings[0]);
-        const cluster: AnnotationCluster = { rings, path: annotationPath(rings), anchor: [(box.minX + box.maxX) / 2, box.minY], route: null, branches: [], anchors: [] };
-        annotations.push({ id, group, clusters: [cluster], label: null, scopeId: scope.id, scopeKind: scope.kind,
-          scopeMarker: scope.marker, scopeLabel: scope.label, scopeLotIds: scope.items.map(item => item.lotId) });
-        members.set(id, ownLots);
+        return { rings, path: annotationPath(rings), anchor: [(box.minX + box.maxX) / 2, box.minY] as AnnotationPoint, route: null, marker: null };
+      }).sort((a, b) => {
+        const area = (c: AnnotationCluster) => { const b = bounds(c.rings[0]); return (b.maxX - b.minX) * (b.maxY - b.minY); };
+        return area(b) - area(a) || a.path.localeCompare(b.path);
       });
-    }
-    spatial = { annotations, members }; cache.set(groups, spatial);
+      return [{ id: group.id, group, clusters, label: null }];
+    });
+    cache.set(groups, spatial);
   }
-  const members = spatial.members;
-  const annotations = spatial.annotations.map(a => ({ ...a, clusters: a.clusters.map(c => ({ ...c, branches: [], anchors: [], route: null })) }));
-  const priority = [...annotations].sort((a, b) => Number(b.scopeId === selectedScopeId) - Number(a.scopeId === selectedScopeId)
-    || Number(b.group.id === selectedId) - Number(a.group.id === selectedId)
-    || (members.get(b.id)?.length ?? 0) - (members.get(a.id)?.length ?? 0) || a.group.marker - b.group.marker).slice(0, maxLabels);
-  const labelWidth = Math.max(126, Math.min(146, (x2 - x1) * .23)), gap = 11;
+  const annotations = spatial.map(a => ({ ...a, clusters: a.clusters.map(c => ({ ...c })) }));
+  const priority = [...annotations].sort((a, b) => Number(b.group.id === promoted) - Number(a.group.id === promoted)
+    || b.group.items.length - a.group.items.length || a.group.marker - b.group.marker).slice(0, maxLabels);
+  const labelWidth = Math.max(134, Math.min(156, (x2 - x1) * .25)), gap = 10;
   const placed: MiniMapBounds[] = [];
   for (const entry of priority) {
-    const nameLines = wrapName(entry.group.name, Math.floor((labelWidth - 28) / 6.3));
-    const labelHeight = 39 + (nameLines.length - 1) * 9 + (entry.scopeLabel ? 7 : 0);
+    const nameLines = wrapName(entry.group.name, Math.floor((labelWidth - 29) / 5.7));
+    const labelHeight = 42 + (nameLines.length - 1) * 10;
     const box = bounds(entry.clusters[0].rings[0]);
     const cx = (box.minX + box.maxX) / 2, cy = (box.minY + box.maxY) / 2;
     const xs = [...new Set([cx - labelWidth / 2, box.minX, box.maxX - labelWidth, ...obstacles.flatMap(b => [b.minX - labelWidth - gap, b.maxX + gap])])];
@@ -166,60 +176,63 @@ export function buildPavilionAnnotationLayout(geometry: CommercialMiniMapGeometr
       if (obstacles.some(b => overlaps(candidate, b, 4)) || placed.some(b => overlaps(candidate, b, gap))) continue;
       const outside = Math.max(0, floor.minX - x) + Math.max(0, candidate.maxX - floor.maxX)
         + Math.max(0, floor.minY - y) + Math.max(0, candidate.maxY - floor.maxY);
-      const distance = Math.hypot(x + labelWidth / 2 - cx, y + labelHeight / 2 - cy);
-      // Proximity wins over staying inside a narrow pavilion: a nearby free
-      // margin is preferable to a distant label at the opposite end of a plan.
-      const current = distance + outside * .35;
+      const current = Math.hypot(x + labelWidth / 2 - cx, y + labelHeight / 2 - cy) + outside * .35;
       if (current < score) { score = current; best = candidate; }
     }
     if (!best) continue;
-    const ownLots = members.get(entry.id) ?? [];
-    const ownIds = new Set(ownLots.map(l => l.lot.id));
-    const items = entry.group.items.filter(item => ownIds.has(item.lotId));
-    const state = items.length ? summarizeOccupancyState(items) : entry.group.state;
     const short = (line: string, unitWidth: number) => {
-      const limit = Math.floor((labelWidth - 20) / unitWidth);
+      const limit = Math.floor((labelWidth - 18) / unitWidth);
       return line.length > limit ? `${line.slice(0, limit - 1)}…` : line;
     };
-    entry.label = { ...best, lines: nameLines, lotLine: short(occupancyLotList(items, 5), 3.9), referenceLine: entry.scopeLabel ? short(entry.scopeLabel, 4.1) : null,
-      stateLine: short(`${items.length}${items.length < entry.scopeLotIds.length ? ` de ${entry.scopeLotIds.length}` : ''} ${entry.scopeLotIds.length === 1 ? 'lote' : 'lotes'} · ${state === 'MIXED' ? 'Situações distintas' : OCCUPANCY_STATE_LABEL[state]}`, 3.5) };
+    entry.label = { ...best, lines: nameLines, lotLine: short(occupancyLotSummary(entry.group.items), 3.8),
+      stateLine: short(OCCUPANCY_STATE_LABEL[entry.group.state], 3.6) };
     placed.push(best);
   }
-  for (const entry of priority) {
+  // Route once to an exposed point on each component's perimeter, never to
+  // every cell. Bounding obstacles conservatively protect numbers and holes.
+  const usedRoutes: AnnotationPoint[][] = [];
+  const componentBadges: MiniMapBounds[] = [];
+  for (const entry of annotations) {
     const label = entry.label;
-    if (!label) continue;
-    const cluster = entry.clusters[0], box = bounds(cluster.rings[0]);
-    const cx = (box.minX + box.maxX) / 2, cy = (box.minY + box.maxY) / 2;
-    const lx = (label.minX + label.maxX) / 2, ly = (label.minY + label.maxY) / 2;
-    const vertical = label.maxY <= box.minY || label.minY >= box.maxY;
-    const sign = vertical ? ly < cy ? -1 : 1 : lx < cx ? -1 : 1;
-    const hub: AnnotationPoint = vertical ? [cx, sign < 0 ? box.minY - 5 : box.maxY + 5] : [sign < 0 ? box.minX - 5 : box.maxX + 5, cy];
-    const start: AnnotationPoint = vertical ? [Math.max(label.minX + 8, Math.min(label.maxX - 8, cx)), sign < 0 ? label.maxY : label.minY]
-      : [sign < 0 ? label.maxX : label.minX, Math.max(label.minY + 8, Math.min(label.maxY - 8, cy))];
-    const allObstacles = [...obstacles, ...placed.filter(b => b !== label && (b.minX !== label.minX || b.minY !== label.minY))];
-    cluster.route = routeAnnotation(start, hub, allObstacles, 0);
-    // If another row obstructs the ideal bus, use an exposed perimeter midpoint.
-    if (!cluster.route) {
-      for (const candidate of edgeAnchors(cluster.rings[0]).sort((a, b) => Math.hypot(a.anchor[0] - lx, a.anchor[1] - ly) - Math.hypot(b.anchor[0] - lx, b.anchor[1] - ly))) {
-        const alternate: AnnotationPoint = [round(candidate.anchor[0] + candidate.outward[0] * 5), round(candidate.anchor[1] + candidate.outward[1] * 5)];
-        const route = routeAnnotation(start, alternate, allObstacles, 0);
-        if (route) { hub[0] = alternate[0]; hub[1] = alternate[1]; cluster.route = route; break; }
+    for (const cluster of entry.clusters) {
+      const candidates = edgeAnchors(cluster.rings[0]);
+      const lx = label ? (label.minX + label.maxX) / 2 : cluster.anchor[0];
+      const ly = label ? (label.minY + label.maxY) / 2 : cluster.anchor[1] - 10;
+      candidates.sort((a, b) => Math.hypot(a.anchor[0] - lx, a.anchor[1] - ly) - Math.hypot(b.anchor[0] - lx, b.anchor[1] - ly));
+      const allObstacles = [...obstacles, ...placed, ...componentBadges];
+      for (const [candidateIndex, { anchor, outward }] of candidates.entries()) {
+        const endpoint: AnnotationPoint = [round(anchor[0] + outward[0] * 4), round(anchor[1] + outward[1] * 4)];
+        const badge = { minX: endpoint[0] - 3, maxX: endpoint[0] + 3, minY: endpoint[1] - 3, maxY: endpoint[1] + 3 };
+        if (!cluster.marker && !allObstacles.some(b => overlaps(badge, b))) cluster.marker = endpoint;
+        if (!label || candidateIndex >= 8) { if (cluster.marker) break; else continue; }
+        const start: AnnotationPoint = [Math.max(label.minX, Math.min(label.maxX, endpoint[0])), Math.max(label.minY, Math.min(label.maxY, endpoint[1]))];
+        // Remote leaders add noise. The local marker identifies the same company.
+        if (Math.hypot(start[0] - endpoint[0], start[1] - endpoint[1]) > 110) continue;
+        const route = routeAnnotation(start, anchor, allObstacles, 0);
+        if (!route) continue;
+        const length = route.slice(1).reduce((sum, p, i) => sum + Math.hypot(p[0] - route[i][0], p[1] - route[i][1]), 0);
+        if (length > 140 || crossesRoutes(route, usedRoutes)) continue;
+        cluster.route = route; cluster.anchor = anchor; cluster.marker = null;
+        usedRoutes.push(route); break;
       }
-    }
-    if (!cluster.route) continue;
-    cluster.anchor = hub;
-    for (const lot of members.get(entry.id) ?? []) {
-      const ring = lot.entity.geometry.coordinates[0].map(p => geometry.project(p).map(round) as AnnotationPoint);
-      const candidates = edgeAnchors(ring).sort((a, b) => Math.hypot(a.anchor[0] - hub[0], a.anchor[1] - hub[1]) - Math.hypot(b.anchor[0] - hub[0], b.anchor[1] - hub[1]));
-      for (const { anchor } of candidates) {
-        // Common bus is parallel to the row; short orthogonal teeth reach each
-        // actual polygon. Routing only intervenes if a neighbor blocks it.
-        const elbow: AnnotationPoint = vertical ? [anchor[0], hub[1]] : [hub[0], anchor[1]];
-        const bus = routeAnnotation(hub, elbow, allObstacles, 0);
-        const tooth = routeAnnotation(elbow, anchor, allObstacles, 0);
-        if (bus && tooth) { cluster.branches.push([...bus, ...tooth.slice(1)]); cluster.anchors.push(anchor); break; }
-      }
+      if (cluster.marker) componentBadges.push({ minX: cluster.marker[0] - 3.2, maxX: cluster.marker[0] + 3.2,
+        minY: cluster.marker[1] - 3.2, maxY: cluster.marker[1] + 3.2 });
     }
   }
-  return { annotations, viewBox: buildCommercialMiniMapViewBox(geometry, placed), hiddenLabels: annotations.filter(a => !a.label).length };
+  const result = { annotations, viewBox: buildCommercialMiniMapViewBox(geometry, [...placed,
+    ...annotations.flatMap(a => a.clusters.flatMap(c => c.marker ? [{ minX: c.marker[0] - 4, maxX: c.marker[0] + 4, minY: c.marker[1] - 4, maxY: c.marker[1] + 4 }] : []))]),
+    hiddenLabels: annotations.filter(a => !a.label).length };
+  variants.set(key, result);
+  // Bound selection variants; union cache remains shared.
+  if (variants.size > 12) variants.delete(variants.keys().next().value!);
+  return result;
+}
+function crossesRoutes(route: AnnotationPoint[], previous: AnnotationPoint[][]) {
+  return route.slice(1).some((b, i) => previous.some(line => line.slice(1).some((d, j) => {
+    const a = route[i], c = line[j];
+    if ((a[0] === b[0]) === (c[0] === d[0])) return false;
+    const [v1, v2, h1, h2] = a[0] === b[0] ? [a, b, c, d] : [c, d, a, b];
+    return v1[0] > Math.min(h1[0], h2[0]) && v1[0] < Math.max(h1[0], h2[0])
+      && h1[1] > Math.min(v1[1], v2[1]) && h1[1] < Math.max(v1[1], v2[1]);
+  })));
 }

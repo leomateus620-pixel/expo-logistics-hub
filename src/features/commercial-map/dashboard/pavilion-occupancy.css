@@ -84,3 +84,6 @@
   .pavilion-workspace button, .pavilion-options summary { min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) { .pavilion-annotations > g { transition: none; } }
+.pavilion-annotation-surface { filter: drop-shadow(0 1px 1px #173e2910); }
+.pavilion-topology-key i.is-contract { border-color: #9a652c; border-style: dashed; }
+.pavilion-company-detail .pavilion-identity-issue { padding: 7px 9px; border-left: 2px solid #b78240; background: #fff9ee; color: #79511e; }

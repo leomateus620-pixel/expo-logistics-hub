@@ -4,7 +4,7 @@ import type { CommercialPavilionDashboardSnapshot } from './commercialDashboardT
 import { buildCommercialMiniMapViewBox, commercialMiniMapNumberLabel, type CommercialMiniMapGeometry } from './commercialDashboardGeometry';
 import { projectPavilionAccessMarkers } from './pavilionAccessGeometry';
 import { buildPavilionAnnotationLayout, type AnnotationPoint } from './pavilionAnnotationLayout';
-import { OCCUPANCY_STATE_LABEL, occupancyLotList, buildOccupancyVisualScopes, buildPavilionOccupancyGroups, occupancyMatchesInventory, type PavilionOccupancy } from './pavilionOccupancy';
+import { OCCUPANCY_STATE_LABEL, occupancyLotList, buildPavilionOccupancyGroups, occupancyMatchesInventory, type PavilionOccupancy } from './pavilionOccupancy';
 import type { DashboardAccessMarker } from './CommercialMiniMap';
 
 /** A3 vector document from the exact cadastral and annotation models. No DOM,
@@ -15,7 +15,6 @@ export async function createPavilionPdf(snapshot: CommercialPavilionDashboardSna
   if (geometry.lots.length !== snapshot.totalLots) throw new Error('Exportação indisponível: há lotes sem geometria válida.');
   const [{ jsPDF }, { default: autoTable }] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
   const groups = buildPavilionOccupancyGroups(payload);
-  const visualScopes = buildOccupancyVisualScopes(groups);
   const markers = projectPavilionAccessMarkers(geometry, accesses);
   const layout = buildPavilionAnnotationLayout(geometry, groups, null, 8, markers.map(marker => marker.bounds));
   const [ax, ay, aw, ah] = layout.viewBox.split(' ').map(Number);
@@ -59,23 +58,28 @@ export async function createPavilionPdf(snapshot: CommercialPavilionDashboardSna
     const config = STATUS_CONFIG[lot.lot.status === 'UNAVAILABLE' ? 'UNAVAILABLE' : toCommercialPhase(lot.lot.status)];
     polygon(lot.entity.geometry.coordinates.map(ring => ring.map(geometry.project)), config.color, config.border);
   }
-  for (const { group, clusters, label, scopeKind, scopeMarker, scopeLabel } of layout.annotations) {
-    doc.setLineDashPattern(scopeKind === 'CONTRACT' ? [] : [1, .7], 0);
+  for (const { group, clusters, label } of layout.annotations) {
+    const contourColor = group.state === 'REVIEW' ? '#a6632b' : '#17685c';
+    doc.setLineDashPattern(group.state === 'REVIEW' || !group.verified ? [.7, .7] : [], 0);
     for (const cluster of clusters) {
-      polygon(cluster.rings, null, '#17685c', .35);
-      if (cluster.route) line(cluster.route, '#17685c', .35);
-      for (const branch of cluster.branches) line(branch, '#17685c', .28);
+      polygon(cluster.rings, null, contourColor, .2);
+      if (cluster.route) line(cluster.route, contourColor, .18);
+      if (cluster.marker) {
+        const [mx, my] = pt(cluster.marker);
+        doc.setFillColor('#ffffff'); doc.setDrawColor(contourColor); doc.setLineWidth(.15);
+        doc.circle(mx, my, 3.2 * scale, 'FD');
+        text(String(group.marker), cluster.marker[0] - 1.2, cluster.marker[1] + 1.4, 4.4, true);
+      }
     }
     doc.setLineDashPattern([], 0);
     if (label) {
       const [x, y] = pt([label.minX, label.minY]);
       doc.setDrawColor('#cbd9d0'); doc.setFillColor('#ffffff'); doc.setLineWidth(.15);
       doc.roundedRect(x, y, (label.maxX - label.minX) * scale, (label.maxY - label.minY) * scale, 1.5, 1.5, 'FD');
-      text(scopeMarker, label.minX + 6, label.minY + 14, 8, true);
-      label.lines.forEach((name, i) => text(name, label.minX + 23, label.minY + 13.5 + i * 9, 9.2, true));
-      if (scopeLabel) text(label.referenceLine!, label.minX + 8, label.minY + 23 + (label.lines.length - 1) * 9, 7.2, true);
-      text(label.lotLine, label.minX + 8, label.minY + 26 + (label.lines.length - 1) * 9 + (scopeLabel ? 7 : 0), 7.8);
-      text(label.stateLine, label.minX + 8, label.minY + 35 + (label.lines.length - 1) * 9 + (scopeLabel ? 7 : 0), 7.2);
+      text(String(group.marker), label.minX + 7, label.minY + 15, 7, true);
+      label.lines.forEach((name, i) => text(name, label.minX + 24, label.minY + 15 + i * 10, 9.2, true));
+      text(label.lotLine, label.minX + 9, label.minY + 28 + (label.lines.length - 1) * 10, 7.8);
+      text(label.stateLine, label.minX + 9, label.minY + 37 + (label.lines.length - 1) * 10, 7);
     }
   }
   // Numbers are painted last and sized against each real cell, including rotation.
@@ -120,8 +124,8 @@ export async function createPavilionPdf(snapshot: CommercialPavilionDashboardSna
   if (groups.length) {
     doc.addPage(); header('Detalhamento dos vínculos comerciais - mesmos dados da planta');
     const rows = groups.flatMap(group => group.orders.length ? group.orders.flatMap(order => {
-      const references = order.contracts.map(c => `${visualScopes.find(scope => scope.id === `contract:${c.id}`)?.marker ?? ''} - ${c.number || 'Sem número'} (${OCCUPANCY_STATE_LABEL[c.state]}; ${occupancyLotList(c.items)})`).join('\n');
-      return [[`${group.marker}. ${group.name}${group.verified ? '' : '\nIdentidade não verificada'}`,
+      const references = order.contracts.map(c => `${c.number || 'Sem número'} [${c.id}] (${c.scope}; ${OCCUPANCY_STATE_LABEL[c.state]}; ${occupancyLotList(c.items)})`).join('\n');
+      return [[`${group.marker}. ${group.name}${group.verified ? '' : '\nIdentidade não verificada'}${group.issues.length ? '\n' + group.issues.join('\n') : ''}`,
         order.orderId ? `Pedido ${order.orderId}` : `Venda ${order.saleId}`,
         occupancyLotList(order.items), order.items.map(item => `${item.number ?? 'Sem número'}: ${OCCUPANCY_STATE_LABEL[item.state]} / ${STATUS_CONFIG[item.status].label}`).join('\n'),
         payload.contractsAccessible ? references || 'Sem contrato vinculado' : 'Referências restritas']];
