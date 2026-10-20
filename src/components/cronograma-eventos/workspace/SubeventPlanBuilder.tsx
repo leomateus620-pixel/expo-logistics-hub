@@ -1,9 +1,11 @@
-import { useEffect, useId, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
   CalendarDays,
   CheckSquare,
   ChevronDown,
   ClipboardList,
+  Coins,
+  RotateCcw,
   Clock3,
   Loader2,
   Plus,
@@ -17,6 +19,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  budgetTotal,
+  formatBRL,
+  formatCurrencyInput,
+  parseCurrencyDigits,
+  sortActionsByTime,
+} from './planBuilderUtils';
 import { statusLabels } from '@/components/cronograma-eventos/cronogramaData';
 import { RelationalMultiSelect } from '@/components/cronograma-eventos/RelationalMultiSelect';
 import {
@@ -33,6 +52,7 @@ import type {
   CronogramaStatus,
   CronogramaSubevent,
   CronogramaSubeventAction,
+  CronogramaSubeventBudgetItem,
   CronogramaSubeventGuest,
   CronogramaSubeventPlanDraft,
   CronogramaSubeventProvision,
@@ -84,6 +104,7 @@ function emptyPlanItem(defaultDate: string | null): CronogramaSubeventPlanDraft 
     responsiblesRel: [],
     actions: [],
     provisions: [],
+    budget: [],
     guests: [],
   };
 }
@@ -123,6 +144,7 @@ function planItemFromSubevent(subevent: CronogramaSubevent, defaultDate: string 
     actions: (subevent.actions ?? []).map((action) => ({ ...action })),
     provisions: (subevent.provisions ?? []).map((provision) => ({ ...provision })),
     guests: (subevent.guests ?? []).map((guest) => ({ ...guest })),
+    budget: (subevent.budget ?? []).map((line) => ({ ...line })),
   };
 }
 
@@ -131,6 +153,7 @@ export function SubeventPlanBuilder({
   defaultDate = null,
   initialSubevents,
   mode = 'create',
+  draftKey,
   onSubmit,
   onCancel,
 }: {
@@ -138,6 +161,8 @@ export function SubeventPlanBuilder({
   defaultDate?: string | null;
   initialSubevents?: CronogramaSubevent[];
   mode?: 'create' | 'edit';
+  /** Stable key used to keep unsaved edits on this device. */
+  draftKey?: string;
   onSubmit: (items: CronogramaSubeventPlanDraft[]) => Promise<void> | void;
   onCancel: () => void;
 }) {
@@ -158,16 +183,66 @@ export function SubeventPlanBuilder({
     return [emptyPlanItem(defaultDate)];
   }, [defaultDate, initialSubevents]);
 
-  const [items, setItems] = useState<CronogramaSubeventPlanDraft[]>(initialItems);
+  const storageKey = draftKey ? `cronograma-plan-draft:${draftKey}` : null;
+  const baseline = useMemo(() => JSON.stringify(initialItems), [initialItems]);
+  const restoredDraft = useMemo<CronogramaSubeventPlanDraft[] | null>(() => {
+    if (!storageKey || typeof window === 'undefined') return null;
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as { items?: CronogramaSubeventPlanDraft[] };
+      return Array.isArray(parsed.items) && parsed.items.length ? parsed.items.map((item) => ({ ...item, budget: item.budget ?? [] })) : null;
+    } catch {
+      return null;
+    }
+    // Only read once per opened builder.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+  const [items, setItems] = useState<CronogramaSubeventPlanDraft[]>(() => restoredDraft ?? initialItems);
+  const [draftRestored, setDraftRestored] = useState(Boolean(restoredDraft));
   const [openIndex, setOpenIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
+  const touchedRef = useRef(Boolean(restoredDraft));
+  const dirty = JSON.stringify(items) !== baseline;
+
+  // Background refreshes only replace the form while the user has not edited anything.
+  useEffect(() => {
+    if (touchedRef.current) return;
+    setItems(initialItems);
+  }, [initialItems]);
 
   useEffect(() => {
+    if (!storageKey || !touchedRef.current) return;
+    try {
+      if (dirty) window.localStorage.setItem(storageKey, JSON.stringify({ items, savedAt: Date.now() }));
+      else window.localStorage.removeItem(storageKey);
+    } catch { /* storage unavailable */ }
+  }, [items, dirty, storageKey]);
+
+  const clearDraft = () => {
+    if (!storageKey) return;
+    try { window.localStorage.removeItem(storageKey); } catch { /* ignore */ }
+  };
+
+  const updateItems: typeof setItems = (value) => {
+    touchedRef.current = true;
+    setItems(value);
+  };
+
+  const discardDraft = () => {
+    clearDraft();
+    touchedRef.current = false;
+    setDraftRestored(false);
     setItems(initialItems);
-    setOpenIndex(0);
-    setError(null);
-  }, [initialItems]);
+  };
+
+  const requestClose = () => {
+    if (saving) return;
+    if (dirty) setConfirmLeave(true);
+    else { clearDraft(); onCancel(); }
+  };
 
   const linkedUnitIds = useMemo(
     () => Array.from(new Set(
@@ -185,16 +260,16 @@ export function SubeventPlanBuilder({
   const fieldId = (name: string) => `${instanceId}-${name}`;
 
   const patchItem = (index: number, patch: Partial<CronogramaSubeventPlanDraft>) => {
-    setItems((current) => current.map((item, position) => (position === index ? { ...item, ...patch } : item)));
+    updateItems((current) => current.map((item, position) => (position === index ? { ...item, ...patch } : item)));
   };
 
   const addSubevent = () => {
-    setItems((current) => [...current, emptyPlanItem(defaultDate)]);
+    updateItems((current) => [...current, emptyPlanItem(defaultDate)]);
     setOpenIndex(items.length);
   };
 
   const removeSubevent = (index: number) => {
-    setItems((current) => (current.length === 1 ? current : current.filter((_, position) => position !== index)));
+    updateItems((current) => (current.length === 1 ? current : current.filter((_, position) => position !== index)));
     setOpenIndex(0);
   };
 
@@ -215,10 +290,13 @@ export function SubeventPlanBuilder({
         title: item.title.trim(),
         description: item.description.trim(),
         responsible: item.responsible.trim(),
-        actions: item.actions.filter((action) => action.title.trim()),
+        actions: sortActionsByTime(item.actions.filter((action) => action.title.trim())),
+        budget: (item.budget ?? []).filter((line) => line.item.trim()),
         provisions: item.provisions.filter((provision) => provision.description.trim()),
         guests: item.guests.filter((guest) => guest.name.trim()),
       })));
+      clearDraft();
+      touchedRef.current = false;
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Não foi possível salvar o planejamento.');
     } finally {
@@ -231,8 +309,9 @@ export function SubeventPlanBuilder({
       actions: accumulator.actions + item.actions.filter((action) => action.title.trim()).length,
       provisions: accumulator.provisions + item.provisions.filter((provision) => provision.description.trim()).length,
       guests: accumulator.guests + item.guests.filter((guest) => guest.name.trim()).length,
+      budget: accumulator.budget + budgetTotal(item.budget),
     }),
-    { actions: 0, provisions: 0, guests: 0 },
+    { actions: 0, provisions: 0, guests: 0, budget: 0 },
   );
 
   return (
@@ -251,7 +330,7 @@ export function SubeventPlanBuilder({
         <button
           type="button"
           className="cronograma-thought-close focus-ring"
-          onClick={onCancel}
+          onClick={requestClose}
           disabled={saving}
           aria-label="Fechar planejamento"
         >
@@ -261,7 +340,16 @@ export function SubeventPlanBuilder({
 
       <p className="cronograma-plan-builder-summary">
         {items.length} {items.length === 1 ? 'subevento' : 'subeventos'} · {totals.actions} ações · {totals.provisions} providências · {totals.guests} convidados
+        {totals.budget > 0 && <> · <strong>{formatBRL(totals.budget)}</strong></>}
       </p>
+
+      {draftRestored && dirty && (
+        <div className="cronograma-plan-draft-notice" role="status">
+          <RotateCcw aria-hidden="true" />
+          <span>Rascunho não salvo restaurado. Salve para gravar no evento.</span>
+          <button type="button" className="focus-ring" onClick={discardDraft}>Descartar</button>
+        </div>
+      )}
 
       <div className="cronograma-plan-builder-list">
         {items.map((item, index) => {
@@ -279,6 +367,7 @@ export function SubeventPlanBuilder({
                   <strong>{item.title.trim() || 'Novo subevento'}</strong>
                   <small>
                     {item.actions.length} ações · {item.provisions.length} providências · {item.guests.length} convidados
+                    {budgetTotal(item.budget) > 0 ? ` · ${formatBRL(budgetTotal(item.budget))}` : ''}
                   </small>
                 </span>
                 <ChevronDown className="cronograma-plan-card-chevron" aria-hidden="true" />
@@ -416,6 +505,11 @@ export function SubeventPlanBuilder({
                     onChange={(provisions) => patchItem(index, { provisions })}
                   />
 
+                  <PlanBudgetSection
+                    budget={item.budget ?? []}
+                    onChange={(budget) => patchItem(index, { budget })}
+                  />
+
                   <PlanGuestsSection
                     guests={item.guests}
                     onChange={(guests) => patchItem(index, { guests })}
@@ -448,7 +542,7 @@ export function SubeventPlanBuilder({
       {error && <p className="cronograma-thought-submit-error" role="alert">{error}</p>}
 
       <div className="cronograma-thought-actions">
-        <Button type="button" variant="ghost" onClick={onCancel} disabled={saving} className="rounded-xl">
+        <Button type="button" variant="ghost" onClick={requestClose} disabled={saving} className="rounded-xl">
           Cancelar
         </Button>
         <Button type="submit" disabled={saving} className="rounded-xl">
@@ -456,6 +550,25 @@ export function SubeventPlanBuilder({
           {saving ? 'Salvando plano…' : 'Salvar planejamento'}
         </Button>
       </div>
+
+      <AlertDialog open={confirmLeave} onOpenChange={setConfirmLeave}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Há alterações não salvas</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você pode manter o rascunho neste aparelho e continuar depois, ou descartar as alterações.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => { clearDraft(); touchedRef.current = false; onCancel(); }}
+            >
+              Descartar alterações
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={() => onCancel()}>Manter rascunho</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </form>
   );
 }
@@ -479,20 +592,53 @@ function PlanActionsSection({
   actions: CronogramaSubeventAction[];
   onChange: (actions: CronogramaSubeventAction[]) => void;
 }) {
+  const [movedKey, setMovedKey] = useState<string | null>(null);
+  const keysRef = useRef<WeakMap<CronogramaSubeventAction, string>>(new WeakMap());
+  const counterRef = useRef(0);
+  const keyOf = (action: CronogramaSubeventAction) => {
+    if (action.id) return action.id;
+    let key = keysRef.current.get(action);
+    if (!key) { key = `new-${counterRef.current++}`; keysRef.current.set(action, key); }
+    return key;
+  };
   const patch = (index: number, value: Partial<CronogramaSubeventAction>) => {
-    onChange(actions.map((action, position) => (position === index ? { ...action, ...value } : action)));
+    onChange(actions.map((action, position) => {
+      if (position !== index) return action;
+      const next = { ...action, ...value };
+      if (!action.id) keysRef.current.set(next, keyOf(action));
+      return next;
+    }));
+  };
+  const reorder = (index: number) => {
+    const target = actions[index];
+    if (!target) return;
+    const key = keyOf(target);
+    const sorted = sortActionsByTime(actions);
+    sorted.forEach((action, position) => {
+      const original = actions.find((candidate) => candidate.title === action.title && candidate.startTime === action.startTime && !sorted.slice(0, position).some((prev) => keysRef.current.get(prev) === keyOf(candidate)));
+      if (original && !original.id) keysRef.current.set(action, keyOf(original));
+    });
+    const newIndex = sorted.findIndex((action) => keyOf(action) === key);
+    if (sorted.some((action, position) => keyOf(action) !== keyOf(actions[position]))) {
+      onChange(sorted);
+      if (newIndex !== index) {
+        setMovedKey(key);
+        window.setTimeout(() => setMovedKey((current) => (current === key ? null : current)), 1400);
+      }
+    }
   };
   return (
     <section className="cronograma-plan-section">
       <SectionHeading icon={Clock3} title="Ações programadas" hint="Roteiro por horário (recepção, abertura, encerramento…)" />
       <ul className="cronograma-plan-rows">
         {actions.map((action, index) => (
-          <li key={action.id ?? `action-${index}`} className="cronograma-plan-row">
+          <li key={keyOf(action)} className="cronograma-plan-row" data-moved={movedKey === keyOf(action) || undefined}>
             <Input
               type="time"
               className="cronograma-plan-row-time"
               value={action.startTime ?? ''}
               onChange={(event) => patch(index, { startTime: event.target.value })}
+              onBlur={() => reorder(index)}
               aria-label={`Horário da ação ${index + 1}`}
             />
             <Input
@@ -525,6 +671,81 @@ function PlanActionsSection({
       >
         <Plus aria-hidden="true" /> Adicionar ação
       </button>
+    </section>
+  );
+}
+
+function PlanBudgetSection({
+  budget,
+  onChange,
+}: {
+  budget: CronogramaSubeventBudgetItem[];
+  onChange: (budget: CronogramaSubeventBudgetItem[]) => void;
+}) {
+  const patch = (index: number, value: Partial<CronogramaSubeventBudgetItem>) => {
+    onChange(budget.map((line, position) => (position === index ? { ...line, ...value } : line)));
+  };
+  const total = budgetTotal(budget);
+  return (
+    <section className="cronograma-plan-section cronograma-plan-budget">
+      <SectionHeading icon={Coins} title="Valor e custo do evento" hint="Orçamento por produto/serviço e fornecedor" />
+      {budget.length > 0 && (
+        <div className="cronograma-plan-budget-head" aria-hidden="true">
+          <span>Produto / serviço</span>
+          <span>Fornecedor</span>
+          <span className="is-num">Valor</span>
+          <span />
+        </div>
+      )}
+      <ul className="cronograma-plan-rows">
+        {budget.map((line, index) => (
+          <li key={line.id ?? `budget-${index}`} className="cronograma-plan-row cronograma-plan-budget-row">
+            <Input
+              value={line.item}
+              onChange={(event) => patch(index, { item: event.target.value })}
+              placeholder="Ex.: Coffee break"
+              aria-label={`Produto ou serviço ${index + 1}`}
+            />
+            <Input
+              value={line.supplier ?? ''}
+              onChange={(event) => patch(index, { supplier: event.target.value })}
+              placeholder="Fornecedor"
+              aria-label={`Fornecedor ${index + 1}`}
+            />
+            <div className="cronograma-plan-budget-amount">
+              <span aria-hidden="true">R$</span>
+              <Input
+                inputMode="numeric"
+                value={formatCurrencyInput(line.amount)}
+                onChange={(event) => patch(index, { amount: parseCurrencyDigits(event.target.value) })}
+                placeholder="0,00"
+                aria-label={`Valor ${index + 1}`}
+              />
+            </div>
+            <button
+              type="button"
+              className="cronograma-plan-row-remove focus-ring"
+              onClick={() => onChange(budget.filter((_, position) => position !== index))}
+              aria-label={`Remover item ${index + 1} do orçamento`}
+            >
+              <Trash2 aria-hidden="true" />
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div className="cronograma-plan-budget-foot">
+        <button
+          type="button"
+          className="cronograma-plan-row-add focus-ring"
+          onClick={() => onChange([...budget, { item: '', supplier: '', amount: 0, sortOrder: budget.length }])}
+        >
+          <Plus aria-hidden="true" /> Adicionar item
+        </button>
+        <div className="cronograma-plan-budget-total" aria-live="polite">
+          <small>Valor total</small>
+          <strong>{formatBRL(total)}</strong>
+        </div>
+      </div>
     </section>
   );
 }
