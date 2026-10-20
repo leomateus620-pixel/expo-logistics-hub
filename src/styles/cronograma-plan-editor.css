@@ -1,0 +1,875 @@
+/* Dedicated planning surface. All overrides stay inside the editor portal.
+   Fenasoja tokens are OKLCH; the timeline and read-only rundown stay untouched. */
+.cronograma-plan-editor-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: oklch(var(--overlay) / 0.35);
+}
+.cronograma-plan-editor {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  height: 100dvh;
+  width: 100%;
+  min-width: 0;
+  overflow: clip;
+  color: oklch(var(--foreground));
+  background: oklch(var(--background));
+  outline: none;
+  animation: plan-editor-enter 180ms ease-out;
+}
+.cronograma-plan-editor .cronograma-plan-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.cronograma-plan-editor-header,
+.cronograma-plan-editor-nav,
+.cronograma-plan-editor-footer {
+  flex: none;
+  background: oklch(var(--surface-1));
+}
+.cronograma-plan-editor-header-inner,
+.cronograma-plan-editor-context,
+.cronograma-plan-editor-nav > div,
+.cronograma-plan-editor-content,
+.cronograma-plan-editor-footer-inner {
+  width: min(100%, 1400px);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 3vw, 2.5rem);
+}
+.cronograma-plan-editor-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 1.25rem 0.9rem;
+}
+.cronograma-plan-editor .cronograma-plan-builder-icon {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.9rem;
+  background: oklch(var(--primary));
+  color: oklch(var(--primary-foreground));
+}
+.cronograma-plan-editor .cronograma-plan-builder-icon svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+.cronograma-plan-editor-heading {
+  min-width: 0;
+  flex: 1;
+}
+.cronograma-plan-editor-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.cronograma-plan-editor-eyebrow > span {
+  color: oklch(var(--border));
+}
+.cronograma-plan-editor-heading h2 {
+  margin-block: 0.2rem;
+  font-size: clamp(1.15rem, 1.7vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  outline: none;
+}
+.cronograma-plan-editor-heading p {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+.cronograma-plan-editor-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: none;
+  border: 1px solid oklch(var(--border));
+  padding: 0.4rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.cronograma-plan-editor-state > span {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: oklch(var(--brand-orange-700));
+}
+.cronograma-plan-editor .cronograma-thought-close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border: 1px solid oklch(var(--border));
+  border-radius: 0.75rem;
+  background: transparent;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor .cronograma-thought-close:hover {
+  background: oklch(var(--surface-2));
+  color: oklch(var(--foreground));
+}
+.cronograma-plan-editor .cronograma-thought-close svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+.cronograma-plan-editor-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.5rem;
+  padding-bottom: 0.9rem;
+}
+.cronograma-plan-editor-metrics > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor-metrics svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: oklch(var(--primary));
+}
+.cronograma-plan-editor-metrics strong {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: oklch(var(--foreground));
+}
+.cronograma-plan-editor-nav {
+  border-block: 1px solid oklch(var(--border) / 0.7);
+}
+.cronograma-plan-editor-nav > div {
+  display: flex;
+  gap: 0.35rem;
+  padding-block: 0.5rem;
+}
+.cronograma-plan-editor-nav button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 42px;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.6rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor-nav button > span {
+  font-size: 0.63rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+.cronograma-plan-editor-nav button:hover,
+.cronograma-plan-editor-nav button[aria-current] {
+  color: oklch(var(--primary));
+  background: oklch(var(--accent));
+}
+.cronograma-plan-editor-mobile-nav {
+  display: none;
+}
+.cronograma-plan-editor-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scroll-padding-block: 1.5rem;
+}
+.cronograma-plan-editor-content {
+  min-width: 0;
+  border: 0;
+  padding-block: 1.5rem 2.5rem;
+}
+.cronograma-plan-editor .cronograma-plan-builder-list {
+  gap: 1rem;
+}
+.cronograma-plan-editor .cronograma-plan-card {
+  overflow: visible;
+  border: 1px solid oklch(var(--border) / 0.75);
+  border-radius: 1rem;
+  background: oklch(var(--surface-1));
+  box-shadow: 0 4px 18px -12px oklch(var(--foreground) / 0.16);
+}
+.cronograma-plan-editor .cronograma-plan-card[data-open] {
+  border-color: oklch(var(--border));
+  box-shadow: 0 4px 18px -12px oklch(var(--foreground) / 0.16);
+}
+.cronograma-plan-editor .cronograma-plan-card-toggle {
+  gap: 0.85rem;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  background: oklch(var(--surface-2) / 0.7);
+}
+.cronograma-plan-editor .cronograma-plan-card-index {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.65rem;
+  background: oklch(var(--accent));
+  color: oklch(var(--primary));
+  font-size: 0.75rem;
+}
+.cronograma-plan-editor .cronograma-plan-card-title strong {
+  font-size: 0.95rem;
+  color: oklch(var(--foreground));
+  overflow-wrap: anywhere;
+}
+.cronograma-plan-editor .cronograma-plan-card-title small {
+  font-size: 0.72rem;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor .cronograma-plan-card-body {
+  padding: 0 1.5rem 1.5rem;
+  gap: 0;
+}
+.cronograma-plan-editor .cronograma-plan-card-body[hidden] {
+  display: none;
+}
+.cronograma-plan-editor .cronograma-plan-section {
+  min-width: 0;
+  gap: 1rem;
+  padding-block: 1.75rem;
+  border-top: 1px solid oklch(var(--border) / 0.65);
+  scroll-margin-top: 1.5rem;
+  outline: none;
+}
+.cronograma-plan-editor .cronograma-plan-section:first-child {
+  border-top: 0;
+}
+.cronograma-plan-editor .cronograma-plan-section-head {
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.cronograma-plan-editor .cronograma-plan-section-head > span {
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: none;
+  border-radius: 0.7rem;
+  background: oklch(var(--accent) / 0.6);
+  color: oklch(var(--primary));
+}
+.cronograma-plan-editor .cronograma-plan-section-head svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+.cronograma-plan-editor .cronograma-plan-section-head h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 1rem;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+}
+.cronograma-plan-editor .cronograma-plan-section-head small {
+  display: block;
+  font-size: 0.77rem;
+  color: oklch(var(--muted-foreground));
+  line-height: 1.6;
+}
+.cronograma-plan-editor
+  .cronograma-plan-section-head
+  .cronograma-plan-section-number {
+  font-size: 0.68rem;
+  color: oklch(var(--primary));
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.cronograma-plan-editor .cronograma-thought-fields {
+  margin: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.cronograma-plan-editor .cronograma-thought-field.is-wide {
+  grid-column: 1 / -1;
+}
+.cronograma-plan-editor .cronograma-thought-field {
+  gap: 0.45rem;
+}
+.cronograma-plan-editor .cronograma-thought-field label {
+  font-size: 0.77rem;
+  font-weight: 650;
+  color: oklch(var(--foreground));
+}
+.cronograma-plan-editor input:not([type='checkbox']),
+.cronograma-plan-editor textarea,
+.cronograma-plan-editor select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 46px;
+  min-height: 46px;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid oklch(var(--input) / 0.8);
+  border-radius: 0.65rem;
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: oklch(var(--foreground));
+  background: oklch(var(--surface-1));
+  box-shadow: 0 1px 2px oklch(var(--foreground) / 0.025);
+  transition:
+    border-color 140ms,
+    box-shadow 140ms;
+}
+.cronograma-plan-editor textarea {
+  height: auto;
+  resize: vertical;
+}
+.cronograma-plan-editor .cronograma-thought-fields textarea {
+  min-height: 120px;
+}
+.cronograma-plan-editor input::placeholder,
+.cronograma-plan-editor textarea::placeholder {
+  color: oklch(var(--muted-foreground) / 0.85);
+}
+.cronograma-plan-editor input:hover,
+.cronograma-plan-editor textarea:hover,
+.cronograma-plan-editor select:hover {
+  border-color: oklch(var(--primary) / 0.45);
+}
+.cronograma-plan-editor input:focus,
+.cronograma-plan-editor textarea:focus,
+.cronograma-plan-editor select:focus {
+  outline: none;
+  border-color: oklch(var(--primary));
+  box-shadow: 0 0 0 3px oklch(var(--primary) / 0.1);
+}
+.cronograma-plan-editor
+  :is(button, select, input[type='checkbox']):focus-visible {
+  outline: 2px solid oklch(var(--focus-ring));
+  outline-offset: 3px;
+}
+.cronograma-plan-editor [aria-invalid='true'] {
+  border-color: oklch(var(--destructive)) !important;
+}
+.cronograma-plan-editor :disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.cronograma-plan-editor .cronograma-plan-relations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+.cronograma-plan-editor .cronograma-thought-field.cronograma-plan-relations {
+  grid-column: auto;
+}
+.cronograma-plan-editor .cronograma-relation-field__heading h4 {
+  font-size: 0.85rem;
+}
+.cronograma-plan-editor .cronograma-relation-trigger {
+  min-height: 64px;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  box-shadow: none;
+}
+.cronograma-plan-editor .cronograma-relation-trigger__copy strong {
+  font-size: 0.85rem;
+}
+.cronograma-plan-editor .cronograma-relation-trigger__icon {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+.cronograma-plan-editor .cronograma-relation-empty {
+  min-height: 52px;
+  padding: 0.6rem 0.75rem;
+}
+.cronograma-plan-editor .cronograma-relation-empty p {
+  font-size: 0.78rem;
+}
+.cronograma-plan-editor .cronograma-plan-rows {
+  gap: 0.65rem;
+}
+.cronograma-plan-editor .cronograma-plan-columns {
+  display: grid;
+  gap: 0.75rem;
+  padding-inline: 0.65rem;
+  font-size: 0.65rem;
+  font-weight: 750;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor .cronograma-plan-row {
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border: 1px solid oklch(var(--border) / 0.55);
+  border-radius: 0.8rem;
+  align-items: start;
+  background: oklch(var(--surface-1));
+  transition: background-color 140ms;
+}
+.cronograma-plan-editor .cronograma-plan-row:hover {
+  background: oklch(var(--surface-2) / 0.5);
+}
+.cronograma-plan-editor .cronograma-plan-row:focus-within {
+  border-color: oklch(var(--primary) / 0.4);
+}
+.cronograma-plan-editor .cronograma-plan-action-row,
+.cronograma-plan-editor .cronograma-plan-action-columns {
+  grid-template-columns: 8rem minmax(0, 1.9fr) minmax(0, 1fr) 44px;
+}
+.cronograma-plan-editor .cronograma-plan-provision-row,
+.cronograma-plan-editor .cronograma-plan-provision-columns {
+  grid-template-columns: 44px minmax(0, 1.9fr) minmax(0, 1fr) 44px;
+}
+.cronograma-plan-editor .cronograma-plan-cell {
+  display: block;
+  min-width: 0;
+}
+.cronograma-plan-editor .cronograma-plan-cell-label {
+  display: none;
+}
+.cronograma-plan-editor .cronograma-plan-row textarea {
+  min-height: 64px;
+}
+@supports (field-sizing: content) {
+  .cronograma-plan-editor .cronograma-plan-row textarea {
+    field-sizing: content;
+  }
+}
+.cronograma-plan-editor .cronograma-plan-row-remove {
+  width: 44px;
+  height: 46px;
+  border-radius: 0.6rem;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor .cronograma-plan-row-remove:hover {
+  color: oklch(var(--destructive));
+  background: oklch(var(--destructive) / 0.08);
+}
+.cronograma-plan-editor .cronograma-plan-row-remove svg {
+  width: 1rem;
+  height: 1rem;
+}
+.cronograma-plan-editor .cronograma-plan-row-check {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 46px;
+  cursor: pointer;
+}
+.cronograma-plan-editor .cronograma-plan-row-check input {
+  width: 20px;
+  height: 20px;
+  accent-color: oklch(var(--success));
+}
+.cronograma-plan-editor .cronograma-plan-row[data-done] {
+  border-left: 3px solid oklch(var(--success));
+  background: oklch(var(--success) / 0.035);
+}
+.cronograma-plan-editor .cronograma-plan-row-add,
+.cronograma-plan-editor .cronograma-plan-add {
+  min-height: 44px;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 0.65rem;
+  background: oklch(var(--surface-1));
+  color: oklch(var(--primary));
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.cronograma-plan-editor .cronograma-plan-row-add:hover,
+.cronograma-plan-editor .cronograma-plan-add:hover {
+  background: oklch(var(--accent) / 0.6);
+  border-color: oklch(var(--primary) / 0.3);
+}
+.cronograma-plan-editor .cronograma-plan-add {
+  width: 100%;
+  margin-top: 1rem;
+  border-style: dashed;
+}
+.cronograma-plan-editor .cronograma-plan-templates {
+  gap: 0.5rem;
+}
+.cronograma-plan-editor .cronograma-plan-templates button {
+  min-height: 36px;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid oklch(var(--border));
+  background: oklch(var(--surface-2));
+  color: oklch(var(--muted-foreground));
+  font-size: 0.74rem;
+  text-align: left;
+}
+.cronograma-plan-editor .cronograma-plan-templates button:hover,
+.cronograma-plan-editor .cronograma-plan-templates button[data-active] {
+  color: oklch(var(--primary));
+  border-color: oklch(var(--primary) / 0.3);
+  background: oklch(var(--accent));
+}
+.cronograma-plan-editor .cronograma-plan-budget-head,
+.cronograma-plan-editor .cronograma-plan-budget-row {
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.15fr) minmax(
+      9rem,
+      0.7fr
+    ) 44px;
+  gap: 0.75rem;
+}
+.cronograma-plan-editor .cronograma-plan-budget-head {
+  padding-inline: 0.65rem;
+  font-size: 0.65rem;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor .cronograma-plan-budget-amount {
+  min-width: 0;
+}
+.cronograma-plan-editor .cronograma-plan-budget-amount > span {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.8rem;
+}
+.cronograma-plan-editor .cronograma-plan-budget-amount input {
+  text-align: right;
+  padding-left: 2.2rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.cronograma-plan-editor .cronograma-plan-budget-foot {
+  margin-top: 0.35rem;
+  align-items: start;
+}
+.cronograma-plan-editor .cronograma-plan-budget-total {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: min(100%, 300px);
+  padding: 1rem 1.25rem;
+  border: 1px solid oklch(var(--primary) / 0.15);
+  border-radius: 0.85rem;
+  background: oklch(var(--accent) / 0.6);
+}
+.cronograma-plan-editor .cronograma-plan-budget-total small {
+  font-size: 0.68rem;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor .cronograma-plan-budget-total strong {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: oklch(var(--primary));
+  font-variant-numeric: tabular-nums;
+}
+.cronograma-plan-editor .cronograma-plan-suggestion-label {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+.cronograma-plan-editor .cronograma-plan-suggestion-label > span {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+.cronograma-plan-editor .cronograma-plan-guest-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  padding-block: 0.5rem 1.25rem;
+  border-bottom: 1px solid oklch(var(--border) / 0.6);
+}
+.cronograma-plan-editor .cronograma-plan-empty {
+  padding: 1rem;
+  border: 1px dashed oklch(var(--border));
+  border-radius: 0.65rem;
+  font-size: 0.8rem;
+  color: oklch(var(--muted-foreground));
+  background: oklch(var(--surface-2) / 0.4);
+}
+.cronograma-plan-editor .cronograma-plan-chips {
+  gap: 0.65rem;
+}
+.cronograma-plan-editor .cronograma-plan-chips li {
+  border-radius: 0.75rem;
+  border: 1px solid oklch(var(--border));
+  background: oklch(var(--accent) / 0.4);
+  color: oklch(var(--foreground));
+  padding: 0.4rem 0.5rem 0.4rem 0.85rem;
+  gap: 0.6rem;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+.cronograma-plan-editor .cronograma-plan-chips li > span {
+  overflow-wrap: anywhere;
+}
+.cronograma-plan-editor .cronograma-plan-chips small {
+  font-size: 0.65rem;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor .cronograma-plan-chips button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 0.4rem;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor .cronograma-plan-draft-notice {
+  padding: 0.85rem;
+  margin: 0 0 1rem;
+  background: oklch(var(--accent));
+  border-color: oklch(var(--primary) / 0.2);
+  color: oklch(var(--foreground));
+}
+.cronograma-plan-editor-footer {
+  border-top: 1px solid oklch(var(--border) / 0.8);
+  box-shadow: 0 -4px 20px -16px oklch(var(--foreground) / 0.2);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.cronograma-plan-editor-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  padding-block: 0.85rem;
+}
+.cronograma-plan-editor-save-state {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.8rem;
+  color: oklch(var(--foreground));
+}
+.cronograma-plan-editor-save-state > svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: oklch(var(--muted-foreground));
+  flex: none;
+}
+.cronograma-plan-editor-save-state small {
+  display: block;
+  font-size: 0.7rem;
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-plan-editor-buttons {
+  display: flex;
+  gap: 0.65rem;
+}
+.cronograma-plan-editor-buttons button {
+  min-height: 46px;
+  border-radius: 0.7rem;
+  padding-inline: 1.2rem;
+  font-size: 0.82rem;
+}
+.cronograma-plan-editor .cronograma-thought-submit-error {
+  width: 100%;
+  margin: 0;
+  font-size: 0.8rem;
+  background: oklch(var(--destructive) / 0.06);
+  color: oklch(var(--destructive));
+  border-color: oklch(var(--destructive) / 0.25);
+}
+.cronograma-plan-leave-dialog {
+  border-radius: 1rem;
+  width: calc(100% - 2rem);
+  max-width: 38rem;
+}
+.cronograma-plan-leave-dialog .cronograma-plan-discard {
+  background: transparent;
+  color: oklch(var(--destructive));
+}
+@keyframes plan-editor-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 960px) {
+  .cronograma-plan-editor-nav button {
+    padding-inline: 0.55rem;
+  }
+  .cronograma-plan-editor-nav button > span {
+    display: none;
+  }
+  .cronograma-plan-editor .cronograma-plan-action-row,
+  .cronograma-plan-editor .cronograma-plan-action-columns {
+    grid-template-columns: 7.5rem minmax(0, 1.6fr) minmax(0, 1fr) 44px;
+  }
+  .cronograma-plan-editor .cronograma-plan-relations-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .cronograma-plan-editor-header-inner {
+    padding-block: 0.8rem;
+    gap: 0.65rem;
+    align-items: flex-start;
+  }
+  .cronograma-plan-editor .cronograma-plan-builder-icon,
+  .cronograma-plan-editor-state {
+    display: none;
+  }
+  .cronograma-plan-editor-heading h2 {
+    font-size: 1.1rem;
+  }
+  .cronograma-plan-editor-heading p {
+    font-size: 0.72rem;
+  }
+  .cronograma-plan-editor-eyebrow {
+    font-size: 0.58rem;
+  }
+  .cronograma-plan-editor-metrics {
+    gap: 0.4rem 0.9rem;
+    padding-bottom: 0.65rem;
+  }
+  .cronograma-plan-editor-metrics > span {
+    font-size: 0.68rem;
+  }
+  .cronograma-plan-editor-nav > div > button {
+    display: none;
+  }
+  .cronograma-plan-editor-mobile-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+    font-size: 0.75rem;
+    color: oklch(var(--muted-foreground));
+  }
+  .cronograma-plan-editor-mobile-nav > span {
+    flex: none;
+  }
+  .cronograma-plan-editor .cronograma-plan-editor-mobile-nav select {
+    height: 42px;
+    min-height: 42px;
+    padding-block: 0.4rem;
+  }
+  .cronograma-plan-editor-content {
+    padding-block: 1rem 2rem;
+  }
+  .cronograma-plan-editor .cronograma-plan-card-toggle {
+    padding: 0.85rem;
+  }
+  .cronograma-plan-editor .cronograma-plan-card-body {
+    padding-inline: 0.85rem;
+  }
+  .cronograma-plan-editor .cronograma-plan-section {
+    padding-block: 1.25rem;
+  }
+  .cronograma-plan-editor .cronograma-thought-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+  }
+  .cronograma-plan-editor .cronograma-plan-section-head h3 {
+    font-size: 0.9rem;
+  }
+  .cronograma-plan-editor .cronograma-plan-section-head small {
+    font-size: 0.72rem;
+  }
+  .cronograma-plan-editor .cronograma-plan-columns,
+  .cronograma-plan-editor .cronograma-plan-budget-head {
+    display: none;
+  }
+  .cronograma-plan-editor .cronograma-plan-action-row,
+  .cronograma-plan-editor .cronograma-plan-provision-row,
+  .cronograma-plan-editor .cronograma-plan-budget-row {
+    grid-template-columns: minmax(0, 1fr) 44px;
+    gap: 0.6rem;
+    padding: 0.75rem;
+  }
+  .cronograma-plan-editor .cronograma-plan-row > :not(button) {
+    grid-column: 1;
+  }
+  .cronograma-plan-editor
+    .cronograma-plan-action-row
+    > .cronograma-plan-cell:not(:first-child),
+  .cronograma-plan-editor
+    .cronograma-plan-provision-row
+    > .cronograma-plan-cell {
+    grid-column: 1 / -1;
+  }
+  .cronograma-plan-editor .cronograma-plan-row > button {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .cronograma-plan-editor .cronograma-plan-row > .cronograma-plan-row-time {
+    grid-column: 1;
+    width: min(100%, 10rem);
+  }
+  .cronograma-plan-editor
+    .cronograma-plan-provision-row
+    > .cronograma-plan-row-check {
+    justify-self: start;
+  }
+  .cronograma-plan-editor .cronograma-plan-cell-label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: oklch(var(--muted-foreground));
+    font-size: 0.72rem;
+    font-weight: 650;
+  }
+  .cronograma-plan-editor .cronograma-plan-row textarea {
+    min-height: 66px;
+  }
+  .cronograma-plan-editor .cronograma-plan-budget-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cronograma-plan-editor input:not([type='checkbox']),
+  .cronograma-plan-editor textarea,
+  .cronograma-plan-editor select {
+    font-size: 1rem;
+  }
+  .cronograma-plan-editor-buttons {
+    width: 100%;
+  }
+  .cronograma-plan-editor-buttons button {
+    padding-inline: 0.8rem;
+  }
+  .cronograma-plan-editor-buttons button[type='submit'] {
+    flex: 1;
+  }
+  .cronograma-plan-editor-save-state {
+    font-size: 0.72rem;
+  }
+  .cronograma-plan-editor-save-state small {
+    display: inline;
+    margin-left: 0.4rem;
+    font-size: 0.65rem;
+  }
+}
+@media (max-width: 420px) {
+  .cronograma-plan-editor .cronograma-thought-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cronograma-plan-editor-save-state small {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cronograma-plan-editor,
+  .cronograma-plan-editor *,
+  .cronograma-plan-editor *::before,
+  .cronograma-plan-editor *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
