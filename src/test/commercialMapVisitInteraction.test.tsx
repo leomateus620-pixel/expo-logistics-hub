@@ -120,14 +120,14 @@ describe('Visit HUD official values and independent touch controls', () => {
     pricingQuery.data = null; pricingQuery.isError = false; pricingQuery.isLoading = false;
   });
   afterEach(() => { cleanup(); visitInput.reset(); useVisitStore.setState({ enabled: false, activePOI: null, activeInterior: null }); vi.useRealTimers(); });
-  function showLot(entityOverrides: Partial<MapEntity> = {}) {
+  function showLot(entityOverrides: Partial<MapEntity> = {}, lotOverrides: Partial<CommercialLot> = {}) {
     const sourceEntity = { ...entity('Q-A-18', 0, 3, 'SELLABLE_LOT'), ...entityOverrides };
-    const lot = { id: 'lot-18', entityId: sourceEntity.id, lotNumber: '18', block: 'A', officialAreaSqm: 39, askingPrice: 777, status: 'AVAILABLE' } as CommercialLot;
+    const lot = { id: 'lot-18', entityId: sourceEntity.id, lotNumber: '18', block: 'A', officialAreaSqm: 40, askingPrice: 777, status: 'AVAILABLE', ...lotOverrides } as CommercialLot;
     useVisitStore.setState({ activePOI: buildVisitPOIs([sourceEntity], [lot], 1)[0] });
     return render(<VisitHUD />);
   }
   it('displays the same official area and stage totals without recalculating or using asking price', () => {
-    pricingQuery.data = { resolutionStatus: 'OK', officialAreaSqm: 40, segundaTotal: 12345, segundaPricePerSqm: 308.625,
+    pricingQuery.data = { lotId: 'lot-18', resolutionStatus: 'OK', officialAreaSqm: 40, segundaTotal: 12345, segundaPricePerSqm: 308.625,
       renovacaoTotal: 10000, renovacaoPricePerSqm: 250 } as LotPricing2028;
     showLot();
     expect(screen.getByRole('heading', { name: 'Lote 18' })).toBeInTheDocument();
@@ -140,11 +140,19 @@ describe('Visit HUD official values and independent touch controls', () => {
     expect(screen.getByText(/10\.000,00/)).toBeInTheDocument();
   });
   it('never displays a total from a pending official pricing resolution', () => {
-    pricingQuery.data = { resolutionStatus: 'SEM_AREA', officialAreaSqm: null, segundaTotal: 98765 } as LotPricing2028;
-    showLot();
+    pricingQuery.data = { lotId: 'lot-18', resolutionStatus: 'SEM_AREA', officialAreaSqm: null, segundaTotal: 98765 } as LotPricing2028;
+    showLot({}, { officialAreaSqm: null });
     expect(screen.getByText('Valor pendente de conferência')).toBeInTheDocument();
     expect(screen.queryByText(/98\.765/)).not.toBeInTheDocument();
     expect(screen.queryByText(/777/)).not.toBeInTheDocument();
+  });
+  it('retains the canonical lot area while an older pricing response is revalidated', () => {
+    pricingQuery.data = {lotId:'lot-18',resolutionStatus:'OK',officialAreaSqm:39,segundaTotal:98765} as LotPricing2028;
+    showLot();
+    expect(screen.getByText('40,00 m²')).toBeInTheDocument();
+    expect(screen.getByText('Atualizando valores oficiais…')).toBeInTheDocument();
+    expect(screen.queryByText(/98\.765/)).not.toBeInTheDocument();
+    expect(screen.queryByText('39,00 m²')).not.toBeInTheDocument();
   });
   it('shows the authorized canonical segment only in expanded details, ahead of divergent legacy metadata', () => {
     showLot({ segmentId: 'industria-comercio-servicos', segmentSource: 'database',

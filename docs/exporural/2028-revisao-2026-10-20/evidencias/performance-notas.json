@@ -1,0 +1,23 @@
+{
+  "before": {
+    "navigation": [
+      {
+        "duration": 1932.8999999985099,
+        "domContentLoaded": 1931.7000000029802,
+        "load": 1932.8999999985099
+      }
+    ],
+    "requests_recorded": 55
+  },
+  "after": {
+    "navigation": [
+      {
+        "duration": 632.5,
+        "domContentLoaded": 442.8999999985099,
+        "load": 632.5
+      }
+    ],
+    "requests_recorded": 41
+  },
+  "limitation": "Published UI measured before/after DB commit; warm caches and navigation history differ. No controlled final-frontend FPS or mobile performance benchmark was completed; no claim of performance improvement."
+}

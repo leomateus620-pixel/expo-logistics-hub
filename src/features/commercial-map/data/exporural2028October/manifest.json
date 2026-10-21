@@ -1,0 +1,751 @@
+[
+  {
+    "code": "Q-R-01",
+    "block": "R",
+    "lot_number": 1,
+    "official_area_sqm": "896.85",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-02",
+    "block": "R",
+    "lot_number": 2,
+    "official_area_sqm": "896.85",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-03",
+    "block": "R",
+    "lot_number": 3,
+    "official_area_sqm": "650.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-04",
+    "block": "R",
+    "lot_number": 4,
+    "official_area_sqm": "644.75",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-05",
+    "block": "R",
+    "lot_number": 5,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-06",
+    "block": "R",
+    "lot_number": 6,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-07",
+    "block": "R",
+    "lot_number": 7,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-08",
+    "block": "R",
+    "lot_number": 8,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-09",
+    "block": "R",
+    "lot_number": 9,
+    "official_area_sqm": "453.42",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-10",
+    "block": "R",
+    "lot_number": 10,
+    "official_area_sqm": "453.42",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-11",
+    "block": "R",
+    "lot_number": 11,
+    "official_area_sqm": "452.42",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-12",
+    "block": "R",
+    "lot_number": 12,
+    "official_area_sqm": "452.42",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-13",
+    "block": "R",
+    "lot_number": 13,
+    "official_area_sqm": "575.85",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-14",
+    "block": "R",
+    "lot_number": 14,
+    "official_area_sqm": "896.85",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-15",
+    "block": "R",
+    "lot_number": 15,
+    "official_area_sqm": "472.10",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-16",
+    "block": "R",
+    "lot_number": 16,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-17",
+    "block": "R",
+    "lot_number": 17,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-18",
+    "block": "R",
+    "lot_number": 18,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-19",
+    "block": "R",
+    "lot_number": 19,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-20",
+    "block": "R",
+    "lot_number": 20,
+    "official_area_sqm": "500.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-21",
+    "block": "R",
+    "lot_number": 21,
+    "official_area_sqm": "500.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-22",
+    "block": "R",
+    "lot_number": 22,
+    "official_area_sqm": "500.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-23",
+    "block": "R",
+    "lot_number": 23,
+    "official_area_sqm": "504.28",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-24",
+    "block": "R",
+    "lot_number": 24,
+    "official_area_sqm": "504.28",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-25",
+    "block": "R",
+    "lot_number": 25,
+    "official_area_sqm": "504.28",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-26",
+    "block": "R",
+    "lot_number": 26,
+    "official_area_sqm": "495.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-27",
+    "block": "R",
+    "lot_number": 27,
+    "official_area_sqm": "495.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-28",
+    "block": "R",
+    "lot_number": 28,
+    "official_area_sqm": "495.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-29",
+    "block": "R",
+    "lot_number": 29,
+    "official_area_sqm": "452.42",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-30",
+    "block": "R",
+    "lot_number": 30,
+    "official_area_sqm": "452.42",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-31",
+    "block": "R",
+    "lot_number": 31,
+    "official_area_sqm": "452.42",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-32",
+    "block": "R",
+    "lot_number": 32,
+    "official_area_sqm": "447.55",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-33",
+    "block": "R",
+    "lot_number": 33,
+    "official_area_sqm": "447.55",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-34",
+    "block": "R",
+    "lot_number": 34,
+    "official_area_sqm": "447.55",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-35",
+    "block": "R",
+    "lot_number": 35,
+    "official_area_sqm": "447.55",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-36",
+    "block": "R",
+    "lot_number": 36,
+    "official_area_sqm": "447.55",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-37",
+    "block": "R",
+    "lot_number": 37,
+    "official_area_sqm": "447.55",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-38",
+    "block": "R",
+    "lot_number": 38,
+    "official_area_sqm": "447.55",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-39",
+    "block": "R",
+    "lot_number": 39,
+    "official_area_sqm": "447.55",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-40",
+    "block": "R",
+    "lot_number": 40,
+    "official_area_sqm": "268.01",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-41",
+    "block": "R",
+    "lot_number": 41,
+    "official_area_sqm": "268.01",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-42",
+    "block": "R",
+    "lot_number": 42,
+    "official_area_sqm": "268.03",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-43",
+    "block": "R",
+    "lot_number": 43,
+    "official_area_sqm": "268.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-44",
+    "block": "R",
+    "lot_number": 44,
+    "official_area_sqm": "268.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-45",
+    "block": "R",
+    "lot_number": 45,
+    "official_area_sqm": "268.01",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-46",
+    "block": "R",
+    "lot_number": 46,
+    "official_area_sqm": "267.85",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-47",
+    "block": "R",
+    "lot_number": 47,
+    "official_area_sqm": "333.34",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-48",
+    "block": "R",
+    "lot_number": 48,
+    "official_area_sqm": "268.07",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-49",
+    "block": "R",
+    "lot_number": 49,
+    "official_area_sqm": "268.02",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-50",
+    "block": "R",
+    "lot_number": 50,
+    "official_area_sqm": "268.01",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-51",
+    "block": "R",
+    "lot_number": 51,
+    "official_area_sqm": "268.02",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-52",
+    "block": "R",
+    "lot_number": 52,
+    "official_area_sqm": "268.03",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-53",
+    "block": "R",
+    "lot_number": 53,
+    "official_area_sqm": "268.04",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-54",
+    "block": "R",
+    "lot_number": 54,
+    "official_area_sqm": "268.04",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-55",
+    "block": "R",
+    "lot_number": 55,
+    "official_area_sqm": "249.64",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-56",
+    "block": "R",
+    "lot_number": 56,
+    "official_area_sqm": "249.12",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-57",
+    "block": "R",
+    "lot_number": 57,
+    "official_area_sqm": "250.05",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-58",
+    "block": "R",
+    "lot_number": 58,
+    "official_area_sqm": "251.01",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-59",
+    "block": "R",
+    "lot_number": 59,
+    "official_area_sqm": "250.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-60",
+    "block": "R",
+    "lot_number": 60,
+    "official_area_sqm": "249.96",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-61",
+    "block": "R",
+    "lot_number": 61,
+    "official_area_sqm": "356.69",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-62",
+    "block": "R",
+    "lot_number": 62,
+    "official_area_sqm": "249.60",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-63",
+    "block": "R",
+    "lot_number": 63,
+    "official_area_sqm": "249.03",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-64",
+    "block": "R",
+    "lot_number": 64,
+    "official_area_sqm": "248.02",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-65",
+    "block": "R",
+    "lot_number": 65,
+    "official_area_sqm": "249.12",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-66",
+    "block": "R",
+    "lot_number": 66,
+    "official_area_sqm": "250.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-67",
+    "block": "R",
+    "lot_number": 67,
+    "official_area_sqm": "250.03",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-68",
+    "block": "R",
+    "lot_number": 68,
+    "official_area_sqm": "242.21",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-69",
+    "block": "R",
+    "lot_number": 69,
+    "official_area_sqm": "471.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-70",
+    "block": "R",
+    "lot_number": 70,
+    "official_area_sqm": "471.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-71",
+    "block": "R",
+    "lot_number": 71,
+    "official_area_sqm": "471.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-R-72",
+    "block": "R",
+    "lot_number": 72,
+    "official_area_sqm": "471.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-01",
+    "block": "S",
+    "lot_number": 1,
+    "official_area_sqm": "500.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-02",
+    "block": "S",
+    "lot_number": 2,
+    "official_area_sqm": "500.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-03",
+    "block": "S",
+    "lot_number": 3,
+    "official_area_sqm": "500.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-04",
+    "block": "S",
+    "lot_number": 4,
+    "official_area_sqm": "692.09",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-05",
+    "block": "S",
+    "lot_number": 5,
+    "official_area_sqm": "450.11",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-06",
+    "block": "S",
+    "lot_number": 6,
+    "official_area_sqm": "450.11",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-07",
+    "block": "S",
+    "lot_number": 7,
+    "official_area_sqm": "450.11",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-08",
+    "block": "S",
+    "lot_number": 8,
+    "official_area_sqm": "450.11",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-09",
+    "block": "S",
+    "lot_number": 9,
+    "official_area_sqm": "450.11",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-10",
+    "block": "S",
+    "lot_number": 10,
+    "official_area_sqm": "450.11",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-11",
+    "block": "S",
+    "lot_number": 11,
+    "official_area_sqm": "449.91",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-12",
+    "block": "S",
+    "lot_number": 12,
+    "official_area_sqm": "376.85",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-13",
+    "block": "S",
+    "lot_number": 13,
+    "official_area_sqm": "376.88",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-14",
+    "block": "S",
+    "lot_number": 14,
+    "official_area_sqm": "506.30",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-15",
+    "block": "S",
+    "lot_number": 15,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-16",
+    "block": "S",
+    "lot_number": 16,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-17",
+    "block": "S",
+    "lot_number": 17,
+    "official_area_sqm": "348.98",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-18",
+    "block": "S",
+    "lot_number": 18,
+    "official_area_sqm": "411.83",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-19",
+    "block": "S",
+    "lot_number": 19,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-20",
+    "block": "S",
+    "lot_number": 20,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-21",
+    "block": "S",
+    "lot_number": 21,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-22",
+    "block": "S",
+    "lot_number": 22,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-23",
+    "block": "S",
+    "lot_number": 23,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-24",
+    "block": "S",
+    "lot_number": 24,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-25",
+    "block": "S",
+    "lot_number": 25,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-26",
+    "block": "S",
+    "lot_number": 26,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-27",
+    "block": "S",
+    "lot_number": 27,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-28",
+    "block": "S",
+    "lot_number": 28,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-29",
+    "block": "S",
+    "lot_number": 29,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-30",
+    "block": "S",
+    "lot_number": 30,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-31",
+    "block": "S",
+    "lot_number": 31,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-32",
+    "block": "S",
+    "lot_number": 32,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-33",
+    "block": "S",
+    "lot_number": 33,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-34",
+    "block": "S",
+    "lot_number": 34,
+    "official_area_sqm": "450.00",
+    "source_page": 1
+  },
+  {
+    "code": "Q-S-35",
+    "block": "S",
+    "lot_number": 35,
+    "official_area_sqm": "649.97",
+    "source_page": 1
+  }
+]

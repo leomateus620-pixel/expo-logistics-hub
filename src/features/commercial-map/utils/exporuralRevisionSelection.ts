@@ -6,7 +6,7 @@ export function exporuralSelectionSnapshot(data: Pick<CommercialMapData, 'entiti
   return new Map(data.lots.filter(l => l.block === 'R' || l.block === 'S').map(l => {
     const e = byId.get(l.entityId);
     return [l.id, { entityId: l.entityId, signature: JSON.stringify([
-      l.entityId, l.publicIdentifier, l.officialAreaSqm,
+      l.entityId, l.publicIdentifier, l.officialAreaSqm, l.archivedAt, l.status, l.officialPricing2028,
       e?.metadata.geometryRevision, e?.geometry.geometryVersion, e?.geometry.coordinates,
     ]) }];
   }));

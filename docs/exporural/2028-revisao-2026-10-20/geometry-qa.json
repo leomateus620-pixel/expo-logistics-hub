@@ -1,0 +1,228 @@
+{
+  "numbered_lots": 107,
+  "R": 72,
+  "S": 35,
+  "affected_lots": 40,
+  "target_overlaps": 0,
+  "road_lot_overlaps": 0,
+  "source_vector_faces": 107,
+  "unitsPerMeter": 0.14679168487402955,
+  "areaResiduals": [
+    {
+      "code": "Q-R-40",
+      "official": "268.01",
+      "calculated": 267.985772,
+      "delta": -0.024228
+    },
+    {
+      "code": "Q-R-41",
+      "official": "268.01",
+      "calculated": 267.97413,
+      "delta": -0.03587
+    },
+    {
+      "code": "Q-R-42",
+      "official": "268.03",
+      "calculated": 267.991629,
+      "delta": -0.038371
+    },
+    {
+      "code": "Q-R-43",
+      "official": "268.00",
+      "calculated": 267.991626,
+      "delta": -0.008374
+    },
+    {
+      "code": "Q-R-44",
+      "official": "268.00",
+      "calculated": 268.009023,
+      "delta": 0.009023
+    },
+    {
+      "code": "Q-R-45",
+      "official": "268.01",
+      "calculated": 268.02576,
+      "delta": 0.01576
+    },
+    {
+      "code": "Q-R-46",
+      "official": "267.85",
+      "calculated": 267.832638,
+      "delta": -0.017362
+    },
+    {
+      "code": "Q-R-47",
+      "official": "333.34",
+      "calculated": 333.265631,
+      "delta": -0.074369
+    },
+    {
+      "code": "Q-R-48",
+      "official": "268.07",
+      "calculated": 268.074308,
+      "delta": 0.004308
+    },
+    {
+      "code": "Q-R-49",
+      "official": "268.02",
+      "calculated": 268.045474,
+      "delta": 0.025474
+    },
+    {
+      "code": "Q-R-50",
+      "official": "268.01",
+      "calculated": 267.991412,
+      "delta": -0.018588
+    },
+    {
+      "code": "Q-R-51",
+      "official": "268.02",
+      "calculated": 267.991412,
+      "delta": -0.028588
+    },
+    {
+      "code": "Q-R-52",
+      "official": "268.03",
+      "calculated": 268.027573,
+      "delta": -0.002427
+    },
+    {
+      "code": "Q-R-53",
+      "official": "268.04",
+      "calculated": 268.079768,
+      "delta": 0.039768
+    },
+    {
+      "code": "Q-R-54",
+      "official": "268.04",
+      "calculated": 268.080339,
+      "delta": 0.040339
+    },
+    {
+      "code": "Q-R-55",
+      "official": "249.64",
+      "calculated": 249.543229,
+      "delta": -0.096771
+    },
+    {
+      "code": "Q-R-56",
+      "official": "249.12",
+      "calculated": 249.083009,
+      "delta": -0.036991
+    },
+    {
+      "code": "Q-R-57",
+      "official": "250.05",
+      "calculated": 250.018257,
+      "delta": -0.031743
+    },
+    {
+      "code": "Q-R-58",
+      "official": "251.01",
+      "calculated": 250.956915,
+      "delta": -0.053085
+    },
+    {
+      "code": "Q-R-59",
+      "official": "250.00",
+      "calculated": 250.019085,
+      "delta": 0.019085
+    },
+    {
+      "code": "Q-R-60",
+      "official": "249.96",
+      "calculated": 250.016982,
+      "delta": 0.056982
+    },
+    {
+      "code": "Q-R-61",
+      "official": "356.69",
+      "calculated": 356.717455,
+      "delta": 0.027455
+    },
+    {
+      "code": "Q-R-62",
+      "official": "249.60",
+      "calculated": 249.58927,
+      "delta": -0.01073
+    },
+    {
+      "code": "Q-R-63",
+      "official": "249.03",
+      "calculated": 249.042896,
+      "delta": 0.012896
+    },
+    {
+      "code": "Q-R-64",
+      "official": "248.02",
+      "calculated": 248.035307,
+      "delta": 0.015307
+    },
+    {
+      "code": "Q-R-65",
+      "official": "249.12",
+      "calculated": 249.036515,
+      "delta": -0.083485
+    },
+    {
+      "code": "Q-R-66",
+      "official": "250.00",
+      "calculated": 250.000029,
+      "delta": 2.9e-05
+    },
+    {
+      "code": "Q-R-67",
+      "official": "250.03",
+      "calculated": 250.013047,
+      "delta": -0.016953
+    },
+    {
+      "code": "Q-R-68",
+      "official": "242.21",
+      "calculated": 242.182449,
+      "delta": -0.027551
+    },
+    {
+      "code": "Q-S-11",
+      "official": "449.91",
+      "calculated": 449.801865,
+      "delta": -0.108135
+    },
+    {
+      "code": "Q-S-12",
+      "official": "376.85",
+      "calculated": 376.842922,
+      "delta": -0.007078
+    },
+    {
+      "code": "Q-S-13",
+      "official": "376.88",
+      "calculated": 376.877208,
+      "delta": -0.002792
+    },
+    {
+      "code": "Q-S-14",
+      "official": "506.30",
+      "calculated": 506.340308,
+      "delta": 0.040308
+    },
+    {
+      "code": "Q-S-15",
+      "official": "450.00",
+      "calculated": 449.966017,
+      "delta": -0.033983
+    },
+    {
+      "code": "Q-S-16",
+      "official": "450.00",
+      "calculated": 450.034386,
+      "delta": 0.034386
+    },
+    {
+      "code": "Q-S-17",
+      "official": "348.98",
+      "calculated": 348.888181,
+      "delta": -0.091819
+    }
+  ]
+}

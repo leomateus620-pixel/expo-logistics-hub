@@ -1,0 +1,11 @@
+{
+  "rows": [
+    {
+      "rollback_exporural_chain": {
+        "businessPreserved": true,
+        "changed": true,
+        "snapshotId": "dbeaf99c-ab1c-4f56-ae11-2dac59d9b535"
+      }
+    }
+  ]
+}

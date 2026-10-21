@@ -1380,7 +1380,10 @@ function SegmentLotAccents({
 }) {
   const invalidate = useThree((state) => state.invalidate);
   const accents = useMemo(() => {
-    const accentedEntries = entries.filter((entry) => !isSoldLot(entry.lot.status) && segmentByEntity.has(entry.entity.id));
+    // ExpoRural already communicates status through the entire turf surface.
+    // The old vertex-average rectangles spill over the rounded R/64–65 corners.
+    const accentedEntries = entries.filter((entry) => !isSoldLot(entry.lot.status)
+      && !isExporuralLandscapeLot(entry.entity) && segmentByEntity.has(entry.entity.id));
     if (accentedEntries.length === 0) return null;
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshStandardMaterial({
@@ -5298,6 +5301,7 @@ const Scene = memo(function Scene({
           )}
           <ParkAccessInfrastructure
             reducedGraphics={reducedGraphics}
+            cadastralRoads={circulationEntities}
             scope={parkAccessScope}
             surfacesVisible={parkAccessPresentation.surfaces.visible}
             surfaceOpacity={parkAccessPresentation.surfaces.opacity}

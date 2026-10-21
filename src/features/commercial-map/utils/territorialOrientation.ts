@@ -3,12 +3,14 @@ import { COMMERCIAL_MAP_SEGMENTS, buildCommercialMapSegmentIndex, type Commercia
 import { normalizeMapEntityMetadata } from './mapMetadata';
 import { lotPointClearance, safeLotAnchor } from './soldLotPresentation';
 import { distanceToSegment, entitySurfaceElevation, pointInPolygon } from './spatialSurface';
+import { isExporuralLongitudinalPassage } from './exporuralPassage';
 
 export type OrientationItem = {
   id: string; name: string; kind: 'segment' | 'block' | 'road';
   segmentId?: CommercialMapSegmentId; anchor: Coordinate; elevation: number;
   edge: [Coordinate, Coordinate]; outline?: readonly Coordinate[][];
   clearance: number;
+  subdued?: boolean;
 };
 
 export const TERRITORY_SYMBOLS: Record<CommercialMapSegmentId, { glyph: string; short: string; pattern: string }> = {
@@ -64,8 +66,12 @@ export function prepareTerritorialOrientation(entities: readonly MapEntity[], lo
   const roadNames = new Set<string>();
   for (const entity of roadEntities) {
     if (entity.isArchived || !['ROAD', 'PEDESTRIAN_PATH'].includes(entity.classification)
+      || entity.metadata.suppressTerritorialLabel === true
+      || entity.publicIdentifier === 'RUA-UBIRETAMA-LATERAL-R55'
+      || (entity.metadata.nameConfirmed === false && !isExporuralLongitudinalPassage(entity))
       || !entity.geometry.coordinates.every(finiteRing)) continue;
-    const name = normalizeMapEntityMetadata(entity).street?.trim();
+    const passage = isExporuralLongitudinalPassage(entity);
+    const name = passage ? 'Passagem' : normalizeMapEntityMetadata(entity).street?.trim();
     if (!name) continue;
     const rings = entity.geometry.coordinates;
     const saved = entity.metadata.labelAnchor;
@@ -75,7 +81,7 @@ export function prepareTerritorialOrientation(entities: readonly MapEntity[], lo
     const anchor = preferred && lotPointClearance(preferred, rings) > 0 ? preferred : safe?.point;
     if (!anchor) continue;
     const normalizedName = name.toLocaleLowerCase('pt-BR');
-    const roadItem: OrientationItem = { id: `road:${entity.id}`, name, kind: 'road', anchor,
+    const roadItem: OrientationItem = { id: `road:${entity.id}`, name, kind: 'road', anchor, subdued: passage,
       elevation: entity.geometry.elevation + .08, edge: largestEdge(rings[0]), outline: rings,
       clearance: lotPointClearance(anchor, rings) };
     const existingIndex = items.findIndex(item => item.kind === 'road' && item.name.toLocaleLowerCase('pt-BR') === normalizedName);
@@ -208,7 +214,7 @@ export function layoutTerritorialOrientation(items: readonly OrientationItem[], 
       if (lotPointClearance(point, rings, obstacles.map(outline => outline[0])) > .02) anchors.push(point);
     }
     const ratio = aspectRatios.get(item.id) ?? item.name.length * .48;
-    const preferredHeight = item.kind === 'road' ? .82 : item.kind === 'block' ? 2.05 : 2.35;
+    const preferredHeight = item.subdued ? .14 : item.kind === 'road' ? .82 : item.kind === 'block' ? 2.05 : 2.35;
     let placement: { anchor: Coordinate; angle: number; height: number; footprint: Coordinate[] } | null = null;
     for (const anchor of anchors) {
       const angle = item.kind === 'road' ? localRoadLabelAngle(anchor, rings) : stableAxis(...item.edge);
@@ -223,7 +229,7 @@ export function layoutTerritorialOrientation(items: readonly OrientationItem[], 
       }
       if (low >= preferredHeight * .998) break;
     }
-    if (!placement || placement.height < (item.kind === 'road' ? .18 : .35)) continue;
+    if (!placement || placement.height < (item.subdued ? .10 : item.kind === 'road' ? .18 : .35)) continue;
     const surfaceEntities = nearby.filter(entity => ['SELLABLE_LOT', 'INTERNAL_STAND', 'QUADRA'].includes(entity.classification));
     const elevation = item.kind === 'road' ? item.elevation : Math.max(item.elevation,
       // Canonical cart/selection/hover lifts are <= .09. Keep the immutable

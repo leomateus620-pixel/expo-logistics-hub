@@ -1,3 +1,4 @@
+import { assertCommercialSnapshotRevision } from '../utils/commercialSnapshotRevision';
 import type { LotBuyerSummaryRow } from '../utils/lotBuyerSummary';
 import { buyerDisplayName } from '../utils/buyerDisplayName';
 import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
@@ -88,7 +89,7 @@ const COMMERCIAL_LOT_BASE_SELECT = `*,
   lot_negotiations(status,company_name),
   lot_sales(id,lot_id,status,negotiated_value,buyer_name,buyer_trade_name,sale_date,salesperson_name,contract_number),
   lot_contracts!lot_contracts_lot_id_fkey(is_active,contract_number)`;
-const PRICING_2028_COLUMNS = 'lot_id,entity_id,renovacao_total,segunda_total,renovacao_is_manual,segunda_is_manual,resolution_status';
+const PRICING_2028_COLUMNS = 'lot_id,entity_id,public_identifier,official_area_sqm,renovacao_total,segunda_total,renovacao_is_manual,segunda_is_manual,resolution_status';
 export const COMMERCIAL_LOT_SELECT = `*,
   lot_prices(is_active,pricing_mode,base_price,price_per_sqm,asking_price,minimum_price),
   lot_reservations(status,company_name,expires_at,responsible_name),
@@ -675,6 +676,7 @@ export async function fetchCommercialMap(
     return fetchCommissionCommercialMap(project, scope, context);
   }
 
+  const revisionBefore = await boundedRevision(project.id, context);
   const calibrationPromise = measureCommercialMapOperation(context.recordStage, 'calibration', async () => {
     const result = await mapRequest(db.from('map_calibrations').select('*').eq('project_id', project.id).order('version', { ascending: false }).limit(1).maybeSingle(), context);
     const mapped = result.data ? mapCalibration(result.data) : null;
@@ -700,9 +702,7 @@ export async function fetchCommercialMap(
     fetchAllRows(() => db.from('commercial_lot_pricing_2028').select(PRICING_2028_COLUMNS).eq('project_id', project.id), 'pricing-2028', context, 'lot_id'),
     mapRequest(db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1), context),
     mapRequest(db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true), context),
-    // Lida no início da carga: se algo mudar durante a leitura, a próxima verificação
-    // vê uma assinatura diferente e recarrega uma vez (nunca adota revisão mais nova que os dados).
-    boundedRevision(project.id, context),
+    Promise.resolve(revisionBefore),
   ]);
 
   const segmentLookupError = segmentsResult.error
@@ -720,6 +720,8 @@ export async function fetchCommercialMap(
   ]
     .find((result) => result.error)?.error;
   if (firstError || segmentLookupError) throw firstError ?? segmentLookupError;
+  const revisionAfter = await boundedRevision(project.id, context);
+  assertCommercialSnapshotRevision(revisionResult.data, revisionAfter.data);
   const transformationStartedAt = performance.now();
   throwIfMapRequestAborted(context.signal);
   context.recordStage('inventory-transformation:start');
@@ -743,7 +745,15 @@ export async function fetchCommercialMap(
   const pricingByEntity = new Map<string, any>(((pricingResult.data ?? []) as any[]).map((row) => [row.entity_id, row]));
   const lotRows = ((lotsResult.data ?? []) as LotRow[]).map((row) => ({
     ...row,
-    financial_entity: { id: row.entity_id, pricing: pricingByEntity.has(row.entity_id) ? [pricingByEntity.get(row.entity_id)] : [] },
+    financial_entity: { id: row.entity_id, pricing: (() => {
+      const pricing = pricingByEntity.get(row.entity_id);
+      if (pricing && (pricing.lot_id !== row.id
+        || (pricing.public_identifier !== undefined && pricing.public_identifier !== row.public_identifier)
+        || (pricing.official_area_sqm !== undefined && Number(pricing.official_area_sqm) !== Number(row.official_area_sqm)))) {
+        throw Object.assign(new Error('Cadastro e preço pertencem a revisões diferentes.'), { status: 503 });
+      }
+      return pricing ? [pricing] : [];
+    })() },
   }) as LotRow);
 
   if (isClearlyLegacy2024Seed(projectRow as ProjectRow, entityRows, (lotPresenceResult.data ?? []).length > 0)) {

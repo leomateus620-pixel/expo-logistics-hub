@@ -16,6 +16,7 @@ import { splitLateralResidentialSidewalk } from './lateralResidentialStreetInteg
 import { ACCESS_JUNCTION } from '../data/accessJunctionReconstruction';
 import { accessCorridor } from './accessJunctionGeometry';
 import { PAVILION_COURTYARD } from '../data/pavilionCourtyard';
+import type { MapEntity } from '../types';
 
 type SpatialPlan = typeof PARK_ACCESS_SPATIAL_PLAN;
 
@@ -174,6 +175,22 @@ export function adaptParkAccessSpatialPlan(
 }
 
 export const PARK_ACCESS_INFRASTRUCTURE_INPUT = adaptParkAccessSpatialPlan();
+
+/** The registered Emanuel continuation and its persisted connector own this
+ * pavement. The old access ribbon at y=.048 hid it with highway-black asphalt.
+ * Preserve the remaining gate access surfaces and their material/geometry. */
+export function withExporuralCadastralRoadOwnership(input: ParkAccessInfrastructureInput, entities: readonly MapEntity[]) {
+  const hasContinuation = entities.some(entity => !entity.isArchived
+    && entity.publicIdentifier === 'RUA-EMANUEL-BRACHMANN'
+    && entity.metadata.exporuralSouthRoadPresentation === true);
+  const hasConnector = entities.some(entity => !entity.isArchived
+    && entity.publicIdentifier === 'EXPORURAL-PASSAGEM-INTERNA-02');
+  if (!hasContinuation || !hasConnector) return input;
+  return { ...input,
+    roadSurfaces: input.roadSurfaces.filter(surface => surface.id !== 'acesso-churrascaria'),
+    curbSegments: input.curbSegments?.filter(segment => !segment.id.startsWith('acesso-churrascaria:')),
+  };
+}
 
 export function selectParkAccessRoadInfrastructure(
   input: ParkAccessInfrastructureInput,

@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { QueryClient } from '@tanstack/react-query';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { scheduleCommercialMapRefresh } from '@/features/commercial-map/queries/commercialMapRefresh';
+import { useSalesStore } from '@/features/commercial-map/sales/useSalesSelection';
 import { useCommercialMapRevision } from '@/features/commercial-map/hooks/useCommercialMapRevision';
 
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: vi.fn() } }));
@@ -42,6 +43,17 @@ describe('verificação leve de versão', () => {
     expect(refetch).toHaveBeenCalledWith({ cancelRefetch: false });
     await flush(1000); // mesma assinatura nova ainda não carregada: não repete
     expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('recebe uma revisão durante Vendas para revalidar o carrinho', async () => {
+    vi.useFakeTimers();
+    useSalesStore.setState({ salesModeActive: true });
+    const refetch=vi.fn().mockResolvedValue({}), fetchRevision=vi.fn().mockResolvedValue('r2');
+    const {unmount}=renderHook(()=>useCommercialMapRevision({...base,dataRevision:'r1',refetch,fetchRevision}));
+    await flush();
+    expect(fetchRevision).toHaveBeenCalled();
+    expect(refetch).toHaveBeenCalledWith({cancelRefetch:false});
+    unmount(); useSalesStore.setState({salesModeActive:false});
   });
 
   it('falhas isoladas não recarregam; falhas seguidas marcam não confirmado e recuperam uma vez', async () => {

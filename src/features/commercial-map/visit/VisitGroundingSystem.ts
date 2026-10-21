@@ -8,7 +8,7 @@ import { GENERATED_REAR_ROAD_SEGMENTS, REPLACED_OFFICIAL_ROAD_IDENTIFIERS } from
 import { buildRearRoadCorridorFootprints, rearRoadTerrainElevationAt } from '../utils/rearRoadNetwork';
 import { buildRoadNetworkGeometries, disposeRoadNetworkGeometries, roadSurfaceHeight } from '../utils/roadInfrastructure';
 import { resolveParkAccessEnvironmentPresentation } from '../data/parkAccessEnvironment';
-import { PARK_ACCESS_INFRASTRUCTURE_INPUT } from '../utils/parkAccessSpatialPlanAdapter';
+import { PARK_ACCESS_INFRASTRUCTURE_INPUT, withExporuralCadastralRoadOwnership } from '../utils/parkAccessSpatialPlanAdapter';
 import { ARENA_FRONT_LAYOUT, sourceBoundsToLocal } from '../data/parkEnvironment';
 import { arenaStairTreadElevation, arenaTerrainElevation, ARENA_TERRAIN_TOP_ELEVATION } from '../data/arenaTerrain';
 import { NATIONS_DISTRICT_LAYOUT } from '../data/nationsDistrict';
@@ -344,7 +344,8 @@ export function buildVisitGroundSurfaces(
   }
   const environment = resolveParkAccessEnvironmentPresentation(false, false);
   for (const surface of [...environment.environmentalSurfaces, ...environment.trailSurfaces]) surfaces.push(visitGroundSurface(surface.id, surface.polygon, surface.elevation, surface.holes));
-  for (const surface of [...PARK_ACCESS_INFRASTRUCTURE_INPUT.roadSurfaces, ...PARK_ACCESS_INFRASTRUCTURE_INPUT.sidewalkSurfaces]) {
+  const accessInput = withExporuralCadastralRoadOwnership(PARK_ACCESS_INFRASTRUCTURE_INPUT, presentedEntities);
+  for (const surface of [...accessInput.roadSurfaces, ...accessInput.sidewalkSurfaces]) {
     surfaces.push(visitGroundSurface(surface.id, surface.polygon, surface.elevation ?? 0.04, surface.holes));
   }
   buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS, { includeShoulders: false, samplesPerWorldUnit: 5 }).forEach((road, index) => {

@@ -1,0 +1,41 @@
+previous_code,new_code,lot_uuid,entity_uuid,action,geometry,official_area_sqm,origin_uuids
+,Q-R-40,1b4ce0cc-4062-5fd1-ba48-2ddcfbda62db,d3b8017c-b027-5849-99d1-d9b35c6b5a00,create,PDF vectors,268.01,d778159b-ce47-4091-b363-d21f8a2b99dd;b9117c5a-fc59-4a4c-b48e-2bf35edc257c
+,Q-R-41,3fc18d72-fd8e-5d60-8745-fba49d5967e8,aea28031-7f7e-5862-a5ce-18bd70a41e93,create,PDF vectors,268.01,b9117c5a-fc59-4a4c-b48e-2bf35edc257c;e2f1c2ea-cccd-426a-bfee-0bef4fcc7acb
+,Q-R-42,5a88cb56-725a-56a7-b26c-0dbc2016063e,79007f40-c452-5d07-bc4c-2fc33105b938,create,PDF vectors,268.03,e2f1c2ea-cccd-426a-bfee-0bef4fcc7acb;8fc7d013-9b7e-47e5-b224-1d3390f6c220
+,Q-R-43,5c8cfb53-1933-5f38-8d40-923419fd7f3d,c0571fa5-e64c-5a79-8127-c4106e0a7cbf,create,PDF vectors,268.00,8fc7d013-9b7e-47e5-b224-1d3390f6c220;01520473-850a-4400-b066-b6857d452c2e
+,Q-R-44,71d83bb6-3f31-59b8-a0b6-0bd63785c4fc,bb98f808-592d-50eb-8e2e-3ced2d60b1bf,create,PDF vectors,268.00,01520473-850a-4400-b066-b6857d452c2e;f136fb5b-d4e0-49fa-b972-5a3711989f4d
+,Q-R-45,6da23f87-d115-524e-9292-dff87add3c51,861670b6-28b7-50a6-a751-862607beee36,create,PDF vectors,268.01,f136fb5b-d4e0-49fa-b972-5a3711989f4d;291c3800-39ea-452d-81d5-cb2228756b0a
+,Q-R-46,fa2e3ac0-7026-5ca3-92be-8463f5b9c75f,e587dfe4-d75a-572e-8793-5d78380bfadf,create,PDF vectors,267.85,291c3800-39ea-452d-81d5-cb2228756b0a;45328830-bfde-457a-88a6-d96b6e148983
+,Q-R-47,930d9495-59e6-5e7c-88ab-aaf9b9977e90,38407a99-4ad6-53b8-94d7-21d7b3f4d646,create,PDF vectors,333.34,45328830-bfde-457a-88a6-d96b6e148983
+,Q-R-48,ad437455-0dff-52b5-b585-d5eb5750c23a,59abad66-8654-56bd-a666-10e94bafb99d,create,PDF vectors,268.07,d778159b-ce47-4091-b363-d21f8a2b99dd;b9117c5a-fc59-4a4c-b48e-2bf35edc257c
+,Q-R-49,eb60e4e8-71f3-5bb8-a7d7-9420dffa2bb0,59655989-4d4d-5420-9b63-944819ff9f99,create,PDF vectors,268.02,b9117c5a-fc59-4a4c-b48e-2bf35edc257c;e2f1c2ea-cccd-426a-bfee-0bef4fcc7acb
+,Q-R-50,6bd8bf19-e2cc-51d0-b98a-057775f5fd86,ab1d53dd-e980-5cd1-aa67-71e553a3100c,create,PDF vectors,268.01,e2f1c2ea-cccd-426a-bfee-0bef4fcc7acb;8fc7d013-9b7e-47e5-b224-1d3390f6c220
+,Q-R-51,d0e37c2a-f34d-5923-9cb2-182c8c9e6089,2234fabd-b11e-5fc2-883d-4454c29b33a7,create,PDF vectors,268.02,8fc7d013-9b7e-47e5-b224-1d3390f6c220;01520473-850a-4400-b066-b6857d452c2e
+,Q-R-52,7d78a02e-aa2f-52e6-8104-665776ba969e,73e3b217-dbba-5fd2-a71d-65e124bdf793,create,PDF vectors,268.03,01520473-850a-4400-b066-b6857d452c2e;f136fb5b-d4e0-49fa-b972-5a3711989f4d
+,Q-R-53,8f6f033e-e2ce-573d-9240-d388c627cf20,92d78ea3-92a3-5591-bda2-1cffe9d25a5e,create,PDF vectors,268.04,f136fb5b-d4e0-49fa-b972-5a3711989f4d;291c3800-39ea-452d-81d5-cb2228756b0a
+,Q-R-54,381e3cfb-d233-5955-aa80-879f26b7a39f,b85b98b4-2ada-5a10-986e-57b806d93a44,create,PDF vectors,268.04,291c3800-39ea-452d-81d5-cb2228756b0a;45328830-bfde-457a-88a6-d96b6e148983
+Q-R-48,Q-R-55,1baea38b-b6ab-46c1-bf04-ea6c53a87544,e1858919-48d4-4677-a7f6-e0ecd7c060af,preserve,PDF vectors,249.64,
+Q-R-49,Q-R-56,86a6f56b-8945-445b-82cc-ca9210fc82f1,7094a1e3-9216-424c-8010-b4123ae1ee9f,preserve,PDF vectors,249.12,
+Q-R-50,Q-R-57,d8dd899c-7e3e-4447-8428-81d0ecf5149b,227ec70d-23b4-4423-ac40-733f2ecb4952,preserve,PDF vectors,250.05,
+Q-R-51,Q-R-58,9dfb2a6e-69da-44ed-b3ec-b5775a2239f5,4c4e87ec-dcab-4de6-af91-4c200c2b068d,preserve,PDF vectors,251.01,
+Q-R-52,Q-R-59,137a7fe9-1724-42b0-adc6-64c46b91a7e8,ed10fb94-8bac-4a21-8a9e-973e2f4295d7,preserve,PDF vectors,250.00,
+Q-R-53,Q-R-60,37bb772b-ba72-464a-a285-40bb96227714,59c502c4-c85c-4a5b-af68-4a4277064070,preserve,PDF vectors,249.96,
+Q-R-54,Q-R-61,db1c5104-235d-495e-9a5f-fb1af75d87d0,83427369-9139-4e54-852e-20dbf9b3dc16,preserve,PDF vectors,356.69,
+Q-R-55,Q-R-62,8c57fffe-d21c-4102-9831-6e5ce54959fc,a5d3887b-6d24-47e5-a355-858bfdfb7b6e,preserve,PDF vectors,249.60,
+Q-R-56,Q-R-63,7a0d01b3-08c0-4203-84d9-924fd6a777cf,2c5162d4-09d0-409a-81cd-1c99b20107bb,preserve,PDF vectors,249.03,
+Q-R-57,Q-R-64,c4b77e2d-5277-41ae-8261-cc034c410cf7,ff71abc7-1341-4d12-8529-cd1766f1dbe7,preserve,PDF vectors,248.02,
+Q-R-58,Q-R-65,13f68c3f-15f7-467a-9d56-495e95c8cb21,bf2cd0ec-3b43-4174-aa02-b08af699f150,preserve,PDF vectors,249.12,
+Q-R-59,Q-R-66,f113c951-c359-429a-a7b6-8bde3ddfed8d,9f65aadc-0584-41f2-b2a2-82e96a8955fe,preserve,PDF vectors,250.00,
+Q-R-60,Q-R-67,98980aba-172e-4ade-af34-afabd664f67c,4c181bf7-c0e4-4cf5-ade0-f381b33c0d9b,preserve,PDF vectors,250.03,
+Q-R-61,Q-R-68,b3f1c02f-b2f0-424e-9a0f-7bc33de56e72,03e06b2a-6bbf-48c7-8fe0-f60996833e75,preserve,PDF vectors,242.21,
+Q-R-62,Q-R-69,73fac7d7-224e-457c-8031-4905a28c3850,b42cf206-7e2d-4688-bacf-19f82efc9df6,preserve,unchanged,471.00,
+Q-R-63,Q-R-70,467b0174-db02-4d29-9425-e53955cb20ad,77922177-4ca2-4029-a696-4bef1eaace9a,preserve,unchanged,471.00,
+Q-R-64,Q-R-71,6a848982-f9bf-4d9c-8098-32c123911e04,c321cc12-dc0a-4cdb-a6da-1cc3285c5692,preserve,unchanged,471.00,
+Q-R-65,Q-R-72,39542dee-d9c3-4d07-b17e-e3b29e7b081b,55c7a6ce-8b90-40e0-bbe4-e875ca8f427e,preserve,unchanged,471.00,
+Q-S-11,Q-S-11,381acab8-e28b-487e-b730-0827df5c4c6c,29fb8aea-ac83-4c70-b6ab-46db4417ad96,preserve,PDF vectors,449.91,
+Q-S-12,Q-S-12,22c8cd21-e37b-49ba-83c7-acf4704e173c,475ec73b-ce72-4d86-903c-1405b828925a,preserve,PDF vectors,376.85,
+Q-S-13,Q-S-13,48aa95ad-c85e-4386-9962-b38d0e466138,a6755090-cbfc-41b0-867c-252a60b4da21,preserve,PDF vectors,376.88,
+Q-S-14,Q-S-14,dfa66e16-d611-417a-8764-258c3f016515,6d06a9ed-445c-4525-a78b-d6262fbe2969,preserve,PDF vectors,506.30,
+Q-S-15,Q-S-15,9503f32f-403e-47b3-b778-bc69583342b8,b7c5aa5e-8316-4920-a501-33ec91c3e437,preserve,PDF vectors,450.00,
+Q-S-16,Q-S-16,26598e4c-1a1d-44c9-802c-3a30dcc84250,d51f89da-f055-4fb7-8995-3925f812edf2,preserve,PDF vectors,450.00,
+Q-S-17,Q-S-17,cfb0a0b4-462e-4cf6-8065-1455891b03a1,545d96c7-d82b-45bb-bd49-728f1eecd4e3,preserve,PDF vectors,348.98,

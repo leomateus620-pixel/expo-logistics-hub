@@ -42,7 +42,7 @@ function createTerritorialOrientationResources(items: readonly OrientationItem[]
   for (const { item, width, x, y } of cells) {
     context.textAlign = 'left';
     // Cream road lettering, a restrained dark keyline, no white halo/card.
-    context.fillStyle = item.kind === 'road' ? '#f7f2d9' : '#173a3e';
+    context.fillStyle = item.subdued ? '#b9beb9' : item.kind === 'road' ? '#f7f2d9' : '#173a3e';
     context.strokeStyle = item.kind === 'road' ? '#243536' : '#f6f0d4';
     context.lineWidth = item.kind === 'road' ? 3 : 3.5;
     if (item.kind === 'block') {

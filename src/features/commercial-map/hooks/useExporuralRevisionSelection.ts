@@ -14,7 +14,13 @@ export function useExporuralRevisionSelection(data: CommercialMapData | undefine
       const changed = changedExporuralSelections(previous.current, current);
       const map = useCommercialMapStore.getState();
       const sales = useSalesStore.getState();
-      if (changed.some(row => row.entityId === map.selectedEntityId)) map.setSelectedEntityId(null);
+      // A renumbered physical parcel keeps its UUID, inspection and camera.
+      // Only removed/archived identities lose the inspection; carts revalidate
+      // every changed cadastral or commercial signature below.
+      if (changed.some(row => row.entityId === map.selectedEntityId
+        && !data.entities.some(entity => entity.id === row.entityId && !entity.isArchived))) {
+        map.setSelectedEntityId(null);
+      }
       const selected = new Set(sales.selection.map(row => row.lotId));
       const stale = changed.filter(row => selected.has(row.lotId));
       stale.forEach(row => sales.removeLot(row.lotId));

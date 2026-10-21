@@ -1,3 +1,5 @@
+import { lotNumberAnchor } from '../utils/exporuralRevisionPresentation';
+import { pointInPolygon } from '../utils/spatialSurface';
 import type { CommercialLot, MapEntity } from '../types';
 
 /** A dashboard record already resolved against the map's canonical entity and price. */
@@ -61,7 +63,7 @@ export function getCommercialMiniMapGeometry(
 ): CommercialMiniMapGeometry {
   const key = JSON.stringify([items.map(({ entity, lot }) => [
     entity.id, lot.id, entity.isArchived, lot.archivedAt, lot.entityId,
-    entity.geometry, entity.metadata?.labelAnchor,
+    entity.geometry, entity.metadata?.geometryRevision, entity.metadata?.labelAnchor,
   ]), outlines, contentEnvelope]);
   let projection = projectionCache.get(key);
   if (!projection) {
@@ -236,9 +238,9 @@ export function buildCommercialMiniMapGeometry(
   for (const { item, rings } of source) {
     const anchor = item.entity.metadata?.labelAnchor;
     const labelPoint = Array.isArray(anchor) && anchor.length === 2 && anchor.every(Number.isFinite)
-      && anchor[0] >= Math.min(...rings[0].map(([x]) => x)) && anchor[0] <= Math.max(...rings[0].map(([x]) => x))
-      && anchor[1] >= Math.min(...rings[0].map(([, y]) => y)) && anchor[1] <= Math.max(...rings[0].map(([, y]) => y))
-      ? anchor as [number, number] : center(rings[0]);
+      && pointInPolygon(anchor as [number, number], rings[0] as [number, number][])
+      && !rings.slice(1).some(ring => pointInPolygon(anchor as [number, number], ring as [number, number][]))
+      ? anchor as [number, number] : lotNumberAnchor(item.entity);
     const geometry = { ...item, path: pathFor(rings), labelPoint: project(labelPoint),
       labelWidth: (Math.max(...rings[0].map(([x]) => x)) - Math.min(...rings[0].map(([x]) => x))) * scale,
       labelHeight: (Math.max(...rings[0].map(([, y]) => y)) - Math.min(...rings[0].map(([, y]) => y))) * scale,
