@@ -70,7 +70,7 @@ describe('Dashboard sales workspace composition', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Acessar vendas e contratos' })).toHaveFocus());
     expect(container.scrollTop).toBe(640);
     expect(screen.getByRole('button', { name: 'Exporural' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: 'Todas as áreas' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Área Externa' })).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByRole('button', { name: 'Área oficial' })).toHaveAttribute('aria-pressed', 'true');
   });
 

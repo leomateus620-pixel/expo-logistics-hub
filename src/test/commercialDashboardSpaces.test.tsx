@@ -64,7 +64,7 @@ describe('managerial scopes in the existing dashboard', () => {
     const currentSnapshot = buildCommercialDashboardSnapshot(data);
     const stateMemory: CommercialDashboardSpacesMemory = { current: { requestedScopeId: 'internal:all', selections: {}, metric: 'lots' } };
     render(<CommercialDashboardSpaces snapshot={currentSnapshot} data={data} onViewLot={vi.fn()} stateMemory={stateMemory} />);
-    expect(screen.getByRole('button', { name: 'Todas as áreas' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Área Externa' })).toHaveAttribute('aria-pressed', 'true');
     expect(within(screen.getByRole('group', { name: 'Selecionar pavilhão' })).queryByRole('button', { pressed: true })).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Mini mapa comercial: Todas as áreas externas' })).toBeInTheDocument();
     expect(stateMemory.current?.requestedScopeId).toBe('external:all');
