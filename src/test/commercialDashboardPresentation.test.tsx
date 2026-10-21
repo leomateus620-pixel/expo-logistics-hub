@@ -122,7 +122,7 @@ describe('integrated Commercial Dashboard presentation', () => {
     expect(screen.queryByRole('region', { name: 'Mini mapa comercial: Classificação pendente' })).not.toBeInTheDocument();
     const map = screen.getByRole('region', { name: 'Mini mapa comercial: Todas as áreas externas' });
     expect(map.querySelectorAll('path[data-entity-id]')).toHaveLength(initial.lots.length);
-    expect(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: 'Todas as áreas' })).toHaveAttribute('aria-pressed', 'true');
+    expect(within(screen.getByRole('group', { name: 'Selecionar área externa' })).getByRole('button', { name: 'Área Externa' })).toHaveAttribute('aria-pressed', 'true');
     expect(kpi('Espaços comerciais').querySelector('strong')).toHaveTextContent(formatDashboardInteger(initial.lots.length));
     expect(initial.lots.every(({ block }) => block === null)).toBe(true);
     expect(buildCommercialDashboardSnapshot(updated).unclassified.records).toEqual([]);

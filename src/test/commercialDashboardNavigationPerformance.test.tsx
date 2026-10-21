@@ -109,7 +109,7 @@ describe('Dashboard presentation across discarded navigation views', () => {
     const view = render(dashboard());
     selectPresentation();
     view.rerender(dashboard(nextIdentity));
-    expect(areaButton('Todas as áreas')).toHaveAttribute('aria-pressed', 'true');
+    expect(areaButton('Área Externa')).toHaveAttribute('aria-pressed', 'true');
     expect(within(metricSelectors()).getByRole('button', { name: 'Quantidade' })).toHaveAttribute('aria-pressed', 'true');
     const map = screen.getByRole('region', { name: 'Mini mapa comercial: Todas as áreas externas' });
     expect(within(map).getByRole('combobox')).toHaveValue('');
@@ -135,7 +135,7 @@ describe('Dashboard presentation across discarded navigation views', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Voltar à visão geral' }));
     await waitFor(() => expect(screen.getByRole('button', { name: 'Acessar vendas e contratos' })).toHaveFocus());
     expect(scrollContainer.scrollTop).toBe(0);
-    expect(areaButton('Todas as áreas')).toHaveAttribute('aria-pressed', 'true');
+    expect(areaButton('Área Externa')).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('ignores a queued overview restoration after an immediate return to sales', async () => {
