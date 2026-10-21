@@ -83,6 +83,7 @@ import { canHandleCommercialDashboardEscape, canHandleCommercialMapEscape, getCo
 import { buildPavilionModuleCommercialIndex, resolveCommercialPavilionModuleNavigationTarget } from './utils/pavilionModuleCommercial';
 import { useCommercialDashboardSync } from './dashboard/useCommercialDashboardSync';
 import { useCommercialMapRevision } from './hooks/useCommercialMapRevision';
+import { scheduleCommercialMapRefresh } from './queries/commercialMapRefresh';
 import { useSaleInspectionStore } from './state/useSaleInspectionStore';
 import { resolveSaleInspection, type SaleInspectionGroup, type SaleInspectionResolution, type SaleInspectionSpace } from './utils/saleInspectionGroups';
 import { SaleInspectionPanel } from './components/panels/SaleInspectionPanel';
@@ -288,15 +289,16 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     }
   }, [dashboardOpen]);
 
+  const dashboardQueryClient = useQueryClient();
+  const refreshCommercialSnapshot = useCallback(() => scheduleCommercialMapRefresh(dashboardQueryClient), [dashboardQueryClient]);
   const mapRevision = useCommercialMapRevision({
     projectId: mapQuery.data?.source === 'database' ? mapQuery.data.project?.id : null,
     dataRevision: mapQuery.data?.revision ?? null,
     enabled: !isPreview && !isCommissionScope,
     isFetching: mapQuery.isFetching,
     hasError: mapQuery.isError,
-    refetch: mapQuery.refetch,
+    refetch: refreshCommercialSnapshot,
   });
-  const dashboardQueryClient = useQueryClient();
   const salesSummaryProjectId = mapQuery.data?.source === 'database' ? mapQuery.data.project?.id : null;
   const refreshDashboardSales = useCallback(async () => {
     if (!salesSummaryProjectId) return;

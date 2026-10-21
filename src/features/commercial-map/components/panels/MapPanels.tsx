@@ -445,7 +445,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, s
             </section>
           )}
 
-          {lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} confirmedStage={lot.status === 'SOLD' ? saleStage(saleHistory.data?.stage) : null} canEdit={permissions.canEditPricing && !lot.id.startsWith('reference:')} />}
+          {lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} snapshotPricing={lot.officialPricing2028} confirmedStage={lot.status === 'SOLD' ? saleStage(saleHistory.data?.stage) : null} canEdit={permissions.canEditPricing && !lot.id.startsWith('reference:')} />}
 
           <Tabs defaultValue="overview" className="commercial-map-detail-tabs">
             <TabsList>

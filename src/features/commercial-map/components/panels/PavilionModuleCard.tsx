@@ -232,6 +232,7 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
            <LotPricing2028Panel
              lotId={persisted ? lot?.id ?? null : null}
              officialAreaSqm={individualArea}
+             snapshotPricing={lot?.officialPricing2028}
              compact
              confirmedStage={lot?.status === 'SOLD' ? confirmedStage(saleHistory.data?.stage) : null}
              canEdit={persisted && permissions.canEditPricing}

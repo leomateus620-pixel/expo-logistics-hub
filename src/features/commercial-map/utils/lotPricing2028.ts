@@ -39,6 +39,23 @@ export interface LotPricing2028 {
   segundaIsManual?: boolean;
 }
 
+/** A detail request can finish on either side of an inventory refresh. Never
+ * present its older area/total beside a parcel from the newer snapshot. */
+export function isLotPricingSnapshotCoherent(pricing: LotPricing2028, lot: {
+  id: string; officialAreaSqm?: number | null;
+  officialPricing2028?: { renovacaoTotal: number | null; segundaTotal: number | null;
+    renovacaoIsManual: boolean; segundaIsManual: boolean; resolutionStatus: LotPricingResolution } | null;
+}) {
+  const expected = lot.officialPricing2028;
+  return pricing.lotId === lot.id
+    && (lot.officialAreaSqm == null || pricing.officialAreaSqm === lot.officialAreaSqm)
+    && (!expected || (pricing.renovacaoTotal === expected.renovacaoTotal
+      && pricing.segundaTotal === expected.segundaTotal
+      && Boolean(pricing.renovacaoIsManual) === expected.renovacaoIsManual
+      && Boolean(pricing.segundaIsManual) === expected.segundaIsManual
+      && pricing.resolutionStatus === expected.resolutionStatus));
+}
+
 const CURRENCY_FORMATTER = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',

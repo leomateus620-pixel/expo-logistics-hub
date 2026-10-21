@@ -18,7 +18,9 @@ import {
 import {
   EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT,
   PARK_ACCESS_INFRASTRUCTURE_INPUT,
+  withExporuralCadastralRoadOwnership,
 } from '../../utils/parkAccessSpatialPlanAdapter';
+import type { MapEntity } from '../../types';
 import { applyParkSurfaceDetail, bindParkSurfaceMaterial } from './parkSurfaceMaterial';
 import { openGroundTextureBundleForEntity, HIGHWAY_ASPHALT_SURFACE_PROFILE, HIGHWAY_ASPHALT_NORMAL_SCALE } from './openGroundTextures';
 
@@ -26,6 +28,7 @@ export type ParkAccessInfrastructureScope = 'all' | 'exporural';
 
 interface ParkAccessInfrastructureProps {
   reducedGraphics: boolean;
+  cadastralRoads?: readonly MapEntity[];
   scope?: ParkAccessInfrastructureScope;
   opacity?: number;
   visible?: boolean;
@@ -508,6 +511,7 @@ function surfaceRenderOrder(
 
 export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
   reducedGraphics,
+  cadastralRoads,
   scope = 'all',
   opacity = 1,
   visible = true,
@@ -523,9 +527,11 @@ export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
   const resolvedArchitectureVisible = visible
     && architectureVisible
     && normalizedArchitectureOpacity > 0.015;
-  const input = scope === 'exporural'
+  const baseInput = scope === 'exporural'
     ? EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT
     : PARK_ACCESS_INFRASTRUCTURE_INPUT;
+  const input = useMemo(() => cadastralRoads
+    ? withExporuralCadastralRoadOwnership(baseInput, cadastralRoads) : baseInput, [baseInput, cadastralRoads]);
   const gate2 = input.gates.find(gate => gate.key === 'gate2');
   const model = useMemo(
     () => buildParkAccessRenderModel(

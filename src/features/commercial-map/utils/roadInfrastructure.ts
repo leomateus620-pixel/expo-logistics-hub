@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { isExporuralLongitudinalPassage } from './exporuralPassage';
 import { mergeBufferGeometries } from 'three-stdlib';
 import type { Coordinate, MapEntity } from '../types';
 import { withoutClosingPoint } from './geometry';
@@ -328,6 +329,8 @@ export function buildRoadBoundaryRuns(
   const runs: RoadBoundaryRun[] = [];
 
   circulation.forEach((entity) => {
+    // Do not consume a 3 m carriageway with two wide white curb ribbons.
+    if (isExporuralLongitudinalPassage(entity)) return;
     const ring = rings.get(entity.id)!;
     if (ring.length < 3) return;
     const winding = ringSignedArea(ring) >= 0 ? 1 : -1;

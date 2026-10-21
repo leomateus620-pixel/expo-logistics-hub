@@ -1,0 +1,14 @@
+{
+  "rows": [
+    {
+      "result": {
+        "caller_role": "anon",
+        "committed": false,
+        "geometry_only_detected": true,
+        "invalid_token_denied": true,
+        "price_only_detected": true,
+        "public_lots": 108
+      }
+    }
+  ]
+}

@@ -10,15 +10,18 @@ import {
   formatPricePerSqm,
   maskBrlInput,
   parseBrlInput,
+  isLotPricingSnapshotCoherent,
   type LotPricing2028,
   type LotPricingStage,
 } from '../../utils/lotPricing2028';
 import './lot-pricing-2028.css';
+import type { CommercialLotOfficialPricing2028 } from '../../types';
 
 interface Props {
   lotId: string | null;
   /** Área persistida do lote, usada como fallback de exibição. */
   officialAreaSqm?: number | null;
+  snapshotPricing?: CommercialLotOfficialPricing2028 | null;
   compact?: boolean;
   confirmedStage?: LotPricingStage | null;
   /** Mostra o ícone de edição manual (apenas usuários com permissão). */
@@ -176,11 +179,14 @@ function PricingBody({ pricing, fallbackArea, confirmedStage, canEdit }: { prici
 export const LotPricing2028Panel = memo(function LotPricing2028Panel({
   lotId,
   officialAreaSqm = null,
+  snapshotPricing,
   compact = false,
   confirmedStage = null,
   canEdit = false,
 }: Props) {
   const query = useLotPricing2028(lotId);
+  const coherent = Boolean(lotId && query.data && isLotPricingSnapshotCoherent(query.data,
+    { id: lotId, officialAreaSqm, officialPricing2028: snapshotPricing }));
 
   if (!lotId) return null;
 
@@ -192,10 +198,11 @@ export const LotPricing2028Panel = memo(function LotPricing2028Panel({
       <header>Valores oficiais 2028</header>
       {query.isLoading && <p className="lot-pricing-2028-state">Carregando valores…</p>}
       {query.isError && <p className="lot-pricing-2028-state">Não foi possível carregar os valores oficiais.</p>}
+      {query.data && (!coherent || query.isFetching) && <p className="lot-pricing-2028-state">Atualizando valores oficiais…</p>}
       {!query.isLoading && !query.isError && !query.data && (
         <p className="lot-pricing-2028-state">Lote sem correspondência na tabela oficial 2028.</p>
       )}
-      {query.data && <PricingBody pricing={query.data} fallbackArea={officialAreaSqm} confirmedStage={confirmedStage} canEdit={canEdit} />}
+      {query.data && coherent && !query.isFetching && <PricingBody pricing={query.data} fallbackArea={officialAreaSqm} confirmedStage={confirmedStage} canEdit={canEdit} />}
     </section>
   );
 });

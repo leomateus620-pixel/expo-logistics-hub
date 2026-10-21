@@ -1,0 +1,59 @@
+{
+  "rows": [
+    {
+      "validation": {
+        "active_area_including_unnumbered": 46126.64,
+        "active_commercial_spaces": 108,
+        "blocks": [
+          {
+            "block": "S",
+            "numbered_area": 16113.47,
+            "numbered_lots": 35
+          },
+          {
+            "block": "R",
+            "numbered_area": 29444.39,
+            "numbered_lots": 72
+          }
+        ],
+        "business_unchanged": true,
+        "individual_manifest_mismatches": 0,
+        "invalid_rings": 0,
+        "legacy_roads_archived": true,
+        "lot_overlaps": 0,
+        "renumbered_signed_sale": {
+          "current_code": "Q-R-59",
+          "lot_uuid": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "negotiated_value": 4125,
+          "sale_status": "CONFIRMED"
+        },
+        "revision": "2028-exporural-2026-10-20.1",
+        "road_lot_overlaps": 0,
+        "snapshots": [
+          {
+            "id": "dbeaf99c-ab1c-4f56-ae11-2dac59d9b535",
+            "revision": "2028-exporural-2026-10-20.1",
+            "status": "APPLIED"
+          },
+          {
+            "id": "28ba4e87-ad05-41b3-a860-76203d1af1be",
+            "revision": "2028-exporural-2026-10-21.labels.1",
+            "status": "APPLIED"
+          },
+          {
+            "id": "b0f93185-4262-416d-a255-7e6e8d14a71c",
+            "revision": "2028-exporural-2026-10-21.surfaces.1",
+            "status": "APPLIED"
+          },
+          {
+            "id": "d645f31a-be2e-4154-8bc1-537117db42aa",
+            "revision": "2028-exporural-2026-10-21.legacy-roads.1",
+            "status": "APPLIED"
+          }
+        ],
+        "unresolved_prices": 0,
+        "validated_at": "2026-10-21T12:10:07.275746+00:00"
+      }
+    }
+  ]
+}

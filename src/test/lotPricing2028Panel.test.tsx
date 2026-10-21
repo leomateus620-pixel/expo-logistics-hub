@@ -62,4 +62,17 @@ describe('LotPricing2028Panel', () => {
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled();
     expect(screen.getByRole('button', { name: /Restaurar valor oficial/ })).toBeVisible();
   });
+
+  it('não mostra preço antigo ao lado de uma área oficial atualizada', () => {
+    render(<LotPricing2028Panel lotId="lot-56" officialAreaSqm={268.01} canEdit />);
+    expect(screen.getByText('Atualizando valores oficiais…')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Editar valor da Renovação' })).not.toBeInTheDocument();
+  });
+
+  it('revalida mudança somente de preço, mesmo com a mesma área e UUID', () => {
+    render(<LotPricing2028Panel lotId="lot-56" officialAreaSqm={471} snapshotPricing={{lotId:'lot-56',entityId:'entity-56',
+      renovacaoTotal:100,segundaTotal:8478,renovacaoIsManual:true,segundaIsManual:false,resolutionStatus:'OK'}} canEdit />);
+    expect(screen.getByText('Atualizando valores oficiais…')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Editar valor da Renovação' })).not.toBeInTheDocument();
+  });
 });

@@ -1,0 +1,15 @@
+{
+  "rows": [
+    {
+      "validation": {
+        "B37_B38_vs_affected": [],
+        "global_project": {
+          "activeVersion": 6,
+          "referenceRevision": "2026.4"
+        },
+        "outside_initial_intervention_unchanged_except_two_explicitly_retired_legacy_roads": false
+      }
+    }
+  ],
+  "note": "The principal transaction asserted no outside changes. Subsequent outside updates were observed in B2-M041/042 and Q-G-01/02; these were not reverted. Two legacy road archives are explicitly authorized follow-up scope."
+}

@@ -5,7 +5,7 @@ import { toCommercialPhase } from '../types';
 import { resolveCommercialMapSegment } from '../data/commercialMapSegments';
 import { useLotPricing2028 } from '../hooks/useLotPricing2028';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
-import { formatAreaSqmLabel, formatBrl, formatPricePerSqm } from '../utils/lotPricing2028';
+import { formatAreaSqmLabel, formatBrl, formatPricePerSqm, isLotPricingSnapshotCoherent } from '../utils/lotPricing2028';
 import { normalizeMapEntityMetadata } from '../utils/mapMetadata';
 import { useVisitStore } from './useVisitStore';
 import { clearTouch, getTouchRun, setTouchMove, setTouchRun, setTouchVehicle, subscribeTouchRun } from './VisitInputManager';
@@ -23,10 +23,11 @@ function HelicopterGlyph() {
 const VisitLotInformation = memo(function VisitLotInformation({ poi, expanded }: { poi: VisitPOI; expanded: boolean }) {
   const lot = poi.lot!;
   const query = useLotPricing2028(lot.id);
-  const pricing = query.data;
+  const pricing = query.data && !query.isFetching && isLotPricingSnapshotCoherent(query.data, lot) ? query.data : undefined;
+  const pricingPending = Boolean(query.data && !pricing);
   const metadata = normalizeMapEntityMetadata(poi.entity, lot);
   const segment = resolveCommercialMapSegment(poi.entity, lot);
-  const area = pricing?.officialAreaSqm ?? lot.officialAreaSqm;
+  const area = lot.officialAreaSqm ?? pricing?.officialAreaSqm;
   const ready = pricing?.resolutionStatus === 'OK' || pricing?.renovacaoTotal != null;
   const secondTotal = ready ? formatBrl(pricing.segundaTotal) : null;
   return <>
@@ -38,6 +39,7 @@ const VisitLotInformation = memo(function VisitLotInformation({ poi, expanded }:
     {secondTotal && <p className="visit-poi__price"><strong>{secondTotal}</strong><small>2ª Etapa</small></p>}
     {!secondTotal && <small className="visit-poi__pending">{query.isLoading ? 'Consultando valor oficial…'
       : query.isError ? 'Valor oficial indisponível no momento'
+        : pricingPending ? 'Atualizando valores oficiais…'
         : pricing && pricing.resolutionStatus !== 'EXCLUIDO' && pricing.resolutionStatus !== 'OK'
           ? 'Valor pendente de conferência' : 'Valor oficial ainda não definido'}</small>}
     {expanded && <div className="visit-poi__details">

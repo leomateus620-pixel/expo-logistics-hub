@@ -1,0 +1,9 @@
+{
+  "rows": [
+    {
+      "no_new_logs": true,
+      "no_new_snapshots": true,
+      "state_identical": true
+    }
+  ]
+}

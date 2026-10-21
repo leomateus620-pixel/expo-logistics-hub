@@ -1,0 +1,27 @@
+{
+  "rows": [
+    {
+      "apply_result": {
+        "addedAsphaltLocalSq": 1.9083152765619842,
+        "afterStateMd5": "fd9f01f6afa8e5ec7dac4b4066cf757a",
+        "businessLinksUnchanged": true,
+        "commercialPolygonsChanged": 0,
+        "entityIds": [
+          "aea28031-7f7e-5862-a5ce-18bd70a41e93",
+          "bb98f808-592d-50eb-8e2e-3ced2d60b1bf",
+          "861670b6-28b7-50a6-a751-862607beee36",
+          "e587dfe4-d75a-572e-8793-5d78380bfadf",
+          "59655989-4d4d-5420-9b63-944819ff9f99",
+          "73e3b217-dbba-5fd2-a71d-65e124bdf793",
+          "92d78ea3-92a3-5591-bda2-1cffe9d25a5e",
+          "b85b98b4-2ada-5a10-986e-57b806d93a44",
+          "a0eeec12-8716-5217-8cc8-c6f282a15ca7",
+          "d527cb89-150e-5df6-81e7-1c79ec1bb7f5",
+          "0769e76c-4ccb-4e01-9a08-751ba8fa757c"
+        ]
+      },
+      "source_revision": "2028-exporural-2026-10-21.surfaces.1",
+      "status": "APPLIED"
+    }
+  ]
+}
