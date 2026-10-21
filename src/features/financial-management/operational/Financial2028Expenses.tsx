@@ -1,6 +1,8 @@
+import { FinancialSectionHeader } from './FinancialSectionHeader';
+import { Popover,PopoverContent,PopoverTrigger } from '@/components/ui/popover';
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import type { ImperativePanelGroupHandle } from 'react-resizable-panels';
-import { RotateCcw, Search, SlidersHorizontal, Tags, X } from 'lucide-react';
+import { Search, SlidersHorizontal, Tags, X } from 'lucide-react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useOrgCommissions } from '@/hooks/useOrgCommissions';
@@ -89,7 +91,7 @@ export function Financial2028Expenses({ edition, focus }: { edition: FinancialEd
   const t = comparison.data?.totals;
   const state = comparison.isError ? 'error' : t ? 'ready' : 'loading';
   const filtered = Boolean(filters.q || filters.category_id || filters.commission_id || filters.status || filters.from || filters.to);
-  const activeFilterCount = [filters.category_id, filters.commission_id, filters.status, filters.from, filters.to].filter(Boolean).length;
+  const activeFilterCount = [filters.q, filters.category_id, filters.commission_id, filters.status, filters.from, filters.to].filter(Boolean).length;
   const formatDate = (value: string) => value.split('-').reverse().join('/');
   const chips: { key: string; label: string; remove: () => void }[] = [];
   if (filters.q) chips.push({ key: 'q', label: `Busca: ${filters.q}`, remove: () => { setQuery(''); updateFilters({ q: '' }); } });
@@ -133,18 +135,21 @@ export function Financial2028Expenses({ edition, focus }: { edition: FinancialEd
   const categoryFilter = <select aria-label="Categoria" value={filters.category_id ?? ''} onChange={e => updateFilters({ category_id: e.target.value })}><option value="">Todas as categorias</option><option value="none">Sem categoria</option>{categories.data?.map(c => <option key={c.id} value={c.id}>{c.name}{c.active ? '' : ' · arquivada'}</option>)}</select>;
   const commissionFilter = <select aria-label="Comissão" value={filters.commission_id ?? ''} onChange={e => updateFilters({ commission_id: e.target.value })}><option value="">Todas as comissões</option><option value="none">Sem comissão</option>{commissions.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}</select>;
   return <div ref={shell} className="f28-expense-comparison" data-expense-focus={focus} data-active-side={side} data-compact={compact || undefined} onClickCapture={focusFinancialControl}>
-    <div className="f28-expense-toolbar">
+    <FinancialSectionHeader kind="expenses" tools={<>
+<div className="f28-expense-toolbar">
       <form className="f28-expense-search" onSubmit={submitSearch}><Search aria-hidden="true" /><input type="search" aria-label="Buscar despesa" placeholder="Título ou favorecido" value={query} onChange={e => setQuery(e.target.value)} />{query && <button type="button" aria-label="Limpar busca" onClick={() => { setQuery(''); updateFilters({ q: '' }); }}><X aria-hidden="true" /></button>}<button type="submit">Buscar</button></form>
       {!compact && <>{categoryFilter}{commissionFilter}</>}
-      <details className="f28-expense-filters"><summary><SlidersHorizontal aria-hidden="true" />Filtros{activeFilterCount > 0 && <span className="f28-expense-filter-count" aria-label={`${activeFilterCount} filtros ativos`}>{activeFilterCount}</span>}</summary><div>
+      <Popover><PopoverTrigger asChild><button type="button" className="f28-expense-filter-trigger"><SlidersHorizontal aria-hidden="true" />Filtros{activeFilterCount > 0 && <span className="f28-expense-filter-count" aria-label={`${activeFilterCount} filtros ativos`}>{activeFilterCount}</span>}</button></PopoverTrigger><PopoverContent className="f28-expense-filter-popover" align="end">
         {compact && <><label>Categoria{categoryFilter}</label><label>Comissão{commissionFilter}</label></>}
         <label>Situação<select value={filters.status ?? ''} onChange={e => updateFilters({ status: e.target.value as ExpenseStatus | '' })}><option value="">Todas as situações</option>{(Object.keys(EXPENSE_STATUS_LABELS) as ExpenseStatus[]).map(s => <option key={s} value={s}>{EXPENSE_STATUS_LABELS[s]}</option>)}</select></label>
         <label>Data do período<select value={filters.date_field} onChange={e => updateFilters({ date_field: e.target.value as ExpenseDateField })}>{(Object.keys(EXPENSE_DATE_FIELD_LABELS) as ExpenseDateField[]).map(k => <option key={k} value={k}>{EXPENSE_DATE_FIELD_LABELS[k]}</option>)}</select></label>
         <label>De<input type="date" value={filters.from ?? ''} max={filters.to || undefined} onChange={e => updateFilters({ from: e.target.value })} /></label><label>Até<input type="date" value={filters.to ?? ''} min={filters.from || undefined} onChange={e => updateFilters({ to: e.target.value })} /></label>
-      </div></details>
+      </PopoverContent></Popover>
     </div>
-    {chips.length > 0 && <div className="f28-expense-filter-chips" aria-label="Filtros ativos">{chips.map(chip => <button key={chip.key} type="button" onClick={chip.remove} aria-label={`Remover filtro ${chip.label}`}><span>{chip.label}</span><X aria-hidden="true" /></button>)}</div>}
-    <div className="f28-expense-scope"><p role="status">{t && state === 'ready' ? `${t.count} despesas no recorte` : state === 'error' ? 'Consulta indisponível' : 'Consultando despesas…'} · Período por {EXPENSE_DATE_FIELD_LABELS[filters.date_field ?? 'planned_on'].toLocaleLowerCase('pt-BR')}{filters.from || filters.to ? ` · ${filters.from ? formatDate(filters.from) : 'início'} a ${filters.to ? formatDate(filters.to) : 'sem limite final'}` : ''}</p><div>{filtered && <button type="button" className="f28-expense-control" onClick={clearFilters}>Limpar filtros</button>}<button type="button" className="f28-expense-control f28-expense-reset" onClick={reset}><RotateCcw aria-hidden="true" />Restaurar 50/50</button><Help label="Como comparar despesas"><strong>Planejamento e execução</strong><p>Projetado e realizado pertencem à mesma despesa. A previsão continua no total após realizar. Realizado é compromisso; pago é liquidação.</p><p>Desvio = realizado − projetado. Valores negativos também podem representar previsões ainda não realizadas. Sem previsão não há percentual comparável.</p><p>Indicadores e gráficos consideram todo o recorte do servidor; a paginação altera apenas a lista. Pagamentos incluem os movimentos das despesas filtradas.</p><p>Arraste o divisor ou use as setas do teclado. Enter, duplo clique e o botão restauram 50/50. Em áreas estreitas, use as abas.</p></Help></div></div>
+</>} context={<>
+<div className="f28-expense-scope"><p role="status">{t && state === 'ready' ? `${t.count} despesas no recorte` : state === 'error' ? 'Consulta indisponível' : 'Consultando despesas…'} · Período por {EXPENSE_DATE_FIELD_LABELS[filters.date_field ?? 'planned_on'].toLocaleLowerCase('pt-BR')}{filters.from || filters.to ? ` · ${filters.from ? formatDate(filters.from) : 'início'} a ${filters.to ? formatDate(filters.to) : 'sem limite final'}` : ''}</p><div>{filtered && <button type="button" className="f28-expense-control" onClick={clearFilters}>Limpar filtros</button>}<Help label="Como comparar despesas"><strong>Planejamento e execução</strong><p>Projetado e realizado pertencem à mesma despesa. A previsão continua no total após realizar. Realizado é compromisso; pago é liquidação.</p><p>Desvio = realizado − projetado. Valores negativos também podem representar previsões ainda não realizadas. Sem previsão não há percentual comparável.</p><p>Indicadores e gráficos consideram todo o recorte do servidor; a paginação altera apenas a lista. Pagamentos incluem os movimentos das despesas filtradas.</p><p>Arraste o divisor ou use as setas do teclado. Em áreas estreitas, use as abas.</p></Help></div></div>
+{chips.length > 0 && <div className="f28-expense-filter-chips" aria-label="Filtros ativos">{chips.map(chip => <button key={chip.key} type="button" onClick={chip.remove} aria-label={`Remover filtro ${chip.label}`}><span>{chip.label}</span><X aria-hidden="true" /></button>)}</div>}
+</>}/>
     {comparison.isError && <ExpenseQueryError error={comparison.error} retry={() => void comparison.refetch()} />}
     {categories.isError && <ExpenseQueryError error={categories.error} retry={() => void categories.refetch()} />}
     <div className="f28-expense-tabs" role="tablist" aria-label="Comparar despesas">{(['projetado', 'realizado'] as const).map(s => <button key={s} type="button" role="tab" id={`${ids}-tab-${s}`} aria-selected={side === s} aria-controls={`${ids}-panel-${s}`} tabIndex={side === s ? 0 : -1} onClick={() => setSide(s)} onKeyDown={event => {

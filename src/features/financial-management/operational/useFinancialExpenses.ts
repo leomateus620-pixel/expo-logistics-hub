@@ -1,3 +1,4 @@
+import type { PaymentPlanInput } from './financialEntryApi';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchExpenseComparison, fetchExpenseDetail, listExpenseCategories, listExpenses, saveExpense, saveExpenseCategory,
@@ -52,7 +53,7 @@ export function useSaveExpense(orgId: string) {
 export function useTransitionExpense(orgId: string) {
   const invalidate = useInvalidate(orgId);
   return useMutation({
-    mutationFn: (v: { id: string; to: ExpenseStatus; expectedVersion: number; payload: { committed_cents?: number; committed_on?: string; due_date?: string | null }; reason: string | null; requestId: string }) =>
+    mutationFn: (v: { id: string; to: ExpenseStatus; expectedVersion: number; payload: { committed_cents?: number; committed_on?: string; due_date?: string | null; payment_plan?: PaymentPlanInput }; reason: string | null; requestId: string }) =>
       transitionExpense(orgId, v.id, v.to, v.expectedVersion, v.payload, v.reason, v.requestId),
     onSuccess: () => invalidate(),
   });

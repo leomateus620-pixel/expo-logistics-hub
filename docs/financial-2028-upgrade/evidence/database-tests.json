@@ -1,0 +1,33 @@
+{
+  "environment": "isolated PostgreSQL",
+  "passed": 27,
+  "tests": [
+    "roster: exactly four authorized identities; general admin denied",
+    "read access does not imply edit/admin/settle",
+    "concurrent normalized creation deduplicates in PostgreSQL",
+    "cross organization catalogue access denied",
+    "atomic batch creates one fact and one obligation per item",
+    "timeout retry/concurrent double submission returns same identities",
+    "failure in item two rolls back all financial writes",
+    "1000 / 3 preserves exact cents and civil dates",
+    "partial receipt allocates one parent with installment child; no extra cash",
+    "settled installment and source reduction protected",
+    "reversal reduces original parent and same installment",
+    "projected schedule creates neither obligation nor cash",
+    "historical 2026 remains read-only",
+    "source counted once in server summary; dates use three distinct bases",
+    "expense batch preserves financial category and separate commitment",
+    "financial_edit can create a category without acquiring administration",
+    "archived reference remains readable; new links rejected",
+    "custom funding source keeps explicit technical classification",
+    "concurrent receipts cannot exceed obligation or installment balances",
+    "legacy unassigned settlement is preserved then explicitly reconciled",
+    "new references validate domain and organization; financial payload rejects unknown keys",
+    "existing funding reference cannot silently change its technical classification",
+    "changing an applicable total requires a versioned matching schedule; settled method is frozen",
+    "expense transition updates commitment and schedule together without cash",
+    "export and origin aggregates cover the full edition independently of page size",
+    "migration rerun leaves all records, versions, schedules and audit events unchanged",
+    "transaction rollback rehearsal preserves all financial records"
+  ]
+}

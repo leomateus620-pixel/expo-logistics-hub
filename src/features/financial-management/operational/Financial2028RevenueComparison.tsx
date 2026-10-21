@@ -1,11 +1,11 @@
+import { FinancialSectionHeader } from './FinancialSectionHeader';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { ImperativePanelGroupHandle } from 'react-resizable-panels';
-import { RotateCcw } from 'lucide-react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { formatCompactBRL } from '../utils/financialFormatters';
-import { FUNDING_TYPE_LABELS, fetchEditionSummary, fetchRevenues, type FinancialEdition, type FinancialRevenue } from './financialOperationalApi';
+import { FUNDING_TYPE_LABELS, fetchEditionSummary, fetchRevenueOverview, type FinancialEdition, type FinancialRevenue } from './financialOperationalApi';
 import { RevenueDialog } from './Financial2028Forms';
 import { Financial2028Loading, Financial2028Panel, Financial2028State } from './Financial2028Presentation';
 import { FinancialRevenueRanking } from './FinancialRevenueRanking';
@@ -38,7 +38,7 @@ export function Financial2028RevenueComparison({ edition, focus }: { edition: Fi
   const canEdit = capabilities.canAccess && capabilities.canEdit && edition.status === 'operacional';
   const canConfirm = capabilities.canAccess && capabilities.canConfirm && edition.status === 'operacional';
   const summary = useQuery({ queryKey: ['financial-operational', 'summary', edition.id], queryFn: () => fetchEditionSummary(orgId as string, edition.id), enabled: Boolean(orgId) && capabilities.canAccess });
-  const revenues = useQuery({ queryKey: ['financial-operational', 'revenues', edition.id], queryFn: () => fetchRevenues(edition.id), enabled: capabilities.canAccess });
+  const revenues = useQuery({ queryKey: ['financial-operational', 'revenues-overview', edition.id], queryFn: () => fetchRevenueOverview(edition.id), enabled: capabilities.canAccess });
   const [active, setActive] = useState(focus);
   const [editing, setEditing] = useState<FinancialRevenue | 'new' | null>(null);
   const [compact, setCompact] = useState(false);
@@ -75,17 +75,12 @@ export function Financial2028RevenueComparison({ edition, focus }: { edition: Fi
     }, 180);
   }, []);
   const reset = () => group.current?.setLayout([50, 50]);
-  const data = revenues.data ?? EMPTY_REVENUES;
+  const data = revenues.data?.items ?? EMPTY_REVENUES;
   const projection = useMemo(() => {
-    const rows = data.filter((row) => row.status !== 'cancelada');
-    const items = Object.entries(FUNDING_TYPE_LABELS).map(([key, label]) => ({ key, label, value: rows.filter((row) => row.funding_type === key).reduce((sum, row) => sum + row.projected_cents, 0) })).sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, 'pt-BR'));
-    return {
-      items, total: rows.reduce((sum, row) => sum + row.projected_cents, 0),
-      rouanet: items.find((item) => item.key === 'lei_rouanet')!.value,
-      missingConfirmed: rows.filter((row) => row.status === 'confirmada' && row.confirmed_cents == null).length,
-      scale: { negative: Math.min(0, ...items.map((item) => item.value)), positive: Math.max(0, ...items.map((item) => item.value)) },
-    };
-  }, [data]);
+    const sources = revenues.data?.by_source || [];
+    const items = sources.map(source => ({key:source.key,label:source.name || FUNDING_TYPE_LABELS[source.funding_type],value:source.projected_cents})).sort((a,b)=>b.value-a.value||a.label.localeCompare(b.label,'pt-BR'));
+    return {items,total:items.reduce((s,i)=>s+i.value,0),rouanet:sources.filter(i=>i.funding_type==='lei_rouanet').reduce((s,i)=>s+i.projected_cents,0),missingConfirmed:data.filter(i=>i.status==='confirmada'&&i.confirmed_cents==null).length,scale:{negative:Math.min(0,...items.map(i=>i.value)),positive:Math.max(0,...items.map(i=>i.value))}};
+  }, [data,revenues.data]);
   const s = summary.data;
   // Same server-only compatibility used by the executive dashboard. Never add list values.
   const projected = s ? s.revenues?.projected_cents ?? s.revenue.projected_cents + s.sponsorship.projected_cents : null;
@@ -116,13 +111,7 @@ export function Financial2028RevenueComparison({ edition, focus }: { edition: Fi
   };
 
   return <div className="f28-revenue-comparison" ref={shell} data-active-side={active} data-compact={compact || undefined} onClickCapture={focusFinancialControl}>
-    <div className="f28-revenue-toolbar">
-      <span className="f28-revenue-toolbar__scope">Resumo da edição<small>Projeção × recebimento</small></span>
-      <div className="f28-revenue-toolbar__actions">
-        <button type="button" className="f28-revenue-reset" onClick={reset}><RotateCcw aria-hidden="true" />Restaurar divisão</button>
-        <FinancialComparisonHelp label="Ajuda sobre fontes e comparação de receitas"><strong>Como ler esta comparação</strong><p>O projetado consolidado inclui receitas manuais e patrocínios, incluindo confirmadas e excluindo canceladas. O recebido usa os recebimentos líquidos registrados nas obrigações.</p><p>Cadastrar uma receita registra o compromisso. Os recebimentos são registrados separadamente em Movimentos; confirmar uma receita não registra entrada no caixa.</p><p><strong>Cobertura financeira</strong>: comercialização de lotes e recebimentos por origem ou registro não são detalhados nesta fonte. As vendas de lotes continuam na Dashboard Comercial e não são somadas aqui.</p><p>Arraste o divisor ou use as setas do teclado. Enter, duplo clique ou “Restaurar divisão” retornam a 50/50.</p></FinancialComparisonHelp>
-      </div>
-    </div>
+    <FinancialSectionHeader kind="revenue" context={<div className="f28-section-header__revenue-context"><div><strong>Resumo da edição</strong><span> · Projeção × recebimento</span></div><FinancialComparisonHelp label="Ajuda sobre fontes e comparação de receitas"><strong>Como ler esta comparação</strong><p>O projetado consolidado inclui receitas manuais e patrocínios, incluindo confirmadas e excluindo canceladas. O recebido usa os recebimentos líquidos registrados nas obrigações.</p><p>Cadastrar uma receita registra o compromisso. Os recebimentos são registrados separadamente em Movimentos; confirmar uma receita não registra entrada no caixa.</p><p><strong>Cobertura financeira</strong>: comercialização de lotes não integra esta fonte. As vendas de lotes continuam na Dashboard Comercial e não são somadas aqui.</p><p>Arraste o divisor ou use as setas do teclado. A busca dos registros tem escopo próprio e não altera os totais da edição.</p></FinancialComparisonHelp></div>}/>
     <div className="f28-revenue-tabs" role="tablist" aria-label="Comparar receitas">{(['projetado', 'realizado'] as const).map((side) => <button key={side} type="button" role="tab" id={`${ids}-tab-${side}`} aria-selected={active === side} aria-controls={`${ids}-panel-${side}`} tabIndex={active === side ? 0 : -1} onClick={() => setActive(side)} onKeyDown={(event) => {
       if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
         event.preventDefault();
@@ -138,15 +127,15 @@ export function Financial2028RevenueComparison({ edition, focus }: { edition: Fi
       <ResizableHandle disabled={compact} tabIndex={compact ? -1 : 0} aria-label="Ajustar comparação entre projetado e recebido" className="f28-revenue-divider" withHandle onDoubleClick={reset} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); reset(); } }} />
       <ResizablePanel id="received-revenue" order={2} defaultSize={100 - split} minSize={35} maxSize={65} className="f28-revenue-resizable" data-side="realizado"><div id={`${ids}-panel-realizado`} role={compact ? 'tabpanel' : undefined} aria-labelledby={compact ? `${ids}-tab-realizado` : undefined}>{panel('realizado')}</div></ResizablePanel>
     </ResizablePanelGroup>
-    <div className="f28-revenue-records-panel"><Financial2028Panel title="Receitas manuais carregadas" actions={<span className="f28-revenue-records__scope-badge">Até 500 registros</span>}>
+    <div className="f28-revenue-records-panel"><Financial2028Panel title="Receitas manuais carregadas" actions={<span className="f28-revenue-records__scope-badge">{data.length} de {revenues.data?.total ?? data.length} registros</span>}>
       <div className="f28-revenue-composition">
-        <div className="f28-revenue-composition__ranking"><div className="f28-revenue-composition__heading"><h3>Projeção por origem</h3><div><span>Registros manuais ativos</span><FinancialComparisonHelp label="Ajuda sobre a composição das receitas manuais"><strong>Composição das receitas manuais</strong><p>O ranking representa os registros ativos carregados, até o limite de 500, antes dos filtros da lista. Receitas confirmadas participam da projeção e canceladas são excluídas.</p><p>Origem do recurso não é categoria comercial. Os valores desta composição não substituem os totais consolidados da edição.</p></FinancialComparisonHelp></div></div>
+        <div className="f28-revenue-composition__ranking"><div className="f28-revenue-composition__heading"><h3>Projeção por origem</h3><div><span>Edição completa · receitas manuais ativas</span><FinancialComparisonHelp label="Ajuda sobre a composição das receitas manuais"><strong>Composição das receitas manuais</strong><p>O ranking representa todos os registros manuais ativos da edição, agregados no servidor, antes dos filtros da lista. Receitas confirmadas participam da projeção e canceladas são excluídas.</p><p>Origem do recurso não é categoria comercial. Os valores desta composição não substituem os totais consolidados da edição.</p></FinancialComparisonHelp></div></div>
           {revenues.data ? <FinancialRevenueRanking items={projection.items} total={projection.total} scale={projection.scale} /> : revenues.isError ? <p className="f28-revenue-unavailable">Ranking indisponível até carregar os registros.</p> : <Financial2028Loading label="Carregando composição…" />}
           <p className="f28-revenue-scale">Escala monetária {revenues.data ? `${formatCompactBRL(projection.scale.negative / 100)} a ${formatCompactBRL(projection.scale.positive / 100)}` : 'indisponível'}</p>
         </div>
-        <div className="f28-revenue-composition__rouanet"><FinancialComparisonMetric label="Rouanet projetado" value={revenues.data ? projection.rouanet : null} state={listState} hint="Origem Lei Rouanet · registros ativos carregados, antes dos filtros. Valores mistos permanecem em sua própria origem. Esta composição não inclui os patrocínios da edição." />{projection.missingConfirmed > 0 ? <p className="f28-revenue-composition__attention">{projection.missingConfirmed} compromisso(s) do recorte sem valor confirmado informado.</p> : null}</div>
+        <div className="f28-revenue-composition__rouanet"><FinancialComparisonMetric label="Rouanet projetado" value={revenues.data ? projection.rouanet : null} state={listState} hint="Classificação Lei Rouanet · todas as receitas manuais ativas da edição. Valores mistos permanecem em sua própria origem. Esta composição não inclui os patrocínios da edição." />{projection.missingConfirmed > 0 ? <p className="f28-revenue-composition__attention">{projection.missingConfirmed} compromisso(s) do recorte sem valor confirmado informado.</p> : null}</div>
       </div>
-      {revenues.data ? <FinancialRevenueRecords data={data} focus={focus === 'projetado' ? 'projetada' : 'confirmada'} canEdit={canEdit} canConfirm={canConfirm} onEdit={edit} /> : revenues.isError ? <p className="f28-revenue-unavailable">Registros indisponíveis.</p> : <Financial2028Loading label="Carregando receitas…" />}
+      {revenues.data ? <FinancialRevenueRecords editionId={edition.id} sourceOptions={Object.fromEntries((revenues.data?.by_source||[]).filter(i=>i.name).map(i=>[i.key,i.name!]))} data={data} focus={focus === 'projetado' ? 'projetada' : 'confirmada'} canEdit={canEdit} canConfirm={canConfirm} onEdit={edit} /> : revenues.isError ? <p className="f28-revenue-unavailable">Registros indisponíveis.</p> : <Financial2028Loading label="Carregando receitas…" />}
     </Financial2028Panel></div>
     {editing && (editing === 'new' ? canEdit : editing.status === 'confirmada' ? canConfirm : canEdit) ? <RevenueDialog key={editing === 'new' ? 'new' : editing.id} edition={edition} revenue={editing === 'new' ? null : editing} capabilities={capabilities} onClose={() => setEditing(null)} /> : null}
   </div>;

@@ -5,9 +5,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { formatBRL, formatCompactBRL } from '../utils/financialFormatters';
 import '@/styles/financial-comparison-ui.css';
+import { FinancialInfo } from './FinancialEntryFields';
 
 export function FinancialComparisonHelp({ label, children }: { label: string; children: ReactNode }) {
-  return <Popover><PopoverTrigger asChild><button type="button" className="f28-comparison-help" aria-label={label}><HelpCircle aria-hidden="true" /></button></PopoverTrigger><PopoverContent className="f28-comparison-help-popover" align="end">{children}</PopoverContent></Popover>;
+  return <FinancialInfo label={label} ariaLabel={label}>{children}</FinancialInfo>;
 }
 
 export const FinancialComparisonMetric = memo(function FinancialComparisonMetric({ label, value, state = 'ready', primary = false, hint, attention = false, className }: {

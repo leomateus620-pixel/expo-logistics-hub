@@ -1,3 +1,4 @@
+import { FinancialScheduleSummary } from './FinancialScheduleSummary';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { formatCents } from '@/features/commercial-map/sales/salesMoney';
@@ -76,5 +77,6 @@ export function DashboardView({ edition }: { edition: FinancialEdition }) {
       </dl>
       <p className="f28-note">Contrapartidas em bens ou serviços ficam fora dos totais em dinheiro. A comercialização de lotes aparece pela Dashboard Comercial, com as mesmas regras de cálculo.</p>
     </Financial2028Panel>
+    <FinancialScheduleSummary editionId={edition.id}/>
   </div>;
 }

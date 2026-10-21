@@ -18,12 +18,13 @@ describe('capacidades financeiras da sessão', () => {
   it('consulta financial_can com o contrato SQL e mantém confirmação distinta de edição', async () => {
     mocked.rpc.mockImplementation(async (_name, args) => ({ data: args._capability === 'financial_access' || args._capability === 'financial_confirm', error: null }));
     const result = await fetchFinancialExpenseCapabilities('org');
-    expect(result).toEqual({ canAccess: true, canEdit: false, canConfirm: true, canAdmin: false });
+    expect(result).toEqual({ canAccess: true, canEdit: false, canConfirm: true, canAdmin: false, canSettle: false });
     expect(mocked.rpc.mock.calls).toEqual([
       ['financial_can', { _org_id: 'org', _capability: 'financial_access' }],
       ['financial_can', { _org_id: 'org', _capability: 'financial_edit' }],
       ['financial_can', { _org_id: 'org', _capability: 'financial_confirm' }],
       ['financial_can', { _org_id: 'org', _capability: 'financial_admin' }],
+      ['financial_can', { _org_id: 'org', _capability: 'financial_settle' }],
     ]);
   });
 

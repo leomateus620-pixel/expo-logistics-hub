@@ -1,10 +1,13 @@
+import { saveFinancialBatch, FinancialEntryError } from '@/features/financial-management/operational/financialEntryApi';
+
+vi.mock('@/features/financial-management/operational/financialEntryApi', async original => ({...await original<typeof import('@/features/financial-management/operational/financialEntryApi')>(), fetchPaymentPlan:vi.fn().mockResolvedValue(null),listFinancialReferences:vi.fn().mockResolvedValue([]),fetchFinancialSchedule:vi.fn().mockResolvedValue({months:[],unscheduled_sources:0}),saveFinancialBatch:vi.fn()}));
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Financial2028Workspace } from '@/features/financial-management/operational/Financial2028Workspace';
 import type { FinancialViewPath } from '@/features/financial-management/types';
-import { fetchBudgets, fetchBudgetLines, fetchEditions, fetchEditionSummary, fetchRevenues, fetchSponsorships, saveFinancialRecord } from '@/features/financial-management/operational/financialOperationalApi';
+import { FUNDING_TYPE_LABELS, fetchBudgets, fetchBudgetLines, fetchEditions, fetchEditionSummary, fetchRevenueOverview, fetchSponsorships, saveFinancialRecord } from '@/features/financial-management/operational/financialOperationalApi';
 
 vi.mock('@/hooks/useCurrentOrg', () => ({ useCurrentOrg: () => ({ orgId: 'qa-org' }) }));
 vi.mock('@/hooks/useOrgCommissions', () => ({ useOrgCommissions: () => ({ commissions: [
@@ -14,12 +17,17 @@ vi.mock('@/hooks/use-toast', () => ({ toast: vi.fn() }));
 vi.mock('@/features/financial-management/operational/useFinancialExpenseCapabilities', () => ({ useFinancialExpenseCapabilities: () => ({ canAccess: true, canEdit: true, canConfirm: true, canAdmin: true, isLoading: false, isError: false, refetch: vi.fn() }) }));
 // Workspace routing is verified here; authenticated expense behavior has its own integration tests.
 vi.mock('@/features/financial-management/operational/Financial2028Expenses', () => ({
-  Financial2028Expenses: ({ focus }: { focus: string }) => <div aria-label={`Despesas compartilhadas ${focus}`} />,
+  Financial2028Expenses: ({ focus }: { focus: string }) => <div aria-label={`Despesas compartilhadas ${focus}`}><h1>Despesas</h1></div>,
 }));
 vi.mock('@/features/financial-management/operational/financialOperationalApi', async (original) => ({
   ...await original<typeof import('@/features/financial-management/operational/financialOperationalApi')>(),
-  fetchEditions: vi.fn(), fetchBudgets: vi.fn(), fetchBudgetLines: vi.fn(), fetchEditionSummary: vi.fn(), fetchRevenues: vi.fn(), fetchSponsorships: vi.fn(), saveFinancialRecord: vi.fn(),
+  fetchEditions: vi.fn(), fetchBudgets: vi.fn(), fetchBudgetLines: vi.fn(), fetchEditionSummary: vi.fn(), fetchRevenueOverview: vi.fn(), fetchSponsorships: vi.fn(), saveFinancialRecord: vi.fn(),
 }));
+
+function overview(items: import('@/features/financial-management/operational/financialOperationalApi').FinancialRevenue[]) {
+ return {items,total:items.length,by_source:Object.keys(FUNDING_TYPE_LABELS).map(key=>({key,name:null,funding_type:key as keyof typeof FUNDING_TYPE_LABELS,count:items.filter(r=>r.funding_type===key&&r.status!=='cancelada').length,projected_cents:items.filter(r=>r.funding_type===key&&r.status!=='cancelada').reduce((s,r)=>s+r.projected_cents,0),confirmed_cents:0}))};
+}
+
 const edition = { id:'qa-e',org_id:'qa-org',code:2028,label:'Fenasoja 2028',status:'operacional' as const,period_start:'2027-01-01',period_end:'2028-12-31' };
 const budget = { id:'qa-b',edition_id:'qa-e',commission_id:'qa-c1',responsible_name:'Responsável de teste',budget_cap_cents:null,period_start:null,period_end:null,notes:null,version:7,updated_at:'' };
 const revenue = { id:'qa-r',description:'Receita de teste',counterparty:'Contraparte',responsible_name:null,funding_type:'recurso_livre' as const,status:'confirmada' as const,projected_cents:123456,confirmed_cents:12345,competence_date:null,due_date:'2028-05-01',notes:null,version:8 };
@@ -30,11 +38,11 @@ function mount(view: FinancialViewPath) {
   return render(<QueryClientProvider client={client}><Financial2028Workspace view={view} /></QueryClientProvider>);
 }
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.clearAllMocks();vi.mocked(saveFinancialBatch).mockResolvedValue({count:1,items:[{draft_id:'qa-draft',record:{id:'qa-saved'}}]});
   vi.mocked(fetchEditions).mockResolvedValue([edition]);
   vi.mocked(fetchBudgets).mockResolvedValue([budget]);
   vi.mocked(fetchBudgetLines).mockResolvedValue([{id:'qa-l',budget_id:budget.id,kind:'operacional',description:'Linha de teste',planned_cents:12345,active:true,version:1,notes:null}]);
-  vi.mocked(fetchRevenues).mockResolvedValue([revenue]);
+  vi.mocked(fetchRevenueOverview).mockResolvedValue(overview([revenue]));
   vi.mocked(fetchEditionSummary).mockResolvedValue({budget:{count:0,cap_cents:0,uncapped_count:0,planned_cents:0,line_count:0},revenues:{projected_cents:123456,confirmed_cents:12345,received_cents:123,receivable_open_cents:12222,overdue_count:0},revenue:{count:1,projected_cents:123456,confirmed_cents:12345},sponsorship:{count:0,declared_cents:0,projected_cents:0,confirmed_cents:0,in_kind_cents:0},obligations:{received_cents:123,paid_cents:0,receivable_open_cents:12222,payable_open_cents:0,overdue_count:0},movements:{count:1,inflow_cents:123,outflow_cents:0}});
   vi.mocked(fetchSponsorships).mockResolvedValue([sponsor]);
   vi.mocked(saveFinancialRecord).mockResolvedValue({id:'qa-saved',version:1});
@@ -52,7 +60,7 @@ describe('apresentação operacional Financeiro 2028', () => {
     await screen.findByText('Recebido');
     expect(screen.getAllByText(/9\.876\.543,21/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/1,23/).length).toBeGreaterThan(0);
-    expect(fetchRevenues).not.toHaveBeenCalled();
+    expect(fetchRevenueOverview).not.toHaveBeenCalled();
   });
   it('apresenta Sem teto e planejado por linhas sem substituir nulo por zero', async () => {
     mount('orcamento-comissoes');
@@ -84,17 +92,17 @@ describe('apresentação operacional Financeiro 2028', () => {
     const user=userEvent.setup(); mount('receitas-confirmadas');
     await screen.findAllByText('Receita de teste');
     await user.click(revenueRecords().getByRole('button',{name:'Editar Receita de teste'}));
-    const dialog=screen.getByRole('dialog'); const description=within(dialog).getByLabelText(/^Descrição/);
+    const description=await screen.findByLabelText(/^Descrição/); const dialog=screen.getByRole('dialog');
     await user.clear(description); await user.type(description,'Receita revisada em teste');
-    vi.mocked(saveFinancialRecord).mockRejectedValueOnce(new Error('Falha de rede recuperável de teste.'));
+    vi.mocked(saveFinancialBatch).mockRejectedValueOnce(new FinancialEntryError('Falha de rede recuperável de teste.',undefined,true));
     await user.click(within(dialog).getByRole('button',{name:'Salvar receita'}));
     await within(dialog).findByText('Falha de rede recuperável de teste.');
     expect(description).toHaveValue('Receita revisada em teste');
-    const first=vi.mocked(saveFinancialRecord).mock.calls[0][0];
-    expect(first).toMatchObject({entity:'revenue',expectedVersion:8,payload:{id:revenue.id,projected_cents:123456,confirmed_cents:12345}});
-    await user.click(within(dialog).getByRole('button',{name:'Salvar receita'}));
+    const first=vi.mocked(saveFinancialBatch).mock.calls[0];
+    expect(first[3][0]).toMatchObject({expected_version:8,payload:{id:revenue.id,projected_cents:123456,confirmed_cents:12345}});
+    await user.click(within(dialog).getByRole('button',{name:'Verificar e repetir tentativa'}));
     await waitFor(()=>expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(vi.mocked(saveFinancialRecord).mock.calls[1][0].requestId).toBe(first.requestId);
+    expect(vi.mocked(saveFinancialBatch).mock.calls[1]).toEqual(first);
   });
   it('conserva conflito de versão visível e rascunho aberto', async () => {
     const user=userEvent.setup(); mount('patrocinios');
@@ -108,14 +116,14 @@ describe('apresentação operacional Financeiro 2028', () => {
   });
   it('bloqueia controles e mantém envio até confirmação real', async () => {
     const user=userEvent.setup(); let confirm:(value:Record<string,unknown>)=>void=()=>undefined;
-    vi.mocked(saveFinancialRecord).mockImplementation(()=>new Promise(resolve=>{confirm=resolve;}));
+    vi.mocked(saveFinancialBatch).mockImplementation(()=>new Promise(resolve=>{confirm=resolve as typeof confirm;}));
     mount('receitas-projetadas'); await screen.findAllByText('Receita de teste');
     await user.click(revenueRecords().getByRole('button',{name:'Editar Receita de teste'}));
-    const dialog=screen.getByRole('dialog'); await user.click(within(dialog).getByRole('button',{name:'Salvar receita'}));
+    await screen.findByLabelText(/^Descrição/);const dialog=screen.getByRole('dialog'); await user.click(within(dialog).getByRole('button',{name:'Salvar receita'}));
     expect(within(dialog).getByLabelText(/^Descrição/)).toBeDisabled();
     expect(within(dialog).getByRole('button',{name:'Cancelar'})).toBeDisabled();
     fireEvent.keyDown(dialog,{key:'Escape'}); expect(dialog).toBeInTheDocument();
-    confirm({id:'qa-saved'}); await waitFor(()=>expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    confirm({count:1,items:[{draft_id:'qa-draft',record:{id:'qa-saved'}}]}); await waitFor(()=>expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
   it('preserva teto zero e motivo obrigatório ao editar teto ausente', async () => {
     const user=userEvent.setup(); mount('orcamento-comissoes');
@@ -162,7 +170,7 @@ describe('apresentação operacional Financeiro 2028', () => {
     expect(vi.mocked(saveFinancialRecord).mock.calls[0][0]).toMatchObject({entity:'sponsorship',expectedVersion:null,payload:{edition_id:'qa-e',name:'Patrocinador criado em teste',declared_cents:null,projected_free_cents:12345,confirmed_free_cents:0,in_kind_description:'Serviços sem movimentação financeira'}});
   });
   it('preserva seleção original: projetadas inclui confirmadas e exclui canceladas', async () => {
-    vi.mocked(fetchRevenues).mockResolvedValue([revenue,{...revenue,id:'qa-p',description:'Expectativa de teste',status:'projetada'},{...revenue,id:'qa-c',description:'Cancelada de teste',status:'cancelada'}]);
+    vi.mocked(fetchRevenueOverview).mockResolvedValue(overview([revenue,{...revenue,id:'qa-p',description:'Expectativa de teste',status:'projetada'},{...revenue,id:'qa-c',description:'Cancelada de teste',status:'cancelada'}]));
     const view=mount('receitas-projetadas');
     await screen.findAllByText('Expectativa de teste'); expect(screen.getAllByText('Receita de teste').length).toBeGreaterThan(0);
     expect(revenueRecords().queryByText('Cancelada de teste')).not.toBeInTheDocument(); view.unmount();

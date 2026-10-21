@@ -20,6 +20,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { resolveModuleAccess } from '@/hooks/useModuleAccess';
+import { useFinancialModuleAccess } from '@/hooks/useFinancialModuleAccess';
 import { dismissAlvoradaIntro } from '@/features/alvorada/introSession';
 import {
   ECOSYSTEM_CLOSE_LABEL,
@@ -117,6 +118,7 @@ export default function CommissionPortalPage() {
     isLoading: capabilitiesLoading,
   } = useCapabilities();
   const { hasOrg, orgId, myRole, isLoading: orgLoading } = useCurrentOrg();
+  const financialAccess = useFinancialModuleAccess(orgId);
   const [expandedEntry, setExpandedEntry] = useState<PortalEntryId | null>(null);
   const [ecosystemOpen, setEcosystemOpen] = useState(false);
   const [historyReleased, setHistoryReleased] = useState(false);
@@ -132,7 +134,7 @@ export default function CommissionPortalPage() {
   const { byUnit, memberUnitSlugs } = useCommissionPeople();
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const accessLoading = authLoading || capabilitiesLoading || orgLoading;
-  const moduleAccessContext = { capSet, hasFullAccess, myRole, memberUnitSlugs };
+  const moduleAccessContext = { capSet, hasFullAccess, myRole, memberUnitSlugs, financialAccess: financialAccess.canAccess };
 
   const fallbackPeople = (entry: OfficialUnitEntry) => {
     const role = entry.responsibleRole ?? 'Responsável';
@@ -161,6 +163,7 @@ export default function CommissionPortalPage() {
     if (!user) return anonymousAccess(getCommissionLoginPath(module));
     if (accessLoading) return loadingAccess();
     if (!hasOrg) return organizationSetupAccess(getCommissionDestination(module));
+    if (module.sensitive && financialAccess.isLoading) return loadingAccess();
 
     const { canAccess } = resolveModuleAccess(module, false, moduleAccessContext);
     if (canAccess) return allowedAccess(getCommissionDestination(module));

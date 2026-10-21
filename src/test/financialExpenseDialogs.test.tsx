@@ -1,4 +1,6 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
+import {saveFinancialBatch,FinancialEntryError} from '@/features/financial-management/operational/financialEntryApi';
+import { cleanup, fireEvent, render as rtlRender, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -8,6 +10,10 @@ import { FinancialExpenseError, type ExpenseCategory, type FinancialExpense } fr
 import type { FinancialEdition } from '@/features/financial-management/operational/financialOperationalApi';
 import type { FinancialExpenseCapabilities } from '@/features/financial-management/operational/useFinancialExpenseCapabilities';
 
+const render=(ui:React.ReactNode)=>rtlRender(<QueryClientProvider client={new QueryClient({defaultOptions:{queries:{retry:false},mutations:{retry:false}}})}>{ui}</QueryClientProvider>);
+vi.mock('@/hooks/useCurrentOrg',()=>({useCurrentOrg:()=>({orgId:'org'})}));
+vi.mock('@/features/financial-management/operational/useFinancialExpenseCapabilities',()=>({useFinancialExpenseCapabilities:()=>({canAccess:true,canEdit:false,canConfirm:false,canAdmin:false,canSettle:false,isLoading:false,isError:false})}));
+vi.mock('@/features/financial-management/operational/financialEntryApi',async original=>({...await original<typeof import('@/features/financial-management/operational/financialEntryApi')>(),fetchPaymentPlan:vi.fn().mockResolvedValue(null),listFinancialReferences:vi.fn().mockResolvedValue([]),saveFinancialBatch:vi.fn()}));
 const mocked = vi.hoisted(() => ({
   save: vi.fn(), transition: vi.fn(), categorySave: vi.fn(), seed: vi.fn(),
   categories: [] as unknown[], categoryLoading: false, categoryError: false, detail: null as unknown,
@@ -33,6 +39,7 @@ const expense: FinancialExpense = {
 };
 
 beforeEach(() => {
+  vi.mocked(saveFinancialBatch).mockReset().mockResolvedValue({count:1,items:[{draft_id:'qa-draft',record:{id:'expense'}}]});
   mocked.save.mockReset().mockResolvedValue(expense);
   mocked.transition.mockReset().mockResolvedValue(expense);
   mocked.categorySave.mockReset().mockResolvedValue(category);
@@ -54,8 +61,8 @@ describe('formulários de despesas 2028', () => {
     const projected = screen.getByLabelText(/Valor projetado/);
     await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
     const titleError = await screen.findByRole('alert');
-    expect(titleError).toHaveTextContent('Informe uma descrição com pelo menos 2 caracteres.');
-    expect(title.closest('label')).toContainElement(titleError);
+    expect(titleError).toHaveTextContent('Informe uma descrição com 2 a 240 caracteres.');
+    expect(document.getElementById(title.getAttribute('aria-describedby')!)).toBe(titleError);
     expect(title).toHaveAttribute('aria-invalid', 'true');
     expect(title).toHaveAttribute('aria-describedby', titleError.id);
     expect(title).toHaveFocus();
@@ -67,53 +74,58 @@ describe('formulários de despesas 2028', () => {
 
     await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
     const amountError = await screen.findByRole('alert');
-    expect(amountError).toHaveTextContent('Informe o valor projetado.');
-    expect(projected.closest('label')).toContainElement(amountError);
+    expect(amountError).toHaveTextContent('Informe o valor projetado maior que zero.');
+    expect(document.getElementById(projected.getAttribute('aria-describedby')!)).toBe(amountError);
     expect(projected).toHaveAttribute('aria-describedby', amountError.id);
     expect(projected).toHaveFocus();
     expect(mocked.save).not.toHaveBeenCalled();
     await user.type(projected, '500,00');
+    fireEvent.change(screen.getByLabelText(/^Vencimento$/),{target:{value:'2028-05-10'}});
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(projected).not.toHaveAttribute('aria-invalid');
     await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
-    expect(mocked.save).toHaveBeenCalledOnce();
-    expect(mocked.save.mock.calls[0][0].payload).toMatchObject({ title: 'Locação planejada', status: 'prevista', planned_cents: 50000 });
+    expect(saveFinancialBatch).toHaveBeenCalledOnce();
+    expect(vi.mocked(saveFinancialBatch).mock.calls[0][3][0].payload).toMatchObject({ title: 'Locação planejada', status: 'prevista', planned_cents: 50000 });
   });
 
   it('retry de realizada direta preserva chave, centavos e ausência de previsão', async () => {
     const user = userEvent.setup();
-    mocked.save.mockRejectedValueOnce(new FinancialExpenseError('network', 'Falha de conexão.'));
+    vi.mocked(saveFinancialBatch).mockRejectedValueOnce(new FinancialEntryError('Falha de conexão.',undefined,true));
     const close = vi.fn();
     render(<ExpenseFormDialog org="org" edition={edition} value="new-realizada" onClose={close} categories={[category]} commissions={[]} capabilities={capabilities} />);
     await user.type(screen.getByLabelText(/Descrição da despesa/), 'Compra direta');
     await user.type(screen.getByLabelText(/Valor realizado/), '1.234,56');
     fireEvent.change(screen.getByLabelText(/Competência/), { target: { value: '2028-05-02' } });
+    fireEvent.change(screen.getByLabelText(/^Vencimento$/),{target:{value:'2028-05-10'}});
     await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Falha de conexão');
     expect(close).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
+    await user.click(screen.getByRole('button', { name: 'Verificar e repetir tentativa' }));
     await waitFor(() => expect(close).toHaveBeenCalledOnce());
-    expect(mocked.save).toHaveBeenCalledTimes(2);
-    expect(mocked.save.mock.calls[0][0]).toEqual(mocked.save.mock.calls[1][0]);
-    expect(mocked.save.mock.calls[0][0]).toMatchObject({ expectedVersion: null, payload: { status: 'realizada', planned_cents: null, committed_cents: 123456 } });
+    expect(saveFinancialBatch).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(saveFinancialBatch).mock.calls[0]).toEqual(vi.mocked(saveFinancialBatch).mock.calls[1]);
+    expect(vi.mocked(saveFinancialBatch).mock.calls[0][3][0]).toMatchObject({ expected_version: null, payload: { status: 'realizada', planned_cents: null, committed_cents: 123456 } });
   });
 
   it('edit sem confirmação preserva os campos realizados e o vínculo arquivado', async () => {
     const user = userEvent.setup();
     render(<ExpenseFormDialog org="org" edition={edition} value={expense} onClose={vi.fn()} categories={[{ ...category, active: false }, { ...category, id: 'other', name: 'Outra arquivada', active: false }]} commissions={[]} capabilities={{ ...capabilities, canConfirm: false }} />);
+    await screen.findByLabelText(/Valor realizado/);
     expect(screen.getByLabelText(/Valor realizado/)).toBeDisabled();
     expect(screen.getByLabelText(/Competência/)).toBeDisabled();
-    expect(screen.getByRole('option', { name: /Serviços.*arquivada/ })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', {name:'Categoria'})).toHaveValue('Serviços');
     expect(screen.queryByRole('option', { name: /Outra arquivada/ })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
-    expect(mocked.save.mock.calls[0][0]).toMatchObject({ expectedVersion: 7, payload: { id: expense.id, planned_cents: 100000, category_id: 'category' } });
-    expect(mocked.save.mock.calls[0][0].payload).not.toHaveProperty('committed_cents');
-    expect(mocked.save.mock.calls[0][0].payload).not.toHaveProperty('committed_on');
+    await waitFor(()=>expect(saveFinancialBatch).toHaveBeenCalledOnce());
+    expect(vi.mocked(saveFinancialBatch).mock.calls[0][3][0]).toMatchObject({ expected_version: 7, payload: { id: expense.id, planned_cents: 100000, category_id: 'category' } });
+    expect(vi.mocked(saveFinancialBatch).mock.calls[0][3][0].payload).not.toHaveProperty('committed_cents');
+    expect(vi.mocked(saveFinancialBatch).mock.calls[0][3][0].payload).not.toHaveProperty('committed_on');
   });
 
   it('não envia compromisso menor que pago nem permite transição paga', async () => {
     const user = userEvent.setup();
     render(<ExpenseFormDialog org="org" edition={edition} value={{ ...expense, paid_cents: 50000 }} onClose={vi.fn()} categories={[]} commissions={[]} capabilities={capabilities} />);
+    await screen.findByLabelText(/Valor realizado/);
     await user.clear(screen.getByLabelText(/Valor realizado/));
     await user.type(screen.getByLabelText(/Valor realizado/), '400,00');
     await user.click(screen.getByRole('button', { name: 'Salvar despesa' }));
@@ -121,7 +133,7 @@ describe('formulários de despesas 2028', () => {
     expect(mocked.save).not.toHaveBeenCalled();
     cleanup();
     render(<TransitionDialog org="org" expense={{ ...expense, paid_cents: 50000 }} to="cancelada" onClose={vi.fn()} capabilities={capabilities} />);
-    expect(screen.getByRole('button', { name: 'Cancelar despesa' })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Cancelar despesa' })).toBeDisabled();
     expect(screen.getByRole('status')).toHaveTextContent('Há pagamentos registrados');
     expect(mocked.transition).not.toHaveBeenCalled();
   });

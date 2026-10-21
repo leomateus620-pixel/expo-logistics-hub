@@ -1,3 +1,8 @@
+import { FinancialPaymentPlanPanel } from './FinancialPaymentPlanPanel';
+import { useQuery } from '@tanstack/react-query';
+import { fetchPaymentPlan, type PaymentPlan } from './financialEntryApi';
+import { FinancialPaymentPlanEditor, makePlanDraft, paymentPlanInput, validatePaymentPlan } from './FinancialPaymentPlanEditor';
+import { FinancialEntryComposer } from './FinancialEntryComposer';
 import { useRef, useState, type ComponentProps, type FormEvent } from 'react';
 import { AlertCircle, Archive, CheckCircle2, Loader2, Pencil, RotateCcw, Tags, Undo2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -66,111 +71,22 @@ function FormError({ error }: { error: unknown }) {
   </div>;
 }
 
-export function ExpenseFormDialog({ org, edition, value, onClose, categories, commissions, capabilities }: {
+export function ExpenseFormDialog({ org, edition, value, onClose, commissions, capabilities }: {
   org: string; edition: FinancialEdition; value: FinancialExpense | 'new-prevista' | 'new-realizada'; onClose: () => void;
   categories: CategoryOption[]; commissions: Array<{ id: string; nome: string }>;
 } & DialogCapabilities) {
-  const existing = typeof value === 'string' ? null : value;
-  const status = existing?.status ?? (value === 'new-realizada' ? 'realizada' : 'prevista');
-  const allowed = edition.status === 'operacional' && status !== 'cancelada' && capabilities.canEdit && (!existing && status === 'realizada' ? capabilities.canConfirm : true) && !capabilities.isLoading && !capabilities.isError;
-  const [form, setForm] = useState({
-    title: existing?.title ?? '', description: existing?.description ?? '', category_id: existing?.category_id ?? '',
-    commission_id: existing?.commission_id ?? '', payee_name: existing?.payee_name ?? '',
-    planned: centsToInput(existing?.planned_cents ?? null), planned_on: existing?.planned_on ?? '',
-    committed: centsToInput(existing?.committed_cents ?? null), committed_on: existing?.committed_on ?? '',
-    due_date: existing?.due_date ?? '', notes: existing?.notes ?? '',
-  });
-  const [error, setError] = useState<unknown>(null);
-  const [errorField, setErrorField] = useState<keyof typeof form | null>(null);
-  const save = useSaveExpense(org);
-  const requests = useRequestKeys();
-  const set = (key: keyof typeof form) => (event: { target: { value: string } }) => {
-    setForm((current) => ({ ...current, [key]: event.target.value }));
-    if (errorField === key) { setError(null); setErrorField(null); }
-  };
-  const fieldError = (key: keyof typeof form) => errorField === key && error
-    ? <p id={`expense-${key}-error`} className="f28-expense-field-error" role="alert">{errorMessage(error)}</p> : null;
-  const fieldA11y = (key: keyof typeof form) => ({ id: `expense-${key}`, 'aria-invalid': errorField === key || undefined, 'aria-describedby': errorField === key ? `expense-${key}-error` : undefined });
-  const canChangeCommitment = capabilities.canConfirm;
-  const options = categories.filter((category) => category.active !== false || category.id === existing?.category_id);
-  if (existing?.category_id && !options.some((category) => category.id === existing.category_id)) {
-    options.push({ id: existing.category_id, name: existing.category_name ?? 'Categoria vinculada', active: false });
-  }
-
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
-    if (!allowed || save.isPending) return;
-    setError(null);
-    setErrorField(null);
-    let validating: keyof typeof form | null = 'title';
-    try {
-      if (form.title.trim().length < 2) throw new FinancialExpenseError('validation', 'Informe uma descrição com pelo menos 2 caracteres.');
-      validating = 'planned';
-      const planned = parseCents(form.planned);
-      if (status === 'prevista' && planned == null) throw new FinancialExpenseError('validation', 'Informe o valor projetado.');
-      validating = 'committed';
-      const committed = status === 'realizada' ? parseCents(form.committed) : null;
-      if (status === 'realizada' && (committed ?? 0) <= 0) throw new FinancialExpenseError('validation', 'Informe valor realizado maior que zero.');
-      if (existing && committed != null && committed < existing.paid_cents) throw new FinancialExpenseError('validation', 'O valor realizado não pode ficar abaixo do que já foi pago.');
-      validating = 'committed_on';
-      if (status === 'realizada' && !form.committed_on) throw new FinancialExpenseError('validation', 'Informe a data de competência / realização.');
-      validating = null;
-      const payload: ExpenseInput = {
-        ...(existing ? { id: existing.id } : { edition_id: edition.id, status: status as 'prevista' | 'realizada' }),
-        title: form.title.trim(), description: form.description.trim() || null, category_id: form.category_id || null,
-        commission_id: form.commission_id || null, payee_name: form.payee_name.trim() || null,
-        planned_cents: planned, planned_on: form.planned_on || null, due_date: form.due_date || null, notes: form.notes.trim() || null,
-        ...(status === 'realizada' && canChangeCommitment ? { committed_cents: committed, committed_on: form.committed_on || null } : {}),
-      };
-      const content = { payload, expectedVersion: existing?.version ?? null };
-      await save.mutateAsync({ ...content, requestId: requests.for(content) });
-      onClose();
-    } catch (caught) {
-      setError(caught); setErrorField(validating);
-      if (validating) document.getElementById(`expense-${validating}`)?.focus();
-    }
-  };
-
-  return <Dialog open onOpenChange={(open) => !open && !save.isPending && onClose()}>
-    <ExpenseDialogContent className="f28-expense-dialog" data-tone={status === 'realizada' ? 'realizado' : 'projetado'}>
-      <DialogHeader><DialogTitle>{existing ? 'Editar despesa' : status === 'realizada' ? 'Adicionar despesa realizada' : 'Adicionar despesa projetada'}</DialogTitle>
-        <DialogDescription>{status === 'realizada' ? 'Realizado registra o compromisso. Pagamentos e saldo vêm da liquidação registrada.' : 'Registre o planejamento. A previsão será preservada quando a despesa for realizada.'}</DialogDescription></DialogHeader>
-      <form noValidate onSubmit={submit} className="f28-expense-dialog-form" aria-busy={save.isPending}>
-        <div className="f28-expense-dialog-body">
-          <PermissionNotice capabilities={capabilities} allowed={allowed} />
-          <fieldset disabled={!allowed || save.isPending} className="f28-expense-fields">
-            <legend>Identificação</legend>
-            <label className="f28-expense-field-wide">Descrição da despesa *<Input {...fieldA11y('title')} autoFocus required minLength={2} maxLength={240} value={form.title} onChange={set('title')} placeholder="Ex.: Locação de equipamentos" />{fieldError('title')}</label>
-            <label>Categoria<select className="f28-expense-select" value={form.category_id} onChange={set('category_id')}>
-              <option value="">Sem categoria</option>{options.map((category) => <option key={category.id} value={category.id}>{category.name}{category.active === false ? ' · arquivada (vínculo atual)' : ''}</option>)}</select></label>
-            <label>Comissão responsável<select className="f28-expense-select" value={form.commission_id} onChange={set('commission_id')}>
-              <option value="">Sem comissão</option>{commissions.map((commission) => <option key={commission.id} value={commission.id}>{commission.nome}</option>)}</select></label>
-            <label className="f28-expense-field-wide">Fornecedor / favorecido<Input maxLength={200} value={form.payee_name} onChange={set('payee_name')} /></label>
-            <label className="f28-expense-field-wide">Detalhamento<Textarea maxLength={2000} value={form.description} onChange={set('description')} rows={2} /></label>
-          </fieldset>
-          <fieldset disabled={!allowed || save.isPending} className="f28-expense-fields">
-            <legend>Previsão e compromisso</legend>
-            <label>Valor projetado (R$){status === 'prevista' ? ' *' : ''}<Input {...fieldA11y('planned')} inputMode="decimal" required={status === 'prevista'} value={form.planned} onChange={set('planned')} placeholder="0,00" />{fieldError('planned')}
-              {status === 'realizada' && !existing && <small>Deixe em branco para registrar sem previsão.</small>}</label>
-            <label>Data prevista<Input type="date" value={form.planned_on} onChange={set('planned_on')} /></label>
-            {status === 'realizada' && <>
-              <label>Valor realizado (R$) *<Input {...fieldA11y('committed')} inputMode="decimal" required value={form.committed} onChange={set('committed')} placeholder="0,00" disabled={!canChangeCommitment} />{fieldError('committed')}</label>
-              <label>Competência / realização *<Input {...fieldA11y('committed_on')} type="date" required value={form.committed_on} onChange={set('committed_on')} disabled={!canChangeCommitment} />{fieldError('committed_on')}</label>
-              {!canChangeCommitment && <p className="f28-expense-field-wide f28-expense-field-help">Alterar o compromisso exige confirmação financeira. Os demais campos seguem editáveis.</p>}
-            </>}
-            <label>Vencimento<Input type="date" value={form.due_date} onChange={set('due_date')} /></label>
-            <label className="f28-expense-field-wide">Observações<Textarea maxLength={2000} value={form.notes} onChange={set('notes')} rows={2} /></label>
-          </fieldset>
-          <FormError error={errorField ? null : error} />
-        </div>
-        <DialogFooter className="f28-expense-dialog-footer"><Button type="button" variant="outline" disabled={save.isPending} onClick={onClose}>Fechar</Button>
-          <Button type="submit" disabled={!allowed || save.isPending}>{save.isPending && <Loader2 className="animate-spin" aria-hidden="true" />}{save.isPending ? 'Salvando…' : 'Salvar despesa'}</Button></DialogFooter>
-      </form>
-    </ExpenseDialogContent>
-  </Dialog>;
+  return <FinancialEntryComposer org={org} edition={edition} kind="expense" expense={typeof value === 'string' ? null : value}
+    initialStatus={value === 'new-realizada' ? 'realizada' : 'prevista'} commissions={commissions} capabilities={capabilities} onClose={onClose} />;
 }
 
-export function TransitionDialog({ org, expense, to, onClose, capabilities }: { org: string; expense: FinancialExpense; to: ExpenseStatus; onClose: () => void } & DialogCapabilities) {
+type TransitionProps = { org: string; expense: FinancialExpense; to: ExpenseStatus; onClose: () => void } & DialogCapabilities;
+export function TransitionDialog(props: TransitionProps) {
+  const plan = useQuery({queryKey:['financial-operational','payment-plan',props.org,props.expense.edition_id,props.expense.id],queryFn:()=>fetchPaymentPlan(props.org,props.expense.edition_id,'despesa',props.expense.id),enabled:props.capabilities.canAccess,retry:false});
+  if (plan.isLoading || plan.isError) return <Dialog open onOpenChange={v=>!v&&props.onClose()}><ExpenseDialogContent className="f28-expense-dialog f28-expense-dialog--compact"><DialogHeader><DialogTitle>Conferir cronograma</DialogTitle><DialogDescription>{plan.isError?'Não foi possível consultar o cronograma atual.':'Consultando o estado persistido…'}</DialogDescription></DialogHeader>{plan.isError&&<Button onClick={()=>void plan.refetch()}>Tentar novamente</Button>}<Button variant="outline" onClick={props.onClose}>Fechar</Button></ExpenseDialogContent></Dialog>;
+  return <TransitionDialogBody {...props} initialPlan={plan.data||null}/>;
+}
+function TransitionDialogBody({ org, expense, to, onClose, capabilities, initialPlan }: TransitionProps & {initialPlan:PaymentPlan|null}) {
+  const [planDraft, setPlanDraft] = useState(()=>makePlanDraft(initialPlan,expense.due_date||''));
   const [committed, setCommitted] = useState(centsToInput(expense.planned_cents));
   const [committedOn, setCommittedOn] = useState(dateToday);
   const [due, setDue] = useState(expense.due_date ?? '');
@@ -179,6 +95,7 @@ export function TransitionDialog({ org, expense, to, onClose, capabilities }: { 
   const mutation = useTransitionExpense(org);
   const requests = useRequestKeys();
   const allowed = canTransitionExpense(expense, to, capabilities);
+  const planTotalPreview=(()=>{try{return to==='realizada'?(parseCents(committed)||0):(expense.planned_cents||0);}catch{return 0;}})();
   const titles = { realizada: 'Realizar despesa', prevista: 'Voltar para prevista', cancelada: 'Cancelar despesa' };
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -188,9 +105,12 @@ export function TransitionDialog({ org, expense, to, onClose, capabilities }: { 
       const amount = to === 'realizada' ? parseCents(committed) : null;
       if (to === 'realizada' && ((amount ?? 0) <= 0 || !committedOn)) throw new FinancialExpenseError('validation', 'Informe valor realizado maior que zero e a data de competência.');
       if (to !== 'realizada' && reason.trim().length < 3) throw new FinancialExpenseError('validation', 'Informe o motivo (mínimo 3 caracteres).');
+      const planTotal=to==='realizada'?amount!:(expense.planned_cents||0);
+      if(to!=='cancelada'){const problem=validatePaymentPlan(planDraft,planTotal);if(problem)throw new FinancialExpenseError('validation',problem);}
+      const schedule=to!=='cancelada'?{payment_plan:paymentPlanInput(planDraft,planTotal)}:{};
       const content = {
         id: expense.id, to, expectedVersion: expense.version,
-        payload: to === 'realizada' ? { committed_cents: amount!, committed_on: committedOn, due_date: due || null } : {},
+        payload: to === 'realizada' ? { committed_cents: amount!, committed_on: committedOn, due_date: due || null, ...schedule } : schedule,
         reason: to === 'realizada' ? null : reason.trim(),
       };
       await mutation.mutateAsync({ ...content, requestId: requests.for(content) });
@@ -212,6 +132,7 @@ export function TransitionDialog({ org, expense, to, onClose, capabilities }: { 
               <label>Vencimento<Input type="date" value={due} onChange={(event) => setDue(event.target.value)} /></label>
             </> : <label>Motivo *<Textarea autoFocus required minLength={3} maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} placeholder="Informe o motivo para o histórico" /></label>}
           </fieldset>
+          {to!=='cancelada'&&<div className="f28-entry-transition"><FinancialPaymentPlanEditor id="expense-transition-plan" value={planDraft} total={planTotalPreview} onChange={setPlanDraft} disabled={!allowed||mutation.isPending}/></div>}
           <FormError error={error} />
         </div>
         <DialogFooter className="f28-expense-dialog-footer"><Button type="button" variant="outline" disabled={mutation.isPending} onClick={onClose}>Fechar</Button>
@@ -320,7 +241,7 @@ export function ExpenseDetailDialog({ org, expenseId, onClose, onEdit, onTransit
             </dl>
             {expense.settlement_inconsistent && <p className="f28-expense-dialog-error" role="alert">O servidor identificou uma inconsistência de liquidação. Revise os movimentos antes de alterar o compromisso.</p>}
             <dl className="f28-expense-detail-metadata">
-              <div><dt>Fornecedor / favorecido</dt><dd>{expense.payee_name || 'Não informado'}</dd></div>
+              <div><dt>Fornecedor / favorecido</dt><dd>{expense.payee_reference_name || expense.payee_name || 'Não informado'}</dd></div>
               <div><dt>Data prevista</dt><dd>{fmtDate(expense.planned_on)}</dd></div>
               <div><dt>Competência / realização</dt><dd>{fmtDate(expense.committed_on)}</dd></div>
               <div><dt>Vencimento</dt><dd>{fmtDate(expense.due_date)}</dd></div>
@@ -339,6 +260,7 @@ export function ExpenseDetailDialog({ org, expenseId, onClose, onEdit, onTransit
               {detail.data.history.length === 0 ? <p className="f28-expense-detail-empty">Nenhuma alteração registrada.</p> : <ol className="f28-expense-history-list">{detail.data.history.map((entry) => <li key={entry.id}><div><strong>{historyLabels[entry.action] ?? entry.action}</strong><time dateTime={entry.created_at}>{new Date(entry.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' })}</time></div>{entry.reason && <p>{entry.reason}</p>}</li>)}</ol>}
             </section>
           </>}
+      {expense&&<FinancialPaymentPlanPanel editionId={expense.edition_id} type="despesa" sourceId={expense.id}/>}
       </div>
       <DialogFooter className="f28-expense-dialog-footer f28-expense-detail-actions">
         {expense && onEdit && capabilities.canEdit && !capabilities.isLoading && !capabilities.isError && expense.status !== 'cancelada' && <Button type="button" size="sm" variant="outline" onClick={() => onEdit(expense)}><Pencil aria-hidden="true" />Editar</Button>}
