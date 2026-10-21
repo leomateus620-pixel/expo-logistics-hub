@@ -1,3 +1,4 @@
+import type { PaymentPlanInput } from './financialEntryApi';
 import { supabase } from '@/integrations/supabase/client';
 import { FinancialNotActivatedError } from './financialOperationalApi';
 
@@ -16,6 +17,7 @@ export const EXPENSE_DATE_FIELD_LABELS: Record<ExpenseDateField, string> = {
 };
 
 export interface FinancialExpense {
+  payee_reference_id?: string | null; payee_reference_name?: string | null;
   id: string; edition_id: string; title: string; description: string | null;
   category_id: string | null; category_name: string | null; commission_id: string | null; commission_name: string | null;
   budget_line_id: string | null; payee_name: string | null;
@@ -129,7 +131,7 @@ export interface ExpenseInput {
 export const saveExpense = (orgId: string, payload: ExpenseInput, expectedVersion: number | null, requestId: string, reason?: string) =>
   rpc<FinancialExpense>('financial_save_expense', { _org_id: orgId, _payload: payload, _expected_version: expectedVersion, _request_id: requestId, _reason: reason ?? null });
 export const transitionExpense = (orgId: string, expenseId: string, to: ExpenseStatus, expectedVersion: number,
-  payload: { committed_cents?: number; committed_on?: string; due_date?: string | null }, reason: string | null, requestId: string) =>
+  payload: { committed_cents?: number; committed_on?: string; due_date?: string | null; payment_plan?: PaymentPlanInput }, reason: string | null, requestId: string) =>
   rpc<FinancialExpense>('financial_transition_expense', { _org_id: orgId, _expense_id: expenseId, _to: to, _expected_version: expectedVersion,
     _payload: payload, _reason: reason, _request_id: requestId });
 export const saveExpenseCategory = (orgId: string, payload: Partial<ExpenseCategory> & { name?: string }, expectedVersion: number | null, requestId: string) =>

@@ -1,0 +1,76 @@
+{
+  "environment": "isolated PostgreSQL 18.4; local HTTP bridge; fictitious records only",
+  "checked_at": "2026-10-21T18:52:39.728Z",
+  "revenue_batch": [
+    {
+      "id": "692b575c-2c43-4b67-b12a-786449b0294f",
+      "description": "Receita navegador · validação isolada",
+      "projected_cents": "100000",
+      "confirmed_cents": "100000",
+      "counterparty_reference_id": "38f09ed9-0244-485b-8ca0-4faf0b28afaf",
+      "funding_source_reference_id": "66c087ae-72f4-4f7e-a4a5-7ab751d5ddef",
+      "plan_id": "0878e92e-81e0-4ae3-9b67-67fae9c15dbe",
+      "version": 1,
+      "condition": "parcelado",
+      "default_method": "pix",
+      "total_cents": "100000",
+      "installments": [
+        {
+          "id": "26f9497f-e946-424f-a7bd-e16139376da3",
+          "date": "2028-01-31",
+          "method": "pix",
+          "amount_cents": 33333
+        },
+        {
+          "id": "46b62d16-8332-456a-8599-abd1777485ae",
+          "date": "2028-02-29",
+          "method": "pix",
+          "amount_cents": 33333
+        },
+        {
+          "id": "4c88d329-47d8-41ff-9d20-61cffbae1555",
+          "date": "2028-03-31",
+          "method": "pix",
+          "amount_cents": 33334
+        }
+      ],
+      "net_settled_cents": "0"
+    },
+    {
+      "id": "c248197c-3d2a-4aa8-b0f4-eab08397c3a5",
+      "description": "Segunda receita do navegador · previsão",
+      "projected_cents": "50000",
+      "confirmed_cents": null,
+      "counterparty_reference_id": null,
+      "funding_source_reference_id": null,
+      "plan_id": "1ae05a37-72dd-4ba0-a557-2f088fbecb91",
+      "version": 1,
+      "condition": "avista",
+      "default_method": null,
+      "total_cents": "50000",
+      "installments": [
+        {
+          "id": "b5585d4c-92b7-4114-ad40-8ddea480c813",
+          "date": "2028-04-30",
+          "method": null,
+          "amount_cents": 50000
+        }
+      ],
+      "net_settled_cents": "0"
+    }
+  ],
+  "expense_mobile": [
+    {
+      "id": "c35b5b00-a745-455c-bf34-fcfbe2c3779f",
+      "title": "Despesa mobile · validação isolada",
+      "planned_cents": "60000",
+      "committed_cents": null,
+      "financial_category_id": "3a650239-2136-44ac-bfd8-8dfc95d10c14",
+      "payee_reference_id": "12e42323-bb1c-4ae1-a616-e14ae4e20d30",
+      "condition": "parcelado",
+      "default_method": "boleto",
+      "total_cents": "60000",
+      "installments": "6"
+    }
+  ]
+}

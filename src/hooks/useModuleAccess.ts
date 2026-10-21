@@ -3,6 +3,7 @@ import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useCommissionPeople } from '@/hooks/useCommissionPeople';
 import { resolveOfficialUnit } from '@/modules/commissions/officialCommissionCatalog';
 import type { CommissionModule } from '@/modules/commissions/commissionRegistry';
+import { useFinancialModuleAccess } from './useFinancialModuleAccess';
 
 interface ModuleAccessContext {
   capSet: ReadonlySet<string>;
@@ -10,12 +11,13 @@ interface ModuleAccessContext {
   myRole?: string | null;
   /** Frentes oficiais em que o usuário está vinculado no Agenda Fenasoja. */
   memberUnitSlugs?: ReadonlySet<string>;
+  financialAccess?: boolean;
 }
 
 export function resolveModuleAccess(
   module: CommissionModule | undefined,
   adminArea: boolean,
-  { capSet, hasFullAccess, myRole, memberUnitSlugs }: ModuleAccessContext,
+  { capSet, hasFullAccess, myRole, memberUnitSlugs, financialAccess }: ModuleAccessContext,
 ) {
   const hasRoleAccess = myRole === 'admin' || myRole === 'gestor';
   const hasExplicitFullAccess = capSet.has('full_access');
@@ -33,9 +35,7 @@ export function resolveModuleAccess(
   );
   // Sensitive modules (Financeiro Gerencial) require an explicit financial grant:
   // generic full access / gestor role is not enough.
-  const hasSensitiveAccess = myRole === 'admin'
-    || capSet.has('admin_access')
-    || capSet.has('financial_access');
+  const hasSensitiveAccess = financialAccess === true;
 
   const canAccess = adminArea
     ? hasAdminAccess
@@ -49,18 +49,20 @@ export function resolveModuleAccess(
 
 export function useModuleAccess(module?: CommissionModule, adminArea = false) {
   const { capSet, hasFullAccess, isLoading: capsLoading } = useCapabilities();
-  const { myRole, isLoading: orgLoading } = useCurrentOrg();
+  const { orgId, myRole, isLoading: orgLoading } = useCurrentOrg();
+  const financial = useFinancialModuleAccess(orgId, Boolean(module?.sensitive) && !adminArea);
   const { memberUnitSlugs, isLoading: peopleLoading } = useCommissionPeople();
   const { canAccess, hasAdminAccess } = resolveModuleAccess(module, adminArea, {
     capSet,
     hasFullAccess,
     myRole,
     memberUnitSlugs,
+    financialAccess: financial.canAccess,
   });
 
   return {
     canAccess,
     hasAdminAccess,
-    isLoading: capsLoading || orgLoading || (!adminArea && peopleLoading),
+    isLoading: capsLoading || orgLoading || (!adminArea && peopleLoading) || financial.isLoading,
   };
 }

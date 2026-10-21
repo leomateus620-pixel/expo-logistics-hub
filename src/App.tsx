@@ -493,7 +493,7 @@ const App = () => (
       buster: lastUserId,
       dehydrateOptions: {
         shouldDehydrateQuery: (query) =>
-          query.queryKey[0] !== 'commercial-map' && query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
+          query.queryKey[0] !== 'commercial-map' && query.queryKey[0] !== 'financial-operational' && query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
       },
     }}
   >

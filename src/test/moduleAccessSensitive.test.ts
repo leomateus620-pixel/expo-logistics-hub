@@ -16,28 +16,29 @@ describe('resolveModuleAccess — módulo sensível (Financeiro Gerencial)', () 
     ).toBe(false);
   });
 
-  it('libera com financial_access, admin_access ou papel admin', () => {
+  it('exige confirmação do servidor mesmo com financial_access, admin_access ou papel admin', () => {
     expect(
       resolveModuleAccess(financeiro, false, {
         capSet: new Set(['financial_access']),
         hasFullAccess: false,
         myRole: 'leitura',
       }).canAccess,
-    ).toBe(true);
+    ).toBe(false);
     expect(
       resolveModuleAccess(financeiro, false, {
         capSet: new Set(['admin_access']),
         hasFullAccess: false,
         myRole: 'leitura',
       }).canAccess,
-    ).toBe(true);
+    ).toBe(false);
     expect(
       resolveModuleAccess(financeiro, false, {
         capSet: new Set<string>(),
         hasFullAccess: false,
         myRole: 'admin',
       }).canAccess,
-    ).toBe(true);
+    ).toBe(false);
+    expect(resolveModuleAccess(financeiro, false, {capSet: new Set(),hasFullAccess: false,myRole:'admin',financialAccess:true}).canAccess).toBe(true);
   });
 
   it('mantém os demais módulos abertos para acesso total', () => {

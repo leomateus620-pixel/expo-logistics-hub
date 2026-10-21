@@ -1,3 +1,4 @@
+import { FinancialEntryComposer } from './FinancialEntryComposer';
 import { createContext, useContext, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -224,52 +225,8 @@ export function BudgetLineDialog({ budgetId, commissionName, open, onOpenChange 
 }
 
 export function RevenueDialog({ edition, revenue, onClose, capabilities }: { edition: FinancialEdition; revenue: FinancialRevenue | null; onClose: () => void; capabilities: FinancialExpenseCapabilities }) {
-  const [description, setDescription] = useState(revenue?.description ?? '');
-  const [counterparty, setCounterparty] = useState(revenue?.counterparty ?? '');
-  const [funding, setFunding] = useState<FundingTypeKey>(revenue?.funding_type ?? 'nao_identificado');
-  const [status, setStatus] = useState<RevenueStatus>(revenue?.status ?? 'projetada');
-  const [projected, setProjected] = useState(moneyText(revenue?.projected_cents));
-  const [confirmed, setConfirmed] = useState(moneyText(revenue?.confirmed_cents));
-  const [dueDate, setDueDate] = useState(revenue?.due_date ?? '');
-  const [reason, setReason] = useState('');
-  const save = useFinancialSave(onClose);
-  const { canEdit, canConfirm } = capabilities;
-  const verified = !capabilities.isLoading && !capabilities.isError;
-  const allowed = edition.status === 'operacional' && capabilities.canAccess && verified && (status === 'confirmada' ? canConfirm : canEdit) && (revenue?.status !== 'confirmada' || canConfirm);
-  const statusOptions = Object.fromEntries(Object.entries(REVENUE_STATUS_LABELS).filter(([key]) => key === status || (key === 'confirmada' ? canConfirm : canEdit)));
-  return (
-    <DialogForm onOpenChange={(v) => !v && onClose()} context="Receitas" title={revenue ? 'Editar receita' : 'Nova receita'}
-      className="financial-2028-dialog--revenue" disabled={!allowed} action="Salvar receita"
-      description="Confirmação comercial não é recebimento: o caixa vem dos movimentos registrados." pending={save.isPending} error={save.error}
-      onSubmit={() => allowed && save.mutate({ entity: 'revenue', expectedVersion: revenue?.version ?? null, reason: reason || null, payload: {
-        ...(revenue ? { id: revenue.id } : { edition_id: edition.id }),
-        description, counterparty, funding_type: funding, status,
-        projected_cents: parseMoneyInputToCents(projected),
-        confirmed_cents: status === 'confirmada' ? parseMoneyInputToCents(confirmed) : null,
-        due_date: dueDate || null,
-      } })}>
-      {!verified ? <p className="financial-2028-dialog__permission" role={capabilities.isError ? 'alert' : 'status'}>{capabilities.isError ? 'Não foi possível verificar suas permissões. Reabra o formulário após atualizar a consulta.' : 'Verificando permissões…'}</p>
-        : !allowed ? <p className="financial-2028-dialog__permission" role="status">{revenue?.status === 'confirmada' && !canConfirm ? 'Editar uma receita confirmada exige confirmação financeira.' : 'Seu acesso permite apenas consultar esta operação.'}</p> : null}
-      <fieldset className="financial-2028-dialog__group">
-        <legend>Identificação da receita</legend>
-        <Field id="rev-desc" label="Descrição" required hint="Identifique a origem ou a finalidade da receita.">{(a11y) => <Input id="rev-desc" required minLength={2} value={description} onChange={(e) => setDescription(e.target.value)} {...a11y} />}</Field>
-        <Field id="rev-cp" label="Contraparte" hint="Pessoa ou organização relacionada à receita, quando houver.">{(a11y) => <Input id="rev-cp" value={counterparty} onChange={(e) => setCounterparty(e.target.value)} {...a11y} />}</Field>
-        <div className="financial-2028-dialog__grid">
-          <SelectField id="rev-funding" label="Origem do recurso" value={funding} onChange={(v) => setFunding(v as FundingTypeKey)} options={FUNDING_TYPE_LABELS} />
-          <SelectField id="rev-status" label="Situação" value={status} onChange={(v) => setStatus(v as RevenueStatus)} options={statusOptions} hint={!canConfirm ? 'Confirmar receita exige confirmação financeira.' : undefined} />
-        </div>
-      </fieldset>
-      <fieldset className="financial-2028-dialog__group">
-        <legend>Valores e vencimento</legend>
-        <div className="financial-2028-dialog__grid">
-          <MoneyField id="rev-proj" label="Valor projetado (R$)" value={projected} onChange={setProjected} />
-          {status === 'confirmada' ? <MoneyField id="rev-conf" label="Valor confirmado (R$)" value={confirmed} onChange={setConfirmed} hint="Confirmação do compromisso; não registra recebimento." /> : null}
-          <Field id="rev-due" label="Vencimento">{(a11y) => <Input id="rev-due" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} {...a11y} />}</Field>
-        </div>
-        {status === 'cancelada' && revenue?.status !== 'cancelada' ? <Field id="rev-reason" label="Motivo do cancelamento" required hint="Explique o cancelamento em pelo menos 3 caracteres.">{(a11y) => <Input id="rev-reason" required minLength={3} value={reason} onChange={(e) => setReason(e.target.value)} {...a11y} />}</Field> : null}
-      </fieldset>
-    </DialogForm>
-  );
+  const { orgId } = useCurrentOrg();
+  return <FinancialEntryComposer org={orgId || ''} edition={edition} kind="revenue" revenue={revenue} capabilities={capabilities} onClose={onClose} />;
 }
 
 export function SponsorshipDialog({ edition, sponsor, onClose }: { edition: FinancialEdition; sponsor: FinancialSponsorship | null; onClose: () => void }) {

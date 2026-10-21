@@ -1,0 +1,138 @@
+{
+  "measured_css_viewports": [
+    [
+      1440,
+      900
+    ],
+    [
+      1280,
+      900
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      430,
+      844
+    ]
+  ],
+  "same_before_after_dimensions": true,
+  "bitmap_dimensions": {
+    "expenses-1440": {
+      "before": [
+        1425,
+        891
+      ],
+      "after": [
+        1425,
+        891
+      ]
+    },
+    "expenses-1280": {
+      "before": [
+        1265,
+        889
+      ],
+      "after": [
+        1265,
+        889
+      ]
+    },
+    "expenses-390": {
+      "before": [
+        375,
+        812
+      ],
+      "after": [
+        375,
+        812
+      ]
+    },
+    "expenses-430": {
+      "before": [
+        415,
+        815
+      ],
+      "after": [
+        415,
+        815
+      ]
+    },
+    "revenues-1440": {
+      "before": [
+        1425,
+        891
+      ],
+      "after": [
+        1425,
+        891
+      ]
+    },
+    "revenues-1280": {
+      "before": [
+        1265,
+        889
+      ],
+      "after": [
+        1265,
+        889
+      ]
+    },
+    "revenues-390": {
+      "before": [
+        375,
+        812
+      ],
+      "after": [
+        375,
+        812
+      ]
+    },
+    "revenues-430": {
+      "before": [
+        415,
+        815
+      ],
+      "after": [
+        415,
+        815
+      ]
+    }
+  },
+  "comparison_crop": "same top-left rectangle, 520px high; viewport and native screenshot dimensions are recorded separately",
+  "horizontal_overflow_observed": false,
+  "expense_header_height_desktop_px": 200,
+  "expense_control_color": "#d8e2f2",
+  "text_contrast": 8.88,
+  "placeholder_contrast": 4.85,
+  "mobile_form_control_height_px": 44,
+  "mobile_form_font_px": 16,
+  "short_viewport": [
+    390,
+    430
+  ],
+  "short_viewport_modal_bounds": {
+    "top": 8,
+    "bottom": 422
+  },
+  "short_viewport_footer_bounds": {
+    "top": 329,
+    "bottom": 421
+  },
+  "reduced_motion_animation_names": [
+    "none"
+  ],
+  "visual_zoom_emulated": 2,
+  "desktop_reflow_equivalent_viewport": [
+    720,
+    450
+  ],
+  "native_touch_event_dispatch": "not supported by in-app browser; tested with DOM pointer events instead",
+  "physical_device_and_real_virtual_keyboard": "not executed",
+  "export": {
+    "source_records": 6,
+    "installment_lines": 16
+  },
+  "browser_context": "real components with local test identity context and real PostgreSQL data; not a production Supabase login"
+}

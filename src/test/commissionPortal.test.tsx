@@ -6,6 +6,7 @@ import { markAlvoradaIntroStarted } from '@/features/alvorada/introSession';
 import { SELECTED_COMMISSION_STORAGE_KEY } from '@/modules/commissions/commissionRegistry';
 
 const portalMocks = vi.hoisted(() => ({
+  financialAccess:false,
   auth: {
     loading: false,
     user: null as { id: string } | null,
@@ -21,6 +22,8 @@ const portalMocks = vi.hoisted(() => ({
     myRole: null as string | null,
   },
 }));
+
+vi.mock('@/hooks/useFinancialModuleAccess',()=>({useFinancialModuleAccess:()=>({canAccess:portalMocks.financialAccess,isLoading:false,isError:false})}));
 
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => portalMocks.auth,
@@ -97,6 +100,7 @@ describe('CommissionPortalPage', () => {
     setReducedMotionPreference(false);
     localStorage.clear();
     sessionStorage.clear();
+    portalMocks.financialAccess = false;
     portalMocks.auth.loading = false;
     portalMocks.auth.user = null;
     portalMocks.capabilities.capSet = new Set<string>();
@@ -409,6 +413,7 @@ describe('CommissionPortalPage', () => {
       'logistica_access',
     ]);
     portalMocks.org.myRole = 'membro';
+    portalMocks.financialAccess = true;
     renderPortal();
 
     expect(screen.getByRole('link', { name: 'Abrir mapa: Mapa Comercial' })).toHaveAttribute(
@@ -426,6 +431,11 @@ describe('CommissionPortalPage', () => {
     );
     expect(screen.queryByRole('link', { name: /Agenda Restaurante e Arena/ })).not.toBeInTheDocument();
     expect(screen.getByLabelText('Perfil sem acesso: Agenda Restaurante e Arena')).toBeInTheDocument();
+  });
+
+  it('denies Financeiro to an unlisted administrator even with a general financial capability', () => {
+    portalMocks.auth.user={id:'unlisted-admin'};portalMocks.org.myRole='admin';portalMocks.capabilities.capSet.add('financial_access');
+    renderPortal();expect(screen.queryByRole('link',{name:'Abrir financeiro: Financeiro'})).not.toBeInTheDocument();expect(screen.getByLabelText('Restrito ao perfil: Financeiro')).toBeInTheDocument();expect(screen.getByRole('link',{name:'Abrir administração: Administrador'})).toHaveAttribute('href','/admin');
   });
 
   it('does not promise Financeiro or Admin access to an operator without explicit permission', () => {

@@ -3,13 +3,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
 const PAGE_STARTED_AT = Date.now();
-const CAPABILITIES = ['financial_access', 'financial_edit', 'financial_confirm', 'financial_admin'] as const;
+const CAPABILITIES = ['financial_access', 'financial_edit', 'financial_confirm', 'financial_admin', 'financial_settle'] as const;
 
 export interface FinancialExpenseCapabilities {
   canAccess: boolean;
   canEdit: boolean;
   canConfirm: boolean;
   canAdmin: boolean;
+  canSettle?: boolean;
   isLoading: boolean;
   isError: boolean;
 }
@@ -26,7 +27,7 @@ export async function fetchFinancialExpenseCapabilities(orgId: string) {
     if (error) throw new Error(error.message);
     return data === true;
   }));
-  return { canAccess: values[0], canEdit: values[1], canConfirm: values[2], canAdmin: values[3] };
+  return { canAccess: values[0], canEdit: values[1], canConfirm: values[2], canAdmin: values[3], canSettle: values[4] };
 }
 
 export function useFinancialExpenseCapabilities(orgId: string | null | undefined) {
@@ -46,6 +47,7 @@ export function useFinancialExpenseCapabilities(orgId: string | null | undefined
     canEdit: verified && query.data?.canEdit === true,
     canConfirm: verified && query.data?.canConfirm === true,
     canAdmin: verified && query.data?.canAdmin === true,
+    canSettle: verified && query.data?.canSettle === true,
     isLoading: authLoading || Boolean(user && orgId && !query.isError && !verified),
     isError: query.isError,
     refetch: query.refetch,

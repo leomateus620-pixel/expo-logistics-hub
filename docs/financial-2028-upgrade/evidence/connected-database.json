@@ -1,0 +1,50 @@
+{
+  "environment": "Connected Supabase PostgreSQL 17.6; schema and read-only authorization checks only",
+  "security_first_applied_utc": "2026-10-21T18:21:51.897102Z",
+  "schema_rehearsal": [
+    {
+      "checked_at": "2026-10-21T19:01:53.775426+00:00",
+      "environment": "connected Supabase PostgreSQL",
+      "plans_table_after_rollback": null,
+      "rehearsal": "rolled back",
+      "source_records_fingerprint": "4b6a2f8b2f256bacae162f76c4fc6ad6"
+    }
+  ],
+  "schema_commit": [
+    {
+      "active_roster": 4,
+      "committed_at": "2026-10-21T19:03:57.424335+00:00",
+      "existing_records_unchanged": true,
+      "new_plans": 0,
+      "new_references": 0,
+      "records_fingerprint_after": "4b6a2f8b2f256bacae162f76c4fc6ad6",
+      "records_fingerprint_before": "4b6a2f8b2f256bacae162f76c4fc6ad6",
+      "registered_versions": [
+        "20261021205900",
+        "20261021210000"
+      ],
+      "revision": "20261021210000"
+    }
+  ],
+  "authorization_reread": [
+    {
+      "batch_exposed_to_anon": false,
+      "checked_at": "2026-10-21T19:04:37.716987+00:00",
+      "internal_core_exposed_to_authenticated": false,
+      "new_rpc_execute_for_authenticated": true,
+      "read_only_privileges_preserved": true,
+      "registered_versions": [
+        "20261021205900",
+        "20261021210000"
+      ],
+      "roster_visible_to_authenticated": false,
+      "verified_authorized_accounts": 4,
+      "verified_duplicate_accounts_denied": 3
+    }
+  ],
+  "transient_attempt": {
+    "sqlstate": "55P03",
+    "outcome": "transaction rolled back before schema commit; metadata read lock ended naturally; retry succeeded"
+  },
+  "privacy": "No live financial rows, buyer details, names of other administrators or credentials were exported. Financial write scenarios use the isolated database."
+}

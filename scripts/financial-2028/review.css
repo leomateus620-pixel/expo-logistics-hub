@@ -1,0 +1,81 @@
+body {
+  margin: 0;
+  background: #f3f5fb;
+  color: #132f49;
+  font-family: Inter, Arial, sans-serif;
+}
+.financial-review-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff5d8;
+  color: #54441b;
+  padding: 7px 24px;
+  font-size: 12px;
+}
+.financial-review-banner select {
+  max-width: 48%;
+  background: white;
+  border: 1px solid #c6bc98;
+  border-radius: 5px;
+  padding: 4px;
+  font-size: 12px;
+}
+.financial-review-nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: white;
+  border-bottom: 1px solid #d9e2ec;
+  padding: 14px 32px;
+}
+.financial-review-nav strong {
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  margin-right: auto;
+}
+.financial-review-nav strong span {
+  color: #62768a;
+}
+.financial-review-nav button {
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  color: #3e536d;
+}
+.financial-review-nav button[aria-current="page"] {
+  background: #e9eff7;
+  color: #0c354e;
+}
+main.financial-operational-2028 {
+  padding: 24px 32px;
+  max-width: 1600px;
+  margin: auto;
+}
+@media (max-width: 600px) {
+  .financial-review-banner {
+    padding: 7px 12px;
+    flex-wrap: wrap;
+  }
+  .financial-review-banner select {
+    max-width: 100%;
+    width: 100%;
+  }
+  .financial-review-nav {
+    padding: 8px 12px;
+    gap: 2px;
+    flex-wrap: wrap;
+  }
+  .financial-review-nav strong {
+    width: 100%;
+    margin: 4px 0;
+  }
+  .financial-review-nav button {
+    padding: 8px 12px;
+  }
+  main.financial-operational-2028 {
+    padding: 16px 12px;
+  }
+}

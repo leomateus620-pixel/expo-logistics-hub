@@ -48,6 +48,7 @@ export interface FinancialBudgetLine {
   description: string; planned_cents: number; active: boolean; version: number; notes: string | null;
 }
 export interface FinancialRevenue {
+  counterparty_reference_id?: string | null; counterparty_reference_name?: string | null; funding_source_reference_id?: string | null; funding_source_name?: string | null;
   id: string; description: string; counterparty: string | null; responsible_name: string | null;
   funding_type: FundingTypeKey; status: RevenueStatus; projected_cents: number; confirmed_cents: number | null;
   competence_date: string | null; due_date: string | null; notes: string | null; version: number;
@@ -114,8 +115,17 @@ export const fetchBudgets = (editionId: string) =>
 export const fetchBudgetLines = (editionId: string) =>
   read<FinancialBudgetLine[]>(db.from('financial_budget_lines').select('*').eq('edition_id', editionId).order('created_at'));
 
-export const fetchRevenues = (editionId: string) =>
-  read<FinancialRevenue[]>(db.from('financial_revenues').select('*').eq('edition_id', editionId).order('created_at', { ascending: false }).limit(500));
+export interface FinancialRevenueOverview {
+  total: number; items: FinancialRevenue[];
+  by_source: Array<{key:string;name:string|null;funding_type:FundingTypeKey;projected_cents:number;confirmed_cents:number;count:number}>;
+}
+export async function fetchRevenueOverview(editionId:string):Promise<FinancialRevenueOverview>{
+  const {data,error}=await db.rpc('financial_list_revenues',{_edition_id:editionId,_limit:500,_offset:0});
+  if(isMissingSchema(error))throw new FinancialNotActivatedError();
+  if(error)throw new Error(describeFinancialError(error));
+  return data as FinancialRevenueOverview;
+}
+export const fetchRevenues = async (editionId:string) => (await fetchRevenueOverview(editionId)).items;
 
 export const fetchSponsorships = (editionId: string) =>
   read<FinancialSponsorship[]>(db.from('financial_sponsorships').select('*').eq('edition_id', editionId).order('name').limit(500));
