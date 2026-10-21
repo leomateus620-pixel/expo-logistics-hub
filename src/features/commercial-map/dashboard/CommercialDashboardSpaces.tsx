@@ -126,7 +126,7 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
         <div className="commercial-dashboard-scope-cards__heading"><span><MapPinned aria-hidden="true" />Áreas externas</span>
           <small>Comercialização por espaços</small></div>
         <div className="commercial-dashboard-scope-grid commercial-dashboard-scope-grid--external" role="group" aria-label="Selecionar área externa">
-          <CommercialDashboardScopeCard scopeId="external:all" title="Todas as áreas" aggregate={snapshot.external}
+          <CommercialDashboardScopeCard scopeId="external:all" title="Área Externa" aggregate={snapshot.external}
             selected={scopeId === 'external:all'} onSelect={() => setScopeId('external:all')} />
           {snapshot.segments.map((item) => <CommercialDashboardScopeCard key={item.segmentId} scopeId={`external:${item.segmentId}`}
             title={item.segment.name} aggregate={item} segmentId={item.segmentId}
