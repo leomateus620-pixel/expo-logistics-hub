@@ -18,6 +18,9 @@ import {
   ModulesGlyph, PendingSignatureGlyph, ProcessGlyph, SyncActiveGlyph, SyncDoneGlyph,
 } from './CommercialDashboardOverviewIcons';
 import type { SaleOrderSummary } from './salesOrders/salesOrdersService';
+import { CommercialCashflowPreview, SignatureLatencyCard, CashflowGlyph } from './CommercialSalesAnalyticsCards';
+import { CommercialAnalyticsView, type CashflowMemory } from './CommercialCashflow';
+import { CommercialSalesAnalyticsProvider } from './salesOrders/useCommercialSalesAnalytics';
 import './commercial-dashboard.css';
 import './commercial-dashboard-overview.css';
 import './salesOrders/sales-orders.css';
@@ -25,6 +28,7 @@ import './salesOrders/sales-orders.css';
 export interface CommercialDashboardProps {
   data: Pick<CommercialMapData, 'entities' | 'lots'>;
   dataUpdatedAt: number;
+  inventoryRevision?: string | null;
   isFetching: boolean;
   onClose: () => void;
   onViewLot: (entityId: string) => void;
@@ -72,8 +76,8 @@ function financeQualifier(lots: number, priced: number): string | null {
   return priced < lots ? 'Parcial' : null;
 }
 
-function FinanceCard({ tone, label, icon, value, lots, priced, info }: {
-  tone: FinanceTone; label: string; icon: ReactNode; value: number; lots: number; priced: number;
+function FinanceCard({ tone, label, icon, value, lots, priced, info, action }: {
+  action?: ReactNode; tone: FinanceTone; label: string; icon: ReactNode; value: number; lots: number; priced: number;
   info: Omit<OverviewInfoContent, 'facts'> & { facts?: readonly OverviewInfoFact[] };
 }) {
   const exact = priced > 0 ? formatDashboardCurrency(value) : '—';
@@ -98,6 +102,7 @@ function FinanceCard({ tone, label, icon, value, lots, priced, info }: {
         <OverviewAmount text={formatDashboardCurrency(value, true)} />
       </span> : '—'}
     </strong>
+    {action}
   </article>;
 }
 
@@ -121,8 +126,21 @@ function statusAreaFact(summary: DashboardStatusSummary, inventoryLots: number):
   return partial ? `${area} · ${formatDashboardInteger(summary.areaPendingCount)} sem área oficial` : area;
 }
 
-export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
+export function CommercialDashboard(props: CommercialDashboardProps) {
+  const scope = `${props.orgId ?? ''}:${props.projectId ?? 'unscoped'}`;
+  return props.projectId && props.canManageSales
+    ? <CommercialSalesAnalyticsProvider key={scope} projectId={props.projectId} orgId={props.orgId ?? null} revision={props.dataUpdatedAt} inventoryRevision={props.inventoryRevision}>
+      <CommercialDashboardBody {...props} /></CommercialSalesAnalyticsProvider>
+    : <CommercialDashboardBody key={scope} {...props} />;
+}
+
+function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const cashflowEntryRef = useRef<HTMLButtonElement>(null);
+  const signatureEntryRef = useRef<HTMLDivElement>(null);
+  const salesOrigin = useRef<'overview' | 'cashflow' | 'signature'>('overview');
+  const analyticsScroll = useRef({ top: 0, orderId: '' });
+  const [cashflow, setCashflow] = useState<CashflowMemory>({ month: null, basis: 'principal', allDates: false, year: null, page: 0 });
   const salesEntryRef = useRef<HTMLButtonElement>(null);
   const presentationScopeId = projectId ?? data.entities[0]?.projectId ?? 'unscoped';
   // Keep only presentation state across sales navigation; maps remain unmounted.
@@ -139,6 +157,22 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
   const setArea = useSalesOrdersUiStore((state) => state.setArea);
   const salesAvailable = Boolean(projectId && onViewSale);
   const inSales = salesAvailable && area === 'sales';
+  const inAnalytics = Boolean(projectId && canManageSales && (area === 'cashflow' || area === 'signature'));
+  const openAnalytics = (destination: 'cashflow' | 'signature', month?: string) => {
+    overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
+    salesOrigin.current = 'overview';
+    if (month) setCashflow(m => ({ ...m, month, year: month.slice(0, 4), allDates: month < '2026-12-01' || month > '2028-04-01', page: 0 }));
+    setArea(destination);
+    const container = scrollContainer?.(); if (container) container.scrollTop = 0;
+  };
+  const backFromAnalytics = () => {
+    const origin = area; setArea('overview');
+    requestAnimationFrame(() => {
+      const container = scrollContainer?.(); if (container) container.scrollTop = overviewMemory.scrollTop;
+      if (origin === 'cashflow') cashflowEntryRef.current?.focus({ preventScroll: true });
+      else signatureEntryRef.current?.querySelector<HTMLButtonElement>('[data-signature-detail]')?.focus({ preventScroll: true });
+    });
+  };
   const [pricingStage, setPricingStage] = useState<LotPricingStage>('RENOVACAO');
   const [composition] = useState(() => OVERVIEW_COMPOSITIONS[overviewOpenings++ % OVERVIEW_COMPOSITIONS.length]);
   const progressFillRef = useRef<SalesProgressFill | null>(null);
@@ -148,6 +182,14 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
   const updatedAtLabel = dataUpdatedAt > 0 && Number.isFinite(dataUpdatedAt)
     ? `Atualizado às ${new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(dataUpdatedAt)}`
     : 'Sincronização pendente';
+  useEffect(() => {
+    const store = useSalesOrdersUiStore.getState();
+    if (store.analyticsScopeId && store.analyticsScopeId !== presentation.scope) {
+      if (store.area === 'cashflow' || store.area === 'signature') store.setArea('overview');
+      if (projectId) store.ensureProjectScope(projectId);
+    }
+    useSalesOrdersUiStore.setState({ analyticsScopeId: presentation.scope });
+  }, [presentation.scope, projectId]);
   useEffect(() => {
     // Ao voltar do mapa, o foco é restaurado no controle de origem da venda.
     if (!useSalesOrdersUiStore.getState().originRecordId) closeButtonRef.current?.focus({ preventScroll: true });
@@ -178,10 +220,25 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
       </div>
     </header>
     <main className={`commercial-dashboard-content${inSales ? ' commercial-dashboard-content--sales' : ''}`}>
-      {inSales && projectId && onViewSale ? <CommercialSalesOrdersSection projectId={projectId} orgId={orgId}
+      {inAnalytics && projectId ? <CommercialAnalyticsView projectId={projectId} orgId={orgId} signature={area === 'signature'}
+        memory={cashflow} setMemory={setCashflow} onBack={backFromAnalytics} onOpenSale={id => {
+          salesOrigin.current = area === 'signature' ? 'signature' : 'cashflow';
+          analyticsScroll.current = { top: scrollContainer?.()?.scrollTop ?? 0, orderId: id };
+          const store = useSalesOrdersUiStore.getState();
+          store.ensureProjectScope(projectId); store.setSelectedRecordIdentity({ recordId: id, orderId: id, saleId: null });
+          store.setExpanded(id); store.setArea('sales');
+          const container = scrollContainer?.(); if (container) container.scrollTop = 0;
+        }} /> : inSales && projectId && onViewSale ? <CommercialSalesOrdersSection projectId={projectId} orgId={orgId}
         canManageSales={canManageSales} canManageContracts={canManageContracts} data={data}
         scrollContainer={scrollContainer ?? emptyScrollContainer} onViewSale={onViewSale}
         onBack={() => {
+          if (salesOrigin.current !== 'overview') {
+            setArea(salesOrigin.current);
+            requestAnimationFrame(() => { const container = scrollContainer?.(); if (container) {
+              container.scrollTop = analyticsScroll.current.top;
+              container.querySelector<HTMLButtonElement>(`[data-analytics-sale="${analyticsScroll.current.orderId}"]`)?.focus({ preventScroll: true });
+            } }); return;
+          }
           setArea('overview');
           requestAnimationFrame(() => {
             if (currentOverviewMemory.current !== overviewMemory
@@ -203,11 +260,15 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
       </div>
       <div className="commercial-dashboard-overview" data-composition={composition}>
       <section className="commercial-dashboard-overview__finance" aria-label="Valores comerciais globais">
+        <div className="commercial-dashboard-overview-confirmed-column">
         <FinanceCard tone="confirmed" label="Valor das vendas confirmadas" icon={<ConfirmedSealGlyph />}
+          action={projectId && canManageSales ? <button type="button" ref={cashflowEntryRef} className="commercial-dashboard-cashflow-entry" onClick={() => openAnalytics('cashflow')}><CashflowGlyph />Ver fluxo de caixa <span aria-hidden="true">↗</span></button> : undefined}
           value={overall.soldValue} lots={overall.soldLots} priced={overall.byStatus.SOLD.pricedLotCount}
           info={{ label: 'Informações sobre vendas confirmadas', title: 'Vendas confirmadas',
             lead: 'Soma do valor negociado das vendas confirmadas no fluxo comercial (situação Vendido).',
             note: 'Valor negociado confirmado. A confirmação comercial não equivale a recebimento financeiro.' }} />
+        {projectId && canManageSales && <CommercialCashflowPreview scope={presentation.scope} onOpen={month => openAnalytics('cashflow', month)} />}
+        </div>
         <FinanceCard tone="open" label="Valor das vendas em andamento" icon={<PendingSignatureGlyph />}
           value={overall.saleOpenValue} lots={overall.saleOpenLots} priced={overall.byStatus.SALE_OPEN.pricedLotCount}
           info={{ label: 'Informações sobre vendas em andamento', title: 'Vendas em andamento',
@@ -221,7 +282,10 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
             facts: [['Composição', `Vendas + tabela oficial (${pricingStage === 'RENOVACAO' ? 'Renovação' : '2ª Etapa'})`]],
             note: 'Não é meta nem receita. Lotes sem valor registrado não são estimados.' }} />
       </section>
-      <CommercialSalesProgress aggregate={overall} fillMemory={progressFillRef} />
+      <div className="commercial-dashboard-overview-progress-row">
+        <CommercialSalesProgress aggregate={overall} fillMemory={progressFillRef} />
+        <div ref={signatureEntryRef}><SignatureLatencyCard onOpen={() => openAnalytics('signature')} /></div>
+      </div>
       <section className="commercial-dashboard-overview__kpis" aria-label="Indicadores comerciais principais">
         <OverviewKpi tone="spaces" label="Espaços comerciais" icon={<ModulesGlyph />} value={formatDashboardInteger(overall.commercialLots)}
           info={{ label: 'Informações sobre espaços comerciais', title: 'Espaços comerciais',
@@ -264,6 +328,7 @@ export function CommercialDashboard({ data, dataUpdatedAt, isFetching, onClose, 
         presentationMemory={spacesMemory} stateMemory={spacesMemory} projectId={projectId} dataUpdatedAt={dataUpdatedAt} canManageSales={canManageSales}
         onOpenOrder={salesAvailable && canManageSales ? (order) => {
           overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
+          salesOrigin.current = 'overview';
           const store = useSalesOrdersUiStore.getState();
           store.setSelectedRecordIdentity({ recordId: order.id, orderId: order.orderId, saleId: order.orderId ? null : order.saleId });
           store.setExpanded(order.id); store.setArea('sales');

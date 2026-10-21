@@ -28,3 +28,6 @@ artifacts/alvorada/
 
 # Local interior renderer QA
 .qa-vite-cache/
+
+# Generated commercial analytics before-view (scripts/commercial-analytics/prepare-review.mjs)
+scripts/commercial-analytics/.baseline.tsx

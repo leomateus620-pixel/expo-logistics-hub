@@ -1,0 +1,608 @@
+{
+  "benchmark": [
+    {
+      "Plan": {
+        "Node Type": "Result",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 0,
+        "Total Cost": 0.27,
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Actual Startup Time": 87.6,
+        "Actual Total Time": 87.6,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Disabled": false,
+        "Shared Hit Blocks": 24775,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "Planning": {
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "Planning Time": 0.014,
+      "Triggers": [],
+      "Execution Time": 87.602
+    }
+  ],
+  "environment": "PostgreSQL local 127.0.0.1:55438/commercial_analytics_test",
+  "identity": "Local auth.uid claims + real capability function; no external Supabase session",
+  "baseline": {
+    "issues": [
+      {
+        "reason": null,
+        "orderId": "91f42f30-8f0c-4b8e-b281-3784138c61f2",
+        "partial": true,
+        "feesCents": "3000",
+        "feesIncluded": false,
+        "confirmedCents": "10000"
+      }
+    ],
+    "months": [
+      {
+        "month": "2026-12-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "53548",
+          "scheduledCents": "53548",
+          "outstandingCents": "53548"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "52548",
+          "scheduledCents": "52548",
+          "outstandingCents": "52548"
+        },
+        "installments": 4,
+        "analyticInstallments": 1
+      },
+      {
+        "month": "2027-01-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "53548",
+          "scheduledCents": "53548",
+          "outstandingCents": "53548"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "52548",
+          "scheduledCents": "52548",
+          "outstandingCents": "52548"
+        },
+        "installments": 4,
+        "analyticInstallments": 1
+      },
+      {
+        "month": "2027-02-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "53550",
+          "outstandingCents": "53550"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "52550",
+          "outstandingCents": "52550"
+        },
+        "installments": 4,
+        "analyticInstallments": 1
+      },
+      {
+        "month": "2027-03-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2027-04-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2027-05-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2027-06-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2027-07-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2027-08-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2027-09-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2027-10-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2027-11-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2027-12-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2028-01-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2028-02-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2028-03-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5882",
+          "outstandingCents": "5882"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2028-04-01",
+        "charge": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5888",
+          "outstandingCents": "5888"
+        },
+        "principal": {
+          "paidCents": "0",
+          "overdueCents": "0",
+          "scheduledCents": "5888",
+          "outstandingCents": "5888"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      },
+      {
+        "month": "2028-06-01",
+        "charge": {
+          "paidCents": "12345",
+          "overdueCents": "0",
+          "scheduledCents": "12345",
+          "outstandingCents": "0"
+        },
+        "principal": {
+          "paidCents": "12345",
+          "overdueCents": "0",
+          "scheduledCents": "12345",
+          "outstandingCents": "0"
+        },
+        "installments": 1,
+        "analyticInstallments": 0
+      }
+    ],
+    "projectId": "20000000-0000-4000-8000-000000000001",
+    "signature": {
+      "count": 4,
+      "exclusions": {
+        "LEGACY_UNVERIFIED": 1,
+        "PENDING_OR_PARTIAL": 1
+      },
+      "averageSeconds": "151200.000000000000"
+    },
+    "generation": "da46b161d9e62585d4d5577f89ada7de",
+    "generatedAt": "2026-10-21T20:35:01.91122-03:00",
+    "referenceDate": "2027-01-15",
+    "reconciliation": {
+      "coveredCents": "252345",
+      "confirmedCents": "282345",
+      "paidWithoutDate": 0,
+      "excludedFeesCents": "3000",
+      "includedFeesCents": "3000",
+      "unknownSaleValues": 0,
+      "undistributedCents": "30000",
+      "undistributedOrders": 0
+    },
+    "settlementModel": "INSTALLMENT_FULL_STATUS",
+    "receiptsByOccurrence": [
+      {
+        "month": "2027-03-01",
+        "chargeCents": "12345",
+        "principalCents": "12345"
+      }
+    ]
+  },
+  "fixtures": {
+    "standard": {
+      "id": "bba6ff61-13df-4143-b717-68b29982c618",
+      "items": [
+        {
+          "id": "6bf5c1e3-f6fa-4184-af32-4e3da5f1f7e3",
+          "lot": "25077518-3752-421c-bb9c-c4e4d957d6d9",
+          "sale": "08b2d1ac-962a-4027-b297-53014acb59c4"
+        }
+      ],
+      "installments": [
+        "247f6157-639a-40e0-b780-76cbe468c123",
+        "0782e4c9-17d8-4b75-99ce-9812220c13f1",
+        "4b24990a-710a-4811-a0b0-e4f47df5d3de",
+        "35ea9cce-0111-4a52-809e-557c30bbd54b",
+        "f0819841-18eb-4f8a-afb2-17b60a4d274f",
+        "c72de1e3-fcd4-474d-8e80-e58573caaf7d",
+        "6c7640e8-43f2-4469-9381-7e0cee6bc5eb",
+        "ff69b66d-950b-4b00-986d-c2f3f602e406",
+        "0d75df35-63e5-4de6-aa43-390dc11eaa39",
+        "0b5c12b9-d6be-4ddf-bdeb-23d003f87aac",
+        "99bff3b5-67dd-4c7c-8152-f85bdfe37df4",
+        "6c5bda8b-ff56-40bd-88be-a1337912ca41",
+        "674683a3-6f33-4766-92ec-98b277ec2dd3",
+        "da8aa794-631b-4fd5-8c6a-f7c160fec04c",
+        "0e95609b-3b66-4028-9840-04fbe707ba83",
+        "84a8736e-6009-46d2-ad08-bf326f0bfe38",
+        "4052ae76-b859-4626-9290-b7310238d7cc"
+      ],
+      "total": 1000
+    },
+    "fees": {
+      "id": "de4626fb-5682-4e7d-87cb-57e26cc6842c",
+      "items": [
+        {
+          "id": "522b0d5b-6969-47fa-89ea-d1c166c80193",
+          "lot": "1213ee67-27de-48b5-8454-7a5706a74d54",
+          "sale": "2faaace1-7756-4e9b-a805-7bc95ac180c4"
+        },
+        {
+          "id": "40ea0e59-15d1-469d-995e-f018fcc7814c",
+          "lot": "0f9f89eb-02c9-41e0-8be3-1efecd868f38",
+          "sale": "6d1d3471-ee23-4a07-870d-d8177a027f45"
+        }
+      ],
+      "installments": [
+        "bd2f5b34-6cbc-47e0-ad1f-c02e84dd826e",
+        "48c0524c-7a37-40d9-84c8-7586104e7d65",
+        "846556dd-ebc9-42c6-b8e3-ad09b317ba36"
+      ],
+      "total": 330
+    },
+    "twenty": {
+      "id": "afe18b29-76fb-4b7b-b2f5-ab10beddc3a2",
+      "items": [
+        {
+          "id": "7ab684c9-11ad-43e3-981f-7af96f642841",
+          "lot": "24da4e4e-4c77-4ae2-8a62-a962569117b2",
+          "sale": "6379a982-9419-4d8d-837d-59e4980efeed"
+        },
+        {
+          "id": "0588fe6a-60ed-4159-9576-7d80ac65410e",
+          "lot": "bf749150-9edd-4964-b0bb-f6f07a1643c9",
+          "sale": "3399a693-bf06-4d34-a9f5-abc6d43a4dad"
+        },
+        {
+          "id": "c6eb65c3-33b4-4e78-84a0-ebd8d3dca267",
+          "lot": "c5a7938a-76d3-4ad7-824c-225e64b47679",
+          "sale": "0b09f1cc-60d5-4917-8d46-7dc359dcf525"
+        },
+        {
+          "id": "d7ecb792-b882-48b2-be86-f98c29f62425",
+          "lot": "4a6182a2-5e7c-4df6-a0b0-8d759d0a09e7",
+          "sale": "22ff25ad-57fa-4b37-b028-e1031f926d14"
+        },
+        {
+          "id": "25cf3c1d-858a-457e-9de5-837abf0994e8",
+          "lot": "aaa899cc-866e-45f8-9a39-bda9579e64af",
+          "sale": "cdabf563-33f0-45e6-8635-6fa997121045"
+        },
+        {
+          "id": "03ef69dd-9910-4a9d-a6ab-97d822d3b92e",
+          "lot": "05a3f957-ed3b-4846-91fd-3743227252c7",
+          "sale": "59cc12c6-6b23-4dc4-945c-13638c7040b0"
+        },
+        {
+          "id": "96be0a0d-de68-4a68-a079-3a2ce93a5b54",
+          "lot": "b6258d7a-0d4d-4c31-a84e-87eca04355c0",
+          "sale": "1158c2ec-951c-4756-a153-7f4d7fb1f48e"
+        },
+        {
+          "id": "3b86760b-9354-476b-8578-b2d721f4b1b7",
+          "lot": "3d392dcf-3855-4762-9882-596cf1c27037",
+          "sale": "2364d356-e9be-40b8-81f2-6c3d31802a9b"
+        },
+        {
+          "id": "b5080bf1-1a77-4a14-bd30-0e5d45b41688",
+          "lot": "93458efd-88c5-4446-acbb-fd70d35c1f0d",
+          "sale": "c7cf5339-0a58-4850-a5a8-54a93cd227ab"
+        },
+        {
+          "id": "b7666d30-a760-4477-91f6-850ab3132a06",
+          "lot": "5c91a586-8f13-43b1-9c27-6939dc56cbd5",
+          "sale": "c6b109a1-0157-47e6-9544-1d473da7be73"
+        },
+        {
+          "id": "375629a2-82f0-4bf9-9ea5-abe93a40936f",
+          "lot": "ddea90f2-ceb6-4937-93e3-d1a45face99b",
+          "sale": "efdb6101-c657-4242-957c-6731892db147"
+        },
+        {
+          "id": "bd253e76-6469-42af-b059-0d4dc40134fe",
+          "lot": "c77a0068-28b9-4f9b-b9de-704054119968",
+          "sale": "c07bd362-a263-41c1-9f12-768783660d0c"
+        },
+        {
+          "id": "ebefb7c7-8712-4ec2-93a8-ade5fc64cf80",
+          "lot": "0760c3a9-c0e4-478f-9de4-9db817a8bcbd",
+          "sale": "85e45d8a-df4f-40dc-9035-69d06d86cdda"
+        },
+        {
+          "id": "64115fc3-2792-4068-b9d0-70b2e04565a0",
+          "lot": "fcfd75e8-2187-4f3f-b612-db80fadbe0bf",
+          "sale": "eca09f55-d4d7-4626-b526-b68f1dfb050f"
+        },
+        {
+          "id": "d5e16cf8-d3ec-47f1-8fc7-390f6b4d5f29",
+          "lot": "1f7fb24d-ec16-4bf6-9622-35480c40ee09",
+          "sale": "955e7bbc-5f26-4656-a138-215b0e1daf96"
+        },
+        {
+          "id": "0b4c3a89-4185-4668-ad74-10889770b60c",
+          "lot": "1ff3411e-1f0d-43f4-baee-924656f6936e",
+          "sale": "669b921e-a33b-47af-8298-61ca8e72f0d5"
+        },
+        {
+          "id": "ee144bcf-0bf9-4ebf-b59a-ef079caf0da1",
+          "lot": "c1814c12-dcd7-4a46-b762-86a72285a18d",
+          "sale": "005b395e-c5e3-406a-9843-ff7c8ab1313c"
+        },
+        {
+          "id": "8d036c07-2917-4943-a56f-9de5e213ba2e",
+          "lot": "6c52a963-fd71-4957-b925-49603f3939a7",
+          "sale": "a69abecf-d595-43e8-87e8-1b0616422089"
+        },
+        {
+          "id": "cff5c1cb-af57-4323-9be2-616daf5e3ac0",
+          "lot": "24733711-b2fa-4a71-b6af-8292a9fed805",
+          "sale": "42f2352c-66ee-488d-b6e3-fa39100f2ff9"
+        },
+        {
+          "id": "87ba8b72-4047-478d-88dd-975918f0e2fa",
+          "lot": "688e9dd8-b769-4242-af24-071b513386e1",
+          "sale": "95271c32-ac62-41b4-9686-7a01aa7f6029"
+        }
+      ],
+      "installments": [
+        "59a584e9-e444-4a21-928b-d07ba917fbc9",
+        "fae3ee18-1618-403e-b83d-46a07d9f89a2",
+        "be4b54f1-c080-47a8-9edb-52e869ba011f"
+      ],
+      "total": 1000
+    },
+    "partial": {
+      "id": "91f42f30-8f0c-4b8e-b281-3784138c61f2",
+      "items": [
+        {
+          "id": "f41feeff-3335-49a7-bf26-5f3d8de53cb5",
+          "lot": "be5f7213-c708-48f4-b68f-4af2a7800265",
+          "sale": "4cd15910-cc06-453e-95d9-27909ed5a432"
+        },
+        {
+          "id": "5d517cae-5b68-4000-a498-b70054989f93",
+          "lot": "0882a3d1-62b8-4f50-9181-6e956c86d80b",
+          "sale": "3a07fcbe-ecdc-4689-86cc-2caadc681336"
+        }
+      ],
+      "installments": [
+        "dc2d2562-5623-45f0-a8ed-efb7296b5595",
+        "740f19f0-937a-4e01-b573-d33c1991125d",
+        "fc7a0302-b64c-442c-be26-c04aabe1885a"
+      ],
+      "total": 330
+    },
+    "pix": {
+      "id": "debed9bb-23e7-4969-af1e-9cafd7cd00b0",
+      "items": [
+        {
+          "id": "8f584c87-d9c7-437c-811a-38456ea52f65",
+          "lot": "6ae1fe6e-a4d7-428a-901e-ed6de05c9e49",
+          "sale": "36061d30-a046-43a7-9921-0d8595586c64"
+        }
+      ],
+      "installments": [
+        "1a932524-9dfd-4ef9-9f88-58c789417e4a"
+      ],
+      "total": 123.45
+    },
+    "legacy": {
+      "id": "49163b45-ceef-45fd-8ebc-600cd57f0867",
+      "items": [
+        {
+          "id": "f65cac9d-f76e-450d-85e1-73e8e3f80f47",
+          "lot": "0dc0e78c-8c83-4a4a-838b-5418cdf61c0c",
+          "sale": "afbe854e-5010-4a02-ab78-b37058cb5a90"
+        }
+      ],
+      "installments": [],
+      "total": 300
+    }
+  }
+}

@@ -20,8 +20,9 @@ describe('recarga agrupada do Mapa Comercial', () => {
     expect(a).toBe(b);
     await act(async () => { await vi.advanceTimersByTimeAsync(500); });
     await a;
-    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledTimes(2); // one inventory refresh and one shared sales/analytics invalidation
     expect(spy).toHaveBeenCalledWith({ queryKey: ['commercial-map'] }, { cancelRefetch: false });
+    expect(spy).toHaveBeenCalledWith({ queryKey: ['commercial-sale-orders'] }, { cancelRefetch: false });
   });
 });
 
