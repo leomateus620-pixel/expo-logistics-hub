@@ -7,7 +7,8 @@ export type SalesOrdersRecordIdentity = Pick<SaleOrderSummary, 'recordId' | 'ord
 /** Só estado de apresentação: nenhum valor comercial é persistido nesta store. */
 interface SalesOrdersUiState {
   scopeProjectId: string | null;
-  area: 'overview' | 'sales';
+  analyticsScopeId: string | null;
+  area: 'overview' | 'sales' | 'cashflow' | 'signature';
   filters: SaleOrdersFilters;
   page: number;
   expandedRecordId: string | null;
@@ -20,7 +21,7 @@ interface SalesOrdersUiState {
   scrollTop: number;
   originRecordId: string | null;
   setFilters: (patch: Partial<SaleOrdersFilters>) => void;
-  setArea: (area: 'overview' | 'sales') => void;
+  setArea: (area: 'overview' | 'sales' | 'cashflow' | 'signature') => void;
   resetFilters: () => void;
   setPage: (page: number) => void;
   setExpanded: (recordId: string | null) => void;
@@ -37,6 +38,7 @@ interface SalesOrdersUiState {
 
 export const useSalesOrdersUiStore = create<SalesOrdersUiState>((set, get) => ({
   scopeProjectId: null,
+  analyticsScopeId: null,
   area: 'overview',
   filters: EMPTY_SALE_FILTERS,
   page: 0,

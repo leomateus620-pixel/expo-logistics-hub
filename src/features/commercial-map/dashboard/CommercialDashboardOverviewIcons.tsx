@@ -140,3 +140,11 @@ export function LegendOpenKey() {
     <path d="M6 1.1a4.9 4.9 0 0 1 0 9.8Z" />
   </svg>;
 }
+
+/** Calendar with incoming principal; same stroke contract as overview glyphs. */
+export function CashflowGlyph() {
+  return <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="5" width="20" height="19" rx="3" /><path d="M9 3v5m10-5v5M4 11h20m-10 3v7m-3-3 3 3 3-3" /></svg>;
+}
+export function SignatureClockGlyph() {
+  return <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="m5 19 2-6L19 2l4 4L11 18Zm1-1 4-4M3 25c4 0 3-4 6-4 2 0 0 4 2 4l3-1m-11 6h11" /><circle cx="24" cy="23" r="7" /><path d="M24 19v4l3 2" /></svg>;
+}

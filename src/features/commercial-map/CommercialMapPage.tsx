@@ -1021,6 +1021,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                 <CommercialDashboard
                   data={data}
                   dataUpdatedAt={mapQuery.dataUpdatedAt}
+                  inventoryRevision={data.revision}
                   isFetching={mapQuery.isFetching}
                   onClose={closeDashboard}
                   onViewLot={handleDashboardViewLot}

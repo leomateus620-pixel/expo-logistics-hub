@@ -945,3 +945,112 @@
   .commercial-dashboard-area-card__value, .commercial-dashboard-area-card__percentage,
   .commercial-dashboard-sales-summary__value { animation: none; }
 }
+
+/* Persisted commercial projections · same tokens and local motion scope. */
+.commercial-dashboard-overview-confirmed-column { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.commercial-dashboard-overview-confirmed-column > article { flex: 1; }
+.commercial-dashboard-cashflow-entry { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 12px; color: var(--overview-blue-800); font-size: 13px; font-weight: 700; }
+.commercial-dashboard-cashflow-entry svg { width: 25px; height: 25px; }
+.commercial-dashboard-cashflow-entry span { margin-left: 8px; }
+.commercial-dashboard-cashflow-preview { min-height: 83px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 16px; border: 1px solid var(--overview-blue-200); border-radius: 10px; background: var(--overview-blue-100); color: var(--overview-blue-950); }
+.commercial-dashboard-cashflow-preview__month { text-align: left; flex: 1; min-height: 52px; }
+.commercial-dashboard-cashflow-preview__transition { display: grid; gap: 5px; animation: commercial-cashflow-arrive 300ms ease-out; }
+.commercial-dashboard-cashflow-preview__transition > span { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.commercial-dashboard-cashflow-preview__transition strong { font: 600 20px var(--overview-font-data); font-variant-numeric: tabular-nums; }
+.commercial-dashboard-cashflow-preview__controls { display: flex; }
+.commercial-dashboard-cashflow-preview__controls button { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; }
+.commercial-dashboard-cashflow-preview__controls svg { width: 16px; height: 16px; }
+.commercial-dashboard-overview-progress-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 12px; }
+.commercial-dashboard-overview-progress-row > div { min-width: 0; }
+.commercial-dashboard-signature-card { height: 100%; min-height: 218px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px 22px; border: 1px solid #dcdff0; border-radius: var(--overview-radius-card); background: linear-gradient(130deg, #f9fafe, #edf1fa); color: var(--overview-blue-950); box-shadow: var(--overview-depth-card); }
+.commercial-dashboard-signature-card header { display: flex; align-items: center; gap: 10px; width: 100%; }
+.commercial-dashboard-signature-card h2 { font-size: 14px; font-weight: 700; flex: 1; }
+.commercial-dashboard-signature-card__icon { width: 35px; height: 35px; color: #5b62a8; }
+.commercial-dashboard-signature-card__duration { font: 600 clamp(24px, 2.5vw, 34px) var(--overview-font-data); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.commercial-dashboard-signature-card p { margin: 0; font-size: 13px; }
+.commercial-dashboard-signature-card > span { color: var(--overview-muted); font-size: 12px; }
+.commercial-dashboard-signature-card > button { margin-top: auto; min-height: 44px; font-size: 13px; font-weight: 700; }
+.commercial-dashboard-cashflow { display: flex; flex-direction: column; gap: 20px; color: var(--overview-ink); font-family: var(--overview-font-text); }
+.commercial-dashboard-cashflow button, .commercial-dashboard-cashflow summary { min-height: 44px; }
+.commercial-dashboard-cashflow button:focus-visible, .commercial-dashboard-cashflow-entry:focus-visible, .commercial-dashboard-cashflow-preview button:focus-visible, .commercial-dashboard-signature-card button:focus-visible { outline: 3px solid var(--overview-blue-600); outline-offset: 3px; border-radius: 6px; }
+.commercial-dashboard-cashflow__header { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.commercial-dashboard-cashflow__header > div { flex: 1; min-width: 220px; }
+.commercial-dashboard-cashflow__header > button { padding: 0 14px; border: 1px solid var(--overview-line); border-radius: 8px; font-size: 13px; }
+.commercial-dashboard-cashflow h2 { font: 600 clamp(23px, 3vw, 30px) var(--overview-font-data); margin: 5px 0; }
+.commercial-dashboard-cashflow h3 { font: 600 20px var(--overview-font-data); text-transform: capitalize; }
+.commercial-dashboard-cashflow__header p, .commercial-dashboard-cashflow__updated { color: var(--overview-muted); font-size: 13px; }
+.commercial-dashboard-cashflow-values { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.commercial-dashboard-cashflow-values > div { padding: 16px; background: var(--overview-blue-50); border: 1px solid var(--overview-blue-200); border-radius: 10px; }
+.commercial-dashboard-cashflow-values dt { font-size: 12px; color: var(--overview-muted); margin-bottom: 8px; }
+.commercial-dashboard-cashflow-values dd { font: 600 clamp(16px, 1.8vw, 22px) var(--overview-font-data); font-variant-numeric: tabular-nums; }
+.commercial-dashboard-cashflow [data-tone="paid"] { background: var(--overview-sage-50); color: var(--overview-sage-950); }
+.commercial-dashboard-cashflow [data-tone="overdue"] { color: var(--overview-orange-950); }
+.commercial-dashboard-cashflow-values > [data-tone="overdue"] { background: var(--overview-orange-50); border-color: var(--overview-orange-200); }
+.commercial-dashboard-cashflow__basis { display: flex; flex-wrap: wrap; gap: 8px; }
+.commercial-dashboard-cashflow__basis legend { font-size: 12px; color: var(--overview-muted); margin-bottom: 8px; }
+.commercial-dashboard-cashflow__basis button, .commercial-dashboard-cashflow__years button { padding: 10px 16px; border: 1px solid var(--overview-line); border-radius: 9px; background: var(--overview-paper); }
+.commercial-dashboard-cashflow button[aria-pressed="true"] { color: var(--overview-blue-950); border-color: var(--overview-blue-600); background: var(--overview-blue-100); }
+.commercial-dashboard-cashflow__reconciliation { padding: 12px 16px; border: 1px solid var(--overview-line); border-radius: 10px; background: var(--overview-paper); font-size: 13px; }
+.commercial-dashboard-cashflow__reconciliation summary { display: flex; align-items: center; cursor: pointer; font-weight: 700; }
+.commercial-dashboard-cashflow__reconciliation summary::after { content: '+'; margin-left: auto; }
+.commercial-dashboard-cashflow__reconciliation[open] summary::after { content: '−'; }
+.commercial-dashboard-cashflow__reconciliation dl > div, .commercial-dashboard-cashflow__exclusions > div { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--overview-line-soft); }
+.commercial-dashboard-cashflow__reconciliation p { margin: 10px 0; }
+.commercial-dashboard-cashflow__years { display: flex; gap: 8px; flex-wrap: wrap; }
+.commercial-dashboard-cashflow__years small { display: block; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.commercial-dashboard-cashflow__year { font-size: 32px !important; }
+.commercial-dashboard-cashflow__year small { color: var(--overview-muted); font: 500 13px var(--overview-font-text); }
+.commercial-dashboard-cashflow__months { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; }
+.commercial-dashboard-cashflow__months > button { display: grid; gap: 8px; text-align: left; padding: 16px; border: 1px solid var(--overview-line); border-radius: 10px; background: white; }
+.commercial-dashboard-cashflow__months > button > span { text-transform: capitalize; font-size: 14px; }
+.commercial-dashboard-cashflow__months strong { font: 600 20px var(--overview-font-data); font-variant-numeric: tabular-nums; }
+.commercial-dashboard-cashflow__months small { font-size: 11px; color: var(--overview-muted); }
+.commercial-dashboard-cashflow__details { display: grid; gap: 10px; }
+.commercial-dashboard-cashflow__details article { padding: 14px 16px; border: 1px solid var(--overview-line); border-radius: 10px; background: white; }
+.commercial-dashboard-cashflow__details article > div { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.commercial-dashboard-cashflow__details button { font-weight: 700; color: var(--overview-blue-800); }
+.commercial-dashboard-cashflow__details dl { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 6px; }
+.commercial-dashboard-cashflow__details dt { color: var(--overview-muted); font-size: 12px; }
+.commercial-dashboard-cashflow__details dd { font-size: 14px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.commercial-dashboard-cashflow__pagination { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 16px; font-size: 13px; }
+.commercial-dashboard-cashflow__pagination button { padding: 0 12px; border: 1px solid var(--overview-line); border-radius: 8px; }
+.commercial-dashboard-cashflow__pagination button:disabled { opacity: .5; cursor: default; }
+.commercial-dashboard-cashflow__signature-total { display: flex; align-items: baseline; flex-wrap: wrap; gap: 16px; padding: 24px; border-radius: 12px; background: var(--overview-blue-50); border: 1px solid var(--overview-blue-200); }
+.commercial-dashboard-cashflow__signature-total strong { font: 600 36px var(--overview-font-data); }
+.commercial-dashboard-analytics-notice { color: var(--overview-orange-950); background: var(--overview-orange-50); border: 1px solid var(--overview-orange-200); padding: 10px; border-radius: 8px; font-size: 12px; }
+@keyframes commercial-cashflow-arrive { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@media(max-width:1100px) { .commercial-dashboard-overview-progress-row { grid-template-columns: minmax(0, 1fr); } .commercial-dashboard-signature-card { min-height: 200px; } .commercial-dashboard-cashflow-values, .commercial-dashboard-cashflow__months { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) { .commercial-dashboard-cashflow__months, .commercial-dashboard-cashflow-values, .commercial-dashboard-cashflow__details dl { grid-template-columns: minmax(0,1fr); } .commercial-dashboard-cashflow__reconciliation dl > div { flex-direction: column; gap: 4px; } .commercial-dashboard-cashflow-values > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px; } .commercial-dashboard-cashflow-values dt { margin: 0; } .commercial-dashboard-cashflow__header > div { min-width: 0; flex-basis: 100%; } .commercial-dashboard-cashflow-preview { padding: 10px 12px; } }
+
+
+/* Requested localized transfer: SVG follows measured menu/value anchors; no render loop. */
+.commercial-dashboard-cashflow-transfer { position: absolute; inset: 0; pointer-events: none; z-index: 2; overflow: visible; }
+.commercial-dashboard-cashflow-transfer__trail { fill: none; stroke: #67aa8b; stroke-width: 1.25; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; animation: commercial-cashflow-trail 720ms ease-out both; }
+.commercial-dashboard-cashflow-transfer__note { animation: commercial-cashflow-note 720ms ease-out both; filter: drop-shadow(0 3px 3px rgb(24 67 49 / .14)); }
+.commercial-dashboard-cashflow-transfer__arrival { fill: none; stroke: #6fac92; stroke-width: 1; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.commercial-dashboard-cashflow-transfer[data-landed="true"] .commercial-dashboard-cashflow-transfer__arrival { animation: commercial-cashflow-land 360ms ease-out both; }
+.commercial-dashboard-cashflow-preview[data-arriving="true"] strong { animation: commercial-cashflow-highlight 370ms ease-out both; }
+@keyframes commercial-cashflow-trail { 0% { opacity: 0; stroke-dashoffset: 1; } 18% { opacity: .65; } 68% { stroke-dashoffset: 0; opacity: .4; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes commercial-cashflow-note { 0% { opacity: 0; } 12%,58% { opacity: 1; } 78%,100% { opacity: 0; } }
+@keyframes commercial-cashflow-land { from { opacity: .55; transform: scale(.6); } to { opacity: 0; transform: scale(1.3); } }
+@keyframes commercial-cashflow-highlight { 0% { color: #227453; } 100% { color: var(--overview-blue-950); } }
+/* Explicit user preference for this preview only; never enables full motion on the Dashboard. */
+@media (prefers-reduced-motion: reduce) {
+  .commercial-dashboard-cashflow-preview__transition { animation-duration: 300ms !important; animation-iteration-count: 1 !important; }
+  .commercial-dashboard-cashflow-transfer__trail, .commercial-dashboard-cashflow-transfer__note { animation-duration: 720ms !important; animation-iteration-count: 1 !important; }
+  .commercial-dashboard-cashflow-transfer[data-landed="true"] .commercial-dashboard-cashflow-transfer__arrival { animation-duration: 360ms !important; animation-iteration-count: 1 !important; }
+  .commercial-dashboard-cashflow-preview[data-arriving="true"] strong { animation-duration: 370ms !important; animation-iteration-count: 1 !important; }
+}
+.commercial-dashboard-overview-progress-row { margin-top: 14px; }
+.commercial-dashboard-overview-progress-row > .commercial-dashboard-overview-progress { margin-top: 0; height: 100%; }
+.commercial-dashboard-cashflow { width: 100%; min-width: 0; max-width: 100%; }
+.commercial-dashboard-cashflow > * { min-width: 0; }
+.commercial-dashboard-cashflow__basis { min-inline-size: 0; }
+.commercial-dashboard-cashflow__basis button { max-width: 100%; white-space: normal; }
+.commercial-dashboard-signature-card__icon svg { width: 100%; height: 100%; }
+@media(max-width:600px) {
+  .commercial-dashboard-cashflow__header { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; }
+  .commercial-dashboard-cashflow__header > button:first-child { grid-column: 1/-1; justify-self: start; }
+  .commercial-dashboard-cashflow__header > div { grid-column: 1; }
+  .commercial-dashboard-cashflow__header > .commercial-dashboard-overview-info-trigger { grid-column: 2; grid-row: 2; }
+}
