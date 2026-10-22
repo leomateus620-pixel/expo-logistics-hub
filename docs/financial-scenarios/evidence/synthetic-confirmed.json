@@ -1,0 +1,662 @@
+{
+  "basis": "confirmed",
+  "orgId": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+  "totals": {
+    "expenseCents": "190800",
+    "revenueCents": "394482640",
+    "otherRevenueCents": "300000",
+    "unclassifiedCents": "511",
+    "sponsorshipFreeCents": "70",
+    "operatingRevenueCents": "394182560",
+    "sponsorshipRouanetCents": "10",
+    "balanceBeforeReserveCents": "394291840"
+  },
+  "history": [
+    {
+      "date": "2026-10-22",
+      "categories": {
+        "parking": {
+          "count": 0,
+          "status": "future",
+          "feesCents": "0",
+          "amountCents": "0",
+          "composition": [],
+          "principalCents": "0",
+          "coverageComplete": true,
+          "commercialConfirmedCents": "0",
+          "commercialPortfolioCents": "0"
+        },
+        "exporural": {
+          "count": 1,
+          "status": "ready",
+          "feesCents": "75",
+          "amountCents": "30078",
+          "composition": [
+            {
+              "count": 1,
+              "issue": null,
+              "stage": "confirmed",
+              "source": "commercial",
+              "feesCents": "75",
+              "principalCents": "30003"
+            }
+          ],
+          "principalCents": "30003",
+          "coverageComplete": true,
+          "commercialConfirmedCents": "30078",
+          "commercialPortfolioCents": "30078"
+        },
+        "automotive": {
+          "count": 0,
+          "status": "empty",
+          "feesCents": "0",
+          "amountCents": "0",
+          "composition": [],
+          "principalCents": "0",
+          "coverageComplete": true,
+          "commercialConfirmedCents": "0",
+          "commercialPortfolioCents": "0"
+        },
+        "food_points": {
+          "count": 0,
+          "status": "empty",
+          "feesCents": "0",
+          "amountCents": "0",
+          "composition": [],
+          "principalCents": "0",
+          "coverageComplete": true,
+          "commercialConfirmedCents": "0",
+          "commercialPortfolioCents": "0"
+        },
+        "agroindustry": {
+          "count": 0,
+          "status": "empty",
+          "feesCents": "0",
+          "amountCents": "0",
+          "composition": [],
+          "principalCents": "0",
+          "coverageComplete": true,
+          "commercialConfirmedCents": "0",
+          "commercialPortfolioCents": "0"
+        },
+        "external_ics": {
+          "count": 0,
+          "status": "empty",
+          "feesCents": "0",
+          "amountCents": "0",
+          "composition": [],
+          "principalCents": "0",
+          "coverageComplete": true,
+          "commercialConfirmedCents": "0",
+          "commercialPortfolioCents": "0"
+        },
+        "pavilion_ics": {
+          "count": 4,
+          "status": "incomplete",
+          "feesCents": "29",
+          "amountCents": "10130",
+          "composition": [
+            {
+              "count": 1,
+              "issue": "SALE_ITEM_MISMATCH",
+              "stage": "confirmed",
+              "source": "commercial",
+              "feesCents": "0",
+              "principalCents": "0"
+            },
+            {
+              "count": 2,
+              "issue": null,
+              "stage": "confirmed",
+              "source": "commercial",
+              "feesCents": "29",
+              "principalCents": "10101"
+            },
+            {
+              "count": 1,
+              "issue": "LEGACY_UNVERIFIED",
+              "stage": "pending",
+              "source": "commercial",
+              "feesCents": "0",
+              "principalCents": "0"
+            }
+          ],
+          "principalCents": "10101",
+          "coverageComplete": false,
+          "commercialConfirmedCents": "10130",
+          "commercialPortfolioCents": "10130"
+        },
+        "other_revenue": {
+          "count": 4,
+          "status": "incomplete",
+          "feesCents": "0",
+          "amountCents": "300000",
+          "composition": [
+            {
+              "count": 3,
+              "issue": "MANUAL_WITHOUT_CATEGORY",
+              "stage": "confirmed",
+              "source": "manual",
+              "feesCents": "0",
+              "principalCents": "300000"
+            },
+            {
+              "count": 1,
+              "issue": "MANUAL_WITHOUT_CATEGORY",
+              "stage": "projected",
+              "source": "manual",
+              "feesCents": "0",
+              "principalCents": "0"
+            }
+          ],
+          "principalCents": "300000",
+          "coverageComplete": false,
+          "commercialConfirmedCents": "0",
+          "commercialPortfolioCents": "0"
+        },
+        "sponsorship_free": {
+          "count": 501,
+          "status": "ready",
+          "feesCents": "0",
+          "amountCents": "70",
+          "composition": [
+            {
+              "count": 1,
+              "issue": null,
+              "stage": "confirmed",
+              "source": "sponsorship",
+              "feesCents": "0",
+              "principalCents": "70"
+            },
+            {
+              "count": 500,
+              "issue": null,
+              "stage": "negociacao",
+              "source": "sponsorship",
+              "feesCents": "0",
+              "principalCents": "0"
+            }
+          ],
+          "principalCents": "70",
+          "coverageComplete": true,
+          "commercialConfirmedCents": "0",
+          "commercialPortfolioCents": "0"
+        },
+        "operating_execution": {
+          "count": 2,
+          "status": "ready",
+          "feesCents": "0",
+          "amountCents": "190000",
+          "composition": [
+            {
+              "count": 2,
+              "issue": null,
+              "stage": "realizada",
+              "source": "expense",
+              "feesCents": "0",
+              "principalCents": "190000"
+            }
+          ],
+          "principalCents": "190000",
+          "coverageComplete": true,
+          "commercialConfirmedCents": "0",
+          "commercialPortfolioCents": "0"
+        },
+        "sponsorship_rouanet": {
+          "count": 501,
+          "status": "ready",
+          "feesCents": "0",
+          "amountCents": "10",
+          "composition": [
+            {
+              "count": 1,
+              "issue": null,
+              "stage": "confirmed",
+              "source": "sponsorship",
+              "feesCents": "0",
+              "principalCents": "10"
+            },
+            {
+              "count": 500,
+              "issue": null,
+              "stage": "negociacao",
+              "source": "sponsorship",
+              "feesCents": "0",
+              "principalCents": "0"
+            }
+          ],
+          "principalCents": "10",
+          "coverageComplete": true,
+          "commercialConfirmedCents": "0",
+          "commercialPortfolioCents": "0"
+        }
+      },
+      "expenseCents": "190000",
+      "revenueCents": "340288",
+      "coverageComplete": false
+    }
+  ],
+  "coverage": {
+    "complete": false,
+    "cashScope": "FINANCIAL_ALLOCATIONS_ONLY",
+    "feePolicy": "PROPORTIONAL_FLOOR_RESIDUAL_UUID;CONFIRMED_SAME_ITEM_SHARES",
+    "issueCount": 10,
+    "futureSources": [
+      "parking"
+    ],
+    "historyCollection": "SERVER_10_MINUTES_90_DAYS",
+    "otherRevenuePolicy": "INCLUDED_SEPARATELY",
+    "openingBalanceCents": null,
+    "unreconciledCommercialPayments": 1
+  },
+  "editionId": "cb9d79c0-730e-4379-bb85-2235f0c8dbbe",
+  "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+  "scenarios": [
+    {
+      "key": "pessimistic",
+      "targets": {
+        "parking": "56000000",
+        "exporural": "78548703",
+        "automotive": "24096253",
+        "food_points": "36000000",
+        "agroindustry": "10670400",
+        "cash_reserve": "65808803",
+        "external_ics": "80383503",
+        "pavilion_ics": "180109944",
+        "revenue_total": "765808803",
+        "sponsorship_free": "240000000",
+        "operating_subtotal": "465808803",
+        "investment_capacity": "0",
+        "operating_execution": "700000000",
+        "sponsorship_rouanet": "60000000"
+      },
+      "version": 3,
+      "provenance": {
+        "issues": [
+          {
+            "code": "ABSOLUTE_VALUES_PRESERVED",
+            "message": "Automóvel e Área Externa preservam os valores absolutos do anexo; não foram recalculados a 80%.",
+            "differenceCents": null
+          }
+        ],
+        "source": "WhatsApp Image 2026-10-21 at 17.30.11 (1).jpeg",
+        "negativeCents": "0",
+        "referenceDate": "2026-10-21",
+        "originalReserveLabel": "Reserva de Caixa 2028"
+      },
+      "referenceKey": "concurrent-1"
+    },
+    {
+      "key": "realistic",
+      "targets": {
+        "parking": "70000000",
+        "exporural": "98185879",
+        "automotive": "30120320",
+        "food_points": "45000000",
+        "agroindustry": "13338000",
+        "cash_reserve": "150000000",
+        "external_ics": "100479335",
+        "pavilion_ics": "225137430",
+        "revenue_total": "1082260964",
+        "sponsorship_free": "400000000",
+        "operating_subtotal": "582260964",
+        "investment_capacity": "232260964",
+        "operating_execution": "700000000",
+        "sponsorship_rouanet": "100000000"
+      },
+      "version": 1,
+      "provenance": {
+        "issues": [],
+        "source": "WhatsApp Image 2026-10-21 at 17.30.11 (1).jpeg",
+        "negativeCents": null,
+        "referenceDate": "2026-10-21",
+        "originalReserveLabel": "Reserva de Caixa 2030"
+      },
+      "referenceKey": "whatsapp-2026-10-21-v1"
+    },
+    {
+      "key": "optimistic",
+      "targets": {
+        "parking": "72000000",
+        "exporural": "98185879",
+        "automotive": "30120320",
+        "food_points": "50000000",
+        "agroindustry": "20000000",
+        "cash_reserve": "200000000",
+        "external_ics": "100479335",
+        "pavilion_ics": "225137430",
+        "revenue_total": "1215922964",
+        "sponsorship_free": "500000000",
+        "operating_subtotal": "595922964",
+        "investment_capacity": "313922964",
+        "operating_execution": "700000000",
+        "sponsorship_rouanet": "120000000"
+      },
+      "version": 1,
+      "provenance": {
+        "issues": [
+          {
+            "code": "INVESTMENT_REFERENCE_MISMATCH",
+            "message": "Divergência na referência: investimento informado R$ 3.139.229,64; fórmula R$ 3.159.229,64. Diferença R$ 20.000,00.",
+            "differenceCents": "2000000"
+          },
+          {
+            "code": "PARKING_LABEL_MISMATCH",
+            "message": "Estacionamento rotulado 120%; valor absoluto preservado R$ 720.000,00 (102,8571% de R$ 700.000,00).",
+            "differenceCents": null
+          }
+        ],
+        "source": "WhatsApp Image 2026-10-21 at 17.30.11 (1).jpeg",
+        "negativeCents": null,
+        "referenceDate": "2026-10-21",
+        "originalReserveLabel": "Reserva de Caixa 2030"
+      },
+      "referenceKey": "whatsapp-2026-10-21-v1"
+    }
+  ],
+  "generation": "1ee86e8d4fb4f5a6494fdb059204158b",
+  "generatedAt": "2026-10-22T03:06:10.475138-03:00",
+  "schemaVersion": 2,
+  "sourceCoverage": [
+    {
+      "count": 1,
+      "issue": "LEGACY_UNVERIFIED",
+      "source": "commercial",
+      "amountCents": "0",
+      "lastChangedAt": "2026-10-22T03:06:10.083984-03:00"
+    },
+    {
+      "count": 2,
+      "issue": "PARENT_INVALID",
+      "source": "commercial",
+      "amountCents": "511",
+      "lastChangedAt": "2026-10-22T03:06:10.193412-03:00"
+    },
+    {
+      "count": 1,
+      "issue": "SALE_ITEM_MISMATCH",
+      "source": "commercial",
+      "amountCents": "0",
+      "lastChangedAt": "2026-10-22T03:06:10.084795-03:00"
+    },
+    {
+      "count": 431,
+      "issue": null,
+      "source": "commercial",
+      "amountCents": "394182560",
+      "lastChangedAt": "2026-10-22T03:06:10.447668-03:00"
+    },
+    {
+      "count": 2,
+      "issue": "FEES_TO_RECONCILE",
+      "source": "commercial_fees",
+      "amountCents": "27",
+      "lastChangedAt": "2026-10-22T03:06:10.200022-03:00"
+    },
+    {
+      "count": 4,
+      "issue": null,
+      "source": "expense",
+      "amountCents": "190800",
+      "lastChangedAt": "2026-10-22T03:06:10.23338-03:00"
+    },
+    {
+      "count": 4,
+      "issue": "MANUAL_WITHOUT_CATEGORY",
+      "source": "manual",
+      "amountCents": "300000",
+      "lastChangedAt": "2026-10-22T03:06:09.959165-03:00"
+    },
+    {
+      "count": 1004,
+      "issue": null,
+      "source": "sponsorship",
+      "amountCents": "80",
+      "lastChangedAt": "2026-10-22T03:06:10.232626-03:00"
+    }
+  ],
+  "currentByCategory": {
+    "parking": {
+      "count": 0,
+      "status": "future",
+      "feesCents": "0",
+      "amountCents": "0",
+      "composition": [],
+      "principalCents": "0",
+      "coverageComplete": true,
+      "commercialConfirmedCents": "0",
+      "commercialPortfolioCents": "0"
+    },
+    "exporural": {
+      "count": 143,
+      "status": "ready",
+      "feesCents": "3236",
+      "amountCents": "90075962",
+      "composition": [
+        {
+          "count": 143,
+          "issue": null,
+          "stage": "confirmed",
+          "source": "commercial",
+          "feesCents": "3236",
+          "principalCents": "90072726"
+        }
+      ],
+      "principalCents": "90072726",
+      "coverageComplete": true,
+      "commercialConfirmedCents": "90075962",
+      "commercialPortfolioCents": "90075962"
+    },
+    "automotive": {
+      "count": 0,
+      "status": "empty",
+      "feesCents": "0",
+      "amountCents": "0",
+      "composition": [],
+      "principalCents": "0",
+      "coverageComplete": true,
+      "commercialConfirmedCents": "0",
+      "commercialPortfolioCents": "20029423"
+    },
+    "food_points": {
+      "count": 0,
+      "status": "empty",
+      "feesCents": "0",
+      "amountCents": "0",
+      "composition": [],
+      "principalCents": "0",
+      "coverageComplete": true,
+      "commercialConfirmedCents": "0",
+      "commercialPortfolioCents": "0"
+    },
+    "agroindustry": {
+      "count": 142,
+      "status": "ready",
+      "feesCents": "1326",
+      "amountCents": "19072531",
+      "composition": [
+        {
+          "count": 142,
+          "issue": null,
+          "stage": "confirmed",
+          "source": "commercial",
+          "feesCents": "1326",
+          "principalCents": "19071205"
+        }
+      ],
+      "principalCents": "19071205",
+      "coverageComplete": true,
+      "commercialConfirmedCents": "19072531",
+      "commercialPortfolioCents": "19072531"
+    },
+    "external_ics": {
+      "count": 1,
+      "status": "ready",
+      "feesCents": "2534",
+      "amountCents": "85002534",
+      "composition": [
+        {
+          "count": 1,
+          "issue": null,
+          "stage": "confirmed",
+          "source": "commercial",
+          "feesCents": "2534",
+          "principalCents": "85000000"
+        }
+      ],
+      "principalCents": "85000000",
+      "coverageComplete": true,
+      "commercialConfirmedCents": "85002534",
+      "commercialPortfolioCents": "85060116"
+    },
+    "pavilion_ics": {
+      "count": 147,
+      "status": "incomplete",
+      "feesCents": "6191",
+      "amountCents": "200031533",
+      "composition": [
+        {
+          "count": 1,
+          "issue": "SALE_ITEM_MISMATCH",
+          "stage": "confirmed",
+          "source": "commercial",
+          "feesCents": "0",
+          "principalCents": "0"
+        },
+        {
+          "count": 145,
+          "issue": null,
+          "stage": "confirmed",
+          "source": "commercial",
+          "feesCents": "6191",
+          "principalCents": "200025342"
+        },
+        {
+          "count": 1,
+          "issue": "LEGACY_UNVERIFIED",
+          "stage": "pending",
+          "source": "commercial",
+          "feesCents": "0",
+          "principalCents": "0"
+        }
+      ],
+      "principalCents": "200025342",
+      "coverageComplete": false,
+      "commercialConfirmedCents": "200031533",
+      "commercialPortfolioCents": "200031533"
+    },
+    "other_revenue": {
+      "count": 4,
+      "status": "incomplete",
+      "feesCents": "0",
+      "amountCents": "300000",
+      "composition": [
+        {
+          "count": 3,
+          "issue": "MANUAL_WITHOUT_CATEGORY",
+          "stage": "confirmed",
+          "source": "manual",
+          "feesCents": "0",
+          "principalCents": "300000"
+        },
+        {
+          "count": 1,
+          "issue": "MANUAL_WITHOUT_CATEGORY",
+          "stage": "projected",
+          "source": "manual",
+          "feesCents": "0",
+          "principalCents": "0"
+        }
+      ],
+      "principalCents": "300000",
+      "coverageComplete": false,
+      "commercialConfirmedCents": "0",
+      "commercialPortfolioCents": "0"
+    },
+    "sponsorship_free": {
+      "count": 502,
+      "status": "ready",
+      "feesCents": "0",
+      "amountCents": "70",
+      "composition": [
+        {
+          "count": 1,
+          "issue": null,
+          "stage": "confirmed",
+          "source": "sponsorship",
+          "feesCents": "0",
+          "principalCents": "70"
+        },
+        {
+          "count": 501,
+          "issue": null,
+          "stage": "negociacao",
+          "source": "sponsorship",
+          "feesCents": "0",
+          "principalCents": "0"
+        }
+      ],
+      "principalCents": "70",
+      "coverageComplete": true,
+      "commercialConfirmedCents": "0",
+      "commercialPortfolioCents": "0"
+    },
+    "operating_execution": {
+      "count": 4,
+      "status": "ready",
+      "feesCents": "0",
+      "amountCents": "190800",
+      "composition": [
+        {
+          "count": 1,
+          "issue": null,
+          "stage": "prevista",
+          "source": "expense",
+          "feesCents": "0",
+          "principalCents": "0"
+        },
+        {
+          "count": 3,
+          "issue": null,
+          "stage": "realizada",
+          "source": "expense",
+          "feesCents": "0",
+          "principalCents": "190800"
+        }
+      ],
+      "principalCents": "190800",
+      "coverageComplete": true,
+      "commercialConfirmedCents": "0",
+      "commercialPortfolioCents": "0"
+    },
+    "sponsorship_rouanet": {
+      "count": 502,
+      "status": "ready",
+      "feesCents": "0",
+      "amountCents": "10",
+      "composition": [
+        {
+          "count": 1,
+          "issue": null,
+          "stage": "confirmed",
+          "source": "sponsorship",
+          "feesCents": "0",
+          "principalCents": "10"
+        },
+        {
+          "count": 501,
+          "issue": null,
+          "stage": "negociacao",
+          "source": "sponsorship",
+          "feesCents": "0",
+          "principalCents": "0"
+        }
+      ],
+      "principalCents": "10",
+      "coverageComplete": true,
+      "commercialConfirmedCents": "0",
+      "commercialPortfolioCents": "0"
+    }
+  },
+  "calculationVersion": "2028.1"
+}

@@ -1,0 +1,98 @@
+body {
+  margin: 0;
+  background: oklch(var(--brand-indigo-50));
+}
+.financial-review-banner {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px;
+  background: oklch(var(--brand-gold-400));
+  color: oklch(var(--brand-navy-900));
+  font:
+    12px Inter,
+    system-ui,
+    sans-serif;
+  position: relative;
+  z-index: 1;
+  gap: 8px;
+}
+.financial-review-banner select {
+  max-width: 45%;
+  background: white;
+  border-radius: 5px;
+  font-size: 11px;
+}
+.financial-review-nav {
+  width: 288px;
+  position: fixed;
+  left: 0;
+  top: 38px;
+  bottom: 0;
+  background: oklch(var(--brand-navy-900));
+  color: oklch(var(--brand-soft-white));
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  gap: 8px;
+}
+.financial-review-nav strong {
+  font-size: 21px;
+  padding: 14px 12px 30px;
+}
+.financial-review-nav button {
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 12px;
+}
+.financial-review-nav button[aria-current="page"] {
+  background: oklch(var(--brand-indigo-500));
+}
+main.financial-operational-2028.financial-management-page {
+  margin-left: 288px;
+  width: calc(100% - 288px);
+  padding: 12px 20px 32px;
+  max-width: none;
+}
+@media (max-width: 767px) {
+  .financial-review-banner {
+    flex-wrap: wrap;
+    height: 64px;
+    align-content: center;
+  }
+  .financial-review-banner select {
+    max-width: 100%;
+    width: 100%;
+  }
+  .financial-review-nav {
+    top: 64px;
+    width: 100%;
+    height: 56px;
+    bottom: auto;
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 16px;
+    gap: 8px;
+    position: sticky;
+    z-index: 2;
+  }
+  .financial-review-nav strong {
+    font-size: 15px;
+    padding: 0;
+    margin-right: auto;
+  }
+  .financial-review-nav button {
+    display: none;
+  }
+  .financial-review-nav button[aria-current="page"] {
+    display: block;
+    padding: 8px;
+    font-size: 12px;
+  }
+  main.financial-operational-2028.financial-management-page {
+    margin: 0;
+    width: 100%;
+    padding: 16px 16px 32px;
+  }
+}

@@ -15,6 +15,7 @@ vi.mock('@/hooks/useOrgCommissions', () => ({ useOrgCommissions: () => ({ commis
 ] }) }));
 vi.mock('@/hooks/use-toast', () => ({ toast: vi.fn() }));
 vi.mock('@/features/financial-management/operational/useFinancialExpenseCapabilities', () => ({ useFinancialExpenseCapabilities: () => ({ canAccess: true, canEdit: true, canConfirm: true, canAdmin: true, isLoading: false, isError: false, refetch: vi.fn() }) }));
+vi.mock('@/features/financial-management/operational/Financial2028Scenarios',()=>({Financial2028Scenarios:()=> <div aria-label="Simulações conectadas 2028"><h1>Simulações</h1></div>}));
 // Workspace routing is verified here; authenticated expense behavior has its own integration tests.
 vi.mock('@/features/financial-management/operational/Financial2028Expenses', () => ({
   Financial2028Expenses: ({ focus }: { focus: string }) => <div aria-label={`Despesas compartilhadas ${focus}`}><h1>Despesas</h1></div>,
@@ -185,9 +186,11 @@ describe('apresentação operacional Financeiro 2028', () => {
     expect(document.querySelector('.f28-header')).not.toBeInTheDocument();
     expect(saveFinancialRecord).not.toHaveBeenCalled();
   });
-  it('explicita indisponibilidade de cenários operacionais', async () => {
+  it('abre a experiência conectada de Simulações, com cabeçalho próprio', async () => {
     mount('simulacoes');
-    await screen.findByRole('heading',{name:'Cenários operacionais ainda indisponíveis'});
+    await screen.findByLabelText('Simulações conectadas 2028');
+    expect(screen.getByRole('heading',{name:'Simulações',level:1})).toBeInTheDocument();
+    expect(document.querySelector('.f28-header')).not.toBeInTheDocument();
     expect(screen.queryByRole('button',{name:'Salvar'})).not.toBeInTheDocument();
     expect(saveFinancialRecord).not.toHaveBeenCalled();
   });
