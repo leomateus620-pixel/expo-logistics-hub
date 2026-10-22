@@ -11690,6 +11690,18 @@ export type Database = {
       }
     }
     Functions: {
+      financial_scenario_revenue_sources: {
+        Args: { _org_id: string; _edition_id: string; _offset?: number; _unmapped_only?: boolean }
+        Returns: Json
+      }
+      financial_scenario_overview: {
+        Args: { _org_id: string; _edition_id: string; _basis?: string }
+        Returns: Json
+      }
+      financial_link_scenario_revenue: {
+        Args: { _org_id: string; _edition_id: string; _revenue_id: string; _category: string; _origin_kind: string; _origin_id: string | null; _expected_version: number; _request_id: string }
+        Returns: Json
+      }
       _commercial_analytics_access: {
         Args: { p_project: string }
         Returns: undefined

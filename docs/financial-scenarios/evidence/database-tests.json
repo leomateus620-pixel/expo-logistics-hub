@@ -1,0 +1,72 @@
+{
+  "environment": "isolated PostgreSQL 18.4, synthetic facts only",
+  "passed": 19,
+  "tests": [
+    "atomic migration and immutable official references",
+    "reapplying seed creates no versions or audit events",
+    "anonymous, roster outsider and cross-org denied; financial reader has no map grant",
+    "single and multi-category order conserve principal plus all fees; partial keeps confirmed shares",
+    "cancel/revise decreases current; unnumbered ExpoRural and physical B3 resolve correctly",
+    "legacy, mismatch, missing parent and unreliable fees are exposed without stock prices",
+    "more than 500 records aggregate fully, declared/in-kind excluded, confirmed replaces projection",
+    "collector deduplicates buckets, records bases separately and no audit per read",
+    "versioned v2 references are idempotent, concurrent edits conflict, reader cannot edit",
+    "financial cash is allocated movement net; PAID commercial installment is not inferred cash",
+    "a failure after DDL and seed rolls back all transaction effects",
+    "manual classification and stable origin links deduplicate portfolio without suppressing cash",
+    "planned expense replaced by commitment; commitment does not create payment",
+    "physical pavilion registry parity and ambiguous parent coverage",
+    "seed refuses mismatched organization and historical edition remains untouched",
+    "missing legacy order margins retain known fees in reconciliation coverage",
+    "all bases return cents strings; malformed historical cash remains unobservable without rewriting history",
+    "cash sponsorship splits conserved cents and reversal removes the same free and Rouanet shares",
+    "representative complete commercial volume and measured execution plan"
+  ],
+  "plan": [
+    {
+      "QUERY PLAN": [
+        {
+          "Plan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 24.533,
+            "Actual Total Time": 24.533,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Disabled": false,
+            "Shared Hit Blocks": 13867,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.006,
+          "Triggers": [],
+          "Execution Time": 24.535
+        }
+      ]
+    }
+  ]
+}

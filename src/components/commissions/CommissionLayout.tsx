@@ -5,6 +5,7 @@ import OfflineBanner from '@/components/OfflineBanner';
 import PageTransition from '@/components/PageTransition';
 import type { CommissionMenuItem, CommissionModule } from '@/modules/commissions/commissionRegistry';
 import { cn } from '@/lib/utils';
+import { useLocation } from 'react-router-dom';
 import '@/styles/commission-map-portals.css';
 
 interface CommissionLayoutProps {
@@ -23,6 +24,8 @@ export default function CommissionLayout({ module, children, variant = 'standard
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMap = variant === 'map';
   const isWorkspace = variant === 'workspace';
+  const location = useLocation();
+  const isScenarios2028 = module.slug === 'financeiro-gerencial' && location.pathname.endsWith('/simulacoes') && new URLSearchParams(location.search).get('edicao') === '2028';
   const Sidebar = isWorkspace ? CommissionWorkspaceSidebar : CommissionSidebar;
 
   return (
@@ -54,7 +57,7 @@ export default function CommissionLayout({ module, children, variant = 'standard
             ? 'commission-layout__map-main h-[100dvh] min-h-0 overflow-hidden pt-16 md:ml-[288px] md:pt-0'
             : isWorkspace
               ? 'commission-workspace-main min-h-screen'
-              : 'min-h-screen px-4 pb-8 pt-20 md:ml-[288px] md:p-8',
+              : isScenarios2028 ? 'min-h-screen px-4 pb-8 pt-20 md:ml-[288px] md:px-5 md:pb-8 md:pt-3' : 'min-h-screen px-4 pb-8 pt-20 md:ml-[288px] md:p-8',
         )}
       >
         {isMap || isWorkspace ? children : <PageTransition>{children}</PageTransition>}

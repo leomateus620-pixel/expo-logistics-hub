@@ -1,0 +1,163 @@
+{
+  "environment": {
+    "lovableProject": "756eeb64-0d44-4171-b445-f8a60f0492c0",
+    "supabaseProject": "btfaumhroqtqzxomqorx",
+    "repository": "leomateus620-pixel/expo-logistics-hub"
+  },
+  "mechanism": "Lovable query_database; explicit BEGIN/COMMIT, advisory lock, exact SQL in supabase_migrations.schema_migrations, source conflict protection and SHA-256 in created_by metadata.",
+  "migrations": [
+    {
+      "version": "20261022090000",
+      "sha256": "e3ae06784b0815d8d2d4eef3d60fdcdcd16e939df2c03c9ea6a568eba2c72a29",
+      "verification": {
+        "anonDenied": true,
+        "exactSource": true,
+        "financialCanUnchanged": true,
+        "historyRecorded": true,
+        "job": {
+          "active": true,
+          "commandMatches": true,
+          "schedule": "*/10 * * * *"
+        },
+        "officialVersions": [
+          {
+            "authorKind": "migration",
+            "key": "optimistic",
+            "schemaVersion": 2,
+            "unit": "BRL_CENTS",
+            "version": 1
+          },
+          {
+            "authorKind": "migration",
+            "key": "pessimistic",
+            "schemaVersion": 2,
+            "unit": "BRL_CENTS",
+            "version": 1
+          },
+          {
+            "authorKind": "migration",
+            "key": "realistic",
+            "schemaVersion": 2,
+            "unit": "BRL_CENTS",
+            "version": 1
+          }
+        ],
+        "privateFunctionsLocked": true,
+        "rosterCount": 4
+      }
+    },
+    {
+      "version": "20261022093000",
+      "sha256": "cbc311a55a61f6b866553f7d934686f18aed621def6ead276374b64ee2d1a4b1",
+      "verification": {
+        "exactSource": true,
+        "financialCanUnchanged": true,
+        "hashRecorded": true,
+        "historyRecorded": true,
+        "privateClassifierLocked": true
+      }
+    },
+    {
+      "version": "20261022100000",
+      "sha256": "c5f120fa09c8ccd793f5c3d5dfd143b02152af557f730c082dac60ffc1b62ffe",
+      "verification": {
+        "exactSource": true,
+        "hashRecorded": true,
+        "historyRecorded": true,
+        "privateBuilderLocked": true
+      }
+    }
+  ],
+  "existingFacts": {
+    "checkedTables": 26,
+    "changedTables": [],
+    "allExistingFactsPreserved": true
+  },
+  "followupFactsUnchanged": true,
+  "classificationParity": {
+    "before": {
+      "rows": [
+        {
+          "checksum": "a72483ffb8b95879e35886b2c5fa76b1",
+          "count": 1652
+        }
+      ]
+    },
+    "after": {
+      "rows": [
+        {
+          "checksum": "a72483ffb8b95879e35886b2c5fa76b1",
+          "count": 1652
+        }
+      ]
+    }
+  },
+  "authenticatedReads": [
+    {
+      "authenticatedRosterReader": true,
+      "basis": "portfolio",
+      "ms": 115,
+      "reconciled": true,
+      "role": "authenticated",
+      "scenarios": 3
+    },
+    {
+      "authenticatedRosterReader": true,
+      "basis": "confirmed",
+      "ms": 115,
+      "reconciled": true,
+      "role": "authenticated",
+      "scenarios": 3
+    },
+    {
+      "authenticatedRosterReader": true,
+      "basis": "cash",
+      "ms": 115,
+      "reconciled": true,
+      "role": "authenticated",
+      "scenarios": 3
+    }
+  ],
+  "historicalCollector": {
+    "rows": [
+      {
+        "jsonb_build_object": {
+          "anonDenied": true,
+          "historyBases": 3,
+          "jobActive": true,
+          "lastJobStatus": "succeeded"
+        },
+        "linked_scopes": 1
+      }
+    ]
+  },
+  "limitations": [
+    "Authenticated reads used SET LOCAL ROLE authenticated and the authorized roster reader JWT claim through the connector. This is not an interactive production browser login.",
+    "Frontend was validated in a local harness using the real components and disposable PostgreSQL with synthetic facts. No frontend deployment or merge.",
+    "No private production money, names, documents, contracts or buyer information is included in these artifacts."
+  ],
+  "cashContractVerification": [
+    {
+      "basis": "portfolio",
+      "currentCentsStrings": true,
+      "historicalCentsStrings": true,
+      "reconciled": true,
+      "role": "authenticated"
+    },
+    {
+      "basis": "confirmed",
+      "currentCentsStrings": true,
+      "historicalCentsStrings": true,
+      "reconciled": true,
+      "role": "authenticated"
+    },
+    {
+      "basis": "cash",
+      "currentCentsStrings": true,
+      "historicalCentsStrings": true,
+      "reconciled": true,
+      "role": "authenticated"
+    }
+  ],
+  "cashFixFactsUnchanged": true
+}
