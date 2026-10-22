@@ -2109,6 +2109,54 @@ export type Database = {
           },
         ]
       }
+      commercial_signature_completions: {
+        Row: {
+          actor_user_id: string | null
+          completed_at: string
+          cycle: number
+          evidence: string
+          item_ids: string[]
+          order_id: string
+          project_id: string
+          registered_at: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          completed_at: string
+          cycle?: number
+          evidence: string
+          item_ids: string[]
+          order_id: string
+          project_id: string
+          registered_at: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          completed_at?: string
+          cycle?: number
+          evidence?: string
+          item_ids?: string[]
+          order_id?: string
+          project_id?: string
+          registered_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commercial_signature_completions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "lot_sale_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commercial_signature_completions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commission_responsibles: {
         Row: {
           active: boolean
@@ -3815,6 +3863,7 @@ export type Database = {
           paid_by_name: string | null
           paid_by_user_id: string | null
           payee_name: string | null
+          payee_reference_id: string | null
           payment_method: string | null
           pix_key: string | null
           pix_key_type: Database["public"]["Enums"]["pix_key_type"] | null
@@ -3855,6 +3904,7 @@ export type Database = {
           paid_by_name?: string | null
           paid_by_user_id?: string | null
           payee_name?: string | null
+          payee_reference_id?: string | null
           payment_method?: string | null
           pix_key?: string | null
           pix_key_type?: Database["public"]["Enums"]["pix_key_type"] | null
@@ -3895,6 +3945,7 @@ export type Database = {
           paid_by_name?: string | null
           paid_by_user_id?: string | null
           payee_name?: string | null
+          payee_reference_id?: string | null
           payment_method?: string | null
           pix_key?: string | null
           pix_key_type?: Database["public"]["Enums"]["pix_key_type"] | null
@@ -3970,6 +4021,13 @@ export type Database = {
             referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "financial_expense_payee_reference_fk"
+            columns: ["org_id", "payee_reference_id"]
+            isOneToOne: false
+            referencedRelation: "financial_references"
+            referencedColumns: ["org_id", "id"]
+          },
         ]
       }
       fenasoja_events: {
@@ -4028,6 +4086,35 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_access_roster: {
+        Row: {
+          active: boolean
+          created_at: string
+          org_id: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          org_id: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          org_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_access_roster_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "financial_restricted_orgs"
+            referencedColumns: ["org_id"]
           },
         ]
       }
@@ -4386,6 +4473,48 @@ export type Database = {
           },
         ]
       }
+      financial_installment_allocations: {
+        Row: {
+          allocation_id: string
+          amount_cents: number
+          created_at: string
+          id: string
+          installment_id: string
+          org_id: string
+        }
+        Insert: {
+          allocation_id: string
+          amount_cents: number
+          created_at?: string
+          id?: string
+          installment_id: string
+          org_id: string
+        }
+        Update: {
+          allocation_id?: string
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          installment_id?: string
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_installment_allocations_allocation_id_fkey"
+            columns: ["allocation_id"]
+            isOneToOne: false
+            referencedRelation: "financial_movement_allocations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_installment_allocations_org_id_installment_id_fkey"
+            columns: ["org_id", "installment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_payment_installments"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
       financial_movement_allocations: {
         Row: {
           amount_cents: number
@@ -4595,18 +4724,212 @@ export type Database = {
           },
         ]
       }
+      financial_payment_installments: {
+        Row: {
+          active: boolean
+          amount_cents: number
+          created_at: string
+          due_date: string
+          id: string
+          method: string | null
+          org_id: string
+          plan_id: string
+          sequence: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          amount_cents: number
+          created_at?: string
+          due_date: string
+          id?: string
+          method?: string | null
+          org_id: string
+          plan_id: string
+          sequence: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          amount_cents?: number
+          created_at?: string
+          due_date?: string
+          id?: string
+          method?: string | null
+          org_id?: string
+          plan_id?: string
+          sequence?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_payment_installments_org_id_plan_id_fkey"
+            columns: ["org_id", "plan_id"]
+            isOneToOne: false
+            referencedRelation: "financial_payment_plans"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_payment_plans: {
+        Row: {
+          active: boolean
+          condition: string
+          created_at: string
+          created_by: string
+          default_method: string | null
+          edition_id: string
+          id: string
+          obligation_id: string | null
+          org_id: string
+          source_id: string
+          source_type: string
+          total_cents: number
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          condition: string
+          created_at?: string
+          created_by: string
+          default_method?: string | null
+          edition_id: string
+          id?: string
+          obligation_id?: string | null
+          org_id: string
+          source_id: string
+          source_type: string
+          total_cents: number
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          condition?: string
+          created_at?: string
+          created_by?: string
+          default_method?: string | null
+          edition_id?: string
+          id?: string
+          obligation_id?: string | null
+          org_id?: string
+          source_id?: string
+          source_type?: string
+          total_cents?: number
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_payment_plans_org_id_edition_id_fkey"
+            columns: ["org_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_editions"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "financial_payment_plans_org_id_obligation_id_fkey"
+            columns: ["org_id", "obligation_id"]
+            isOneToOne: false
+            referencedRelation: "financial_obligations"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      financial_references: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          funding_type: string
+          id: string
+          kind: string
+          name: string
+          normalized_name: string | null
+          org_id: string
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          funding_type?: string
+          id?: string
+          kind: string
+          name: string
+          normalized_name?: string | null
+          org_id: string
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          funding_type?: string
+          id?: string
+          kind?: string
+          name?: string
+          normalized_name?: string | null
+          org_id?: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_references_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_restricted_orgs: {
+        Row: {
+          created_at: string
+          org_id: string
+        }
+        Insert: {
+          created_at?: string
+          org_id: string
+        }
+        Update: {
+          created_at?: string
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_restricted_orgs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financial_revenues: {
         Row: {
           category_id: string | null
           competence_date: string | null
           confirmed_cents: number | null
           counterparty: string | null
+          counterparty_reference_id: string | null
           created_at: string
           created_by: string
           description: string
           due_date: string | null
           edition_id: string
           extra: Json
+          funding_source_reference_id: string | null
           funding_type: string
           id: string
           notes: string | null
@@ -4623,12 +4946,14 @@ export type Database = {
           competence_date?: string | null
           confirmed_cents?: number | null
           counterparty?: string | null
+          counterparty_reference_id?: string | null
           created_at?: string
           created_by: string
           description: string
           due_date?: string | null
           edition_id: string
           extra?: Json
+          funding_source_reference_id?: string | null
           funding_type?: string
           id?: string
           notes?: string | null
@@ -4645,12 +4970,14 @@ export type Database = {
           competence_date?: string | null
           confirmed_cents?: number | null
           counterparty?: string | null
+          counterparty_reference_id?: string | null
           created_at?: string
           created_by?: string
           description?: string
           due_date?: string | null
           edition_id?: string
           extra?: Json
+          funding_source_reference_id?: string | null
           funding_type?: string
           id?: string
           notes?: string | null
@@ -4663,6 +4990,20 @@ export type Database = {
           version?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "financial_revenue_counterparty_reference_fk"
+            columns: ["org_id", "counterparty_reference_id"]
+            isOneToOne: false
+            referencedRelation: "financial_references"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "financial_revenue_funding_reference_fk"
+            columns: ["org_id", "funding_source_reference_id"]
+            isOneToOne: false
+            referencedRelation: "financial_references"
+            referencedColumns: ["org_id", "id"]
+          },
           {
             foreignKeyName: "financial_revenues_org_id_category_id_fkey"
             columns: ["org_id", "category_id"]
@@ -11349,6 +11690,33 @@ export type Database = {
       }
     }
     Functions: {
+      _commercial_analytics_access: {
+        Args: { p_project: string }
+        Returns: undefined
+      }
+      _commercial_cent_matrix: {
+        Args: { p_components: number[]; p_rows: number[] }
+        Returns: {
+          cents: number
+          component_n: number
+          row_n: number
+        }[]
+      }
+      _commercial_sales_projection: {
+        Args: { p_project: string }
+        Returns: Json
+      }
+      _commercial_signature_rows: {
+        Args: { p_project: string }
+        Returns: {
+          completed_at: string
+          exclusion: string
+          order_id: string
+          reference: string
+          registered_at: string
+          seconds: number
+        }[]
+      }
       _cronograma_apply_event_commissions: {
         Args: { _event_id: string; _items: Json; _org_id: string }
         Returns: undefined
@@ -12018,6 +12386,29 @@ export type Database = {
         Returns: Json
       }
       commercial_sale_logos: { Args: { p_project_id: string }; Returns: Json }
+      commercial_sales_analytics_summary: {
+        Args: { p_project_id: string; p_reference_date?: string }
+        Returns: Json
+      }
+      commercial_sales_cashflow_month: {
+        Args: {
+          p_generation: string
+          p_limit?: number
+          p_month: string
+          p_offset?: number
+          p_project_id: string
+        }
+        Returns: Json
+      }
+      commercial_sales_signature_details: {
+        Args: {
+          p_generation: string
+          p_limit?: number
+          p_offset?: number
+          p_project_id: string
+        }
+        Returns: Json
+      }
       commission_leadership_user_ids: {
         Args: { _commission_id: string }
         Returns: {
@@ -12217,6 +12608,19 @@ export type Database = {
         Returns: number
       }
       financial_accessible_org_ids: { Args: never; Returns: string[] }
+      financial_assert_plan_settlement: {
+        Args: { _obligation: string }
+        Returns: undefined
+      }
+      financial_assign_installments: {
+        Args: {
+          _allocation_id: string
+          _details: Json
+          _org_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
       financial_audit: {
         Args: {
           _action: string
@@ -12248,6 +12652,16 @@ export type Database = {
         Returns: boolean
       }
       financial_cents: { Args: { _field: string; _v: Json }; Returns: number }
+      financial_create_reference: {
+        Args: {
+          _funding_type: string
+          _kind: string
+          _name: string
+          _org_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
       financial_date: { Args: { _field: string; _v: Json }; Returns: string }
       financial_edition_summary: {
         Args: { _edition_id: string; _org_id: string }
@@ -12292,6 +12706,7 @@ export type Database = {
           paid_by_name: string | null
           paid_by_user_id: string | null
           payee_name: string | null
+          payee_reference_id: string | null
           payment_method: string | null
           pix_key: string | null
           pix_key_type: Database["public"]["Enums"]["pix_key_type"] | null
@@ -12318,6 +12733,10 @@ export type Database = {
         Args: { _expense_id: string }
         Returns: number
       }
+      financial_export_entries: {
+        Args: { _edition_id: string; _kind: string; _org_id: string }
+        Returns: Json
+      }
       financial_finish: {
         Args: {
           _key: string
@@ -12341,6 +12760,29 @@ export type Database = {
         }
         Returns: Json
       }
+      financial_list_references: {
+        Args: {
+          _include_archived?: boolean
+          _kind: string
+          _org_id: string
+          _query?: string
+        }
+        Returns: Json
+      }
+      financial_list_revenues: {
+        Args: { _edition_id: string; _limit?: number; _offset?: number }
+        Returns: Json
+      }
+      financial_normalize_name: { Args: { _name: string }; Returns: string }
+      financial_payment_plan: {
+        Args: {
+          _edition_id: string
+          _org_id: string
+          _source_id: string
+          _source_type: string
+        }
+        Returns: Json
+      }
       financial_reconcile_obligation: {
         Args: { _actor: string; _obligation_id: string }
         Returns: undefined
@@ -12353,6 +12795,38 @@ export type Database = {
           _request_id: string
         }
         Returns: Json
+      }
+      financial_record_movement_core_20261021: {
+        Args: {
+          _allocations: Json
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      financial_reference: {
+        Args: { _id: string; _kind: string; _org: string; _previous: string }
+        Returns: {
+          active: boolean
+          created_at: string
+          created_by: string
+          funding_type: string
+          id: string
+          kind: string
+          name: string
+          normalized_name: string | null
+          org_id: string
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "financial_references"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       financial_reorder_categories: {
         Args: { _ordered_ids: string[]; _org_id: string; _request_id: string }
@@ -12385,6 +12859,16 @@ export type Database = {
         }
         Returns: Json
       }
+      financial_reverse_movement_core_20261021: {
+        Args: {
+          _movement_id: string
+          _occurred_on: string
+          _org_id: string
+          _reason: string
+          _request_id: string
+        }
+        Returns: Json
+      }
       financial_save: {
         Args: {
           _entity: string
@@ -12396,11 +12880,32 @@ export type Database = {
         }
         Returns: Json
       }
+      financial_save_batch: {
+        Args: {
+          _edition_id: string
+          _items: Json
+          _kind: string
+          _org_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
       financial_save_category: {
         Args: {
           _expected_version: number
           _org_id: string
           _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      financial_save_core_20261021: {
+        Args: {
+          _entity: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _reason?: string
           _request_id: string
         }
         Returns: Json
@@ -12415,6 +12920,26 @@ export type Database = {
         }
         Returns: Json
       }
+      financial_save_expense_core_20261021: {
+        Args: {
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _reason?: string
+          _request_id: string
+        }
+        Returns: Json
+      }
+      financial_save_payment_plan: {
+        Args: {
+          _edition: string
+          _org: string
+          _payload: Json
+          _source: string
+          _type: string
+        }
+        Returns: Json
+      }
       financial_save_scenario: {
         Args: {
           _assumptions: Json
@@ -12424,6 +12949,10 @@ export type Database = {
           _org_id: string
           _request_id: string
         }
+        Returns: Json
+      }
+      financial_schedule_summary: {
+        Args: { _edition_id: string; _org_id: string }
         Returns: Json
       }
       financial_seed_expense_categories: {
@@ -12457,6 +12986,29 @@ export type Database = {
         }
         Returns: Json
       }
+      financial_transition_expense_core_20261021: {
+        Args: {
+          _expected_version: number
+          _expense_id: string
+          _org_id: string
+          _payload: Json
+          _reason: string
+          _request_id: string
+          _to: string
+        }
+        Returns: Json
+      }
+      financial_update_reference: {
+        Args: {
+          _active: boolean
+          _expected_version: number
+          _id: string
+          _name: string
+          _org_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
       financial_validate_expense_links: {
         Args: {
           _category: string
@@ -12471,6 +13023,10 @@ export type Database = {
       financial_validate_extra: {
         Args: { _entity: string; _extra: Json; _org: string }
         Returns: Json
+      }
+      financial_write_installment_allocation: {
+        Args: { _allocation: string; _details: Json; _org: string }
+        Returns: undefined
       }
       get_commercial_sale_order_detail: {
         Args: { p_order_id?: string; p_sale_id?: string }
