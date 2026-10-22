@@ -183,6 +183,13 @@
       "when": 1792488048972,
       "tag": "0025_commercial_revision_order_contracts",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792627634019,
+      "tag": "0026_commercial_sales_analytics",
+      "breakpoints": true
     }
   ]
 }
