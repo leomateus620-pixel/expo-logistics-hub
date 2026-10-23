@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { isPrimaryWebUrl, isSafeAppUrl, validateCitations, WorkerError, WORKER_IDS, type WorkerCitation } from './contracts.ts';
 import { isKbSourceDate, isSafeKbSourceUrl } from './kb-source.ts';
-import { commercialReportSpecSchema } from './commercial-report.ts';
 
 // This is a data format, not a component/chart configuration language.
 const text = z.string().trim().min(1).max(1200).refine(value => !/[<>`]/.test(value), 'Plain text required');
@@ -34,31 +33,19 @@ export const workerQueryFiltersSchema = z.object({
 }).strict();
 export type WorkerQueryFilters = z.infer<typeof workerQueryFiltersSchema>;
 const profile = z.object({ type: z.literal('profile'), name: label, role: label, edition: label, verifiedOn: date, publishedOn: date.optional(), photoUrl: z.string().refine(isPrimaryWebUrl).optional(), details: z.array(z.object({ label, value: text }).strict()).max(6) }).strict();
-export const commercialReportBlockSchema = z.object({
-  type: z.literal('commercial_report'), snapshotId: z.string().uuid(), reportId: z.string().uuid().optional(), title: label,
-  scopeLabels: z.array(label).max(20), filterLabels: z.array(label).max(20), generatedAt: z.string().datetime({ offset: true }),
-  generation: z.string().min(1).max(180), rowCount: z.number().int().nonnegative(), previewCount: z.number().int().min(0).max(30),
-  coverage: z.object({ complete: z.boolean(), excludedRows: z.number().int().nonnegative(), issues: z.array(z.object({ code: z.string().regex(/^[A-Za-z][A-Za-z0-9_]{0,100}$/), count: z.number().int().nonnegative() }).strict()).max(30) }).strict(),
-  capabilities: z.object({ companyNames: z.boolean(), monetaryValues: z.boolean(), contractReferences: z.boolean() }).strict(),
-  status: z.enum(['available', 'requested', 'querying', 'rendering', 'ready', 'error', 'expired']), expiresAt: z.string().datetime({ offset: true }).optional(),
-}).strict();
-export const commercialPlanBlockSchema = z.object({
-  type: z.literal('commercial_plan'), snapshotId: z.string().uuid(), generation: z.string().min(1).max(180), title: label,
-  scopeLabels: z.array(label).max(20), lotCount: z.number().int().nonnegative(), missingGeometryCount: z.number().int().nonnegative(),
-}).strict();
 export const workerResponseBlockSchema = z.union([
-  z.object({ type: z.literal('summary'), text }).strict(), indicators, barChart, pieChart, table, comparison, profile, entityRanking, commercialReportBlockSchema, commercialPlanBlockSchema,
+  z.object({ type: z.literal('summary'), text }).strict(), indicators, barChart, pieChart, table, comparison, profile, entityRanking,
   z.object({ type: z.literal('sources'), items: z.array(source).min(1).max(8) }).strict(),
   z.object({ type: z.literal('empty'), message: text }).strict(),
   z.object({ type: z.literal('clarification'), question: text, options: z.array(label).max(8).optional(),
     choices: z.array(z.object({ id: z.string().uuid(), name: label }).strict()).min(1).max(8).optional() }).strict(),
 ]);
 export const workerResponseSchema = z.object({
-  version: z.union([z.literal(1), z.literal(2)]), worker: z.enum(WORKER_IDS), intent: label, summary: text,
+  version: z.literal(1), worker: z.enum(WORKER_IDS), intent: label, summary: text,
   metadata: z.object({ organizationId: z.string().uuid(), edition: label.optional(), projectId: z.string().uuid().optional(),
     period: z.object({ from: date, to: date, label }).strict().optional(), timezone: z.literal('America/Sao_Paulo'),
     scope: label, updatedAt: z.string().datetime({ offset: true }), completeness: z.enum(['complete', 'partial', 'unavailable']),
-    filters: z.object({ relationship: z.enum(['linked', 'created', 'responsible', 'attendance']).optional(), commissionId: z.string().uuid().optional(), personId: z.string().uuid().optional(), query: workerQueryFiltersSchema.optional(), commercial: commercialReportSpecSchema.optional() }).strict().optional(),
+    filters: z.object({ relationship: z.enum(['linked', 'created', 'responsible', 'attendance']).optional(), commissionId: z.string().uuid().optional(), personId: z.string().uuid().optional(), query: workerQueryFiltersSchema.optional() }).strict().optional(),
     notes: z.array(text).max(8),
   }).strict(), blocks: z.array(workerResponseBlockSchema).max(12),
 }).strict().superRefine((response, ctx) => {
@@ -67,12 +54,6 @@ export const workerResponseSchema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocks'], message: 'Invalid KB source count' });
   }
   for (const [index, block] of response.blocks.entries()) {
-    if ((block.type === 'commercial_report' || block.type === 'commercial_plan') && response.version !== 2) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['version'], message: 'Commercial reports require version 2' });
-    }
-    if (block.type === 'commercial_report' && (block.previewCount > block.rowCount || block.status !== 'available' && !block.reportId)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocks', index], message: 'Invalid commercial report identity or preview' });
-    }
     if (block.type === 'clarification' && block.choices && (new Set(block.choices.map(choice => choice.id)).size !== block.choices.length
       || block.options && block.options.length !== block.choices.length)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocks', index], message: 'Invalid identity choices' });
     if (block.type === 'entity_ranking') {

@@ -8,20 +8,10 @@ import { proposalIntent, type ProposalIntent } from './proposal-policy.ts';
 import { interpretWorkerIntent } from './intent.ts';
 import { composeWorkerResponse, validateToolEvidence, type ToolEvidence } from './response-composer.ts';
 import { institutionalTool } from './institutional.ts';
-import { decodeWorkerResponse, encodeWorkerResponse } from './response-contract.ts';
+import { decodeWorkerResponse } from './response-contract.ts';
 import { plannerPlaybooks } from './question-bank.ts';
 import { composeKbResponse, interpretKbQuery, isPublicKbQuestion, KB_TOOL_NAME, type KbSelection } from './knowledge-base.ts';
 import { workerFailureDiagnostic } from './failures.ts';
-import { parseCommercialReportSnapshot, type CommercialReportSnapshot } from './commercial-report.ts';
-import { commercialReportPreview } from './commercial-report-preview.ts';
-import { type WorkerResponseBlock } from './response-contract.ts';
-
-export interface CommercialReportCapture {
-  snapshotId: string;
-  reportId?: string;
-  status: Extract<WorkerResponseBlock, {type?:'commercial_report'}>['status'];
-  expiresAt?: string;
-}
 
 export interface TurnStart {
   conversationId: string;
@@ -54,10 +44,6 @@ export interface WorkerTurnDependencies {
   proposalTools?(intent: ProposalIntent, worker: WorkerId): Promise<PlannerTool[]>;
   propose?(name: string, input: unknown, context: { conversationId: string; requestId: string }): Promise<{ kind: 'action' | 'routine'; id: string; citation: WorkerCitation }>;
   memory?(worker: WorkerId): Promise<string[]>;
-  /** Explicit infrastructure writes; never registered as a read-only tool. */
-  captureCommercialReport?(snapshot: CommercialReportSnapshot, context: {orgId:string;conversationId:string;requestId:string;generatePdf:boolean}): Promise<CommercialReportCapture>;
-  /** Revalidates current bot, project and field permissions before returning saved evidence. */
-  resolveCommercialReport?(snapshotId: string, context: {orgId:string;conversationId:string}): Promise<CommercialReportSnapshot>;
   now?: () => Date;
   signal?: AbortSignal;
 }
@@ -79,7 +65,6 @@ Para referências ambíguas, consulte antes de selecionar um ID; não adivinhe.
 Interprete o pedido e preserve métrica, pessoa, comissão, filtros e período nas perguntas de continuidade.
 A referência explícita da mensagem prevalece sobre a tela, a edição atual e o histórico. Organização é sempre a organização autenticada desta requisição.
 Valores de vendas e lotes usam map_sales_overview; contratos firmados, aguardando assinatura e total de registros comerciais usam map_sales_records_summary (mesma classificação SIGNED/PENDING da Dashboard). Documentos anexados não são contratos assinados. Recebimento exige fonte financeira; nunca substitua a métrica por vendas.
-Recortes por pavilhão, segmento, empresa, lotes, assinatura, documentos, taxas, planta e relatórios usam map_commercial_report_query. Parâmetros seguem interpretedIntent.commercialSpec e são revalidados no servidor. scopeSearch contém nomes de áreas persistidas; Pavilhão 12 nunca significa B12. Não infira edição, empresa ou segmento por prefixos. Cada nova consulta lê dados atuais. PDF é um artefato autorizado pelo pedido textual e produzido fora das ferramentas de leitura; nunca use ferramenta de proposta de venda/reserva para isso.
 Agenda: quantidade pessoal usa agenda_personal_summary; ranking de pessoas usa agenda_people_ranking; ranking de comissões usa agenda_commission_ranking. Pessoa nominal exige agenda_resolve_identity e depois agenda_person_events com UUID autorizado; comissão nominal exige resolução e agenda_query com commission_id. Nunca use a conta autenticada no lugar de outra pessoa. Listas, situações, locais, categorias, prioridades e distribuições usam agenda_query.
 O catálogo de perguntas contém referências sem respostas fixas. Interprete sinônimos, palavras novas e perguntas fora do catálogo por sua intenção; não exija correspondência literal.
 Use interpretedIntent.period e previousPeriod. Comparação temporal exige uma consulta completa para cada período com os MESMOS filtros. A primeira é o período atual solicitado e a segunda o anterior. Nunca compare amostras.
@@ -129,27 +114,12 @@ function manualRoute(worker: WorkerId): string {
   return '/portal';
 }
 
-/** Backend can deploy before the UI: older clients receive the same verified facts in v1. */
-export function adaptCommercialResponseVersion(content:string,request:WorkerRequest):string {
-  const response=decodeWorkerResponse(content);
-  if(!response||response.version!==2||request.context?.responseVersion===2)return content;
-  response.version=1;
-  response.blocks=response.blocks.filter(block=>block.type!=='commercial_report'&&block.type!=='commercial_plan');
-  if(response.metadata.filters)delete response.metadata.filters.commercial;
-  return encodeWorkerResponse(response);
-}
-
 export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDependencies, emit: EmitWorkerEvent): Promise<void> {
   if (deps.signal?.aborted) throw new WorkerError('request_cancelled', 499);
   const now = deps.now?.() ?? new Date();
   // History is read only through the authenticated conversation scope, before beginning a new turn.
   const history = request.conversationId ? await deps.history?.(request.conversationId) ?? [] : [];
   const queryIntent = interpretWorkerIntent(request, now, history);
-  let savedCommercialSnapshot: CommercialReportSnapshot | undefined;
-  const priorCommercialResponse = [...history].reverse().filter(item=>item.role==='assistant').map(item=>decodeWorkerResponse(item.content)).find(Boolean);
-  const priorCommercialBlock = priorCommercialResponse?.blocks.find(block=>block.type==='commercial_report');
-  const requestedSnapshotId = request.context?.commercialSnapshotId ?? (queryIntent.generatePdf && queryIntent.continuation && priorCommercialBlock?.type==='commercial_report' ? priorCommercialBlock.snapshotId : undefined);
-  if (request.context?.commercialSnapshotId) {queryIntent.kind='map_report';queryIntent.worker='mapa';}
   const kbCandidate = Boolean(deps.searchKb && isPublicKbQuestion(request.message));
   const worker = kbCandidate ? routeWorker(request) : queryIntent.worker;
   const admitted = await deps.begin(request, worker);
@@ -169,14 +139,6 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
     let kbQueried = false;
     try {
       if (deps.signal?.aborted) throw new WorkerError('request_cancelled', 499);
-      if (requestedSnapshotId) {
-        if (!deps.resolveCommercialReport) throw new WorkerError('report_source_unavailable',503);
-        savedCommercialSnapshot = parseCommercialReportSnapshot(await deps.resolveCommercialReport(requestedSnapshotId,{orgId:request.orgId,conversationId:admitted.conversationId}));
-        if (request.context?.commercialSnapshotId) {
-          const {projectId,...spec} = savedCommercialSnapshot.spec;
-          queryIntent.projectId=projectId;queryIntent.commercialSpec=spec;
-        }
-      }
       const intent = proposalIntent(request.message);
       const proposalTools = intent && deps.propose ? await deps.proposalTools?.(intent, worker) ?? [] : [];
       if (proposalTools.some(tool => tool.readOnly !== false || !/^propose_(?:arena_note|commercial_reservation|commercial_negotiation|routine)$/.test(tool.name))) throw new WorkerError('unsafe_tool_registry', 503);
@@ -226,23 +188,13 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
           const allowed = new Set(tools.map(tool => tool.name));
           const proposals = new Set(proposalTools.map(tool => tool.name));
           let proposed: { kind: 'action' | 'routine'; id: string; citation: WorkerCitation } | undefined;
-          const captureReportResult = async (result: ReadResult): Promise<ReadResult> => {
-            if (!result.commercialSnapshot) return result;
-            const snapshot = parseCommercialReportSnapshot(result.commercialSnapshot);
-            if (!deps.captureCommercialReport) throw new WorkerError('report_capture_unavailable',503);
-            emit('progress',{label:queryIntent.generatePdf?'Preparando o relatório PDF…':'Registrando a fotografia da consulta…',status:'running'});
-            const artifact = await deps.captureCommercialReport(snapshot,{orgId:request.orgId,conversationId:admitted.conversationId,requestId:request.requestId,generatePdf:queryIntent.generatePdf===true});
-            if (artifact.snapshotId !== snapshot.snapshotId) throw new WorkerError('report_snapshot_mismatch',502);
-            const {commercialSnapshot:_private,...publicResult} = result;
-            return {...publicResult,records:publicResult.records.map(record=>isObject(record)?{...record,artifact}:record)};
-          };
-          const directName = intent ? '' : { map_report:'map_commercial_report_query',map_sales: 'map_sales_overview', map_contracts:'map_sales_records_summary', map_documents:'', map_receipts:'', map_inventory: '', agenda_query: '', agenda_personal: 'agenda_personal_summary', agenda_ranking: 'agenda_people_ranking', agenda_commission_ranking:'agenda_commission_ranking', agenda_person:'agenda_person_events', agenda_commission:'agenda_query', institutional_president: institutionalTool.name, domain_query: '' }[queryIntent.kind];
+          const directName = intent ? '' : { map_sales: 'map_sales_overview', map_contracts:'map_sales_records_summary', map_documents:'', map_receipts:'', map_inventory: '', agenda_query: '', agenda_personal: 'agenda_personal_summary', agenda_ranking: 'agenda_people_ranking', agenda_commission_ranking:'agenda_commission_ranking', agenda_person:'agenda_person_events', agenda_commission:'agenda_query', institutional_president: institutionalTool.name, domain_query: '' }[queryIntent.kind];
           const attendanceUnavailable = queryIntent.kind.startsWith('agenda_') && queryIntent.relationship === 'attendance';
           const receiptSourceUnavailable=queryIntent.kind==='map_receipts';
           const rankingFilterUnavailable=['agenda_ranking','agenda_commission_ranking','agenda_person'].includes(queryIntent.kind)&&(/conclu[ií]d|cancelad|planejad|prioridade|por local|na comiss[aã]o|do restaurante/i.test(request.message)
             ||Object.keys(queryIntent.queryFilters??{}).some(key=>!['group_by','relationship'].includes(key)));
           const contractScopeUnavailable=queryIntent.kind==='map_contracts'&&/pavilh[aã]o|segmento|quadra|comprador|cliente|empresa|sem (?:contrato|documento)|com documento/i.test(request.message);
-          if (directName && allowed.has(directName) && !intent && !attendanceUnavailable && !rankingFilterUnavailable && !contractScopeUnavailable && !queryIntent.commercialClarification) {
+          if (directName && allowed.has(directName) && !intent && !attendanceUnavailable && !rankingFilterUnavailable && !contractScopeUnavailable) {
             if (queryIntent.resolveProject && allowed.has('map_projects')) {
               const projects = await deps.executeTool('map_projects', { limit: 100 });
               validateToolEvidence(projects); executed.push('map_projects');
@@ -253,9 +205,7 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
               // Discovery remains internal: only the specialized aggregate can produce the answer.
             }
             const commercial = queryIntent.kind === 'map_sales' || queryIntent.kind === 'map_contracts';
-            const input: Record<string, unknown> = queryIntent.kind==='map_report'
-              ? {...(queryIntent.projectId?{project_id:queryIntent.projectId}:{}),spec:queryIntent.commercialSpec??{}}
-              : commercial || queryIntent.kind === 'institutional_president'
+            const input: Record<string, unknown> = commercial || queryIntent.kind === 'institutional_president'
               ? { ...(queryIntent.editionYear ? { edition_year: queryIntent.editionYear } : {}), ...(commercial && queryIntent.projectId ? { project_id: queryIntent.projectId } : {}),
                 ...(commercial && queryIntent.period ? { date_from: queryIntent.period.from, date_to: queryIntent.period.to } : {}) }
               : { date_from: queryIntent.period!.from, date_to: queryIntent.period!.to, ...(queryIntent.kind === 'agenda_personal' ? { relationship: queryIntent.relationship } : { limit: 10 }) };
@@ -293,17 +243,7 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
                   choices:identities.slice(0,8).map(identity=>({id:String(identity.id),name:String(identity.name).slice(0,180)}))}],total:1};
               }
             }
-            let reusedSnapshot: CommercialReportSnapshot | undefined;
-            if (queryIntent.kind==='map_report' && queryIntent.generatePdf && savedCommercialSnapshot && !/atualiz|ultimas vendas/i.test(request.message)) {
-              const operational = (value:Record<string,unknown>) => {const {projectId:_project,sections:_sections,presentation:_presentation,...filters}=value;return JSON.stringify(filters);};
-              if (operational(savedCommercialSnapshot.spec)===operational(queryIntent.commercialSpec??{})) {
-                // New emission identity preserves the old facts/time. It also
-                // avoids rewriting older snapshots when schema defaults evolve.
-                reusedSnapshot={...savedCommercialSnapshot,snapshotId:crypto.randomUUID(),spec:{...savedCommercialSnapshot.spec,sections:queryIntent.commercialSpec!.sections,presentation:queryIntent.commercialSpec!.presentation}};
-              }
-            }
-            const savedResult = reusedSnapshot ? {summary:'Fotografia da consulta anterior preservada para a emissão do PDF.',records:[commercialReportPreview(reusedSnapshot)],citations:[{label:'Consulta comercial por recorte',url:'/mapa-comercial',source:'app' as const}],total:reusedSnapshot.rows.length,commercialSnapshot:reusedSnapshot} : undefined;
-            const result = await captureReportResult(identityClarification ?? savedResult ?? (directName === institutionalTool.name ? await deps.institutionalPresident!(input, deps.signal) : await deps.executeTool(directName, input)));
+            const result = identityClarification ?? (directName === institutionalTool.name ? await deps.institutionalPresident!(input, deps.signal) : await deps.executeTool(directName, input));
             validateToolEvidence(result); results.push({ tool: directName, input, result }); executed.push(directName);
             if(queryIntent.previousPeriod && queryIntent.kind==='map_sales') {
               const previousInput={...input,date_from:queryIntent.previousPeriod.from,date_to:queryIntent.previousPeriod.to};
@@ -312,7 +252,7 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
             }
             emit('progress', { label: 'Consulta concluída', status: 'complete' });
           }
-          for (let round = 0; round < MAX_ROUNDS && (!directName || !allowed.has(directName)) && !attendanceUnavailable && !rankingFilterUnavailable && !receiptSourceUnavailable && !contractScopeUnavailable && !queryIntent.commercialClarification; round++) {
+          for (let round = 0; round < MAX_ROUNDS && (!directName || !allowed.has(directName)) && !attendanceUnavailable && !rankingFilterUnavailable && !receiptSourceUnavailable && !contractScopeUnavailable; round++) {
             if (deps.signal?.aborted) throw new WorkerError('request_cancelled', 499);
             emit('progress', { label: round === 0 ? 'Entendendo seu pedido…' : 'Conferindo as fontes…', status: 'running' });
             providerAttempted = true;
@@ -341,10 +281,9 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
               }
               const title = tools.find(tool => tool.name === call.function.name)?.title ?? (call.function.name === webSearchTool.name ? 'fontes públicas' : 'dados autorizados');
               emit('progress', { label: `Consultando ${title}…`, status: 'running' });
-              const rawResult = call.function.name === webSearchTool.name ? await deps.searchWeb!(input, deps.signal)
+              const result = call.function.name === webSearchTool.name ? await deps.searchWeb!(input, deps.signal)
                 : call.function.name === institutionalTool.name ? await deps.institutionalPresident!(input, deps.signal)
                 : await deps.executeTool(call.function.name, input);
-              const result = await captureReportResult(rawResult);
               // Validate before either model continuation, persistence or streaming.
               validateToolEvidence(result);
               const providerResult = redactWorkerData(result);
@@ -377,7 +316,6 @@ export async function runWorkerTurn(request: WorkerRequest, deps: WorkerTurnDepe
       if (deps.signal?.aborted) throw new WorkerError('request_cancelled', 499);
       // A successful lookup is audited even when its miss continues through existing tools.
       if (kbQueried && !completion.tools.includes(KB_TOOL_NAME)) completion.tools = [KB_TOOL_NAME, ...completion.tools];
-      completion.content=adaptCommercialResponseVersion(completion.content,request);
       try { await deps.finish(request, completion); }
       catch (error) {
         if (!kbSelection || !deps.searchKb || !(error instanceof WorkerError) || error.code !== 'kb_version_changed' || deps.signal?.aborted) throw error;

@@ -1,7 +1,6 @@
 import { isObject, redactWorkerText, validateCitations, type ReadResult, type WorkerCitation, WorkerError, type WorkerRequest } from './contracts.ts';
 import { encodeWorkerResponse, type WorkerResponse, type WorkerResponseBlock, workerResponseSchema, workerQueryFiltersSchema } from './response-contract.ts';
 import { type WorkerIntent } from './intent.ts';
-import { composeCommercialReportResponse } from './commercial-report-response.ts';
 
 export interface ToolEvidence { tool: string; input: Record<string, unknown>; result: ReadResult }
 export function validateToolEvidence(result: ReadResult): WorkerCitation[] {
@@ -75,15 +74,15 @@ const unavailable = 'Não obtive dados verificáveis para esse pedido. Informe o
 
 export function composeWorkerResponse(request: WorkerRequest, intent: WorkerIntent, evidence: ToolEvidence[], now: Date): { content: string; citations: WorkerCitation[] } {
   if(intent.kind==='domain_query'){
-    const specialized=[...evidence].reverse().find(item=>['map_commercial_report_query','map_inventory_summary','agenda_query','agenda_personal_summary','agenda_people_ranking'].includes(item.tool));
-    const kind= specialized ? ({map_commercial_report_query:'map_report',map_inventory_summary:'map_inventory',agenda_query:'agenda_query',agenda_personal_summary:'agenda_personal',agenda_people_ranking:'agenda_ranking'} as const)[specialized.tool] : undefined;
+    const specialized=[...evidence].reverse().find(item=>['map_inventory_summary','agenda_query','agenda_personal_summary','agenda_people_ranking'].includes(item.tool));
+    const kind= specialized ? ({map_inventory_summary:'map_inventory',agenda_query:'agenda_query',agenda_personal_summary:'agenda_personal',agenda_people_ranking:'agenda_ranking'} as const)[specialized.tool] : undefined;
     if(kind)return composeWorkerResponse(request,{...intent,kind,worker:kind.startsWith('map_')?'mapa':'agenda'},evidence,now);
   }
   const sources = evidence.flatMap(item => validateToolEvidence(item.result));
   const citations = [...new Map(sources.map(source => [source.url, source])).values()].slice(0, 8);
   const response: WorkerResponse = { version: 1, worker: intent.worker, intent: intent.kind, summary: unavailable,
     metadata: { organizationId: request.orgId, timezone: 'America/Sao_Paulo', scope: 'Dados autorizados para seu usuário', updatedAt: now.toISOString(), completeness: 'unavailable', notes: [], ...(intent.kind === 'agenda_personal' ? { filters: { relationship: intent.relationship } } : {}), ...(intent.period ? { period: intent.period } : {}), ...(intent.editionYear ? { edition: `Fenasoja ${intent.editionYear}` } : {}) }, blocks: [] };
-  const expected = { map_report:'map_commercial_report_query',map_sales: 'map_sales_overview', map_contracts:'map_sales_records_summary', map_documents:'sale_order_contract_summary', map_receipts:'', map_inventory: 'map_inventory_summary', agenda_query: 'agenda_query', agenda_personal: 'agenda_personal_summary', agenda_ranking: 'agenda_people_ranking', agenda_commission_ranking:'agenda_commission_ranking', agenda_person:'agenda_person_events', agenda_commission:'agenda_query', institutional_president: 'workers_institutional_president', domain_query: '' }[intent.kind];
+  const expected = { map_sales: 'map_sales_overview', map_contracts:'map_sales_records_summary', map_documents:'sale_order_contract_summary', map_receipts:'', map_inventory: 'map_inventory_summary', agenda_query: 'agenda_query', agenda_personal: 'agenda_personal_summary', agenda_ranking: 'agenda_people_ranking', agenda_commission_ranking:'agenda_commission_ranking', agenda_person:'agenda_person_events', agenda_commission:'agenda_query', institutional_president: 'workers_institutional_president', domain_query: '' }[intent.kind];
   const candidates = evidence.filter(item => item.tool === expected);
   const main = [...candidates].reverse().find(item => {
     if(!intent.previousPeriod)return true;
@@ -96,12 +95,7 @@ export function composeWorkerResponse(request: WorkerRequest, intent: WorkerInte
   const financialEdition = isObject(financialRecord?.edition) ? financialRecord.edition : undefined;
   const financialYears = [...new Set(`${financialEdition?.code ?? ''} ${financialEdition?.label ?? ''}`.match(/20\d{2}/g) ?? [])];
   if (financialEdition?.label) response.metadata.edition = clean(financialEdition.label);
-  if (intent.commercialClarification) {
-    response.summary=intent.commercialClarification==='contract_unit'?'Você quer consultar documentos anexados ou vendas com assinatura confirmada?':intent.commercialClarification==='company_identity'?'Qual empresa ou expositor deseja consultar? Informe o nome empresarial para localizar a identidade correta.':intent.commercialClarification==='contract_identity'?'Qual documento deseja verificar? Informe a referência contratual exata para conferir a abrangência do pedido.':intent.commercialClarification==='comparison_periods'?'Quais dois períodos deseja comparar? Informe as datas e se a comparação considera cadastro ou assinatura.':'A posição em uma data passada exige histórico reconstruível. Posso consultar a situação atual ou filtrar cadastros e assinaturas por período.';
-    response.blocks.push({type:'clarification',question:response.summary,...(intent.commercialClarification==='contract_unit'?{options:['Documentos anexados','Vendas com assinatura confirmada']}:intent.commercialClarification==='historical_position'?{options:['Situação atual','Cadastradas no período','Assinadas no período']}:{})});
-  } else if (intent.kind==='map_report'&&record&&!record.needs_clarification&&!record.needsClarification) {
-    return composeCommercialReportResponse(request,intent,record,citations);
-  } else if (financialEvidence && intent.editionYear && (financialYears.length !== 1 || Number(financialYears[0]) !== intent.editionYear)) {
+  if (financialEvidence && intent.editionYear && (financialYears.length !== 1 || Number(financialYears[0]) !== intent.editionYear)) {
     response.summary = `Não consegui confirmar a edição financeira ${intent.editionYear} nesta consulta. Qual edição você deseja consultar?`;
     response.blocks.push({ type: 'clarification', question: response.summary });
   } else if (financialEvidence && intent.period) {
