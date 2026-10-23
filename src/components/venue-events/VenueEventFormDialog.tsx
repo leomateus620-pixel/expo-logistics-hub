@@ -42,6 +42,8 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { VenuePermissionMap } from "@/hooks/useVenueOperations";
 import { toDisplayUpper } from "@/lib/textNormalize";
+import { XCircle } from "lucide-react";
+import { canOfferCancellation, validateCancellationReason } from "@/lib/venue-cancellation";
 import {
   COUNTERPART_UNIT_LABELS,
   VENUE_EVENT_TYPE_SUGGESTIONS,
@@ -78,7 +80,15 @@ interface VenueEventFormDialogProps {
   activeVenueLabel?: string;
   isSaving: boolean;
   onCheckAvailability: (draft: VenueEventDraft) => Promise<ServerConflict[]>;
-  onSave: (draft: VenueEventDraft) => Promise<{ event_id: string }>;
+  onSave: (draft: VenueEventDraft) => Promise<{ event_id: string; version?: number }>;
+  /** Status persistido do evento em edição. */
+  currentStatus?: string | null;
+  currentCancellationReason?: string | null;
+  onCancelEvent?: (input: {
+    eventId: string;
+    expectedVersion: number;
+    reason: string;
+  }) => Promise<unknown>;
 }
 
 const DEFAULT_FENASOJA_RESPONSIBLE = "roque";
@@ -220,6 +230,9 @@ export function VenueEventFormDialog({
   isSaving,
   onCheckAvailability,
   onSave,
+  currentStatus,
+  currentCancellationReason,
+  onCancelEvent,
 }: VenueEventFormDialogProps) {
   const [draft, setDraft] = useState<VenueEventDraft>(() =>
     createEmptyVenueEventDraft(),
@@ -232,6 +245,9 @@ export function VenueEventFormDialog({
   const [baseline, setBaseline] = useState("");
   const [discardOpen, setDiscardOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionId>("identificacao");
+  const [cancelRequested, setCancelRequested] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelError, setCancelError] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const initializationKeyRef = useRef("");
@@ -312,7 +328,22 @@ export function VenueEventFormDialog({
     open,
   ]);
 
-  const isDirty = open && baseline !== "" && JSON.stringify(draft) !== baseline;
+  useEffect(() => {
+    if (!open) return;
+    setCancelRequested(false);
+    setCancelReason("");
+    setCancelError(null);
+  }, [open, initialDraft?.id]);
+
+  const cancellable = Boolean(
+    draft.id &&
+      onCancelEvent &&
+      canOfferCancellation(currentStatus, permissions.venue_events_cancel),
+  );
+
+  const isDirty =
+    open &&
+    ((baseline !== "" && JSON.stringify(draft) !== baseline) || cancelRequested);
 
   const activeStakeholders = useMemo(
     () => workspace.stakeholders.filter((stakeholder) => stakeholder.active),
@@ -508,25 +539,52 @@ export function VenueEventFormDialog({
   };
 
   const submit = async () => {
+    if (cancelRequested) {
+      const reasonError = validateCancellationReason(cancelReason);
+      if (reasonError) {
+        setCancelError(reasonError);
+        goToSection("identificacao");
+        return;
+      }
+    }
     if (!validate()) return;
     if (
+      !cancelRequested &&
       !draft.pendingDate &&
       reviewedAvailabilityFingerprint !== currentAvailabilityFingerprint &&
       !(await reviewAvailability())
     ) {
       return;
     }
+    let saved: { event_id: string; version?: number };
     try {
-      await onSave(draft);
-      toast.success(
-        draft.id ? "Evento atualizado com segurança." : "Evento criado.",
-      );
-      onOpenChange(false);
+      saved = await onSave(draft);
     } catch (error) {
       toast.error("Não foi possível salvar o evento.", {
         description: error instanceof Error ? error.message : undefined,
       });
+      return;
     }
+    if (cancelRequested && onCancelEvent) {
+      try {
+        await onCancelEvent({
+          eventId: saved.event_id,
+          expectedVersion: saved.version ?? draft.version ?? 1,
+          reason: cancelReason.trim(),
+        });
+        toast.success("Evento cancelado.");
+      } catch (error) {
+        toast.error("Alterações salvas, mas o cancelamento não foi aplicado.", {
+          description: error instanceof Error ? error.message : undefined,
+        });
+        return;
+      }
+    } else {
+      toast.success(
+        draft.id ? "Evento atualizado com segurança." : "Evento criado.",
+      );
+    }
+    onOpenChange(false);
   };
 
   const selectedAgreement = workspace.agreements.find(
@@ -596,6 +654,56 @@ export function VenueEventFormDialog({
             )}
 
             <section className="venue-form-section" data-section="identificacao">
+              {draft.id && currentStatus === "cancelado" && (
+                <div className="venue-cancel-banner" role="status">
+                  <XCircle aria-hidden="true" />
+                  <div>
+                    <strong>Evento cancelado</strong>
+                    {currentCancellationReason && <p>{currentCancellationReason}</p>}
+                  </div>
+                </div>
+              )}
+              {cancellable && (
+                <div className="venue-cancel-field" data-active={cancelRequested || undefined}>
+                  <div className="venue-cancel-field__row">
+                    <div>
+                      <strong>Situação do evento</strong>
+                      <p>{cancelRequested ? "Cancelado" : "Ativo"} — marque para cancelar este evento.</p>
+                    </div>
+                    <div className="venue-cancel-field__switch">
+                      <Label htmlFor="venue-event-cancel">Cancelar evento</Label>
+                      <Switch
+                        id="venue-event-cancel"
+                        checked={cancelRequested}
+                        onCheckedChange={(checked) => {
+                          setCancelRequested(checked);
+                          if (!checked) setCancelError(null);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  {cancelRequested && (
+                    <>
+                      <p className="venue-cancel-field__warning">
+                        <AlertTriangle aria-hidden="true" /> O evento sai da ocupação, libera os espaços e não poderá ser reaberto.
+                      </p>
+                      <Label htmlFor="venue-event-cancel-reason">Motivo do cancelamento</Label>
+                      <Textarea
+                        id="venue-event-cancel-reason"
+                        rows={2}
+                        value={cancelReason}
+                        onChange={(event) => {
+                          setCancelReason(toDisplayUpper(event.target.value));
+                          setCancelError(null);
+                        }}
+                        aria-invalid={Boolean(cancelError)}
+                        placeholder="EX.: CANCELADO PELO REQUERENTE"
+                      />
+                      {cancelError && <p className="venue-cancel-field__error">{cancelError}</p>}
+                    </>
+                  )}
+                </div>
+              )}
               <div className="venue-form-section__intro">
                 <h3>Identificação do evento</h3>
                 <span className="venue-context-chip">{spacesLabel}</span>
@@ -1018,6 +1126,15 @@ export function VenueEventFormDialog({
               <div className="venue-form-section__intro">
                 <h3>Revisão e disponibilidade</h3>
               </div>
+              {cancelRequested && (
+                <div className="venue-cancel-banner" role="alert">
+                  <XCircle aria-hidden="true" />
+                  <div>
+                    <strong>Este evento será CANCELADO ao salvar</strong>
+                    <p>{cancelReason.trim() || "Motivo não informado"}</p>
+                  </div>
+                </div>
+              )}
               <div className="venue-review-grid">
                 <article>
                   <span>Evento</span>

@@ -1220,3 +1220,46 @@
     padding: 0 0.3rem;
   }
 }
+
+/* Evento cancelado — destaque vermelho */
+.venue-event-card[data-status="cancelado"] {
+  border-color: hsl(var(--destructive) / 0.55);
+  background: hsl(var(--destructive) / 0.06);
+  box-shadow: inset 4px 0 0 hsl(var(--destructive));
+}
+.venue-event-card[data-status="cancelado"] .venue-event-card__title {
+  text-decoration: line-through;
+  text-decoration-color: hsl(var(--destructive) / 0.6);
+}
+.venue-event-card__cancelled {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+  margin-top: 0.35rem; padding: 0.3rem 0.6rem; border-radius: 0.6rem;
+  background: hsl(var(--destructive)); color: hsl(var(--destructive-foreground));
+  font-size: 0.78rem; font-weight: 600; max-width: 100%;
+}
+.venue-event-card__cancelled strong { letter-spacing: 0.08em; }
+.venue-event-card__cancelled span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.venue-cancel-banner {
+  display: flex; gap: 0.75rem; align-items: flex-start;
+  margin: 0.75rem 0; padding: 0.9rem 1rem; border-radius: 0.9rem;
+  background: hsl(var(--destructive)); color: hsl(var(--destructive-foreground));
+  box-shadow: 0 8px 24px hsl(var(--destructive) / 0.25);
+}
+.venue-cancel-banner svg { width: 1.4rem; height: 1.4rem; flex-shrink: 0; }
+.venue-cancel-banner strong { display: block; font-size: 1rem; letter-spacing: 0.02em; }
+.venue-cancel-banner p { margin: 0.15rem 0 0; font-size: 0.85rem; opacity: 0.95; }
+.venue-cancel-field {
+  margin-bottom: 1rem; padding: 0.9rem 1rem; border-radius: 0.9rem;
+  border: 1px solid hsl(var(--border)); display: grid; gap: 0.5rem;
+}
+.venue-cancel-field[data-active] {
+  border-color: hsl(var(--destructive)); background: hsl(var(--destructive) / 0.07);
+}
+.venue-cancel-field__row { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.venue-cancel-field__row p { margin: 0; font-size: 0.82rem; color: hsl(var(--muted-foreground)); }
+.venue-cancel-field__switch { display: flex; align-items: center; gap: 0.5rem; }
+.venue-cancel-field__warning, .venue-cancel-field__error {
+  display: flex; gap: 0.4rem; align-items: center; margin: 0;
+  color: hsl(var(--destructive)); font-size: 0.82rem; font-weight: 600;
+}
+.venue-cancel-field__warning svg { width: 1rem; height: 1rem; }

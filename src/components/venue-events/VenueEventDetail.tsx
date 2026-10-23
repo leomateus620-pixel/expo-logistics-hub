@@ -1066,6 +1066,15 @@ export function VenueEventDetail({
                 )}
               </SheetDescription>
             </SheetHeader>
+            {event.status === "cancelado" && (
+              <div className="venue-cancel-banner" role="alert">
+                <XCircle aria-hidden="true" />
+                <div>
+                  <strong>Evento cancelado</strong>
+                  <p>{event.cancellation_reason || "Motivo não informado"}</p>
+                </div>
+              </div>
+            )}
             {event.executive_description && (
               <p className="venue-detail-hero__note">
                 {event.executive_description}
