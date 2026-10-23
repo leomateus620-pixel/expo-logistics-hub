@@ -1,0 +1,58 @@
+{
+  "browser": "Codex in-app browser",
+  "fixture": "Local isolated UI; no production API or customer data",
+  "cashflow": {
+    "keyboardEnter": true,
+    "returnedFocus": "Ver fluxo de caixa",
+    "preservedBasis": "charge",
+    "preservedYear": "2027",
+    "preservedMonth": "2027-10-01"
+  },
+  "signature": {
+    "keyboardEnter": true,
+    "originScrollTop": 923.5,
+    "returnedScrollTop": 923.5,
+    "returnedFocus": "Ver detalhamento de assinatura",
+    "singlePresentationInSalesSummary": true,
+    "sample": 4,
+    "signedCount": 12,
+    "desktopLayout": "Fourth metric beside the three counters; area/sales width 1:2",
+    "equalDesktopHeights": 173.3984375,
+    "returnRetestedAfterHorizontalRefinement": true
+  },
+  "preview": {
+    "intervalMilliseconds": 10000,
+    "heightBefore": 164,
+    "heightAfter": 164,
+    "manualNext": true,
+    "pause": true,
+    "reducedMotionAnimation": "none"
+  },
+  "states": [
+    "ready",
+    "loading",
+    "error",
+    "stale",
+    "restricted",
+    "insufficient-history",
+    "contracts-only"
+  ],
+  "mobile": {
+    "width": 390,
+    "containerWidth": 390,
+    "containerScrollWidth": 390,
+    "buttonWidth": 44,
+    "buttonHeight": 44
+  },
+  "zoom": {
+    "method": "Emulation.setDeviceMetricsOverride: effective layout 720 CSS px at DPR 2, equivalent reflow for a 1440px surface at 200%; not a native browser zoom command",
+    "documentWidth": 720,
+    "scrollWidth": 720,
+    "popoverContained": true
+  },
+  "keyboardTooltip": true,
+  "visibleFocus": true,
+  "sojinhaLocalPause": true,
+  "finalConsoleErrors": [],
+  "touchLimitation": "Touch target and click/keyboard semantics verified. Native Input.dispatchTouchEvent is not supported by IAB."
+}

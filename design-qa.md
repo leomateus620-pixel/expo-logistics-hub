@@ -1,23 +1,53 @@
-# QA de design — agrupamento empresarial dos pavilhões
+# Product Design QA — Dashboard Comercial compacta
 
-final result: blocked
+Data: 23/10/2026. Escopo: visão global, do cabeçalho até Área comercial / Vendas e contratos.
 
-A integridade comercial, o SVG dos componentes e os PDFs foram verificados. A aprovação visual final em navegador permanece pendente: a ferramenta passou a retornar `Local browser use is disabled in Work settings` após as primeiras capturas e a conferência autenticada. A PR deve permanecer em rascunho até completar essa etapa. Este relatório substitui a aprovação anterior que se referia à arquitetura de contornos por contrato, agora corrigida.
+## Alvo e evidências
 
-## Alvo
+As duas capturas fornecidas pelo usuário em 23/10/2026 às 00h32 orientam identidade, conteúdo e grafismos. O alvo combina essa identidade com as mudanças de composição solicitadas, incluindo o refinamento posterior: Área comercial menor na horizontal, Vendas e contratos maior, quatro métricas juntas e alturas iguais no desktop.
 
-Pedido e sete anexos de 20/10/2026: uma empresa, uma identificação principal, todos os seus lotes, documentos independentes, contornos e líderes leves. O esquema conceitual fornecido é uma referência de hierarquia; as cores e geometrias reais permanecem as do cadastro. Não é uma clonagem da superfície preta do exemplo.
+A comparação dimensional usa o mesmo conjunto fictício e os mesmos viewports, sem dados de compradores nem chamadas à produção:
 
-## Etapas e evidências
+- Fonte controlada antes: [before-1440.png](docs/validation/dashboard-compact/before-1440.png), fontes da `main` `151d829d`.
+- Implementação final: [after-1440.png](docs/validation/dashboard-compact/after-1440.png).
+- Comparação conjunta da tela: [comparison-1440.jpg](docs/validation/dashboard-compact/comparison-1440.jpg), 2880×1030px (duas capturas 1440×1000px, mesma escala, apenas legenda externa).
+- Comparação focal financeira: [comparison-finance.png](docs/validation/dashboard-compact/comparison-finance.png), recortes 564×270px em escala 1:1.
+- Comparação focal dos dois cards inferiores: [comparison-summary.png](docs/validation/dashboard-compact/comparison-summary.png), mesma densidade; recortes alinhados pela região, cuja posição vertical mudou intencionalmente.
+- Responsividade: [1280px](docs/validation/dashboard-compact/after-1280.png), [390px](docs/validation/dashboard-compact/after-390.png), [430px](docs/validation/dashboard-compact/after-430.png), [resumo mobile](docs/validation/dashboard-compact/after-390-summary.png).
+- [Reflow ampliado e popover](docs/validation/dashboard-compact/after-200pct-info.png), 1440×1000 pixels físicos, 720×500 CSS px, DPR 2. É emulação equivalente ao reflow de uma superfície de 1440px em 200%, não comando de zoom nativo. As demais capturas usam DPR 1 e não precisaram de normalização de densidade.
 
-1. **Identificação real — conferida em leitura.** Chrome Leo, Dashboard publicada: Ótica Diniz 58–63; American Fisio 247–251; Adri Modas 85–89; Via Mundi 49–56. Os subconjuntos tinham o mesmo ID de expositor. A documentação distingue os lotes adicionais do enunciado. [Observações](docs/validation/pavilion-company-grouping/authenticated-observations.json).
-2. **Representação empresarial — SVG conferido.** Renderização dos componentes React com o mesmo fixture antes/depois: sete cards viram três no P12; cinco viram dois no P13. Caminhos, IDs, numeração, status e preenchimentos são iguais. Contorno 1/1,6 px, líderes 0,85/1,1 px, sem halo branco ou ramificações por célula. [Antes/depois e limites da renderização](docs/validation/pavilion-company-grouping/README.md#evidências-visuais).
-3. **Seleção e contratos — testes React aprovados.** Empresa completa preservada durante inspeção do documento; traço secundário somente no subconjunto real; uma etiqueta; limpeza de estados e navegação. Zoom e seleção persistem pela modal; foco retorna ao acionador. Os testes não comprovam por si só a qualidade de enquadramento CSS real.
-4. **PDF — conferido visual e programaticamente.** A3 vetorial com 257/104 números, etiqueta única por empresa, cores originais e contratos na seção detalhada. Páginas renderizadas sem sobreposição ou corte; nenhuma imagem raster no PDF. [Relatório](docs/validation/pavilion-company-grouping/pdf-report.json).
-5. **Navegador e mobile depois — bloqueados.** É necessário recapturar a versão final em desktop e mobile, inspecionar padrão/seleção/documento, testar zoom, entrada/saída da tela cheia, mostrar/ocultar conexões, teclado e console. Não foi declarada conformidade de acessibilidade a partir de imagens ou jsdom.
+Navegador integrado do Codex, tema claro, inventário e preços fictícios idênticos entre versões, sem sessão de produção. Meses variam com o ciclo existente; os valores comerciais e a amostra não variam entre versões. As capturas originais do usuário têm números e viewport distintos e foram usadas como referência de identidade, não para afirmar medidas exatas.
 
-## Limites
+## Histórico de comparação
 
-Os PNGs com sufixo `-svg` são rasterizações do SVG real, não screenshots. A tipografia/traços do diagrama foram inspecionados; layout responsivo, recortes em viewport e comportamento visual de scroll não receberam aprovação final. As renderizações mantêm a aparência clara da Dashboard e os números livres de conexões. Nenhum ativo raster foi necessário: a planta é o diagrama vetorial cadastral solicitado.
+1. **Iteração 1 — blocked.** A faixa financeira e o progresso já estavam compactos, mas a média abaixo dos contadores acrescentava 55px a Vendas e contratos. O usuário apontou a composição como desorganizada. Evidência: [iteration-1-1440.jpg](docs/validation/dashboard-compact/iteration-1-1440.jpg). Classificação P2: crescimento desnecessário e desequilíbrio entre cards vizinhos.
+2. **Correção.** A região passou a distribuir largura em 1:2. A média é a quarta célula da matriz, com ícone, duração, informação e detalhes; mantém uma faixa inferior somente em telas estreitas. Os cards compartilham altura natural, sem altura rígida nem recorte.
+3. **Iteração 2 — passed.** Comparação conjunta e focal final inspecionadas. Área comercial: 460,66px; Vendas e contratos: 921,34px em 1440. Em 1280: 407,33px e 814,67px. **Ambos com 173,40px de altura nas duas larguras.** Evidência: `after-1440.png`, `after-1280.png` e `comparison-summary.png`. Nenhum P0/P1/P2 visual permanece no escopo solicitado.
 
-Não há falha conhecida de vínculo comercial ou de composição do diagrama nos cenários testados. Não se afirma ausência de regressão visual no navegador enquanto a etapa 5 estiver pendente.
+## Superfícies obrigatórias
+
+- **Fontes e tipografia:** Manrope e Sora originais, mesmos tamanhos dos indicadores financeiros e cifras tabulares. Duração de 17px subordinada aos contadores de 29/36px; títulos/valores financeiros alinhados. Quebras naturais em mobile, sem texto cortado, escala por transform ou fonte menor para forçar cabimento.
+- **Espaçamento e composição:** faixa financeira de 164px, largura 1,4:1:1 preservada; preview interno sem card adicional; progresso integral de 1392px/1232px e 200,25px de altura. Quatro métricas no card de vendas e alturas iguais às de Área comercial no desktop. Sem overflow global em 390/430px. A diferença em relação à composição anterior é intencional.
+- **Cores e tokens:** tons azul/laranja/verde, padrões, bordas, raios, sombras e contraste permanecem na família existente; estilos na folha local, usando tokens `--overview-*`. Não há overrides de tipografia ou tokens de outras telas.
+- **Imagens e ativos:** Sojinha, contornos, grafismos e glyphs existentes preservados, sem substituição por novos desenhos ou placeholders. O glyph de assinatura ocupa 20px na métrica compacta; o de fluxo ocupa 20px dentro de alvo de 34px/44px. Não foi necessária geração de imagens.
+- **Copy e conteúdo:** três contadores mantidos. A média usa `signatureDuration` e a amostra própria do provider; metodologia/exclusões ficam no `OverviewInfo`. Nenhum número da captura original foi fixado na implementação. Venda confirmada continua distinta de recebimento; qualificadores de cobertura permanecem disponíveis.
+
+## Interações e acessibilidade
+
+- Enter abre fluxo e detalhes; retorno recupera foco no controle compacto. O fluxo mantém ano/mês/base e a assinatura manteve scrollTop 923,5px na conferência móvel; o retorno foi revalidado após reposicionar a métrica na quarta coluna.
+- Tooltip “Ver fluxo de caixa” com Tab, foco visível, informação por clique/foco/teclado, Escape fecha o popover. Tamanho do alvo mobile 44×44px. Clique e teclado exercitados; o navegador integrado não suporta `Input.dispatchTouchEvent`, portanto não há afirmação de teste em hardware de toque.
+- Meses alternaram mantendo altura 164px. Controles de pausa e próximo mês funcionam; a mudança é local e `prefers-reduced-motion: reduce` desativa a animação. Pausa local do Sojinha funciona, pista responde à nova largura.
+- Ready, loading, error, stale, restrito, contratos somente e histórico insuficiente revisados; ausência não vira zero. Amostra 4 e contador assinado 12 confirmam apresentação independente.
+- Console final de uma aba nova sem erros. Avisos intermediários do HMR do harness foram resolvidos pelo descarte da raiz React ao recarregar o módulo.
+
+[Medidas, verificações e reprodução](docs/validation/dashboard-compact/README.md) · [interações](docs/validation/dashboard-compact/interaction-checks.json) · [resultados dos testes](docs/validation/dashboard-compact/checks.json).
+
+## Limites e conclusão
+
+Testes de apresentação/navegação pertinentes: 48 aprovados em 6 arquivos, reexecutados após o refinamento horizontal. Typecheck e build aprovados. A suíte completa da tarefa teve 90 falhas também reproduzidas por nome em cópia limpa da `main`; não são declaradas como resolvidas. Sem certificação de acessibilidade em dispositivo físico nem verificação de dados autenticados de produção.
+
+Checklist de implementação: composição compacta, alturas desktop, responsividade, navegação, estados, foco e movimento reduzido conferidos. Sem correção P0/P1/P2 pendente neste escopo.
+
+O [relatório anterior de agrupamento empresarial](https://github.com/leomateus620-pixel/expo-logistics-hub/blob/151d829d5610acbc355a581d6cca79e7e9401d87/design-qa.md) permanece no histórico do Git, com seu escopo e limitações próprios; esta revisão não reavalia aquela funcionalidade.
+
+final result: passed

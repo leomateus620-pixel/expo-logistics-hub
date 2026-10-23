@@ -1,5 +1,6 @@
 import type { Ref } from 'react';
 import { ArrowUpRight, FileCheck2 } from 'lucide-react';
+import { SignatureLatencyInline } from './CommercialSalesAnalyticsCards';
 import { OverviewInfo } from './CommercialDashboardOverviewInfo';
 import { ConfirmedSealGlyph, PendingSignatureGlyph } from './CommercialDashboardOverviewIcons';
 import { formatDashboardInteger } from './commercialDashboardFormatters';
@@ -8,9 +9,11 @@ import { useCommercialSalesSummary, type CommercialSalesSummaryAccess } from './
 export interface CommercialDashboardSalesSummaryProps extends CommercialSalesSummaryAccess {
   entryRef?: Ref<HTMLButtonElement>;
   onAccess: () => void;
+  signatureEntryRef?: Ref<HTMLButtonElement>;
+  onSignatureDetails?: () => void;
 }
 
-export function CommercialDashboardSalesSummary({ entryRef, onAccess, ...access }: CommercialDashboardSalesSummaryProps) {
+export function CommercialDashboardSalesSummary({ entryRef, onAccess, signatureEntryRef, onSignatureDetails, ...access }: CommercialDashboardSalesSummaryProps) {
   const { totals, state, isFetching, errorText } = useCommercialSalesSummary(access);
   const value = (count: number | undefined) => count === undefined ? '—' : formatDashboardInteger(count);
   const status = state === 'restricted' ? 'Acesso restrito'
@@ -51,6 +54,7 @@ export function CommercialDashboardSalesSummary({ entryRef, onAccess, ...access 
         <strong key={totals?.signed ?? 'unavailable'} className="commercial-dashboard-sales-summary__value">{value(totals?.signed)}</strong>
         <span>Assinatura confirmada</span>
       </div>
+      <SignatureLatencyInline entryRef={signatureEntryRef} onOpen={onSignatureDetails} />
     </div>
     <p className="commercial-dashboard-sales-summary__status" role="status" data-visible={status ? 'true' : 'false'}>{status ?? '\u00a0'}</p>
   </section>;
