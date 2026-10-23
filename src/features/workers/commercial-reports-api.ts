@@ -19,9 +19,10 @@ export interface CommercialReportRequest {
 
 /** Public messages are local and fixed: database errors and private URLs stay on the server. */
 export class CommercialReportError extends Error {
-  constructor(readonly code: 'access_denied' | 'expired' | 'unavailable' | 'invalid_response') {
+  constructor(readonly code: 'access_denied' | 'expired' | 'unavailable' | 'invalid_response' | 'inventory_current_only') {
     super(code === 'access_denied' ? 'Seu acesso a este relatório não está disponível. Consulte a equipe responsável.'
       : code === 'expired' ? 'A validade desta emissão terminou. Atualize os dados para gerar um novo relatório.'
+        : code === 'inventory_current_only' ? 'Esta consulta antiga mistura período de vendas com inventário atual. Faça uma nova consulta do inventário atual para gerar o relatório.'
         : code === 'invalid_response' ? 'Não foi possível validar o relatório recebido. Tente novamente.'
           : 'Não foi possível consultar o relatório agora. Tente novamente.');
     this.name = 'CommercialReportError';
@@ -50,7 +51,7 @@ async function reportRequest(operation: 'prepare' | 'status' | 'download' | 'pla
   }
   if (!response.ok) {
     await response.body?.cancel().catch(() => undefined);
-    throw new CommercialReportError([401, 403, 404].includes(response.status) ? 'access_denied' : response.status === 410 ? 'expired' : 'unavailable');
+    throw new CommercialReportError([401, 403, 404].includes(response.status) ? 'access_denied' : response.status === 410 ? 'expired' : response.status === 422 ? 'inventory_current_only' : 'unavailable');
   }
   return response;
 }

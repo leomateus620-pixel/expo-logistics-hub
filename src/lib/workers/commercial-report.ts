@@ -107,8 +107,14 @@ export const commercialReportSnapshotSchema = z.object({
 export type CommercialReportSnapshot = z.infer<typeof commercialReportSnapshotSchema>;
 export type CommercialReportRow = z.infer<typeof commercialReportRowSchema>;
 
+export class CommercialReportCurrentInventoryError extends Error {
+  readonly code = 'report_inventory_current_only';
+  constructor() { super('O inventário representa a situação atual; filtros de cadastro e assinatura não se aplicam.'); }
+}
+
 export function parseCommercialReportSpec(value: unknown): CommercialReportSpec {
   const spec = commercialReportSpecSchema.parse(value);
+  if (spec.reportFocus === 'inventory' && (spec.period || spec.comparisonPeriod)) throw new CommercialReportCurrentInventoryError();
   for (const period of [spec.period, spec.comparisonPeriod]) {
     if (!period) continue;
     const valid = (value: string) => new Date(`${value}T12:00:00Z`).toISOString().slice(0, 10) === value;

@@ -43,7 +43,7 @@ export function createCommercialReportPdf(snapshot:CommercialReportSnapshot, opt
     for(const line of lines){if(y>doc.internal.pageSize.getHeight()-22)addPage();doc.text(line,12,y);y+=size*.48;}
     y+=3;
   };
-  const heading=(text:string)=>{if(y>doc.internal.pageSize.getHeight()-40)addPage();doc.setTextColor(INK);doc.setFont('helvetica','bold');doc.setFontSize(12);const lines=doc.splitTextToSize(text,doc.internal.pageSize.getWidth()-24) as string[];doc.text(lines,12,y);y+=lines.length*5+2;};
+  const heading=(text:string,reserveBelow=40)=>{if(y>doc.internal.pageSize.getHeight()-reserveBelow)addPage();doc.setTextColor(INK);doc.setFont('helvetica','bold');doc.setFontSize(12);const lines=doc.splitTextToSize(text,doc.internal.pageSize.getWidth()-24) as string[];doc.text(lines,12,y);y+=lines.length*5+2;};
   const table=(head:string[],body:(string|number)[][])=>{
     autoTable(doc,{startY:y,margin:{left:12,right:12,top:39,bottom:19},head:[head],body,
       styles:{font:'helvetica',fontSize:8,cellPadding:2.5,overflow:'linebreak',textColor:INK,lineColor:'#d9e1eb',lineWidth:.1},
@@ -112,7 +112,8 @@ export function createCommercialReportPdf(snapshot:CommercialReportSnapshot, opt
       rows.some(r=>r.principalCents===null)?'Valor parcial / indisponível':amount(amountOf(rows))]));
     paragraph('Empresas homônimas com identidades diferentes permanecem separadas. Vínculos sem identidade comprovada não são fundidos pelo nome.');
   }else if(snapshot.spec.reportFocus!=='contracts'&&snapshot.spec.sections.some(s=>s==='sales'||s==='exhibitors')){
-    heading(`Vendas e espaços (${snapshot.rows.length} linhas)`);
+    // Keep the section title, table header and its first dated row together.
+    heading(`Vendas e espaços (${snapshot.rows.length} linhas)`,70);
     table(['Empresa / referência','Lote / área','m² negociados / atuais','Situação','Principal / taxas','Documentos'],snapshot.rows.map(row=>[
       (snapshot.capabilities.companyNames?row.displayName??'Identidade não comprovada':'Identificação restrita')+'\n'+row.reference+(row.historicalDisplayName&&row.historicalDisplayName!==row.displayName?'\nNa venda: '+row.historicalDisplayName:'')
         +(snapshot.spec.presentation==='detailed'||snapshot.spec.period||['created','signed'].includes(snapshot.spec.sortBy)?'\nCadastro: '+civil(row.createdAt)+(row.signedAt?'\nAssinatura: '+civil(row.signedAt):''):''),

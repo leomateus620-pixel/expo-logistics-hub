@@ -2,19 +2,19 @@
 // AUTO-GENERATED. Do not edit; canonical source: src/lib/workers/index.ts.
 // Regenerate: node scripts/workers/build-edge-registry.mjs
 // Verify without writing: node scripts/workers/build-edge-registry.mjs --check
-// Source inputs + generator SHA256: d1fbeae75d85395c4de751f332e980175ca30b84c9ab2c8df3a94e28e9bb8022
+// Source inputs + generator SHA256: 53b6cf9cf9349a3f28f4d9791e4bfaaf06888a7a567dae4c4ee3b0ccfe0a6330
 // esbuild: 0.21.5; ESM JavaScript; external runtime dependency: zod.
 // Input src/lib/workers/access.ts SHA256 e831e76d097707346be3b82114890dc5608aa95532255847c76ab46d77aa0aea
 // Input src/lib/workers/analytics.ts SHA256 d6c3fa36d36347ef5a7d3200615ed933dbd4095727cd45c0f7671edad65fc6a2
 // Input src/lib/workers/auth-failure.ts SHA256 468a11683d18687c7d3d92753ed8a2e0866532e5b5a7dec797051f7990b6a687
 // Input src/lib/workers/catalog.ts SHA256 b7a40864279ee0f1308651b42b0c9fafc66e4e311390732e8411f449b3dd52af
 // Input src/lib/workers/commercial-report-preview.ts SHA256 90df5875dd23b5415f70b4e7978fb1e693497b9540f89986a97cd792a9d2dc06
-// Input src/lib/workers/commercial-report.ts SHA256 54f42eaab40a18f298cf503e5928c0edacb5950d81b8d88179926be1295bc1a9
+// Input src/lib/workers/commercial-report.ts SHA256 7c72bac566f7fcb5624cac41b13c2b9603f5fd41b9bca5c11326ef88ecbcd986
 // Input src/lib/workers/index.ts SHA256 658986def892b6cd32d73c89a1a94ea6877a623694bc151d46af8ba651e80a7c
 // Input src/lib/workers/inventory.ts SHA256 68e24327d4120f412fcac87ede4721163c405b93be2a42ed56bb5d784bdbea82
 // Input src/lib/workers/privacy.ts SHA256 92eae6d36abb1f3cdaef896b2a6152ff2c8c037ab011f8d22b3b05b31e6b6c2e
 // Input src/lib/workers/question-analytics.ts SHA256 8fac26f8def1e20ac6ffa33bc841c4e980169d09af7c11c5d6038100a5ed1bbe
-// Input src/lib/workers/registry.ts SHA256 c7987365ed728853f1fe467a0514d111d9790fb20016f2d18bc36e4fc599be62
+// Input src/lib/workers/registry.ts SHA256 e1e51ddfc0d96920071b9562b8d812b9bac6d3a90810463bc6a72fc0480a4533
 // Input src/lib/workers/schema.ts SHA256 574d426897d572da11ae8675153894f9a61fe793f426933b54b8ddbd59e19353
 // Input src/lib/workers/sources.ts SHA256 1a5b30f62a054db9119e0af3564eccd6a402ca94bcf5e3ce8881356ba30df173
 // Input src/lib/workers/tools/agenda/index.ts SHA256 bc70e2a6d38c63f1b146f60aa2ee87e60aadfe72b8d9e249ccdbe222b3b29c59
@@ -436,8 +436,15 @@ var commercialReportSnapshotSchema = z5.object({
   calibration: z5.object({ mapUnitsPerMeter: z5.number().finite().positive(), status: z5.literal("VALIDATED") }).strict().nullable(),
   notes: z5.array(z5.string().max(2e3)).max(30)
 }).strict();
+var CommercialReportCurrentInventoryError = class extends Error {
+  code = "report_inventory_current_only";
+  constructor() {
+    super("O inventário representa a situação atual; filtros de cadastro e assinatura não se aplicam.");
+  }
+};
 function parseCommercialReportSpec(value) {
   const spec = commercialReportSpecSchema.parse(value);
+  if (spec.reportFocus === "inventory" && (spec.period || spec.comparisonPeriod)) throw new CommercialReportCurrentInventoryError();
   for (const period of [spec.period, spec.comparisonPeriod]) {
     if (!period) continue;
     const valid = (value2) => (/* @__PURE__ */ new Date(`${value2}T12:00:00Z`)).toISOString().slice(0, 10) === value2;
@@ -959,7 +966,7 @@ async function dispatch(def, input2, ctx) {
       const rpcResult = await ctx.supabase.rpc("workers_map_commercial_report", { p_project_id: projectId, p_spec: spec });
       if (rpcResult.error) {
         const reason = typeof rpcResult.error.message === "string" ? rpcResult.error.message.split(":", 1)[0] : "";
-        const question = { REPORT_SCOPE_UNRESOLVED: "Não encontrei uma única área autorizada com essa identificação. Informe o pavilhão físico, segmento ou quadra do projeto.", REPORT_COMPANY_UNRESOLVED_OR_AMBIGUOUS: "Não encontrei uma identidade empresarial única com esse nome. Informe o nome empresarial exato ou selecione o expositor no módulo.", REPORT_CONTRACT_UNRESOLVED_OR_AMBIGUOUS: "Não encontrei um único documento com essa referência no projeto autorizado. Informe a referência contratual exata ou selecione o documento no módulo.", REPORT_ORDER_UNRESOLVED_OR_AMBIGUOUS: "Não encontrei um único pedido com essa referência persistida. Informe a referência exata ou selecione o pedido no módulo.", REPORT_EDITION_NOT_PROVEN: "A edição solicitada não está comprovada no cadastro desse projeto. Deseja consultar o projeto inteiro?" };
+        const question = { REPORT_INVENTORY_CURRENT_ONLY: "O inventário disponível representa a situação atual. Para um período, consulte vendas por cadastro ou assinatura; ocupação passada exige histórico reconstruível.", REPORT_SCOPE_UNRESOLVED: "Não encontrei uma única área autorizada com essa identificação. Informe o pavilhão físico, segmento ou quadra do projeto.", REPORT_COMPANY_UNRESOLVED_OR_AMBIGUOUS: "Não encontrei uma identidade empresarial única com esse nome. Informe o nome empresarial exato ou selecione o expositor no módulo.", REPORT_CONTRACT_UNRESOLVED_OR_AMBIGUOUS: "Não encontrei um único documento com essa referência no projeto autorizado. Informe a referência contratual exata ou selecione o documento no módulo.", REPORT_ORDER_UNRESOLVED_OR_AMBIGUOUS: "Não encontrei um único pedido com essa referência persistida. Informe a referência exata ou selecione o pedido no módulo.", REPORT_EDITION_NOT_PROVEN: "A edição solicitada não está comprovada no cadastro desse projeto. Deseja consultar o projeto inteiro?" };
         if (question[reason]) return output(def, [{ needs_clarification: true, question: question[reason], ...reason === "REPORT_EDITION_NOT_PROVEN" ? { options: ["Consultar o projeto inteiro"] } : {} }]);
         throw workerDataError(rpcResult.error, "query");
       }

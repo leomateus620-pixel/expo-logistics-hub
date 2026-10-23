@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { commercialReportSpecSchema, type CommercialReportSnapshot } from '../lib/workers/commercial-report';
+import { commercialReportSpecSchema, parseCommercialReportSpec, parseCommercialReportSnapshot, type CommercialReportSnapshot } from '../lib/workers/commercial-report';
 import { commercialReportPreview } from '../lib/workers/commercial-report-preview';
 import { interpretWorkerIntent } from '../../supabase/functions/_shared/workers/intent';
 import { composeWorkerResponse } from '../../supabase/functions/_shared/workers/response-composer';
 import { decodeWorkerResponse, workerResponseSchema } from '../../supabase/functions/_shared/workers/response-contract';
 import { runWorkerTurn, adaptCommercialResponseVersion, type WorkerTurnDependencies } from '../../supabase/functions/_shared/workers/engine';
 import { asksForMutation, parseWorkerRequest, type ReadResult, type WorkerRequest } from '../../supabase/functions/_shared/workers/contracts';
+import { publicWorkerError } from '../../supabase/functions/_shared/workers/failures';
 
 const project='10000000-0000-4000-8000-000000000001',org='10000000-0000-4000-8000-000000000002',sid='10000000-0000-4000-8000-000000000003',conversation='10000000-0000-4000-8000-000000000004';
 const now=new Date('2026-10-23T13:00:00Z');
@@ -29,6 +30,27 @@ function dependencies(history:Array<{role:string;content:string}>=[]):WorkerTurn
  captureCommercialReport:vi.fn(async value=>({snapshotId:value.snapshotId,status:'available' as const})),resolveCommercialReport:vi.fn(async()=>snapshot())};
 }
 describe('commercial intent and semantic continuity',()=>{
+ it('clears inherited sales periods when switching to current inventory',()=>{
+  const scoped=snapshot();scoped.spec.period={from:'2026-10-01',to:'2026-10-31',basis:'created'};scoped.spec.comparisonPeriod={from:'2026-09-01',to:'2026-09-30',basis:'created'};
+  const history=[{role:'user',content:'Compare vendas cadastradas entre setembro e outubro.'},{role:'assistant',content:response(scoped).content}];
+  const intent=interpretWorkerIntent({...request,message:'Mostre ocupação e disponibilidade por pavilhão.'},now,history);
+  expect(intent.commercialSpec).toMatchObject({reportFocus:'inventory',scopeSearch:['ExpoRural']});expect(intent.commercialSpec?.period).toBeUndefined();expect(intent.commercialSpec?.comparisonPeriod).toBeUndefined();expect(intent.period).toBeUndefined();
+  const current=snapshot();current.spec={...current.spec,...intent.commercialSpec};
+  const evidence=result(current);delete evidence.commercialSnapshot;
+  const answer=decodeWorkerResponse(composeWorkerResponse(request,intent,[{tool:'map_commercial_report_query',input:{},result:evidence}],now).content)!;
+  expect(answer.metadata.period).toBeUndefined();expect(JSON.stringify(answer.blocks.filter(block=>block.type==='commercial_report'))).not.toMatch(/Cadastradas de|Assinadas de/);
+ });
+ it('explains unsupported explicit temporal inventory without querying misleading current data',async()=>{
+  const message='Mostre ocupação do Pavilhão 13 em setembro de 2026.';
+  const intent=interpretWorkerIntent({...request,message},now);expect(intent.commercialClarification).toBe('inventory_period');expect(intent.commercialSpec?.period).toBeUndefined();
+  const deps=dependencies();await runWorkerTurn({...request,message},deps,()=>{});expect(deps.executeTool).not.toHaveBeenCalled();
+  const answer=decodeWorkerResponse(vi.mocked(deps.finish).mock.calls[0][1].content)!;expect(answer.summary).toContain('inventário disponível mostra a situação atual');
+ });
+ it('rejects a period on inventory DTOs and explains legacy immutable snapshot refusal',()=>{
+  const legacy=snapshot();legacy.spec.reportFocus='inventory';legacy.spec.period={from:'2026-10-01',to:'2026-10-31',basis:'created'};
+  expect(()=>parseCommercialReportSpec(legacy.spec)).toThrow(/situação atual/);
+  try{parseCommercialReportSnapshot(legacy);throw new Error('expected refusal');}catch(error){expect(publicWorkerError(error)).toMatchObject({code:'report_inventory_current_only',retryable:false,message:expect.stringContaining('Faça uma nova consulta')});}
+ });
  it('preserves geography while changing signature, names, PDF, fees and presentation',()=>{
   let current=response();const history=[{role:'user',content:request.message},{role:'assistant',content:current.content}];
   const pending=interpretWorkerIntent({...request,message:'Mostre só as que aguardam assinatura.'},now,history);

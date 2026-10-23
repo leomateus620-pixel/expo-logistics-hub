@@ -23,7 +23,7 @@ export interface WorkerIntent {
   continuation: boolean;
   commercialSpec?: CommercialIntentSpec;
   generatePdf?: boolean;
-  commercialClarification?: 'contract_unit' | 'historical_position' | 'company_identity' | 'comparison_periods' | 'contract_identity';
+  commercialClarification?: 'contract_unit' | 'historical_position' | 'company_identity' | 'comparison_periods' | 'contract_identity' | 'inventory_period';
 }
 const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const months = ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
@@ -157,6 +157,7 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
     }
   }
   let commercialSpec: CommercialIntentSpec | undefined;
+  let inventoryPeriodUnsupported=false;
   if (kind === 'map_report') {
     const previous = continuation ? priorCommercial ?? previousIntent?.commercialSpec : undefined;
     const { projectId: _ignored, ...previousFilters } = previous && 'projectId' in previous ? previous : { ...previous, projectId: undefined };
@@ -262,8 +263,13 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
     if(minValue)commercialSpec.minValueCents=Math.round(decimal(minValue)*100);if(maxValue)commercialSpec.maxValueCents=Math.round(decimal(maxValue)*100);
     const inventoryStates:Array<[RegExp,CommercialReportSpec['inventoryStates'][number]]>=[[/disponiveis|disponivel|livres/,'AVAILABLE'],[/bloquead/,'BLOCKED'],[/reservad/,'RESERVED'],[/em negociacao/,'IN_NEGOTIATION'],[/vendidos no mapa/,'SOLD']];
     if(commercialSpec.reportFocus==='inventory')for(const [pattern,state] of inventoryStates)if(pattern.test(text))commercialSpec.inventoryStates=[state];
+    if(commercialSpec.reportFocus==='inventory'){
+      inventoryPeriodUnsupported=Boolean(period)&&(namedMonth>=0||Boolean(explicitDates?.length)||brDates.length>0||/\bontem\b|\bamanha\b|mes anterior|mes passado|neste mes|nesse mes|este mes|\bsemana\b|\bperiodo\b|cadastrad|assinad/.test(text))&&!/\bsituacao atual\b|\bneste momento\b/.test(text);
+      delete commercialSpec.period;delete commercialSpec.comparisonPeriod;period=undefined;
+    }
   }
   const commercialClarification: WorkerIntent['commercialClarification'] = kind === 'map_report' && /como estava|situacao em \d|posicao em \d/.test(text) ? 'historical_position'
+    :inventoryPeriodUnsupported?'inventory_period'
     :kind==='map_report'&&/essa? empresa|determinada empresa|empresa selecionada/.test(text)&&!commercialSpec?.companySearch&&!commercialSpec?.exhibitorIds.length?'company_identity'
     :kind==='map_report'&&/compar.*(?:dois periodos|periodos|datas)/.test(text)&&!commercialSpec?.comparisonPeriod?'comparison_periods'
     :kind==='map_report'&&/esse contrato|este contrato|esse documento|este documento/.test(text)&&!commercialSpec?.contractSearch&&!commercialSpec?.contractIds.length?'contract_identity'

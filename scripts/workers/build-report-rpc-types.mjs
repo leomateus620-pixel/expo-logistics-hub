@@ -6,6 +6,7 @@ const sources = [
  'supabase/migrations/20261023150000_workers_commercial_report_artifacts.sql',
  'supabase/migrations/20261023170000_workers_commercial_report_projection_parity.sql',
  'supabase/migrations/20261023190000_workers_commercial_report_selectors.sql',
+ 'supabase/migrations/20261023200000_workers_commercial_report_current_inventory.sql',
 ];
 const authenticated = [
  'workers_commercial_report_authorize', 'workers_map_commercial_report',

@@ -35,6 +35,10 @@ describe('authorized commercial artifact transport', () => {
     await expect(downloadCommercialReport({ ...request, reportId })).rejects.toMatchObject({ code: 'expired' });
     await expect(downloadCommercialReport({ ...request, reportId })).rejects.toMatchObject({ code: 'invalid_response' });
   });
+  it('explains legacy inventory/period mismatch without exposing upstream diagnostics', async () => {
+    vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response('REPORT_INVENTORY_CURRENT_ONLY private SQL', {status:422})));
+    await expect(prepareCommercialReport(request)).rejects.toMatchObject({code:'inventory_current_only',message:expect.stringContaining('Faça uma nova consulta do inventário atual')});
+  });
   it('requires explicit IDs and validates a successful job response', async () => {
     const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ report: { id: 'arbitrary', status: 'ready' } }))); vi.stubGlobal('fetch', fetch);
     await expect(prepareCommercialReport(request)).rejects.toMatchObject({ code: 'invalid_response' });

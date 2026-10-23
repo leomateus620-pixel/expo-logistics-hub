@@ -475,8 +475,15 @@ var commercialReportSnapshotSchema = z5.object({
   calibration: z5.object({ mapUnitsPerMeter: z5.number().finite().positive(), status: z5.literal("VALIDATED") }).strict().nullable(),
   notes: z5.array(z5.string().max(2e3)).max(30)
 }).strict();
+var CommercialReportCurrentInventoryError = class extends Error {
+  code = "report_inventory_current_only";
+  constructor() {
+    super("O invent\xE1rio representa a situa\xE7\xE3o atual; filtros de cadastro e assinatura n\xE3o se aplicam.");
+  }
+};
 function parseCommercialReportSpec(value) {
   const spec = commercialReportSpecSchema.parse(value);
+  if (spec.reportFocus === "inventory" && (spec.period || spec.comparisonPeriod)) throw new CommercialReportCurrentInventoryError();
   for (const period of [spec.period, spec.comparisonPeriod]) {
     if (!period) continue;
     const valid = (value2) => (/* @__PURE__ */ new Date(`${value2}T12:00:00Z`)).toISOString().slice(0, 10) === value2;
@@ -987,7 +994,7 @@ async function dispatch(def, input2, ctx) {
       const rpcResult = await ctx.supabase.rpc("workers_map_commercial_report", { p_project_id: projectId, p_spec: spec });
       if (rpcResult.error) {
         const reason = typeof rpcResult.error.message === "string" ? rpcResult.error.message.split(":", 1)[0] : "";
-        const question = { REPORT_SCOPE_UNRESOLVED: "N\xE3o encontrei uma \xFAnica \xE1rea autorizada com essa identifica\xE7\xE3o. Informe o pavilh\xE3o f\xEDsico, segmento ou quadra do projeto.", REPORT_COMPANY_UNRESOLVED_OR_AMBIGUOUS: "N\xE3o encontrei uma identidade empresarial \xFAnica com esse nome. Informe o nome empresarial exato ou selecione o expositor no m\xF3dulo.", REPORT_CONTRACT_UNRESOLVED_OR_AMBIGUOUS: "N\xE3o encontrei um \xFAnico documento com essa refer\xEAncia no projeto autorizado. Informe a refer\xEAncia contratual exata ou selecione o documento no m\xF3dulo.", REPORT_ORDER_UNRESOLVED_OR_AMBIGUOUS: "N\xE3o encontrei um \xFAnico pedido com essa refer\xEAncia persistida. Informe a refer\xEAncia exata ou selecione o pedido no m\xF3dulo.", REPORT_EDITION_NOT_PROVEN: "A edi\xE7\xE3o solicitada n\xE3o est\xE1 comprovada no cadastro desse projeto. Deseja consultar o projeto inteiro?" };
+        const question = { REPORT_INVENTORY_CURRENT_ONLY: "O invent\xE1rio dispon\xEDvel representa a situa\xE7\xE3o atual. Para um per\xEDodo, consulte vendas por cadastro ou assinatura; ocupa\xE7\xE3o passada exige hist\xF3rico reconstru\xEDvel.", REPORT_SCOPE_UNRESOLVED: "N\xE3o encontrei uma \xFAnica \xE1rea autorizada com essa identifica\xE7\xE3o. Informe o pavilh\xE3o f\xEDsico, segmento ou quadra do projeto.", REPORT_COMPANY_UNRESOLVED_OR_AMBIGUOUS: "N\xE3o encontrei uma identidade empresarial \xFAnica com esse nome. Informe o nome empresarial exato ou selecione o expositor no m\xF3dulo.", REPORT_CONTRACT_UNRESOLVED_OR_AMBIGUOUS: "N\xE3o encontrei um \xFAnico documento com essa refer\xEAncia no projeto autorizado. Informe a refer\xEAncia contratual exata ou selecione o documento no m\xF3dulo.", REPORT_ORDER_UNRESOLVED_OR_AMBIGUOUS: "N\xE3o encontrei um \xFAnico pedido com essa refer\xEAncia persistida. Informe a refer\xEAncia exata ou selecione o pedido no m\xF3dulo.", REPORT_EDITION_NOT_PROVEN: "A edi\xE7\xE3o solicitada n\xE3o est\xE1 comprovada no cadastro desse projeto. Deseja consultar o projeto inteiro?" };
         if (question[reason]) return output(def, [{ needs_clarification: true, question: question[reason], ...reason === "REPORT_EDITION_NOT_PROVEN" ? { options: ["Consultar o projeto inteiro"] } : {} }]);
         throw workerDataError(rpcResult.error, "query");
       }

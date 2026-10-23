@@ -38,6 +38,7 @@ const registryCodes: Record<string, string> = {
   INVALID_INPUT: 'invalid_tool_arguments', NOT_FOUND: 'not_found', DATA_UNAVAILABLE: 'query_failed',
   RPC_INCOMPATIBLE: 'rpc_incompatible', SQL_ERROR: 'sql_error', TIMEOUT: 'timeout',
   NETWORK_ERROR: 'network_error', INVALID_RESPONSE: 'invalid_response',
+  report_inventory_current_only: 'report_inventory_current_only',
 };
 const messages: Record<string, string> = {
   forbidden: 'Seu usuário não tem acesso a esta consulta.',
@@ -46,6 +47,7 @@ const messages: Record<string, string> = {
   rpc_incompatible: 'Esta consulta precisa de uma atualização do sistema. Consulte o módulo enquanto ela é corrigida.',
   sql_error: 'O sistema encontrou uma falha ao consultar os dados. Consulte o módulo enquanto ela é corrigida.',
   invalid_response: 'O resultado não pôde ser validado. Consulte os dados no módulo.',
+  report_inventory_current_only: 'Esta consulta mistura um período de vendas com inventário atual. Faça uma nova consulta do inventário atual para gerar o relatório; a ocupação passada exige histórico reconstruível.',
   ambiguous_identity: 'Encontrei mais de uma identidade. Escolha a pessoa ou comissão para continuar.',
   query_failed: 'Não consegui concluir esta consulta. Consulte o módulo ou tente novamente mais tarde.',
   request_failed: 'Não consegui concluir esta consulta. Consulte o módulo ou tente novamente mais tarde.',

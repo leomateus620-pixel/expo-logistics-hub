@@ -11,7 +11,8 @@
     "20261023160000": "8f6d7f0fd1b985c3c1f5db430d29d54328474aa14a9287cc29200f49ff86a746",
     "20261023170000": "fc7ff30fb81b3010f9be05cdfbff370b2ea1a0f9dbc47b6df5cab94b15da5763",
     "20261023180000": "3b516685afb900113d04b0a29d556629b3c784b59c7592a1ead2a3395986133e",
-    "20261023190000": "ecff41376e7672d007cdc347bd3b844e0fc87a0f7e0cd9ebbc1a1f72351832e0"
+    "20261023190000": "ecff41376e7672d007cdc347bd3b844e0fc87a0f7e0cd9ebbc1a1f72351832e0",
+    "20261023200000": "2c07d7245079e6710c2748e340958eaab4edf415f59d9d0a58a2cbce3e16e87c"
   },
   "commercialFacts": "Read-only fingerprints of orders/items/sales/contracts/lots/exhibitors before/after inside repeatable-read DDL transactions were unchanged.",
   "liveScopes": {
@@ -191,22 +192,28 @@
   "tests": {
     "targeted": {
       "files": 41,
-      "passed": 631
+      "passed": 636,
+      "failed": 0
     },
     "full": {
       "files": 462,
-      "passed": 3932,
-      "failed": 90
+      "total": 4027,
+      "passed": 3937,
+      "failed": 90,
+      "failuresMatchBaseline": true,
+      "maxWorkers": 2,
+      "minWorkers": 1
     },
     "baseline": {
       "commit": "9f01dcd1",
       "files": 457,
       "passed": 3852,
-      "failed": 90
+      "failed": 90,
+      "total": 3942
     },
     "newFailures": 0,
     "isolated": {
-      "query": 73,
+      "query": 82,
       "artifacts": 21,
       "persistence": 16,
       "dbToChat": 35
@@ -218,8 +225,99 @@
       "lots": 1652,
       "pages": 89,
       "elapsedMs": 388
+    },
+    "typecheck": {
+      "passed": true
+    },
+    "build": {
+      "passed": true
+    },
+    "transientRuns": "One default-concurrency run had an additional unrelated commercialMapHistory failure (13 isolated tests passed on recheck); a second had worker onTaskUpdate timeouts. The final bounded-concurrency full run completed with exactly the baseline failure identities.",
+    "denoFinalSource": {
+      "runtime": "Deno 2.9.6 local",
+      "orchestratorPassed": true,
+      "reportsPassed": true
     }
   },
-  "backendDeployment": "Pending exact reviewed commit deployment; SQL evidence is not a deployment claim.",
-  "browser": "Controlled synthetic fixture, native 703px and 390px iframe; no physical iOS or real authorized HTTP report download tested yet."
+  "backendDeployment": {
+    "method": "Lovable deploy_edge_functions",
+    "initialSourceRevision": "cb195bce",
+    "functions": {
+      "workers-orchestrator": "Deployed and authenticated HTTP verified at 0e2233b2",
+      "workers-commercial-reports": "Deployed and authenticated HTTP verified at 0e2233b2"
+    },
+    "initialDeploymentVerified": true,
+    "finalSourceVerificationPending": true,
+    "verifiedRevisionBeforeLastFix": "0e2233b24ccc0d21617ba902e2ed31f16a303bc3",
+    "denoCheck": "Both functions passed on Lovable sandbox Deno 2.6.10; deployment tool does not typecheck hosted runtime.",
+    "sourceHashesBeforeLastFix": {
+      "workers-orchestrator": "a34ad24320666dec5f5b0e4a5fbd7d44515588615d1b3237abb4d9eaacde40f9",
+      "workers-commercial-reports": "d7fdca51b87fd9eae1bbb4b79ea32eb119803af3a9973c1e0af6967278dca9f9"
+    },
+    "lastDeployedSourceRevision": "0e2233b24ccc0d21617ba902e2ed31f16a303bc3",
+    "remainingDeployment": "Latest PR corrections (current inventory continuity/error copy and PDF orphan-header layout) were not redeployed. Owner explicitly requested no further Lovable calls to preserve credits."
+  },
+  "browser": {
+    "syntheticLayout": "Controlled synthetic fixture at native 703 px and 390 px iframe.",
+    "authenticatedHttp": "Live authenticated orchestration, durable job and mediated PDF download verified separately; this is not a claim of a complete authenticated browser interaction.",
+    "physicalIosTested": false
+  },
+  "migrationStatus": {
+    "applied": true,
+    "count": 7,
+    "executor": "Lovable official executor",
+    "hashesUnchanged": true,
+    "commitAndJournalVerified": true,
+    "compensatingInventoryGuard": "Applied via Lovable query_database, COMMIT and journal verified; current inventory rejects sale periods; canonical scopes deduplicated; commercial fingerprints unchanged."
+  },
+  "liveAuthenticatedHttp": {
+    "session": "Authenticated user eligible for ai_workers_can_access; personal identity omitted.",
+    "orchestrator": {
+      "httpStatus": 200,
+      "responseVersion": 2,
+      "snapshotCaptured": true
+    },
+    "job": {
+      "observedStates": [
+        "requested",
+        "rendering",
+        "ready"
+      ],
+      "attempts": 1
+    },
+    "download": {
+      "method": "mediated authenticated download",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "bytes": 430442,
+      "pages": 60,
+      "sha256": "05680f9301214dad2d6de3fb2b050c34eb8b0e1af65cd43e01268f8683a3973f"
+    },
+    "createdAt": "2026-10-23T14:25:23Z",
+    "expiresOn": "2026-11-22",
+    "scope": "Initial deployed backend revision; final compatibility renderer update must be verified separately.",
+    "commercialFactsChanged": false
+  },
+  "liveHttpAccessDenials": {
+    "anonymousHttpStatus": 401,
+    "invalidWorkerSecretHttpStatus": 403
+  },
+  "liveScopedHttp": {
+    "scope": "Pavilhão 13",
+    "inventory": 104,
+    "responseVersion": 2,
+    "orchestratorHttpStatus": 200,
+    "reportAndPlanBlocks": true,
+    "prepareTwiceSameJob": true,
+    "attempts": 1,
+    "jobStatus": "ready",
+    "downloadHttpStatus": 200,
+    "pages": 12,
+    "bytes": 306247,
+    "sha256": "9179eb096341d0343b6702b782dcb2454cdf2e830b1b168d88f1d924df334a9f",
+    "privateFileVerifiedInDatabase": true,
+    "revision": "0e2233b24ccc0d21617ba902e2ed31f16a303bc3",
+    "finalRevisionPending": true
+  },
+  "executionConstraint": "Owner requested no more Lovable messages/calls after the seven migrations and deployment 0e2233b2 had completed; no further Lovable operation was sent."
 }

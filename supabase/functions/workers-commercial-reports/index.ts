@@ -60,6 +60,7 @@ Deno.serve(async(req:Request)=>{
   const db=client(bearer),{data,error}=await db.auth.getUser();
   if(error||!data.user||data.user.role==='service_role')return json({error:{code:'forbidden'}},401);
   const snapshot=await rpc(db,'workers_commercial_report_snapshot',{_org_id:input.orgId,_snapshot_id:input.snapshotId});
+  if((input.operation==='prepare'||input.operation==='plan')&&snapshot?.spec?.reportFocus==='inventory'&&(snapshot.spec.period||snapshot.spec.comparisonPeriod))throw Error('REPORT_INVENTORY_CURRENT_ONLY');
   if(input.operation==='plan')return json({snapshotId:snapshot.snapshotId,generation:snapshot.generation,inventory:snapshot.inventory,planOutlines:snapshot.planOutlines??[],calibration:snapshot.calibration});
   if(input.operation==='download'){
    if(!input.reportId)return json({error:{code:'invalid_request'}},400);
@@ -76,7 +77,7 @@ Deno.serve(async(req:Request)=>{
   const report=await rpc(db,'workers_commercial_report_status',{_org_id:input.orgId,_snapshot_id:input.snapshotId,_report_id:input.reportId??null});
   return json({report});
  }catch(error){
-  const code=error instanceof z.ZodError?'invalid_request':error instanceof Error&&error.message==='REPORT_FORBIDDEN'?'forbidden':error instanceof Error&&error.message==='REPORT_EXPIRED'?'expired':'report_unavailable';
-  return json({error:{code}},code==='forbidden'?403:code==='expired'?410:code==='invalid_request'?400:503);
+  const code=error instanceof z.ZodError?'invalid_request':error instanceof Error&&error.message==='REPORT_FORBIDDEN'?'forbidden':error instanceof Error&&error.message==='REPORT_EXPIRED'?'expired':error instanceof Error&&error.message==='REPORT_INVENTORY_CURRENT_ONLY'?'inventory_current_only':'report_unavailable';
+  return json({error:{code}},code==='forbidden'?403:code==='expired'?410:code==='invalid_request'?400:code==='inventory_current_only'?422:503);
  }
 });
