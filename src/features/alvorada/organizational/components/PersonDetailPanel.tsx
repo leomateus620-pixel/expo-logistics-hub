@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { UserRound, UsersRound, X } from 'lucide-react';
 import {
   responsibleRoleLabel,
@@ -76,6 +76,12 @@ function DetailAvatar({ person }: { person: OrgPerson }) {
 }
 
 export function PersonDetailPanel({ graph, node, selectedPersonId, onPersonSelect, onClose }: PersonDetailPanelProps) {
+  const closeButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => closeButton.current?.focus({ preventScroll: true }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [node.id]);
+
   const people = node.personIds
     .map((personId) => graph.people[personId])
     .filter((person): person is OrgPerson => Boolean(person));
@@ -111,7 +117,7 @@ export function PersonDetailPanel({ graph, node, selectedPersonId, onPersonSelec
           <h2>{heading}</h2>
           <p>{presentationText(selectedPerson ? node.title : node.type === 'executive' ? (node.subtitle ?? 'PRESIDÊNCIA') : (node.subtitle ?? node.title))}</p>
         </div>
-        <button type="button" onClick={onClose} aria-label="Fechar detalhes" title="Fechar detalhes">
+        <button type="button" onClick={onClose} ref={closeButton} aria-label="Fechar detalhes" title="Fechar detalhes">
           <X aria-hidden="true" />
         </button>
       </header>

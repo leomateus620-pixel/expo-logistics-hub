@@ -46,7 +46,7 @@ const central = unit({
 });
 
 describe('organizationalResolver', () => {
-  it('gera raízes pares e o caminho executivo pela vice-presidência sem mudar cargos', () => {
+  it('gera a cadeia CCPF → presidente → vice → Central sem mudar cargos', () => {
     const members = [
       member({ user_id: 'president', nome_exibicao: 'Fabiano Soltis', cargo: 'Presidente', commission_id: central.id }),
       member({ user_id: 'vice', nome_exibicao: 'Djeison Drey', cargo: 'Vice-presidente', commission_id: central.id }),
@@ -57,8 +57,9 @@ describe('organizationalResolver', () => {
     const president = graph.nodes.find((node) => node.subtitle === 'PRESIDENTE')!;
     const vice = graph.nodes.find((node) => node.subtitle === 'VICE-PRESIDENTE')!;
     const centralNode = graph.nodes.find((node) => node.type === 'central-commission')!;
-    expect(president.parentIds).toEqual([]);
-    expect(vice.parentIds.sort()).toEqual([graph.rootNodeId, president.id].sort());
+    expect(president.parentIds).toEqual([graph.rootNodeId]);
+    expect(vice.parentIds).toEqual([president.id]);
+    expect(graph.edges.some(edge => edge.sourceId === graph.rootNodeId && edge.targetId === vice.id)).toBe(false);
     expect(centralNode.parentIds).toEqual([vice.id]);
     expect(president.authorityLevel).toBe(2);
     expect(vice.authorityLevel).toBe(2);

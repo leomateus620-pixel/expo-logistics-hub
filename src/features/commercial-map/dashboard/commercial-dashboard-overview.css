@@ -813,8 +813,8 @@
   --region-open: #d88a36;
   --region-sold: #3976c3;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  align-items: stretch;
+  grid-template-columns: minmax(240px, .85fr) minmax(0, 2.4fr);
+  align-items: start;
   gap: 10px;
   min-width: 0;
 }
@@ -897,7 +897,7 @@
 .commercial-dashboard-sales-summary__access svg { width: 14px; height: 14px; }
 .commercial-dashboard-sales-summary__access:hover { border-color: #719577; background: #e4eee0; }
 .commercial-dashboard-sales-summary__access:focus-visible { outline: 2px solid #497b50; outline-offset: 3px; }
-.commercial-dashboard-sales-summary__metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.65fr); min-width: 0; gap: 14px; margin-top: 18px; }
+.commercial-dashboard-sales-summary__metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(180px, 1.45fr); min-width: 0; gap: 14px; margin-top: 10px; }
 .commercial-dashboard-sales-summary__metrics > div { display: grid; align-content: end; gap: 4px; min-width: 0; }
 .commercial-dashboard-sales-summary__metrics > div + div { padding-left: 14px; border-left: 1px solid #e0e6e1; }
 .commercial-dashboard-sales-summary__value { color: #23372d; font-family: var(--overview-font-data); font-size: 29px; font-weight: 600; line-height: 1.15; letter-spacing: -.045em; overflow-wrap: anywhere; }

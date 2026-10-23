@@ -1,4 +1,7 @@
-import { Suspense, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { WorkersLauncherButton } from './WorkersLauncherButton';
+import { subscribeWorkersLauncherPlacement, workersLauncherSlot, type WorkersLauncherSurface } from './workersLauncherPlacement';
+import { Suspense, useEffect, useState, useSyncExternalStore } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
@@ -9,11 +12,13 @@ import { PasswordPrompt, readUnlock, useWorkersEligibility, writeUnlock } from '
 const SessionRunner = lazyWithRetry(() => import('@/features/workers/WorkersSessionRunner'));
 const Copilot = lazyWithRetry(() => import('@/features/workers/WorkersCopilot'));
 
-/** Lightweight entry: Motion, CSS, chat and map stores load only when the user opens it. */
+/** Lightweight entry: chat, Motion and map stores load only when the user opens it. */
 export default function WorkersLauncher() {
   const { user } = useAuth();
   const { orgId } = useCurrentOrg();
   const location = useLocation();
+  const surface: WorkersLauncherSurface | null = location.pathname === '/portal' ? 'portal' : location.pathname === '/mapa-comercial' ? 'map' : location.pathname.startsWith('/cronograma-eventos') ? 'agenda' : null;
+  const slot = useSyncExternalStore(subscribeWorkersLauncherPlacement, () => workersLauncherSlot(surface), () => null);
   const [open, setOpen] = useState(false);
   const isWorkers = location.pathname.startsWith('/equipe-ia') || location.pathname.startsWith('/admin/workers/');
   const isPublic = /^\/(?:areas\/|login\/|unsubscribe|\.lovable\/)/.test(location.pathname);
@@ -37,15 +42,8 @@ export default function WorkersLauncher() {
   if (!enabled) return runner;
   return <>
     {runner}
-    <button type="button" data-workers-launcher aria-label="Abrir BOT FENASOJA"
-      aria-keyshortcuts="Control+k Meta+k" aria-expanded={open} onClick={() => setOpen(true)}
-      className="focus-ring"
-      style={{ position: 'fixed', right: 20, bottom: 'max(24px, env(safe-area-inset-bottom))', zIndex: 39,
-        display: 'flex', alignItems: 'center', gap: 8, minHeight: 48,
-        padding: '12px 16px', borderRadius: 999, border: 0,
-        background: '#121D85', color: '#fff', boxShadow: 'var(--shadow-md)', fontSize: 13, fontWeight: 600 }}>
-      <img src="/bot-fenasoja/mascot-open.webp" alt="" width={28} height={28} /><span>BOT FENASOJA</span>
-    </button>
+    {surface ? slot && createPortal(<WorkersLauncherButton docked open={open} onOpen={() => setOpen(true)} />, slot)
+      : <WorkersLauncherButton docked={false} open={open} onOpen={() => setOpen(true)} />}
     {open && !unlocked && <Dialog open onOpenChange={value => { if (!value) setOpen(false); }}>
       <DialogContent className="max-w-sm border-0 bg-transparent p-0 shadow-none">
         <DialogTitle className="sr-only">Senha do BOT FENASOJA</DialogTitle><DialogDescription className="sr-only">Confirme sua senha</DialogDescription>

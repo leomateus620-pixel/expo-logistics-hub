@@ -54,7 +54,7 @@ import robertoRacho from '@/assets/person-roberto-racho.jpeg.asset.json';
 const PERSON_PHOTOS: Record<string, string> = {
   'elvio becker': '/alvorada/portraits/person-elvio-becker.webp',
   'jorge luiz viana': '/alvorada/portraits/person-jorge-luiz-viana.webp',
-  'jona santos': '/alvorada/portraits/person-jona-santos.webp',
+  'jonas santos': '/alvorada/portraits/person-jona-santos.webp',
   'francine maria boijink': '/alvorada/portraits/person-francine-maria-boijink.webp',
   'jonas fotografo': '/alvorada/portraits/person-jona-santos.webp', // Historical snapshots keep their original text.
 

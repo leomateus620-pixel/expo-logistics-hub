@@ -9,6 +9,7 @@ import { withDashboardValue } from '@/test/helpers/dashboardFinancialFixture';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import report from '../../docs/commercial-analytics/database-report.json';
 import '@/index.css';
+import regionBeforeCss from './compact-baselines.local/region-before.css?inline';
 import currentCss from '@/features/commercial-map/dashboard/commercial-dashboard-overview.css?inline';
 import beforeCss from './compact-baselines.local/before/commercial-dashboard-overview.css?inline';
 import historicalCss from './compact-baselines.local/historical/commercial-dashboard-overview.css?inline';
@@ -20,7 +21,7 @@ const data = { ...OFFICIAL_REFERENCE_DATA, lots: OFFICIAL_REFERENCE_DATA.lots.ma
 function Qa() {
   const scroll = useRef<HTMLDivElement>(null);
   return <QueryClientProvider client={client}>
-    <style>{phase === 'before' ? beforeCss : phase === 'historical' ? historicalCss : currentCss}</style>
+    <style>{phase === 'region-before' ? regionBeforeCss : phase === 'before' ? beforeCss : phase === 'historical' ? historicalCss : currentCss}</style>
     <div ref={scroll} data-qa-scroll style={{ height: '100dvh', overflow: 'auto', background: '#f4f7f2' }}>
       <div style={{ padding: '4px 24px', fontSize: 11 }}>Prévia local · dados fictícios · {phase}</div>
       <CommercialDashboardOrBaseline />

@@ -1,24 +1,21 @@
 import { memo, type CSSProperties } from 'react';
 import type { OrgNodeVisualState } from '../hooks/useOrgGraphInteraction';
+import { presentationStage } from '../presentationPlan';
+import { organizationalPresentationLevel } from '../layout/organizationalLayout';
 import type { OrganizationalLayout } from '../layout/organizationalLayout';
 
 interface RelationshipLayerProps {
   active: boolean;
+  presenting?: boolean;
   activeEdgeIds: Set<string>;
   selectionActive: boolean;
   layout: OrganizationalLayout;
   visualStateById: Map<string, OrgNodeVisualState>;
 }
 
-function relationshipDelay(authorityLevel: number, levelOrder: number): number {
-  if (authorityLevel === 2) return 80 + levelOrder * 60;
-  if (authorityLevel === 3) return 180;
-  if (authorityLevel === 4) return Math.min(620, 260 + levelOrder * 12);
-  return 80;
-}
-
 function RelationshipLayerComponent({
   active,
+  presenting = false,
   activeEdgeIds,
   layout,
   selectionActive,
@@ -33,6 +30,7 @@ function RelationshipLayerComponent({
       aria-hidden="true"
       focusable="false"
       data-active={active || undefined}
+      data-presenting={presenting || undefined}
       data-selection-active={selectionActive || undefined}
       style={{ pointerEvents: 'none' }}
     >
@@ -60,10 +58,7 @@ function RelationshipLayerComponent({
         const targetPosition = layout.nodeById.get(edge.targetId);
         const targetNode = targetPosition?.node;
         const advisory = sourceNode?.type === 'advisory' || targetNode?.type === 'advisory';
-        const delay = selectionActive ? 0 : relationshipDelay(
-          targetNode?.authorityLevel ?? edge.authorityLevel,
-          targetPosition?.levelOrder ?? 0,
-        );
+        const stage = presentationStage(targetNode ? organizationalPresentationLevel(targetNode) : 1, targetPosition?.levelOrder);
 
         return (
           <g
@@ -74,7 +69,7 @@ function RelationshipLayerComponent({
             data-muted={isMuted || undefined}
             data-target-authority={targetNode?.authorityLevel}
             data-target-order={targetPosition?.levelOrder}
-            style={{ '--org-edge-delay': `${delay}ms` } as CSSProperties}
+            style={{ '--org-edge-delay': `${stage.connectorStart}ms`, '--org-edge-duration': `${stage.connectorDuration}ms` } as CSSProperties}
           >
             {isActive && <path className="org-relationship__glow" d={path} pathLength={1} vectorEffect="non-scaling-stroke" />}
             <path
@@ -82,7 +77,7 @@ function RelationshipLayerComponent({
               d={path}
               pathLength={1}
               vectorEffect="non-scaling-stroke"
-              stroke={advisory ? 'url(#org-connector-advisory)' : 'url(#org-connector-base)'}
+              stroke={targetNode && targetNode.authorityLevel < 4 ? '#d8b870' : advisory ? 'url(#org-connector-advisory)' : 'url(#org-connector-base)'}
             />
           </g>
         );

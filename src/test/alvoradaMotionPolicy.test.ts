@@ -21,10 +21,10 @@ describe('Alvorada-only canonical full-motion policy', () => {
     expect(ALVORADA_MOTION_MODE).toBe('canonical');
     const folder = resolve('src/features/alvorada');
     expect(existsSync(resolve(folder, 'reducedMotion.ts'))).toBe(false);
-    // Diagnostic reads are the sole allowed use. Guard the whole runtime, not
-    // just engine labels: camera/frame/quality forks are also regressions.
+    // The embedded cinematic keeps its canonical policy. The independent DOM
+    // ecosystem now honors reduced motion by explicit owner instruction (23/10).
     const files = readdirSync(folder, { recursive: true }) as string[];
-    for (const file of files.filter(f => /\.(tsx?|css)$/.test(f) && f !== 'diagnostics.ts')) {
+    for (const file of files.filter(f => /\.(tsx?|css)$/.test(f) && f !== 'diagnostics.ts' && !f.replaceAll('\\', '/').startsWith('organizational/'))) {
       const source = readFileSync(resolve(folder, file), 'utf8');
       expect(source, file).not.toMatch(/prefers-reduced-motion|prefersReducedMotion|reducedMotion|sampleReducedAlvorada|data-reduced/);
     }

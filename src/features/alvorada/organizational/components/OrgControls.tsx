@@ -16,11 +16,13 @@ import type { OrgGraphFilter } from '../hooks/useOrgGraphInteraction';
 
 interface OrgFilterBarProps {
   filter: OrgGraphFilter;
+  compact?: boolean;
   onFilterChange: (filter: OrgGraphFilter) => void;
 }
 
 interface OrgViewportControlsProps {
   scale: number;
+  fitLabel?: string;
   selected: boolean;
   onClearSelection?: () => void;
   onFit: () => void;
@@ -48,9 +50,9 @@ const FILTERS = [
   icon: typeof Layers3;
 }>;
 
-export function OrgFilterBar({ filter, onFilterChange }: OrgFilterBarProps) {
+export function OrgFilterBar({ filter, compact = false, onFilterChange }: OrgFilterBarProps) {
   return (
-    <nav className="org-filters" aria-label="Filtrar níveis organizacionais" data-org-interactive>
+    <nav className="org-filters" data-compact={compact || undefined} aria-label="Filtrar níveis organizacionais" data-org-interactive>
       {FILTERS.map((item) => {
         const FilterIcon = item.icon;
         return (
@@ -63,7 +65,7 @@ export function OrgFilterBar({ filter, onFilterChange }: OrgFilterBarProps) {
             onClick={() => onFilterChange(item.id)}
           >
             <FilterIcon aria-hidden="true" data-org-filter-icon />
-            <span>{item.label}</span>
+            <span className="org-filter-label">{item.accessibleLabel ?? item.label}</span>
           </button>
         );
       })}
@@ -73,6 +75,7 @@ export function OrgFilterBar({ filter, onFilterChange }: OrgFilterBarProps) {
 
 export function OrgViewportControls({
   scale,
+  fitLabel = 'Enquadrar todo o ecossistema',
   selected,
   onClearSelection,
   onFit,
@@ -98,7 +101,7 @@ export function OrgViewportControls({
         <Plus aria-hidden="true" />
       </button>
       <span className="org-viewport-controls__divider" aria-hidden="true" />
-      <button type="button" onClick={onFit} aria-label="Enquadrar todo o ecossistema" title="Enquadrar todo o ecossistema">
+      <button type="button" onClick={onFit} aria-label={fitLabel} title={fitLabel}>
         <RotateCcw aria-hidden="true" />
       </button>
       <button

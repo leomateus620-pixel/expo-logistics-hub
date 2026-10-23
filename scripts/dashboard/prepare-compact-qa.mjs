@@ -19,3 +19,5 @@ for (const [name, ref] of [['before', '151d829d5610acbc355a581d6cca79e7e9401d87'
   }
 }
 console.log('Before and historical presentation fixtures prepared.');
+
+await fs.writeFile(new URL('./compact-baselines.local/region-before.css', import.meta.url), execFileSync('git', ['show', '9e8e35b4:src/features/commercial-map/dashboard/commercial-dashboard-overview.css']));

@@ -1,3 +1,4 @@
+import { WorkersLauncherSlot } from '@/components/WorkersLauncherSlot';
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, LogOut } from 'lucide-react';
@@ -89,6 +90,7 @@ function CronogramaCommandBar() {
           {compactHeader && mobileModeContainer ? createPortal(modes, mobileModeContainer) : modes}
 
           <CronogramaHeaderSearch className="cronograma-command-search hidden lg:flex" />
+          <WorkersLauncherSlot surface="agenda" />
         </div>
 
         <div className="cronograma-command-layer__right">

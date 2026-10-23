@@ -1027,10 +1027,9 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
         title: person?.fullName ?? '',
         subtitle: executiveRole === 'president' ? 'Presidente' : 'Vice-Presidente',
         personIds: [personId],
-        parentIds: executiveRole === 'president' ? [] : [
-          ORGANIZATIONAL_ROOT_NODE_ID,
-          ...presidentPersonIds.map((id) => `executive:${id}`),
-        ],
+        parentIds: executiveRole === 'president' || presidentPersonIds.length === 0
+          ? [ORGANIZATIONAL_ROOT_NODE_ID]
+          : presidentPersonIds.filter((id) => id !== personId).map((id) => `executive:${id}`),
         commissionId: centralUnits[0]?.id ?? null,
         advisoryId: null,
         sortOrder: index,
@@ -1048,7 +1047,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
   // executive. In a complete registry only the vice leads to the Central node.
   const centralParentIds = viceNodes.length > 0
     ? viceNodes.map((item) => item.id)
-    : [ORGANIZATIONAL_ROOT_NODE_ID, ...executiveNodes.map((item) => item.id)];
+    : executiveNodes.length > 0 ? executiveNodes.map((item) => item.id) : [ORGANIZATIONAL_ROOT_NODE_ID];
 
   const centralNodeId = centralUnits.length > 0 || hasCentralMembership
     ? 'org:central-commission'

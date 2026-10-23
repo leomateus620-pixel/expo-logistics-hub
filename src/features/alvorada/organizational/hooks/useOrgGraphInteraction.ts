@@ -27,8 +27,8 @@ function matchesFilter(node: OrgNode, filter: OrgGraphFilter): boolean {
   return filter === 'all' || node.type === filter;
 }
 
-/** Only explicit incident relationships: a collective membership never grants
- * the selected person every outgoing relationship of that collective. */
+/** Follow canonical ancestry. A person never inherits the outgoing authority
+ * of a collective merely because they belong to it. */
 export function collectRelationshipContext(
   graph: OrganizationalGraph,
   focusNodeId: string | null,
@@ -55,6 +55,22 @@ export function collectRelationshipContext(
     nodeIds.add(edge.sourceId);
     nodeIds.add(edge.targetId);
   });
+  const walk = (starts: Set<string>, down: boolean) => {
+    const pending = [...starts], visited = new Set(starts);
+    while (pending.length) {
+      const id = pending.shift();
+      graph.edges.forEach(edge => {
+        if (!nodeById.has(edge.sourceId) || !nodeById.has(edge.targetId)) return;
+        if ((down ? edge.sourceId : edge.targetId) !== id) return;
+        const next = down ? edge.targetId : edge.sourceId;
+        edgeIds.add(edge.id); nodeIds.add(edge.sourceId); nodeIds.add(edge.targetId);
+        if (!visited.has(next)) { visited.add(next); pending.push(next); }
+      });
+    }
+  };
+  walk(membershipIds, false);
+  const descendantRoots = new Set([...membershipIds].filter(id => !personId || nodeById.get(id)?.type === 'executive'));
+  walk(descendantRoots, true);
   return { edgeIds, nodeIds, membershipIds };
 }
 
