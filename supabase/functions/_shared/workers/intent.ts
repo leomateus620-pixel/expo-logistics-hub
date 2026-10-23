@@ -180,7 +180,7 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
     else if (/parcialmente assinad|parciais/.test(text)) commercialSpec.saleStates=['partial'];
     else if (/legado|sem comprovacao/.test(text)) commercialSpec.saleStates=['legacy'];
     else if (/cancelad/.test(text)) commercialSpec.saleStates=['cancelled'];
-    else if (/assinatura(?:s)? confirmada|assinad[oa]s?|vendas.*confirmadas|vendas.*confirmados/.test(text) && !/contratos pendentes/.test(text)) commercialSpec.saleStates=['signed'];
+    else if (/assinatura(?:s)? confirmada|assinad[oa]s?|vendas.*confirmadas|vendas.*confirmados|foi vendido|quanto.*(?:vendido|vendeu)|valor vendido/.test(text) && !/contratos pendentes|vendidos no mapa/.test(text)) commercialSpec.saleStates=['signed'];
     if (/todos os estados|todas as situacoes|sem filtro de assinatura/.test(text)) commercialSpec.saleStates=[];
     if (/sem (?:contrato|documento)|nao tem documento|nao tem contrato/.test(text)) commercialSpec.contractFilter='without_document';
     else if (/com (?:contrato|documento)|documentos vinculados/.test(text)) commercialSpec.contractFilter='with_document';
@@ -213,7 +213,7 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
     commercialSpec.sections=[...sections];
     if (/quais documentos|liste (?:os )?documentos|documentos ativos|documentos.*versoes|versoes anteriores|quais contratos|contratos.*mais de um lote|contratos por empresa|abrangencia|cobre todos/.test(text) && !/aguard|penden.*assinatura/.test(text)) commercialSpec.reportFocus='contracts';
     else if (/quais empresas|quais expositores|mais de um pavilhao|expositores.*mais espacos|quem.*maior area|ranking.*(?:empresas|expositores)|empresas da area externa/.test(text)) commercialSpec.reportFocus='exhibitors';
-    else if (/ocupacao|disponibilidade|lotes.*(?:metragem ausente|sem metragem)|associacoes.*revisao/.test(text)) commercialSpec.reportFocus='inventory';
+    else if (/ocupacao|disponibilidade|vendidos no mapa|lotes.*(?:metragem ausente|sem metragem)|associacoes.*revisao/.test(text)) commercialSpec.reportFocus='inventory';
     else if (/vendas|venda|pedidos|assinatura|empresa,\s*lote|empresa.*lotes.*situacao/.test(text)) commercialSpec.reportFocus='sales';
     if (/mais de um lote|multiplos lotes|varios lotes/.test(text)&&commercialSpec.reportFocus==='contracts') commercialSpec.documentFilter='multi_lot';
     else if (/versoes anteriores|mais de uma versao|possuem versoes/.test(text)&&commercialSpec.reportFocus==='contracts') commercialSpec.documentFilter='with_prior_versions';

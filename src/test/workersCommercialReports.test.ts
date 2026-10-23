@@ -110,7 +110,7 @@ describe('forty natural acceptance journeys use typed filters, never stored nume
   ['Quantas vendas estão confirmadas?',{commercialSpec:{saleStates:['signed']}}],
   ['Quantas estão em aberto?',{commercialSpec:{saleStates:['pending']}}],
   ['Quantos pedidos estão parcialmente assinados?',{commercialSpec:{saleStates:['partial']}}],
-  ['Quanto foi vendido por pavilhão?',{commercialSpec:{groupBy:'scope'}}],
+  ['Quanto foi vendido por pavilhão?',{commercialSpec:{groupBy:'scope',saleStates:['signed']}}],
   ['Qual área tem maior valor em andamento?',{commercialSpec:{saleStates:['pending'],sortBy:'value',sortDirection:'desc'}}],
   ['Mostre principal e taxas separados.',{commercialSpec:{monetaryBasis:'principal_and_fees'}}],
   ['Inclua somente assinaturas confirmadas neste mês.',{commercialSpec:{saleStates:['signed'],period:{basis:'signed',from:'2026-10-01',to:'2026-10-31'}}}],
