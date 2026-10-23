@@ -226,5 +226,29 @@
     "output": "/alvorada/portraits/person-fabiano-soltis.webp",
     "sourceBytes": 15789,
     "outputBytes": 5274
+  },
+  {
+    "source": "person-elvio-becker.jpg",
+    "output": "/alvorada/portraits/person-elvio-becker.webp",
+    "sourceBytes": 192186,
+    "outputBytes": 48422
+  },
+  {
+    "source": "person-jorge-luiz-viana.jpg",
+    "output": "/alvorada/portraits/person-jorge-luiz-viana.webp",
+    "sourceBytes": 113548,
+    "outputBytes": 24690
+  },
+  {
+    "source": "person-jona-santos.jpg",
+    "output": "/alvorada/portraits/person-jona-santos.webp",
+    "sourceBytes": 136639,
+    "outputBytes": 31572
+  },
+  {
+    "source": "person-francine-maria-boijink.jpg",
+    "output": "/alvorada/portraits/person-francine-maria-boijink.webp",
+    "sourceBytes": 138698,
+    "outputBytes": 31876
   }
 ]

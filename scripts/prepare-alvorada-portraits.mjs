@@ -16,7 +16,7 @@ const sources = await Promise.all(manifests.map(async (filename) => {
   return { filename: asset.original_filename, url: asset.url };
 }));
 // Keep filenames as source identities. personPhotos.ts already corrects the two swapped originals.
-sources.push(...['person-fabiano-soltis.jpg', 'person-djeison-drey.jpg'].map((filename) => ({ filename, local: true })));
+sources.push(...['person-fabiano-soltis.jpg', 'person-djeison-drey.jpg', 'person-elvio-becker.jpg', 'person-jorge-luiz-viana.jpg', 'person-jona-santos.jpg', 'person-francine-maria-boijink.jpg'].map((filename) => ({ filename, local: true })));
 const records = [];
 let nextSource = 0;
 async function convertNext() {
@@ -33,7 +33,7 @@ async function convertNext() {
     const output = await sharp(input)
       .rotate()
       // Preserve original aspect ratio/framing; the existing avatar CSS applies its own crop.
-      .resize({ width: 256, height: 256, fit: 'inside', withoutEnlargement: true })
+      .resize({ width: source.local ? 512 : 256, height: source.local ? 512 : 256, fit: 'inside', withoutEnlargement: true })
       .webp({ quality: 82, effort: 5 })
       .toBuffer();
     await writeFile(join(outputDirectory, outputName), output);
