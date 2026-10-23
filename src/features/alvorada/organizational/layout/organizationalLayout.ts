@@ -1,297 +1,151 @@
-import type { OrgEdge, OrgNode } from '../types';
+import type { OrgEdge, OrgNode, OrgPerson } from '../types';
+import type { OrgGraphFilter } from '../hooks/useOrgGraphInteraction';
 
-export interface OrgLayoutPoint {
-  x: number;
-  y: number;
-}
-
-export interface OrgLayoutBounds {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
+export interface OrgLayoutPoint { x: number; y: number }
+export interface OrgLayoutBounds extends OrgLayoutPoint { width: number; height: number }
 export interface PositionedOrgNode extends OrgLayoutPoint {
-  node: OrgNode;
-  /** Stable order inside the node's own hierarchy level. */
-  levelOrder: number;
-  order: number;
-  radius: number;
+  node: OrgNode; levelOrder: number; order: number; radius: number;
+  width: number; height: number; horizontal: boolean; context: boolean; captionSide?: 'left' | 'right'; compactGroup?: boolean;
 }
-
-export interface PositionedOrgEdge {
-  edge: OrgEdge;
-  path: string;
-  source: OrgLayoutPoint;
-  target: OrgLayoutPoint;
-}
-
+export interface PositionedOrgEdge { edge: OrgEdge; path: string; source: OrgLayoutPoint; target: OrgLayoutPoint }
 export interface OrganizationalLayout {
-  bounds: OrgLayoutBounds;
-  nodes: PositionedOrgNode[];
-  edges: PositionedOrgEdge[];
-  nodeById: Map<string, PositionedOrgNode>;
+  bounds: OrgLayoutBounds; nodes: PositionedOrgNode[]; edges: PositionedOrgEdge[];
+  nodeById: Map<string, PositionedOrgNode>; grouped: boolean;
+  page: number; pageCount: number; unitCount: number; minimumScale: number;
+}
+export type OrgNavigationDirection = 'up' | 'right' | 'down' | 'left';
+export interface OrganizationalLayoutOptions {
+  viewportWidth?: number; viewportHeight?: number; availableWidth?: number; availableHeight?: number;
+  people?: Record<string, OrgPerson>; filter?: OrgGraphFilter; page?: number;
 }
 
-export type OrgNavigationDirection = 'up' | 'right' | 'down' | 'left';
-
-const LEVEL_RADII: Record<1 | 2 | 3 | 4, number> = {
-  1: 80,
-  2: 62,
-  3: 52,
-  4: 42,
-};
-
-const TOP_PADDING = 88;
-// Include the entire portrait + caption, including the CCPF member count.
-const LEVEL_2_Y = 360;
-const LEVEL_3_Y = 590;
-const LEVEL_4_Y = 810;
-const LEVEL_4_ROW_GAP = 232;
-const LEVEL_4_COLUMN_GAP = 184;
-const SIDE_PADDING = 102;
-
-/** Visual rows are independent of institutional authority and filter identity. */
+/** Presentation depth deliberately does not change institutional authority. */
 export function organizationalPresentationLevel(node: OrgNode): number {
   if (node.type === 'ccp') return 1;
   if (node.type === 'executive') {
     const roles = node.metadata.executiveRole;
-    return Array.isArray(roles) && roles.includes('president') ? 1 : 2;
+    return Array.isArray(roles) && roles.includes('president') ? 2 : 3;
   }
-  return node.authorityLevel;
+  return node.type === 'central-commission' ? 4 : 5;
 }
-
-function clamp(value: number, minimum: number, maximum: number): number {
-  return Math.min(maximum, Math.max(minimum, value));
-}
-
 function sortNodes(nodes: OrgNode[]): OrgNode[] {
-  return [...nodes].sort((a, b) => (
-    a.sortOrder - b.sortOrder
-    || a.type.localeCompare(b.type, 'pt-BR')
-    || a.title.localeCompare(b.title, 'pt-BR')
-    || a.id.localeCompare(b.id)
-  ));
-}
-
-function distributeAcrossSpan(
-  nodes: OrgNode[],
-  y: number,
-  centerX: number,
-  preferredGap: number,
-  maximumSpan: number,
-  orderOffset: number,
-): PositionedOrgNode[] {
-  if (nodes.length === 0) return [];
-  const span = Math.min(maximumSpan, Math.max(0, (nodes.length - 1) * preferredGap));
-  const startX = centerX - span / 2;
-  const gap = nodes.length === 1 ? 0 : span / (nodes.length - 1);
-
-  return nodes.map((node, index) => ({
-    node,
-    x: startX + gap * index,
-    y,
-    levelOrder: index,
-    order: orderOffset + index,
-    radius: LEVEL_RADII[node.authorityLevel as 1 | 2 | 3 | 4] ?? LEVEL_RADII[4],
-  }));
-}
-
-function averageParentX(
-  node: OrgNode,
-  positionedById: Map<string, PositionedOrgNode>,
-  fallback: number,
-): number {
-  const parentPositions = node.parentIds
-    .map((parentId) => positionedById.get(parentId)?.x)
-    .filter((value): value is number => typeof value === 'number');
-
-  if (parentPositions.length === 0) return fallback;
-  return parentPositions.reduce((sum, value) => sum + value, 0) / parentPositions.length;
-}
-
-function createConnectionPath(source: PositionedOrgNode, target: PositionedOrgNode): string {
-  const side = target.x >= source.x ? 1 : -1;
-  const sourceX = source.x + side * source.radius * 0.9;
-  const sourceY = source.y + source.radius * 0.38;
-  const captionHalfWidth = source.node.type === 'ccp' ? 143
-    : source.node.type === 'executive' ? 112 : 98;
-  const exitX = source.x + side * (captionHalfWidth + 12);
-  // Leave the rim horizontally before descending beside the source caption.
-  const departure = `M ${sourceX} ${sourceY} C ${sourceX + side * 24} ${sourceY}, ${exitX} ${sourceY}, ${exitX} ${sourceY + 24}`;
-  if (target.node.authorityLevel === 4) {
-    // Keep the established column gutters and fan-out. The approach to each
-    // upper side of the rim stays below the preceding row's long captions.
-    const gutterSide = target.x === source.x ? -1 : side;
-    const gutterX = target.x - gutterSide * (LEVEL_4_COLUMN_GAP / 2);
-    const fanY = source.y + 156;
-    const targetX = target.x - gutterSide * target.radius * 0.9;
-    const targetY = target.y - target.radius * 0.38;
-    return `${departure} L ${exitX} ${fanY - 18} Q ${exitX} ${fanY} ${exitX + side * 18} ${fanY} L ${gutterX} ${fanY} L ${gutterX} ${targetY - 18} Q ${gutterX} ${targetY} ${targetX} ${targetY}`;
-  }
-  const targetY = target.y - target.radius - 5;
-  return `${departure} L ${exitX} ${targetY - 22} Q ${exitX} ${targetY} ${target.x} ${targetY}`;
-}
-
-export interface OrganizationalLayoutOptions {
-  viewportWidth?: number;
-  viewportHeight?: number;
-}
-
-/**
- * Stable, domain-agnostic organizational layout. It consumes only the already
- * resolved graph model and never infers authority from names or labels.
- */
-export function calculateOrganizationalLayout(
-  nodes: OrgNode[],
-  edges: OrgEdge[],
-  options: OrganizationalLayoutOptions = {},
-): OrganizationalLayout {
-  const renderable = sortNodes(nodes.filter((node) => (
-    node.isRenderable && node.authorityLevel >= 1 && node.authorityLevel <= 4
-  )));
-  const byLevel = new Map<number, OrgNode[]>();
-  renderable.forEach((node) => {
-    const level = organizationalPresentationLevel(node);
-    const group = byLevel.get(level) ?? [];
-    group.push(node);
-    byLevel.set(level, group);
-  });
-
-  const level4 = byLevel.get(4) ?? [];
-  const level3 = byLevel.get(3) ?? [];
-  const compact = (options.viewportWidth ?? 1280) <= 720
-    || ((options.viewportWidth ?? 1280) <= 960 && (options.viewportHeight ?? 800) <= 520);
-  const level4Columns = level4.length === 0 ? 1 : compact
-    ? Math.min(level4.length, (options.viewportWidth ?? 390) <= 440 ? 2 : 3)
-    : clamp(Math.ceil(level4.length / 3), 1, 12);
-  const level4Rows = Math.max(1, Math.ceil(level4.length / level4Columns));
-  const worldWidth = Math.max(
-    compact ? 600 : 660,
-    (level4Columns - 1) * LEVEL_4_COLUMN_GAP + SIDE_PADDING * 2,
-    (Math.min(10, Math.max(1, level3.length)) - 1) * 188 + SIDE_PADDING * 2,
-  );
-  const centralY = LEVEL_3_Y;
-  const operationalY = LEVEL_4_Y;
-  const worldHeight = level4.length > 0
-    ? operationalY + (level4Rows - 1) * LEVEL_4_ROW_GAP + 132
-    : centralY + 180;
-  const centerX = worldWidth / 2;
-  const maximumTopSpan = worldWidth - SIDE_PADDING * 2;
-
-  const positioned: PositionedOrgNode[] = [];
-  let order = 0;
-
-  const level1Positions = distributeAcrossSpan(
-    [...(byLevel.get(1) ?? [])].sort((a, b) => Number(a.type !== 'ccp') - Number(b.type !== 'ccp') || a.sortOrder - b.sortOrder || a.id.localeCompare(b.id)),
-    TOP_PADDING,
-    centerX,
-    300,
-    maximumTopSpan,
-    order,
-  );
-  positioned.push(...level1Positions);
-  order += level1Positions.length;
-
-  const level2Positions = distributeAcrossSpan(
-    byLevel.get(2) ?? [],
-    LEVEL_2_Y,
-    centerX,
-    280,
-    maximumTopSpan,
-    order,
-  );
-  positioned.push(...level2Positions);
-  order += level2Positions.length;
-
-  const level3Base = distributeAcrossSpan(
-    level3,
-    centralY,
-    centerX,
-    220,
-    maximumTopSpan,
-    order,
-  );
-  const level3Positions = level3Base.map((item, index) => {
-    const normalized = level3Base.length <= 1
-      ? 0
-      : Math.abs((index / (level3Base.length - 1)) * 2 - 1);
-    return { ...item, y: item.y + Math.pow(normalized, 1.35) * 62 };
-  });
-  positioned.push(...level3Positions);
-  order += level3Positions.length;
-
-  const positionedById = new Map(positioned.map((item) => [item.node.id, item]));
-  const orderedLevel4 = [...level4].sort((a, b) => (
-    averageParentX(a, positionedById, centerX) - averageParentX(b, positionedById, centerX)
+  return [...nodes].sort((a, b) => organizationalPresentationLevel(a) - organizationalPresentationLevel(b)
     || Number(a.type === 'advisory') - Number(b.type === 'advisory')
-    || a.sortOrder - b.sortOrder
-    || a.title.localeCompare(b.title, 'pt-BR')
-    || a.id.localeCompare(b.id)
-  ));
+    || a.sortOrder - b.sortOrder || a.id.localeCompare(b.id));
+}
 
-  const columnGap = LEVEL_4_COLUMN_GAP;
-  const gridStartX = centerX - ((level4Columns - 1) * columnGap) / 2;
-  const availableSlots = Array.from({ length: level4Rows * level4Columns }, (_, slotIndex) => {
-    const row = Math.floor(slotIndex / level4Columns);
-    const column = slotIndex % level4Columns;
-    return {
-      row,
-      column,
-      x: gridStartX + columnGap * column,
-      y: operationalY + row * LEVEL_4_ROW_GAP,
-    };
-  });
-
-  orderedLevel4.forEach((node, index) => {
-    const desiredX = averageParentX(node, positionedById, centerX);
-    let bestSlotIndex = 0;
-    let bestCost = Number.POSITIVE_INFINITY;
-    availableSlots.forEach((slot, slotIndex) => {
-      const rowCost = slot.row * 66;
-      const advisoryLaneBias = node.type === 'advisory'
-        ? Math.max(0, centerX - slot.x) * 0.08
-        : Math.max(0, slot.x - centerX) * 0.025;
-      const cost = Math.abs(slot.x - desiredX) + rowCost + advisoryLaneBias;
-      if (cost < bestCost) {
-        bestCost = cost;
-        bestSlotIndex = slotIndex;
-      }
-    });
-    const [slot] = availableSlots.splice(bestSlotIndex, 1);
-    if (!slot) return;
-    const item: PositionedOrgNode = {
-      node,
-      x: slot.x,
-      y: slot.y,
-      levelOrder: index,
-      order: order + index,
-      radius: LEVEL_RADII[4],
-    };
-    positioned.push(item);
-    positionedById.set(node.id, item);
-  });
-
-  const finalNodeById = new Map(positioned.map((item) => [item.node.id, item]));
-  const positionedEdges = edges.flatMap((edge): PositionedOrgEdge[] => {
-    const source = finalNodeById.get(edge.sourceId);
-    const target = finalNodeById.get(edge.targetId);
-    if (!source || !target) return [];
-    return [{
-      edge,
-      path: createConnectionPath(source, target),
-      source: { x: source.x, y: source.y },
-      target: { x: target.x, y: target.y },
-    }];
-  });
-
+/** Conservative wrapping estimate; full names also grow naturally in the DOM. */
+export function captionLines(text: string, width: number, fontSize: number): number {
+  const capacity = Math.max(1, Math.floor(width / (fontSize * 0.62)));
+  let lines = 1, used = 0;
+  for (const word of text.split(/\s+/)) {
+    if (used && used + word.length + 1 > capacity) { lines++; used = 0; }
+    lines += Math.max(0, Math.ceil(word.length / capacity) - 1);
+    used = (used ? used + 1 : 0) + word.length % capacity;
+  }
+  return lines;
+}
+function unitHeight(node: OrgNode, width: number, people: Record<string, OrgPerson>, mobile: boolean): number {
+  const name = people[node.personIds[0]]?.fullName ?? node.responsibilities[0]?.displayName ?? node.title;
+  return 44 + captionLines(name, width + 8, mobile ? 14 : 13.5) * 16.5
+    + Math.min(2, captionLines(node.title, width + 8, 11.5)) * 13.5
+    + (node.personIds.length > 1 ? 14 : 0) + 4;
+}
+function groupNode(type: 'commission' | 'advisory', units: OrgNode[]): OrgNode {
+  const members = units.filter(node => node.type === type);
+  const parents = [...new Set(members.flatMap(node => node.parentIds))];
   return {
-    bounds: { x: 0, y: 0, width: worldWidth, height: worldHeight },
-    nodes: positioned,
-    edges: positionedEdges,
-    nodeById: finalNodeById,
+    id: `presentation:${type}`, type, authorityLevel: 4, title: type === 'commission' ? 'Comissões' : 'Assessorias',
+    subtitle: `${members.length} unidades`, personIds: [], parentIds: parents, childIds: [], commissionId: null,
+    advisoryId: null, sortOrder: type === 'commission' ? 0 : 1, isRenderable: true, responsibilities: [],
+    metadata: { presentationGroupIds: members.map(node => node.id), presentationFilter: type },
   };
+}
+export function calculateOrganizationalLayout(nodes: OrgNode[], edges: OrgEdge[], options: OrganizationalLayoutOptions = {}): OrganizationalLayout {
+  const renderable = sortNodes(nodes.filter(node => node.isRenderable && node.authorityLevel <= 4));
+  const width = Math.max(260, options.availableWidth ?? (options.viewportWidth ?? 1280) - 48);
+  const height = Math.max(180, options.availableHeight ?? (options.viewportHeight ?? 800) - 140);
+  const mobile = (options.viewportWidth ?? 1280) <= 720;
+  const short = height < 380;
+  const filter = options.filter ?? 'all';
+  const people = options.people ?? {};
+  const upper = renderable.filter(node => organizationalPresentationLevel(node) < 5);
+  const allUnits = renderable.filter(node => organizationalPresentationLevel(node) === 5);
+  const units = filter === 'all' ? allUnits : allUnits.filter(node => node.type === filter);
+  const phoneCellWidth = (width - 16) / 2 - 10;
+  const fullPhoneHeight = upper.length * 86 + 26 + Math.ceil(allUnits.length / 2)
+    * (Math.max(112, ...allUnits.map(node => unitHeight(node, phoneCellWidth, people, true))) + 12);
+  const grouped = filter === 'all' && (short || (mobile && fullPhoneHeight > height / .92));
+  const context = filter !== 'all';
+  // Four separate rows stay centered, even on a narrow or short viewport.
+  const upperHeight = context || short ? 38 : mobile ? 68 : 44;
+  const upperGap = context || short ? 6 : 18;
+  const upperWidth = Math.min(width - 8, context || short ? 310 : mobile ? 320 : 350);
+  const positioned: PositionedOrgNode[] = [];
+  let y = 4;
+  for (const level of [1, 2, 3, 4]) {
+    const row = upper.filter(node => organizationalPresentationLevel(node) === level);
+    const tierHeight = upperHeight + (!context && !short ? level === 1 ? 4 : level === 4 ? 2 : 0 : 0);
+    row.forEach((node, i) => {
+      const itemWidth = Math.min(upperWidth, width / Math.max(1, row.length) - 8);
+      positioned.push({ node, x: width / 2 + (i - (row.length - 1) / 2) * (itemWidth + 8),
+        y: y + tierHeight / 2, width: itemWidth, height: tierHeight, radius: tierHeight / 2,
+        horizontal: true, context: context && node.type !== filter, captionSide: 'right', levelOrder: i, order: positioned.length });
+    });
+    if (row.length) y += tierHeight + upperGap;
+  }
+  y += grouped ? 18 : 14;
+  let displayed = grouped ? (['commission', 'advisory'] as const).map(type => groupNode(type, allUnits))
+    .filter(node => (node.metadata.presentationGroupIds as string[]).length > 0) : units;
+  const maxColumns = Math.max(1, Math.min(units.length, Math.floor(width / 110)));
+  const columns = grouped ? 2 : mobile ? 2 : Math.max(1, Math.ceil(units.length / Math.ceil(Math.max(1, units.length) / maxColumns)));
+  const cellWidth = Math.min(grouped ? 190 : mobile ? 190 : 160, (width - 16) / Math.max(1, columns) - 10);
+  const rowHeight = grouped ? short ? 56 : 106 : Math.max(112, ...units.map(node => unitHeight(node, cellWidth, people, mobile)));
+  const rowsAvailable = Math.max(1, Math.floor((height / 0.92 - y + 4) / (rowHeight + 12)));
+  const capacity = Math.max(1, columns * rowsAvailable);
+  const pageCount = grouped ? 1 : Math.max(1, Math.ceil(displayed.length / capacity));
+  const page = Math.max(0, Math.min(pageCount - 1, options.page ?? 0));
+  if (!grouped) displayed = displayed.slice(page * capacity, (page + 1) * capacity);
+  const countColumns = Math.min(columns, displayed.length);
+  displayed.forEach((node, index) => {
+    const column = index % columns, row = Math.floor(index / columns);
+    positioned.push({ node, x: width / 2 + (column - (countColumns - 1) / 2) * (cellWidth + 10),
+      y: y + row * (rowHeight + 12) + 24, width: cellWidth, height: rowHeight, radius: grouped ? short ? 18 : 24 : 22, compactGroup: grouped && short,
+      horizontal: false, context: false, levelOrder: index, order: positioned.length });
+  });
+  const nodeById = new Map(positioned.map(item => [item.node.id, item]));
+  const presentationEdges = grouped ? [
+    ...edges.filter(edge => nodeById.has(edge.sourceId) && nodeById.has(edge.targetId)),
+    ...displayed.flatMap(node => node.parentIds.filter(id => nodeById.has(id)).map(parent => ({
+      id: `presentation:${parent}:${node.id}`, sourceId: parent, targetId: node.id, authorityLevel: 4 as const,
+    }))),
+  ] : edges;
+  const positionedEdges = presentationEdges.flatMap((edge): PositionedOrgEdge[] => {
+    const source = nodeById.get(edge.sourceId), target = nodeById.get(edge.targetId);
+    if (!source || !target) return [];
+    const sx = source.x;
+    const sy = source.y + (source.horizontal ? source.radius + 3 : source.height - source.radius);
+    const tx = target.compactGroup ? target.x - target.width / 2 + target.radius : target.x, ty = target.y - target.radius - 3;
+    let path: string;
+    if (target.horizontal) {
+      const middle = (sy + ty) / 2;
+      path = `M ${sx} ${sy} C ${sx} ${middle}, ${tx} ${middle}, ${tx} ${ty}`;
+    } else if (target.compactGroup) {
+      // Compact groups put their labels beside the portrait. Approach from above
+      // so a sibling branch cannot pass through the preceding group's label.
+      path = `M ${sx} ${sy} L ${sx} ${y - 9} L ${tx} ${y - 9} L ${tx} ${ty}`;
+    } else {
+      const fanY = y - 9;
+      // Each real parent owns its own branch. Vertical lanes live in cell gutters,
+      // never through the portraits or captions of a previous row of siblings.
+      const gutter = tx - cellWidth / 2 - 5;
+      path = `M ${sx} ${sy} L ${sx} ${fanY} L ${gutter} ${fanY} L ${gutter} ${target.y} L ${tx - target.radius - 3} ${target.y}`;
+    }
+    return [{ edge, path, source: { x: sx, y: sy }, target: { x: tx, y: ty } }];
+  });
+  const bottom = Math.max(y, ...positioned.map(item => item.horizontal ? item.y + item.height / 2 : item.y - item.radius + item.height));
+  return { bounds: { x: 0, y: 0, width, height: bottom + 6 }, nodes: positioned, edges: positionedEdges,
+    nodeById, grouped, page, pageCount, unitCount: units.length, minimumScale: 0.92 };
 }
 
 export function findDirectionalNode(
@@ -319,8 +173,7 @@ export function findDirectionalNode(
       : Math.abs(candidate.x - current.x);
     if (sameRowPeers && secondaryDelta > 8) return;
     // Prefer the next visual band while still penalizing strong diagonal jumps.
-    // A lighter cross-axis weight keeps a centered Level 3 node from skipping
-    // over the intentionally split President/Vice band.
+    // A lighter cross-axis weight keeps navigation on the nearest visual tier.
     const score = primaryDelta + secondaryDelta * 0.38;
     if (score < bestScore) {
       best = candidate;

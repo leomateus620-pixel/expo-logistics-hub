@@ -1,0 +1,520 @@
+[
+  {
+    "label": "dashboard-after-1440",
+    "viewport": [
+      1440,
+      900
+    ],
+    "scroll": [
+      1440,
+      900
+    ],
+    "area": {
+      "x": 24,
+      "y": 640.5,
+      "w": 361.4,
+      "h": 170.3,
+      "bottom": 810.8
+    },
+    "sales": {
+      "x": 395.4,
+      "y": 640.5,
+      "w": 1020.6,
+      "h": 163.6,
+      "bottom": 804.1
+    },
+    "signature": {
+      "x": 1090,
+      "y": 708.2,
+      "w": 305.5,
+      "h": 59.4,
+      "bottom": 767.6
+    },
+    "financeHeights": [
+      164,
+      164,
+      164
+    ],
+    "kpiTop": 530.5
+  },
+  {
+    "label": "dashboard-after-1280",
+    "viewport": [
+      1280,
+      720
+    ],
+    "scroll": [
+      1280,
+      720
+    ],
+    "area": {
+      "x": 24,
+      "y": 640.5,
+      "w": 319.6,
+      "h": 166,
+      "bottom": 806.5
+    },
+    "sales": {
+      "x": 353.6,
+      "y": 640.5,
+      "w": 902.4,
+      "h": 163.6,
+      "bottom": 804.1
+    },
+    "signature": {
+      "x": 968.5,
+      "y": 708.2,
+      "w": 267,
+      "h": 59.4,
+      "bottom": 767.6
+    },
+    "financeHeights": [
+      164,
+      164,
+      164
+    ],
+    "kpiTop": 530.5
+  },
+  {
+    "label": "dashboard-after-390",
+    "viewport": [
+      390,
+      844
+    ],
+    "scroll": [
+      390,
+      844
+    ],
+    "area": {
+      "x": 12,
+      "y": 1047.4,
+      "w": 366,
+      "h": 164.8,
+      "bottom": 1212.2
+    },
+    "sales": {
+      "x": 12,
+      "y": 1220.2,
+      "w": 366,
+      "h": 261.1,
+      "bottom": 1481.3
+    },
+    "signature": {
+      "x": 27,
+      "y": 1365.8,
+      "w": 336,
+      "h": 78.5,
+      "bottom": 1444.3
+    },
+    "financeHeights": [
+      164.3,
+      118,
+      118
+    ],
+    "kpiTop": 841.4
+  },
+  {
+    "label": "dashboard-after-430",
+    "viewport": [
+      430,
+      932
+    ],
+    "scroll": [
+      430,
+      932
+    ],
+    "area": {
+      "x": 12,
+      "y": 1032.3,
+      "w": 406,
+      "h": 164.8,
+      "bottom": 1197.1
+    },
+    "sales": {
+      "x": 12,
+      "y": 1205.1,
+      "w": 406,
+      "h": 261.1,
+      "bottom": 1466.2
+    },
+    "signature": {
+      "x": 27,
+      "y": 1350.7,
+      "w": 376,
+      "h": 78.5,
+      "bottom": 1429.2
+    },
+    "financeHeights": [
+      164.3,
+      118,
+      118
+    ],
+    "kpiTop": 826.3
+  },
+  {
+    "label": "dashboard-before-1440",
+    "viewport": [
+      1440,
+      900
+    ],
+    "scroll": [
+      1440,
+      900
+    ],
+    "area": {
+      "x": 24,
+      "y": 640.5,
+      "w": 460.7,
+      "h": 171.6,
+      "bottom": 812.1
+    },
+    "sales": {
+      "x": 494.7,
+      "y": 640.5,
+      "w": 921.3,
+      "h": 171.6,
+      "bottom": 812.1
+    },
+    "signature": {
+      "x": 1098,
+      "y": 716.2,
+      "w": 297.4,
+      "h": 59.4,
+      "bottom": 775.6
+    },
+    "financeHeights": [
+      164,
+      164,
+      164
+    ],
+    "kpiTop": 530.5
+  },
+  {
+    "label": "dashboard-before-1280",
+    "viewport": [
+      1280,
+      720
+    ],
+    "scroll": [
+      1280,
+      720
+    ],
+    "area": {
+      "x": 24,
+      "y": 640.5,
+      "w": 407.3,
+      "h": 171.6,
+      "bottom": 812.1
+    },
+    "sales": {
+      "x": 441.3,
+      "y": 640.5,
+      "w": 814.7,
+      "h": 171.6,
+      "bottom": 812.1
+    },
+    "signature": {
+      "x": 975.9,
+      "y": 716.2,
+      "w": 259.6,
+      "h": 59.4,
+      "bottom": 775.6
+    },
+    "financeHeights": [
+      164,
+      164,
+      164
+    ],
+    "kpiTop": 530.5
+  },
+  {
+    "label": "ecosystem-after-1440",
+    "viewport": [
+      1440,
+      900
+    ],
+    "scroll": [
+      1440,
+      900
+    ],
+    "mode": "individual",
+    "scale": "1.000",
+    "centers": [
+      720,
+      720,
+      720,
+      720
+    ],
+    "tops": [
+      113.3,
+      179.3,
+      241.3,
+      303.3
+    ],
+    "nodes": 37,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  },
+  {
+    "label": "ecosystem-after-1366",
+    "viewport": [
+      1366,
+      768
+    ],
+    "scroll": [
+      1366,
+      768
+    ],
+    "mode": "individual",
+    "scale": "0.939",
+    "centers": [
+      683,
+      682.9,
+      682.9,
+      683
+    ],
+    "tops": [
+      67.8,
+      129.7,
+      187.9,
+      246.1
+    ],
+    "nodes": 37,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  },
+  {
+    "label": "ecosystem-after-1280",
+    "viewport": [
+      1280,
+      720
+    ],
+    "scroll": [
+      1280,
+      720
+    ],
+    "mode": "individual",
+    "scale": "1.000",
+    "centers": [
+      640,
+      640,
+      640,
+      640
+    ],
+    "tops": [
+      91.5,
+      157.5,
+      219.5,
+      281.5
+    ],
+    "nodes": 26,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  },
+  {
+    "label": "ecosystem-after-390",
+    "viewport": [
+      390,
+      844
+    ],
+    "scroll": [
+      390,
+      844
+    ],
+    "mode": "groups",
+    "scale": "1.000",
+    "centers": [
+      195,
+      195,
+      195,
+      195
+    ],
+    "tops": [
+      202,
+      292,
+      378,
+      464
+    ],
+    "nodes": 6,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  },
+  {
+    "label": "ecosystem-after-393",
+    "viewport": [
+      393,
+      852
+    ],
+    "scroll": [
+      393,
+      852
+    ],
+    "mode": "groups",
+    "scale": "1.000",
+    "centers": [
+      196.5,
+      196.5,
+      196.5,
+      196.5
+    ],
+    "tops": [
+      206,
+      296,
+      382,
+      468
+    ],
+    "nodes": 6,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  },
+  {
+    "label": "ecosystem-after-430",
+    "viewport": [
+      430,
+      932
+    ],
+    "scroll": [
+      430,
+      932
+    ],
+    "mode": "groups",
+    "scale": "1.000",
+    "centers": [
+      215,
+      215,
+      215,
+      215
+    ],
+    "tops": [
+      246,
+      336,
+      422,
+      508
+    ],
+    "nodes": 6,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  },
+  {
+    "label": "ecosystem-after-360",
+    "viewport": [
+      360,
+      800
+    ],
+    "scroll": [
+      360,
+      800
+    ],
+    "mode": "groups",
+    "scale": "1.000",
+    "centers": [
+      180,
+      180,
+      180,
+      180
+    ],
+    "tops": [
+      180,
+      270,
+      356,
+      442
+    ],
+    "nodes": 6,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  },
+  {
+    "label": "ecosystem-after-844",
+    "viewport": [
+      844,
+      390
+    ],
+    "scroll": [
+      844,
+      390
+    ],
+    "mode": "groups",
+    "scale": "1.000",
+    "centers": [
+      422,
+      422,
+      422,
+      422
+    ],
+    "tops": [
+      59,
+      103,
+      147,
+      191
+    ],
+    "nodes": 6,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  },
+  {
+    "label": "ecosystem-after-1280x600",
+    "viewport": [
+      1280,
+      600
+    ],
+    "scroll": [
+      1280,
+      600
+    ],
+    "mode": "individual",
+    "scale": "1.000",
+    "centers": [
+      640,
+      640,
+      640,
+      640
+    ],
+    "tops": [
+      96.8,
+      162.8,
+      224.8,
+      286.8
+    ],
+    "nodes": 15,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  },
+  {
+    "label": "ecosystem-after-reflow",
+    "viewport": [
+      720,
+      450
+    ],
+    "scroll": [
+      720,
+      450
+    ],
+    "mode": "groups",
+    "scale": "1.000",
+    "centers": [
+      360,
+      360,
+      360,
+      360
+    ],
+    "tops": [
+      114,
+      158,
+      202,
+      246
+    ],
+    "nodes": 6,
+    "inside": true,
+    "crossings": 0,
+    "presentation": "complete"
+  }
+]

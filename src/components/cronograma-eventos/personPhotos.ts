@@ -52,6 +52,12 @@ import robertoRacho from '@/assets/person-roberto-racho.jpeg.asset.json';
  * existing initials / generic icon treatment.
  */
 const PERSON_PHOTOS: Record<string, string> = {
+  'elvio becker': '/alvorada/portraits/person-elvio-becker.webp',
+  'jorge luiz viana': '/alvorada/portraits/person-jorge-luiz-viana.webp',
+  'jonas santos': '/alvorada/portraits/person-jona-santos.webp',
+  'francine maria boijink': '/alvorada/portraits/person-francine-maria-boijink.webp',
+  'jonas fotografo': '/alvorada/portraits/person-jona-santos.webp', // Historical snapshots keep their original text.
+
   'fabiano soltis': fabianoSoltis,
   'djeison drey': djeisonDrey,
   'bruna pacheco de quadros': brunaQuadros.url,
@@ -108,6 +114,11 @@ const PERSON_PHOTOS: Record<string, string> = {
 };
 
 const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
+  '0c1b6c1e-a6ad-49b7-bb00-88478b28fd01': '/alvorada/portraits/person-elvio-becker.webp',
+  '5085afb8-f0a8-4641-a795-9f1113d456e7': '/alvorada/portraits/person-jorge-luiz-viana.webp',
+  '3e7f410c-c14d-4841-8597-8a84f1b8c639': '/alvorada/portraits/person-jona-santos.webp',
+  'd53cbc3e-01b2-46a3-923e-a36d50e6de3f': '/alvorada/portraits/person-francine-maria-boijink.webp',
+
   'b8fd1e36-b46c-4eff-bb75-372b676ce123': fabianoSoltis,
   'e0ada2e5-4440-4d15-91bd-aa4160247113': djeisonDrey,
   '19171788-66a7-4ffc-bf72-82c74ca1a7ca': djeisonDrey,

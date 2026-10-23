@@ -6,15 +6,19 @@ import {
   type MouseEvent,
   type Ref,
 } from 'react';
-import { UserRound } from 'lucide-react';
+import { BriefcaseBusiness, PanelsTopLeft, UserRound } from 'lucide-react';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import type { OrgPerson } from '../types';
 import type { PositionedOrgNode } from '../layout/organizationalLayout';
 import type { OrgNodeVisualState } from '../hooks/useOrgGraphInteraction';
+import { presentationStage } from '../presentationPlan';
+import { organizationalPresentationLevel } from '../layout/organizationalLayout';
 import { optimizedPortraitUrl } from '../optimizedPortrait';
 
 interface OrganizationalNodeProps {
   active: boolean;
+  presenting?: boolean;
+  elapsed?: number;
   buttonRef?: Ref<HTMLButtonElement>;
   keyboardActive: boolean;
   people: Record<string, OrgPerson>;
@@ -30,19 +34,16 @@ interface OrganizationalNodeProps {
 
 type NodeStyle = CSSProperties & {
   '--org-node-delay': string;
+  '--org-node-duration': string;
   '--org-node-x': string;
   '--org-node-y': string;
+  '--org-node-size': string;
+  '--org-node-width': string;
+  '--org-node-height': string;
 };
 
 function presentationText(value: string): string {
   return value.toLocaleUpperCase('pt-BR');
-}
-
-function arrivalDelay(authorityLevel: number, levelOrder: number): number {
-  if (authorityLevel === 1) return 0;
-  if (authorityLevel === 2) return 100 + levelOrder * 60;
-  if (authorityLevel === 3) return 220;
-  return Math.min(680, 300 + levelOrder * 12);
 }
 
 function normalizedIdentity(value: string): string {
@@ -104,6 +105,8 @@ function Avatar({
 
 function OrganizationalNodeComponent({
   active,
+  presenting = false,
+  elapsed = 3400,
   buttonRef,
   keyboardActive,
   people,
@@ -117,6 +120,11 @@ function OrganizationalNodeComponent({
   onSelect,
 }: OrganizationalNodeProps) {
   const { node, levelOrder, x, y } = position;
+  const stage = presentationStage(organizationalPresentationLevel(node), levelOrder);
+  const revealed = !presenting || elapsed >= stage.start + stage.duration;
+  const groupIds = node.metadata.presentationGroupIds;
+  const isGroup = Array.isArray(groupIds);
+  const GroupIcon = node.type === 'advisory' ? PanelsTopLeft : BriefcaseBusiness;
   const focusedPerson = selectedPersonId && node.personIds.includes(selectedPersonId)
     ? people[selectedPersonId]
     : null;
@@ -161,9 +169,13 @@ function OrganizationalNodeComponent({
     names.filter((name) => name !== primaryLabel).join(', '),
   ].filter(Boolean).join('. ');
   const nodeStyle: NodeStyle = {
-    '--org-node-delay': `${arrivalDelay(node.authorityLevel, levelOrder)}ms`,
+    '--org-node-delay': `${stage.start}ms`,
+    '--org-node-duration': `${stage.duration}ms`,
     '--org-node-x': `${x}px`,
     '--org-node-y': `${y}px`,
+    '--org-node-size': `${position.radius * 2}px`,
+    '--org-node-width': `${position.width}px`,
+    '--org-node-height': `${position.height}px`,
   };
   const visiblePeople = focusedPerson ? [focusedPerson] : peopleForNode.slice(0, isCluster ? 3 : 1);
 
@@ -171,6 +183,13 @@ function OrganizationalNodeComponent({
     <article
       className="org-node"
       data-active={active || undefined}
+      data-presenting={presenting || undefined}
+      data-horizontal={position.horizontal || undefined}
+      data-caption-side={position.captionSide}
+      data-context={position.context || undefined}
+      data-group={isGroup || undefined}
+      data-compact-group={position.compactGroup || undefined}
+      data-node-id={node.id}
       data-authority={node.authorityLevel}
       data-filtered={state.filtered || undefined}
       data-hovered={state.hovered || undefined}
@@ -178,10 +197,10 @@ function OrganizationalNodeComponent({
       data-node-type={node.type}
       data-related={state.related || undefined}
       data-selected={!state.filtered && state.selected ? true : undefined}
-      aria-hidden={state.filtered || undefined}
+      aria-hidden={!revealed || state.filtered || undefined}
       style={nodeStyle}
     >
-      <button
+      <div className="org-node__reveal"><button
         ref={buttonRef}
         type="button"
         className="org-node__button"
@@ -189,8 +208,8 @@ function OrganizationalNodeComponent({
         aria-label={ariaDescription}
         title={ariaDescription}
         aria-pressed={!state.filtered && state.selected}
-        disabled={!active || state.filtered}
-        tabIndex={active && !state.filtered && keyboardActive ? 0 : -1}
+        disabled={!active || !revealed || position.context || state.filtered}
+        tabIndex={active && revealed && !position.context && !state.filtered && keyboardActive ? 0 : -1}
         onBlur={() => onBlur(node.id)}
         onClick={(event) => {
           event.stopPropagation();
@@ -211,7 +230,7 @@ function OrganizationalNodeComponent({
         <span className="org-node__ring" aria-hidden="true">
           <span className="org-node__ring-segments" />
           <span className="org-node__portrait">
-            {isRoot && !focusedPerson ? (
+            {isGroup ? <GroupIcon className="org-node__group-icon" /> : isRoot && !focusedPerson ? (
               <FenasojaBrand
                 className="org-node__brand-mark"
                 markOnly
@@ -237,15 +256,16 @@ function OrganizationalNodeComponent({
         </span>
 
         <span className="org-node__copy">
+          {position.horizontal && <span className="org-node__rank" aria-hidden="true">{String(organizationalPresentationLevel(node)).padStart(2, '0')}<i /></span>}
           <span className="org-node__name">{primaryLabel}</span>
           {additionalCount > 0 && (
             <span className="org-node__additional">
               {isRoot ? `${additionalCount} INTEGRANTES` : `+${additionalCount} RESPONSÁVEIS`}
             </span>
           )}
-          <span className="org-node__organization">{visibleOrganizationLabel}</span>
+          <span className="org-node__organization">{isGroup ? node.subtitle : visibleOrganizationLabel}</span>
         </span>
-      </button>
+      </button></div>
     </article>
   );
 }
@@ -254,6 +274,8 @@ export const OrganizationalNode = memo(
   OrganizationalNodeComponent,
   (previous, next) => (
     previous.active === next.active
+    && previous.presenting === next.presenting
+    && previous.elapsed === next.elapsed
     && previous.buttonRef === next.buttonRef
     && previous.keyboardActive === next.keyboardActive
     && previous.people === next.people

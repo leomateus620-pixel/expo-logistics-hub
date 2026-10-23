@@ -10,7 +10,6 @@ import {
 } from 'react';
 import { AlertTriangle, Network } from 'lucide-react';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
-import { CCPF_FULL_LABEL } from '../resolver';
 import type { OrganizationalGraph, OrgNode } from '../types';
 import {
   calculateOrganizationalLayout,
@@ -22,7 +21,8 @@ import {
   type OrgGraphFilter,
 } from '../hooks/useOrgGraphInteraction';
 import { useOrgPerformanceTelemetry } from '../hooks/useOrgPerformanceTelemetry';
-import { useOrgViewport } from '../hooks/useOrgViewport';
+import { useOrgPresentation } from '../hooks/useOrgPresentation';
+import { useOrgViewport, type OrgViewportCamera, type ViewportSize } from '../hooks/useOrgViewport';
 import { OrganizationalNode } from './OrganizationalNode';
 import { OrgFilterBar, OrgViewportControls } from './OrgControls';
 import { PersonDetailPanel } from './PersonDetailPanel';
@@ -79,18 +79,23 @@ function GraphReady({
   const renderableNodes = useMemo(() => graph.nodes.filter((node) => (
     node.isRenderable && renderableNodeIds.has(node.id)
   )), [graph.nodes, renderableNodeIds]);
-  const [viewportSize, setViewportSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  const layout = useMemo(
-    () => calculateOrganizationalLayout(renderableNodes, graph.edges, {
-      viewportWidth: viewportSize.width, viewportHeight: viewportSize.height,
-    }),
-    [graph.edges, renderableNodes, viewportSize.width, viewportSize.height],
-  );
+  const [viewportSize, setViewportSize] = useState<ViewportSize>({ width: window.innerWidth, height: window.innerHeight });
+  const [page, setPage] = useState(0);
+  const [presentationKeyboardId, setPresentationKeyboardId] = useState<string | null>(null);
+  const presentation = useOrgPresentation(active);
   const interaction = useOrgGraphInteraction({
     graph,
     initialSelectedNodeId,
     onSelectedNodeChange,
   });
+  const layout = useMemo(
+    () => calculateOrganizationalLayout(renderableNodes, graph.edges, {
+      viewportWidth: viewportSize.width, viewportHeight: viewportSize.height,
+      availableWidth: viewportSize.availableWidth, availableHeight: viewportSize.availableHeight,
+      people: graph.people, filter: interaction.filter, page,
+    }),
+    [graph.edges, graph.people, renderableNodes, viewportSize, interaction.filter, page],
+  );
   const {
     clearSelection,
     selectNode: commitSelection,
@@ -100,6 +105,9 @@ function GraphReady({
     setKeyboardNodeId,
     visualStateById,
   } = interaction;
+  const originGroup = useRef<string | null>(null);
+  const cameraBeforeDetails = useRef<OrgViewportCamera | null>(null);
+  const bottomControlsRef = useRef<HTMLDivElement>(null);
   const topControlsRef = useRef<HTMLDivElement>(null);
   const nodeElements = useRef(new Map<string, HTMLButtonElement>());
   const nodeRefCallbacks = useRef(new Map<string, RefCallback<HTMLButtonElement>>());
@@ -109,12 +117,30 @@ function GraphReady({
   const viewport = useOrgViewport({
     bounds: layout.bounds,
     topControlsRef,
+    bottomControlsRef,
+    minimumInteractiveScale: layout.minimumScale,
     detailOpen: Boolean(interaction.selectedNode),
     resizeFocusPoint: selectedNodeId ? layout.nodeById.get(selectedNodeId) : null,
     onBackgroundPress: handleBackgroundPress,
-    onViewportSizeChange: setViewportSize,
+    onViewportSizeChange: useCallback((size: ViewportSize) => {
+      setViewportSize(previous => previous.width === size.width && previous.height === size.height
+        && previous.availableWidth === size.availableWidth && previous.availableHeight === size.availableHeight ? previous : size);
+    }, []),
   });
   const { camera, fit: fitViewport, focusPoint } = viewport;
+  const modeKey = `${interaction.filter}:${layout.grouped}:${layout.page}:${viewportSize.width}:${viewportSize.height}:${viewportSize.availableHeight}`;
+  const previousMode = useRef(modeKey);
+  const measuredOnce = useRef(false);
+  useEffect(() => {
+    if (previousMode.current === modeKey) return;
+    previousMode.current = modeKey;
+    if (!measuredOnce.current) {
+      if (viewportSize.availableHeight !== undefined) measuredOnce.current = true;
+      return;
+    }
+    presentation.complete();
+    fitViewport();
+  }, [modeKey, fitViewport, presentation.complete, viewportSize.availableHeight]);
 
   const getNodeRef = useCallback((nodeId: string): RefCallback<HTMLButtonElement> => {
     const known = nodeRefCallbacks.current.get(nodeId);
@@ -133,21 +159,34 @@ function GraphReady({
   }, [focusPoint, layout.nodeById]);
 
   const selectNode = useCallback((nodeId: string) => {
+    presentation.complete();
+    const item = layout.nodeById.get(nodeId);
+    const groupFilter = item?.node.metadata.presentationFilter;
+    if (groupFilter === 'commission' || groupFilter === 'advisory') {
+      originGroup.current = nodeId;
+      clearSelection(); setPresentationKeyboardId(null); setPage(0); setFilter(groupFilter);
+      const first = renderableNodes.find(node => node.type === groupFilter)?.id;
+      if (first) window.requestAnimationFrame(() => nodeElements.current.get(first)?.focus({ preventScroll: true }));
+      return;
+    }
+    if (!interaction.selectedNode) cameraBeforeDetails.current = viewport.getCamera();
     commitSelection(nodeId);
     focusNode(nodeId, undefined, true);
-  }, [commitSelection, focusNode]);
+  }, [commitSelection, focusNode, presentation.complete, layout.nodeById, clearSelection, setFilter, interaction.selectedNode, viewport.getCamera, renderableNodes]);
 
   const closeDetails = useCallback(() => {
     const nodeId = selectedNodeId;
     clearSelection();
+    if (cameraBeforeDetails.current) viewport.restoreCamera(cameraBeforeDetails.current);
     if (!nodeId) return;
     window.requestAnimationFrame(() => {
       nodeElements.current.get(nodeId)?.focus({ preventScroll: true });
     });
-  }, [clearSelection, selectedNodeId]);
+  }, [clearSelection, selectedNodeId, viewport.restoreCamera]);
 
   const handleNodeFocus = useCallback((nodeId: string) => {
-    setKeyboardNodeId(nodeId);
+    setPresentationKeyboardId(nodeId);
+    if (!nodeId.startsWith('presentation:')) setKeyboardNodeId(nodeId);
     setHoveredNodeId(nodeId);
   }, [setHoveredNodeId, setKeyboardNodeId]);
 
@@ -164,7 +203,7 @@ function GraphReady({
       event.preventDefault();
       let candidate = findDirectionalNode(layout, currentNodeId, direction);
       const visited = new Set<string>();
-      while (candidate && visualStateById.get(candidate.node.id)?.filtered) {
+      while (candidate && (candidate.context || visualStateById.get(candidate.node.id)?.filtered)) {
         if (visited.has(candidate.node.id)) {
           candidate = null;
           break;
@@ -173,9 +212,13 @@ function GraphReady({
         candidate = findDirectionalNode(layout, candidate.node.id, direction);
       }
       if (!candidate) return;
-      setKeyboardNodeId(candidate.node.id);
+      setPresentationKeyboardId(candidate.node.id);
+      if (!candidate.node.id.startsWith('presentation:')) setKeyboardNodeId(candidate.node.id);
       nodeElements.current.get(candidate.node.id)?.focus({ preventScroll: true });
-      focusPoint(candidate, 0.82);
+      const currentCamera = viewport.getCamera();
+      const targetX = candidate.x * currentCamera.scale + currentCamera.x;
+      const targetY = candidate.y * currentCamera.scale + currentCamera.y;
+      if (targetX < 24 || targetX > viewportSize.width - 24 || targetY < 100 || targetY > viewportSize.height - 80) focusPoint(candidate);
       return;
     }
 
@@ -184,8 +227,8 @@ function GraphReady({
       const rootId = graph.rootNodeId || layout.nodes[0]?.node.id;
       if (!rootId) return;
       setKeyboardNodeId(rootId);
-      nodeElements.current.get(rootId)?.focus({ preventScroll: true });
-      focusNode(rootId);
+      window.requestAnimationFrame(() => nodeElements.current.get(rootId)?.focus({ preventScroll: true }));
+      setPresentationKeyboardId(null); setPage(0); setFilter('all'); fitViewport();
       return;
     }
 
@@ -203,17 +246,22 @@ function GraphReady({
     selectedNodeId,
     setKeyboardNodeId,
     visualStateById,
+    viewport.getCamera, viewportSize, fitViewport, setFilter,
   ]);
 
   const handleFilterChange = useCallback((filter: OrgGraphFilter) => {
-    setFilter(filter);
-  }, [setFilter]);
+    presentation.complete(); clearSelection(); setPresentationKeyboardId(null); setPage(0); setFilter(filter);
+  }, [setFilter, clearSelection, presentation.complete]);
 
   useEffect(() => {
     if (!active || layout.nodes.length === 0) return undefined;
     const readyFrame = window.requestAnimationFrame(() => onReady?.());
     return () => window.cancelAnimationFrame(readyFrame);
   }, [active, layout.nodes.length, onReady]);
+
+  const presentationVisualStates = useMemo(() => new Map([...visualStateById].map(([id, state]) => [
+    id, layout.nodeById.get(id)?.context ? { ...state, filtered: false, muted: false } : state,
+  ])), [layout.nodeById, visualStateById]);
 
   const integrityWarningCount = useMemo(
     () => graph.anomalies.filter((item) => item.severity === 'warning').length,
@@ -225,10 +273,15 @@ function GraphReady({
       ref={performanceTelemetryRef}
       className="org-ecosystem__ready"
       data-active={active || undefined}
+      data-presentation={presentation.presenting ? 'playing' : 'complete'}
+      data-layout-mode={layout.grouped ? 'groups' : 'individual'}
+      onPointerDownCapture={presentation.complete}
+      onWheelCapture={presentation.complete}
       data-camera-animating={viewport.isAnimating || undefined}
       data-camera-interacting={viewport.isInteracting || undefined}
       data-integrity-info-count={graph.anomalies.length - integrityWarningCount}
       data-integrity-warning-count={integrityWarningCount}
+      data-available-height={viewportSize.availableHeight}
       data-layout-height={layout.bounds.height}
       data-layout-width={layout.bounds.width}
       data-viewport-scale={camera.scale.toFixed(3)}
@@ -237,6 +290,7 @@ function GraphReady({
       data-org-detail-open={interaction.selectedNode ? 'true' : undefined}
       aria-hidden={!active}
       onKeyDownCapture={(event) => {
+        if (event.key !== 'Escape') presentation.complete();
         if (event.key !== 'Escape' || !interaction.selectedNode) return;
         event.preventDefault();
         event.stopPropagation();
@@ -255,7 +309,7 @@ function GraphReady({
             <h1>Ecossistema</h1>
           </div>
         </header>
-        <OrgFilterBar filter={interaction.filter} onFilterChange={handleFilterChange} />
+        <OrgFilterBar compact={viewportSize.width < 1150} filter={interaction.filter} onFilterChange={handleFilterChange} />
       </div>
 
       <div
@@ -265,14 +319,10 @@ function GraphReady({
         aria-label="MAPA INTERATIVO DA ORGANIZAÇÃO FENASOJA 2028"
         aria-describedby="org-viewport-instructions"
         onPointerCancel={viewport.onPointerCancel}
-        onPointerDown={(event) => {
-              viewport.onPointerDown(event);
-        }}
+        onPointerDown={viewport.onPointerDown}
         onPointerMove={viewport.onPointerMove}
         onPointerUp={viewport.onPointerUp}
-        onWheel={(event) => {
-              viewport.onWheel(event);
-        }}
+        onWheel={viewport.onWheel}
       >
         <div
           className="org-viewport__world"
@@ -284,22 +334,25 @@ function GraphReady({
         >
           <RelationshipLayer
             active={active}
+            presenting={presentation.presenting}
             activeEdgeIds={interaction.activeEdgeIds}
             selectionActive={Boolean(interaction.selectedNode)}
             layout={layout}
-            visualStateById={visualStateById}
+            visualStateById={presentationVisualStates}
           />
           <div className="org-viewport__nodes">
             {layout.nodes.map((position) => (
               <OrganizationalNode
                 key={position.node.id}
                 active={active}
+                presenting={presentation.presenting}
+                elapsed={presentation.elapsed}
                 buttonRef={getNodeRef(position.node.id)}
-                keyboardActive={active && interaction.keyboardNodeId === position.node.id}
+                keyboardActive={active && ((presentationKeyboardId ?? interaction.keyboardNodeId) === position.node.id || (!layout.nodeById.has(presentationKeyboardId ?? interaction.keyboardNodeId ?? '') && position === layout.nodes[0]))}
                 people={graph.people}
                 selectedPersonId={interaction.selectedPersonId}
                 position={position}
-                state={visualStateById.get(position.node.id) ?? {
+                state={position.context ? { filtered: false, hovered: false, muted: false, related: false, selected: false } : visualStateById.get(position.node.id) ?? {
                   filtered: false,
                   hovered: false,
                   muted: false,
@@ -322,37 +375,36 @@ function GraphReady({
         use as setas para percorrer as estruturas, Enter para selecionar e Home para retornar ao CCPF.
       </p>
 
-      <p className="org-viewport-hint" aria-hidden="true">Arraste para explorar</p>
-
-      <div className="org-level-legend" aria-label="LEGENDA DOS NÍVEIS ORGANIZACIONAIS" data-org-interactive>
-        <span aria-label={`01 ${CCPF_FULL_LABEL}`} title={CCPF_FULL_LABEL}>
-          <i data-level="1" />01 CCPF
-        </span>
-        <span><i data-level="2" />02 PRESIDÊNCIA</span>
-        <span><i data-level="3" />03 COMISSÃO CENTRAL</span>
-        <span><i data-level="4" />04 COMISSÕES E ASSESSORIAS</span>
-      </div>
+      {presentation.presenting && <button className="org-presentation-skip" data-org-interactive onClick={presentation.complete}>Pular apresentação</button>}
+      <div className="org-bottom-bar" ref={bottomControlsRef} data-org-interactive>
+        {interaction.filter !== 'all' && <button className="org-overview-return" onClick={() => { handleFilterChange('all'); window.requestAnimationFrame(() => { const id = originGroup.current ?? graph.rootNodeId; setPresentationKeyboardId(id); nodeElements.current.get(id)?.focus({ preventScroll: true }); }); }}>Ver todo o ecossistema</button>}
+        {layout.pageCount > 1 && <nav className="org-pages" aria-label="Páginas de unidades">
+          <button disabled={layout.page === 0} onClick={() => { clearSelection(); setPage(layout.page - 1); }}>Anterior</button>
+          <span>{layout.page + 1} / {layout.pageCount} · {layout.unitCount} unidades</span>
+          <button disabled={layout.page + 1 >= layout.pageCount} onClick={() => { clearSelection(); setPage(layout.page + 1); }}>Próxima</button>
+        </nav>}
 
       <OrgViewportControls
+        fitLabel={interaction.filter === 'all' ? 'Enquadrar todo o ecossistema' : 'Enquadrar visão atual'}
         scale={viewport.camera.scale}
         selected={Boolean(interaction.selectedNode)}
         onClearSelection={() => {
           clearSelection();
           fitViewport();
         }}
-        onFit={() => {
-              fitViewport();
-        }}
+        onFit={fitViewport}
         onFocusSelected={() => {
-                if (selectedNodeId) focusNode(selectedNodeId);
+          if (selectedNodeId) focusNode(selectedNodeId);
         }}
         onZoomIn={() => {
-              viewport.zoomBy(1.2);
+          viewport.zoomBy(1.2);
         }}
         onZoomOut={() => {
-              viewport.zoomBy(1 / 1.2);
+          viewport.zoomBy(1 / 1.2);
         }}
       />
+
+      </div>
 
       {interaction.selectedNode && (
         <PersonDetailPanel
@@ -369,7 +421,7 @@ function GraphReady({
       <p className="org-ecosystem__selection-announcement" aria-live="polite">
         {interaction.selectedNode
           ? `${interaction.selectedNode.title} selecionada. Detalhes exibidos.`
-          : 'Visão geral do ecossistema.'}
+          : interaction.filter === 'all' ? 'Visão geral do ecossistema.' : `${layout.unitCount || layout.nodes.filter(item => !item.context).length} estruturas. Página ${layout.page + 1} de ${layout.pageCount}.`}
       </p>
     </div>
   );

@@ -1,0 +1,1188 @@
+[
+  {
+    "label": "before-1366x768",
+    "bottom": {
+      "bottom": 746,
+      "height": 52,
+      "right": 1346,
+      "width": 238,
+      "x": 1108,
+      "y": 694
+    },
+    "document": {
+      "height": 768,
+      "width": 1366
+    },
+    "nodes": [
+      {
+        "bottom": 247.9523468017578,
+        "height": 100.94807434082033,
+        "label": "CCPF3 INTEGRANTESCONSELHO CONSULTIVO PERMANENTE",
+        "right": 680.3712768554688,
+        "type": "ccp",
+        "width": 107.40252685546876,
+        "x": 572.96875,
+        "y": 147.0042724609375
+      },
+      {
+        "bottom": 225.16510009765625,
+        "height": 71.40122985839844,
+        "label": "FABIANO SOLTISPRESIDENTE",
+        "right": 781.3897705078125,
+        "type": "executive",
+        "width": 84.1195068359375,
+        "x": 697.270263671875,
+        "y": 153.7638702392578
+      },
+      {
+        "bottom": 327.3101806640625,
+        "height": 71.40121459960938,
+        "label": "DJEISON DREYVICE-PRESIDENTE",
+        "right": 725.0597534179688,
+        "type": "executive",
+        "width": 84.1195068359375,
+        "x": 640.9402465820312,
+        "y": 255.90896606445312
+      },
+      {
+        "bottom": 419.2308044433594,
+        "height": 73.19381713867188,
+        "label": "COMISSÃO CENTRAL3 INTEGRANTES",
+        "right": 719.80224609375,
+        "type": "central-commission",
+        "width": 73.6044921875,
+        "x": 646.19775390625,
+        "y": 346.0369873046875
+      },
+      {
+        "bottom": 498.09283447265625,
+        "height": 65.68316650390625,
+        "label": "VALTAIR DORNELLESSERVIÇOS",
+        "right": 716.7979736328125,
+        "type": "commission",
+        "width": 67.595947265625,
+        "x": 649.2020263671875,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 592.7272338867188,
+        "height": 73.19378662109375,
+        "label": "LEONARDO RUY DAMBROZPREVENÇÃO E COMBATE A INCÊNDIO",
+        "right": 716.7979736328125,
+        "type": "commission",
+        "width": 67.595947265625,
+        "x": 649.2020263671875,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 670.104736328125,
+        "height": 63.447509765625,
+        "label": "FELIPE BORTOLIINDÚSTRIA, COMÉRCIO E SERVIÇOS",
+        "right": 716.7979736328125,
+        "type": "commission",
+        "width": 67.595947265625,
+        "x": 649.2020263671875,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 498.09283447265625,
+        "height": 65.68316650390625,
+        "label": "LEONARDO CHITOLINAARTE E CULTURA",
+        "right": 647.6998291015625,
+        "type": "commission",
+        "width": 67.595947265625,
+        "x": 580.1038818359375,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 505.6034851074219,
+        "height": 73.19381713867188,
+        "label": "VANESSA MATRASZEK GNOATTOAGRICULTURA, SOJA E DERIVADOS",
+        "right": 785.8961181640625,
+        "type": "commission",
+        "width": 67.595947265625,
+        "x": 718.3001708984375,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 585.216552734375,
+        "height": 65.68310546875,
+        "label": "JOSÉ FERNANDO BORELLABILHETERIA",
+        "right": 647.6998291015625,
+        "type": "commission",
+        "width": 67.595947265625,
+        "x": 580.1038818359375,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 592.7272338867188,
+        "height": 73.19378662109375,
+        "label": "ROBERTO STEFFENSEGURANÇA E TRÂNSITO",
+        "right": 785.8961181640625,
+        "type": "commission",
+        "width": 67.595947265625,
+        "x": 718.3001708984375,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 670.104736328125,
+        "height": 63.447509765625,
+        "label": "THAIS BRODLORECEPÇÃO E EVENTOS",
+        "right": 647.6998291015625,
+        "type": "commission",
+        "width": 67.595947265625,
+        "x": 580.1038818359375,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 672.34033203125,
+        "height": 65.68310546875,
+        "label": "CRISTINA SCHEUERMANNESPORTE E LAZER",
+        "right": 785.8961181640625,
+        "type": "commission",
+        "width": 67.595947265625,
+        "x": 718.3001708984375,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 498.09283447265625,
+        "height": 65.68316650390625,
+        "label": "DANIEL U RIBEIRO DA SILVASHOWS",
+        "right": 578.6016845703125,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 511.0056762695313,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 505.6034851074219,
+        "height": 73.19381713867188,
+        "label": "PAULO MIGUEL NEDELRELAÇÕES ESTRATÉGICAS",
+        "right": 854.9943237304688,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 787.3983154296875,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 592.7272338867188,
+        "height": 73.19378662109375,
+        "label": "FERNANDA MATARUCCO MEINERTZRELACIONAMENTO E EXPERIÊNCIA",
+        "right": 578.6016845703125,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 511.0056762695313,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 585.216552734375,
+        "height": 65.68310546875,
+        "label": "LARISSA MELLO DALLALBACREDENCIAMENTO",
+        "right": 854.9943237304688,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 787.3983154296875,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 672.34033203125,
+        "height": 65.68310546875,
+        "label": "CÁSSIO RICARDO FELTESSOY SUMMIT",
+        "right": 578.6016845703125,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 511.0056762695313,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 672.34033203125,
+        "height": 65.68310546875,
+        "label": "ALEXANDRE DALL AGNESERESTAURANTES",
+        "right": 854.9943237304688,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 787.3983154296875,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 498.09283447265625,
+        "height": 65.68316650390625,
+        "label": "EDUARDO SANTOSINFRAESTRUTURA",
+        "right": 509.5035400390625,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 441.9075317382813,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 498.09283447265625,
+        "height": 65.68316650390625,
+        "label": "ROSA ZORZAN DE PAULATURISMO",
+        "right": 924.0924682617188,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 856.4964599609375,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 585.216552734375,
+        "height": 65.68310546875,
+        "label": "RODRIGO CALIXTOGASTRONOMIA",
+        "right": 509.5035400390625,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 441.9075317382813,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 585.216552734375,
+        "height": 65.68310546875,
+        "label": "ESTELA ZAMBERLAM SCHWERZACESSIBILIDADE",
+        "right": 924.0924682617188,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 856.4964599609375,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 672.34033203125,
+        "height": 65.68310546875,
+        "label": "BRUNA PACHECO DE QUADROSACOLHIMENTO",
+        "right": 509.5035400390625,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 441.9075317382813,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 672.34033203125,
+        "height": 65.68310546875,
+        "label": "VANESSA PERIPOLLIBRIGADA",
+        "right": 924.0924682617188,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 856.4964599609375,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 505.6034851074219,
+        "height": 73.19381713867188,
+        "label": "JOSYANE CRISTINA HECKCOMUNICAÇÃO VISUAL",
+        "right": 440.4053955078125,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 372.8093872070313,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 505.6034851074219,
+        "height": 73.19381713867188,
+        "label": "ELTON LUIS WALKERESPAÇO AUTOMÓVEL",
+        "right": 993.1906127929688,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 925.5946044921876,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 585.216552734375,
+        "height": 65.68310546875,
+        "label": "FELIPE CARPENEDO GABRIELINOVAÇÃO",
+        "right": 440.4053955078125,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 372.8093872070313,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 585.216552734375,
+        "height": 65.68310546875,
+        "label": "GERMANO TESSMER BUTTOWEXPOCULTURAL",
+        "right": 993.1906127929688,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 925.5946044921876,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 672.34033203125,
+        "height": 65.68310546875,
+        "label": "ELISANDRA SIMÃO REISPECUÁRIA",
+        "right": 440.4053955078125,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 372.8093872070313,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 672.34033203125,
+        "height": 65.68310546875,
+        "label": "RAUL DARIO NUNEZMERCOSUL",
+        "right": 993.1906127929688,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 925.5946044921876,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 498.09283447265625,
+        "height": 65.68316650390625,
+        "label": "ROQUE VANDERLEI LUGOCHVOLUNTARIADO",
+        "right": 371.3072509765625,
+        "type": "commission",
+        "width": 67.59600830078125,
+        "x": 303.71124267578125,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 505.6034851074219,
+        "height": 73.19381713867188,
+        "label": "DEISE ANELISE FROELICHASSESSORIA DE IMPRENSA",
+        "right": 1062.288818359375,
+        "type": "advisory",
+        "width": 67.5960693359375,
+        "x": 994.6927490234376,
+        "y": 432.40966796875
+      },
+      {
+        "bottom": 582.98095703125,
+        "height": 63.447509765625,
+        "label": "JÚLIO BRAVOASSESSORIA DE RELAÇÕES INTERNACIONAIS",
+        "right": 1062.288818359375,
+        "type": "advisory",
+        "width": 67.5960693359375,
+        "x": 994.6927490234376,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 679.8510131835938,
+        "height": 73.19378662109375,
+        "label": "JORGE LUIZ VIANAASSESSORIA DE PROTOCOLO",
+        "right": 1062.288818359375,
+        "type": "advisory",
+        "width": 67.5960693359375,
+        "x": 994.6927490234376,
+        "y": 606.6572265625
+      },
+      {
+        "bottom": 582.98095703125,
+        "height": 63.447509765625,
+        "label": "ZÉLIA SAVOLDIASSESSORIA DE MARKETING/COMUNICAÇÃO",
+        "right": 371.3072509765625,
+        "type": "advisory",
+        "width": 67.59600830078125,
+        "x": 303.71124267578125,
+        "y": 519.533447265625
+      },
+      {
+        "bottom": 679.8510131835938,
+        "height": 73.19378662109375,
+        "label": "JOSÉ MAURO BARBIERIASSESSORIA JURÍDICA",
+        "right": 371.3072509765625,
+        "type": "advisory",
+        "width": 67.59600830078125,
+        "x": 303.71124267578125,
+        "y": 606.6572265625
+      }
+    ],
+    "scale": "0.376",
+    "top": {
+      "bottom": 108,
+      "height": 92,
+      "right": 1290,
+      "width": 1266,
+      "x": 24,
+      "y": 16
+    },
+    "viewport": {
+      "height": 768,
+      "width": 1366
+    },
+    "world": {
+      "bottom": 672,
+      "height": 528,
+      "right": 1066.795166015625,
+      "width": 767.59033203125,
+      "x": 299.204833984375,
+      "y": 144
+    }
+  },
+  {
+    "label": "before-390x844",
+    "bottom": {
+      "bottom": 832,
+      "height": 52,
+      "right": 378,
+      "width": 236,
+      "x": 142,
+      "y": 780
+    },
+    "document": {
+      "height": 844,
+      "width": 390
+    },
+    "nodes": [
+      {
+        "bottom": 318.7397766113281,
+        "height": 155.85977172851562,
+        "label": "CCPF3 INTEGRANTESCONSELHO CONSULTIVO PERMANENTE",
+        "right": 190.7300071716309,
+        "type": "ccp",
+        "width": 174.4600067138672,
+        "x": 16.270000457763672,
+        "y": 162.8800048828125
+      },
+      {
+        "bottom": 285.3184509277344,
+        "height": 111.4584503173828,
+        "label": "FABIANO SOLTISPRESIDENTE",
+        "right": 354.82000732421875,
+        "type": "executive",
+        "width": 136.63999938964844,
+        "x": 218.1800079345703,
+        "y": 173.86000061035156
+      },
+      {
+        "bottom": 451.2384338378906,
+        "height": 111.45843505859376,
+        "label": "DJEISON DREYVICE-PRESIDENTE",
+        "right": 263.3200149536133,
+        "type": "executive",
+        "width": 136.6400146484375,
+        "x": 126.68000030517578,
+        "y": 339.7799987792969
+      },
+      {
+        "bottom": 585.4384765625,
+        "height": 99.25848388671876,
+        "label": "COMISSÃO CENTRAL3 INTEGRANTES",
+        "right": 254.77999877929688,
+        "type": "central-commission",
+        "width": 119.55999755859376,
+        "x": 135.22000122070312,
+        "y": 486.1799926757813
+      },
+      {
+        "bottom": 726.5152587890625,
+        "height": 100.0352783203125,
+        "label": "VALTAIR DORNELLESSERVIÇOS",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 626.47998046875
+      },
+      {
+        "bottom": 737.7669067382812,
+        "height": 111.28692626953124,
+        "label": "LEONARDO RUY DAMBROZPREVENÇÃO E COMBATE A INCÊNDIO",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 626.47998046875
+      },
+      {
+        "bottom": 866.3101196289062,
+        "height": 98.31011962890624,
+        "label": "FELIPE BORTOLIINDÚSTRIA, COMÉRCIO E SERVIÇOS",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 768
+      },
+      {
+        "bottom": 868.0352783203125,
+        "height": 100.0352783203125,
+        "label": "LEONARDO CHITOLINAARTE E CULTURA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 768
+      },
+      {
+        "bottom": 1020.806884765625,
+        "height": 111.286865234375,
+        "label": "VANESSA MATRASZEK GNOATTOAGRICULTURA, SOJA E DERIVADOS",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 909.52001953125
+      },
+      {
+        "bottom": 1009.5552368164062,
+        "height": 100.03521728515624,
+        "label": "JOSÉ FERNANDO BORELLABILHETERIA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 909.52001953125
+      },
+      {
+        "bottom": 1149.35009765625,
+        "height": 98.31005859375,
+        "label": "ROBERTO STEFFENSEGURANÇA E TRÂNSITO",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1051.0400390625
+      },
+      {
+        "bottom": 1138.098388671875,
+        "height": 87.058349609375,
+        "label": "THAIS BRODLORECEPÇÃO E EVENTOS",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1051.0400390625
+      },
+      {
+        "bottom": 1292.59521484375,
+        "height": 100.03515625,
+        "label": "CRISTINA SCHEUERMANNESPORTE E LAZER",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1192.56005859375
+      },
+      {
+        "bottom": 1292.59521484375,
+        "height": 100.03515625,
+        "label": "DANIEL U RIBEIRO DA SILVASHOWS",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1192.56005859375
+      },
+      {
+        "bottom": 1445.366943359375,
+        "height": 111.286865234375,
+        "label": "PAULO MIGUEL NEDELRELAÇÕES ESTRATÉGICAS",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1334.080078125
+      },
+      {
+        "bottom": 1445.366943359375,
+        "height": 111.286865234375,
+        "label": "FERNANDA MATARUCCO MEINERTZRELACIONAMENTO E EXPERIÊNCIA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1334.080078125
+      },
+      {
+        "bottom": 1575.63525390625,
+        "height": 100.0352783203125,
+        "label": "LARISSA MELLO DALLALBACREDENCIAMENTO",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1475.5999755859375
+      },
+      {
+        "bottom": 1575.63525390625,
+        "height": 100.0352783203125,
+        "label": "CÁSSIO RICARDO FELTESSOY SUMMIT",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1475.5999755859375
+      },
+      {
+        "bottom": 1717.1552734375,
+        "height": 100.0352783203125,
+        "label": "ALEXANDRE DALL AGNESERESTAURANTES",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1617.1199951171875
+      },
+      {
+        "bottom": 1704.178466796875,
+        "height": 87.0584716796875,
+        "label": "EDUARDO SANTOSINFRAESTRUTURA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1617.1199951171875
+      },
+      {
+        "bottom": 1858.67529296875,
+        "height": 100.0352783203125,
+        "label": "ROSA ZORZAN DE PAULATURISMO",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1758.6400146484375
+      },
+      {
+        "bottom": 1845.698486328125,
+        "height": 87.0584716796875,
+        "label": "RODRIGO CALIXTOGASTRONOMIA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1758.6400146484375
+      },
+      {
+        "bottom": 2000.1953125,
+        "height": 100.0352783203125,
+        "label": "ESTELA ZAMBERLAM SCHWERZACESSIBILIDADE",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1900.1600341796875
+      },
+      {
+        "bottom": 2000.1953125,
+        "height": 100.0352783203125,
+        "label": "BRUNA PACHECO DE QUADROSACOLHIMENTO",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1900.1600341796875
+      },
+      {
+        "bottom": 2141.71533203125,
+        "height": 100.0352783203125,
+        "label": "VANESSA PERIPOLLIBRIGADA",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2041.6800537109375
+      },
+      {
+        "bottom": 2152.966796875,
+        "height": 111.2867431640625,
+        "label": "JOSYANE CRISTINA HECKCOMUNICAÇÃO VISUAL",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2041.6800537109375
+      },
+      {
+        "bottom": 2283.2353515625,
+        "height": 100.03515625,
+        "label": "ELTON LUIS WALKERESPAÇO AUTOMÓVEL",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2183.2001953125
+      },
+      {
+        "bottom": 2283.2353515625,
+        "height": 100.03515625,
+        "label": "FELIPE CARPENEDO GABRIELINOVAÇÃO",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2183.2001953125
+      },
+      {
+        "bottom": 2424.75537109375,
+        "height": 100.035400390625,
+        "label": "GERMANO TESSMER BUTTOWEXPOCULTURAL",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2324.719970703125
+      },
+      {
+        "bottom": 2424.75537109375,
+        "height": 100.035400390625,
+        "label": "ELISANDRA SIMÃO REISPECUÁRIA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2324.719970703125
+      },
+      {
+        "bottom": 2553.298583984375,
+        "height": 87.05859375,
+        "label": "RAUL DARIO NUNEZMERCOSUL",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2466.239990234375
+      },
+      {
+        "bottom": 2566.275390625,
+        "height": 100.035400390625,
+        "label": "ROQUE VANDERLEI LUGOCHVOLUNTARIADO",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2466.239990234375
+      },
+      {
+        "bottom": 2719.046875,
+        "height": 111.286865234375,
+        "label": "DEISE ANELISE FROELICHASSESSORIA DE IMPRENSA",
+        "right": 306.02001953125,
+        "type": "advisory",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2607.760009765625
+      },
+      {
+        "bottom": 2706.070068359375,
+        "height": 98.31005859375,
+        "label": "JÚLIO BRAVOASSESSORIA DE RELAÇÕES INTERNACIONAIS",
+        "right": 193.77999877929688,
+        "type": "advisory",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2607.760009765625
+      },
+      {
+        "bottom": 2847.590087890625,
+        "height": 98.31005859375,
+        "label": "JORGE LUIZ VIANAASSESSORIA DE PROTOCOLO",
+        "right": 306.02001953125,
+        "type": "advisory",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2749.280029296875
+      },
+      {
+        "bottom": 2847.590087890625,
+        "height": 98.31005859375,
+        "label": "ZÉLIA SAVOLDIASSESSORIA DE MARKETING/COMUNICAÇÃO",
+        "right": 193.77999877929688,
+        "type": "advisory",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2749.280029296875
+      },
+      {
+        "bottom": 2990.835205078125,
+        "height": 100.03515625,
+        "label": "JOSÉ MAURO BARBIERIASSESSORIA JURÍDICA",
+        "right": 306.02001953125,
+        "type": "advisory",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2890.800048828125
+      },
+      {
+        "bottom": 318.7397766113281,
+        "height": 155.85977172851562,
+        "label": "CCPF3 INTEGRANTESCONSELHO CONSULTIVO PERMANENTE",
+        "right": 190.7300071716309,
+        "type": "ccp",
+        "width": 174.4600067138672,
+        "x": 16.270000457763672,
+        "y": 162.8800048828125
+      },
+      {
+        "bottom": 285.3184509277344,
+        "height": 111.4584503173828,
+        "label": "FABIANO SOLTISPRESIDENTE",
+        "right": 354.82000732421875,
+        "type": "executive",
+        "width": 136.63999938964844,
+        "x": 218.1800079345703,
+        "y": 173.86000061035156
+      },
+      {
+        "bottom": 451.2384338378906,
+        "height": 111.45843505859376,
+        "label": "DJEISON DREYVICE-PRESIDENTE",
+        "right": 263.3200149536133,
+        "type": "executive",
+        "width": 136.6400146484375,
+        "x": 126.68000030517578,
+        "y": 339.7799987792969
+      },
+      {
+        "bottom": 585.4384765625,
+        "height": 99.25848388671876,
+        "label": "COMISSÃO CENTRAL3 INTEGRANTES",
+        "right": 254.77999877929688,
+        "type": "central-commission",
+        "width": 119.55999755859376,
+        "x": 135.22000122070312,
+        "y": 486.1799926757813
+      },
+      {
+        "bottom": 726.5152587890625,
+        "height": 100.0352783203125,
+        "label": "VALTAIR DORNELLESSERVIÇOS",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 626.47998046875
+      },
+      {
+        "bottom": 737.7669067382812,
+        "height": 111.28692626953124,
+        "label": "LEONARDO RUY DAMBROZPREVENÇÃO E COMBATE A INCÊNDIO",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 626.47998046875
+      },
+      {
+        "bottom": 866.3101196289062,
+        "height": 98.31011962890624,
+        "label": "FELIPE BORTOLIINDÚSTRIA, COMÉRCIO E SERVIÇOS",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 768
+      },
+      {
+        "bottom": 868.0352783203125,
+        "height": 100.0352783203125,
+        "label": "LEONARDO CHITOLINAARTE E CULTURA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 768
+      },
+      {
+        "bottom": 1020.806884765625,
+        "height": 111.286865234375,
+        "label": "VANESSA MATRASZEK GNOATTOAGRICULTURA, SOJA E DERIVADOS",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 909.52001953125
+      },
+      {
+        "bottom": 1009.5552368164062,
+        "height": 100.03521728515624,
+        "label": "JOSÉ FERNANDO BORELLABILHETERIA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 909.52001953125
+      },
+      {
+        "bottom": 1149.35009765625,
+        "height": 98.31005859375,
+        "label": "ROBERTO STEFFENSEGURANÇA E TRÂNSITO",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1051.0400390625
+      },
+      {
+        "bottom": 1138.098388671875,
+        "height": 87.058349609375,
+        "label": "THAIS BRODLORECEPÇÃO E EVENTOS",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1051.0400390625
+      },
+      {
+        "bottom": 1292.59521484375,
+        "height": 100.03515625,
+        "label": "CRISTINA SCHEUERMANNESPORTE E LAZER",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1192.56005859375
+      },
+      {
+        "bottom": 1292.59521484375,
+        "height": 100.03515625,
+        "label": "DANIEL U RIBEIRO DA SILVASHOWS",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1192.56005859375
+      },
+      {
+        "bottom": 1445.366943359375,
+        "height": 111.286865234375,
+        "label": "PAULO MIGUEL NEDELRELAÇÕES ESTRATÉGICAS",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1334.080078125
+      },
+      {
+        "bottom": 1445.366943359375,
+        "height": 111.286865234375,
+        "label": "FERNANDA MATARUCCO MEINERTZRELACIONAMENTO E EXPERIÊNCIA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1334.080078125
+      },
+      {
+        "bottom": 1575.63525390625,
+        "height": 100.0352783203125,
+        "label": "LARISSA MELLO DALLALBACREDENCIAMENTO",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1475.5999755859375
+      },
+      {
+        "bottom": 1575.63525390625,
+        "height": 100.0352783203125,
+        "label": "CÁSSIO RICARDO FELTESSOY SUMMIT",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1475.5999755859375
+      },
+      {
+        "bottom": 1717.1552734375,
+        "height": 100.0352783203125,
+        "label": "ALEXANDRE DALL AGNESERESTAURANTES",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1617.1199951171875
+      },
+      {
+        "bottom": 1704.178466796875,
+        "height": 87.0584716796875,
+        "label": "EDUARDO SANTOSINFRAESTRUTURA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1617.1199951171875
+      },
+      {
+        "bottom": 1858.67529296875,
+        "height": 100.0352783203125,
+        "label": "ROSA ZORZAN DE PAULATURISMO",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1758.6400146484375
+      },
+      {
+        "bottom": 1845.698486328125,
+        "height": 87.0584716796875,
+        "label": "RODRIGO CALIXTOGASTRONOMIA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1758.6400146484375
+      },
+      {
+        "bottom": 2000.1953125,
+        "height": 100.0352783203125,
+        "label": "ESTELA ZAMBERLAM SCHWERZACESSIBILIDADE",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 1900.1600341796875
+      },
+      {
+        "bottom": 2000.1953125,
+        "height": 100.0352783203125,
+        "label": "BRUNA PACHECO DE QUADROSACOLHIMENTO",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 1900.1600341796875
+      },
+      {
+        "bottom": 2141.71533203125,
+        "height": 100.0352783203125,
+        "label": "VANESSA PERIPOLLIBRIGADA",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2041.6800537109375
+      },
+      {
+        "bottom": 2152.966796875,
+        "height": 111.2867431640625,
+        "label": "JOSYANE CRISTINA HECKCOMUNICAÇÃO VISUAL",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2041.6800537109375
+      },
+      {
+        "bottom": 2283.2353515625,
+        "height": 100.03515625,
+        "label": "ELTON LUIS WALKERESPAÇO AUTOMÓVEL",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2183.2001953125
+      },
+      {
+        "bottom": 2283.2353515625,
+        "height": 100.03515625,
+        "label": "FELIPE CARPENEDO GABRIELINOVAÇÃO",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2183.2001953125
+      },
+      {
+        "bottom": 2424.75537109375,
+        "height": 100.035400390625,
+        "label": "GERMANO TESSMER BUTTOWEXPOCULTURAL",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2324.719970703125
+      },
+      {
+        "bottom": 2424.75537109375,
+        "height": 100.035400390625,
+        "label": "ELISANDRA SIMÃO REISPECUÁRIA",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2324.719970703125
+      },
+      {
+        "bottom": 2553.298583984375,
+        "height": 87.05859375,
+        "label": "RAUL DARIO NUNEZMERCOSUL",
+        "right": 193.77999877929688,
+        "type": "commission",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2466.239990234375
+      },
+      {
+        "bottom": 2566.275390625,
+        "height": 100.035400390625,
+        "label": "ROQUE VANDERLEI LUGOCHVOLUNTARIADO",
+        "right": 306.02001953125,
+        "type": "commission",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2466.239990234375
+      },
+      {
+        "bottom": 2719.046875,
+        "height": 111.286865234375,
+        "label": "DEISE ANELISE FROELICHASSESSORIA DE IMPRENSA",
+        "right": 306.02001953125,
+        "type": "advisory",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2607.760009765625
+      },
+      {
+        "bottom": 2706.070068359375,
+        "height": 98.31005859375,
+        "label": "JÚLIO BRAVOASSESSORIA DE RELAÇÕES INTERNACIONAIS",
+        "right": 193.77999877929688,
+        "type": "advisory",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2607.760009765625
+      },
+      {
+        "bottom": 2847.590087890625,
+        "height": 98.31005859375,
+        "label": "JORGE LUIZ VIANAASSESSORIA DE PROTOCOLO",
+        "right": 306.02001953125,
+        "type": "advisory",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2749.280029296875
+      },
+      {
+        "bottom": 2847.590087890625,
+        "height": 98.31005859375,
+        "label": "ZÉLIA SAVOLDIASSESSORIA DE MARKETING/COMUNICAÇÃO",
+        "right": 193.77999877929688,
+        "type": "advisory",
+        "width": 109.79999542236328,
+        "x": 83.9800033569336,
+        "y": 2749.280029296875
+      },
+      {
+        "bottom": 2990.835205078125,
+        "height": 100.03515625,
+        "label": "JOSÉ MAURO BARBIERIASSESSORIA JURÍDICA",
+        "right": 306.02001953125,
+        "type": "advisory",
+        "width": 109.80001831054688,
+        "x": 196.22000122070312,
+        "y": 2890.800048828125
+      }
+    ],
+    "scale": "0.610",
+    "top": {
+      "bottom": 146,
+      "height": 136,
+      "right": 378,
+      "width": 366,
+      "x": 12,
+      "y": 10
+    },
+    "viewport": {
+      "height": 844,
+      "width": 390
+    },
+    "world": {
+      "bottom": 2996.940185546875,
+      "height": 2838.940185546875,
+      "right": 378,
+      "width": 366,
+      "x": 12,
+      "y": 158
+    }
+  }
+]

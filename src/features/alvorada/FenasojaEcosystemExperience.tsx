@@ -44,6 +44,8 @@ export function FenasojaEcosystemExperienceView({
   }, [onComplete]);
 
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const focusFrame = window.requestAnimationFrame(() => closeButton.current?.focus({
       preventScroll: true,
     }));
@@ -57,6 +59,7 @@ export function FenasojaEcosystemExperienceView({
         ).filter((element) => (
           element.getAttribute('aria-hidden') !== 'true'
           && !element.closest('[aria-hidden="true"]')
+          && element.getClientRects().length > 0
         ));
         const first = focusable[0];
         const last = focusable.at(-1);
@@ -91,6 +94,7 @@ export function FenasojaEcosystemExperienceView({
     window.addEventListener('keydown', containKeyboard, true);
 
     return () => {
+      document.body.style.overflow = previousOverflow;
       window.cancelAnimationFrame(focusFrame);
       window.removeEventListener('keydown', containKeyboard, true);
       if (exitTimer.current !== null) window.clearTimeout(exitTimer.current);

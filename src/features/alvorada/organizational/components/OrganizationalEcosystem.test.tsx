@@ -1,8 +1,16 @@
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import type { ReactElement } from 'react';
+import { act, fireEvent, render as renderBase, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { OrganizationalGraph, OrgNode } from '../types';
 import { OrganizationalEcosystem } from './OrganizationalEcosystem';
 import { buildOrganizationalGraph } from '../resolver';
+
+const render = (ui: ReactElement) => {
+  const result = renderBase(ui);
+  const skip = screen.queryByRole('button', { name: 'Pular apresentação' });
+  if (skip) fireEvent.click(skip);
+  return result;
+};
 
 function createNode(partial: Partial<OrgNode> & Pick<OrgNode, 'id' | 'type' | 'authorityLevel' | 'title'>): OrgNode {
   return {
@@ -32,6 +40,7 @@ function createGraph(): OrganizationalGraph {
     }),
     createNode({
       id: 'president',
+      metadata: { executiveRole: ['president'] },
       type: 'executive',
       authorityLevel: 2,
       title: 'Presidência',
@@ -339,7 +348,7 @@ describe('OrganizationalEcosystem', () => {
     expect(container.querySelector('[data-selection-person]')).toBeNull();
     expect(screen.getByRole('heading', { name: 'COMISSÃO CENTRAL' })).toBeInTheDocument();
     const edgeIds = Array.from(container.querySelectorAll('[data-edge-id]'), (edge) => edge.getAttribute('data-edge-id')).sort();
-    expect(edgeIds).toEqual(['central-logistics', 'central-press', 'president-central']);
+    expect(edgeIds).toEqual(['central-logistics', 'central-press', 'president-central', 'root-president']);
   });
 
   it('announces every mixed responsibility once and translates raw relationship roles', () => {
@@ -374,10 +383,8 @@ describe('OrganizationalEcosystem', () => {
     expect(screen.getByRole('button', {
       name: /^CCPF\. CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA$/,
     })).toBeInTheDocument();
-    expect(screen.getByText('01 CCPF')).toBeInTheDocument();
-    expect(screen.getByLabelText(
-      '01 CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA',
-    )).toBeInTheDocument();
+    expect(screen.getByText('CCPF', { selector: '.org-node__name' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA' })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /BRUNO SOUZA/ }));
     const presentationSurface = [
@@ -404,12 +411,12 @@ describe('OrganizationalEcosystem', () => {
     );
 
     expect(nodeDelays(1)).toEqual([0]);
-    expect(nodeDelays(2)).toEqual([100]);
-    expect(nodeDelays(3)).toEqual([220]);
-    expect(nodeDelays(4).sort((left, right) => left - right)).toEqual([300, 312]);
-    expect(edgeDelays(2)).toEqual([80]);
-    expect(edgeDelays(3)).toEqual([180]);
-    expect(edgeDelays(4).sort((left, right) => left - right)).toEqual([260, 272]);
+    expect(nodeDelays(2)).toEqual([450]);
+    expect(nodeDelays(3)).toEqual([1650]);
+    expect(nodeDelays(4).sort((left, right) => left - right)).toEqual([2250, 2274]);
+    expect(edgeDelays(2)).toEqual([220]);
+    expect(edgeDelays(3)).toEqual([1420]);
+    expect(edgeDelays(4).sort((left, right) => left - right)).toEqual([2020, 2044]);
     expect(container.querySelectorAll('.org-relationship__reveal-glow')).toHaveLength(0);
     expect(container.querySelectorAll('.org-relationship__terminal')).toHaveLength(0);
     container.querySelectorAll('.org-relationship path').forEach((path) => {
@@ -556,9 +563,7 @@ describe('OrganizationalEcosystem', () => {
     }));
 
     expect(screen.queryByLabelText(/Detalhes de Comissão de Logística/i)).not.toBeInTheDocument();
-    expect(logisticsNode).toBeDisabled();
-    expect(logisticsNode).toHaveAttribute('tabindex', '-1');
-    expect(logisticsNode.closest('.org-node')).toHaveAttribute('aria-hidden', 'true');
+    expect(logisticsNode).not.toBeInTheDocument();
     expect(container.querySelector('.org-node[data-authority="1"] [data-org-node]'))
       .toHaveAttribute('tabindex', '0');
     expect(onSelectedNodeChange).toHaveBeenLastCalledWith(null);
@@ -644,7 +649,7 @@ describe('OrganizationalEcosystem', () => {
     expect(screen.queryByLabelText(/Detalhes de Comissão de Logística/i)).not.toBeInTheDocument();
   });
 
-  it('preserves the current zoom when the viewport is resized', async () => {
+  it('refits when resizing changes the presentation composition', async () => {
     render(<OrganizationalEcosystem graph={createGraph()} active />);
 
     const zoomOutput = screen.getByLabelText(/Zoom em/i);
@@ -659,7 +664,8 @@ describe('OrganizationalEcosystem', () => {
       } as ResizeObserverEntry], {} as ResizeObserver);
     });
 
-    await waitFor(() => expect(zoomOutput.textContent).toBe(zoomAfterInteraction));
+    await waitFor(() => expect(zoomOutput.textContent).not.toBe(zoomAfterInteraction));
+    expect(Number(document.querySelector<HTMLElement>('.org-ecosystem__ready')?.dataset.viewportScale)).toBeGreaterThanOrEqual(.92);
   });
 
   it('excludes allow-list omissions from the graph and initial selection', () => {
@@ -682,18 +688,18 @@ describe('OrganizationalEcosystem', () => {
     expect(edges()).toEqual(['central-logistics', 'central-press', 'president-central', 'root-president']);
 
     fireEvent.click(screen.getByRole('button', { name: /Bruno Souza/i }));
-    expect(edges()).toEqual(['central-logistics']);
-    expect(container.querySelector('[data-edge-id="root-president"]')).toBeNull();
+    expect(edges()).toEqual(['central-logistics', 'president-central', 'root-president']);
+    expect(container.querySelector('[data-edge-id="root-president"]')).not.toBeNull();
     expect(container.querySelector('.org-relationship__reveal-glow')).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: /^Ana Silva/i }));
-    expect(edges()).toEqual(['president-central', 'root-president']);
+    expect(edges()).toEqual(['central-logistics', 'central-press', 'president-central', 'root-president']);
     fireEvent.mouseEnter(screen.getByRole('button', { name: /^Daniela Souza/i }));
-    expect(edges()).toEqual(['president-central', 'root-president']);
+    expect(edges()).toEqual(['central-logistics', 'central-press', 'president-central', 'root-president']);
 
     fireEvent.click(within(screen.getByRole('group', { name: /Mapa interativo/i })).getByRole('button', { name: /^Comissão Central/i }));
-    expect(edges()).toEqual(['central-logistics', 'central-press', 'president-central']);
-    expect(container.querySelector('[data-edge-id="root-president"]')).toBeNull();
+    expect(edges()).toEqual(['central-logistics', 'central-press', 'president-central', 'root-president']);
+    expect(container.querySelector('[data-edge-id="root-president"]')).not.toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: /Limpar seleção e restaurar/i }));
     expect(edges()).toHaveLength(4);
@@ -710,7 +716,7 @@ describe('OrganizationalEcosystem', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Bruno Souza/i }));
     fireEvent.click(screen.getByRole('button', { name: /^Selecionar Carla Ribeiro/i }));
     expect(screen.getByLabelText(/Detalhes de Carla Ribeiro/i)).toBeInTheDocument();
-    expect(edges()).toEqual(['central-logistics', 'president-central']);
+    expect(edges()).toEqual(['central-logistics', 'president-central', 'root-president']);
     expect(container.querySelector('[data-edge-id="central-press"]')).toBeNull();
     expect(container.querySelector('[data-selection-person="person-carla"]')).toBeInTheDocument();
 
@@ -718,7 +724,7 @@ describe('OrganizationalEcosystem', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Bruno Souza/i }));
     fireEvent.click(screen.getByRole('button', { name: /^Selecionar Carla Ribeiro/i }));
     expect(screen.getByLabelText(/Detalhes de Carla Ribeiro/i)).toBeInTheDocument();
-    expect(edges()).toEqual(['central-logistics', 'president-central']);
+    expect(edges()).toEqual(['central-logistics', 'president-central', 'root-president']);
     const logistics = container.querySelector('.org-node[data-node-type="commission"][data-selected="true"]');
     expect(logistics?.querySelector('.org-node__name')).toHaveTextContent('CARLA RIBEIRO');
   });

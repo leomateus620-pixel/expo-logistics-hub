@@ -1,3 +1,4 @@
+import { WorkersLauncherSlot } from '@/components/WorkersLauncherSlot';
 import {
   lazy,
   Suspense,
@@ -412,6 +413,7 @@ export default function CommissionPortalPage() {
             <FenasojaPortalHistory released={historyReleased} paused={ecosystemOpen}
               userPaused={historyUserPaused} onMotionAvailable={setHistoryMotionAvailable} />
           </button>
+          <WorkersLauncherSlot surface="portal" />
           {historyMotionAvailable && <button type="button" className="fenasoja-portal__history-toggle"
             aria-label={historyUserPaused ? 'Retomar faixa histórica' : 'Pausar faixa histórica'}
             aria-pressed={historyUserPaused} onClick={() => setHistoryUserPaused((value) => !value)}>

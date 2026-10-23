@@ -84,3 +84,18 @@ describe('retratos oficiais das comissões', () => {
     );
   });
 });
+
+
+describe('retratos enviados pelo proprietário em 23/10/2026', () => {
+  it.each([
+    ['Elvio Becker', '0c1b6c1e-a6ad-49b7-bb00-88478b28fd01', 'elvio-becker'],
+    ['Jorge Luiz Viana', '5085afb8-f0a8-4641-a795-9f1113d456e7', 'jorge-luiz-viana'],
+    ['Jonas Santos', '3e7f410c-c14d-4841-8597-8a84f1b8c639', 'jona-santos'],
+    ['Francine Maria Boijink', 'd53cbc3e-01b2-46a3-923e-a36d50e6de3f', 'francine-maria-boijink'],
+  ])('mantém a identidade de %s por ID e pelo nome completo', (name, id, file) => {
+    const expected = `/alvorada/portraits/person-${file}.webp`;
+    expect(getPersonPhoto(name)).toBe(expected);
+    expect(getPersonPhoto('Nome desatualizado', id)).toBe(expected);
+    expect(getPersonPhoto(name.split(' ')[0])).toBeNull();
+  });
+});

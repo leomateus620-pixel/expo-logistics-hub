@@ -1,73 +1,66 @@
-# Ecossistema Fenasoja — hierarquia e controles
+# Ecossistema FENASOJA — hierarquia e apresentação
 
-A apresentação agora coloca CCPF à esquerda e a presidência de Fabiano Soltis à direita, ambos em `y=88`. Djeison Drey aparece centralizado na linha seguinte; a Comissão Central fica abaixo dele. O critério usa tipo de nó e `metadata.executiveRole`, sem comparar nomes para determinar posição ou modificar `authorityLevel`, cargo ou filtro institucional. Ambos os executivos continuam no filtro Presidência.
+Atualizado em 23/10/2026. Esta especificação substitui a apresentação anterior de raízes pares e a exploração vertical obrigatória no celular.
 
-As raízes têm `parentIds=[]`. A vice-presidência recebe CCPF e presidência como pais; a Central recebe a vice-presidência. `edges` e `childIds` continuam gerados a partir de `parentIds`, inclusive para o destaque de relacionamentos. Não existe linha decorativa nem ligação direta da presidência à Central no cadastro executivo completo. Os fallbacks de cadastros sem vice continuam conectados e sinalizados pelas anomalias existentes, sem inventar uma pessoa.
+## Grafo e classificação
 
-## Correção restrita da Zélia
+A cadeia resolvida é **CCPF → presidente → vice-presidente → Comissão Central → unidades**. Presidente e vice são identificados por `metadata.executiveRole` e identidades canônicas, sem comparar os nomes dos ocupantes. `parentIds` é a fonte das arestas e de `childIds`; não existe a ligação paralela CCPF → vice no cadastro completo.
 
-Fontes conferidas no repositório:
+Sem vice, a Central usa a presidência; sem presidente, a vice usa CCPF. As anomalias existentes continuam explícitas, inclusive cardinalidade executiva inesperada. Nenhum ocupante é fabricado nem escolhido silenciosamente entre múltiplos registros. Pessoas, responsabilidades, IDs e vínculos inferiores permanecem nas fontes existentes.
 
-- `supabase/functions/provision-presidentes-2028/data.ts`: conta da diretoria `74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f`, na Central, com cargo de Marketing e Comunicação.
-- `src/components/cronograma-eventos/personPhotos.ts`: retrato oficial vinculado a essa conta e à conta histórica `38e7e8d3-4c66-4279-92ea-961b70ee4e80`.
-- `src/modules/commissions/officialCommissionCatalog.ts`: assessoria de Marketing/Comunicação e sua responsável oficial.
-- `useOrgMembers` e `useOrgCommissions`: membros e responsáveis continuam chegando pelas fontes existentes; não houve mudança de consulta.
+A profundidade de apresentação é independente de `AuthorityLevel`: conselho, Presidência (ambos os executivos), Central, Comissões e Assessorias mantêm suas classificações, filtros e regras de renderização. A posição não concede capabilities, gestão comercial ou acesso aos bots.
 
-O resolver omite a segunda identidade **somente do `personIds` apresentado pela Central**, quando a identidade da diretoria também está nessa lista e ambas mantêm o nome auditado. A conta da assessoria, seus cargos, suas fontes e sua classificação institucional continuam no grafo. A legenda contextual da diretoria na Central é `COMISSÃO CENTRAL · MARKETING E COMUNICAÇÃO`; o cargo completo continua em `OrgPerson.roles`. Homônimos com outros IDs permanecem separados. Se a diretoria estiver ausente numa atualização incompleta, a outra entrada é preservada.
+A deduplicação restrita da Zélia na lista apresentada pela Central permanece: somente a identidade histórica `38e7e8d3-4c66-4279-92ea-961b70ee4e80` é omitida dessa lista quando a conta da diretoria `74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f` também está presente e ambas mantêm o nome auditado. A conta da assessoria, suas responsabilidades e fontes continuam no grafo. Homônimos com outros IDs e cadastros incompletos não são suprimidos.
 
-Contagem, retratos, lista e seleção usam a mesma lista corrigida. Não há número de integrantes fixado. Os testes cobrem ordem invertida, atualização, identidade renomeada, ausência da diretoria, homônimos e seleção da conta histórica pela assessoria.
+## Composição e leitura
 
-## Cabeçalho, espaço e navegação
+Os quatro retratos superiores compartilham o mesmo eixo vertical, com conectores visíveis e legendas à direita. Pequenas diferenças nos medalhões e nas cores distinguem conselho, executivos e Central, sem cartões ou zigue-zague. As unidades usam uma grade ampla, com famílias identificadas pela cor e pelos filtros. Conectores partem dos pais reais, passam pelos corredores entre células e não ligam irmãos entre si.
 
-A marca original FENASOJA 2028 fica ao lado de “Ecossistema”, com estilos limitados às classes deste módulo. A busca, seu estado, resultados, handlers, CSS e tratamento específico de Escape foram removidos. Os seis filtros mantêm textos completos, `aria-pressed` e foco visível; usam 34 px no desktop com ponteiro fino e pelo menos 44 px em interfaces de toque. Em telas estreitas eles quebram em linhas, sem abreviações ou corte dos nomes.
+O layout calcula dimensões e número de colunas com base no espaço disponível e na quebra dos nomes completos. Os nomes não usam reticências. Descrições de unidades podem ocupar duas linhas; seleção e painel disponibilizam o conteúdo completo. Retratos usam thumbnails locais e dimensões reservadas.
 
-`useOrgViewport` observa a altura real do bloco superior e usa a mesma medida para a câmera e o painel. Atualizações de dados mantêm pan/zoom; mudanças de orientação que alteram a grade reenquadram o conjunto. No celular, as raízes permanecem pares e o enquadramento inicial contém os dois retratos.
+Quando todas as unidades não cabem com leitura adequada, a apresentação muda em vez de impor um zoom que corte o grafo. No celular, a visão geral mostra os quatro níveis e dois grupos com contagens reais. Tocar no grupo ou no filtro abre as unidades, com a cadeia superior como referência. Paginação mantém os nomes e retratos legíveis em telas baixas e em conjuntos grandes; nenhuma unidade é retirada do grafo canônico. “Ver todo o ecossistema” retorna ao grupo de origem e restaura o foco. No notebook de 1280×720 da fixture, as unidades são divididas em duas páginas, sem reduzir os nomes para caber.
 
-Os centros superiores usam `88 / 360 / 590`, com o conjunto inferior iniciando em `810`. O intervalo inferior passou de 184 para 232 unidades: a medição detectou descrições longas atravessando o retrato da linha seguinte após acomodar a nova hierarquia. As colunas, a ordem e os agrupamentos foram preservados. Os conectores mantêm o leque e os corredores entre colunas; suas saídas contornam as legendas e sua aproximação ao retrato evita as descrições da linha anterior.
+Os seis filtros são ícones pequenos abaixo da marca, com nomes acessíveis, estado pressionado, tooltip por foco/hover e alvo de toque de pelo menos 44 px. A barra inferior ocupa espaço medido, sem cobrir os nomes. A busca não foi reintroduzida.
 
-## Evidência visual e estrutural
+## Viewport e interação
 
-Capturas locais em Chromium com a fixture diagnóstica existente, ampliada para reproduzir as duas identidades auditadas da Zélia. Não representam consulta autenticada ao cadastro remoto nem validação de dispositivo físico/iOS. O navegador conectado não carregou sua política de acesso durante esta execução.
+`ResizeObserver` mede o container, o cabeçalho e o rodapé. Fontes, orientação e `visualViewport` provocam nova medição. A tela cheia usa `100dvh`, safe areas e bloqueio temporário do scroll do fundo. O fit usa o menor quociente entre largura/altura úteis e bounds do layout, sem um piso que corte conteúdo. O limite do zoom manual é separado da política de enquadramento.
 
-Baseline: `8c4dd1214acae2e1dcf68ff981b846bdf23d8b1f`. O script de comparação materializa seus componentes e resolver e usa exatamente a mesma entrada diagnóstica do código atual. A auditoria confirmou igualdade completa das 41 pessoas e dos 33 nós inferiores da fixture, incluindo membros, responsabilidades e metadados. Ordem e colunas são idênticas; a tradução horizontal no celular é apenas a centralização do mundo mais largo. Esses números descrevem a fixture, não limites ou contagens do cadastro. [Auditoria estrutural](evidence/ecosystem-hierarchy/baseline-audit.json).
+O layout muda de nível de detalhe ou pagina quando necessário. Atualização de nome/foto ou refetch não reinicia a apresentação nem a câmera. Gesto manual interrompe a transição de câmera. O painel textual tem rolagem própria; ao fechar, recupera câmera e foco. Setas, Home, Escape, seleção e foco visível continuam disponíveis. Destaque de ascendentes e descendentes usa relações canônicas; pertencer ao coletivo não transforma uma pessoa em autoridade sobre todas as suas unidades.
 
-| Cenário | Antes | Depois |
-|---|---|---|
-| Desktop 1440×900 | [Captura](evidence/ecosystem-hierarchy/desktop-before.png) | [Captura](evidence/ecosystem-hierarchy/desktop-after.png) |
-| Celular 390×844 | [Captura](evidence/ecosystem-hierarchy/mobile-before.png) | [Captura](evidence/ecosystem-hierarchy/mobile-after.png) |
-| Paisagem 844×390 | [Captura](evidence/ecosystem-hierarchy/landscape-before.png) | [Captura](evidence/ecosystem-hierarchy/landscape-after.png) |
-| Lista da Central | [Captura](evidence/ecosystem-hierarchy/central-before.png) | [Captura](evidence/ecosystem-hierarchy/central-after.png) |
+## Entrada progressiva
 
-[Tela de 320×740](evidence/ecosystem-hierarchy/narrow-after.png): nenhum rótulo de filtro cortado; título afastado do botão de fechar. [Auditoria](evidence/ecosystem-hierarchy/narrow-audit.json).
+`presentationPlan.ts` é a fonte única de tempos para nós e conexões: CCPF em 0 ms, presidente em 450 ms, vice em 1.050 ms, Central em 1.650 ms e ondas inferiores a partir de 2.250 ms. O conjunto termina em até 3.400 ms, independentemente da quantidade de unidades. Os conectores antecedem os filhos. As posições finais ficam reservadas desde o início; apenas opacidade, transformações locais e desenho SVG são animados.
 
-A reserva medida termina em 108 px no desktop, 146 px no celular e 96 px em paisagem; a câmera adiciona 12 px. A escala inicial é 0,504 / 0,610 / 0,680 respectivamente. O desktop usa uma escala menor que o baseline para mostrar todos os níveis e dar espaço às legendas. O celular e a paisagem mantêm exploração vertical por pan. A amostragem dos caminhos SVG a cada três unidades encontrou zero cruzamentos com legendas; os retângulos dos cartões não se sobrepõem nos três cenários.
+O relógio roda uma vez por abertura. Pular, gesto, filtro ou seleção concluem a entrada. Nós invisíveis não recebem foco; aba oculta conclui o relógio e desmontagem cancela os timers. `prefers-reduced-motion` entrega o estado final imediatamente. Não há estado React por frame.
 
-## Validação
+## Retratos e nome
 
-- **82 testes passaram**, em 9 arquivos: resolver, layout, controles, painel, interação, dados, retratos, telemetria, contrato de acesso e integração do portal.
-- **65 verificações de navegador passaram**: 21 no desktop, 22 no celular e 22 em paisagem. Incluem seis filtros, hierarquia, lista/contagem/seleção, teclado e Home, mouse, roda, pan de toque, pinça, atualização sem salto de câmera, orientação, reabertura, Escape, fechamento do painel/tela cheia e retorno de foco. [Desktop](evidence/ecosystem-hierarchy/desktop-audit.json), [celular](evidence/ecosystem-hierarchy/mobile-audit.json), [paisagem](evidence/ecosystem-hierarchy/landscape-audit.json).
-- `npm run typecheck`, `npm run build` e ESLint dos arquivos TypeScript/TSX alterados passaram. O build mantém os avisos existentes de Browserslist e tamanho de chunks.
-- `npm run lint` do checkout completo falhou com 3.954 erros e 282 avisos fora dos arquivos verificados deste escopo, incluindo cópias em worktrees locais. Não foi tratado como evidência de lint global aprovado.
-- Ampliação para toda a pasta Alvorada revelou a falha preexistente de `AlvoradaBrandHero.test.tsx`: o teste espera `/alvorada/fenasoja-symbol-official.png`, enquanto o componente inalterado usa a URL existente do asset. O teste isolado reproduz a falha. Houve também timeout de 5 s da integração sob carga concorrente; a execução isolada e a execução final pertinente passaram no limite original.
+Os retratos fornecidos de Elvio Becker, Jorge Luiz Viana, Jonas Santos e Francine Maria Boijink foram incluídos no registro compartilhado e em thumbnails WebP de 512 px. O nome corrigido é **Jonas Santos**, inclusive nas fontes persistidas usadas por outras telas. A correção é por IDs exatos, preservando aliases históricos para localizar o mesmo retrato.
 
-Comandos de reprodução (configure `PLAYWRIGHT_PATH` se Playwright não estiver na resolução local):
+A migração `20261023050000_register_official_people_portraits.sql` registra somente esses quatro retratos no cadastro vinculado e corrige o nome de Jonas nos metadados da conta, perfil, membro e responsável. Foi aplicada e conferida na base durante esta execução. Não altera estrutura, senha, autenticação, capabilities ou RLS. As URLs apontam para os assets de um commit imutável já publicado. Layout e hierarquia não exigem mudança de banco.
 
-```powershell
-npx vite --config scripts/alvorada-qa.config.ts --port 4183
-npx vitest run src/features/alvorada/organizational src/test/organizationalResolver.test.ts src/test/alvoradaPortalIntegration.test.tsx src/test/alvoradaAccessContract.test.ts
-node scripts/check-alvorada-interactions.mjs http://127.0.0.1:4183 artifacts/ecosystem-interactions
-node scripts/check-ecosystem-baseline.mjs 8c4dd121 http://127.0.0.1:4183
+## Alterações associadas
+
+Em Vendas e contratos, a faixa recebeu mais largura horizontal e espaçamento menor entre título e métricas. Área comercial passou a ocupar uma coluna menor, sem stretch que iguale artificialmente alturas. A média de assinatura continua usando o mesmo provider, amostra, estados, permissões, detalhes e retorno de foco.
+
+O Bot FENASOJA passou a usar o mascote compacto: ao lado do Ecossistema no portal, da Dashboard no Mapa e da busca na Agenda. Slots leves recebem a única instância do botão; elegibilidade, reconfirmação de senha, atalho e sessão permanecem no launcher existente. Não há novo provider ou consulta. O piscar respeita movimento reduzido.
+
+## Evidência e reprodução
+
+As medidas, capturas comparáveis, limitações e verificações estão em [design-qa.md](validation/ecosystem-fit/design-qa.md). A comparação usa main `9e8e35b4ef235131059f3a6fd3c1caa0a5951b5c` e a mesma fixture de 41 pessoas e 33 unidades inferiores. Esses números descrevem a fixture, não são limites do produto nem contagens fixas do cadastro.
+
+```sh
+node scripts/prepare-ecosystem-qa.mjs
+node scripts/dashboard/prepare-compact-qa.mjs
+npx vite --config scripts/alvorada-qa.config.ts --port 8089
+npx vite --config scripts/dashboard/compact-qa.vite.config.ts --port 8088
+# /scripts/alvorada-qa.html?graph e /scripts/ecosystem-before.html?graph
+# /scripts/responsive-review.html?target=... para medidas de DOM
+# /scripts/workers-launcher-qa.html?surface=portal|map|agenda
 npm run typecheck
 npm run build
+npm test
 ```
 
-## Arquivos e limite da intervenção
-
-- `resolver.ts`: relações de apresentação e lista restrita da Central, mantendo os registros de pessoas.
-- `organizationalLayout.ts`: linhas explícitas, espaçamento, conectores e navegação entre raízes pares.
-- `OrganizationalEcosystem.tsx`, `OrgControls.tsx`, `useOrgGraphInteraction.ts`, `OrganizationalNode.tsx`, `FenasojaEcosystemExperience.tsx`: cabeçalho e remoção integral da busca.
-- `useOrgViewport.ts` e `organizational-ecosystem.css`: medida do topo, enquadramento e controles responsivos.
-- `PersonDetailPanel.tsx`: legenda contextual da diretoria na Central.
-- Testes, harness, scripts e estes anexos: regressões e comparação com o baseline.
-
-Nenhuma alteração em consultas, hooks de autenticação, capabilities, RLS, migrações, arquivos de provisionamento, vínculos ou gravação de banco. Nenhuma conta ou pessoa foi excluída. As fontes institucionais foram somente lidas; a comparação do grafo confirma preservação dos registros. Alterações de terceiros já presentes ou surgidas durante a execução em `package-lock.json`, `supabase/functions/mcp/index.ts` e worktrees foram mantidas fora desta entrega. Não houve deploy ou merge.
+O script opcional `check-alvorada-interactions.mjs` contém as expectativas atualizadas para reprodução em ambiente com Playwright. As verificações de navegador desta entrega foram feitas pela ferramenta de navegador/computador do Codex, incluindo Chrome no perfil Leo. Não houve teste físico em iPhone ou Safari iOS, merge ou deploy da interface.

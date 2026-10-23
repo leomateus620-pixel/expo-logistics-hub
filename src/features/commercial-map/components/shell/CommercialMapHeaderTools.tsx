@@ -1,3 +1,4 @@
+import { WorkersLauncherSlot } from '@/components/WorkersLauncherSlot';
 import { useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Flame, Footprints, List, Settings2, ShoppingCart, SlidersHorizontal } from 'lucide-react';
@@ -128,6 +129,8 @@ export function CommercialMapHeaderTools({
           <span className="commercial-map-header-dashboard__label">Dashboard</span>
         </button>
       </TooltipTrigger><TooltipContent side="bottom">Dashboard Comercial</TooltipContent></Tooltip>}
+
+      <WorkersLauncherSlot surface="map" />
 
       <Popover open={managementOpen && !toolsUnavailable} onOpenChange={(open) => {
         if (toolsUnavailable) return;
