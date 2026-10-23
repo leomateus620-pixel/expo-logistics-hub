@@ -14269,6 +14269,63 @@ export type Database = {
         Args: { _kind: string; _org_id: string; _search: string }
         Returns: Json
       }
+      workers_commercial_report_authorize: {
+        Args: { p_project_id: string }
+        Returns: Json
+      }
+      workers_commercial_report_claim: {
+        Args: { _report_id?: string; _worker_token?: string }
+        Returns: Json
+      }
+      workers_commercial_report_download: {
+        Args: { _org_id: string; _report_id: string; _snapshot_id: string }
+        Returns: Json
+      }
+      workers_commercial_report_expired_files: {
+        Args: never
+        Returns: {
+          id: string
+          object_path: string
+        }[]
+      }
+      workers_commercial_report_finish: {
+        Args: {
+          _file_size?: number
+          _lease_token: string
+          _object_path?: string
+          _page_count?: number
+          _report_id: string
+          _sha256?: string
+          _success: boolean
+        }
+        Returns: undefined
+      }
+      workers_commercial_report_prepare: {
+        Args: { _org_id: string; _snapshot_id: string }
+        Returns: Json
+      }
+      workers_commercial_report_purge: {
+        Args: { _object_path?: string; _report_id: string }
+        Returns: undefined
+      }
+      workers_commercial_report_snapshot: {
+        Args: { _org_id: string; _snapshot_id: string }
+        Returns: Json
+      }
+      workers_commercial_report_status: {
+        Args: { _org_id: string; _report_id?: string; _snapshot_id: string }
+        Returns: Json
+      }
+      workers_commercial_report_store: {
+        Args: {
+          _conversation_id: string
+          _org_id: string
+          _request_id: string
+          _snapshot: Json
+          _user_id: string
+        }
+        Returns: string
+      }
       workers_interest_summary: {
         Args: { _from?: string; _org_id: string; _to?: string }
         Returns: Json
@@ -14283,6 +14340,10 @@ export type Database = {
           _score: number
         }
         Returns: undefined
+      }
+      workers_map_commercial_report: {
+        Args: { p_project_id: string; p_spec: Json }
+        Returns: Json
       }
       workers_map_inventory_summary: {
         Args: {
@@ -14350,6 +14411,10 @@ export type Database = {
           sources: Json
           status: string
         }[]
+      }
+      workers_validate_commercial_report_spec: {
+        Args: { p_project_id: string; s: Json }
+        Returns: undefined
       }
     }
     Enums: {
