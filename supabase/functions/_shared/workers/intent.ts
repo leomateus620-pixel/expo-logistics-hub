@@ -1,9 +1,12 @@
 import { routeWorker, type WorkerId, type WorkerRequest } from './contracts.ts';
 import { decodeWorkerResponse, type WorkerQueryFilters } from './response-contract.ts';
 import { interpretKbQuery } from './knowledge-base.ts';
+import { commercialReportSpecSchema, type CommercialReportSpec } from './commercial-report.ts';
+
+export type CommercialIntentSpec = Omit<CommercialReportSpec, 'projectId'>;
 
 export interface WorkerIntent {
-  kind: 'map_sales' | 'map_inventory' | 'map_contracts' | 'map_documents' | 'map_receipts' | 'agenda_query' | 'agenda_personal' | 'agenda_ranking' | 'agenda_commission_ranking' | 'agenda_person' | 'agenda_commission' | 'institutional_president' | 'domain_query';
+  kind: 'map_report' | 'map_sales' | 'map_inventory' | 'map_contracts' | 'map_documents' | 'map_receipts' | 'agenda_query' | 'agenda_personal' | 'agenda_ranking' | 'agenda_commission_ranking' | 'agenda_person' | 'agenda_commission' | 'institutional_president' | 'domain_query';
   worker: WorkerId;
   editionYear?: number;
   projectId?: string;
@@ -18,6 +21,9 @@ export interface WorkerIntent {
   previousPeriod?: { from: string; to: string; label: string };
   relationship: 'linked' | 'created' | 'responsible' | 'attendance';
   continuation: boolean;
+  commercialSpec?: CommercialIntentSpec;
+  generatePdf?: boolean;
+  commercialClarification?: 'contract_unit' | 'historical_position' | 'company_identity' | 'comparison_periods' | 'contract_identity';
 }
 const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const months = ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
@@ -38,12 +44,14 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
   const previousIntent = previousQuestion && history.length <= 40
     ? interpretWorkerIntent({ ...request, message: previousQuestion }, now, history.slice(0, previousIndex)) : undefined;
   const answeringClarification = Boolean(prior?.blocks.some(block => block.type === 'clarification'));
-  const continuation = answeringClarification || /^(?:e\b|tambem\b|agora\b|no mes anterior|mes anterior|e quanto)/.test(text);
+  const priorCommercial = prior?.metadata.filters?.commercial;
+  const commercialFollowup = Boolean(priorCommercial || previousIntent?.commercialSpec || prior?.worker==='mapa' && /\bpdf\b/.test(text)) && /^(?:mostre|inclua|tire|retire|mantenha|gere|faca|atualiz|somente|so\b|essa?\b|dess[ae]s?\b|troque)/.test(text);
+  const continuation = answeringClarification || commercialFollowup || /^(?:e\b|tambem\b|agora\b|no mes anterior|mes anterior|e quanto)/.test(text);
   const subject = text;
   const publicContext = interpretKbQuery(request.message, now);
   const routedWorker = routeWorker(request);
   const explicitAgenda = /eventos?|agenda|programacao|compromissos/.test(text);
-  const mapContext = !explicitAgenda && (routedWorker === 'mapa' || /\bmapa\b|comercial|lotes|espacos|vendas?|contrat|assinatura|documentos anexados/.test(subject));
+  const mapContext = !explicitAgenda && (routedWorker === 'mapa' || /\bmapa\b|comercial|lotes|espacos|vendas?|contrat|assinatura|documentos anexados|exporural|expo rural|pavilh|expositor|empresas?|automovel/.test(subject) || commercialFollowup);
   const mapDetail = /contrat|assinatura|documento|precos?|renovacao|pavilh|segment|estrutura|recebid|pagament/.test(subject);
   const inventory = /\bdisponive(?:l|is)\b|\blivres?\b|\breservad[oa]s?\b|\bbloquead[oa]s?\b|\bnegociacao\b|\barea\b|\bareas\b|metragem|quadras?|cobert|eletric|energia|agua|internet|inventario|situacao dos (?:lotes|espacos)|distribuicao dos (?:lotes|espacos)/.test(subject);
   let kind: WorkerIntent['kind'] = 'domain_query';
@@ -71,6 +79,13 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
     && /quantos|quantidade|duracao|media|\bfiz\b/.test(subject) && !/situacao|concluid|cancelad|local|categoria|prioridade|hoje|amanha|semana|compare|versus/.test(subject)) kind = 'agenda_personal';
   else if (continuation && !explicitAgenda && !mapDetail && !/subevento|detalhe|presenca/.test(text) && (previousIntent || prior)) kind = previousIntent?.kind ?? prior!.intent as WorkerIntent['kind'];
   else if ((routedWorker === 'agenda' || /eventos?|agenda|programacao|compromissos/.test(subject)) && !mapContext && !/subevento|detalhe/.test(subject)) kind = 'agenda_query';
+  const commercialReport = mapContext && kind !== 'map_receipts' && (
+    /\bpdf\b|relator?io|planta|expo\s*r{1,2}ural|pavilh?|automov|\bics\b|industria.*comercio|area externa|empresas?|expositores?|parcialmente|parciais|principal|taxas|sem (?:contrato|documento)|com (?:contrato|documento)|por (?:pavilhao|empresa|area)|quadra\b|associaco|versoes anteriores|documentos ativos|ultimas vendas|metragem ausente|sem metragem/.test(text)
+    || continuation && Boolean(priorCommercial || previousIntent?.commercialSpec)
+    || /(?:assinad|assinaturas? confirmad|cadastrad|registrad).*(?:mes|outubro|setembro|periodo|\d{2}\/)/.test(text)
+    || /quant[ao]s.*vendas|^quant[ao]s (?:estao|ficaram|temos|ha|existem).*(?:em aberto|confirmad)|pedidos.*(?:assinad|aberto|confirmad|documento)|maior valor.*andamento|contratos?.*(?:mais de um lote|versoes|cobre todos)|(?:quais|liste|mostre).*(?:vendas|pedidos).*assinatura/.test(text)
+  );
+  if (commercialReport) kind = 'map_report';
   const worker: WorkerId = kind.startsWith('map_') ? 'mapa' : kind === 'institutional_president' ? 'radar'
     : kind.startsWith('agenda_') ? 'agenda' : continuation && prior ? prior.worker : routeWorker(request);
   const explicitYear = /\b((?:19|20)\d{2}|2100)\b/.exec(text)?.[1];
@@ -86,7 +101,7 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
     else if(/firmad|assinad|confirmad/.test(text))commercialMetric='signed_records';
   }
   const priorYear = prior?.metadata.edition?.match(/20\d{2}/)?.[0] ?? previousIntent?.editionYear?.toString();
-  const editionYear = kind === 'institutional_president' ? publicContext.editionYear : /projeto inteiro|todas as edicoes/.test(text) ? undefined : explicitYear && (!kind.startsWith('agenda_') || /fenasoja|edicao/.test(text)) ? Number(explicitYear) : continuation && priorYear ? Number(priorYear) : undefined;
+  const editionYear = kind === 'institutional_president' ? publicContext.editionYear : /projeto inteiro|todas as edicoes/.test(text) ? undefined : explicitYear && (kind === 'map_report' ? /fenasoja|edicao/.test(text) : !kind.startsWith('agenda_') || /fenasoja|edicao/.test(text)) ? Number(explicitYear) : continuation && priorYear ? Number(priorYear) : undefined;
   const projectId = continuation && prior?.metadata.projectId && (!explicitYear || !priorYear || explicitYear === priorYear) ? prior.metadata.projectId : undefined;
   const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(now).map(item => [item.type, item.value]));
   let year = Number(parts.year), month = Number(parts.month) - 1;
@@ -141,8 +156,121 @@ export function interpretWorkerIntent(request: WorkerRequest, now: Date, history
       previousPeriod = { from: iso(previous), to, label: `${iso(previous).split('-').reverse().join('/')} a ${to.split('-').reverse().join('/')}` };
     }
   }
+  let commercialSpec: CommercialIntentSpec | undefined;
+  if (kind === 'map_report') {
+    const previous = continuation ? priorCommercial ?? previousIntent?.commercialSpec : undefined;
+    const { projectId: _ignored, ...previousFilters } = previous && 'projectId' in previous ? previous : { ...previous, projectId: undefined };
+    commercialSpec = commercialReportSpecSchema.omit({projectId:true}).parse(previousFilters);
+    const scopes: string[] = [];
+    for (const match of text.matchAll(/pavilh?(?:ao|oes)\s*(\d{1,2})(?:\s*(?:e|,)\s*(\d{1,2}))?/g)) {
+      scopes.push(`Pavilhão ${Number(match[1])}`); if (match[2]) scopes.push(`Pavilhão ${Number(match[2])}`);
+    }
+    if (/expo\s*r{1,2}ural/.test(text)) scopes.push('ExpoRural');
+    if (/espaco do automovel|automoveis|automovel/.test(text)) scopes.push('Espaço do Automóvel');
+    if (/\bics\b|industria.*comercio/.test(text)) scopes.push('Indústria, Comércio e Serviços');
+    const block = /quadra\s+([a-z0-9-]{1,20})\b/.exec(text)?.[1];
+    if (block) scopes.push(`Quadra ${block.toUpperCase()}`);
+    if (/todas as (?:tres|3) areas externas|tres areas externas|3 areas externas/.test(text)) scopes.push('Indústria, Comércio e Serviços','ExpoRural','Espaço do Automóvel');
+    if (scopes.length) { commercialSpec.scopeSearch = [...new Set(scopes)]; commercialSpec.scopes = []; }
+    if (/todos os pavilhoes/.test(text)) { commercialSpec.scopes=[]; commercialSpec.scopeSearch=[]; commercialSpec.geography='internal'; }
+    if (/area externa|areas externas|externa ics|ics externa/.test(text)) commercialSpec.geography='external';
+    else if (/interior|internos|pavilhoes ics/.test(text)) commercialSpec.geography='internal';
+    if (/pavilh(?:ao|oes)|interior|internos/.test(text) && /area externa|areas externas/.test(text)) commercialSpec.geography='all';
+    if (/aguard|penden.*assinatura|contratos? pendentes|em aberto|em andamento/.test(text)) commercialSpec.saleStates=['pending'];
+    else if (/parcialmente assinad|parciais/.test(text)) commercialSpec.saleStates=['partial'];
+    else if (/legado|sem comprovacao/.test(text)) commercialSpec.saleStates=['legacy'];
+    else if (/cancelad/.test(text)) commercialSpec.saleStates=['cancelled'];
+    else if (/assinatura(?:s)? confirmada|assinad[oa]s?|vendas.*confirmadas|vendas.*confirmados/.test(text) && !/contratos pendentes/.test(text)) commercialSpec.saleStates=['signed'];
+    if (/todos os estados|todas as situacoes|sem filtro de assinatura/.test(text)) commercialSpec.saleStates=[];
+    if (/sem (?:contrato|documento)|nao tem documento|nao tem contrato/.test(text)) commercialSpec.contractFilter='without_document';
+    else if (/com (?:contrato|documento)|documentos vinculados/.test(text)) commercialSpec.contractFilter='with_document';
+    if (/sem filtro de (?:documento|contrato)|com e sem documento/.test(text)) commercialSpec.contractFilter='any';
+    if (/inclua.*taxas|com taxas|principal e taxas|principal mais taxas/.test(text)) commercialSpec.monetaryBasis='principal_and_fees';
+    if (/sem taxas|somente (?:o )?principal|so (?:o )?principal/.test(text)) commercialSpec.monetaryBasis='principal';
+    if (editionYear) commercialSpec.editionYear=editionYear;
+    else if (/projeto inteiro|todas as edicoes/.test(text)) delete commercialSpec.editionYear;
+    if (period) commercialSpec.period={from:period.from,to:period.to,basis:/assinad|assinatura.*(?:mes|periodo)/.test(text)?'signed':/cadastrad|criadas?|registrad/.test(text)?'created':commercialSpec.period?.basis??'created'};
+    if (presentation==='comparison'||answeringClarification&&previousIntent?.commercialClarification==='comparison_periods') {
+      const basis=commercialSpec.period?.basis??'created';
+      const mentionedMonths=[...text.matchAll(new RegExp(`\\b(${months.join('|')})\\b`,'g'))].map(match=>months.indexOf(match[1]));
+      if(mentionedMonths.length===2){
+        const earlier=monthPeriod(explicitYear?Number(explicitYear):year,mentionedMonths[0]),later=monthPeriod(explicitYear?Number(explicitYear):year,mentionedMonths[1]);
+        commercialSpec.comparisonPeriod={from:earlier.from,to:earlier.to,basis};commercialSpec.period={from:later.from,to:later.to,basis};
+      }else if(brDates.length===4||explicitDates?.length===4){
+        const dates=brDates.length===4?brDates:explicitDates!;
+        commercialSpec.comparisonPeriod={from:dates[0],to:dates[1],basis};commercialSpec.period={from:dates[2],to:dates[3],basis};
+      }else if(previousPeriod&&commercialSpec.period)commercialSpec.comparisonPeriod={from:previousPeriod.from,to:previousPeriod.to,basis};
+    }
+    if (/sem periodo|todo o periodo/.test(text)) delete commercialSpec.period;
+    if (/detalhad/.test(text)) commercialSpec.presentation='detailed';
+    if (/executiv/.test(text)) commercialSpec.presentation='executive';
+    const sections = new Set(commercialSpec.sections);
+    if (/empresa|expositor/.test(text)) sections.add('exhibitors');
+    if (/contrato|documento/.test(text)) sections.add('contracts');
+    if (/planta|\b2d\b/.test(text)) sections.add('plan_2d');
+    if (/tire.*grafic|retire.*grafic|sem grafic/.test(text)) sections.delete('charts');
+    else if (/grafico/.test(text)) sections.add('charts');
+    commercialSpec.sections=[...sections];
+    if (/quais documentos|liste (?:os )?documentos|documentos ativos|documentos.*versoes|versoes anteriores|quais contratos|contratos.*mais de um lote|contratos por empresa|abrangencia|cobre todos/.test(text) && !/aguard|penden.*assinatura/.test(text)) commercialSpec.reportFocus='contracts';
+    else if (/quais empresas|quais expositores|mais de um pavilhao|expositores.*mais espacos|quem.*maior area|ranking.*(?:empresas|expositores)|empresas da area externa/.test(text)) commercialSpec.reportFocus='exhibitors';
+    else if (/ocupacao|disponibilidade|lotes.*(?:metragem ausente|sem metragem)|associacoes.*revisao/.test(text)) commercialSpec.reportFocus='inventory';
+    else if (/vendas|venda|pedidos|assinatura|empresa,\s*lote|empresa.*lotes.*situacao/.test(text)) commercialSpec.reportFocus='sales';
+    if (/mais de um lote|multiplos lotes|varios lotes/.test(text)&&commercialSpec.reportFocus==='contracts') commercialSpec.documentFilter='multi_lot';
+    else if (/versoes anteriores|mais de uma versao|possuem versoes/.test(text)&&commercialSpec.reportFocus==='contracts') commercialSpec.documentFilter='with_prior_versions';
+    else if (/todos os documentos|todos os contratos/.test(text)) commercialSpec.documentFilter='any';
+    if(/documentos? ativos/.test(text))commercialSpec.documentStates='active';
+    else if(/documentos? inativos/.test(text))commercialSpec.documentStates='inactive';
+    else if(/ativos e inativos|todos os documentos/.test(text))commercialSpec.documentStates='all';
+    if (/por empresa|por expositor/.test(text)) commercialSpec.groupBy='exhibitor';
+    else if (/por situacao|por assinatura/.test(text)) commercialSpec.groupBy='status';
+    else if (/por area|por pavilhao|compare/.test(text)) commercialSpec.groupBy='scope';
+    if(commercialSpec.reportFocus==='exhibitors')commercialSpec.groupBy='exhibitor';
+    if(answeringClarification&&previousIntent?.commercialClarification==='contract_unit'&&/documento/.test(text)){
+      commercialSpec.reportFocus='contracts';if(!commercialSpec.sections.includes('contracts'))commercialSpec.sections.push('contracts');
+    }
+    if (/maior area|mais area|por metragem/.test(text)) {commercialSpec.sortBy='area';commercialSpec.sortDirection='desc';}
+    else if (/maior valor|mais vendeu|maior venda/.test(text)) {commercialSpec.sortBy='value';commercialSpec.sortDirection='desc';}
+    else if (/ultimas vendas|ultimos pedidos/.test(text)) {commercialSpec.sortBy='created';commercialSpec.sortDirection='desc';}
+    else if (/mais espacos|mais lotes/.test(text)) {commercialSpec.sortBy='lots';commercialSpec.sortDirection='desc';}
+    if (/metragem ausente|sem metragem|sem area/.test(text)) {commercialSpec.missingArea=true;commercialSpec.groupBy='none';}
+    if (/sem identificacao empresarial|sem empresa|sem expositor/.test(text)) commercialSpec.missingCompany=true;
+    if (/vendidos.*sem identificacao empresarial/.test(text)) {commercialSpec.reportFocus='sales';commercialSpec.inventoryStates=['SOLD'];}
+    if(/associacoes.*(?:revisao|revisar)|inconsistencias|vinculos ambiguos/.test(text)){commercialSpec.issuesOnly=true;commercialSpec.reportFocus='sales';}
+    if(/sem filtro de inconsistencias|inclua todas as associacoes/.test(text))commercialSpec.issuesOnly=false;
+    // Quoted business names are search data; the server resolves stable IDs and
+    // explicitly asks about homonyms. Never fabricate an exhibitor identity.
+    const quotedCompany = /(?:empresa|expositor)\s+["“]([^"”]{1,180})["”]/i.exec(request.message)?.[1];
+    const namedCompany = /(?:empresa|expositor)\s+(?:chamad[ao]\s+)?([^,;?!]{1,180}?)(?=\s+(?:ocupa|possui|aparece|tem\b|no pavilh|na expo|nos pavilh|com situacao)|[,;?!]|$)/i.exec(request.message)?.[1]?.trim();
+    const company = quotedCompany ?? (namedCompany&&!/^(?:e |ou |com |os |as |no |na |nos |nas |do |da |dos |das |tem |ocupa|possui|em |por |uma |determinada |lote|pavilh|area|situacao|assinatura|aparece)/i.test(namedCompany)?namedCompany:undefined);
+    if (company) {commercialSpec.companySearch=company;commercialSpec.exhibitorIds=[];}
+    else if(answeringClarification&&previousIntent?.commercialClarification==='company_identity'&&request.message.trim().length<=180&&!/vendas|periodo|pavilh|assinatura|pdf/.test(text)){
+      commercialSpec.companySearch=request.message.trim();commercialSpec.exhibitorIds=[];
+    }
+    const quotedContract=/(?:contrato|documento)\s+["“]([^"”]{1,160})["”]/i.exec(request.message)?.[1];
+    const quotedOrder=/(?:pedido|venda)\s+["“]([^"”]{1,160})["”]/i.exec(request.message)?.[1];
+    if(quotedContract){commercialSpec.contractSearch=quotedContract;commercialSpec.contractIds=[];commercialSpec.reportFocus='contracts';}
+    if(quotedOrder){commercialSpec.orderSearch=quotedOrder;commercialSpec.orderIds=[];}
+    if(answeringClarification&&previousIntent?.commercialClarification==='contract_identity'&&request.message.trim().length<=160&&!/vendas|periodo|pavilh|assinatura|pdf/.test(text)){
+      commercialSpec.contractSearch=request.message.trim();commercialSpec.contractIds=[];
+    }
+    const minArea=/(?:area|metragem)\s*(?:maior que|acima de|a partir de|minima de)\s*([\d.,]+)/.exec(text)?.[1];
+    const maxArea=/(?:area|metragem)\s*(?:menor que|abaixo de|ate|maxima de)\s*([\d.,]+)/.exec(text)?.[1];
+    const decimal=(value:string)=>Number(value.replace(/[.,]+$/,'').replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.'));
+    if(minArea)commercialSpec.minArea=decimal(minArea);if(maxArea)commercialSpec.maxArea=decimal(maxArea);
+    const minValue=/(?:valor|principal)\s*(?:maior que|acima de|a partir de|minimo de)\s*(?:r\$\s*)?([\d.,]+)/.exec(text)?.[1];
+    const maxValue=/(?:valor|principal)\s*(?:menor que|abaixo de|ate|maximo de)\s*(?:r\$\s*)?([\d.,]+)/.exec(text)?.[1];
+    if(minValue)commercialSpec.minValueCents=Math.round(decimal(minValue)*100);if(maxValue)commercialSpec.maxValueCents=Math.round(decimal(maxValue)*100);
+    const inventoryStates:Array<[RegExp,CommercialReportSpec['inventoryStates'][number]]>=[[/disponiveis|disponivel|livres/,'AVAILABLE'],[/bloquead/,'BLOCKED'],[/reservad/,'RESERVED'],[/em negociacao/,'IN_NEGOTIATION'],[/vendidos no mapa/,'SOLD']];
+    if(commercialSpec.reportFocus==='inventory')for(const [pattern,state] of inventoryStates)if(pattern.test(text))commercialSpec.inventoryStates=[state];
+  }
+  const commercialClarification: WorkerIntent['commercialClarification'] = kind === 'map_report' && /como estava|situacao em \d|posicao em \d/.test(text) ? 'historical_position'
+    :kind==='map_report'&&/essa? empresa|determinada empresa|empresa selecionada/.test(text)&&!commercialSpec?.companySearch&&!commercialSpec?.exhibitorIds.length?'company_identity'
+    :kind==='map_report'&&/compar.*(?:dois periodos|periodos|datas)/.test(text)&&!commercialSpec?.comparisonPeriod?'comparison_periods'
+    :kind==='map_report'&&/esse contrato|este contrato|esse documento|este documento/.test(text)&&!commercialSpec?.contractSearch&&!commercialSpec?.contractIds.length?'contract_identity'
+    : kind === 'map_report' && /\bcontratos\b/.test(text) && !/assin|document|anex|arquivo|penden|abrang|vers|relatorio|\bpdf\b/.test(text) ? 'contract_unit' : undefined;
   return { kind, worker, resolveProject: kind.startsWith('map_') && (answeringClarification || /projeto|parque/.test(text)), ...(projectId ? { projectId } : {}), ...(editionYear ? { editionYear } : {}), ...(period ? { period } : {}), ...(previousPeriod ? { previousPeriod } : {}),
     ...(entitySearch ? { entitySearch } : {}), ...(entityId ? { entityId } : {}), ...(commercialMetric ? { commercialMetric } : {}),
     ...(continuation && prior?.metadata.filters?.query ? { queryFilters: prior.metadata.filters.query } : {}),
+    ...(commercialSpec ? { commercialSpec, generatePdf: /\bpdf\b|ger(?:e|ar).*relatorio|faca.*relatorio|atualiz.*relatorio|ger(?:e|ar).*versao (?:detalhad|executiv)/.test(text) } : {}), ...(commercialClarification ? { commercialClarification } : {}),
     presentation, relationship, continuation };
 }

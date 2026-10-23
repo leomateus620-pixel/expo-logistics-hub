@@ -1,8 +1,10 @@
 // AUTO-GENERATED from canonical TypeScript declarations. Do not edit.
-// Source inputs + generator SHA256: eec471a1babbd01dfbfce9a3cc74c2c8edfd10df902aaaa0c5383e07f329b55b
+// Source inputs + generator SHA256: 9697c621f7a9ae1af22cac5daaa0d7313f791b5a133d9a1ed2de7358312c6383
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { z } from 'zod';
+
+import type { CommercialReportSnapshot } from "../commercial-report.ts";
 
 export type WorkerId = 'agenda' | 'arena' | 'mapa' | 'interesse' | 'comissao' | 'logistica' | 'caixa' | 'radar';
 
@@ -30,6 +32,8 @@ export interface ToolResult {
     citations: ToolCitation[];
     total?: number;
     truncated?: boolean;
+    /** Server-only evidence for immutable capture; never sent to the planner or chat. */
+    commercialSnapshot?: CommercialReportSnapshot;
 }
 
 export type AccessPolicy = 'member' | 'commission' | 'map' | 'map_sales' | 'map_contracts' | 'analytics' | 'venue' | 'venue_reports' | 'financial' | 'logistics';
