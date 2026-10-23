@@ -257,6 +257,12 @@ export function VenueEventCard({
       <span className="venue-event-card__body">
         <strong className="venue-event-card__title">{title}</strong>
         <VenueEventRequester name={event.requester_name} />
+        {event.status === "cancelado" && (
+          <span className="venue-event-card__cancelled" role="note">
+            <strong>CANCELADO</strong>
+            {event.cancellation_reason && <span>{event.cancellation_reason}</span>}
+          </span>
+        )}
         <VenueEventChips>
           <VenueEventChip
             kind="space"

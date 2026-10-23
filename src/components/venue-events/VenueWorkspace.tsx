@@ -2645,6 +2645,13 @@ export function VenueWorkspace() {
         onSave={(draft) =>
           safeMutation(operations.saveEvent.mutateAsync(draft))
         }
+        currentStatus={editingEvent?.status ?? null}
+        currentCancellationReason={editingEvent?.cancellation_reason ?? null}
+        onCancelEvent={(input) =>
+          safeMutation(
+            operations.transitionEvent.mutateAsync({ ...input, transition: "cancel" }),
+          )
+        }
       />
       <VenueEventDetail
         event={selectedEvent}

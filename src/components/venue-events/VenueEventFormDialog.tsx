@@ -42,7 +42,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { VenuePermissionMap } from "@/hooks/useVenueOperations";
 import { toDisplayUpper } from "@/lib/textNormalize";
-import { AlertTriangle, XCircle } from "lucide-react";
+import { XCircle } from "lucide-react";
 import { canOfferCancellation, validateCancellationReason } from "@/lib/venue-cancellation";
 import {
   COUNTERPART_UNIT_LABELS,
