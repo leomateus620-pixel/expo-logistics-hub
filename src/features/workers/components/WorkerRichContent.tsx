@@ -7,6 +7,8 @@ import { WorkerSourceIcon } from './WorkerKnowledgeSource';
 import '../styles/entity-ranking.css';
 import { PersonAvatar } from '@/components/cronograma-eventos/PersonAvatar';
 import { OrgUnitIdentityBadge, resolveOrgUnitIdentity } from '@/components/cronograma-eventos/org-unit-identity';
+import { WorkerCommercialReport, commercialDateLabel, type CommercialResponseActions } from './WorkerCommercialReport';
+import { WorkerCommercialPlan } from './WorkerCommercialPlan';
 
 const legacyLabel = z.string().min(1).max(180);
 const legacyTableSchema = z.object({ columns: z.array(legacyLabel).min(1).max(8), rows: z.array(z.array(z.string().max(400))).max(100) }).strict().refine(value => value.rows.every(row => row.length === value.columns.length));
@@ -65,6 +67,11 @@ function blockText(block: WorkerResponseBlock): string {
       : `${item.label}: ${item.url}`).join('\n');
     case 'empty': return block.message;
     case 'clarification': return [block.question, ...clarificationOptions(block)].join('\n');
+    case 'commercial_report': return [block.title, ...block.scopeLabels, ...block.filterLabels,
+      `Dados consultados em ${commercialDateLabel(block.generatedAt)} · Horário de Brasília`,
+      `Exibindo ${block.previewCount} de ${block.rowCount} registros`, block.coverage.complete ? 'Cobertura completa do recorte' : 'Cobertura parcial',
+      'O PDF mantém a fotografia desta consulta. A disponibilidade do arquivo é verificada ao abrir a conversa.'].join('\n');
+    case 'commercial_plan': return `${block.title}\n${block.scopeLabels.join(' · ')} · ${block.lotCount} espaços\n${block.missingGeometryCount} espaços sem geometria. A planta usa a mesma fotografia da consulta.`;
   }
 }
 function clarificationOptions(block: Extract<WorkerResponseBlock, { type?: 'clarification' }>): string[] {
@@ -105,7 +112,7 @@ function ResponseComparison({ comparison }: { comparison: Comparison }) {
   const currentLabel = comparison.currentLabel ?? 'Período atual'; const previousLabel = comparison.previousLabel ?? 'Período anterior';
   return <section className="worker-response-comparison" aria-label={comparison.title}><h3>{comparison.title}</h3><div className="worker-comparison-items">{comparison.items.map((item, index) => <article key={index}><h4>{item.label}</h4><dl><div><dt>{currentLabel}</dt><dd>{formatResponseValue(item.current, comparison.unit)}</dd></div><span className="worker-comparison-versus" aria-hidden="true">vs.</span><div><dt>{previousLabel}</dt><dd>{formatResponseValue(item.previous, comparison.unit)}</dd></div></dl></article>)}</div><details className="worker-comparison-table"><summary>Ver valores em tabela <ChevronDown size={13} /></summary><ResponseTable title={comparison.title} table={{ columns: ['Indicador', currentLabel, previousLabel], rows: comparison.items.map(item => [item.label, formatResponseValue(item.current, comparison.unit), formatResponseValue(item.previous, comparison.unit)]) }} /></details></section>;
 }
-function ResponseBlock({ block }: { block: WorkerResponseBlock }) {
+function ResponseBlock({ block, orgId, ...actions }: { block: WorkerResponseBlock; orgId: string } & CommercialResponseActions) {
   switch (block.type) {
     case 'summary': return <Text text={block.text} />;
     case 'indicators': return <dl className="worker-response-indicators">{block.items.map((item, index) => <div key={index} data-unit={item.unit}><dt>{item.label}</dt><dd>{formatResponseValue(item.value, item.unit)}</dd>{item.description && <p>{item.description}</p>}</div>)}</dl>;
@@ -133,19 +140,22 @@ function ResponseBlock({ block }: { block: WorkerResponseBlock }) {
     case 'sources': return <div className="worker-response-sources worker-source-icons" aria-label="Fontes da resposta"><span className="worker-source-icons__label">Fontes</span>{block.items.map((item, index) => <WorkerSourceIcon key={index} label={item.label} url={item.url} date={item.date} source={item.source} />)}</div>;
     case 'empty': return <p className="worker-response-notice">{block.message}</p>;
     case 'clarification': return <div className="worker-response-notice"><Text text={block.question} />{clarificationOptions(block).length > 0 && <ul>{clarificationOptions(block).map((option, index) => <li key={index}>{option}</li>)}</ul>}</div>;
+    case 'commercial_report': return <WorkerCommercialReport block={block} orgId={orgId} {...actions} />;
+    case 'commercial_plan': return <WorkerCommercialPlan block={block} orgId={orgId} />;
   }
 }
-function StructuredResponse({ response }: { response: WorkerResponse }) {
+function StructuredResponse({ response, ...actions }: { response: WorkerResponse } & CommercialResponseActions) {
   const { metadata } = response;
+  const hasCommercialSnapshot = response.blocks.some(block => block.type === 'commercial_report');
   if (response.intent === 'knowledge_base') return <div className="worker-response worker-response--knowledge">
     <div className="worker-response-lead"><Text text={response.summary} /></div>
     {(metadata.edition || metadata.period?.label) && <p className="worker-knowledge-period">{[metadata.edition, metadata.period?.label].filter(Boolean).join(' · ')}</p>}
     {metadata.notes.length > 0 && <div className="worker-knowledge-notes" aria-label="Contexto e ressalvas">{metadata.notes.map((note, index) => <p key={index}>{note}</p>)}</div>}
-    {response.blocks.map((block, index) => <ResponseBlock key={index} block={block} />)}
+    {response.blocks.map((block, index) => <ResponseBlock key={index} block={block} orgId={metadata.organizationId} {...actions} />)}
     <footer className="worker-knowledge-scope">{metadata.scope}</footer>
   </div>;
-  return <div className="worker-response"><div className="worker-response-lead"><Text text={response.summary} /></div>{response.blocks.map((block, index) => <ResponseBlock key={index} block={block} />)}<footer className="worker-response-context">{metadata.completeness === 'partial' && <p className="worker-response-coverage">Consulta parcial. Os registros exibidos não representam um total.</p>}{response.intent === 'map_sales' && metadata.completeness === 'complete' && <p className="worker-response-essential">Valores das vendas. Pagamentos recebidos são apurados separadamente.</p>}<div className="worker-response-stamp"><span>{[metadata.edition, metadata.period?.label].filter(Boolean).join(' · ')}</span><small>Atualizado em {new Date(metadata.updatedAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' })}</small></div>{metadata.notes.length > 0 && <details className="worker-response-details"><summary>Como interpretar estes dados <ChevronDown size={13} /></summary><div>{metadata.notes.map((note, index) => <p key={index}>{note}</p>)}<span>{metadata.scope} · Horário de Brasília</span></div></details>}</footer></div>;
+  return <div className="worker-response"><div className="worker-response-lead"><Text text={response.summary} /></div>{response.blocks.map((block, index) => <ResponseBlock key={index} block={block} orgId={metadata.organizationId} {...actions} />)}<footer className="worker-response-context">{metadata.completeness === 'partial' && <p className="worker-response-coverage">Consulta parcial. Os registros exibidos não representam um total.</p>}{response.intent === 'map_sales' && metadata.completeness === 'complete' && <p className="worker-response-essential">Valores das vendas. Pagamentos recebidos são apurados separadamente.</p>}{!hasCommercialSnapshot && <div className="worker-response-stamp"><span>{[metadata.edition, metadata.period?.label].filter(Boolean).join(' · ')}</span><small>Atualizado em {new Date(metadata.updatedAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' })}</small></div>}{metadata.notes.length > 0 && <details className="worker-response-details"><summary>Como interpretar estes dados <ChevronDown size={13} /></summary><div>{metadata.notes.map((note, index) => <p key={index}>{note}</p>)}<span>{metadata.scope} · Horário de Brasília</span></div></details>}</footer></div>;
 }
-export default function WorkerRichContent({ content, streaming }: { content: string; streaming?: boolean }) {
-  return <div className="worker-rich">{parseRichContent(content, streaming).map((segment, index) => segment.kind === 'text' ? <Text key={index} text={segment.text} /> : segment.kind === 'table' ? <ResponseTable key={index} table={segment.table} /> : segment.kind === 'response' ? <StructuredResponse key={index} response={segment.response} /> : <ResponseChart key={index} chart={segment.chart} legacy />)}</div>;
+export default function WorkerRichContent({ content, streaming, ...actions }: { content: string; streaming?: boolean } & CommercialResponseActions) {
+  return <div className="worker-rich">{parseRichContent(content, streaming).map((segment, index) => segment.kind === 'text' ? <Text key={index} text={segment.text} /> : segment.kind === 'table' ? <ResponseTable key={index} table={segment.table} /> : segment.kind === 'response' ? <StructuredResponse key={index} response={segment.response} {...actions} /> : <ResponseChart key={index} chart={segment.chart} legacy />)}</div>;
 }

@@ -61,6 +61,20 @@ beforeEach(() => {
 afterEach(() => { cleanup(); streams.forEach(stream => stream.resolve()); });
 
 describe('bots chat request lifecycle', () => {
+  it('requests response v2 and preserves the clicked commercial snapshot through a retry', async () => {
+    const snapshotId = '90000000-0000-4000-8000-000000000001';
+    mocks.stream.mockRejectedValueOnce(new TypeError('network connection interrupted'));
+    const { result } = renderHook(() => useWorkersChat({ workerId: 'mapa' }));
+    await act(async () => { await result.current.sendMessage('Atualize os dados deste recorte comercial.', [], undefined, snapshotId); });
+    const failedRequest = result.current.messages[0].requestId!;
+    expect(mocks.stream.mock.calls[0][0].context).toEqual({ route: '/equipe-ia', responseVersion: 2, commercialSnapshotId: snapshotId });
+    act(() => { void result.current.retryMessage(failedRequest); });
+    await waitFor(() => expect(streams).toHaveLength(1));
+    expect(streams[0].request.context).toEqual({ route: '/equipe-ia', responseVersion: 2, commercialSnapshotId: snapshotId });
+    expect(result.current.messages.map(message => message.content).join(' ')).not.toContain(snapshotId);
+    await act(async () => { streams[0].resolve(); });
+  });
+
   it('sends current scope and stripped attachment metadata, blocks duplicate sends and masks local personal data', async () => {
     const { result } = renderHook(() => useWorkersChat({ workerId: 'agenda', context: { route: '/cronograma-eventos' } }));
     act(() => { void result.current.sendMessage('Contato ana@example.com', [{ name: 'nota', text: 'conteúdo', trust: 'untrusted' }]); void result.current.sendMessage('duplicate'); });

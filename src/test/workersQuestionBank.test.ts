@@ -41,10 +41,13 @@ describe('Reviewed live-query question bank',()=>{
   });
   it('does not inherit sales overview across an explicit contracts or receipts follow-up',()=>{
     const prior=compose('Quantos eventos eu fiz neste mês?');prior.intent='map_sales';prior.worker='mapa';
-    expect(interpretWorkerIntent({...request,worker:'mapa',message:'E quais vendas estão sem contrato?'},now,[{role:'assistant',content:encodeWorkerResponse(prior)}]).kind).toBe('domain_query');
+    expect(interpretWorkerIntent({...request,worker:'mapa',message:'E quais vendas estão sem contrato?'},now,[{role:'assistant',content:encodeWorkerResponse(prior)}])).toMatchObject({kind:'map_report',commercialSpec:{contractFilter:'without_document'}});
     expect(interpretWorkerIntent({...request,worker:'mapa',message:'E quanto já foi recebido?'},now,[{role:'assistant',content:encodeWorkerResponse(prior)}]).kind).toBe('map_receipts');
   });
-  it.each(['Quais vendas em aberto estão sem contrato?','Qual o preço do lote?','Quais estruturas existem no mapa comercial?'])('does not replace distinct map queries with the sales overview: %s',message=>{
+  it('routes document-filtered open sales through the complete scoped report, preserving both filters',()=>{
+    expect(interpretWorkerIntent({...request,worker:'mapa',message:'Quais vendas em aberto estão sem contrato?'},now)).toMatchObject({kind:'map_report',commercialSpec:{saleStates:['pending'],contractFilter:'without_document'}});
+  });
+  it.each(['Qual o preço do lote?','Quais estruturas existem no mapa comercial?'])('does not replace distinct map queries with the sales overview: %s',message=>{
     expect(interpretWorkerIntent({...request,worker:'mapa',message},now).kind).toBe('domain_query');
   });
   it('uses word boundaries: indisponível is not available, and explicit availability chooses inventory',()=>{

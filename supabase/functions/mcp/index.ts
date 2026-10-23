@@ -200,6 +200,7 @@ function workerJsonSchema(schema) {
     return result;
   }
   if (schema instanceof z.ZodBoolean) return { type: "boolean" };
+  if (schema instanceof z.ZodLiteral && ["string", "number", "boolean"].includes(typeof schema.value)) return { type: typeof schema.value, enum: [schema.value] };
   if (schema instanceof z.ZodEnum) return { type: "string", enum: schema.options };
   if (schema instanceof z.ZodArray) return { type: "array", items: workerJsonSchema(schema.element), maxItems: schema._def.maxLength?.value ?? 100 };
   if (schema instanceof z.ZodObject) {
@@ -292,18 +293,246 @@ var arenaTools = [
 ];
 
 // src/lib/workers/tools/mapa/index.ts
+import { z as z6 } from "npm:zod@^3.25.76";
+
+// src/lib/workers/commercial-report.ts
 import { z as z5 } from "npm:zod@^3.25.76";
+
+// src/lib/workers/privacy.ts
+var PRIVATE_KEYS = /(?:token|secret|password|authorization|document(?:number|_number)?|cpf|cnpj|telefone|phone|email|e_mail|pix|renavam|storage.?path|raw_payload|internal.?notes|observa[cç][oõ]es|description|descricao|evidence|contact|buyer_?name|buyer_?trade_?name|responsible_?text)/i;
+function maskWorkerText(text3) {
+  return text3.replace(/\b(?:Bearer\s+)?eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gi, "[token protegido]").replace(/\b(?:sb_secret_|sb_publishable_|sk-)[A-Za-z0-9_-]+\b/g, "[chave protegida]").replace(/\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, "[e-mail protegido]").replace(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g, "[CPF protegido]").replace(/\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g, "[documento protegido]").replace(/(?:\+?55[\s.-]*)?\(?\b\d{2}\)?[\s.-]*9?\d{4}[\s.-]*\d{4}\b/g, "[telefone protegido]").replace(/\b(?:PIX|chave\s+pix)\s*[:=]\s*[^\s,;]+/gi, "PIX: [protegido]").replace(/https?:\/\/[^\s]+/gi, "[link externo omitido]");
+}
+function sanitizeWorkerData(value, depth = 0) {
+  if (depth > 8) return null;
+  if (typeof value === "string") return maskWorkerText(value).slice(0, 1200);
+  if (value === null || typeof value === "boolean") return value;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (Array.isArray(value)) return value.slice(0, 100).map((item) => sanitizeWorkerData(item, depth + 1));
+  if (value && typeof value === "object") {
+    const result = {};
+    for (const [key, item] of Object.entries(value)) {
+      if (key === "document_count") {
+        if (item === null || typeof item === "number" && Number.isSafeInteger(item) && item >= 0) result[key] = item;
+        continue;
+      }
+      if (PRIVATE_KEYS.test(key) || key === "__proto__" || key === "constructor" || key === "prototype") continue;
+      if (/^(?:id|.*_id|.*Id|lot_ids)$/.test(key) && (typeof item === "string" || Array.isArray(item))) {
+        const ids = Array.isArray(item) ? item : [item];
+        result[key] = ids.every((id2) => typeof id2 === "string" && /^[0-9a-f-]{36}$/i.test(id2)) ? item : sanitizeWorkerData(item, depth + 1);
+      } else result[key] = sanitizeWorkerData(item, depth + 1);
+    }
+    return result;
+  }
+  return null;
+}
+function pickWorkerFields(value, fields) {
+  const row = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return sanitizeWorkerData(Object.fromEntries(fields.filter((field) => Object.prototype.hasOwnProperty.call(row, field)).map((field) => [field, row[field]])));
+}
+
+// src/lib/workers/commercial-report.ts
+var id = z5.string().uuid();
+var count = z5.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
+var cents = count.nullable();
+var area = z5.number().finite().min(0).nullable();
+var date2 = z5.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+var commercialReportSpecSchema = z5.object({
+  schemaVersion: z5.literal(1).default(1),
+  projectId: id,
+  editionYear: z5.number().int().min(2e3).max(2200).optional(),
+  scopes: z5.array(z5.object({ kind: z5.enum(["pavilion", "segment", "block", "lot"]), id }).strict()).max(100).default([]),
+  scopeSearch: z5.array(z5.string().trim().min(1).max(120)).max(20).default([]),
+  geography: z5.enum(["all", "internal", "external"]).default("all"),
+  saleStates: z5.array(z5.enum(["pending", "signed", "partial", "legacy", "cancelled"])).max(5).default([]),
+  inventoryStates: z5.array(z5.enum(["AVAILABLE", "BLOCKED", "RESERVED", "IN_NEGOTIATION", "SALE_OPEN", "SOLD", "UNAVAILABLE"])).max(7).default([]),
+  contractFilter: z5.enum(["any", "with_document", "without_document"]).default("any"),
+  exhibitorIds: z5.array(id).max(100).default([]),
+  companySearch: z5.string().trim().min(1).max(180).optional(),
+  orderIds: z5.array(id).max(100).default([]),
+  contractIds: z5.array(id).max(100).default([]),
+  orderSearch: z5.string().trim().min(1).max(160).optional(),
+  contractSearch: z5.string().trim().min(1).max(160).optional(),
+  issuesOnly: z5.boolean().default(false),
+  documentStates: z5.enum(["all", "active", "inactive"]).default("all"),
+  period: z5.object({ from: date2, to: date2, basis: z5.enum(["created", "signed"]) }).strict().optional(),
+  comparisonPeriod: z5.object({ from: date2, to: date2, basis: z5.enum(["created", "signed"]) }).strict().optional(),
+  reportFocus: z5.enum(["sales", "exhibitors", "contracts", "inventory"]).default("sales"),
+  documentFilter: z5.enum(["any", "multi_lot", "with_prior_versions"]).default("any"),
+  minArea: z5.number().finite().min(0).max(1e9).optional(),
+  maxArea: z5.number().finite().min(0).max(1e9).optional(),
+  minValueCents: count.optional(),
+  maxValueCents: count.optional(),
+  missingArea: z5.boolean().default(false),
+  missingCompany: z5.boolean().default(false),
+  monetaryBasis: z5.enum(["principal", "principal_and_fees"]).default("principal"),
+  groupBy: z5.enum(["scope", "exhibitor", "status", "none"]).default("scope"),
+  sortBy: z5.enum(["scope", "exhibitor", "area", "value", "created", "signed", "lots"]).default("scope"),
+  sortDirection: z5.enum(["asc", "desc"]).default("asc"),
+  sections: z5.array(z5.enum(["summary", "sales", "exhibitors", "contracts", "charts", "plan_2d"])).max(6).default(["summary", "sales", "charts"]),
+  presentation: z5.enum(["executive", "detailed"]).default("executive")
+}).strict();
+var commercialReportRowSchema = z5.object({
+  id,
+  orderId: id.nullable(),
+  saleId: id.nullable(),
+  lotId: id,
+  exhibitorId: id.nullable(),
+  reference: z5.string().max(160),
+  displayName: z5.string().max(300).nullable(),
+  historicalDisplayName: z5.string().max(300).nullable().default(null),
+  lotLabel: z5.string().max(300),
+  historicalLotLabel: z5.string().max(300).nullable(),
+  lotNumber: z5.string().max(120).nullable(),
+  block: z5.string().max(120).nullable(),
+  pavilionId: id.nullable(),
+  pavilionName: z5.string().max(300).nullable(),
+  segmentId: id.nullable(),
+  segmentName: z5.string().max(300).nullable(),
+  category: z5.enum(["internal", "external", "unclassified"]),
+  mapStatus: z5.string().max(40),
+  state: z5.enum(["pending", "signed", "legacy", "cancelled", "inconsistent"]),
+  partialOrder: z5.boolean(),
+  historicalArea: area,
+  currentArea: area,
+  principalCents: cents,
+  feesCents: cents,
+  totalCents: cents,
+  createdAt: z5.string().datetime({ offset: true }),
+  signedAt: z5.string().datetime({ offset: true }).nullable(),
+  documentCount: count.nullable(),
+  contractIds: z5.array(id).max(200).nullable(),
+  issues: z5.array(z5.string().max(80)).max(20)
+}).strict();
+var commercialReportInventorySchema = z5.object({
+  lotId: id,
+  entityId: id,
+  lotLabel: z5.string().max(300),
+  lotNumber: z5.string().max(120).nullable(),
+  block: z5.string().max(120).nullable(),
+  pavilionId: id.nullable(),
+  pavilionName: z5.string().max(300).nullable(),
+  segmentId: id.nullable(),
+  segmentName: z5.string().max(300).nullable(),
+  category: z5.enum(["internal", "external", "unclassified"]),
+  status: z5.string().max(40),
+  currentArea: area,
+  labelAnchor: z5.array(z5.number().finite()).length(2).nullable(),
+  geometry: z5.object({ type: z5.literal("Polygon"), coordinates: z5.array(z5.array(z5.array(z5.number().finite()).min(2).max(3)).min(4).max(2e4)).min(1).max(100) }).strict().nullable(),
+  associations: z5.array(z5.object({ rowId: id, exhibitorId: id.nullable(), displayName: z5.string().max(300).nullable(), state: z5.string().max(40) }).strict()).max(100),
+  issues: z5.array(z5.string().max(80)).max(20)
+}).strict();
+var commercialReportContractSchema = z5.object({
+  id,
+  reference: z5.string().max(160).nullable(),
+  scope: z5.enum(["LOT", "ORDER_ITEMS"]),
+  orderId: id.nullable(),
+  lotIds: z5.array(id).max(2e4),
+  active: z5.boolean(),
+  activeVersion: count,
+  versionCount: count,
+  orderCoverage: z5.object({ totalLots: count, coveredLots: count, missingLotIds: z5.array(id).max(1e5), complete: z5.boolean() }).strict().nullable().default(null),
+  createdAt: z5.string().datetime({ offset: true }),
+  updatedAt: z5.string().datetime({ offset: true })
+}).strict();
+var commercialReportTotalsSchema = z5.object({
+  orders: count,
+  signedLots: count,
+  pendingLots: count,
+  legacyLots: count,
+  cancelledItems: count,
+  partialOrders: count,
+  exhibitors: count,
+  documents: count.nullable(),
+  soldMapLots: count,
+  availableLots: count,
+  inventoryLots: count,
+  principalCents: cents,
+  signedPrincipalCents: cents,
+  pendingPrincipalCents: cents,
+  legacyPrincipalCents: cents,
+  feesCents: cents,
+  totalCents: cents,
+  historicalArea: area,
+  currentArea: area
+}).strict();
+var commercialReportSnapshotSchema = z5.object({
+  schemaVersion: z5.literal(1),
+  snapshotId: id,
+  generatedAt: z5.string().datetime({ offset: true }),
+  generation: z5.string().regex(/^[a-f0-9]{32,64}$/),
+  spec: commercialReportSpecSchema,
+  scope: z5.object({ projectId: id, projectName: z5.string().max(300), editionYear: z5.number().int().nullable(), timezone: z5.literal("America/Sao_Paulo") }).strict(),
+  totals: commercialReportTotalsSchema,
+  comparison: z5.object({ period: z5.object({ from: date2, to: date2, basis: z5.enum(["created", "signed"]) }).strict(), totals: commercialReportTotalsSchema }).strict().optional(),
+  coverage: z5.object({ complete: z5.boolean(), excludedRows: count, issues: z5.array(z5.object({ code: z5.string().max(80), count }).strict()).max(100) }).strict(),
+  capabilities: z5.object({ companyNames: z5.boolean(), monetaryValues: z5.boolean(), contractReferences: z5.boolean() }).strict(),
+  rows: z5.array(commercialReportRowSchema).max(1e5),
+  inventory: z5.array(commercialReportInventorySchema).max(1e5),
+  contracts: z5.array(commercialReportContractSchema).max(1e5),
+  groups: z5.array(z5.object({ key: z5.string().max(180), label: z5.string().max(300), lots: count, orders: count, exhibitors: count, principalCents: cents, feesCents: cents, historicalArea: area }).strict()).max(1e5),
+  planOutlines: z5.array(z5.object({ id, label: z5.string().max(300), kind: z5.enum(["segment", "block", "pavilion", "support"]), lotIds: z5.array(id).max(1e5).default([]), geometry: z5.object({ type: z5.literal("Polygon"), coordinates: z5.array(z5.array(z5.array(z5.number().finite()).min(2).max(3)).min(4).max(2e4)).min(1).max(100) }).strict() }).strict()).max(1e5),
+  calibration: z5.object({ mapUnitsPerMeter: z5.number().finite().positive(), status: z5.literal("VALIDATED") }).strict().nullable(),
+  notes: z5.array(z5.string().max(2e3)).max(30)
+}).strict();
+var CommercialReportCurrentInventoryError = class extends Error {
+  code = "report_inventory_current_only";
+  constructor() {
+    super("O invent\xE1rio representa a situa\xE7\xE3o atual; filtros de cadastro e assinatura n\xE3o se aplicam.");
+  }
+};
+function parseCommercialReportSpec(value) {
+  const spec = commercialReportSpecSchema.parse(value);
+  if (spec.reportFocus === "inventory" && (spec.period || spec.comparisonPeriod)) throw new CommercialReportCurrentInventoryError();
+  for (const period of [spec.period, spec.comparisonPeriod]) {
+    if (!period) continue;
+    const valid = (value2) => (/* @__PURE__ */ new Date(`${value2}T12:00:00Z`)).toISOString().slice(0, 10) === value2;
+    if (!valid(period.from) || !valid(period.to) || period.from > period.to) throw new Error("Per\xEDodo inv\xE1lido.");
+  }
+  if (spec.comparisonPeriod && (!spec.period || spec.period.basis !== spec.comparisonPeriod.basis)) throw new Error("Compara\xE7\xE3o exige per\xEDodos com a mesma base temporal.");
+  if (spec.minArea !== void 0 && spec.maxArea !== void 0 && spec.minArea > spec.maxArea || spec.minValueCents !== void 0 && spec.maxValueCents !== void 0 && spec.minValueCents > spec.maxValueCents) throw new Error("Faixa inv\xE1lida.");
+  return spec;
+}
+function parseCommercialReportSnapshot(value) {
+  const snapshot = commercialReportSnapshotSchema.parse(value);
+  parseCommercialReportSpec(snapshot.spec);
+  if (snapshot.spec.projectId !== snapshot.scope.projectId) throw new Error("Projeto divergente.");
+  const unique = (ids) => new Set(ids).size === ids.length;
+  if (!unique(snapshot.rows.map((row) => row.id)) || !unique(snapshot.inventory.map((lot) => lot.lotId)) || !unique(snapshot.contracts.map((contract) => contract.id))) throw new Error("Identidades duplicadas.");
+  const rowById = new Map(snapshot.rows.map((row) => [row.id, row]));
+  for (const lot of snapshot.inventory) for (const association of lot.associations) {
+    const row = rowById.get(association.rowId);
+    if (!row || row.lotId !== lot.lotId || row.exhibitorId !== association.exhibitorId) throw new Error("Associa\xE7\xE3o de planta divergente.");
+  }
+  const sanitize = (name) => name === null ? null : maskWorkerText(name).slice(0, 300);
+  for (const row of snapshot.rows) {
+    row.displayName = snapshot.capabilities.companyNames ? sanitize(row.displayName) : null;
+    row.historicalDisplayName = snapshot.capabilities.companyNames ? sanitize(row.historicalDisplayName) : null;
+    if (!snapshot.capabilities.monetaryValues && [row.principalCents, row.feesCents, row.totalCents].some((n) => n !== null)) throw new Error("Proje\xE7\xE3o monet\xE1ria n\xE3o autorizada.");
+    if (!snapshot.capabilities.contractReferences && (row.documentCount !== null || row.contractIds !== null)) throw new Error("Proje\xE7\xE3o contratual n\xE3o autorizada.");
+  }
+  for (const lot of snapshot.inventory) for (const association of lot.associations) association.displayName = snapshot.capabilities.companyNames ? sanitize(association.displayName) : null;
+  if (!snapshot.capabilities.monetaryValues && ([snapshot.totals.principalCents, snapshot.totals.signedPrincipalCents, snapshot.totals.pendingPrincipalCents, snapshot.totals.legacyPrincipalCents, snapshot.totals.feesCents, snapshot.totals.totalCents].some((n) => n !== null) || snapshot.groups.some((group) => group.principalCents !== null || group.feesCents !== null))) throw new Error("Totais monet\xE1rios n\xE3o autorizados.");
+  if (!snapshot.capabilities.monetaryValues && snapshot.comparison && [snapshot.comparison.totals.principalCents, snapshot.comparison.totals.signedPrincipalCents, snapshot.comparison.totals.pendingPrincipalCents, snapshot.comparison.totals.legacyPrincipalCents, snapshot.comparison.totals.feesCents, snapshot.comparison.totals.totalCents].some((n) => n !== null)) throw new Error("Compara\xE7\xE3o monet\xE1ria n\xE3o autorizada.");
+  if (!snapshot.capabilities.contractReferences && snapshot.comparison?.totals.documents != null) throw new Error("Compara\xE7\xE3o contratual n\xE3o autorizada.");
+  if (!snapshot.capabilities.contractReferences && snapshot.totals.documents !== null) throw new Error("Total de documentos n\xE3o autorizado.");
+  if (!snapshot.capabilities.contractReferences && snapshot.contracts.length) throw new Error("Contratos n\xE3o autorizados.");
+  return snapshot;
+}
+
+// src/lib/workers/tools/mapa/index.ts
 var mapaTools = [
-  tool("map_sales_records_summary", "mapa", "Contratos e registros comerciais", "Reutiliza exatamente os totais da API da Dashboard: total global, PENDING (inclui parciais) e SIGNED. Unidade \xE9 agrupamento/registro comercial, n\xE3o lote, documento ou recebimento. A API n\xE3o filtra edi\xE7\xE3o: pe\xE7a escopo de projeto inteiro quando uma edi\xE7\xE3o for solicitada.", input({ project_id: uuid().optional(), edition_year: z5.number().int().min(2e3).max(2200).optional(), date_from: date().optional(), date_to: date().optional() }), "map_sales", "/mapa-comercial", ["map_projects", "list_commercial_sale_orders"]),
-  tool("map_inventory_summary", "mapa", "Espa\xE7os e infraestrutura", "Calcula sobre todos os lotes ativos autorizados do projeto. Filtra situa\xE7\xE3o, quadra, \xE1rea oficial e infraestrutura persistida. Agrupa por situa\xE7\xE3o ou quadra, com Outros calculado no servidor se necess\xE1rio. N\xE3o confundir disponibilidade com vendas, pre\xE7os ou recebimentos. Projeto/edi\xE7\xE3o amb\xEDguos pedem esclarecimento.", input({ project_id: uuid().optional(), edition_year: z5.number().int().min(2e3).max(2200).optional(), status: z5.enum(["AVAILABLE", "BLOCKED", "RESERVED", "IN_NEGOTIATION", "SALE_OPEN", "SOLD"]).optional(), block: z5.string().max(120).optional(), min_area: z5.number().min(0).max(1e9).optional(), max_area: z5.number().min(0).max(1e9).optional(), covered: z5.boolean().optional(), electricity: z5.boolean().optional(), water: z5.boolean().optional(), internet: z5.boolean().optional(), group_by: z5.enum(["status", "block"]).default("status"), missing_number: z5.boolean().optional(), missing_area: z5.boolean().optional() }), "map", "/mapa-comercial", ["workers_map_inventory_summary"]),
-  tool("map_sales_overview", "mapa", "Panorama de vendas comerciais", "Agrega todo o conjunto autorizado por projeto/edi\xE7\xE3o persistidos. Per\xEDodo opcional exige as duas datas: confirmados usam assinatura; itens atualmente em aberto usam cria\xE7\xE3o. N\xE3o representa posi\xE7\xE3o hist\xF3rica nem recebimentos.", input({ project_id: uuid().optional(), edition_year: z5.number().int().min(2e3).max(2200).optional(), date_from: date().optional(), date_to: date().optional() }), "map_sales", "/mapa-comercial", ["workers_map_sales_overview"]),
+  tool("map_commercial_report_query", "mapa", "Consulta comercial por recorte", "Consulta transacional completa de vendas, empresas, assinatura, contratos e ocupa\xE7\xE3o. Resolve pavilh\xF5es f\xEDsicos, segmentos, quadras e lotes persistidos; preserve spec nas continua\xE7\xF5es. Valores e refer\xEAncias de documentos dependem de autoriza\xE7\xE3o no servidor. Retorna pr\xE9via de at\xE9 25 linhas e totais do conjunto inteiro; documento n\xE3o comprova assinatura, principal e taxas s\xE3o separados. N\xE3o gera arquivo nem altera fatos comerciais.", input({ project_id: uuid().optional(), spec: commercialReportSpecSchema.omit({ projectId: true }) }), "map_sales", "/mapa-comercial", ["map_projects", "workers_map_commercial_report"]),
+  tool("map_sales_records_summary", "mapa", "Contratos e registros comerciais", "Reutiliza exatamente os totais da API da Dashboard: total global, PENDING (inclui parciais) e SIGNED. Unidade \xE9 agrupamento/registro comercial, n\xE3o lote, documento ou recebimento. A API n\xE3o filtra edi\xE7\xE3o: pe\xE7a escopo de projeto inteiro quando uma edi\xE7\xE3o for solicitada.", input({ project_id: uuid().optional(), edition_year: z6.number().int().min(2e3).max(2200).optional(), date_from: date().optional(), date_to: date().optional() }), "map_sales", "/mapa-comercial", ["map_projects", "list_commercial_sale_orders"]),
+  tool("map_inventory_summary", "mapa", "Espa\xE7os e infraestrutura", "Calcula sobre todos os lotes ativos autorizados do projeto. Filtra situa\xE7\xE3o, quadra, \xE1rea oficial e infraestrutura persistida. Agrupa por situa\xE7\xE3o ou quadra, com Outros calculado no servidor se necess\xE1rio. N\xE3o confundir disponibilidade com vendas, pre\xE7os ou recebimentos. Projeto/edi\xE7\xE3o amb\xEDguos pedem esclarecimento.", input({ project_id: uuid().optional(), edition_year: z6.number().int().min(2e3).max(2200).optional(), status: z6.enum(["AVAILABLE", "BLOCKED", "RESERVED", "IN_NEGOTIATION", "SALE_OPEN", "SOLD"]).optional(), block: z6.string().max(120).optional(), min_area: z6.number().min(0).max(1e9).optional(), max_area: z6.number().min(0).max(1e9).optional(), covered: z6.boolean().optional(), electricity: z6.boolean().optional(), water: z6.boolean().optional(), internet: z6.boolean().optional(), group_by: z6.enum(["status", "block"]).default("status"), missing_number: z6.boolean().optional(), missing_area: z6.boolean().optional() }), "map", "/mapa-comercial", ["workers_map_inventory_summary"]),
+  tool("map_sales_overview", "mapa", "Panorama de vendas comerciais", "Agrega todo o conjunto autorizado por projeto/edi\xE7\xE3o persistidos. Per\xEDodo opcional exige as duas datas: confirmados usam assinatura; itens atualmente em aberto usam cria\xE7\xE3o. N\xE3o representa posi\xE7\xE3o hist\xF3rica nem recebimentos.", input({ project_id: uuid().optional(), edition_year: z6.number().int().min(2e3).max(2200).optional(), date_from: date().optional(), date_to: date().optional() }), "map_sales", "/mapa-comercial", ["workers_map_sales_overview"]),
   tool("map_projects", "mapa", "Projetos comerciais", "Lista projetos ativos vis\xEDveis.", input({ limit: limit() }), "map", "/mapa-comercial", ["map_projects"]),
   tool("map_segments", "mapa", "Segmentos do mapa", "Consulta segmentos ativos do projeto autorizado.", input(project()), "map", "/mapa-comercial", ["map_projects", "map_segments"]),
   tool("map_entities", "mapa", "Identifica\xE7\xE3o de pavilh\xF5es", "Consulta entidades persistidas para relacionar lote, pavilh\xE3o e segmento. N\xE3o retorna geometria.", input({ ...project(), segment_id: uuid().optional() }), "map", "/mapa-comercial", ["map_projects", "map_entities"]),
-  tool("map_inventory", "mapa", "Invent\xE1rio comercial", "Lista lotes ativos com identidade persistida; distingue SALE_OPEN de SOLD. Total refere-se ao filtro e registros podem ser parciais.", input({ ...project(), status: z5.enum(["AVAILABLE", "BLOCKED", "RESERVED", "IN_NEGOTIATION", "SALE_OPEN", "SOLD"]).optional() }), "map", "/mapa-comercial", ["map_projects", "commercial_lots"]),
-  tool("map_prices", "mapa", "Pre\xE7os autorizados", "Consulta pre\xE7os oficiais sob RLS; nunca altera valores.", input({ ...project(), pavilion: z5.string().max(80).optional() }), "map", "/mapa-comercial", ["map_projects", "commercial_lot_pricing_2028"]),
+  tool("map_inventory", "mapa", "Invent\xE1rio comercial", "Lista lotes ativos com identidade persistida; distingue SALE_OPEN de SOLD. Total refere-se ao filtro e registros podem ser parciais.", input({ ...project(), status: z6.enum(["AVAILABLE", "BLOCKED", "RESERVED", "IN_NEGOTIATION", "SALE_OPEN", "SOLD"]).optional() }), "map", "/mapa-comercial", ["map_projects", "commercial_lots"]),
+  tool("map_prices", "mapa", "Pre\xE7os autorizados", "Consulta pre\xE7os oficiais sob RLS; nunca altera valores.", input({ ...project(), pavilion: z6.string().max(80).optional() }), "map", "/mapa-comercial", ["map_projects", "commercial_lot_pricing_2028"]),
   tool("map_segment_inventory", "mapa", "Completude do segmento", "Retorna contagens estruturais, sem inferir invent\xE1rio comercial.", input({ project_id: uuid(), segment_id: uuid() }), "map", "/mapa-comercial", ["map_projects", "map_segments", "get_commission_map_segment_inventory"]),
-  tool("list_sale_orders", "mapa", "Vendas em aberto e confirmadas", "Consulta estados e quantidade de itens; omite comprador, contatos, valores e pagamentos.", input({ ...project(), status: z5.enum(["PENDING", "SIGNED", "PARTIAL", "CANCELLED_PARTIAL", "LEGACY"]).optional(), has_document: z5.boolean().optional() }), "map_sales", "/mapa-comercial", ["map_projects", "list_commercial_sale_orders"]),
+  tool("list_sale_orders", "mapa", "Vendas em aberto e confirmadas", "Consulta estados e quantidade de itens; omite comprador, contatos, valores e pagamentos.", input({ ...project(), status: z6.enum(["PENDING", "SIGNED", "PARTIAL", "CANCELLED_PARTIAL", "LEGACY"]).optional(), has_document: z6.boolean().optional() }), "map_sales", "/mapa-comercial", ["map_projects", "list_commercial_sale_orders"]),
   tool("sale_order_detail", "mapa", "Itens de uma venda", "Consulta itens e estado de assinatura. N\xE3o confirma, cancela ou revisa venda; n\xE3o retorna dados pessoais nem parcelas.", input({ project_id: uuid(), order_id: uuid() }), "map_sales", "/mapa-comercial", ["map_projects", "lot_sale_orders", "get_commercial_sale_order_detail"]),
   tool("sale_order_contract_summary", "mapa", "Abrang\xEAncia dos contratos", "Consulta somente quantidade e lotes abrangidos pelos contratos autorizados de uma venda; sem arquivos, contatos ou pagamentos.", input({ project_id: uuid(), order_id: uuid() }), "map_contracts", "/mapa-comercial", ["map_projects", "lot_sale_orders", "get_commercial_sale_order_detail"])
 ];
@@ -350,39 +579,6 @@ var workerToolDefinitions = Object.freeze([
   ...logisticaTools,
   ...caixaTools
 ]);
-
-// src/lib/workers/privacy.ts
-var PRIVATE_KEYS = /(?:token|secret|password|authorization|document(?:number|_number)?|cpf|cnpj|telefone|phone|email|e_mail|pix|renavam|storage.?path|raw_payload|internal.?notes|observa[cç][oõ]es|description|descricao|evidence|contact|buyer_?name|buyer_?trade_?name|responsible_?text)/i;
-function maskWorkerText(text3) {
-  return text3.replace(/\b(?:Bearer\s+)?eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gi, "[token protegido]").replace(/\b(?:sb_secret_|sb_publishable_|sk-)[A-Za-z0-9_-]+\b/g, "[chave protegida]").replace(/\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, "[e-mail protegido]").replace(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g, "[CPF protegido]").replace(/\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g, "[documento protegido]").replace(/(?:\+?55[\s.-]*)?\(?\b\d{2}\)?[\s.-]*9?\d{4}[\s.-]*\d{4}\b/g, "[telefone protegido]").replace(/\b(?:PIX|chave\s+pix)\s*[:=]\s*[^\s,;]+/gi, "PIX: [protegido]").replace(/https?:\/\/[^\s]+/gi, "[link externo omitido]");
-}
-function sanitizeWorkerData(value, depth = 0) {
-  if (depth > 8) return null;
-  if (typeof value === "string") return maskWorkerText(value).slice(0, 1200);
-  if (value === null || typeof value === "boolean") return value;
-  if (typeof value === "number") return Number.isFinite(value) ? value : null;
-  if (Array.isArray(value)) return value.slice(0, 100).map((item) => sanitizeWorkerData(item, depth + 1));
-  if (value && typeof value === "object") {
-    const result = {};
-    for (const [key, item] of Object.entries(value)) {
-      if (key === "document_count") {
-        if (item === null || typeof item === "number" && Number.isSafeInteger(item) && item >= 0) result[key] = item;
-        continue;
-      }
-      if (PRIVATE_KEYS.test(key) || key === "__proto__" || key === "constructor" || key === "prototype") continue;
-      if (/^(?:id|.*_id|.*Id|lot_ids)$/.test(key) && (typeof item === "string" || Array.isArray(item))) {
-        const ids = Array.isArray(item) ? item : [item];
-        result[key] = ids.every((id) => typeof id === "string" && /^[0-9a-f-]{36}$/i.test(id)) ? item : sanitizeWorkerData(item, depth + 1);
-      } else result[key] = sanitizeWorkerData(item, depth + 1);
-    }
-    return result;
-  }
-  return null;
-}
-function pickWorkerFields(value, fields) {
-  const row = value && typeof value === "object" && !Array.isArray(value) ? value : {};
-  return sanitizeWorkerData(Object.fromEntries(fields.filter((field) => Object.prototype.hasOwnProperty.call(row, field)).map((field) => [field, row[field]])));
-}
 
 // src/lib/workers/sources.ts
 var READ_TABLES = {
@@ -432,12 +628,13 @@ var READ_RPCS = [
   "workers_agenda_people_ranking",
   "workers_agenda_query",
   "workers_map_inventory_summary",
+  "workers_map_commercial_report",
   "workers_agenda_resolve_identity",
   "workers_agenda_person_events",
   "workers_agenda_commission_ranking"
 ];
-async function requireProject(ctx, id) {
-  const { data, error } = await ctx.supabase.from("map_projects").select("id,org_id,is_archived").eq("org_id", ctx.orgId).eq("id", id).eq("is_archived", false).maybeSingle();
+async function requireProject(ctx, id2) {
+  const { data, error } = await ctx.supabase.from("map_projects").select("id,org_id,is_archived").eq("org_id", ctx.orgId).eq("id", id2).eq("is_archived", false).maybeSingle();
   if (error) throw workerDataError(error, "authorization");
   if (!data || data.org_id !== ctx.orgId) throw new WorkerToolError("NOT_FOUND", "Projeto n\xE3o encontrado ou sem acesso.");
 }
@@ -463,10 +660,10 @@ async function readRows(ctx, table, options = {}) {
     if (operation === "is") query = query.is(column, value);
   }
   if (options.order) query = query.order(options.order, { ascending: true });
-  const { data, error, count: count3 } = await query.limit(size + 1);
+  const { data, error, count: count4 } = await query.limit(size + 1);
   if (error) throw workerDataError(error);
   const rows2 = data ?? [];
-  return { records: rows2.slice(0, size).map((row) => pickWorkerFields(row, spec.fields)), total: count3 ?? rows2.length, truncated: count3 != null ? count3 > size : rows2.length > size };
+  return { records: rows2.slice(0, size).map((row) => pickWorkerFields(row, spec.fields)), total: count4 ?? rows2.length, truncated: count4 != null ? count4 > size : rows2.length > size };
 }
 async function readRpc(ctx, rpc, args) {
   if (!READ_RPCS.includes(rpc)) throw new WorkerToolError("TOOL_NOT_ALLOWED", "RPC fora da allowlist de leitura.");
@@ -477,81 +674,81 @@ async function readRpc(ctx, rpc, args) {
 }
 
 // src/lib/workers/analytics.ts
-import { z as z6 } from "npm:zod@^3.25.76";
-var count = z6.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
-var finite = z6.number().finite().nonnegative().max(Number.MAX_SAFE_INTEGER);
-var text = z6.string().min(1).max(500);
-var scope = z6.object({
-  timezone: z6.literal("America/Sao_Paulo"),
-  complete: z6.literal(true),
-  as_of: z6.string().datetime({ offset: true }),
-  period: z6.object({ from: z6.string().regex(/^\d{4}-\d{2}-\d{2}$/), to: z6.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).strict().optional(),
-  project_id: z6.string().uuid().optional(),
+import { z as z7 } from "npm:zod@^3.25.76";
+var count2 = z7.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
+var finite = z7.number().finite().nonnegative().max(Number.MAX_SAFE_INTEGER);
+var text = z7.string().min(1).max(500);
+var scope = z7.object({
+  timezone: z7.literal("America/Sao_Paulo"),
+  complete: z7.literal(true),
+  as_of: z7.string().datetime({ offset: true }),
+  period: z7.object({ from: z7.string().regex(/^\d{4}-\d{2}-\d{2}$/), to: z7.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).strict().optional(),
+  project_id: z7.string().uuid().optional(),
   project_name: text.optional(),
-  edition_year: z6.number().int().min(2e3).max(2200).optional(),
+  edition_year: z7.number().int().min(2e3).max(2200).optional(),
   edition_label: text.optional(),
-  unit: z6.enum(["BRL_cents", "events"]).optional(),
-  relationship: z6.enum(["linked", "created", "responsible"]).optional(),
-  duration_basis: z6.literal("full_scheduled_event").optional(),
-  subevents: z6.literal("deduplicated_parent").optional(),
-  cancelled: z6.literal("excluded").optional()
+  unit: z7.enum(["BRL_cents", "events"]).optional(),
+  relationship: z7.enum(["linked", "created", "responsible"]).optional(),
+  duration_basis: z7.literal("full_scheduled_event").optional(),
+  subevents: z7.literal("deduplicated_parent").optional(),
+  cancelled: z7.literal("excluded").optional()
 }).strict();
-var notes = z6.array(text).max(8);
-var map = z6.object({ scope, notes, metrics: z6.object({
-  confirmed_value_cents: count,
-  open_value_cents: count,
-  confirmed_orders: count,
-  open_orders: count,
-  confirmed_lots: count,
-  open_lots: count,
-  legacy_lots: count,
-  cancelled_lots: count,
-  unverified_lots: count,
-  missing_value_lots: count,
-  unallocated_lots: count,
-  unknown_period_lots: count
+var notes = z7.array(text).max(8);
+var map = z7.object({ scope, notes, metrics: z7.object({
+  confirmed_value_cents: count2,
+  open_value_cents: count2,
+  confirmed_orders: count2,
+  open_orders: count2,
+  confirmed_lots: count2,
+  open_lots: count2,
+  legacy_lots: count2,
+  cancelled_lots: count2,
+  unverified_lots: count2,
+  missing_value_lots: count2,
+  unallocated_lots: count2,
+  unknown_period_lots: count2
 }).strict() }).strict();
-var personal = z6.object({ scope, notes, metrics: z6.object({
-  events: count,
-  created_events: count,
-  responsible_events: count,
-  linked_events: count,
-  completed_events: count,
-  past_events: count,
-  scheduled_events: count,
-  valid_duration_events: count,
+var personal = z7.object({ scope, notes, metrics: z7.object({
+  events: count2,
+  created_events: count2,
+  responsible_events: count2,
+  linked_events: count2,
+  completed_events: count2,
+  past_events: count2,
+  scheduled_events: count2,
+  valid_duration_events: count2,
   average_duration_minutes: finite.nullable(),
-  weekday_counts: z6.array(z6.object({ weekday: z6.number().int().min(0).max(6), events: count }).strict()).max(7)
+  weekday_counts: z7.array(z7.object({ weekday: z7.number().int().min(0).max(6), events: count2 }).strict()).max(7)
 }).strict() }).strict();
-var ranking = z6.object({
+var ranking = z7.object({
   scope,
   notes,
-  metrics: z6.object({
-    people_count: count,
-    event_count: count,
-    unidentified_links: count,
-    shown_people: z6.number().int().min(1).max(30),
-    tie_break: z6.literal("name_then_id")
+  metrics: z7.object({
+    people_count: count2,
+    event_count: count2,
+    unidentified_links: count2,
+    shown_people: z7.number().int().min(1).max(30),
+    tie_break: z7.literal("name_then_id")
   }).strict(),
-  people: z6.array(z6.object({ person_id: z6.string().uuid(), name: text, events: count, position: count }).strict()).max(30)
+  people: z7.array(z7.object({ person_id: z7.string().uuid(), name: text, events: count2, position: count2 }).strict()).max(30)
 }).strict();
-var identity = z6.object({ id: z6.string().uuid(), name: text, kind: z6.enum(["person", "commission"]), visual_key: z6.string().regex(/^[a-z0-9_-]{1,100}$/).optional() }).strict();
-var identities = z6.object({ complete: z6.literal(true), identities: z6.array(identity) }).strict();
-var personEvents = z6.object({ scope, notes, person: identity.extend({ kind: z6.literal("person") }), metrics: z6.object({ events: count }).strict() }).strict();
-var commissionRanking = z6.object({
+var identity = z7.object({ id: z7.string().uuid(), name: text, kind: z7.enum(["person", "commission"]), visual_key: z7.string().regex(/^[a-z0-9_-]{1,100}$/).optional() }).strict();
+var identities = z7.object({ complete: z7.literal(true), identities: z7.array(identity) }).strict();
+var personEvents = z7.object({ scope, notes, person: identity.extend({ kind: z7.literal("person") }), metrics: z7.object({ events: count2 }).strict() }).strict();
+var commissionRanking = z7.object({
   scope,
   notes,
-  metrics: z6.object({
-    commission_count: count,
-    event_count: count,
-    shown_commissions: z6.number().int().min(1).max(30),
-    tie_break: z6.literal("name_then_id")
+  metrics: z7.object({
+    commission_count: count2,
+    event_count: count2,
+    shown_commissions: z7.number().int().min(1).max(30),
+    tie_break: z7.literal("name_then_id")
   }).strict(),
-  commissions: z6.array(z6.object({ commission_id: z6.string().uuid(), name: text, slug: z6.string().regex(/^[a-z0-9_-]{1,100}$/), events: count, position: count }).strict()).max(30)
+  commissions: z7.array(z7.object({ commission_id: z7.string().uuid(), name: text, slug: z7.string().regex(/^[a-z0-9_-]{1,100}$/), events: count2, position: count2 }).strict()).max(30)
 }).strict();
-var clarification = z6.object({ needs_clarification: z6.literal(true), question: text, options: z6.array(text).max(100) }).strict();
+var clarification = z7.object({ needs_clarification: z7.literal(true), question: text, options: z7.array(text).max(100) }).strict();
 function parseWorkerAnalytics(tool2, value) {
-  const schema = tool2 === "map_sales_overview" ? z6.union([map, clarification]) : tool2 === "agenda_personal_summary" ? personal : tool2 === "agenda_people_ranking" ? ranking : tool2 === "agenda_commission_ranking" ? commissionRanking : tool2 === "agenda_resolve_identity" ? identities : tool2 === "agenda_person_events" ? personEvents : void 0;
+  const schema = tool2 === "map_sales_overview" ? z7.union([map, clarification]) : tool2 === "agenda_personal_summary" ? personal : tool2 === "agenda_people_ranking" ? ranking : tool2 === "agenda_commission_ranking" ? commissionRanking : tool2 === "agenda_resolve_identity" ? identities : tool2 === "agenda_person_events" ? personEvents : void 0;
   if (!schema) throw new WorkerToolError("INVALID_RESPONSE", "Resultado de consulta n\xE3o reconhecido.", { stage: "validation" });
   const parsed = schema.safeParse(value);
   if (!parsed.success) throw new WorkerToolError("INVALID_RESPONSE", "N\xE3o foi poss\xEDvel verificar o resultado desta consulta.", { stage: "validation" });
@@ -587,24 +784,135 @@ function parseWorkerAnalytics(tool2, value) {
 }
 
 // src/lib/workers/question-analytics.ts
-import { z as z7 } from "npm:zod@^3.25.76";
-var count2 = z7.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
-var amount = z7.number().finite().nonnegative().max(Number.MAX_SAFE_INTEGER);
-var text2 = z7.string().max(500);
-var filters = z7.object({ relationship: z7.enum(["all", "linked", "created", "responsible"]).optional(), status: text2.optional(), search: text2.optional(), location: text2.optional(), category: text2.optional(), priority: text2.optional(), weekday: z7.number().int().min(0).max(6).optional(), commission_id: z7.string().uuid().optional(), block: text2.optional(), min_area: amount.optional(), max_area: amount.optional(), covered: z7.boolean().optional(), electricity: z7.boolean().optional(), water: z7.boolean().optional(), internet: z7.boolean().optional(), missing_number: z7.boolean().optional(), missing_area: z7.boolean().optional(), missing_time: z7.boolean().optional(), missing_location: z7.boolean().optional(), missing_category: z7.boolean().optional(), cross_midnight: z7.boolean().optional(), cross_period: z7.boolean().optional(), start_in_period: z7.boolean().optional() }).strict();
-var scope2 = z7.object({ complete: z7.literal(true), as_of: z7.string().datetime({ offset: true }), timezone: z7.literal("America/Sao_Paulo"), period: z7.object({ from: text2, to: text2 }).strict().optional(), project_id: z7.string().uuid().optional(), project_name: text2.optional(), edition_year: z7.number().int().optional(), edition_label: text2.optional(), group_by: z7.enum(["status", "block", "location", "category", "weekday", "day"]), filters }).strict();
-var common = { scope: scope2, groups: z7.array(z7.object({ label: z7.string().min(1).max(180), count: count2 }).strict()).max(20) };
-var inventory = z7.object({ ...common, metrics: z7.object({ total: count2, area_sqm: amount, missing_area: count2 }).strict(), rows: z7.array(z7.object({ name: text2, number: text2.nullable(), block: text2.nullable(), status: text2, area_sqm: amount.nullable(), covered: z7.boolean(), electricity: z7.boolean(), water: z7.boolean(), internet: z7.boolean() }).strict()).max(20) }).strict();
-var agenda = z7.object({ ...common, metrics: z7.object({ total: count2, valid_duration_events: count2, average_duration_minutes: amount.nullable() }).strict(), rows: z7.array(z7.object({ title: text2, status: text2, start_date: text2.nullable(), end_date: text2.nullable(), start_time: text2.nullable(), end_time: text2.nullable(), location: text2.nullable(), category: text2, priority: text2 }).strict()).max(20) }).strict();
-var clarification2 = z7.object({ needs_clarification: z7.literal(true), question: text2, options: z7.array(text2).max(100) }).strict();
+import { z as z8 } from "npm:zod@^3.25.76";
+var count3 = z8.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
+var amount = z8.number().finite().nonnegative().max(Number.MAX_SAFE_INTEGER);
+var text2 = z8.string().max(500);
+var filters = z8.object({ relationship: z8.enum(["all", "linked", "created", "responsible"]).optional(), status: text2.optional(), search: text2.optional(), location: text2.optional(), category: text2.optional(), priority: text2.optional(), weekday: z8.number().int().min(0).max(6).optional(), commission_id: z8.string().uuid().optional(), block: text2.optional(), min_area: amount.optional(), max_area: amount.optional(), covered: z8.boolean().optional(), electricity: z8.boolean().optional(), water: z8.boolean().optional(), internet: z8.boolean().optional(), missing_number: z8.boolean().optional(), missing_area: z8.boolean().optional(), missing_time: z8.boolean().optional(), missing_location: z8.boolean().optional(), missing_category: z8.boolean().optional(), cross_midnight: z8.boolean().optional(), cross_period: z8.boolean().optional(), start_in_period: z8.boolean().optional() }).strict();
+var scope2 = z8.object({ complete: z8.literal(true), as_of: z8.string().datetime({ offset: true }), timezone: z8.literal("America/Sao_Paulo"), period: z8.object({ from: text2, to: text2 }).strict().optional(), project_id: z8.string().uuid().optional(), project_name: text2.optional(), edition_year: z8.number().int().optional(), edition_label: text2.optional(), group_by: z8.enum(["status", "block", "location", "category", "weekday", "day"]), filters }).strict();
+var common = { scope: scope2, groups: z8.array(z8.object({ label: z8.string().min(1).max(180), count: count3 }).strict()).max(20) };
+var inventory = z8.object({ ...common, metrics: z8.object({ total: count3, area_sqm: amount, missing_area: count3 }).strict(), rows: z8.array(z8.object({ name: text2, number: text2.nullable(), block: text2.nullable(), status: text2, area_sqm: amount.nullable(), covered: z8.boolean(), electricity: z8.boolean(), water: z8.boolean(), internet: z8.boolean() }).strict()).max(20) }).strict();
+var agenda = z8.object({ ...common, metrics: z8.object({ total: count3, valid_duration_events: count3, average_duration_minutes: amount.nullable() }).strict(), rows: z8.array(z8.object({ title: text2, status: text2, start_date: text2.nullable(), end_date: text2.nullable(), start_time: text2.nullable(), end_time: text2.nullable(), location: text2.nullable(), category: text2, priority: text2 }).strict()).max(20) }).strict();
+var clarification2 = z8.object({ needs_clarification: z8.literal(true), question: text2, options: z8.array(text2).max(100) }).strict();
 function parseQuestionAnalytics(tool2, value) {
-  const parsed = (tool2 === "map_inventory_summary" ? z7.union([inventory, clarification2]) : agenda).safeParse(value);
+  const parsed = (tool2 === "map_inventory_summary" ? z8.union([inventory, clarification2]) : agenda).safeParse(value);
   if (!parsed.success) throw new WorkerToolError("DATA_UNAVAILABLE", "N\xE3o foi poss\xEDvel verificar os dados solicitados.");
   if ("metrics" in parsed.data) {
     const data = parsed.data;
     if (data.groups.reduce((sum, group) => sum + group.count, 0) !== data.metrics.total || new Set(data.groups.map((group) => group.label)).size !== data.groups.length || data.rows.length > data.metrics.total || "valid_duration_events" in data.metrics && (data.metrics.valid_duration_events > data.metrics.total || data.metrics.valid_duration_events === 0 !== (data.metrics.average_duration_minutes === null))) throw new WorkerToolError("DATA_UNAVAILABLE", "N\xE3o foi poss\xEDvel verificar a abrang\xEAncia da consulta.");
   }
   return parsed.data;
+}
+
+// src/lib/workers/commercial-report-preview.ts
+function commercialReportContracts(snapshot) {
+  return snapshot.contracts.filter((contract) => snapshot.spec.documentFilter === "multi_lot" ? contract.lotIds.length > 1 : snapshot.spec.documentFilter === "with_prior_versions" ? contract.versionCount > 1 : true).map((contract) => ({ ...contract, exhibitors: [...new Map(snapshot.rows.filter((row) => contract.lotIds.includes(row.lotId) && (contract.scope === "LOT" || row.orderId === contract.orderId)).map((row) => [row.exhibitorId ?? `missing:${row.id}`, { id: row.exhibitorId, displayName: row.displayName }])).values()] })).sort((a, b) => b.lotIds.length - a.lotIds.length || a.id.localeCompare(b.id));
+}
+function commercialReportGroups(snapshot) {
+  const spec = snapshot.spec;
+  const inventoryGroups = /* @__PURE__ */ new Map();
+  if (spec.reportFocus === "inventory") for (const lot of snapshot.inventory) {
+    const key = spec.groupBy === "status" ? lot.status : lot.pavilionId ?? lot.segmentId ?? "unclassified";
+    const label = spec.groupBy === "status" ? lot.status : lot.pavilionName ?? lot.segmentName ?? "\xC1rea sem classifica\xE7\xE3o";
+    const group = inventoryGroups.get(key) ?? { key, label, lots: 0, orders: 0, exhibitors: 0, principalCents: null, feesCents: null, historicalArea: null, availableLots: 0, soldMapLots: 0, saleOpenLots: 0, blockedLots: 0 };
+    group.lots++;
+    if (lot.status === "AVAILABLE") group.availableLots = (group.availableLots ?? 0) + 1;
+    if (lot.status === "SOLD") group.soldMapLots = (group.soldMapLots ?? 0) + 1;
+    if (lot.status === "SALE_OPEN") group.saleOpenLots = (group.saleOpenLots ?? 0) + 1;
+    if (lot.status === "BLOCKED") group.blockedLots = (group.blockedLots ?? 0) + 1;
+    inventoryGroups.set(key, group);
+  }
+  const contractGroups = /* @__PURE__ */ new Map();
+  if (spec.reportFocus === "contracts") for (const contract of commercialReportContracts(snapshot)) {
+    const linked = snapshot.inventory.filter((lot) => contract.lotIds.includes(lot.lotId));
+    const identities2 = spec.groupBy === "exhibitor" ? contract.exhibitors.length ? contract.exhibitors.map((exhibitor) => ({ key: exhibitor.id ?? `missing:${contract.id}`, label: exhibitor.displayName ?? "Identidade n\xE3o comprovada", lotId: null })) : [{ key: `missing:${contract.id}`, label: "Identidade n\xE3o comprovada", lotId: null }] : linked.length ? linked.map((lot) => ({ key: lot.pavilionId ?? lot.segmentId ?? "unclassified", label: lot.pavilionName ?? lot.segmentName ?? "\xC1rea sem classifica\xE7\xE3o", lotId: lot.lotId })) : [{ key: "unclassified", label: "\xC1rea sem classifica\xE7\xE3o", lotId: null }];
+    for (const identity2 of identities2) {
+      const key = spec.groupBy === "status" ? contract.active ? "active" : "inactive" : spec.groupBy === "none" ? "all" : identity2.key;
+      const label = spec.groupBy === "status" ? contract.active ? "Ativos" : "Inativos" : spec.groupBy === "none" ? "Todos os documentos" : identity2.label;
+      const entry = contractGroups.get(key) ?? { group: { key, label, lots: 0, orders: 0, exhibitors: 0, principalCents: null, feesCents: null, historicalArea: null, documents: 0 }, documents: /* @__PURE__ */ new Set(), lots: /* @__PURE__ */ new Set(), orders: /* @__PURE__ */ new Set() };
+      entry.documents.add(contract.id);
+      if (identity2.lotId) entry.lots.add(identity2.lotId);
+      if (contract.orderId) entry.orders.add(contract.orderId);
+      entry.group.documents = entry.documents.size;
+      entry.group.lots = entry.lots.size;
+      entry.group.orders = entry.orders.size;
+      contractGroups.set(key, entry);
+    }
+  }
+  const compare = (a, b) => {
+    const field = spec.sortBy === "area" ? "historicalArea" : spec.sortBy === "value" ? "principalCents" : spec.sortBy === "lots" ? "lots" : void 0;
+    if (field) {
+      const left = a[field], right = b[field];
+      if (left === null && right !== null) return 1;
+      if (right === null && left !== null) return -1;
+      const delta = Number(left) - Number(right);
+      if (delta) return spec.sortDirection === "desc" ? -delta : delta;
+    }
+    return a.label.localeCompare(b.label, "pt-BR") || a.key.localeCompare(b.key);
+  };
+  const groups = [...spec.reportFocus === "inventory" ? inventoryGroups.values() : spec.reportFocus === "contracts" ? [...contractGroups.values()].map((entry) => entry.group) : snapshot.groups].sort(compare);
+  return groups;
+}
+function commercialReportPreview(snapshot) {
+  const spec = snapshot.spec, groups = commercialReportGroups(snapshot);
+  const monetary = !["inventory", "contracts"].includes(spec.reportFocus) && snapshot.capabilities.monetaryValues && spec.sortBy !== "lots" && groups.every((group) => group.principalCents !== null);
+  const fullChart = groups.map((group) => ({ label: group.label, value: monetary ? group.principalCents : spec.reportFocus === "contracts" ? group.documents ?? 0 : group.lots }));
+  const chart = fullChart.slice(0, fullChart.length > 20 ? 19 : 20);
+  if (fullChart.length > 20) {
+    const remaining = fullChart.slice(19).reduce((sum, group) => sum + group.value, 0);
+    if (!Number.isSafeInteger(remaining)) throw new Error("Agregado fora da faixa num\xE9rica.");
+    chart.push({ label: fullChart.some((group) => group.label === "Outros") ? "Demais grupos" : "Outros", value: remaining });
+  }
+  const contracts = commercialReportContracts(snapshot);
+  const inventory2 = snapshot.inventory.map((lot) => ({
+    lotId: lot.lotId,
+    lotLabel: lot.lotLabel,
+    block: lot.block,
+    pavilionName: lot.pavilionName,
+    segmentName: lot.segmentName,
+    status: lot.status,
+    currentArea: lot.currentArea,
+    hasGeometry: lot.geometry !== null,
+    associationCount: lot.associations.length
+  }));
+  const inventorySummary = [...new Set(inventory2.map((lot) => lot.status))].sort().map((status) => ({ status, lots: inventory2.filter((lot) => lot.status === status).length }));
+  const contractSummary = {
+    total: contracts.length,
+    active: contracts.filter((contract) => contract.active).length,
+    inactive: contracts.filter((contract) => !contract.active).length,
+    versions: contracts.reduce((sum, contract) => sum + contract.versionCount, 0),
+    multiLot: contracts.filter((contract) => contract.lotIds.length > 1).length,
+    withPriorVersions: contracts.filter((contract) => contract.versionCount > 1).length
+  };
+  const focus = spec.reportFocus;
+  const inventoryGrouped = focus === "inventory" && spec.groupBy !== "none";
+  const rowCount = focus === "contracts" ? contracts.length : inventoryGrouped ? groups.length : focus === "inventory" ? inventory2.length : focus === "exhibitors" ? groups.length : snapshot.rows.length;
+  return {
+    schemaVersion: snapshot.schemaVersion,
+    snapshotId: snapshot.snapshotId,
+    generatedAt: snapshot.generatedAt,
+    generation: snapshot.generation,
+    spec: snapshot.spec,
+    scope: snapshot.scope,
+    totals: snapshot.totals,
+    coverage: snapshot.coverage,
+    capabilities: snapshot.capabilities,
+    rows: focus === "sales" ? snapshot.rows.slice(0, 25) : [],
+    groups: groups.slice(0, 20),
+    groupCount: groups.length,
+    chart: { unit: monetary ? "BRL" : "count", data: chart.map((group) => ({ ...group, value: monetary ? group.value / 100 : group.value })), population: chart.length, sourceGroups: groups.length },
+    contracts: focus === "contracts" ? contracts.slice(0, 25) : [],
+    contractCount: contracts.length,
+    contractSummary,
+    inventory: focus === "inventory" ? inventory2.slice(0, 25) : [],
+    inventoryCount: inventory2.length,
+    inventorySummary,
+    rowCount,
+    previewCount: Math.min(focus === "exhibitors" || inventoryGrouped ? 20 : 25, rowCount),
+    plan: { lotCount: snapshot.inventory.length, missingGeometryCount: snapshot.inventory.filter((lot) => !lot.geometry).length },
+    notes: snapshot.notes.slice(0, 8),
+    ...snapshot.comparison ? { comparison: snapshot.comparison } : {}
+  };
 }
 
 // src/lib/workers/registry.ts
@@ -634,11 +942,11 @@ function output(definition4, records, options = {}) {
     truncated: options.truncated ?? false
   };
 }
-async function requireCommission(ctx, id, ownOnly = false) {
-  const { data, error } = await ctx.supabase.from("commissions").select("id,org_id").eq("org_id", ctx.orgId).eq("id", id).eq("is_active", true).maybeSingle();
+async function requireCommission(ctx, id2, ownOnly = false) {
+  const { data, error } = await ctx.supabase.from("commissions").select("id,org_id").eq("org_id", ctx.orgId).eq("id", id2).eq("is_active", true).maybeSingle();
   if (error) throw workerDataError(error, "authorization");
   if (!data || data.org_id !== ctx.orgId) throw new WorkerToolError("NOT_FOUND", "Comiss\xE3o n\xE3o encontrada ou sem acesso.");
-  if (ownOnly && ctx.role !== "admin" && !(await ownCommissionIds(ctx)).includes(id)) throw new WorkerToolError("PERMISSION_DENIED", "Comiss\xE3o fora do seu v\xEDnculo.");
+  if (ownOnly && ctx.role !== "admin" && !(await ownCommissionIds(ctx)).includes(id2)) throw new WorkerToolError("PERMISSION_DENIED", "Comiss\xE3o fora do seu v\xEDnculo.");
 }
 async function ownCommissionIds(ctx) {
   const [memberResult, responsibleResult] = await Promise.all([
@@ -646,15 +954,15 @@ async function ownCommissionIds(ctx) {
     ctx.supabase.from("commission_responsibles").select("commission_id").eq("org_id", ctx.orgId).eq("user_id", ctx.userId).eq("active", true).limit(100)
   ]);
   if (memberResult.error || responsibleResult.error) throw workerDataError(memberResult.error ?? responsibleResult.error, "authorization");
-  return [...new Set([memberResult.data?.commission_id, ...(responsibleResult.data ?? []).map((row) => row.commission_id)].filter((id) => typeof id === "string"))];
+  return [...new Set([memberResult.data?.commission_id, ...(responsibleResult.data ?? []).map((row) => row.commission_id)].filter((id2) => typeof id2 === "string"))];
 }
-async function requireEvent(ctx, id) {
-  const result = await readRows(ctx, "cronograma_eventos_full", { filters: [["id", "eq", id]], limit: 1 });
+async function requireEvent(ctx, id2) {
+  const result = await readRows(ctx, "cronograma_eventos_full", { filters: [["id", "eq", id2]], limit: 1 });
   if (!result.records.length) throw new WorkerToolError("NOT_FOUND", "Evento n\xE3o encontrado ou sem acesso.");
   return result.records[0];
 }
-async function requireEdition(ctx, id) {
-  const result = await readRows(ctx, "financial_editions", { filters: [["id", "eq", id]], limit: 1 });
+async function requireEdition(ctx, id2) {
+  const result = await readRows(ctx, "financial_editions", { filters: [["id", "eq", id2]], limit: 1 });
   if (!result.records.length) throw new WorkerToolError("NOT_FOUND", "Edi\xE7\xE3o n\xE3o encontrada ou sem acesso.");
   return pickWorkerFields(result.records[0], ["id", "code", "label", "period_start", "period_end"]);
 }
@@ -663,6 +971,52 @@ async function dispatch(def, input2, ctx) {
   const size = Number(input2.limit ?? 20);
   const text3 = (key) => String(input2[key]);
   switch (def.name) {
+    case "map_commercial_report_query": {
+      let projectId = input2.project_id;
+      if (!projectId) {
+        const projects = await readRows(ctx, "map_projects", { limit: 100, filters: [["is_archived", "eq", false]] });
+        if (projects.truncated || projects.records.length !== 1) return output(def, [{
+          needs_clarification: true,
+          question: projects.records.length ? "Qual projeto comercial deseja consultar?" : "N\xE3o encontrei um projeto comercial autorizado para este relat\xF3rio.",
+          options: projects.records.slice(0, 8).map((project2) => String(project2.name)),
+          ...projects.records.length ? { choices: projects.records.slice(0, 8).map((project2) => ({ id: String(project2.id), name: String(project2.name) })) } : {}
+        }]);
+        projectId = String(projects.records[0].id);
+      }
+      await requireProject(ctx, projectId);
+      let spec;
+      try {
+        const filters2 = object(input2.spec);
+        spec = parseCommercialReportSpec({ ...filters2, ...filters2.reportFocus === "exhibitors" ? { groupBy: "exhibitor" } : {}, projectId });
+      } catch {
+        throw new WorkerToolError("INVALID_INPUT", "Filtros inv\xE1lidos para o relat\xF3rio comercial.");
+      }
+      const rpcResult = await ctx.supabase.rpc("workers_map_commercial_report", { p_project_id: projectId, p_spec: spec });
+      if (rpcResult.error) {
+        const reason = typeof rpcResult.error.message === "string" ? rpcResult.error.message.split(":", 1)[0] : "";
+        const question = { REPORT_INVENTORY_CURRENT_ONLY: "O invent\xE1rio dispon\xEDvel representa a situa\xE7\xE3o atual. Para um per\xEDodo, consulte vendas por cadastro ou assinatura; ocupa\xE7\xE3o passada exige hist\xF3rico reconstru\xEDvel.", REPORT_SCOPE_UNRESOLVED: "N\xE3o encontrei uma \xFAnica \xE1rea autorizada com essa identifica\xE7\xE3o. Informe o pavilh\xE3o f\xEDsico, segmento ou quadra do projeto.", REPORT_COMPANY_UNRESOLVED_OR_AMBIGUOUS: "N\xE3o encontrei uma identidade empresarial \xFAnica com esse nome. Informe o nome empresarial exato ou selecione o expositor no m\xF3dulo.", REPORT_CONTRACT_UNRESOLVED_OR_AMBIGUOUS: "N\xE3o encontrei um \xFAnico documento com essa refer\xEAncia no projeto autorizado. Informe a refer\xEAncia contratual exata ou selecione o documento no m\xF3dulo.", REPORT_ORDER_UNRESOLVED_OR_AMBIGUOUS: "N\xE3o encontrei um \xFAnico pedido com essa refer\xEAncia persistida. Informe a refer\xEAncia exata ou selecione o pedido no m\xF3dulo.", REPORT_EDITION_NOT_PROVEN: "A edi\xE7\xE3o solicitada n\xE3o est\xE1 comprovada no cadastro desse projeto. Deseja consultar o projeto inteiro?" };
+        if (question[reason]) return output(def, [{ needs_clarification: true, question: question[reason], ...reason === "REPORT_EDITION_NOT_PROVEN" ? { options: ["Consultar o projeto inteiro"] } : {} }]);
+        throw workerDataError(rpcResult.error, "query");
+      }
+      const response = object(rpcResult.data);
+      if (response.needs_clarification === true || response.needsClarification === true) return output(def, [response]);
+      let snapshot;
+      try {
+        snapshot = parseCommercialReportSnapshot(response);
+      } catch {
+        throw new WorkerToolError("INVALID_RESPONSE", "N\xE3o foi poss\xEDvel validar a fotografia comercial.", { stage: "validation" });
+      }
+      if (snapshot.scope.projectId !== projectId || snapshot.spec.projectId !== projectId) throw new WorkerToolError("PERMISSION_DENIED", "Fotografia fora do projeto autorizado.");
+      const preview = commercialReportPreview(snapshot);
+      return {
+        summary: "Fotografia comercial consultada sobre todo o conjunto autorizado; a tabela do chat \xE9 uma pr\xE9via.",
+        records: [preview],
+        citations: [{ label: def.title, url: def.deepLink, source: "app" }],
+        total: snapshot.rows.length,
+        truncated: false,
+        commercialSnapshot: snapshot
+      };
+    }
     case "agenda_resolve_identity": {
       const response = await readRpc(ctx, "workers_agenda_resolve_identity", { _org_id: ctx.orgId, _kind: input2.kind, _search: input2.search });
       return output(def, [parseWorkerAnalytics(def.name, response)], { summary: "Identidades persistidas vis\xEDveis para esta consulta." });
@@ -935,13 +1289,22 @@ async function executeWorkerTool(name, input2, context) {
   if (!parsed.success) throw new WorkerToolError("INVALID_INPUT", "Par\xE2metros inv\xE1lidos para esta consulta.");
   return dispatch(definition4, parsed.data, ctx);
 }
+function publicWorkerToolResult(result) {
+  return {
+    summary: result.summary,
+    records: result.records,
+    citations: result.citations,
+    ...result.total === void 0 ? {} : { total: result.total },
+    ...result.truncated === void 0 ? {} : { truncated: result.truncated }
+  };
+}
 async function executeMcpReadTool(client, userId, name, input2) {
   const { data: auth2, error: authError } = await client.auth.getUser();
   if (authError || auth2?.user?.id !== userId) throw new WorkerToolError("AUTH_REQUIRED", "Sess\xE3o de usu\xE1rio necess\xE1ria.");
   const { data, error } = await client.from("org_members").select("org_id").eq("user_id", userId).eq("is_active", true).limit(2);
   if (error || data?.length !== 1) throw new WorkerToolError("PERMISSION_DENIED", "A consulta MCP exige um \xFAnico v\xEDnculo organizacional ativo. Use a equipe no app para escolher a organiza\xE7\xE3o.");
   const ctx = await resolveWorkerAccess(client, userId, data[0].org_id);
-  return executeWorkerTool(name, input2, ctx);
+  return publicWorkerToolResult(await executeWorkerTool(name, input2, ctx));
 }
 
 // src/lib/workers/inventory.ts
@@ -1028,20 +1391,20 @@ var get_event_default = defineTool2({
 
 // src/lib/mcp/tools/create-event.ts
 import { defineTool as defineTool3 } from "npm:@lovable.dev/mcp-js@0.26.2";
-import { z as z8 } from "npm:zod@^3.25.76";
+import { z as z9 } from "npm:zod@^3.25.76";
 var create_event_default = defineTool3({
   name: "create_event",
   title: "Criar evento no cronograma",
   description: "Cria um novo evento na Agenda Fenasoja para a organiza\xE7\xE3o do usu\xE1rio autenticado.",
   inputSchema: {
-    title: z8.string().trim().min(1).describe("T\xEDtulo do evento."),
-    start_date: z8.string().describe("Data de in\xEDcio (YYYY-MM-DD)."),
-    end_date: z8.string().optional().describe("Data de t\xE9rmino (YYYY-MM-DD)."),
-    start_time: z8.string().optional().describe("Hor\xE1rio de in\xEDcio (HH:MM)."),
-    end_time: z8.string().optional().describe("Hor\xE1rio de t\xE9rmino (HH:MM)."),
-    location: z8.string().optional().describe("Local do evento."),
-    description: z8.string().optional().describe("Descri\xE7\xE3o/observa\xE7\xF5es."),
-    priority: z8.string().optional().describe("Prioridade do evento.")
+    title: z9.string().trim().min(1).describe("T\xEDtulo do evento."),
+    start_date: z9.string().describe("Data de in\xEDcio (YYYY-MM-DD)."),
+    end_date: z9.string().optional().describe("Data de t\xE9rmino (YYYY-MM-DD)."),
+    start_time: z9.string().optional().describe("Hor\xE1rio de in\xEDcio (HH:MM)."),
+    end_time: z9.string().optional().describe("Hor\xE1rio de t\xE9rmino (HH:MM)."),
+    location: z9.string().optional().describe("Local do evento."),
+    description: z9.string().optional().describe("Descri\xE7\xE3o/observa\xE7\xF5es."),
+    priority: z9.string().optional().describe("Prioridade do evento.")
   },
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
   handler: async (input2, ctx) => {

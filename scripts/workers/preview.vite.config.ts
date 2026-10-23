@@ -7,6 +7,7 @@ import { handleWorkspacePreview } from './preview-workspace';
 import { responseFixture } from './preview-responses';
 import { publicWorkerError } from '../../supabase/functions/_shared/workers/failures';
 import { WorkerError } from '../../supabase/functions/_shared/workers/contracts';
+import { commercialResponseFixture, handleCommercialPreview } from './preview-commercial';
 
 const harness = path.resolve('scripts/workers');
 const messages: Array<Record<string, unknown>> = [];
@@ -23,6 +24,7 @@ export default defineConfig({
   plugins: [{ name: 'workers-isolated-visual-qa', configureServer(server) {
     server.middlewares.use(async (request, response, next) => {
       const url = new URL(request.url ?? '/', 'http://127.0.0.1:5188');
+      if (await handleCommercialPreview(request, response, url)) return;
       if (await handleWorkspacePreview(request, response, url)) return;
       if (url.pathname.startsWith('/__workers-qa/history/')) {
         const rows = url.pathname.endsWith('/ai_messages') ? messages : conversations;
@@ -39,7 +41,8 @@ export default defineConfig({
           const conversationId = input.conversationId ?? randomUUID();
           const createdAt = new Date().toISOString();
           const userId = '00000000-0000-4000-8000-000000000001';
-          const fixture = responseFixture(input, messages.filter(row => row.conversation_id === conversationId).map(row => ({ role: String(row.role), content: String(row.content) })));
+          const fixtureHistory = messages.filter(row => row.conversation_id === conversationId).map(row => ({ role: String(row.role), content: String(row.content) }));
+          const fixture = commercialResponseFixture(input, fixtureHistory) ?? responseFixture(input, fixtureHistory);
           if (fixture) worker = fixture.worker;
           const content = fixture?.content ?? (/apaga|exclui|confirma|adiciona|cria|manda|envia/i.test(input.message)
             ? 'Nesta fase eu só consulto informações. Abra o módulo para realizar manualmente uma ação permitida ao seu perfil.'

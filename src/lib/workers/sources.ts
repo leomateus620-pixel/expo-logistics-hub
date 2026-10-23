@@ -36,6 +36,7 @@ export const READ_RPCS = [
   'workers_interest_summary','workers_public_links_overview',
   'workers_map_sales_overview','workers_agenda_personal_summary','workers_agenda_people_ranking',
   'workers_agenda_query','workers_map_inventory_summary',
+  'workers_map_commercial_report',
   'workers_agenda_resolve_identity','workers_agenda_person_events','workers_agenda_commission_ranking',
 ] as const;
 export type ReadRpc = typeof READ_RPCS[number];

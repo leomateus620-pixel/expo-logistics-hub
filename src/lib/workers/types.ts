@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { z } from 'zod';
+import type { CommercialReportSnapshot } from './commercial-report.ts';
 
 export type WorkerId = 'agenda' | 'arena' | 'mapa' | 'interesse' | 'comissao' | 'logistica' | 'caixa' | 'radar';
 export type WorkerRole = 'admin' | 'gestor' | 'operador' | 'leitura';
@@ -23,6 +24,8 @@ export interface ToolResult {
   citations: ToolCitation[];
   total?: number;
   truncated?: boolean;
+  /** Server-only evidence for immutable capture; never sent to the planner or chat. */
+  commercialSnapshot?: CommercialReportSnapshot;
 }
 export type AccessPolicy = 'member' | 'commission' | 'map' | 'map_sales' | 'map_contracts' | 'analytics' | 'venue' | 'venue_reports' | 'financial' | 'logistics';
 export interface WorkerToolDefinition {

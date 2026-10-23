@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { CommercialReportRpcFunctions, CommercialReportServiceRpcFunctions } from './generated/commercialReportRpcTypes';
 import type { Database, Json } from '@/integrations/supabase/types';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -31,7 +32,7 @@ export type WorkerMessageRow = {
 type ReadTable<Row> = { Row: Row; Insert: never; Update: never; Relationships: [] };
 type WorkersDatabase = Omit<Database, 'public'> & {
   public: Omit<Database['public'], 'Tables' | 'Functions'> & {
-    Functions: Database['public']['Functions'] & {
+    Functions: Omit<Database['public']['Functions'], keyof CommercialReportServiceRpcFunctions | 'workers_validate_commercial_report_spec'> & CommercialReportRpcFunctions & {
       ai_workers_read_history: { Args: { _org_id: string; _conversation_id: string; _before_sequence?: number; _turn_limit?: number }; Returns: WorkerMessageRow[] };
     };
     Tables: Database['public']['Tables'] & {
