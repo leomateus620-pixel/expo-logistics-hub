@@ -43,7 +43,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { VenuePermissionMap } from "@/hooks/useVenueOperations";
 import { toDisplayUpper } from "@/lib/textNormalize";
 import { XCircle } from "lucide-react";
-import { canOfferCancellation, validateCancellationReason } from "@/lib/venue-cancellation";
+import { canOfferCancellation, DEFAULT_CANCEL_REASON, validateCancellationReason } from "@/lib/venue-cancellation";
 import {
   COUNTERPART_UNIT_LABELS,
   VENUE_EVENT_TYPE_SUGGESTIONS,
@@ -678,6 +678,7 @@ export function VenueEventFormDialog({
                         onCheckedChange={(checked) => {
                           setCancelRequested(checked);
                           if (!checked) setCancelError(null);
+                          if (checked && !cancelReason.trim()) setCancelReason(DEFAULT_CANCEL_REASON);
                         }}
                       />
                     </div>

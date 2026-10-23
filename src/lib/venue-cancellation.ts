@@ -1,5 +1,6 @@
 /** Regras de cancelamento de evento do Restaurante e Arena (espelham `venue_transition_event`). */
 export const VENUE_CANCEL_REASON_MIN = 8;
+export const DEFAULT_CANCEL_REASON = "CANCELADO PELO REQUERENTE";
 
 const NON_CANCELLABLE = new Set(["concluido", "cancelado"]);
 
