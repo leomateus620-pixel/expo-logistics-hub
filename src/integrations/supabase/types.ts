@@ -5020,38 +5020,214 @@ export type Database = {
           },
         ]
       }
+      financial_scenario_observations: {
+        Row: {
+          amounts: Json
+          basis: string
+          bucket: string
+          coverage_complete: boolean
+          edition_id: string
+          generation: string
+          observed_on: string
+        }
+        Insert: {
+          amounts: Json
+          basis: string
+          bucket: string
+          coverage_complete: boolean
+          edition_id: string
+          generation: string
+          observed_on: string
+        }
+        Update: {
+          amounts?: Json
+          basis?: string
+          bucket?: string
+          coverage_complete?: boolean
+          edition_id?: string
+          generation?: string
+          observed_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_scenario_observations_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_scenario_sources"
+            referencedColumns: ["edition_id"]
+          },
+        ]
+      }
+      financial_scenario_pavilions: {
+        Row: {
+          category: string
+          entity_id: string
+          physical_number: number
+          project_id: string
+        }
+        Insert: {
+          category: string
+          entity_id: string
+          physical_number: number
+          project_id: string
+        }
+        Update: {
+          category?: string
+          entity_id?: string
+          physical_number?: number
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_scenario_pavilions_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: true
+            referencedRelation: "map_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_scenario_pavilions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_scenario_revenue_links: {
+        Row: {
+          category: string
+          edition_id: string
+          org_id: string
+          origin_id: string | null
+          origin_kind: string
+          revenue_id: string
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          category: string
+          edition_id: string
+          org_id: string
+          origin_id?: string | null
+          origin_kind: string
+          revenue_id: string
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          category?: string
+          edition_id?: string
+          org_id?: string
+          origin_id?: string | null
+          origin_kind?: string
+          revenue_id?: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_scenario_revenue_links_org_id_edition_id_fkey"
+            columns: ["org_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "financial_scenario_sources"
+            referencedColumns: ["org_id", "edition_id"]
+          },
+          {
+            foreignKeyName: "financial_scenario_revenue_links_revenue_id_fkey"
+            columns: ["revenue_id"]
+            isOneToOne: true
+            referencedRelation: "financial_revenues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_scenario_sources: {
+        Row: {
+          calculation_version: string
+          edition_id: string
+          forecast_window_days: number
+          org_id: string
+          project_id: string
+        }
+        Insert: {
+          calculation_version?: string
+          edition_id: string
+          forecast_window_days?: number
+          org_id: string
+          project_id: string
+        }
+        Update: {
+          calculation_version?: string
+          edition_id?: string
+          forecast_window_days?: number
+          org_id?: string
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_scenario_sources_org_id_edition_id_fkey"
+            columns: ["org_id", "edition_id"]
+            isOneToOne: true
+            referencedRelation: "financial_editions"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "financial_scenario_sources_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financial_scenarios: {
         Row: {
           assumptions: Json
+          author_kind: string
           created_at: string
-          created_by: string
+          created_by: string | null
           edition_id: string
           id: string
+          money_unit: string
           notes: string | null
           org_id: string
+          reference_key: string | null
           scenario_key: string
+          schema_version: number
           version: number
         }
         Insert: {
           assumptions: Json
+          author_kind?: string
           created_at?: string
-          created_by: string
+          created_by?: string | null
           edition_id: string
           id?: string
+          money_unit?: string
           notes?: string | null
           org_id: string
+          reference_key?: string | null
           scenario_key: string
+          schema_version?: number
           version: number
         }
         Update: {
           assumptions?: Json
+          author_kind?: string
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           edition_id?: string
           id?: string
+          money_unit?: string
           notes?: string | null
           org_id?: string
+          reference_key?: string | null
           scenario_key?: string
+          schema_version?: number
           version?: number
         }
         Relationships: [
@@ -11690,18 +11866,6 @@ export type Database = {
       }
     }
     Functions: {
-      financial_scenario_revenue_sources: {
-        Args: { _org_id: string; _edition_id: string; _offset?: number; _unmapped_only?: boolean }
-        Returns: Json
-      }
-      financial_scenario_overview: {
-        Args: { _org_id: string; _edition_id: string; _basis?: string }
-        Returns: Json
-      }
-      financial_link_scenario_revenue: {
-        Args: { _org_id: string; _edition_id: string; _revenue_id: string; _category: string; _origin_kind: string; _origin_id: string | null; _expected_version: number; _request_id: string }
-        Returns: Json
-      }
       _commercial_analytics_access: {
         Args: { p_project: string }
         Returns: undefined
@@ -11781,6 +11945,33 @@ export type Database = {
         Args: { _org_id: string }
         Returns: undefined
       }
+      _financial_collect_scenarios: { Args: never; Returns: undefined }
+      _financial_scenario_build: {
+        Args: { _basis: string; _edition_id: string; _org_id: string }
+        Returns: Json
+      }
+      _financial_scenario_commercial: {
+        Args: { project: string }
+        Returns: {
+          category: string
+          changed_at: string
+          fees: number
+          issue: string
+          origin_id: string
+          principal: number
+          source: string
+          stage: string
+        }[]
+      }
+      _financial_scenario_lots: {
+        Args: { project: string }
+        Returns: {
+          category: string
+          issue: string
+          lot_id: string
+        }[]
+      }
+      _financial_scenario_validate: { Args: { a: Json }; Returns: undefined }
       _revise_sale_order_items_core: {
         Args: {
           p_actor: string
@@ -12758,6 +12949,19 @@ export type Database = {
         }
         Returns: Json
       }
+      financial_link_scenario_revenue: {
+        Args: {
+          _category: string
+          _edition_id: string
+          _expected_version: number
+          _org_id: string
+          _origin_id: string
+          _origin_kind: string
+          _request_id: string
+          _revenue_id: string
+        }
+        Returns: Json
+      }
       financial_list_categories: {
         Args: { _domain?: string; _include_archived?: boolean; _org_id: string }
         Returns: Json
@@ -12952,14 +13156,40 @@ export type Database = {
         }
         Returns: Json
       }
-      financial_save_scenario: {
+      financial_save_scenario:
+        | {
+            Args: {
+              _assumptions: Json
+              _edition_id: string
+              _key: string
+              _notes: string
+              _org_id: string
+              _request_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _assumptions: Json
+              _edition_id: string
+              _expected_version: number
+              _key: string
+              _notes: string
+              _org_id: string
+              _request_id: string
+            }
+            Returns: Json
+          }
+      financial_scenario_overview: {
+        Args: { _basis?: string; _edition_id: string; _org_id: string }
+        Returns: Json
+      }
+      financial_scenario_revenue_sources: {
         Args: {
-          _assumptions: Json
           _edition_id: string
-          _key: string
-          _notes: string
+          _offset?: number
           _org_id: string
-          _request_id: string
+          _unmapped_only?: boolean
         }
         Returns: Json
       }
