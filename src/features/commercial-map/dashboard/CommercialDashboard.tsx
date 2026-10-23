@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { CommercialMapData } from '../types';
 import type { LotPricingStage } from '../utils/lotPricing2028';
 import { CommercialDashboardSpaces, type DashboardSpacesPresentationMemory, type CommercialDashboardSpacesMemory } from './CommercialDashboardSpaces';
@@ -18,7 +19,7 @@ import {
   ModulesGlyph, PendingSignatureGlyph, ProcessGlyph, SyncActiveGlyph, SyncDoneGlyph,
 } from './CommercialDashboardOverviewIcons';
 import type { SaleOrderSummary } from './salesOrders/salesOrdersService';
-import { CommercialCashflowPreview, SignatureLatencyCard, CashflowGlyph } from './CommercialSalesAnalyticsCards';
+import { CommercialCashflowPreview, CashflowGlyph } from './CommercialSalesAnalyticsCards';
 import { CommercialAnalyticsView, type CashflowMemory } from './CommercialCashflow';
 import { CommercialSalesAnalyticsProvider } from './salesOrders/useCommercialSalesAnalytics';
 import './commercial-dashboard.css';
@@ -76,8 +77,8 @@ function financeQualifier(lots: number, priced: number): string | null {
   return priced < lots ? 'Parcial' : null;
 }
 
-function FinanceCard({ tone, label, icon, value, lots, priced, info, action }: {
-  action?: ReactNode; tone: FinanceTone; label: string; icon: ReactNode; value: number; lots: number; priced: number;
+function FinanceCard({ tone, label, icon, value, lots, priced, info, action, footer }: {
+  action?: ReactNode; footer?: ReactNode; tone: FinanceTone; label: string; icon: ReactNode; value: number; lots: number; priced: number;
   info: Omit<OverviewInfoContent, 'facts'> & { facts?: readonly OverviewInfoFact[] };
 }) {
   const exact = priced > 0 ? formatDashboardCurrency(value) : '—';
@@ -95,14 +96,14 @@ function FinanceCard({ tone, label, icon, value, lots, priced, info, action }: {
       <span className="commercial-dashboard-overview-finance__badge" aria-hidden="true">{icon}</span>
       <span className="commercial-dashboard-overview-finance__title">{label}</span>
       {qualifier && <span className="commercial-dashboard-overview-qualifier">{qualifier}</span>}
-      <OverviewInfo {...info} facts={[['Valor exato', exact], ['Cobertura', financeCoverage(lots, priced)], ...(info.facts ?? [])]} />
+      <div className="commercial-dashboard-overview-finance__actions">{action}<OverviewInfo {...info} facts={[['Valor exato', exact], ['Cobertura', financeCoverage(lots, priced)], ...(info.facts ?? [])]} /></div>
     </header>
     <strong className="commercial-dashboard-overview-finance__value">
       {priced > 0 ? <span className="commercial-dashboard-overview-amount" title={exact}>
         <OverviewAmount text={formatDashboardCurrency(value, true)} />
       </span> : '—'}
     </strong>
-    {action}
+    {footer}
   </article>;
 }
 
@@ -137,7 +138,7 @@ export function CommercialDashboard(props: CommercialDashboardProps) {
 function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const cashflowEntryRef = useRef<HTMLButtonElement>(null);
-  const signatureEntryRef = useRef<HTMLDivElement>(null);
+  const signatureEntryRef = useRef<HTMLButtonElement>(null);
   const salesOrigin = useRef<'overview' | 'cashflow' | 'signature'>('overview');
   const analyticsScroll = useRef({ top: 0, orderId: '' });
   const [cashflow, setCashflow] = useState<CashflowMemory>({ month: null, basis: 'principal', allDates: false, year: null, page: 0 });
@@ -170,7 +171,7 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
     requestAnimationFrame(() => {
       const container = scrollContainer?.(); if (container) container.scrollTop = overviewMemory.scrollTop;
       if (origin === 'cashflow') cashflowEntryRef.current?.focus({ preventScroll: true });
-      else signatureEntryRef.current?.querySelector<HTMLButtonElement>('[data-signature-detail]')?.focus({ preventScroll: true });
+      else signatureEntryRef.current?.focus({ preventScroll: true });
     });
   };
   const [pricingStage, setPricingStage] = useState<LotPricingStage>('RENOVACAO');
@@ -260,15 +261,16 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
       </div>
       <div className="commercial-dashboard-overview" data-composition={composition}>
       <section className="commercial-dashboard-overview__finance" aria-label="Valores comerciais globais">
-        <div className="commercial-dashboard-overview-confirmed-column">
         <FinanceCard tone="confirmed" label="Valor das vendas confirmadas" icon={<ConfirmedSealGlyph />}
-          action={projectId && canManageSales ? <button type="button" ref={cashflowEntryRef} className="commercial-dashboard-cashflow-entry" onClick={() => openAnalytics('cashflow')}><CashflowGlyph />Ver fluxo de caixa <span aria-hidden="true">↗</span></button> : undefined}
+          action={projectId && canManageSales ? <TooltipProvider><Tooltip><TooltipTrigger asChild>
+            <button type="button" ref={cashflowEntryRef} className="commercial-dashboard-cashflow-entry"
+              aria-label="Ver fluxo de caixa" onClick={() => openAnalytics('cashflow')}><CashflowGlyph /></button>
+          </TooltipTrigger><TooltipContent>Ver fluxo de caixa</TooltipContent></Tooltip></TooltipProvider> : undefined}
+          footer={projectId && canManageSales ? <CommercialCashflowPreview scope={presentation.scope} onOpen={month => openAnalytics('cashflow', month)} /> : undefined}
           value={overall.soldValue} lots={overall.soldLots} priced={overall.byStatus.SOLD.pricedLotCount}
           info={{ label: 'Informações sobre vendas confirmadas', title: 'Vendas confirmadas',
             lead: 'Soma do valor negociado das vendas confirmadas no fluxo comercial (situação Vendido).',
             note: 'Valor negociado confirmado. A confirmação comercial não equivale a recebimento financeiro.' }} />
-        {projectId && canManageSales && <CommercialCashflowPreview scope={presentation.scope} onOpen={month => openAnalytics('cashflow', month)} />}
-        </div>
         <FinanceCard tone="open" label="Valor das vendas em andamento" icon={<PendingSignatureGlyph />}
           value={overall.saleOpenValue} lots={overall.saleOpenLots} priced={overall.byStatus.SALE_OPEN.pricedLotCount}
           info={{ label: 'Informações sobre vendas em andamento', title: 'Vendas em andamento',
@@ -282,10 +284,7 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
             facts: [['Composição', `Vendas + tabela oficial (${pricingStage === 'RENOVACAO' ? 'Renovação' : '2ª Etapa'})`]],
             note: 'Não é meta nem receita. Lotes sem valor registrado não são estimados.' }} />
       </section>
-      <div className="commercial-dashboard-overview-progress-row">
-        <CommercialSalesProgress aggregate={overall} fillMemory={progressFillRef} />
-        <div ref={signatureEntryRef}><SignatureLatencyCard onOpen={() => openAnalytics('signature')} /></div>
-      </div>
+      <CommercialSalesProgress aggregate={overall} fillMemory={progressFillRef} />
       <section className="commercial-dashboard-overview__kpis" aria-label="Indicadores comerciais principais">
         <OverviewKpi tone="spaces" label="Espaços comerciais" icon={<ModulesGlyph />} value={formatDashboardInteger(overall.commercialLots)}
           info={{ label: 'Informações sobre espaços comerciais', title: 'Espaços comerciais',
@@ -315,6 +314,7 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
           <CommercialDashboardAreaCard aggregate={overall} />
           {salesAvailable && projectId && <CommercialDashboardSalesSummary projectId={projectId}
             canManageSales={canManageSales} canManageContracts={canManageContracts} entryRef={salesEntryRef}
+            signatureEntryRef={signatureEntryRef} onSignatureDetails={() => openAnalytics('signature')}
             onAccess={() => {
               overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
               setArea('sales');

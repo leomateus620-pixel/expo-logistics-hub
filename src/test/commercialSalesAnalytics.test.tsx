@@ -6,12 +6,14 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CommercialDashboard } from "@/features/commercial-map/dashboard/CommercialDashboard";
 import {
   CommercialCashflowPreview,
   shuffledMonths,
+  SignatureLatencyInline,
 } from "@/features/commercial-map/dashboard/CommercialSalesAnalyticsCards";
 import { CommercialSalesAnalyticsProvider } from "@/features/commercial-map/dashboard/salesOrders/useCommercialSalesAnalytics";
 import {
@@ -164,13 +166,16 @@ describe("commercial analytics navigation and confidentiality", () => {
       isFetching: false,
       onClose: vi.fn(),
       onViewLot: vi.fn(),
+      onViewSale: vi.fn(),
     };
     const { rerender } = render(
       <QueryClientProvider client={client}>
         <CommercialDashboard {...props} canManageSales />
       </QueryClientProvider>,
     );
-    await screen.findByText(`Calculado com ${sample.signature.count} vendas`);
+    await screen.findByRole('button', { name: 'Ver detalhamento de assinatura' });
+    fireEvent.click(screen.getByRole('button', { name: 'Como é calculado o tempo médio de assinatura' }));
+    expect(screen.getByText(`Calculado com ${sample.signature.count} vendas`)).toBeInTheDocument();
     rerender(
       <QueryClientProvider client={client}>
         <CommercialDashboard {...props} canManageSales={false} />
@@ -238,59 +243,57 @@ describe("commercial analytics navigation and confidentiality", () => {
     );
     expect(screen.queryByText("R$ 0,00")).not.toBeInTheDocument();
   });
-  it("lands the money transfer before replacing the complete month/value pair, then cleans up", async () => {
+  it("changes the complete month/value pair locally, announces manual changes and keeps pause on unmount", async () => {
     vi.useFakeTimers();
-    const { container, unmount } = render(
-      wrap(
-        <div>
-          <button className="commercial-dashboard-cashflow-entry">
-            Ver fluxo de caixa
-          </button>
-          <CommercialCashflowPreview scope="flight" onOpen={vi.fn()} />
-        </div>,
-      ),
-    );
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(100);
-    });
-    const pair = () =>
-      container.querySelector(
-        ".commercial-dashboard-cashflow-preview__transition",
-      )?.textContent;
-    const previous = pair(),
-      calls = api.rpc.mock.calls.length;
-    fireEvent.click(
-      screen.getByRole("button", { name: "Próximo mês da prévia" }),
-    );
-    expect(
-      container.querySelector(".commercial-dashboard-cashflow-transfer"),
-    ).toHaveAttribute("aria-hidden", "true");
-    act(() => {
-      vi.advanceTimersByTime(479);
-    });
-    expect(pair()).toBe(previous);
-    act(() => {
-      vi.advanceTimersByTime(1);
-    });
+    const { container, unmount } = render(wrap(<CommercialCashflowPreview scope="compact" onOpen={vi.fn()} />));
+    await act(async () => { await vi.advanceTimersByTimeAsync(100); });
+    const pair = () => container.querySelector(".commercial-dashboard-cashflow-preview__transition")?.textContent;
+    const previous = pair(), calls = api.rpc.mock.calls.length;
+    fireEvent.click(screen.getByRole("button", { name: "Próximo mês da prévia" }));
     expect(pair()).not.toBe(previous);
     expect(screen.getByRole("status")).toHaveTextContent(/R\$/);
-    expect(
-      container.querySelector(".commercial-dashboard-cashflow-preview"),
-    ).toHaveAttribute("data-arriving", "true");
-    act(() => {
-      vi.advanceTimersByTime(370);
-    });
-    expect(
-      container.querySelector(".commercial-dashboard-cashflow-transfer"),
-    ).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Pausar prévia mensal" }));
+    const paused = pair();
+    act(() => { vi.advanceTimersByTime(30_000); });
+    expect(pair()).toBe(paused);
     expect(api.rpc.mock.calls.length).toBe(calls);
-    fireEvent.click(
-      screen.getByRole("button", { name: "Próximo mês da prévia" }),
-    );
     unmount();
-    act(() => {
-      vi.advanceTimersByTime(20_000);
-    });
+    act(() => { vi.advanceTimersByTime(20_000); });
     expect(api.rpc.mock.calls.length).toBe(calls);
+  });
+  it("shows signature only inside sales summary, exposes its own sample in info and restores focus and scroll", async () => {
+    const scroll = document.createElement('div');
+    render(<QueryClientProvider client={client}><CommercialDashboard
+      data={{ lots: [], entities: [] }} projectId={sample.projectId} orgId="test-org" dataUpdatedAt={1}
+      isFetching={false} canManageSales onClose={vi.fn()} onViewLot={vi.fn()} onViewSale={vi.fn()}
+      scrollContainer={() => scroll} /></QueryClientProvider>);
+    const entry = await screen.findByRole('button', { name: 'Ver detalhamento de assinatura' });
+    const summary = screen.getByRole('region', { name: 'Vendas e contratos' });
+    expect(summary).toContainElement(entry);
+    expect(screen.getAllByText('Tempo médio de assinatura')).toHaveLength(1);
+    for (const label of ['Registros de venda', 'Aguardando assinatura', 'Assinatura confirmada']) expect(within(summary).getByText(label)).toBeVisible();
+    fireEvent.click(within(summary).getByRole('button', { name: 'Como é calculado o tempo médio de assinatura' }));
+    expect(screen.getByText(`Calculado com ${sample.signature.count} vendas`)).toBeVisible();
+    fireEvent.keyDown(within(summary).getByRole('button', { name: 'Como é calculado o tempo médio de assinatura' }), { key: 'Escape' });
+    scroll.scrollTop = 360;
+    fireEvent.click(entry);
+    expect(await screen.findByRole('heading', { name: 'Tempo médio de assinatura' })).toBeInTheDocument();
+    expect(scroll.scrollTop).toBe(0);
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar à visão geral' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Ver detalhamento de assinatura' })).toHaveFocus());
+    expect(scroll.scrollTop).toBe(360);
+  });
+  it("keeps restricted and insufficient signature history explicit without granting details", async () => {
+    const { unmount } = render(<SignatureLatencyInline onOpen={vi.fn()} />);
+    expect(screen.getByText('Acesso restrito à gestão de vendas')).toBeVisible();
+    expect(screen.getByText('—')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Ver detalhamento de assinatura' })).toBeNull();
+    unmount();
+    const noHistory = clone(); noHistory.signature = { count: 0, averageSeconds: null, exclusions: {} };
+    api.rpc.mockReturnValue({ abortSignal: () => Promise.resolve({ data: noHistory, error: null }) });
+    render(wrap(<SignatureLatencyInline onOpen={vi.fn()} />));
+    expect(await screen.findByText('Sem histórico suficiente')).toBeVisible();
+    expect(screen.getByText('—')).toBeVisible();
+    expect(screen.queryByText('0 min')).toBeNull();
   });
 });

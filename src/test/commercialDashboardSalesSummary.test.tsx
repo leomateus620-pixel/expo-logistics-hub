@@ -216,8 +216,10 @@ describe('sales summary presentation', () => {
   it('shows unavailable values and an explicit restricted state instead of three zeros', () => {
     render(<CommercialDashboardSalesSummary {...access} canManageSales={false} onAccess={vi.fn()} />, { wrapper });
     const summary = screen.getByRole('region', { name: 'Vendas e contratos' });
-    expect(within(summary).getAllByText('—')).toHaveLength(3);
-    expect(within(summary).getByRole('status')).toHaveTextContent('Acesso restrito');
+    expect(summary.querySelectorAll('.commercial-dashboard-sales-summary__value')).toHaveLength(3);
+    expect([...summary.querySelectorAll('.commercial-dashboard-sales-summary__value')].every(value => value.textContent === '—')).toBe(true);
+    expect(summary.querySelector('.commercial-dashboard-sales-summary__status')).toHaveTextContent('Acesso restrito');
+    expect(within(summary).getByText('Acesso restrito à gestão de vendas')).toBeInTheDocument();
     expect(within(summary).queryByText('0')).not.toBeInTheDocument();
   });
 });
