@@ -92,7 +92,7 @@ describe('authenticated bots fetch', () => {
     const fetcher = vi.fn().mockResolvedValue(new Response(doneFrame, { headers: { 'Content-Type': 'text/event-stream' } }));
     vi.stubGlobal('fetch', fetcher);
     await streamWorkersTurn(request, () => undefined, new AbortController().signal);
-    expect(fetcher).toHaveBeenCalledWith('https://project.supabase.co/functions/v1/workers-orchestrator', expect.objectContaining({ method: 'POST', headers: expect.objectContaining({ Authorization: 'Bearer user-test-token', apikey: 'publishable-test' }), body: JSON.stringify(request) }));
+    expect(fetcher).toHaveBeenCalledWith('https://project.supabase.co/functions/v1/workers-orchestrator', expect.objectContaining({ method: 'POST', headers: expect.objectContaining({ Authorization: 'Bearer user-test-token', apikey: 'publishable-test' }), body: JSON.stringify({ ...request, context: { route: '/equipe-ia', responseVersion: 2 } }) }));
   });
 
   it('does not request a session or make a fetch for an already aborted turn', async () => {

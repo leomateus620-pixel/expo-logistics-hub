@@ -7,6 +7,7 @@ import { searchWorkersWeb } from '../_shared/workers/web-search.ts';
 import { workspacePlanner } from '../_shared/workers/workspace-planner.ts';
 import { readInstitutionalPresident } from '../_shared/workers/institutional.ts';
 import { searchKnowledgeBase } from '../_shared/workers/knowledge-base.ts';
+import { parseCommercialReportSnapshot } from '../_shared/workers/commercial-report.ts';
 import { boundedWorkerCleanup, raceWorkerSignal, workerAuthFailureCode, workerFailureDiagnostic } from '../_shared/workers/failures.ts';
 
 const corsHeaders = {
@@ -102,6 +103,27 @@ Deno.serve(async (req: Request) => {
     let cleanup: Promise<void> | undefined;
     const dependencies: WorkerTurnDependencies = {
       provider,
+      captureCommercialReport: async (snapshot, context) => {
+        const verified = parseCommercialReportSnapshot(snapshot);
+        const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+        if (!serviceKey) throw new WorkerError('report_capture_unavailable', 503);
+        // The privileged client only stores trusted tool evidence. Commercial reads use the caller JWT.
+        const artifacts = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+        const snapshotId = await scopedRpc(artifacts, 'workers_commercial_report_store', {
+          _org_id: context.orgId, _user_id: callerId, _conversation_id: context.conversationId,
+          _request_id: context.requestId, _snapshot: verified,
+        }, abort.signal);
+        if (snapshotId !== verified.snapshotId) throw new WorkerError('report_snapshot_mismatch', 503);
+        if (!context.generatePdf) return { snapshotId: verified.snapshotId, status: 'available' };
+        const report = await scopedRpc(client, 'workers_commercial_report_prepare', {
+          _org_id: context.orgId, _snapshot_id: verified.snapshotId,
+        }, abort.signal);
+        if (!isObject(report) || !isUuid(report.id) || typeof report.status !== 'string') throw new WorkerError('invalid_storage_response', 503);
+        return { snapshotId: verified.snapshotId, reportId: report.id, status: report.status as 'requested' | 'rendering' | 'ready' | 'error' | 'expired', ...(typeof report.expiresAt === 'string' ? { expiresAt: report.expiresAt } : {}) };
+      },
+      resolveCommercialReport: async (snapshotId, context) => parseCommercialReportSnapshot(await scopedRpc(client, 'workers_commercial_report_snapshot', {
+        _org_id: context.orgId, _snapshot_id: snapshotId,
+      }, abort.signal)),
       ...workspacePlanner(client, request.orgId),
       signal: abort.signal,
       listTools: worker => raceWorkerSignal(() => listWorkerTools(worker, access), abort.signal),

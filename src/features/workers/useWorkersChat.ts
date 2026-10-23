@@ -68,7 +68,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
   const currentConversation = useRef<string | null>(null);
   const previousWorker = useRef(options.workerId);
   const activeRequest = useRef<string | null>(null);
-  const retryInputs = useRef(new Map<string, { text: string; attachments: WorkerAttachment[] }>());
+  const retryInputs = useRef(new Map<string, { text: string; attachments: WorkerAttachment[]; commercialSnapshotId?: string }>());
 
   const stop = useCallback(() => {
     generation.current += 1;
@@ -252,7 +252,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
     if (options.conversationId) void selectConversation(options.conversationId);
   }, [options.conversationId, selectConversation]);
 
-  const sendMessage = useCallback(async (text: string, attachments: WorkerAttachment[] = [], retryOfRequestId?: string) => {
+  const sendMessage = useCallback(async (text: string, attachments: WorkerAttachment[] = [], retryOfRequestId?: string, commercialSnapshotId?: string) => {
     const message = text.trim();
     if (!message || busy.current) return { accepted: false };
     if (!user?.id || !orgId) { setError('Entre na sua organização para conversar com a equipe.'); return { accepted: false }; }
@@ -313,7 +313,8 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
         orgId, requestId, message,
         ...(currentConversation.current ? { conversationId: currentConversation.current } : {}),
         ...(turnWorker ? { worker: turnWorker } : {}),
-        ...(options.context ? { context: options.context } : {}),
+        context: { route: options.context?.route ?? '/equipe-ia', ...options.context, responseVersion: 2,
+          ...(uuid(commercialSnapshotId) ? { commercialSnapshotId } : {}) },
         ...(attachments.length ? { attachments: attachments.map(file => ({ name: maskSensitiveText(file.name).slice(0, 100), text: file.text })) } : {}),
       }, onEvent, controller.signal);
       if (alive()) {
@@ -329,7 +330,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
         const failure = workerTurnError(cause, requestId);
         setError(failure.message);
         if (failure.retryable) {
-          retryInputs.current.set(requestId, { text: message, attachments });
+          retryInputs.current.set(requestId, { text: message, attachments, commercialSnapshotId });
           if (retryInputs.current.size > 20) retryInputs.current.delete(retryInputs.current.keys().next().value!);
         }
         setMessages(current => current.map(item => item.id === assistantId ? { ...item,
@@ -350,7 +351,7 @@ export function useWorkersChat(options: UseWorkersChatOptions = {}) {
 
   const retryMessage = useCallback(async (requestId: string) => {
     const original = retryInputs.current.get(requestId);
-    if (original && !busy.current) await sendMessage(original.text, original.attachments, requestId);
+    if (original && !busy.current) await sendMessage(original.text, original.attachments, requestId, original.commercialSnapshotId);
   }, [sendMessage]);
 
   const visible = ownerScope === scope;

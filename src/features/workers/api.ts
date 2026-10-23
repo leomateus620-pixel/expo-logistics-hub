@@ -26,6 +26,8 @@ export function workerTurnError(cause: unknown, requestId?: string): WorkerTurnE
 export interface WorkerRequestContext {
   route: string;
   recordId?: string;
+  commercialSnapshotId?: string;
+  responseVersion?: 2;
 }
 
 export interface WorkersTurnRequest {
@@ -135,7 +137,7 @@ export async function streamWorkersTurn(
       'Content-Type': 'application/json',
       Accept: 'text/event-stream',
     },
-    body: JSON.stringify(request),
+    body: JSON.stringify({ ...request, context: { route: request.context?.route ?? '/equipe-ia', ...request.context, responseVersion: 2 } }),
   }); } catch (cause) { throw workerTurnError(cause, request.requestId); }
   if (signal.aborted) {
     await response.body?.cancel().catch(() => undefined);

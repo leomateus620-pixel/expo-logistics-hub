@@ -1,4 +1,5 @@
 import { isKbSourceDate, isSafeKbSourceUrl } from './kb-source.ts';
+import type { CommercialReportSnapshot } from './commercial-report.ts';
 
 export const WORKER_IDS = ['agenda', 'arena', 'mapa', 'interesse', 'comissao', 'logistica', 'caixa', 'radar'] as const;
 export type WorkerId = typeof WORKER_IDS[number];
@@ -9,7 +10,7 @@ export interface WorkerRequest {
   conversationId?: string;
   worker?: WorkerId;
   message: string;
-  context?: { route: string; recordId?: string };
+  context?: { route: string; recordId?: string; commercialSnapshotId?: string; responseVersion?: 2 };
   attachments?: Array<{ name: string; text: string }>;
 }
 export interface PlannerTool {
@@ -26,6 +27,8 @@ export interface ReadResult {
   citations: WorkerCitation[];
   total?: number;
   truncated?: boolean;
+  /** Server-only snapshot. Strip before provider messages and response composition. */
+  commercialSnapshot?: CommercialReportSnapshot;
 }
 export interface ProviderMessage {
   role: 'system' | 'user' | 'assistant' | 'tool';
@@ -55,10 +58,12 @@ export function parseWorkerRequest(value: unknown): WorkerRequest {
     || (value.conversationId !== undefined && !isUuid(value.conversationId))
     || (value.worker !== undefined && !WORKER_IDS.includes(value.worker as WorkerId))
     || typeof value.message !== 'string' || !value.message.trim() || value.message.length > 6000) throw new WorkerError('invalid_request');
-  if (value.context !== undefined && (!isObject(value.context) || !onlyKeys(value.context, ['route', 'recordId'])
+  if (value.context !== undefined && (!isObject(value.context) || !onlyKeys(value.context, ['route', 'recordId', 'commercialSnapshotId', 'responseVersion'])
     || typeof value.context.route !== 'string' || value.context.route.length > 500
     || !/^\/[a-zA-Z0-9/_-]*$/.test(value.context.route) || /^\/areas\//.test(value.context.route)
-    || (value.context.recordId !== undefined && !isUuid(value.context.recordId)))) throw new WorkerError('invalid_context');
+    || (value.context.recordId !== undefined && !isUuid(value.context.recordId))
+    || (value.context.commercialSnapshotId !== undefined && !isUuid(value.context.commercialSnapshotId))
+    || (value.context.responseVersion !== undefined && value.context.responseVersion !== 2))) throw new WorkerError('invalid_context');
   if (value.attachments !== undefined && (!Array.isArray(value.attachments) || value.attachments.length > 3
     || value.attachments.some(item => !isObject(item) || !onlyKeys(item, ['name', 'text'])
       || typeof item.name !== 'string' || !item.name.trim() || item.name.length > 100
@@ -162,7 +167,7 @@ export function asksForMutation(message: string): boolean {
     // Asking about a past entry fee or a carbon obligation does not initiate a payment.
     .replace(/\b(precisava|era preciso)\s+pagar(?=\s+para\s+entrar\b)/g, '$1')
     .replace(/\b(vai ter que|e preciso)\s+pagar(?=\s+pelo\s+carbono\b)/g, '$1')
-    .replace(/^\s*(?:atualize|refaca|repita|recarregue)\s+(?:(?:a|o|as|os|essa|esta)\s+)?(?:consulta|dados|resposta|disponibilidade|indicadores)\b/,'');
+    .replace(/^\s*(?:agora\s+)?(?:atualize|refaca|repita|recarregue)\s+(?:(?:a|o|as|os|essa|esta|esse|este)\s+)?(?:consulta|dados|resposta|disponibilidade|indicadores|relatorio)\b/,'');
   // "Público" is an audience noun; the commands are publica/publicar/publique.
   return /\b(apag[ae]|exclu[ai]|delet[ae]|remov[ae]|cancele?|confirm[ae]|publicar?|publique|envie?|mande|dispar[ae]|alter[ae]|edit[ae]|adicion[ae]|crie|cria|cri[ao]r|salv[ae]|reserv[ae]|registr[ae]|atualiz[ae]|mude|pague|pag[au]r|rotacion[ae])\b/.test(text);
 }

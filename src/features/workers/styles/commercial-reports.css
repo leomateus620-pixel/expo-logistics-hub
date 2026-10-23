@@ -1,0 +1,72 @@
+.workers-scope .worker-commercial-report {
+  min-width:0;max-width:100%;display:grid;gap:14px;padding:20px;
+  border:1px solid var(--worker-border);border-top:3px solid oklch(var(--brand-gold-500));
+  border-radius:16px;background:var(--worker-paper);box-shadow:var(--worker-shadow)
+}
+.workers-scope .worker-commercial-report__header { display:flex;align-items:center;gap:12px;min-width:0 }
+.workers-scope .worker-commercial-report__header>div { min-width:0;flex:1 }
+.workers-scope .worker-commercial-report__icon { display:grid;place-items:center;flex:0 0 44px;height:48px;border-radius:12px;color:var(--worker-primary);background:var(--worker-surface-soft) }
+.workers-scope .worker-commercial-report__eyebrow { display:block;color:var(--worker-muted);font-size:10px;line-height:16px;font-weight:600;letter-spacing:.07em;text-transform:uppercase }
+.workers-scope .worker-commercial-report__header h3 { font-size:16px;line-height:23px;letter-spacing:-.02em;overflow-wrap:anywhere }
+.workers-scope .worker-commercial-report__info { position:relative;align-self:flex-start }
+.workers-scope .worker-commercial-report__info summary { display:grid;place-items:center;width:44px;height:44px;color:var(--worker-muted);list-style:none;border-radius:10px;cursor:pointer }
+.workers-scope .worker-commercial-report__info summary:hover { background:var(--worker-surface-soft);color:var(--worker-primary) }
+.workers-scope .worker-commercial-report__info summary::-webkit-details-marker { display:none }
+.workers-scope .worker-commercial-report__info>p { position:absolute;z-index:2;top:45px;right:0;width:min(280px,65vw);padding:14px;background:var(--worker-paper);border:1px solid var(--worker-border);box-shadow:var(--worker-shadow);border-radius:12px;font-size:12px;line-height:19px }
+.workers-scope .worker-commercial-chips { display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0;min-width:0 }
+.workers-scope .worker-commercial-chips>li { display:inline-flex;align-items:center;max-width:100%;padding:4px 9px;border-radius:7px;background:var(--worker-surface-soft);color:var(--worker-ink);font-size:11px;line-height:17px;overflow-wrap:anywhere }
+.workers-scope .worker-commercial-report__facts { display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;font-size:11px;line-height:18px;color:var(--worker-muted) }
+.workers-scope .worker-commercial-report__facts time { white-space:nowrap;font-variant-numeric:tabular-nums }
+.workers-scope .worker-commercial-report__coverage { display:flex;align-items:flex-start;gap:7px;color:var(--worker-muted);font-size:11px;line-height:18px }
+.workers-scope .worker-commercial-report__coverage>svg { margin-top:2px }
+.workers-scope .worker-commercial-report__criteria { border-top:1px solid var(--worker-border);padding-top:10px;font-size:12px;line-height:19px;color:var(--worker-muted) }
+.workers-scope .worker-commercial-report__criteria>summary { display:flex;align-items:center;gap:5px;width:fit-content;min-height:30px;list-style:none;cursor:pointer;font-weight:500 }
+.workers-scope .worker-commercial-report__criteria>summary::-webkit-details-marker { display:none }
+.workers-scope .worker-commercial-report__criteria[open]>summary>svg { transform:rotate(180deg) }
+.workers-scope .worker-commercial-report__criteria>div { display:grid;gap:12px;padding:12px;border-radius:10px;background:var(--worker-surface-soft) }
+.workers-scope .worker-commercial-report__criteria p { font-size:12px;line-height:19px }
+.workers-scope .worker-commercial-report__criteria dl { display:grid;gap:7px;margin:0 }
+.workers-scope .worker-commercial-report__criteria dl>div { display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px }
+.workers-scope .worker-commercial-report__criteria dd { margin:0;color:var(--worker-ink) }
+.workers-scope .worker-commercial-report__criteria ul { margin:0;padding-left:18px }
+.workers-scope .worker-commercial-report__status { display:flex;align-items:center;gap:7px;color:var(--worker-primary);font-size:12px;line-height:19px;font-weight:500 }
+.workers-scope .worker-commercial-report__failure { font-size:12px;line-height:19px;color:var(--worker-ink);padding:10px 12px;border-radius:9px;background:var(--worker-surface-soft) }
+.workers-scope .worker-commercial-report__validity { font-size:11px;line-height:18px;color:var(--worker-muted) }
+.workers-scope .worker-commercial-report__actions { display:flex;flex-wrap:wrap;gap:8px }
+.workers-scope .worker-commercial-report__actions>.worker-button { padding:10px 14px;font-size:12px;line-height:18px;border-radius:10px }
+.workers-scope .worker-commercial-spin { animation:worker-commercial-spin 1.2s linear infinite }
+@keyframes worker-commercial-spin { to { transform:rotate(360deg) } }
+.workers-scope .worker-commercial-plan { min-width:0;border:1px solid var(--worker-border);border-radius:14px;background:var(--worker-surface-soft);overflow:hidden }
+.workers-scope .worker-commercial-plan>summary { display:flex;align-items:center;gap:10px;min-height:64px;padding:14px 16px;cursor:pointer;list-style:none }
+.workers-scope .worker-commercial-plan>summary::-webkit-details-marker { display:none }
+.workers-scope .worker-commercial-plan>summary>span { flex:1;min-width:0 }
+.workers-scope .worker-commercial-plan>summary strong { display:block;font-size:13px;line-height:20px }
+.workers-scope .worker-commercial-plan>summary small { display:block;font-size:11px;line-height:18px;color:var(--worker-muted) }
+.workers-scope .worker-commercial-plan[open]>summary>svg:last-child { transform:rotate(180deg) }
+.workers-scope .worker-commercial-plan__body { min-width:0;padding:0 14px 14px;display:grid;gap:12px }
+.workers-scope .worker-commercial-plan__body p { font-size:12px;line-height:19px;color:var(--worker-muted) }
+.workers-scope .worker-commercial-plan__controls { display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:12px;line-height:20px }
+.workers-scope .worker-commercial-plan__controls label { display:flex;align-items:center;gap:7px;min-height:44px;margin-left:auto }
+.workers-scope .worker-commercial-plan__controls input { accent-color:var(--worker-primary);width:16px;height:16px }
+.workers-scope :is(.worker-commercial-report,.worker-commercial-plan) summary:focus-visible { outline:2px solid var(--worker-primary);outline-offset:3px;border-radius:5px }
+.workers-scope .worker-commercial-plan__canvas { border:1px solid var(--worker-border);border-radius:10px;overflow:auto;max-width:100%;background:var(--worker-paper) }
+.workers-scope .worker-commercial-plan__canvas svg { display:block;width:100%;min-height:220px;max-height:560px }
+.workers-scope .worker-commercial-plan__legend { display:flex;flex-wrap:wrap;gap:7px 14px;margin:0;padding:0;list-style:none;font-size:11px;line-height:18px }
+.workers-scope .worker-commercial-plan__legend li { display:flex;align-items:center;gap:5px }
+.workers-scope .worker-commercial-plan__legend i { width:10px;height:10px;display:inline-block;border-radius:2px;border:1px solid rgb(0 0 0/.25) }
+.workers-scope .worker-commercial-plan__key { overflow:auto;max-height:320px }
+.workers-scope .worker-commercial-plan__key table { width:100%;border-collapse:collapse;text-align:left;font-size:11px;line-height:18px }
+.workers-scope .worker-commercial-plan__key th,.workers-scope .worker-commercial-plan__key td { padding:7px 8px;border-bottom:1px solid var(--worker-border);vertical-align:top }
+.workers-scope .worker-commercial-plan__key th { font-weight:600 }
+@media(max-width:540px) {
+  .workers-scope .worker-commercial-report { padding:14px 12px;gap:12px }
+  .workers-scope .worker-commercial-report__header { gap:8px }
+  .workers-scope .worker-commercial-report__icon { flex-basis:36px;height:42px;border-radius:9px }
+  .workers-scope .worker-commercial-report__header h3 { font-size:14px;line-height:21px }
+  .workers-scope .worker-commercial-report__actions { display:grid;grid-template-columns:1fr;width:100% }
+  .workers-scope .worker-commercial-report__actions>.worker-button { width:100%;min-height:44px }
+  .workers-scope .worker-commercial-report__facts { display:grid;gap:2px }
+}
+@media(prefers-reduced-motion:reduce) {
+  .workers-scope .worker-commercial-spin { animation:none }
+}

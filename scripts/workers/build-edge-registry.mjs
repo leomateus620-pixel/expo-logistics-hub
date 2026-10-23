@@ -27,7 +27,16 @@ async function declarations() {
   const typesText = await readFile(path.join(repositoryRoot, 'src/lib/workers/types.ts'), 'utf8');
   const types = ts.createSourceFile('types.ts', typesText, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
   const chunks = types.statements.filter(statement => ts.isImportDeclaration(statement) || ts.isTypeAliasDeclaration(statement) || ts.isInterfaceDeclaration(statement))
-    .map(statement => printer.printNode(ts.EmitHint.Unspecified, statement, types));
+    .map(statement => {
+      // Declarations live one directory below their reviewed Edge-compatible
+      // mirrors. Never leave a source-relative import pointing at generated/.
+      if (ts.isImportDeclaration(statement) && statement.moduleSpecifier.text.startsWith('.')) {
+        if (statement.moduleSpecifier.text !== './commercial-report.ts') throw new Error('Unmapped canonical Edge type import.');
+        statement = ts.factory.updateImportDeclaration(statement, statement.modifiers, statement.importClause,
+          ts.factory.createStringLiteral('../commercial-report.ts'), statement.attributes);
+      }
+      return printer.printNode(ts.EmitHint.Unspecified, statement, types);
+    });
   const found = [];
   for (const filename of ['access.ts', 'registry.ts']) {
     const source = ts.createSourceFile(filename, await readFile(path.join(repositoryRoot, 'src/lib/workers', filename), 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);

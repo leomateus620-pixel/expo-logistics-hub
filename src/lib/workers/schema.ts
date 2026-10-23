@@ -26,6 +26,7 @@ export function workerJsonSchema(schema: z.ZodTypeAny): Record<string, unknown> 
     return result;
   }
   if (schema instanceof z.ZodBoolean) return { type: 'boolean' };
+  if (schema instanceof z.ZodLiteral && ['string','number','boolean'].includes(typeof schema.value)) return {type:typeof schema.value,enum:[schema.value]};
   if (schema instanceof z.ZodEnum) return { type: 'string', enum: schema.options };
   if (schema instanceof z.ZodArray) return { type: 'array', items: workerJsonSchema(schema.element), maxItems: schema._def.maxLength?.value ?? 100 };
   if (schema instanceof z.ZodObject) {

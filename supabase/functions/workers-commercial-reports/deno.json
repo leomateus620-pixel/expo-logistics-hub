@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.96.0",
+    "zod": "npm:zod@3.25.76",
+    "jspdf": "npm:jspdf@4.2.1",
+    "jspdf-autotable": "npm:jspdf-autotable@5.0.7"
+  }
+}

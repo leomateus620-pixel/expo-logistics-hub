@@ -1,0 +1,225 @@
+{
+  "project": "Fenasoja Log",
+  "lovableProjectId": "756eeb64-0d44-4171-b445-f8a60f0492c0",
+  "supabaseProjectRef": "btfaumhroqtqzxomqorx",
+  "account": "Fenasoja",
+  "date": "2026-10-23",
+  "method": "Lovable query_database; additive DDL with COMMIT and schema_migrations journal",
+  "migrations": {
+    "20261023140000": "c50839f5af9f8fa14111957db1908c9fb1985c3c5bb84696296b9102b0a07c1d",
+    "20261023150000": "4b83b51f68375f93bc359d2bfe6dab8ec0beab6d6d9acac0c6db8dc18d789aed",
+    "20261023160000": "8f6d7f0fd1b985c3c1f5db430d29d54328474aa14a9287cc29200f49ff86a746",
+    "20261023170000": "fc7ff30fb81b3010f9be05cdfbff370b2ea1a0f9dbc47b6df5cab94b15da5763",
+    "20261023180000": "3b516685afb900113d04b0a29d556629b3c784b59c7592a1ead2a3395986133e",
+    "20261023190000": "ecff41376e7672d007cdc347bd3b844e0fc87a0f7e0cd9ebbc1a1f72351832e0"
+  },
+  "commercialFacts": "Read-only fingerprints of orders/items/sales/contracts/lots/exhibitors before/after inside repeatable-read DDL transactions were unchanged.",
+  "liveScopes": {
+    "rows": [
+      {
+        "label": "Pavilhão 13",
+        "validation": {
+          "comparison_present": false,
+          "coverage": {
+            "complete": true,
+            "excludedRows": 2,
+            "issues": []
+          },
+          "documents": 15,
+          "generation_present": true,
+          "inventory": 104,
+          "no_unproven_edition": true,
+          "rows": 84
+        }
+      },
+      {
+        "label": "Pavilhão 12",
+        "validation": {
+          "comparison_present": false,
+          "coverage": {
+            "complete": true,
+            "excludedRows": 0,
+            "issues": []
+          },
+          "documents": 9,
+          "generation_present": true,
+          "inventory": 257,
+          "no_unproven_edition": true,
+          "rows": 80
+        }
+      },
+      {
+        "label": "Pavilhão 7",
+        "validation": {
+          "comparison_present": false,
+          "coverage": {
+            "complete": true,
+            "excludedRows": 0,
+            "issues": []
+          },
+          "documents": 0,
+          "generation_present": true,
+          "inventory": 57,
+          "no_unproven_edition": true,
+          "rows": 0
+        }
+      },
+      {
+        "label": "ExpoRural pendente",
+        "validation": {
+          "comparison_present": false,
+          "coverage": {
+            "complete": true,
+            "excludedRows": 0,
+            "issues": []
+          },
+          "documents": 0,
+          "generation_present": true,
+          "inventory": 108,
+          "no_unproven_edition": true,
+          "rows": 10
+        }
+      },
+      {
+        "label": "Espaço do Automóvel",
+        "validation": {
+          "comparison_present": false,
+          "coverage": {
+            "complete": true,
+            "excludedRows": 0,
+            "issues": []
+          },
+          "documents": 0,
+          "generation_present": true,
+          "inventory": 52,
+          "no_unproven_edition": true,
+          "rows": 0
+        }
+      },
+      {
+        "label": "ICS interiores",
+        "validation": {
+          "comparison_present": false,
+          "coverage": {
+            "complete": true,
+            "excludedRows": 0,
+            "issues": []
+          },
+          "documents": 0,
+          "generation_present": true,
+          "inventory": 1064,
+          "no_unproven_edition": true,
+          "rows": 0
+        }
+      },
+      {
+        "label": "ICS externa",
+        "validation": {
+          "comparison_present": false,
+          "coverage": {
+            "complete": true,
+            "excludedRows": 0,
+            "issues": []
+          },
+          "documents": 0,
+          "generation_present": true,
+          "inventory": 105,
+          "no_unproven_edition": true,
+          "rows": 0
+        }
+      },
+      {
+        "label": "Documentos anteriores",
+        "validation": {
+          "comparison_present": false,
+          "coverage": {
+            "complete": false,
+            "excludedRows": 3,
+            "issues": [
+              {
+                "code": "SEGMENT_MISSING",
+                "count": 12
+              }
+            ]
+          },
+          "documents": 0,
+          "generation_present": true,
+          "inventory": 1479,
+          "no_unproven_edition": true,
+          "rows": 736
+        }
+      },
+      {
+        "label": "Comparação",
+        "validation": {
+          "comparison_present": true,
+          "coverage": {
+            "complete": false,
+            "excludedRows": 3,
+            "issues": [
+              {
+                "code": "SEGMENT_MISSING",
+                "count": 12
+              }
+            ]
+          },
+          "documents": 112,
+          "generation_present": true,
+          "inventory": 1479,
+          "no_unproven_edition": true,
+          "rows": 736
+        }
+      }
+    ]
+  },
+  "liveJobs": {
+    "rows": [
+      {
+        "result": {
+          "anonymous_cannot_snapshot": true,
+          "authenticated_cannot_claim": true,
+          "exclusive_lease": true,
+          "idempotent": true,
+          "other_user_denied": true,
+          "private_bucket": true,
+          "same_snapshot": true,
+          "transaction_rolled_back": true
+        }
+      }
+    ]
+  },
+  "tests": {
+    "targeted": {
+      "files": 41,
+      "passed": 631
+    },
+    "full": {
+      "files": 462,
+      "passed": 3932,
+      "failed": 90
+    },
+    "baseline": {
+      "commit": "9f01dcd1",
+      "files": 457,
+      "passed": 3852,
+      "failed": 90
+    },
+    "newFailures": 0,
+    "isolated": {
+      "query": 73,
+      "artifacts": 21,
+      "persistence": 16,
+      "dbToChat": 35
+    },
+    "rendererRuntime": {
+      "runtime": "Deno",
+      "synthetic": true,
+      "rows": 706,
+      "lots": 1652,
+      "pages": 89,
+      "elapsedMs": 388
+    }
+  },
+  "backendDeployment": "Pending exact reviewed commit deployment; SQL evidence is not a deployment claim.",
+  "browser": "Controlled synthetic fixture, native 703px and 390px iframe; no physical iOS or real authorized HTTP report download tested yet."
+}

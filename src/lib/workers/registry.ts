@@ -6,6 +6,8 @@ import { READ_RPCS, READ_TABLES, readRows, readRpc, requireProject } from './sou
 import { WorkerToolError, workerDataError, type AccessPolicy, type ToolResult, type WorkerAccessContext, type WorkerId, type WorkerToolDefinition } from './types.ts';
 import { parseWorkerAnalytics } from './analytics.ts';
 import { parseQuestionAnalytics } from './question-analytics.ts';
+import { parseCommercialReportSpec, parseCommercialReportSnapshot } from './commercial-report.ts';
+import { commercialReportPreview } from './commercial-report-preview.ts';
 
 const ACCESS_SOURCES = ['agenda_meeting_sessions','cronograma_evento_comissoes','org_members','user_capabilities','commission_responsibles'];
 const allowedSources = new Set([...Object.keys(READ_TABLES), ...READ_RPCS, ...ACCESS_SOURCES]);
@@ -79,6 +81,40 @@ async function dispatch(def: WorkerToolDefinition, input: Record<string, unknown
   const size = Number(input.limit ?? 20);
   const text = (key: string) => String(input[key]);
   switch (def.name) {
+    case 'map_commercial_report_query': {
+      let projectId = input.project_id as string | undefined;
+      if (!projectId) {
+        const projects = await readRows(ctx,'map_projects',{limit:100,filters:[['is_archived','eq',false]]});
+        if (projects.truncated || projects.records.length !== 1) return output(def,[{needs_clarification:true,
+          question:projects.records.length ? 'Qual projeto comercial deseja consultar?' : 'Não encontrei um projeto comercial autorizado para este relatório.',
+          options:projects.records.slice(0,8).map(project=>String(project.name)),
+          ...(projects.records.length ? {choices:projects.records.slice(0,8).map(project=>({id:String(project.id),name:String(project.name)}))}:{}),
+        }]);
+        projectId = String(projects.records[0].id);
+      }
+      await requireProject(ctx,projectId);
+      let spec;
+      try { const filters=object(input.spec);spec = parseCommercialReportSpec({...filters,...(filters.reportFocus==='exhibitors'?{groupBy:'exhibitor'}:{}),projectId}); }
+      catch { throw new WorkerToolError('INVALID_INPUT','Filtros inválidos para o relatório comercial.'); }
+      const rpcResult = await ctx.supabase.rpc('workers_map_commercial_report',{p_project_id:projectId,p_spec:spec});
+      if (rpcResult.error) {
+        const reason=typeof rpcResult.error.message==='string'?rpcResult.error.message.split(':',1)[0]:'';
+        const question:Record<string,string>={REPORT_SCOPE_UNRESOLVED:'Não encontrei uma única área autorizada com essa identificação. Informe o pavilhão físico, segmento ou quadra do projeto.',REPORT_COMPANY_UNRESOLVED_OR_AMBIGUOUS:'Não encontrei uma identidade empresarial única com esse nome. Informe o nome empresarial exato ou selecione o expositor no módulo.',REPORT_CONTRACT_UNRESOLVED_OR_AMBIGUOUS:'Não encontrei um único documento com essa referência no projeto autorizado. Informe a referência contratual exata ou selecione o documento no módulo.',REPORT_ORDER_UNRESOLVED_OR_AMBIGUOUS:'Não encontrei um único pedido com essa referência persistida. Informe a referência exata ou selecione o pedido no módulo.',REPORT_EDITION_NOT_PROVEN:'A edição solicitada não está comprovada no cadastro desse projeto. Deseja consultar o projeto inteiro?'};
+        if(question[reason])return output(def,[{needs_clarification:true,question:question[reason],...(reason==='REPORT_EDITION_NOT_PROVEN'?{options:['Consultar o projeto inteiro']}:{})}]);
+        throw workerDataError(rpcResult.error,'query');
+      }
+      const response = object(rpcResult.data);
+      if (response.needs_clarification === true || response.needsClarification === true) return output(def,[response]);
+      let snapshot;
+      try { snapshot = parseCommercialReportSnapshot(response); }
+      catch { throw new WorkerToolError('INVALID_RESPONSE','Não foi possível validar a fotografia comercial.',{stage:'validation'}); }
+      if (snapshot.scope.projectId !== projectId || snapshot.spec.projectId !== projectId) throw new WorkerToolError('PERMISSION_DENIED','Fotografia fora do projeto autorizado.');
+      // This specific DTO has already passed the report allowlist and capability
+      // checks. The global buyer/document sanitizer intentionally stays unchanged.
+      const preview = commercialReportPreview(snapshot);
+      return {summary:'Fotografia comercial consultada sobre todo o conjunto autorizado; a tabela do chat é uma prévia.',records:[preview],
+        citations:[{label:def.title,url:def.deepLink,source:'app'}],total:snapshot.rows.length,truncated:false,commercialSnapshot:snapshot};
+    }
     case 'agenda_resolve_identity': {
       const response = await readRpc(ctx,'workers_agenda_resolve_identity',{_org_id:ctx.orgId,_kind:input.kind,_search:input.search});
       return output(def,[parseWorkerAnalytics(def.name,response)],{summary:'Identidades persistidas visíveis para esta consulta.'});
@@ -318,12 +354,19 @@ export async function executeWorkerTool(name: string, input: unknown, context: W
   return dispatch(definition,parsed.data,ctx);
 }
 
+/** External tool consumers only receive the bounded projection, never server evidence. */
+export function publicWorkerToolResult(result: ToolResult): Omit<ToolResult, 'commercialSnapshot'> {
+  return { summary: result.summary, records: result.records, citations: result.citations,
+    ...(result.total === undefined ? {} : { total: result.total }),
+    ...(result.truncated === undefined ? {} : { truncated: result.truncated }) };
+}
+
 /** MCP has no current-org field. Ambiguous organizations must never be guessed. */
-export async function executeMcpReadTool(client: SupabaseClient, userId: string, name: 'list_events'|'get_event'|'list_transports', input: unknown): Promise<ToolResult> {
+export async function executeMcpReadTool(client: SupabaseClient, userId: string, name: 'list_events'|'get_event'|'list_transports', input: unknown): Promise<Omit<ToolResult, 'commercialSnapshot'>> {
   const {data:auth,error:authError}=await client.auth.getUser();
   if(authError||auth?.user?.id!==userId) throw new WorkerToolError('AUTH_REQUIRED','Sessão de usuário necessária.');
   const {data,error}=await client.from('org_members').select('org_id').eq('user_id',userId).eq('is_active',true).limit(2);
   if(error||data?.length!==1) throw new WorkerToolError('PERMISSION_DENIED','A consulta MCP exige um único vínculo organizacional ativo. Use a equipe no app para escolher a organização.');
   const ctx=await resolveWorkerAccess(client,userId,data[0].org_id);
-  return executeWorkerTool(name,input,ctx);
+  return publicWorkerToolResult(await executeWorkerTool(name,input,ctx));
 }
