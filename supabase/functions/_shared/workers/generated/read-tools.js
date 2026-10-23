@@ -2,13 +2,13 @@
 // AUTO-GENERATED. Do not edit; canonical source: src/lib/workers/index.ts.
 // Regenerate: node scripts/workers/build-edge-registry.mjs
 // Verify without writing: node scripts/workers/build-edge-registry.mjs --check
-// Source inputs + generator SHA256: 9697c621f7a9ae1af22cac5daaa0d7313f791b5a133d9a1ed2de7358312c6383
+// Source inputs + generator SHA256: d1fbeae75d85395c4de751f332e980175ca30b84c9ab2c8df3a94e28e9bb8022
 // esbuild: 0.21.5; ESM JavaScript; external runtime dependency: zod.
 // Input src/lib/workers/access.ts SHA256 e831e76d097707346be3b82114890dc5608aa95532255847c76ab46d77aa0aea
 // Input src/lib/workers/analytics.ts SHA256 d6c3fa36d36347ef5a7d3200615ed933dbd4095727cd45c0f7671edad65fc6a2
 // Input src/lib/workers/auth-failure.ts SHA256 468a11683d18687c7d3d92753ed8a2e0866532e5b5a7dec797051f7990b6a687
 // Input src/lib/workers/catalog.ts SHA256 b7a40864279ee0f1308651b42b0c9fafc66e4e311390732e8411f449b3dd52af
-// Input src/lib/workers/commercial-report-preview.ts SHA256 0438b7342e956ce1df8efb31a720b18891dac57e753dc56172c6448733c62ef2
+// Input src/lib/workers/commercial-report-preview.ts SHA256 90df5875dd23b5415f70b4e7978fb1e693497b9540f89986a97cd792a9d2dc06
 // Input src/lib/workers/commercial-report.ts SHA256 54f42eaab40a18f298cf503e5928c0edacb5950d81b8d88179926be1295bc1a9
 // Input src/lib/workers/index.ts SHA256 658986def892b6cd32d73c89a1a94ea6877a623694bc151d46af8ba651e80a7c
 // Input src/lib/workers/inventory.ts SHA256 68e24327d4120f412fcac87ede4721163c405b93be2a42ed56bb5d784bdbea82
@@ -770,10 +770,10 @@ function commercialReportGroups(snapshot) {
     const label = spec.groupBy === "status" ? lot.status : lot.pavilionName ?? lot.segmentName ?? "Área sem classificação";
     const group = inventoryGroups.get(key) ?? { key, label, lots: 0, orders: 0, exhibitors: 0, principalCents: null, feesCents: null, historicalArea: null, availableLots: 0, soldMapLots: 0, saleOpenLots: 0, blockedLots: 0 };
     group.lots++;
-    if (lot.status === "AVAILABLE") group.availableLots++;
-    if (lot.status === "SOLD") group.soldMapLots++;
-    if (lot.status === "SALE_OPEN") group.saleOpenLots++;
-    if (lot.status === "BLOCKED") group.blockedLots++;
+    if (lot.status === "AVAILABLE") group.availableLots = (group.availableLots ?? 0) + 1;
+    if (lot.status === "SOLD") group.soldMapLots = (group.soldMapLots ?? 0) + 1;
+    if (lot.status === "SALE_OPEN") group.saleOpenLots = (group.saleOpenLots ?? 0) + 1;
+    if (lot.status === "BLOCKED") group.blockedLots = (group.blockedLots ?? 0) + 1;
     inventoryGroups.set(key, group);
   }
   const contractGroups = /* @__PURE__ */ new Map();

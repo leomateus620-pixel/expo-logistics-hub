@@ -18,7 +18,7 @@ export function commercialReportGroups(snapshot:CommercialReportSnapshot):Commer
     const key=spec.groupBy==='status'?lot.status:lot.pavilionId??lot.segmentId??'unclassified';
     const label=spec.groupBy==='status'?lot.status:lot.pavilionName??lot.segmentName??'Área sem classificação';
     const group=inventoryGroups.get(key)??{key,label,lots:0,orders:0,exhibitors:0,principalCents:null,feesCents:null,historicalArea:null,availableLots:0,soldMapLots:0,saleOpenLots:0,blockedLots:0};
-    group.lots++;if(lot.status==='AVAILABLE')group.availableLots++;if(lot.status==='SOLD')group.soldMapLots++;if(lot.status==='SALE_OPEN')group.saleOpenLots++;if(lot.status==='BLOCKED')group.blockedLots++;
+    group.lots++;if(lot.status==='AVAILABLE')group.availableLots=(group.availableLots??0)+1;if(lot.status==='SOLD')group.soldMapLots=(group.soldMapLots??0)+1;if(lot.status==='SALE_OPEN')group.saleOpenLots=(group.saleOpenLots??0)+1;if(lot.status==='BLOCKED')group.blockedLots=(group.blockedLots??0)+1;
     inventoryGroups.set(key,group);
   }
   const contractGroups=new Map<string,{group:CommercialReportGroup;documents:Set<string>;lots:Set<string>;orders:Set<string>}>();

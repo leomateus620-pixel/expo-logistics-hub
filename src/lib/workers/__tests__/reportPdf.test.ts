@@ -29,6 +29,14 @@ function inspectPdf(bytes: Uint8Array) {
 }
 
 describe('commercial PDF export regression', () => {
+  it('keeps chart units aligned with the commercial query, including value and lot rankings', () => {
+    const value=snapshot();value.spec.sections=['charts'];value.spec.reportFocus='sales';value.spec.sortBy='scope';
+    value.groups=[{key:'scope',label:'Recorte de teste',lots:3,orders:2,exhibitors:1,principalCents:123456,feesCents:0,historicalArea:12}];
+    let text=inspectPdf(createCommercialReportPdf(value).bytes).text;
+    expect(text).toContain('Principal negociado por recorte');expect(text).toContain('1.234,56');
+    value.spec.sortBy='lots';text=inspectPdf(createCommercialReportPdf(value).bytes).text;
+    expect(text).toContain('Lotes por recorte');expect(text).toContain('3 lotes');
+  });
   it('keeps a small executive summary on a single A4 page with selectable local metadata', () => {
     const value = snapshot(); value.spec.presentation = 'executive'; value.spec.sections = ['summary'];
     const pdf = createCommercialReportPdf(value); const parsed = inspectPdf(pdf.bytes);

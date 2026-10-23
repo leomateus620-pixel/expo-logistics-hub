@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { CommercialReportSnapshot } from './commercial-report';
 import { COMMERCIAL_METRICS } from './commercial-report';
-import { commercialReportGroups, commercialReportContracts } from './commercial-report-preview';
+import { commercialReportGroups, commercialReportContracts, commercialReportPreview } from './commercial-report-preview';
 import { buildReportPlan, buildReportPlanGroups } from './report-plan';
 
 const INK='#102d50', GOLD='#bd9449', MUTED='#53657a', LIGHT='#f3f6fa';
@@ -21,6 +21,7 @@ export function createCommercialReportPdf(snapshot:CommercialReportSnapshot, opt
   const title=`Relatório comercial${snapshot.scope.editionYear?' '+snapshot.scope.editionYear:''}`;
   const scope=snapshot.spec.scopeSearch.length?snapshot.spec.scopeSearch.join(' · '):snapshot.scope.projectName;
   const groups=commercialReportGroups(snapshot);
+  const chart=commercialReportPreview(snapshot).chart;
   const planGroups=buildReportPlanGroups(snapshot.inventory);
   const planGroupByLot=new Map(planGroups.flatMap(group=>group.lots.map(lot=>[lot.lotId,group] as const)));
   const contractRows=commercialReportContracts(snapshot);
@@ -61,6 +62,8 @@ export function createCommercialReportPdf(snapshot:CommercialReportSnapshot, opt
         :[['Documentos e abrangência','Informação restrita']])
       :[['Pedidos distintos',number(snapshot.totals.orders)],['Assinatura confirmada',`${number(snapshot.totals.signedLots)} lotes`],['Aguardando assinatura',`${number(snapshot.totals.pendingLots)} lotes`],['Legado sem comprovação',`${number(snapshot.totals.legacyLots)} lotes`],['Área negociada',`${number(snapshot.totals.historicalArea)} m²`],['Principal negociado',amount(snapshot.totals.principalCents)]];
     table(['Indicador','Resultado'],stats);
+    if(snapshot.spec.monetaryBasis==='principal_and_fees')paragraph(`Taxas conciliadas${snapshot.coverage.issues.some(issue=>issue.code==='FEES_UNRECONCILED')?' conhecidas':''}: ${amount(snapshot.totals.feesCents)}. Principal + taxas: ${amount(snapshot.totals.totalCents)}.`);
+    if(snapshot.totals.legacyLots>0&&snapshot.totals.legacyPrincipalCents!==null)paragraph(`Principal registrado no legado: ${amount(snapshot.totals.legacyPrincipalCents)}, exibido separadamente do principal acima. Não comprova assinatura.`);
   }
   if(snapshot.comparison){
     heading('Comparação entre períodos');
@@ -76,12 +79,15 @@ export function createCommercialReportPdf(snapshot:CommercialReportSnapshot, opt
     paragraph('Os dois períodos usam os mesmos filtros, base temporal e regras de contagem. São cadastros ou confirmações no período; não representam reconstrução da situação passada.');
   }
   if(snapshot.spec.sections.includes('charts')&&groups.length){
-    heading('Comparação por recorte');
-    const max=Math.max(...groups.map(g=>g.lots),1);
-    for(const group of groups){if(y>265)addPage();doc.setFontSize(8);doc.setTextColor(INK);const name=doc.splitTextToSize(group.label,68) as string[];
-      doc.text(name,12,y);doc.setFillColor('#e4eaf2');doc.rect(85,y-3,87,4,'F');doc.setFillColor(GOLD);doc.rect(85,y-3,87*group.lots/max,4,'F');doc.text(`${group.lots} lotes`,178,y);y+=Math.max(8,name.length*4+2);}
+    heading(chart.unit==='BRL'?'Principal negociado por recorte':snapshot.spec.reportFocus==='contracts'?'Documentos por recorte':'Lotes por recorte');
+    const max=Math.max(...chart.data.map(g=>g.value),1);
+    for(const group of chart.data){if(y>265)addPage();doc.setFontSize(8);doc.setTextColor(INK);const name=doc.splitTextToSize(group.label,68) as string[];
+      doc.text(name,12,y);doc.setFillColor('#e4eaf2');doc.rect(85,y-3,72,4,'F');doc.setFillColor(GOLD);doc.rect(85,y-3,72*group.value/max,4,'F');
+      const value=chart.unit==='BRL'?amount(group.value*100):`${group.value} ${snapshot.spec.reportFocus==='contracts'?'docs.':'lotes'}`;
+      doc.text(value,198,y,{align:'right'});y+=Math.max(8,name.length*4+2);}
     y+=4;
-    if(snapshot.spec.reportFocus==='inventory')table(['Recorte','Lotes no inventário'],groups.map(g=>[g.label,g.lots]));
+    if(snapshot.spec.reportFocus==='inventory')table(['Recorte','Espaços','Disponíveis','Vendidos','Em aberto','Bloqueados'],groups.map(g=>[g.label,g.lots,number(g.availableLots??null),number(g.soldMapLots??null),number(g.saleOpenLots??null),number(g.blockedLots??null)]));
+    else if(snapshot.spec.reportFocus==='contracts')table(['Recorte','Documentos distintos','Lotes vinculados','Pedidos'],groups.map(g=>[g.label,number(g.documents??null),g.lots,g.orders]));
     else table(['Recorte','Lotes','Pedidos','Expositores','Principal'],groups.map(g=>[g.label,g.lots,g.orders,g.exhibitors,amount(g.principalCents)]));
     paragraph('Pedidos, expositores e documentos podem ocupar várias áreas. Seus subtotais não devem ser somados para obter identidades distintas globais.');
   }
@@ -108,7 +114,8 @@ export function createCommercialReportPdf(snapshot:CommercialReportSnapshot, opt
   }else if(snapshot.spec.reportFocus!=='contracts'&&snapshot.spec.sections.some(s=>s==='sales'||s==='exhibitors')){
     heading(`Vendas e espaços (${snapshot.rows.length} linhas)`);
     table(['Empresa / referência','Lote / área','m² negociados / atuais','Situação','Principal / taxas','Documentos'],snapshot.rows.map(row=>[
-      (snapshot.capabilities.companyNames?row.displayName??'Identidade não comprovada':'Identificação restrita')+'\n'+row.reference+(row.historicalDisplayName&&row.historicalDisplayName!==row.displayName?'\nNa venda: '+row.historicalDisplayName:''),
+      (snapshot.capabilities.companyNames?row.displayName??'Identidade não comprovada':'Identificação restrita')+'\n'+row.reference+(row.historicalDisplayName&&row.historicalDisplayName!==row.displayName?'\nNa venda: '+row.historicalDisplayName:'')
+        +(snapshot.spec.presentation==='detailed'||snapshot.spec.period||['created','signed'].includes(snapshot.spec.sortBy)?'\nCadastro: '+civil(row.createdAt)+(row.signedAt?'\nAssinatura: '+civil(row.signedAt):''):''),
       row.lotLabel+'\n'+(row.pavilionName??row.segmentName??'Área não classificada')+(row.historicalLotLabel&&row.historicalLotLabel!==row.lotLabel?'\nNa venda: '+row.historicalLotLabel:''),
       number(row.historicalArea)+' / '+number(row.currentArea),
       (STATES[row.state]??row.state)+(row.partialOrder?'\nPedido parcialmente assinado':''),

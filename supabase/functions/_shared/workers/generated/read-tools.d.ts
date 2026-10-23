@@ -1,5 +1,5 @@
 // AUTO-GENERATED from canonical TypeScript declarations. Do not edit.
-// Source inputs + generator SHA256: 9697c621f7a9ae1af22cac5daaa0d7313f791b5a133d9a1ed2de7358312c6383
+// Source inputs + generator SHA256: d1fbeae75d85395c4de751f332e980175ca30b84c9ab2c8df3a94e28e9bb8022
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { z } from 'zod';
