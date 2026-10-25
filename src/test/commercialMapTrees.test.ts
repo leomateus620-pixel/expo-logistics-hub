@@ -130,7 +130,7 @@ function distanceToEntitySurface(point: readonly [number, number], entity: MapEn
 
 describe('camada cartográfica de árvores do mapa comercial', () => {
   it('mantém inventário versionado por quadra e por área ambiental', () => {
-    expect(COMMERCIAL_TREE_LAYER_REVISION).toBe('2026.8-quadras-ab.1');
+    expect(COMMERCIAL_TREE_LAYER_REVISION).toBe('2026.10-exporural.1');
     expect(COMMERCIAL_TREE_COUNTS_BY_QUADRA).toEqual({ D: 9, I: 15, J: 14, E: 14 });
     expect(COMMERCIAL_TREE_COUNTS_BY_AREA).toEqual({
       D: 9,
@@ -146,8 +146,9 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
       TERCEIRA_IDADE_EDGE: 9,
       GATE_FOUR_DISTRICT: 10,
       NATIONS_DISTRICT: 25,
+      EXPORURAL: 1,
     });
-    expect(COMMERCIAL_MAP_TREES).toHaveLength(274);
+    expect(COMMERCIAL_MAP_TREES).toHaveLength(275);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id)).size).toBe(COMMERCIAL_MAP_TREES.length);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.area))).toEqual(new Set(Object.keys(COMMERCIAL_TREE_COUNTS_BY_AREA)));
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.speciesGroup)).size).toBe(4);
@@ -365,7 +366,7 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
         return;
       }
       expect(['INSIDE_LOT', 'LOT_EDGE']).toContain(tree.placement);
-      expect(tree.relatedLotId.startsWith(`Q-${tree.quadra}-`), tree.id).toBe(true);
+      expect(tree.relatedLotId.startsWith(`Q-${tree.area === 'EXPORURAL' ? 'R' : tree.quadra}-`), tree.id).toBe(true);
       const lot = resolveCommercialTreeLot(tree, OFFICIAL_REFERENCE_DATA.lots);
       expect(lot, tree.id).not.toBeNull();
       const entity = entityByPublicIdentifier.get(tree.relatedLotId);
@@ -380,7 +381,7 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
   });
 
   it('preserva troncos ambientais fora de vias, prédios, marcos e lotes comerciais', () => {
-    const environmentalTrees = COMMERCIAL_MAP_TREES.filter((tree) => tree.quadra === null);
+    const environmentalTrees = COMMERCIAL_MAP_TREES.filter((tree) => tree.quadra === null && tree.placement !== 'INSIDE_LOT');
     const allowedGroundClassifications = new Set([
       'PARKING',
       'GREEN_AREA',
@@ -418,8 +419,8 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
     });
   });
 
-  it('mantém a única copa interna apoiada pelos anexos dentro do lote I-08', () => {
-    const internalTrees = COMMERCIAL_MAP_TREES.filter((tree) => tree.placement === 'INSIDE_LOT');
+  it('mantém a copa interna histórica da quadra I dentro do lote I-08', () => {
+    const internalTrees = COMMERCIAL_MAP_TREES.filter((tree) => tree.placement === 'INSIDE_LOT' && tree.quadra === 'I');
     expect(internalTrees).toHaveLength(1);
     expect(internalTrees[0]).toMatchObject({ quadra: 'I', relatedLotId: 'Q-I-08' });
     const lotEntity = OFFICIAL_REFERENCE_DATA.entities.find(
@@ -438,7 +439,7 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
     expect(new Set(industryTrees.map((tree) => tree.area))).toEqual(new Set(['D', 'I', 'J', 'E']));
     expect(industryTrees).toHaveLength(52);
     const exporural = scopeCommercialMapData(OFFICIAL_REFERENCE_DATA, COMMERCIAL_MAP_SEGMENT_IDS.exporural);
-    expect(selectCommercialTreesForScene(exporural.entities, exporural.lots)).toEqual([]);
+    expect(selectCommercialTreesForScene(exporural.entities, exporural.lots).map(tree => tree.id)).toEqual(['tree-exporural-r01-01']);
     const automotive = scopeCommercialMapData(OFFICIAL_REFERENCE_DATA, COMMERCIAL_MAP_SEGMENT_IDS.automotive);
     expect(selectCommercialTreesForScene(automotive.entities, automotive.lots)).toEqual([]);
   });

@@ -14,6 +14,7 @@ import type {
 import type { CommercialMapSegmentId } from '../data/commercialMapSegments';
 import type { ParkingCameraView } from '../utils/parkingViewport';
 import type { LunarLaunchPhase } from '../utils/lunarLaunch';
+import { isSoyHarvestCameraOwned } from '../harvest/soyHarvestOwnership';
 
 export type CommercialMapDockSection =
   | 'search'
@@ -671,7 +672,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   )),
   toggleRainMode: () => get().setRainModeActive(!get().rainModeActive),
   requestLunarLaunch: () => set((state) => {
-    if (state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning) return state;
+    if (state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning || isSoyHarvestCameraOwned()) return state;
     return {
       ...CLEARED_PARKING_INSPECTION,
       lunarLaunchPhase: 'ignition',

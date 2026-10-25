@@ -71,6 +71,9 @@ export function commercialTreeAreasForScene(
 ) {
   const areas = new Set<CommercialTreeArea>(commercialTreeBlocksForScene(entities, lots));
   const identifiers = new Set(entities.map((entity) => entity.publicIdentifier));
+  // Lots can be supplied without their decorative area anchor in an isolated
+  // scene. Only the authorized Q-R-01 lot admits this inventory.
+  if (lots.some(lot => lot.publicIdentifier === 'Q-R-01')) areas.add('EXPORURAL');
   (Object.keys(COMMERCIAL_TREE_AREA_SCENE_ANCHORS) as Array<Exclude<CommercialTreeArea, CommercialTreeQuadra>>)
     .forEach((area) => {
       if (COMMERCIAL_TREE_AREA_SCENE_ANCHORS[area].every((identifier) => identifiers.has(identifier))) {

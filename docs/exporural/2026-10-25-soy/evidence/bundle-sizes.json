@@ -1,0 +1,14 @@
+{
+  "baselineAllJavaScriptGzipBytes": 3986278,
+  "candidateJavaScriptExceptLazyRuntimeGzipBytes": 3998443,
+  "initialConservativeDeltaJavaScriptGzipBytes": 12165,
+  "initialCssDeltaGzipBytes": 396,
+  "lazyRuntime": [
+    {
+      "file": "SoyHarvestExperience-DvW8UCmZ.js",
+      "rawBytes": 21409,
+      "gzipBytes": 8721
+    }
+  ],
+  "method": "gzip with Python default level9 per emitted asset. Difference of all emitted JS except lazy runtime is a conservative integration-size estimate, not a network trace of one entry. No external machine assets."
+}

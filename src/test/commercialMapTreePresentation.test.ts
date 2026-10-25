@@ -23,13 +23,13 @@ const rendererSource = readFileSync(rendererPath, 'utf8');
 describe('apresentação profissional e instanciada das árvores comerciais', () => {
   it('preserva o inventário canônico e produz identidades visuais determinísticas por árvore', () => {
     const previousAreas = COMMERCIAL_MAP_TREES.filter((tree) => (
-      tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'
+      tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B' && tree.area !== 'EXPORURAL'
     ));
     const quadrasAB = COMMERCIAL_MAP_TREES.filter((tree) => (
       tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B'
     ));
 
-    expect(COMMERCIAL_MAP_TREES).toHaveLength(274);
+    expect(COMMERCIAL_MAP_TREES).toHaveLength(275);
     expect(previousAreas).toHaveLength(240);
     expect(quadrasAB).toHaveLength(34);
     expect(previousAreas.reduce<Record<string, number>>((counts, tree) => {
@@ -48,7 +48,7 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
       GATE_FOUR_DISTRICT: 10,
       NATIONS_DISTRICT: 25,
     });
-    expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id)).size).toBe(274);
+    expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id)).size).toBe(275);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.speciesGroup)).size).toBe(4);
     expect([...new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.visualVariant))].sort()).toEqual([
       0, 1, 2, 3, 4, 5,
@@ -144,7 +144,7 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
     // A tree is never removed by distance or quality tier: only branches
     // drop with distance. Full graphics keeps the real shadow caster and
     // the ground-contact patch so the overview still reads volume.
-    expect(plan.countByTier).toEqual({ near: 274, mid: 274, far: 274 });
+    expect(plan.countByTier).toEqual({ near: 275, mid: 275, far: 275 });
     expect(new Set(plan.itemsByTier.near.map((tree) => tree.id))).toEqual(canonicalIds);
     expect(new Set(plan.itemsByTier.far.map((tree) => tree.id))).toEqual(canonicalIds);
     expect(rendererSource).toContain('COMMERCIAL_TREE_LOD_DENSITY = Object.freeze({ near: 1, mid: 1, far: 1 })');
@@ -152,44 +152,44 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
     expect(rendererSource).not.toContain('vegetationDensity');
 
     expect(resolveCommercialTreeLodInstanceCounts(plan.countByTier, 'near', 7, false)).toEqual({
-      trees: 274,
-      trunks: 274,
-      branches: 548,
-      crowns: 1_918,
+      trees: 275,
+      trunks: 275,
+      branches: 550,
+      crowns: 1_925,
       shadows: 0,
-      contactPatches: 274,
+      contactPatches: 275,
       castsDynamicShadows: true,
     });
     expect(resolveCommercialTreeLodInstanceCounts(plan.countByTier, 'mid', 7, false)).toEqual({
-      trees: 274,
-      trunks: 274,
-      branches: 548,
-      crowns: 1_918,
+      trees: 275,
+      trunks: 275,
+      branches: 550,
+      crowns: 1_925,
       shadows: 0,
-      contactPatches: 274,
+      contactPatches: 275,
       castsDynamicShadows: true,
     });
     expect(resolveCommercialTreeLodInstanceCounts(plan.countByTier, 'near', 3, true)).toEqual({
-      trees: 274,
-      trunks: 274,
-      branches: 548,
-      crowns: 822,
+      trees: 275,
+      trunks: 275,
+      branches: 550,
+      crowns: 825,
       shadows: 0,
-      contactPatches: 274,
+      contactPatches: 275,
       castsDynamicShadows: true,
     });
     expect(resolveCommercialTreeLodInstanceCounts(plan.countByTier, 'far', 7, false)).toEqual({
-      trees: 274,
-      trunks: 274,
+      trees: 275,
+      trunks: 275,
       branches: 0,
-      crowns: 1_918,
+      crowns: 1_925,
       shadows: 0,
-      contactPatches: 274,
+      contactPatches: 275,
       castsDynamicShadows: true,
     });
     // Legacy plans that still shrink lower tiers cannot hide trees either.
-    expect(resolveCommercialTreeLodInstanceCounts({ near: 274, mid: 225, far: 170 }, 'far', 7, false).trees)
-      .toBe(274);
+    expect(resolveCommercialTreeLodInstanceCounts({ near: 275, mid: 225, far: 170 }, 'far', 7, false).trees)
+      .toBe(275);
 
     const scene = resolveCommercialTreeLodSceneMetrics(COMMERCIAL_MAP_TREES);
     expect(scene.diagonal).toBeGreaterThan(1);

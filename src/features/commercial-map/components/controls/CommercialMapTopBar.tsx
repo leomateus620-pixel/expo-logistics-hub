@@ -16,6 +16,7 @@ import type { CameraPreset, MapPermissions } from '../../types';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import { canUseTechnicalValidationOverlay } from '../../utils/technicalValidation';
 import { CommercialMapControlRail } from './CommercialMapControlRail';
+import { SoyHarvestButton } from '../../harvest/SoyHarvestButton';
 import {
   FenasojaFoldedMapIcon,
   FenasojaHydrologyIcon,
@@ -41,6 +42,7 @@ interface CommercialMapTopBarProps {
   permissions: MapPermissions;
   hasSelection: boolean;
   isCommissionScope: boolean;
+  soyHarvestAvailable?: boolean;
 }
 
 /** Floating rail with the visualization controls of the 3D canvas. */
@@ -49,6 +51,7 @@ export function CommercialMapTopBar({
   permissions,
   hasSelection,
   isCommissionScope,
+  soyHarvestAvailable = false,
 }: CommercialMapTopBarProps) {
   const activePanel = useCommercialMapStore((state) => state.activePanel);
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
@@ -115,6 +118,8 @@ export function CommercialMapTopBar({
       ))}
 
       <span className="commercial-map-topbar__divider" aria-hidden="true" />
+
+      {soyHarvestAvailable && <SoyHarvestButton className="commercial-map-topbar__trigger"/>}
 
       {renderAction('focus', Maximize2, 'Centralizar seleção', focusSelection, { disabled: !hasSelection })}
 

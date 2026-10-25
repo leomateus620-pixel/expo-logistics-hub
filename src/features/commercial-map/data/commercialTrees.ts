@@ -1,4 +1,5 @@
-import { OFFICIAL_REFERENCE_DATA, officialPdfPointToLocal } from './officialReference2026';
+import { OFFICIAL_REFERENCE_DATA, officialPdfPointToLocal, officialLocalPointToPdf } from './officialReference2026';
+import { EXPORURAL_SCENE_CORRECTIONS } from './exporuralSceneCorrections';
 import { pointInPolygon } from '../utils/spatialSurface';
 import { NATIONS_DISTRICT_LAYOUT } from './nationsDistrict';
 import { GATE_FOUR_DISTRICT_LAYOUT } from './gateFourDistrict';
@@ -16,7 +17,8 @@ export type CommercialTreeArea = CommercialTreeQuadra
   | 'TERCEIRA_IDADE_EDGE'
   | 'GATE_FOUR_DISTRICT'
   | 'REAR_PARKING'
-  | 'NATIONS_DISTRICT';
+  | 'NATIONS_DISTRICT'
+  | 'EXPORURAL';
 
 export type CommercialTreePlacement =
   | 'INSIDE_LOT'
@@ -74,7 +76,7 @@ export interface CommercialMapTree {
   verificationStatus: CommercialTreeVerificationStatus;
 }
 
-export const COMMERCIAL_TREE_LAYER_REVISION = '2026.8-quadras-ab.1';
+export const COMMERCIAL_TREE_LAYER_REVISION = '2026.10-exporural.1';
 
 export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
   D: 'Anexo 1 — satélite da Quadra D (088fa39a-75de-4768-b7fb-7017886f84ab.png)',
@@ -90,10 +92,12 @@ export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
   TERCEIRA_IDADE_EDGE: 'Anexos 3 e 7 — árvores próximas ao Pavilhão Terceira Idade',
   GATE_FOUR_DISTRICT: 'Anexos 5 a 7 — árvores maduras e floração ornamental no entorno do Núcleo Crioulo e da Rua Buenos Aires',
   REAR_PARKING: 'Anexo 7 — satélite IMG_9816 (1).jpeg, 1179 × 861 pixels; copas das bordas do estacionamento posterior',
+  EXPORURAL: 'Anexos — capturas 25/10/2026 01.27.40 e 01.39.19 — árvore isolada do lote Q-R-01',
   NATIONS_DISTRICT: 'Anexos oficiais IMG_9670 (1).jpeg e IMG_9671.jpeg — massas periféricas da Praça das Nações',
 } as const satisfies Record<CommercialTreeArea, string>;
 
 export const COMMERCIAL_TREE_AREA_SCENE_ANCHORS: Readonly<Record<Exclude<CommercialTreeArea, CommercialTreeQuadra>, readonly string[]>> = {
+  EXPORURAL: ['Q-R-01'],
   QUADRA_A: ['QUADRA-A'],
   QUADRA_B: ['QUADRA-B', 'B12', 'B13'],
   PARKING_EXHIBITORS_VISITORS: ['EST-EXP-VIS'],
@@ -148,6 +152,7 @@ function isCommercialTreeQuadra(area: CommercialTreeArea): area is CommercialTre
 }
 
 const TREE_AREA_ID_PREFIX: Readonly<Record<CommercialTreeArea, string>> = {
+  EXPORURAL: 'exporural',
   D: 'd',
   I: 'i',
   J: 'j',
@@ -515,7 +520,22 @@ const NATIONS_DISTRICT_TREES = buildTrees('NATIONS_DISTRICT', recommendFieldRevi
   })),
 ));
 
+const exporuralTree = EXPORURAL_SCENE_CORRECTIONS.tree;
+const EXPORURAL_TREES: readonly CommercialMapTree[] = [{
+  id: exporuralTree.id,
+  classification: 'PARK_TREE', isSellable: false, contributesToCommercialMetrics: false,
+  area: 'EXPORURAL', quadra: null, relatedLotId: exporuralTree.lotIdentifier,
+  surfaceEntityIdentifier: exporuralTree.lotIdentifier, placement: 'INSIDE_LOT',
+  position: exporuralTree.position, sourcePosition: officialLocalPointToPdf(exporuralTree.position),
+  ...exporuralTree.dimensions, speciesGroup: 'OPEN_CANOPY', visualVariant: 4,
+  shadowSize: [1.72, 1.04], shadowRotation: exporuralTree.rotationRadians,
+  shadowDirection: [Math.cos(exporuralTree.rotationRadians), Math.sin(exporuralTree.rotationRadians)],
+  isVisible: true, sourceReference: COMMERCIAL_TREE_SOURCE_REFERENCES.EXPORURAL,
+  notes: exporuralTree.notes, verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
+}];
+
 export const COMMERCIAL_MAP_TREES: readonly CommercialMapTree[] = [
+  ...EXPORURAL_TREES,
   ...QUADRA_D_TREES,
   ...QUADRA_I_TREES,
   ...QUADRA_J_TREES,
@@ -542,6 +562,7 @@ export const COMMERCIAL_TREE_COUNTS_BY_QUADRA: Readonly<Record<CommercialTreeQua
 // silently change the existing canonical inventory or be counted twice here.
 export const COMMERCIAL_TREE_COUNTS_BY_AREA: Readonly<Record<Exclude<CommercialTreeArea, 'REAR_PARKING'>, number>> = {
   ...COMMERCIAL_TREE_COUNTS_BY_QUADRA,
+  EXPORURAL: EXPORURAL_TREES.length,
   QUADRA_A: QUADRA_A_TREES.length,
   QUADRA_B: QUADRA_B_TREES.length,
   PARKING_EXHIBITORS_VISITORS: PARKING_EXHIBITORS_VISITORS_TREES.length,

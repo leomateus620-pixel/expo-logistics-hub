@@ -1,6 +1,57 @@
 import type { Coordinate, MapEntity } from '../types';
-import type { CommercialElectricalNode } from './electricalInfrastructure';
+import type { CommercialElectricalConnection, CommercialElectricalNode } from './electricalInfrastructure';
+import { EXPORURAL_SCENE_CORRECTIONS, exporuralTransformerSupportPosition } from './exporuralSceneCorrections';
+import { pointInPolygon } from '../utils/spatialSurface';
 import { complexWorldPolygon, FENASOJA_COMPLEX_REVISION } from './fenasojaComplexReconstruction';
+
+/** Apply after authorization/scoping. The source inventory and inferred graph
+ * remain immutable; only this local rendered graph replaces the three simples. */
+export function presentExporuralElectricalInfrastructure(
+  nodes: readonly CommercialElectricalNode[],
+  connections: readonly CommercialElectricalConnection[],
+  entities: readonly MapEntity[],
+) {
+  const correction = EXPORURAL_SCENE_CORRECTIONS.transformer;
+  const host = entities.find(entity => entity.publicIdentifier === correction.lotIdentifier);
+  // Do not project the model into the old rectangular reference or an unrelated
+  // segment. Both authored supports must fit the currently loaded lot surface.
+  if (!host || !correction.envelope.every(point => pointInPolygon(point, host.geometry.coordinates[0]))) {
+    return { nodes: [...nodes], connections: [...connections] };
+  }
+  const roles = new Map([['pole-ref-134', 'LEFT'], ['pole-ref-135', 'RIGHT']] as const);
+  const presentedNodes = nodes.filter(node => node.sourceMarkerId !== 'pole-ref-136').map(node => {
+    const role = roles.get(node.sourceMarkerId as 'pole-ref-134' | 'pole-ref-135');
+    return role ? { ...node, presentationAssembly: { id: correction.id,
+      revision: EXPORURAL_SCENE_CORRECTIONS.revision, role } } : node;
+  });
+  const nodeIds = new Set(presentedNodes.map(node => node.id));
+  const replacement = (id: string) => id === 'electrical-pole-ref-136' ? 'electrical-pole-ref-135' : id;
+  const presentedConnections = connections.flatMap(connection => {
+    const fromNodeId = replacement(connection.fromNodeId), toNodeId = replacement(connection.toNodeId);
+    if (fromNodeId === toNodeId || !nodeIds.has(fromNodeId) || !nodeIds.has(toNodeId)) return [];
+    return [{ ...connection, fromNodeId, toNodeId,
+      ...(toNodeId !== connection.toNodeId || fromNodeId !== connection.fromNodeId ? {
+        id: `${connection.id}:exporural-2026-10-25`,
+        notes: `${connection.notes} Terminal de apresentação substituído por ${correction.id}; origem preservada no inventário.`,
+      } : {}) }];
+  });
+  // The two tall supports carry the same three conductors across the platform.
+  if (nodeIds.has('electrical-pole-ref-134') && nodeIds.has('electrical-pole-ref-135')) {
+    presentedConnections.push({
+      id: 'electrical-exporural-r34-presentation-bridge', fromNodeId: 'electrical-pole-ref-134',
+      toNodeId: 'electrical-pole-ref-135', kind: 'PRIMARY_ALIGNMENT', conductorCount: 3,
+      circuitId: 'presentation-exporural-r34', sourceAlignmentChainId: 'EXPORURAL-R34-PRESENTATION',
+      topologyEvidence: 'PHOTO_PRESENTATION', sag: 0.012,
+      source: 'PHOTO_PRESENTATION',
+      notes: 'Ligação visual local entre os dois apoios da fotografia; não é uma conexão de engenharia levantada.',
+    });
+  }
+  return { nodes: presentedNodes, connections: presentedConnections };
+}
+
+export function resolveExporuralAssemblyPosition(node: CommercialElectricalNode): Coordinate | null {
+  return node.presentationAssembly ? exporuralTransformerSupportPosition(node.presentationAssembly.role) : null;
+}
 
 /**
  * Small presentation-only offsets for the reconstructed gate-four volumes.

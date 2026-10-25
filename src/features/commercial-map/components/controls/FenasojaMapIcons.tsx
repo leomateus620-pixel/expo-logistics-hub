@@ -9,6 +9,18 @@ import './fenasoja-map-icons.css';
  */
 export type FenasojaMapIconProps = Omit<SVGProps<SVGSVGElement>, 'strokeWidth'> & { strokeWidth?: number | string };
 
+/** Original soy header/combine silhouette; same 24 px grid as the map controls. */
+export function FenasojaHarvestIcon(props: FenasojaMapIconProps) {
+  return <IconFrame iconName="harvest" {...props}>
+    <path d="M4 7h8l3 4v5H4Z" fill="#49a262" fillOpacity=".85" />
+    <path d="M12 6h5l2 6h-7Z" fill="#9ddde9" fillOpacity=".85" />
+    <path d="M4 7h8v5h7l-2-6h-5M4 7v9h10M7 7V4h7l2 2M5 10 2 8" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+    <circle cx="7" cy="17" r="3" fill="#e5bf42" stroke="currentColor" strokeWidth="1.5" />
+    <circle cx="16" cy="17.5" r="2.2" fill="#e5bf42" stroke="currentColor" strokeWidth="1.5" />
+    <path d="m18 13 3 2v4h-2M19 15h3M20 15v5M22 15v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </IconFrame>;
+}
+
 function useGradientId(prefix: string) {
   return `${prefix}-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
 }

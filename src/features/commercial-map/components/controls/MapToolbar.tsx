@@ -34,6 +34,7 @@ import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import { canUseTechnicalValidationOverlay } from '../../utils/technicalValidation';
 import { COMMERCIAL_MAP_COMPACT_QUERY } from '../../utils/compactLayout';
 import { CommercialMapControlRail } from './CommercialMapControlRail';
+import { SoyHarvestButton } from '../../harvest/SoyHarvestButton';
 import {
   FenasojaFoldedMapIcon,
   FenasojaHydrologyIcon,
@@ -62,6 +63,7 @@ export function MapToolbar({
   areaScope,
   isCommissionScope = false,
   showDesktopControls = false,
+  soyHarvestAvailable = false,
 }: {
   permissions: MapPermissions;
   hasSelection: boolean;
@@ -69,6 +71,7 @@ export function MapToolbar({
   isCommissionScope?: boolean;
   /** Desktop search and camera rail now live in the left dock. */
   showDesktopControls?: boolean;
+  soyHarvestAvailable?: boolean;
 }) {
   const [isCompactSearchOpen, setIsCompactSearchOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
@@ -157,6 +160,7 @@ export function MapToolbar({
       </div>}
 
       {showDesktopControls && <div className="commercial-map-toolbar commercial-map-toolbar--desktop" aria-label="Controles do mapa">
+        {soyHarvestAvailable && <SoyHarvestButton />}
         {presets.map((preset) => {
           const Icon = presetIcons[preset];
           return (
@@ -280,6 +284,7 @@ export function MapToolbar({
         label="Controles principais do mapa"
         nightModeActive={nightModeActive}
       >
+        {soyHarvestAvailable && <SoyHarvestButton />}
         <button
           type="button"
           className={cameraPreset === mobileResetPreset ? 'is-active' : ''}

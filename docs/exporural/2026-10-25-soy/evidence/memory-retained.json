@@ -1,0 +1,155 @@
+{
+  "method": "Three alternating fresh contexts, identical October fixture and viewport; two explicit CDP collections after scene readiness. These samples investigate GC noise and are not loading-time measurements.",
+  "runs": [
+    {
+      "label": "baseline",
+      "run": 0,
+      "heap": {
+        "usedSize": 76705792,
+        "totalSize": 78888960,
+        "embedderHeapUsedSize": 6854328,
+        "backingStorageSize": 68729170
+      },
+      "renderer": {
+        "at": 5442.399999991059,
+        "calls": 1126,
+        "triangles": 1085369,
+        "geometries": 573,
+        "textures": 111,
+        "programs": 190,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 145801598,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      }
+    },
+    {
+      "label": "candidate",
+      "run": 0,
+      "heap": {
+        "usedSize": 77356092,
+        "totalSize": 79413248,
+        "embedderHeapUsedSize": 6972496,
+        "backingStorageSize": 70108035
+      },
+      "renderer": {
+        "at": 5556.79999999702,
+        "calls": 1136,
+        "triangles": 1153813,
+        "geometries": 579,
+        "textures": 111,
+        "programs": 196,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 147955895,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      }
+    },
+    {
+      "label": "baseline",
+      "run": 1,
+      "heap": {
+        "usedSize": 76393284,
+        "totalSize": 78888960,
+        "embedderHeapUsedSize": 6892184,
+        "backingStorageSize": 68729142
+      },
+      "renderer": {
+        "at": 5282.20000000298,
+        "calls": 1126,
+        "triangles": 1085369,
+        "geometries": 573,
+        "textures": 111,
+        "programs": 176,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 145558322,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      }
+    },
+    {
+      "label": "candidate",
+      "run": 1,
+      "heap": {
+        "usedSize": 77309140,
+        "totalSize": 79413248,
+        "embedderHeapUsedSize": 6916448,
+        "backingStorageSize": 70108046
+      },
+      "renderer": {
+        "at": 5334.29999999702,
+        "calls": 1136,
+        "triangles": 1153813,
+        "geometries": 579,
+        "textures": 111,
+        "programs": 195,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 147914118,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      }
+    },
+    {
+      "label": "baseline",
+      "run": 2,
+      "heap": {
+        "usedSize": 76557044,
+        "totalSize": 78626816,
+        "embedderHeapUsedSize": 6869712,
+        "backingStorageSize": 68729175
+      },
+      "renderer": {
+        "at": 5294.29999999702,
+        "calls": 1126,
+        "triangles": 1085369,
+        "geometries": 573,
+        "textures": 111,
+        "programs": 186,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 145730367,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      }
+    },
+    {
+      "label": "candidate",
+      "run": 2,
+      "heap": {
+        "usedSize": 77295736,
+        "totalSize": 79413248,
+        "embedderHeapUsedSize": 6921544,
+        "backingStorageSize": 70108022
+      },
+      "renderer": {
+        "at": 5314.399999991059,
+        "calls": 1136,
+        "triangles": 1153813,
+        "geometries": 579,
+        "textures": 111,
+        "programs": 194,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 147861914,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      }
+    }
+  ]
+}
