@@ -1,6 +1,10 @@
 import { InteriorViewControls } from '../InteriorViewControls';
 import { useVisitStore } from '../../visit/useVisitStore';
 import { useVisitCameraLease } from '../../visit/useVisitCameraLease';
+import { useSoyHarvestCameraLease } from '../../harvest/useSoyHarvestCameraLease';
+import { useSoyHarvestStore } from '../../harvest/useSoyHarvestStore';
+import { isSoyHarvestCameraOwned } from '../../harvest/soyHarvestOwnership';
+import { SoyHarvestLayer } from '../../harvest/SoyHarvestLayer';
 import { clampInteriorPan, resolveInteriorView, interpolateInteriorOrbit } from '../../utils/interiorView';
 import { resolveSaleInspectionInteriorView } from '../../utils/saleInspectionCamera';
 import { publicLotOutlinePositions } from '../../public/publicLotOutline';
@@ -2065,6 +2069,12 @@ function CameraRig({
   const visitLease = useVisitCameraLease(camera, controlsRef, invalidate);
   const visitEnabled = visitLease.enabled;
   const visitRestoredAt = visitLease.restoredAt;
+  const soyLease = useSoyHarvestCameraLease(camera, controlsRef, invalidate);
+  const soyEnabled = soyLease.enabled;
+  const soyRestoredAt = soyLease.restoredAt;
+  const soyBlocksResizeRefit = useCallback(() => isSoyHarvestCameraOwned()
+    || (soyRestoredAt.current > 0 && performance.now() - soyRestoredAt.current
+      < COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS), [soyRestoredAt]);
   useEffect(() => {
     if (!gl.domElement.closest('.public-map-shell')) return;
     const save = () => savePublicNavigation({ position: camera.position.toArray() as [number, number, number], target: controlsRef.current?.target.toArray() as [number, number, number], zoom: camera.zoom });
@@ -2572,7 +2582,8 @@ function CameraRig({
     nextLens: Partial<CameraLensState> = {},
     source = 'navigation',
   ) => {
-    if ((useVisitStore.getState().enabled && !useCommercialMapStore.getState().interiorEntityId)
+    if (isSoyHarvestCameraOwned() || performance.now() - soyRestoredAt.current < 300
+      || (useVisitStore.getState().enabled && !useCommercialMapStore.getState().interiorEntityId)
       || performance.now() - visitRestoredAt.current < 300) return;
     if (source !== 'panel-layout') clampQueuedCameraPose(minDistance, maxDistance, clampTarget);
     const controls = controlsRef.current;
@@ -2684,9 +2695,11 @@ function CameraRig({
     setCameraNavigating,
     writeCameraDiagnostics,
     visitRestoredAt,
+    soyRestoredAt,
   ]);
 
   const cancelCameraTransition = useCallback((preserveView = true) => {
+    if (isSoyHarvestCameraOwned()) return;
     const transition = cameraTransition.current;
     if (!transition.active) return;
     transition.active = false;
@@ -2791,6 +2804,7 @@ function CameraRig({
   }, [gl, invalidate]);
 
   const enforceDesiredCameraLimits = useCallback(() => {
+    if (isSoyHarvestCameraOwned()) return false;
     if (useVisitStore.getState().enabled && !useCommercialMapStore.getState().interiorEntityId) return false;
     const controls = controlsRef.current;
     const currentTarget = controls?.target ?? targetLookAt.current;
@@ -2825,6 +2839,7 @@ function CameraRig({
 
   useEffect(() => {
     if (lunarCameraLockedRef.current || !(camera instanceof THREE.PerspectiveCamera)) return;
+    if (isSoyHarvestCameraOwned()) return;
     if (useVisitStore.getState().enabled && !useCommercialMapStore.getState().interiorEntityId) return;
     if (interiorEntity && !interiorFrame) return;
     if (navigation.current.active || navigation.current.settling || (interiorFrame?.pavilion && preserveManualView.current)) {
@@ -3231,6 +3246,7 @@ function CameraRig({
   }, [camera, gl, interiorFrame, publicPolicy, size.height, size.width, startCameraMove]);
 
   resizeRefitView.current = () => {
+    if (soyBlocksResizeRefit()) return;
     // A panel can change the free screen center without changing the user's
     // manually chosen world position, pivot, distance or zoom.
     if (preserveManualView.current) {
@@ -3264,7 +3280,7 @@ function CameraRig({
   const cancelTransientNavigation = useCallback(() => {
     // Cinematic locks own their timeline and must not be released by an OS
     // gesture cancellation or tab switch. Their visibility pause stays intact.
-    if (lunarCameraLockedRef.current) return;
+    if (lunarCameraLockedRef.current || isSoyHarvestCameraOwned()) return;
     cancelCameraTransition(true);
     cancelScheduledResizeRefit();
     pendingResizeRefit.current = false;
@@ -3507,6 +3523,11 @@ function CameraRig({
   ]);
 
   const scheduleResizeRefit = useCallback(() => {
+    if (soyBlocksResizeRefit()) {
+      pendingResizeRefit.current = false;
+      cancelScheduledResizeRefit();
+      return;
+    }
     if (useVisitStore.getState().enabled && !useCommercialMapStore.getState().interiorEntityId) return;
     if (
       lunarCameraLockedRef.current
@@ -3522,6 +3543,7 @@ function CameraRig({
 
     const runRefit = () => {
       resizeRefitTimer.current = null;
+      if (soyBlocksResizeRefit()) { pendingResizeRefit.current = false; return; }
       if (navigation.current.active || lunarCameraLockedRef.current) return;
       if (shouldSuppressCommercialMapResizeRefit(Date.now(), resizeRefitSuppressedUntil.current)) {
         pendingResizeRefit.current = false;
@@ -3547,14 +3569,15 @@ function CameraRig({
       runRefit,
       COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS,
     );
-  }, [cancelScheduledResizeRefit, gl]);
+  }, [cancelScheduledResizeRefit, gl, soyBlocksResizeRefit]);
 
   // Claim the next frame during commit, before panel effects can schedule work.
   // Camera coordinates still change only inside the single frame controller.
   useLayoutEffect(() => {
     const selectedId = selectedEntity?.id ?? null;
     const interiorId = interiorEntity?.id ?? null;
-    if ((visitEnabled && !interiorId) || performance.now() - visitRestoredAt.current < 300) {
+    if (soyEnabled || performance.now() - soyRestoredAt.current < 300
+      || (visitEnabled && !interiorId) || performance.now() - visitRestoredAt.current < 300) {
       cancelScheduledResizeRefit();
       cameraTransition.current.active = false;
       animating.current = false;
@@ -3754,6 +3777,8 @@ function CameraRig({
     activeSegmentEntities,
     visitEnabled,
     visitRestoredAt,
+    soyEnabled,
+    soyRestoredAt,
     framingSegment,
     framingSegmentEntities,
     publicPolicy,
@@ -3857,6 +3882,10 @@ function CameraRig({
     // coalesces drag frames and retains manual pan/zoom ownership.
     const onPanelResize = () => {
       if (!initialized.current || navigation.current.active) return;
+      // Restoring the same dock can notify after camera ownership is released.
+      // Drop that notification before the debounce outlives the handoff guard;
+      // it must not start a new panel flight over the restored snapshot.
+      if (soyBlocksResizeRefit()) return;
       // Public sheets are an inspection overlay. Opening/closing them must not
       // issue a camera command; actual viewport resizing still fits.
       if (gl.domElement.closest('.public-map-shell')) return;
@@ -3865,15 +3894,17 @@ function CameraRig({
     };
     window.addEventListener('commercial-map-panel-resize', onPanelResize);
     return () => window.removeEventListener('commercial-map-panel-resize', onPanelResize);
-  }, [gl, scheduleResizeRefit]);
+  }, [gl, scheduleResizeRefit, soyBlocksResizeRefit]);
 
   useLayoutEffect(() => {
+    if (isSoyHarvestCameraOwned()) return;
     if (camera instanceof THREE.PerspectiveCamera && camera.view?.enabled) {
       applyContextualCameraViewOffset(camera, size.width, size.height, readContextualCameraViewOffset(camera));
     }
   }, [camera, size.width, size.height]);
 
   const clampTarget = useCallback(() => {
+    if (isSoyHarvestCameraOwned()) return;
     const controls = controlsRef.current;
     if (!controls) return;
     clampCameraTarget(
@@ -3885,7 +3916,7 @@ function CameraRig({
   }, [camera, clampCameraTarget, effectiveControlsMaximumDistance]);
 
   const handleControlsStart = useCallback(() => {
-    if (lunarCameraLockedRef.current) return;
+    if (lunarCameraLockedRef.current || isSoyHarvestCameraOwned()) return;
     const controls = controlsRef.current;
     const alreadyNavigating = navigation.current.navigating
       || navigation.current.settling;
@@ -3911,7 +3942,7 @@ function CameraRig({
   ]);
 
   const handleControlsChange = useCallback(() => {
-    if (lunarCameraLockedRef.current || cameraTransition.current.active) return;
+    if (lunarCameraLockedRef.current || cameraTransition.current.active || isSoyHarvestCameraOwned()) return;
     const controls = controlsRef.current;
     clampTarget();
     if (controls && navigation.current.active) {
@@ -3943,7 +3974,7 @@ function CameraRig({
   ]);
 
   const handleControlsEnd = useCallback(() => {
-    if (lunarCameraLockedRef.current) return;
+    if (lunarCameraLockedRef.current || isSoyHarvestCameraOwned()) return;
     const wasNavigating = navigation.current.navigating;
     navigation.current.active = false;
     if (wasNavigating) {
@@ -4146,6 +4177,7 @@ function CameraRig({
   }, [camera, cancelScheduledResizeRefit, gl, setCameraNavigating]);
 
   useFrame(() => {
+    if (soyLease.apply()) { writeCameraDiagnostics(); return; }
     if (visitLease.apply(Boolean(interiorEntity))) { writeCameraDiagnostics(); return; }
     const path = lunarPath.current;
     const snapshot = path.snapshot;
@@ -4545,8 +4577,8 @@ function CameraRig({
     <OrbitControls
       ref={controlsRef}
       makeDefault
-      enabled={!(visitEnabled && !interiorEntity) && !lunarCameraLocked && !transitionControlsLocked}
-      enableDamping={!lunarCameraLocked && !transitionControlsLocked}
+      enabled={!soyEnabled && !(visitEnabled && !interiorEntity) && !lunarCameraLocked && !transitionControlsLocked}
+      enableDamping={!soyEnabled && !lunarCameraLocked && !transitionControlsLocked}
       dampingFactor={interiorFrame?.dampingFactor ?? (interiorEntity ? 0.11 : 0.14)}
       enablePan={!lunarCameraLocked && !transitionControlsLocked && (interiorFrame?.enablePan ?? true)}
       enableRotate={!lunarCameraLocked && !transitionControlsLocked && (interiorFrame?.enableRotate ?? true)}
@@ -4672,6 +4704,7 @@ const Scene = memo(function Scene({
   const lunarLaunchPhase = useCommercialMapStore((state) => state.lunarLaunchPhase);
   const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
   const lunarCinematicActive = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
+  const soyCinematicActive = useSoyHarvestStore(state => state.enabled || state.status === 'restoring');
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const fallbackSegmentId = useCommercialMapStore((state) => sceneSegmentId === undefined ? state.activeSegmentId : null);
   const activeSegmentId = sceneSegmentId === undefined ? fallbackSegmentId : sceneSegmentId;
@@ -4796,6 +4829,7 @@ const Scene = memo(function Scene({
     [interactiveEntityIds],
   );
   const handleEntitySelect = useCallback((entityId: string) => {
+    if (isSoyHarvestCameraOwned()) return;
     if (useVisitStore.getState().enabled) return;
     if (hydrologicalModeActive) return;
     if (!canInspectEntity(entityId)) return;
@@ -4805,6 +4839,7 @@ const Scene = memo(function Scene({
     setSelectedEntityId(entityId);
   }, [canInspectEntity, entities, hydrologicalModeActive, interactiveEntityIds, lots, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
+    if (isSoyHarvestCameraOwned()) return;
     if (useVisitStore.getState().enabled) return;
     if (hydrologicalModeActive) return;
     const allowed = canInspectEntity(entityId);
@@ -5120,7 +5155,7 @@ const Scene = memo(function Scene({
   const contextualLabel = useContextualMapLabel({
     selectedEntityId,
     hoveredEntityId,
-    enabled: labelsVisible && !visitEnabled && !interiorEntity && !hydrologicalModeActive && !lunarCinematicActive,
+    enabled: labelsVisible && !visitEnabled && !soyCinematicActive && !interiorEntity && !hydrologicalModeActive && !lunarCinematicActive,
   });
   const contextualLabelEntities = useMemo(() => {
     const ids = [contextualLabel.selectedId, contextualLabel.hoveredId].filter(
@@ -5197,6 +5232,12 @@ const Scene = memo(function Scene({
       <InteriorCameraRequestContext.Provider value={setInteriorCameraRequest}>
         {interiorContent}
         {!publicPavilion && <PublicContextGroup><group ref={exteriorGroup} visible={!interiorEntity}>
+      {!publicPolicy && (!isolatedArea || isolatedArea === 'exporural')
+        && (!segmentOverride || segmentOverride.id === 'exporural')
+        && (!activeSegmentId || activeSegmentId === 'exporural')
+        && !hydrologicalModeActive && !salesPresentationActive
+        && entities.some(entity => entity.publicIdentifier === 'Q-R-01')
+        && <SoyHarvestLayer isolated={isolatedArea === 'exporural'}/>}
       {!isolatedArea && (
         <group visible={!hydrologicalModeActive}>
           <ReferenceUnderlay calibration={calibration} />
@@ -5489,7 +5530,7 @@ const Scene = memo(function Scene({
       />
       <RuntimeFrameDiagnostics />
       {publicPolicy && labelsVisible && !interiorEntity && <TerritorialOrientation entities={entities} lots={lots} roads={circulationEntities} policy={publicPolicy} />}
-      {!publicPolicy && !publicPavilion && labelsVisible && !interiorEntity && !visitEnabled && !hydrologicalModeActive && !lunarCinematicActive && (
+      {!publicPolicy && !publicPavilion && labelsVisible && !interiorEntity && !visitEnabled && !soyCinematicActive && !hydrologicalModeActive && !lunarCinematicActive && (
         <TerritorialOrientation
           entities={territorialLabelEntities}
           lots={lots}
@@ -5730,7 +5771,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           gl.domElement.style.cursor = 'grab';
       }}
       onPointerMissed={(event) => {
-        if (useVisitStore.getState().enabled) return;
+        if (useVisitStore.getState().enabled || isSoyHarvestCameraOwned()) return;
         if (!isMapSelectionClick(undefined, event)) return;
         // Empty-ground orbit/pan must not close parking or reset a close-up camera.
         const interactionState = useCommercialMapStore.getState();

@@ -1,0 +1,312 @@
+{
+  "browser": "156.0.8078.47",
+  "viewport": [
+    1366,
+    768
+  ],
+  "dpr": 1,
+  "cache": "Fresh browser context per run; warmed Vite and shared OS/GPU cache. Paired alternating runs. No CPU throttling.",
+  "runs": [
+    {
+      "label": "baseline",
+      "run": 0,
+      "errors": [],
+      "interactiveMs": 4027,
+      "requestCount": 549,
+      "resourceTimingCount": 539,
+      "transferBytes": 31966879,
+      "heavyRequestsBeforeClick": [],
+      "opening": {
+        "at": 5848.79999999702,
+        "calls": 1126,
+        "triangles": 1085369,
+        "geometries": 573,
+        "textures": 111,
+        "programs": 199,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 167999631,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigation": {
+        "at": 11268.70000000298,
+        "calls": 312,
+        "triangles": 457563,
+        "geometries": 580,
+        "textures": 137,
+        "programs": 236,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 197500751,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigationFrameMs": {
+        "samples": 214,
+        "p50": 16.7,
+        "p95": 17.7
+      }
+    },
+    {
+      "label": "candidate",
+      "run": 0,
+      "errors": [],
+      "interactiveMs": 4071,
+      "requestCount": 563,
+      "resourceTimingCount": 553,
+      "transferBytes": 32182085,
+      "heavyRequestsBeforeClick": [],
+      "opening": {
+        "at": 5893,
+        "calls": 1136,
+        "triangles": 1153813,
+        "geometries": 579,
+        "textures": 111,
+        "programs": 208,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 216025837,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigation": {
+        "at": 11312.20000000298,
+        "calls": 318,
+        "triangles": 518629,
+        "geometries": 586,
+        "textures": 137,
+        "programs": 244,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 229827293,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigationFrameMs": {
+        "samples": 214,
+        "p50": 16.6,
+        "p95": 18.3
+      }
+    },
+    {
+      "label": "baseline",
+      "run": 1,
+      "errors": [],
+      "interactiveMs": 4055,
+      "requestCount": 549,
+      "resourceTimingCount": 539,
+      "transferBytes": 31966879,
+      "heavyRequestsBeforeClick": [],
+      "opening": {
+        "at": 5876,
+        "calls": 1126,
+        "triangles": 1085369,
+        "geometries": 573,
+        "textures": 111,
+        "programs": 192,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 204106973,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigation": {
+        "at": 11312.09999999404,
+        "calls": 312,
+        "triangles": 457563,
+        "geometries": 580,
+        "textures": 137,
+        "programs": 236,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 191863311,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigationFrameMs": {
+        "samples": 215,
+        "p50": 16.7,
+        "p95": 18.3
+      }
+    },
+    {
+      "label": "candidate",
+      "run": 1,
+      "errors": [],
+      "interactiveMs": 3991,
+      "requestCount": 563,
+      "resourceTimingCount": 553,
+      "transferBytes": 32182085,
+      "heavyRequestsBeforeClick": [],
+      "opening": {
+        "at": 5812.300000011921,
+        "calls": 1136,
+        "triangles": 1153813,
+        "geometries": 579,
+        "textures": 111,
+        "programs": 207,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 196580928,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigation": {
+        "at": 11248.300000011921,
+        "calls": 318,
+        "triangles": 518629,
+        "geometries": 586,
+        "textures": 137,
+        "programs": 244,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 185714664,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigationFrameMs": {
+        "samples": 215,
+        "p50": 16.7,
+        "p95": 17.1
+      }
+    },
+    {
+      "label": "baseline",
+      "run": 2,
+      "errors": [],
+      "interactiveMs": 3998,
+      "requestCount": 549,
+      "resourceTimingCount": 539,
+      "transferBytes": 31966879,
+      "heavyRequestsBeforeClick": [],
+      "opening": {
+        "at": 5817,
+        "calls": 1126,
+        "triangles": 1085369,
+        "geometries": 573,
+        "textures": 111,
+        "programs": 199,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 179383219,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigation": {
+        "at": 11220.29999999702,
+        "calls": 312,
+        "triangles": 457563,
+        "geometries": 580,
+        "textures": 137,
+        "programs": 236,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 180516694,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigationFrameMs": {
+        "samples": 213,
+        "p50": 16.7,
+        "p95": 18.1
+      }
+    },
+    {
+      "label": "candidate",
+      "run": 2,
+      "errors": [],
+      "interactiveMs": 4022,
+      "requestCount": 563,
+      "resourceTimingCount": 553,
+      "transferBytes": 32182085,
+      "heavyRequestsBeforeClick": [],
+      "opening": {
+        "at": 5843.699999988079,
+        "calls": 1136,
+        "triangles": 1153813,
+        "geometries": 579,
+        "textures": 111,
+        "programs": 207,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 199384844,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigation": {
+        "at": 11281.59999999404,
+        "calls": 318,
+        "triangles": 518629,
+        "geometries": 586,
+        "textures": 137,
+        "programs": 244,
+        "dpr": 1,
+        "width": 1366,
+        "height": 696,
+        "heapBytes": 190131628,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "navigationFrameMs": {
+        "samples": 215,
+        "p50": 16.7,
+        "p95": 18.1
+      }
+    }
+  ],
+  "medians": {
+    "baseline": {
+      "interactiveMs": 4027,
+      "requestCount": 549,
+      "resourceTimingCount": 539,
+      "transferBytes": 31966879,
+      "calls": 1126,
+      "triangles": 1085369,
+      "geometries": 573,
+      "textures": 111,
+      "programs": 199,
+      "heapBytes": 179383219,
+      "p50": 16.7,
+      "p95": 18.1
+    },
+    "candidate": {
+      "interactiveMs": 4022,
+      "requestCount": 563,
+      "resourceTimingCount": 553,
+      "transferBytes": 32182085,
+      "calls": 1136,
+      "triangles": 1153813,
+      "geometries": 579,
+      "textures": 111,
+      "programs": 207,
+      "heapBytes": 199384844,
+      "p50": 16.7,
+      "p95": 18.1
+    }
+  },
+  "method": "Three paired alternating runs, fresh browser contexts, warmed Vite/OS/GPU caches, actual browser requests and 10000-entry resource-timing buffer. Full map October read-only fixture, identical mouse navigation. Vite development network sizes are not production transfer sizes. Renderer memory reports object counts and JS heap; it does not expose exact GPU bytes."
+}

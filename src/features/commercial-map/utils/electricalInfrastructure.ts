@@ -8,6 +8,8 @@ import {
   resolveElectricalArchitectureClearancePosition,
   resolveParkAccessElectricalClearancePosition,
   resolveRearRoadElectricalClearancePosition,
+  presentExporuralElectricalInfrastructure,
+  resolveExporuralAssemblyPosition,
 } from '../data/electricalPresentation';
 import { buildElectricalPoleConstraints, resolveElectricalPoleClearance } from './electricalPolePlacement';
 import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '../types';
@@ -276,6 +278,14 @@ export function resolveElectricalNodePlacements(
     : [];
   const poleConstraints = buildElectricalPoleConstraints(entities, rearRoadsActive, rearRoadFootprints);
   return nodes.map((node) => {
+    const assemblyPosition = resolveExporuralAssemblyPosition(node);
+    if (assemblyPosition) return {
+      node, renderPosition: assemblyPosition,
+      groundElevation: groundElevationAtPosition(node, assemblyPosition, poleSurfaces),
+      rotationRadians: 0, sourceAnchorPreserved: true as const,
+      placementStatus: 'PROJECTED_CLEARANCE' as const,
+      poleAudit: { sourceLotIdentifier: 'Q-R-34', conflicts: [], resolved: true },
+    };
     const facade = resolveFacadePresentation(node, entityByIdentifier, obstacles, rearRoadFootprints);
     const architectureClearance = facade
       ? null
@@ -402,7 +412,7 @@ export function selectCommercialElectricalInfrastructureForScene(
   const connections = COMMERCIAL_ELECTRICAL_CONNECTIONS.filter((connection) => (
     nodeIds.has(connection.fromNodeId) && nodeIds.has(connection.toNodeId)
   ));
-  return { nodes, connections };
+  return presentExporuralElectricalInfrastructure(nodes, connections, entities);
 }
 
 export function buildElectricalPoleCrossarmLayouts(
@@ -476,7 +486,7 @@ export function buildElectricalPoleCrossarmLayouts(
         id: `${pole.id}-crossarm-${sourceAlignmentChainId}`,
         nodeId: pole.id,
         sourceAlignmentChainId,
-        rotationRadians,
+        rotationRadians: pole.presentationAssembly ? Math.PI / 2 : rotationRadians,
       });
     });
   });
@@ -496,9 +506,10 @@ export function electricalInfrastructureInstanceBudget(
   const conductorSegments = connections.reduce((total, connection) => (
     total + (reducedGraphics ? 1 : connection.conductorCount) * (wireSamples - 1)
   ), 0);
-  const primaryDrawCalls = nodes.length > 0 ? ELECTRICAL_INFRASTRUCTURE_PRIMARY_DRAW_CALL_BUDGET : 0;
+  const assemblyCount = nodes.filter(node => node.presentationAssembly?.role === 'LEFT').length;
+  const primaryDrawCalls = nodes.length > 0 ? ELECTRICAL_INFRASTRUCTURE_PRIMARY_DRAW_CALL_BUDGET + assemblyCount * 4 : 0;
   const shadowDrawCalls = nodes.length > 0 && !reducedGraphics
-    ? ELECTRICAL_INFRASTRUCTURE_SHADOW_DRAW_CALL_BUDGET
+    ? ELECTRICAL_INFRASTRUCTURE_SHADOW_DRAW_CALL_BUDGET + assemblyCount * 4
     : 0;
   return {
     poleCount,

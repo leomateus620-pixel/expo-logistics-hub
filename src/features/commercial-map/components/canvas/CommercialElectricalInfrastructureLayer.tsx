@@ -6,6 +6,7 @@ import type {
   CommercialElectricalNode,
 } from '../../data/electricalInfrastructure';
 import type { MapEntity } from '../../types';
+import { ExporuralTransformerAssembly } from './ExporuralTransformerAssembly';
 import {
   buildElectricalSceneLayout,
   type ElectricalSceneLayout,
@@ -123,13 +124,16 @@ function CommercialElectricalInfrastructureInstances({
   const visibilityProgress = useRef(visible ? 1 : 0);
   const transitionPending = useRef(true);
   const { gl, invalidate } = useThree();
-  const poles = useMemo(() => nodes.filter((node) => node.type === 'POLE'), [nodes]);
+  const poles = useMemo(() => nodes.filter((node) => node.type === 'POLE' && !node.presentationAssembly), [nodes]);
   const transformers = useMemo(() => nodes.filter((node) => node.type === 'TRANSFORMER'), [nodes]);
   const layout = useMemo(
     () => resolvedScene ?? buildElectricalSceneLayout(nodes, connections, surfaceEntities, rearRoadsActive),
     [resolvedScene, nodes, connections, rearRoadsActive, surfaceEntities],
   );
-  const { placements: resolvedPlacements, crossarms: crossarmLayouts } = layout;
+  const { placements: resolvedPlacements } = layout;
+  const assemblyPlacement = resolvedPlacements.find(placement => placement.node.presentationAssembly?.role === 'LEFT');
+  const crossarmLayouts = useMemo(() => layout.crossarms.filter(arm =>
+    !nodes.some(node => node.id === arm.nodeId && node.presentationAssembly)), [layout.crossarms, nodes]);
   const placementByNodeId = useMemo(() => new Map(
     resolvedPlacements.map((placement) => [placement.node.id, placement]),
   ), [resolvedPlacements]);
@@ -152,12 +156,12 @@ function CommercialElectricalInfrastructureInstances({
       surfaceEntities,
       reducedGraphics,
       resolvedPlacements,
-      crossarmLayouts,
+      layout.crossarms,
     ), 3));
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     return geometry;
-  }, [connections, nodes, reducedGraphics, resolvedPlacements, crossarmLayouts, surfaceEntities]);
+  }, [connections, nodes, reducedGraphics, resolvedPlacements, layout.crossarms, surfaceEntities]);
 
   useLayoutEffect(() => {
     const poleMesh = poleRef.current;
@@ -365,6 +369,11 @@ function CommercialElectricalInfrastructureInstances({
       name="camada-infraestrutura-eletrica-comercial"
       visible={visible || visibilityProgress.current > 0.002}
     >
+      {assemblyPlacement && <ExporuralTransformerAssembly
+        groundElevation={assemblyPlacement.groundElevation}
+        materials={{ concrete: materials.pole, base: materials.concrete, metal: materials.transformer, dark: materials.radiator }}
+        reducedGraphics={reducedGraphics} castShadow={visible && !reducedGraphics}
+      />}
       <instancedMesh
         ref={poleRef}
         name="postes-infraestrutura-eletrica"

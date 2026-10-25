@@ -1,0 +1,16 @@
+.soy-harvest-hud { position:absolute; z-index:31; bottom:max(22px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); width:max-content; max-width:calc(100% - 24px); color:#153a39; font-family:inherit; pointer-events:auto; }
+.soy-harvest-hud__bar { display:flex; align-items:center; gap:6px; padding:8px 10px; border:1px solid #a5c7bc; border-radius:18px; background:rgba(248,255,250,.97); box-shadow:0 5px 22px #102f3029; }
+.soy-harvest-hud__stage { display:flex; flex-direction:column; gap:6px; min-width:155px; padding:0 6px; font-size:12px; }
+.soy-harvest-hud progress { appearance:none; height:3px; width:100%; border:0; border-radius:5px; overflow:hidden; background:#dce7df; }
+.soy-harvest-hud progress::-webkit-progress-bar { background:#dce7df; }
+.soy-harvest-hud progress::-webkit-progress-value { background:#2d794b; }
+.soy-harvest-hud progress::-moz-progress-bar { background:#2d794b; }
+.soy-harvest-hud button { min-height:44px; padding:7px 12px; border:1px solid #bdd3c7; border-radius:12px; font-size:12px; font-weight:650; white-space:nowrap; background:#edf6ef; }
+.soy-harvest-hud button:hover { background:#dceee1; }
+.soy-harvest-hud button:focus-visible { outline:3px solid #147fa4; outline-offset:2px; }
+.soy-harvest-hud .soy-harvest-hud__info { min-width:44px; font-family:Georgia,serif; font-size:18px; }
+.soy-harvest-hud__note { max-width:520px; margin:6px auto 0; padding:12px 16px; font-size:12px; line-height:1.5; border-radius:12px; background:#f7fff9; box-shadow:0 3px 14px #102f3029; }
+.soy-harvest-hud__steps { display:flex; justify-content:center; align-items:center; gap:6px; font-size:11px; background:#f7fff9; padding:4px; border-radius:12px; margin-top:5px; }
+@media(max-width:600px) { .soy-harvest-hud { bottom:max(16px,env(safe-area-inset-bottom)); width:calc(100% - 24px); } .soy-harvest-hud__bar { flex-wrap:wrap; justify-content:center; gap:5px; padding:7px; } .soy-harvest-hud__stage { flex-basis:100%; padding:2px 5px; } .soy-harvest-hud button { flex:1; padding:7px 9px; } .soy-harvest-hud .soy-harvest-hud__info { flex:0; } }
+
+@media(max-width:600px) { .soy-harvest-hud[data-soy-camera-owned="false"] { bottom:calc(76px + env(safe-area-inset-bottom)); } }

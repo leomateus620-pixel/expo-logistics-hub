@@ -8,6 +8,7 @@ import {
 } from '../../data/commercialMapEnvironment';
 import type { CommercialMapTree, CommercialTreeSpeciesGroup } from '../../data/commercialTrees';
 import type { MapEntity } from '../../types';
+import { EXPORURAL_SCENE_CORRECTIONS } from '../../data/exporuralSceneCorrections';
 import {
   COMMERCIAL_TREE_BRANCHES,
   COMMERCIAL_TREE_CANOPY_LOBES,
@@ -698,7 +699,12 @@ function CommercialTreeInstances({
           z + lobe.offsetZ,
         );
         transform.rotation.set(referenceQuadras ? 0 : lobe.rotation * 0.08, lobe.rotation, referenceQuadras ? 0 : -lobe.rotation * 0.045);
-        transform.scale.set(lobe.scaleX, lobe.scaleY, lobe.scaleZ);
+        // The photographed isolated R/01 tree has a wider, open silhouette;
+        // keep gaps between its leaf sprays without changing other inventories.
+        // Close-up QA: .99 replaces .86 (about +32% nominal scaled area),
+        // keeping the authored lobe centers and the existing shared leaf atlas.
+        const openCrown = tree.id === EXPORURAL_SCENE_CORRECTIONS.tree.id ? .99 : 1;
+        transform.scale.set(lobe.scaleX * openCrown, lobe.scaleY * openCrown, lobe.scaleZ * openCrown);
         transform.updateMatrix();
         crownMesh.setMatrixAt(instanceIndex, transform.matrix);
         const foliageIndex = (

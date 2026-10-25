@@ -30,7 +30,7 @@ export const INTERNAL_TREE_VISUAL_RINGS = [
 // their exact stable points; do not invent a wider parcel/perimeter or recolour
 // neighboring regional/roadside trees by proximity to one of these records.
 const authoredInteriorEdgeAreas = new Set([
-  'PAVILIONS_1_14_GROVE', 'RUA_BRASIL_GROVE', 'TERCEIRA_IDADE_EDGE', 'NATIONS_DISTRICT',
+  'PAVILIONS_1_14_GROVE', 'RUA_BRASIL_GROVE', 'TERCEIRA_IDADE_EDGE', 'NATIONS_DISTRICT', 'EXPORURAL',
 ]);
 const pointKey = (point: readonly [number, number]) => `${point[0].toFixed(4)}:${point[1].toFixed(4)}`;
 const authoredInteriorTreePoints = new Set([...COMMERCIAL_MAP_TREES

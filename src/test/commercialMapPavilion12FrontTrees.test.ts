@@ -34,7 +34,7 @@ const requested = [
 
 describe('three requested trees on the Pavilion 12 concrete frontage', () => {
   it('relocates the exact three canonical IDs with provenance and no commercial association', () => {
-    expect(COMMERCIAL_MAP_TREES).toHaveLength(274);
+    expect(COMMERCIAL_MAP_TREES).toHaveLength(275);
     expect(COMMERCIAL_TREE_COUNTS_BY_QUADRA.I).toBe(15);
     expect(trees.map(tree => tree.id)).toEqual(requested.map(record => record.id));
     for (const record of requested) {

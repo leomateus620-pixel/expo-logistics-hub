@@ -33,8 +33,8 @@ const localCorrectionIds = new Set([
 describe('internal park vegetation scope and immutable spatial inventory', () => {
   it('preserves all 274 canonical IDs and only relocates the 18 authorized frontage/gate trees', () => {
     expect(baseline.base).toBe('9ddda43f');
-    expect(COMMERCIAL_MAP_TREES.map(tree => tree.id)).toEqual(baseline.canonicalTrees.map(tree => tree.id));
-    expect(COMMERCIAL_MAP_TREES).toHaveLength(274);
+    expect(COMMERCIAL_MAP_TREES.filter(tree => tree.area !== 'EXPORURAL').map(tree => tree.id)).toEqual(baseline.canonicalTrees.map(tree => tree.id));
+    expect(COMMERCIAL_MAP_TREES).toHaveLength(275);
     for (const previous of baseline.canonicalTrees) {
       const tree = COMMERCIAL_MAP_TREES.find(item => item.id === previous.id)!;
       expect(tree.area).toBe(previous.area);

@@ -31,6 +31,8 @@ export interface CommercialElectricalNode {
   contributesToCommercialMetrics: false;
   verificationStatus: 'OFFICIAL_PLAN_AFFINE_CALIBRATED';
   notes: string;
+  /** Optional scene-only replacement; all PDF/source fields remain unchanged. */
+  presentationAssembly?: { id: string; revision: string; role: 'LEFT' | 'RIGHT' };
 }
 
 export interface CommercialElectricalConnection {
@@ -41,9 +43,9 @@ export interface CommercialElectricalConnection {
   conductorCount: 1 | 3;
   circuitId: string;
   sourceAlignmentChainId: string | null;
-  topologyEvidence: 'RECIPROCAL_NEAREST_COLLINEAR_ALIGNMENT' | 'TRANSFORMER_PROXIMITY';
+  topologyEvidence: 'RECIPROCAL_NEAREST_COLLINEAR_ALIGNMENT' | 'TRANSFORMER_PROXIMITY' | 'PHOTO_PRESENTATION';
   sag: number;
-  source: 'INFERRED_FROM_OFFICIAL_MARKER_ALIGNMENT';
+  source: 'INFERRED_FROM_OFFICIAL_MARKER_ALIGNMENT' | 'PHOTO_PRESENTATION';
   notes: string;
 }
 

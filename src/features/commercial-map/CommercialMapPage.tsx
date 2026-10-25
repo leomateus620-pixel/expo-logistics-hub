@@ -34,6 +34,9 @@ import { MapLotDeepLink } from './components/MapLotDeepLink';
 import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { useVisitStore } from './visit/useVisitStore';
 import { VisitOverlay } from './visit/VisitOverlay';
+import { SoyHarvestOverlay } from './harvest/SoyHarvestOverlay';
+import { useSoyHarvestStore } from './harvest/useSoyHarvestStore';
+import { useSoyHarvestLifecycle } from './harvest/useSoyHarvestLifecycle';
 import { preloadCommercialMapCanvas } from './utils/preloadCanvas';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { classifyCommercialMapFailure } from './queries/commercialMapRetryPolicy';
@@ -350,6 +353,11 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     ),
     [areaScope, data?.entities, data?.lots],
   );
+  const soyHarvestActive = useSoyHarvestStore(state => state.enabled || state.status === 'restoring');
+  const soyHarvestAvailable = webglAvailable && (areaScope === 'park' || areaScope === 'exporural')
+    && (!activeSegmentId || activeSegmentId === 'exporural')
+    && scopedData.entities.some(entity => entity.publicIdentifier === 'Q-R-01');
+  useSoyHarvestLifecycle(soyHarvestAvailable, workspaceMode === '3d' && !dashboardOpen);
   // Contexto cartográfico em ambos os modos, sem inventário comercial de
   // outros segmentos. A seleção permanece restrita ao segmento autorizado.
   const commissionSceneEntities = useMemo(() => {
@@ -736,13 +744,13 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         dashboardAvailable={dashboardAvailable}
         onOpenDashboard={() => setDashboardOpen(true)}
         salesAvailable={webglAvailable && data.source === 'database' && permissions.canManageSales}
-        visitAvailable={(areaScope === 'park' || isCommissionScope) && webglAvailable && !interiorEntity && !lunarCinematicUiActive}
+        visitAvailable={(areaScope === 'park' || isCommissionScope) && webglAvailable && !interiorEntity && !lunarCinematicUiActive && !soyHarvestActive}
         visitEntityId={selectedLot && selectedEntity?.classification !== 'INTERNAL_STAND' ? selectedEntity?.id : undefined}
       />
 
       <div className="commercial-map-body">
         <div ref={dashboardDockRef} aria-hidden={dashboardOpen || undefined}
-          style={{ display: visitEnabled && !interiorEntity ? 'none' : 'contents', pointerEvents: dashboardOpen ? 'none' : undefined }}
+          style={{ display: soyHarvestActive || (visitEnabled && !interiorEntity) ? 'none' : 'contents', pointerEvents: dashboardOpen ? 'none' : undefined }}
           data-visit-preserved-dock>
         <CommercialMapDock
           entities={scopedData.entities}
@@ -776,7 +784,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
         {webglAvailable && workspaceMode === '3d' && permissions.canManageSales
           && (!visitEnabled || workspaceBeforeVisit.current === '3d') && (
-          <div style={{ display: visitEnabled ? 'none' : 'contents' }} data-visit-preserved-sales>
+          <div style={{ display: visitEnabled || soyHarvestActive ? 'none' : 'contents' }} data-visit-preserved-sales>
           <SalesModeLayer projectId={data.project?.id ?? null} lots={data.lots} entities={data.entities} />
           </div>
         )}
@@ -811,6 +819,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               <CommercialMapRendererStatus active={workspaceMode === '3d'} onOpenList={() => setWorkspaceMode('list')} />
               </Suspense>
               <VisitOverlay />
+              {soyHarvestAvailable && <SoyHarvestOverlay />}
               <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer"
                 style={{position:'absolute',right:8,bottom:8,zIndex:5,fontSize:10,padding:'2px 5px',borderRadius:3,background:'#f5f7efdd',color:'#384b42'}}>
                 Entorno © OpenStreetMap
@@ -860,8 +869,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                 </button>
               )}
               {!interiorEntity && (
-                <div style={{ display: visitEnabled ? 'none' : 'contents' }} data-visit-preserved-controls>
+                <div style={{ display: visitEnabled || soyHarvestActive ? 'none' : 'contents' }} data-visit-preserved-controls>
                   {!lunarCinematicUiActive && <CommercialMapTopBar
+                    soyHarvestAvailable={soyHarvestAvailable}
                     areaScope={areaScope}
                     permissions={permissions}
                     hasSelection={Boolean(selectedEntity)}
@@ -869,6 +879,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   />}
 
                   {!lunarCinematicUiActive && <MapToolbar
+                    soyHarvestAvailable={soyHarvestAvailable}
                     permissions={permissions}
                     hasSelection={Boolean(selectedEntity)}
                     areaScope={areaScope}

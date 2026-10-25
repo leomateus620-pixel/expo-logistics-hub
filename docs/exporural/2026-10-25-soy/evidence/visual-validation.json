@@ -1,0 +1,3353 @@
+[
+  {
+    "label": "desktop",
+    "scope": "full",
+    "errors": [],
+    "shots": [
+      {
+        "name": "initial",
+        "state": {
+          "camera": {
+            "position": [
+              52,
+              12,
+              -38
+            ],
+            "target": [
+              52,
+              0.1,
+              -54.5
+            ],
+            "quaternion": [
+              -0.307353292211565,
+              0,
+              0,
+              0.9515954780087558
+            ],
+            "fov": 38,
+            "zoom": 1,
+            "near": 0.0847647889423695,
+            "far": 1283.2451713105356,
+            "controls": {
+              "enabled": true,
+              "enableDamping": true,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {},
+          "render": {
+            "frame": 113,
+            "calls": 49,
+            "triangles": 228463,
+            "points": 0,
+            "lines": 10718
+          },
+          "memory": {
+            "geometries": 582,
+            "textures": 111,
+            "programs": 198
+          },
+          "cycle": {
+            "status": "idle",
+            "elapsed": 0,
+            "enabled": false,
+            "field": "green"
+          },
+          "selection": null
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        }
+      },
+      {
+        "name": "planting",
+        "state": {
+          "camera": {
+            "position": [
+              52,
+              13,
+              -36.5
+            ],
+            "target": [
+              52,
+              0.1,
+              -54.5
+            ],
+            "quaternion": [
+              -0.30592717468871117,
+              0,
+              0,
+              0.9520549163714154
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                51.43,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                -1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                43,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                42.2515,
+                0.024,
+                -56.3
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 3379,
+            "calls": 97,
+            "triangles": 238212,
+            "points": 0,
+            "lines": 10718
+          },
+          "memory": {
+            "geometries": 615,
+            "textures": 136,
+            "programs": 252
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 3,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 773.9375,
+            "y": 996,
+            "width": 372.125,
+            "height": 62,
+            "top": 996,
+            "right": 1146.0625,
+            "bottom": 1058,
+            "left": 773.9375
+          }
+        }
+      },
+      {
+        "name": "growth",
+        "state": {
+          "camera": {
+            "position": [
+              50.98340192043896,
+              1.3082990397805219,
+              -52.44170096021948
+            ],
+            "target": [
+              51.34170096021948,
+              0.12834019204389574,
+              -54
+            ],
+            "quaternion": [
+              -0.31055387381690497,
+              -0.10711137047394952,
+              -0.03524295668211256,
+              0.9438439382529343
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                43,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                42.2515,
+                0.024,
+                -56.3
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 3399,
+            "calls": 65,
+            "triangles": 1208042,
+            "points": 0,
+            "lines": 10695
+          },
+          "memory": {
+            "geometries": 618,
+            "textures": 136,
+            "programs": 252
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 12,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 767.3203125,
+            "y": 996,
+            "width": 385.359375,
+            "height": 62,
+            "top": 996,
+            "right": 1152.6796875,
+            "bottom": 1058,
+            "left": 767.3203125
+          }
+        }
+      },
+      {
+        "name": "management",
+        "state": {
+          "camera": {
+            "position": [
+              58.405078125,
+              4.6,
+              -50.8
+            ],
+            "target": [
+              52.841796875,
+              0.25,
+              -54.5
+            ],
+            "quaternion": [
+              -0.25082842106156183,
+              0.4528143125919468,
+              0.1344172451083022,
+              0.8449711863236173
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                52.817499999999995,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                42.2515,
+                0.024,
+                -56.3
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 3419,
+            "calls": 439,
+            "triangles": 1657578,
+            "points": 0,
+            "lines": 10718
+          },
+          "memory": {
+            "geometries": 639,
+            "textures": 136,
+            "programs": 252
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 18.5,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 773.9375,
+            "y": 996,
+            "width": 372.125,
+            "height": 62,
+            "top": 996,
+            "right": 1146.0625,
+            "bottom": 1058,
+            "left": 773.9375
+          }
+        }
+      },
+      {
+        "name": "maturation",
+        "state": {
+          "camera": {
+            "position": [
+              55.896,
+              5.208,
+              -45.792
+            ],
+            "target": [
+              52,
+              0.11792,
+              -54.5
+            ],
+            "quaternion": [
+              -0.23727411788577057,
+              0.20256033204371326,
+              0.05065921247850222,
+              0.9487380824310405
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                42.2515,
+                0.024,
+                -56.3
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 3439,
+            "calls": 63,
+            "triangles": 1205112,
+            "points": 0,
+            "lines": 10695
+          },
+          "memory": {
+            "geometries": 639,
+            "textures": 136,
+            "programs": 252
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 25,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 773.9375,
+            "y": 996,
+            "width": 372.125,
+            "height": 62,
+            "top": 996,
+            "right": 1146.0625,
+            "bottom": 1058,
+            "left": 773.9375
+          }
+        }
+      },
+      {
+        "name": "harvest",
+        "state": {
+          "camera": {
+            "position": [
+              54.29955555555556,
+              8.450074074074074,
+              -43
+            ],
+            "target": [
+              52.549925925925926,
+              0.11099851851851852,
+              -54.5
+            ],
+            "quaternion": [
+              -0.30512510134189114,
+              0.07180253450223696,
+              0.023078341708826576,
+              0.949321051443676
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                52.755399999999995,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                -1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            }
+          },
+          "render": {
+            "frame": 3459,
+            "calls": 88,
+            "triangles": 230512,
+            "points": 0,
+            "lines": 10695
+          },
+          "memory": {
+            "geometries": 665,
+            "textures": 137,
+            "programs": 253
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 32,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 773.9375,
+            "y": 996,
+            "width": 372.125,
+            "height": 62,
+            "top": 996,
+            "right": 1146.0625,
+            "bottom": 1058,
+            "left": 773.9375
+          }
+        }
+      },
+      {
+        "name": "unloading",
+        "state": {
+          "camera": {
+            "position": [
+              64,
+              2.6999999999999993,
+              -48.8
+            ],
+            "target": [
+              62,
+              0.4,
+              -52.2
+            ],
+            "quaternion": [
+              -0.2517203842139068,
+              0.25364226831220454,
+              0.06854554797034362,
+              0.9314526052087075
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                62.5,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            }
+          },
+          "render": {
+            "frame": 3499,
+            "calls": 107,
+            "triangles": 1230530,
+            "points": 0,
+            "lines": 5670
+          },
+          "memory": {
+            "geometries": 684,
+            "textures": 137,
+            "programs": 253
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 40.5,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 773.9375,
+            "y": 996,
+            "width": 372.125,
+            "height": 62,
+            "top": 996,
+            "right": 1146.0625,
+            "bottom": 1058,
+            "left": 773.9375
+          }
+        }
+      },
+      {
+        "name": "transport",
+        "state": {
+          "camera": {
+            "position": [
+              64.972,
+              3.088799999999999,
+              -48.5408
+            ],
+            "target": [
+              62.324,
+              0.3352,
+              -52.524
+            ],
+            "quaternion": [
+              -0.24718852364894142,
+              0.2793559225517503,
+              0.07466744636839338,
+              0.9248150489499726
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                62.5,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                65.01134475893335,
+                0.024,
+                -50.304894968149085
+              ],
+              "rotation": [
+                0,
+                1.0309511414627799,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            }
+          },
+          "render": {
+            "frame": 3519,
+            "calls": 91,
+            "triangles": 1215130,
+            "points": 0,
+            "lines": 10664
+          },
+          "memory": {
+            "geometries": 684,
+            "textures": 137,
+            "programs": 253
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 46,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 765.328125,
+            "y": 996,
+            "width": 389.34375,
+            "height": 62,
+            "top": 996,
+            "right": 1154.671875,
+            "bottom": 1058,
+            "left": 765.328125
+          }
+        }
+      },
+      {
+        "name": "final",
+        "state": {
+          "camera": {
+            "position": [
+              65.5,
+              3.3000000000000007,
+              -48.4
+            ],
+            "target": [
+              62.5,
+              0.3,
+              -52.7
+            ],
+            "quaternion": [
+              -0.24511574722522098,
+              0.2898257734501184,
+              0.07705545985489225,
+              0.9219445469293766
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                62.5,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                87.79999999999995,
+                0.024,
+                -58.078
+              ],
+              "rotation": [
+                0,
+                2.6691379117806586,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 3539,
+            "calls": 87,
+            "triangles": 1213926,
+            "points": 0,
+            "lines": 10664
+          },
+          "memory": {
+            "geometries": 684,
+            "textures": 137,
+            "programs": 253
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 48,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 765.328125,
+            "y": 996,
+            "width": 389.34375,
+            "height": 62,
+            "top": 996,
+            "right": 1154.671875,
+            "bottom": 1058,
+            "left": 765.328125
+          }
+        }
+      },
+      {
+        "name": "night",
+        "state": {
+          "camera": {
+            "position": [
+              64,
+              2.6999999999999993,
+              -48.8
+            ],
+            "target": [
+              62,
+              0.4,
+              -52.2
+            ],
+            "quaternion": [
+              -0.2517203842139068,
+              0.25364226831220454,
+              0.06854554797034362,
+              0.9314526052087075
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                62.5,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            }
+          },
+          "render": {
+            "frame": 11339,
+            "calls": 112,
+            "triangles": 1256660,
+            "points": 0,
+            "lines": 5670
+          },
+          "memory": {
+            "geometries": 626,
+            "textures": 137,
+            "programs": 253
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 40.5,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 773.9375,
+            "y": 996,
+            "width": 372.125,
+            "height": 62,
+            "top": 996,
+            "right": 1146.0625,
+            "bottom": 1058,
+            "left": 773.9375
+          }
+        }
+      },
+      {
+        "name": "rain",
+        "state": {
+          "camera": {
+            "position": [
+              64,
+              2.6999999999999993,
+              -48.8
+            ],
+            "target": [
+              62,
+              0.4,
+              -52.2
+            ],
+            "quaternion": [
+              -0.2517203842139068,
+              0.25364226831220454,
+              0.06854554797034362,
+              0.9314526052087075
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                62.5,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            }
+          },
+          "render": {
+            "frame": 13199,
+            "calls": 116,
+            "triangles": 1265402,
+            "points": 0,
+            "lines": 5670
+          },
+          "memory": {
+            "geometries": 630,
+            "textures": 137,
+            "programs": 253
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 40.5,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 773.9375,
+            "y": 996,
+            "width": 372.125,
+            "height": 62,
+            "top": 996,
+            "right": 1146.0625,
+            "bottom": 1058,
+            "left": 773.9375
+          }
+        }
+      },
+      {
+        "name": "reduced-motion",
+        "state": {
+          "camera": {
+            "position": [
+              52,
+              14,
+              -35
+            ],
+            "target": [
+              52,
+              0.1,
+              -54.5
+            ],
+            "quaternion": [
+              -0.3047151158409532,
+              0,
+              0,
+              0.9524435406773645
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                43,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                42.2515,
+                0.024,
+                -56.3
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 14679,
+            "calls": 72,
+            "triangles": 238378,
+            "points": 0,
+            "lines": 10718
+          },
+          "memory": {
+            "geometries": 584,
+            "textures": 136,
+            "programs": 251
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 16,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "hud": {
+            "x": 773.9375,
+            "y": 939,
+            "width": 372.125,
+            "height": 119,
+            "top": 939,
+            "right": 1146.0625,
+            "bottom": 1058,
+            "left": 773.9375
+          }
+        }
+      }
+    ],
+    "assertions": [
+      "idle green; actual lot click; paused time frozen; background selection retained",
+      "full camera and selection restored; final composition persists",
+      "actual lot click after restoring field preserves commercial selection and enabled navigation",
+      "visibilitychange pauses; manual resume; Escape cancels",
+      "reduced-motion stable camera and keyboard-accessible stage navigation"
+    ],
+    "resources": [
+      {
+        "name": "restored",
+        "geometries": 591,
+        "textures": 137,
+        "programs": 250
+      },
+      {
+        "name": "repeat-0",
+        "geometries": 592,
+        "textures": 137,
+        "programs": 250
+      },
+      {
+        "name": "repeat-1",
+        "geometries": 592,
+        "textures": 137,
+        "programs": 250
+      },
+      {
+        "name": "repeat-2",
+        "geometries": 592,
+        "textures": 137,
+        "programs": 250
+      }
+    ],
+    "initial": {
+      "camera": {
+        "position": [
+          52,
+          12,
+          -38
+        ],
+        "target": [
+          52,
+          0.1,
+          -54.5
+        ],
+        "quaternion": [
+          -0.307353292211565,
+          0,
+          0,
+          0.9515954780087558
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.0847647889423695,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 113,
+        "calls": 49,
+        "triangles": 228463,
+        "points": 0,
+        "lines": 10718
+      },
+      "memory": {
+        "geometries": 582,
+        "textures": 111,
+        "programs": 198
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": null
+    },
+    "selected": {
+      "camera": {
+        "position": [
+          11.528297129091982,
+          16.102756392028397,
+          -17.406980901052982
+        ],
+        "target": [
+          11.528297129091982,
+          0.14,
+          -17.806132971
+        ],
+        "quaternion": [
+          -0.6982129345999283,
+          0,
+          0,
+          0.7158901437772113
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.06653227521993169,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 1299,
+        "calls": 139,
+        "triangles": 397499,
+        "points": 0,
+        "lines": 10738
+      },
+      "memory": {
+        "geometries": 588,
+        "textures": 137,
+        "programs": 244
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    },
+    "before": {
+      "camera": {
+        "position": [
+          52,
+          12,
+          -38
+        ],
+        "target": [
+          52,
+          0.1,
+          -54.5
+        ],
+        "quaternion": [
+          -0.307353292211565,
+          0,
+          0,
+          0.9515954780087558
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.0847647889423695,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 2419,
+        "calls": 69,
+        "triangles": 229730,
+        "points": 0,
+        "lines": 10718
+      },
+      "memory": {
+        "geometries": 587,
+        "textures": 137,
+        "programs": 251
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    },
+    "returned": {
+      "camera": {
+        "position": [
+          52,
+          12,
+          -38
+        ],
+        "target": [
+          52,
+          0.1,
+          -54.5
+        ],
+        "quaternion": [
+          -0.307353292211565,
+          0,
+          0,
+          0.9515954780087558
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.0847647889423695,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {
+        "soy-tractor-planter": {
+          "position": [
+            61.675,
+            0.024,
+            -52.699999999999996
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ],
+          "visible": false
+        },
+        "soy-high-clearance-sprayer": {
+          "position": [
+            61,
+            0.024,
+            -54.5
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ],
+          "visible": false
+        },
+        "soy-john-deere-x9": {
+          "position": [
+            62.5,
+            0.024,
+            -52.699999999999996
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ],
+          "visible": true
+        },
+        "soy-grain-truck": {
+          "position": [
+            87.79999999999995,
+            0.024,
+            -58.078
+          ],
+          "rotation": [
+            0,
+            2.6691379117806586,
+            0,
+            "XYZ"
+          ],
+          "visible": false
+        }
+      },
+      "render": {
+        "frame": 4399,
+        "calls": 95,
+        "triangles": 242722,
+        "points": 0,
+        "lines": 10718
+      },
+      "memory": {
+        "geometries": 685,
+        "textures": 138,
+        "programs": 254
+      },
+      "cycle": {
+        "status": "completed",
+        "elapsed": 48,
+        "enabled": false,
+        "field": "harvested"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    },
+    "final": {
+      "camera": {
+        "position": [
+          11.528297129091982,
+          16.102756392028393,
+          -17.406980901052982
+        ],
+        "target": [
+          11.528297129091982,
+          0.14,
+          -17.806132971
+        ],
+        "quaternion": [
+          -0.6982129345999283,
+          0,
+          0,
+          0.7158901437772113
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.06653227521993167,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 14859,
+        "calls": 143,
+        "triangles": 406241,
+        "points": 0,
+        "lines": 10738
+      },
+      "memory": {
+        "geometries": 586,
+        "textures": 137,
+        "programs": 250
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    }
+  },
+  {
+    "label": "notebook",
+    "scope": "full",
+    "errors": [],
+    "shots": [
+      {
+        "name": "initial",
+        "state": {
+          "camera": {
+            "position": [
+              52,
+              12,
+              -38
+            ],
+            "target": [
+              52,
+              0.1,
+              -54.5
+            ],
+            "quaternion": [
+              -0.307353292211565,
+              0,
+              0,
+              0.9515954780087558
+            ],
+            "fov": 38,
+            "zoom": 1,
+            "near": 0.0847647889423695,
+            "far": 1283.2451713105356,
+            "controls": {
+              "enabled": true,
+              "enableDamping": true,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {},
+          "render": {
+            "frame": 120,
+            "calls": 49,
+            "triangles": 228463,
+            "points": 0,
+            "lines": 10718
+          },
+          "memory": {
+            "geometries": 579,
+            "textures": 111,
+            "programs": 207
+          },
+          "cycle": {
+            "status": "idle",
+            "elapsed": 0,
+            "enabled": false,
+            "field": "green"
+          },
+          "selection": null
+        },
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        }
+      },
+      {
+        "name": "growth",
+        "state": {
+          "camera": {
+            "position": [
+              51.09314128943759,
+              1.2534293552812077,
+              -52.496570644718794
+            ],
+            "target": [
+              51.39657064471879,
+              0.13931412894375858,
+              -54
+            ],
+            "quaternion": [
+              -0.3074429366814644,
+              -0.09454623903914638,
+              -0.030715147192906547,
+              0.9463595664974007
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                43,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                42.2515,
+                0.024,
+                -56.3
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 3346,
+            "calls": 65,
+            "triangles": 1208042,
+            "points": 0,
+            "lines": 10695
+          },
+          "memory": {
+            "geometries": 586,
+            "textures": 136,
+            "programs": 251
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 14,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1366,
+          "height": 768,
+          "hud": {
+            "x": 490.3203125,
+            "y": 684,
+            "width": 385.359375,
+            "height": 62,
+            "top": 684,
+            "right": 875.6796875,
+            "bottom": 746,
+            "left": 490.3203125
+          }
+        }
+      },
+      {
+        "name": "unloading",
+        "state": {
+          "camera": {
+            "position": [
+              64,
+              2.6999999999999993,
+              -48.8
+            ],
+            "target": [
+              62,
+              0.4,
+              -52.2
+            ],
+            "quaternion": [
+              -0.2517203842139068,
+              0.25364226831220454,
+              0.06854554797034362,
+              0.9314526052087075
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                62.5,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            }
+          },
+          "render": {
+            "frame": 3366,
+            "calls": 447,
+            "triangles": 1633493,
+            "points": 0,
+            "lines": 5670
+          },
+          "memory": {
+            "geometries": 632,
+            "textures": 137,
+            "programs": 253
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 40.5,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1366,
+          "height": 768,
+          "hud": {
+            "x": 496.9375,
+            "y": 684,
+            "width": 372.125,
+            "height": 62,
+            "top": 684,
+            "right": 869.0625,
+            "bottom": 746,
+            "left": 496.9375
+          }
+        }
+      },
+      {
+        "name": "final",
+        "state": {
+          "camera": {
+            "position": [
+              65.5,
+              3.3000000000000007,
+              -48.4
+            ],
+            "target": [
+              62.5,
+              0.3,
+              -52.7
+            ],
+            "quaternion": [
+              -0.24511574722522098,
+              0.2898257734501184,
+              0.07705545985489225,
+              0.9219445469293766
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.788878056206686,
+              "maxDistance": 328.6701254626882,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                62.5,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                87.79999999999995,
+                0.024,
+                -58.078
+              ],
+              "rotation": [
+                0,
+                2.6691379117806586,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 3386,
+            "calls": 87,
+            "triangles": 1212770,
+            "points": 0,
+            "lines": 10664
+          },
+          "memory": {
+            "geometries": 632,
+            "textures": 137,
+            "programs": 253
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 48,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 1366,
+          "height": 768,
+          "hud": {
+            "x": 488.328125,
+            "y": 684,
+            "width": 389.34375,
+            "height": 62,
+            "top": 684,
+            "right": 877.671875,
+            "bottom": 746,
+            "left": 488.328125
+          }
+        }
+      }
+    ],
+    "assertions": [
+      "idle green; actual lot click; paused time frozen; background selection retained",
+      "full camera and selection restored; final composition persists",
+      "actual lot click after restoring field preserves commercial selection and enabled navigation"
+    ],
+    "resources": [
+      {
+        "name": "restored",
+        "geometries": 587,
+        "textures": 137,
+        "programs": 250
+      }
+    ],
+    "initial": {
+      "camera": {
+        "position": [
+          52,
+          12,
+          -38
+        ],
+        "target": [
+          52,
+          0.1,
+          -54.5
+        ],
+        "quaternion": [
+          -0.307353292211565,
+          0,
+          0,
+          0.9515954780087558
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.0847647889423695,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 120,
+        "calls": 49,
+        "triangles": 228463,
+        "points": 0,
+        "lines": 10718
+      },
+      "memory": {
+        "geometries": 579,
+        "textures": 111,
+        "programs": 207
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": null
+    },
+    "selected": {
+      "camera": {
+        "position": [
+          12.197282136150456,
+          16.102756392028397,
+          -17.406980901052982
+        ],
+        "target": [
+          12.197282136150456,
+          0.14,
+          -17.806132971
+        ],
+        "quaternion": [
+          -0.6982129345999283,
+          0,
+          0,
+          0.7158901437772113
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.06653227521993169,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 1766,
+        "calls": 139,
+        "triangles": 391879,
+        "points": 0,
+        "lines": 10738
+      },
+      "memory": {
+        "geometries": 585,
+        "textures": 137,
+        "programs": 244
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    },
+    "before": {
+      "camera": {
+        "position": [
+          52,
+          12,
+          -38
+        ],
+        "target": [
+          52,
+          0.1,
+          -54.5
+        ],
+        "quaternion": [
+          -0.307353292211565,
+          0,
+          0,
+          0.9515954780087558
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.0847647889423695,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 2846,
+        "calls": 69,
+        "triangles": 229730,
+        "points": 0,
+        "lines": 10718
+      },
+      "memory": {
+        "geometries": 584,
+        "textures": 137,
+        "programs": 251
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    },
+    "returned": {
+      "camera": {
+        "position": [
+          52,
+          12,
+          -38
+        ],
+        "target": [
+          52,
+          0.1,
+          -54.5
+        ],
+        "quaternion": [
+          -0.307353292211565,
+          0,
+          0,
+          0.9515954780087558
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.0847647889423695,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {
+        "soy-tractor-planter": {
+          "position": [
+            61.675,
+            0.024,
+            -52.699999999999996
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ],
+          "visible": false
+        },
+        "soy-high-clearance-sprayer": {
+          "position": [
+            61,
+            0.024,
+            -54.5
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ],
+          "visible": false
+        },
+        "soy-john-deere-x9": {
+          "position": [
+            62.5,
+            0.024,
+            -52.699999999999996
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ],
+          "visible": true
+        },
+        "soy-grain-truck": {
+          "position": [
+            87.79999999999995,
+            0.024,
+            -58.078
+          ],
+          "rotation": [
+            0,
+            2.6691379117806586,
+            0,
+            "XYZ"
+          ],
+          "visible": false
+        }
+      },
+      "render": {
+        "frame": 4226,
+        "calls": 95,
+        "triangles": 242722,
+        "points": 0,
+        "lines": 10718
+      },
+      "memory": {
+        "geometries": 633,
+        "textures": 138,
+        "programs": 254
+      },
+      "cycle": {
+        "status": "completed",
+        "elapsed": 48,
+        "enabled": false,
+        "field": "harvested"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    },
+    "final": {
+      "camera": {
+        "position": [
+          12.197282136150456,
+          16.102756392028393,
+          -17.406980901052982
+        ],
+        "target": [
+          12.197282136150456,
+          0.14,
+          -17.806132971
+        ],
+        "quaternion": [
+          -0.6982129345999283,
+          0,
+          0,
+          0.7158901437772113
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.06653227521993167,
+        "far": 1283.2451713105356,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.788878056206686,
+          "maxDistance": 328.6701254626882,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 5046,
+        "calls": 139,
+        "triangles": 391879,
+        "points": 0,
+        "lines": 10738
+      },
+      "memory": {
+        "geometries": 588,
+        "textures": 137,
+        "programs": 250
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    }
+  },
+  {
+    "label": "mobile",
+    "scope": "commission",
+    "errors": [],
+    "shots": [
+      {
+        "name": "initial",
+        "state": {
+          "camera": {
+            "position": [
+              52,
+              12,
+              -23.28258717128516
+            ],
+            "target": [
+              52,
+              0.1,
+              -39.782587171285165
+            ],
+            "quaternion": [
+              -0.307353292211565,
+              0,
+              0,
+              0.9515954780087558
+            ],
+            "fov": 38,
+            "zoom": 0.9735114111852822,
+            "near": 0.0847647889423695,
+            "far": 2155.7681017362743,
+            "controls": {
+              "enabled": true,
+              "enableDamping": true,
+              "minDistance": 8.205022605549129,
+              "maxDistance": 214.28049878222257,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {},
+          "render": {
+            "frame": 1484,
+            "calls": 53,
+            "triangles": 114054,
+            "points": 0,
+            "lines": 4208
+          },
+          "memory": {
+            "geometries": 114,
+            "textures": 60,
+            "programs": 131
+          },
+          "cycle": {
+            "status": "idle",
+            "elapsed": 0,
+            "enabled": false,
+            "field": "green"
+          },
+          "selection": null
+        },
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      {
+        "name": "growth",
+        "state": {
+          "camera": {
+            "position": [
+              50.72902606310014,
+              2.5903676268861453,
+              -50.69245541838135
+            ],
+            "target": [
+              51.39657064471879,
+              0.13931412894375858,
+              -54
+            ],
+            "quaternion": [
+              -0.30744293668146433,
+              -0.09454623903914687,
+              -0.030715147192906696,
+              0.9463595664974005
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.205022605549129,
+              "maxDistance": 214.28049878222257,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                43,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                42.2515,
+                0.024,
+                -56.3
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 4704,
+            "calls": 51,
+            "triangles": 1103580,
+            "points": 0,
+            "lines": 4185
+          },
+          "memory": {
+            "geometries": 120,
+            "textures": 59,
+            "programs": 136
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 14,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "hud": {
+            "x": 12,
+            "y": 732,
+            "width": 366,
+            "height": 96,
+            "top": 732,
+            "right": 378,
+            "bottom": 828,
+            "left": 12
+          }
+        }
+      },
+      {
+        "name": "unloading",
+        "state": {
+          "camera": {
+            "position": [
+              66.4,
+              5.460000000000002,
+              -44.71999999999999
+            ],
+            "target": [
+              62,
+              0.4,
+              -52.2
+            ],
+            "quaternion": [
+              -0.25172038421390697,
+              0.2536422683122049,
+              0.06854554797034373,
+              0.9314526052087071
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.205022605549129,
+              "maxDistance": 214.28049878222257,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                62.5,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                62.5525,
+                0.024,
+                -51.4955
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            }
+          },
+          "render": {
+            "frame": 4724,
+            "calls": 118,
+            "triangles": 152716,
+            "points": 0,
+            "lines": 0
+          },
+          "memory": {
+            "geometries": 166,
+            "textures": 60,
+            "programs": 138
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 40.5,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "hud": {
+            "x": 12,
+            "y": 732,
+            "width": 366,
+            "height": 96,
+            "top": 732,
+            "right": 378,
+            "bottom": 828,
+            "left": 12
+          }
+        }
+      },
+      {
+        "name": "final",
+        "state": {
+          "camera": {
+            "position": [
+              69.1,
+              6.9,
+              -43.239999999999995
+            ],
+            "target": [
+              62.5,
+              0.3,
+              -52.7
+            ],
+            "quaternion": [
+              -0.24511574722522106,
+              0.28982577345011823,
+              0.07705545985489222,
+              0.9219445469293766
+            ],
+            "fov": 44,
+            "zoom": 1,
+            "near": 0.02,
+            "far": 500,
+            "controls": {
+              "enabled": false,
+              "enableDamping": false,
+              "minDistance": 8.205022605549129,
+              "maxDistance": 214.28049878222257,
+              "minPolarAngle": 0.025,
+              "maxPolarAngle": 1.5103810834566314
+            }
+          },
+          "model": {
+            "soy-tractor-planter": {
+              "position": [
+                61.675,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-high-clearance-sprayer": {
+              "position": [
+                61,
+                0.024,
+                -54.5
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            },
+            "soy-john-deere-x9": {
+              "position": [
+                62.5,
+                0.024,
+                -52.699999999999996
+              ],
+              "rotation": [
+                0,
+                1.5707963267948966,
+                0,
+                "XYZ"
+              ],
+              "visible": true
+            },
+            "soy-grain-truck": {
+              "position": [
+                87.79999999999995,
+                0.024,
+                -58.078
+              ],
+              "rotation": [
+                0,
+                2.6691379117806586,
+                0,
+                "XYZ"
+              ],
+              "visible": false
+            }
+          },
+          "render": {
+            "frame": 4764,
+            "calls": 61,
+            "triangles": 104094,
+            "points": 0,
+            "lines": 0
+          },
+          "memory": {
+            "geometries": 166,
+            "textures": 60,
+            "programs": 138
+          },
+          "cycle": {
+            "status": "paused",
+            "elapsed": 48,
+            "enabled": true,
+            "field": "cycle"
+          },
+          "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+        },
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "hud": {
+            "x": 12,
+            "y": 732,
+            "width": 366,
+            "height": 96,
+            "top": 732,
+            "right": 378,
+            "bottom": 828,
+            "left": 12
+          }
+        }
+      }
+    ],
+    "assertions": [
+      "idle green; actual lot click; paused time frozen; background selection retained",
+      "portrait/landscape resize retains camera ownership and paused clock",
+      "full camera and selection restored; final composition persists",
+      "actual lot click after restoring field preserves commercial selection and enabled navigation"
+    ],
+    "resources": [
+      {
+        "name": "restored",
+        "geometries": 121,
+        "textures": 60,
+        "programs": 135
+      }
+    ],
+    "initial": {
+      "camera": {
+        "position": [
+          52,
+          12,
+          -23.28258717128516
+        ],
+        "target": [
+          52,
+          0.1,
+          -39.782587171285165
+        ],
+        "quaternion": [
+          -0.307353292211565,
+          0,
+          0,
+          0.9515954780087558
+        ],
+        "fov": 38,
+        "zoom": 0.9735114111852822,
+        "near": 0.0847647889423695,
+        "far": 2155.7681017362743,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.205022605549129,
+          "maxDistance": 214.28049878222257,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 1544,
+        "calls": 53,
+        "triangles": 114054,
+        "points": 0,
+        "lines": 4208
+      },
+      "memory": {
+        "geometries": 114,
+        "textures": 60,
+        "programs": 131
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": null
+    },
+    "selected": {
+      "camera": {
+        "position": [
+          10.035945959500001,
+          32.79557919060533,
+          -16.989573367562205
+        ],
+        "target": [
+          10.035945959500001,
+          0.14,
+          -17.806132971
+        ],
+        "quaternion": [
+          -0.6982129345999284,
+          0,
+          0,
+          0.7158901437772112
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.1361074446553994,
+        "far": 2155.7681017362743,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.205022605549129,
+          "maxDistance": 214.28049878222257,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 4444,
+        "calls": 70,
+        "triangles": 141225,
+        "points": 0,
+        "lines": 4220
+      },
+      "memory": {
+        "geometries": 118,
+        "textures": 60,
+        "programs": 136
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    },
+    "before": {
+      "camera": {
+        "position": [
+          52,
+          12,
+          -23.28258717128516
+        ],
+        "target": [
+          52,
+          0.1,
+          -39.782587171285165
+        ],
+        "quaternion": [
+          -0.307353292211565,
+          0,
+          0,
+          0.9515954780087558
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.0847647889423695,
+        "far": 2155.7681017362743,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.205022605549129,
+          "maxDistance": 214.28049878222257,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 4484,
+        "calls": 53,
+        "triangles": 114054,
+        "points": 0,
+        "lines": 4208
+      },
+      "memory": {
+        "geometries": 118,
+        "textures": 60,
+        "programs": 136
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    },
+    "returned": {
+      "camera": {
+        "position": [
+          52,
+          12,
+          -23.28258717128516
+        ],
+        "target": [
+          52,
+          0.1,
+          -39.782587171285165
+        ],
+        "quaternion": [
+          -0.307353292211565,
+          0,
+          0,
+          0.9515954780087558
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.0847647889423695,
+        "far": 2155.7681017362743,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.205022605549129,
+          "maxDistance": 214.28049878222257,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {
+        "soy-tractor-planter": {
+          "position": [
+            61.675,
+            0.024,
+            -52.699999999999996
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ],
+          "visible": false
+        },
+        "soy-high-clearance-sprayer": {
+          "position": [
+            61,
+            0.024,
+            -54.5
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ],
+          "visible": false
+        },
+        "soy-john-deere-x9": {
+          "position": [
+            62.5,
+            0.024,
+            -52.699999999999996
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ],
+          "visible": true
+        },
+        "soy-grain-truck": {
+          "position": [
+            87.79999999999995,
+            0.024,
+            -58.078
+          ],
+          "rotation": [
+            0,
+            2.6691379117806586,
+            0,
+            "XYZ"
+          ],
+          "visible": false
+        }
+      },
+      "render": {
+        "frame": 5604,
+        "calls": 53,
+        "triangles": 114054,
+        "points": 0,
+        "lines": 4208
+      },
+      "memory": {
+        "geometries": 167,
+        "textures": 61,
+        "programs": 139
+      },
+      "cycle": {
+        "status": "completed",
+        "elapsed": 48,
+        "enabled": false,
+        "field": "harvested"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    },
+    "final": {
+      "camera": {
+        "position": [
+          10.035945959500001,
+          32.81073668649862,
+          -16.98919435119984
+        ],
+        "target": [
+          10.035945959500001,
+          0.14,
+          -17.806132971
+        ],
+        "quaternion": [
+          -0.6982129345999284,
+          0,
+          0,
+          0.7158901437772112
+        ],
+        "fov": 38,
+        "zoom": 1,
+        "near": 0.13617062062975185,
+        "far": 2155.7681017362743,
+        "controls": {
+          "enabled": true,
+          "enableDamping": true,
+          "minDistance": 8.205022605549129,
+          "maxDistance": 214.28049878222257,
+          "minPolarAngle": 0.025,
+          "maxPolarAngle": 1.5103810834566314
+        }
+      },
+      "model": {},
+      "render": {
+        "frame": 6484,
+        "calls": 70,
+        "triangles": 141225,
+        "points": 0,
+        "lines": 4220
+      },
+      "memory": {
+        "geometries": 121,
+        "textures": 60,
+        "programs": 135
+      },
+      "cycle": {
+        "status": "idle",
+        "elapsed": 0,
+        "enabled": false,
+        "field": "green"
+      },
+      "selection": "7cbfc7ab-a8fe-4643-ac8b-b9d2b2a63791"
+    }
+  }
+]
