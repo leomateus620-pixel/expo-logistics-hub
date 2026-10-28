@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import * as Popover from '@radix-ui/react-popover';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Download, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { paymentMethodLabel, SALES_PAYMENT_METHODS, SALES_PAYMENT_METHOD_LABELS } from '../../sales/salesTypes';
 import type { SaleOrdersFilters } from './salesOrdersService';
@@ -24,7 +24,7 @@ function saleFilterLabel(key: keyof SaleOrdersFilters, value: string) {
   return `Busca: ${value}`;
 }
 
-export function SalesOrdersFilters() {
+export function SalesOrdersFilters({ onExport, exportBusy = false }: { onExport?: () => void; exportBusy?: boolean }) {
   const { filters, filtersOpen, searchOpen, setFiltersOpen, setSearchOpen, setFilters, resetFilters } = useSalesOrdersUiStore(useShallow((state) => ({
     filters: state.filters, filtersOpen: state.filtersOpen, searchOpen: state.searchOpen,
     setFiltersOpen: state.setFiltersOpen, setSearchOpen: state.setSearchOpen,
@@ -72,6 +72,7 @@ export function SalesOrdersFilters() {
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
+      {onExport && <button type="button" className="cso-filter-toggle" onClick={onExport}><Download aria-hidden="true" />{exportBusy ? 'Gerando PDF…' : 'Baixar lista em PDF'}</button>}
       {activeFilters.length > 0 && <span className="cso-filter-summary">{activeFilters.length} {activeFilters.length === 1 ? 'critério aplicado' : 'critérios aplicados'}</span>}
     </div>
     {searchOpen && <form id="cso-search-form" className="cso-search" onSubmit={submitSearch} role="search" onKeyDown={(e) => {

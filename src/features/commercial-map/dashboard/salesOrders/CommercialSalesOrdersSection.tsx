@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useShallow } from 'zustand/react/shallow';
 import { ArrowLeft, Loader2, Search, ShieldAlert } from 'lucide-react';
@@ -8,6 +8,7 @@ import { useSalesOrdersUiStore } from './useSalesOrdersUiStore';
 import { SaleOrderCard } from './SaleOrderCard';
 import { SaleOrderDetail } from './SaleOrderDetail';
 import { SalesOrdersFilters } from './SalesOrdersFilters';
+import { ContractsExportDialog } from './ContractsExportDialog';
 
 export { signatureSummary } from './salesOrdersPresentation';
 
@@ -36,6 +37,8 @@ export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSection
   const expandedRecordId = sameProject ? storedExpanded : null;
   const filters = sameProject ? storedFilters : EMPTY_SALE_FILTERS;
   const page = sameProject ? storedPage : 0;
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportBusy, setExportBusy] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const initialScrollRestored = useRef(false);
   const pendingCardFocus = useRef<string | null>(null);
@@ -123,7 +126,7 @@ export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSection
     </header>
     {!canManageSales ? <p className="cso-state"><ShieldAlert aria-hidden="true" />Acesso restrito: consultar vendas exige a permissão de gestão de vendas.</p>
       : <>
-        {!expandedRecordId && <><SalesOrdersFilters /><div className="cso-list-caption"><span>Pedidos individuais e registros legados</span><span>Valores negociados · não representam recebimentos</span></div></>}
+        {!expandedRecordId && <><SalesOrdersFilters onExport={() => setExportOpen(true)} exportBusy={exportBusy} /><div className="cso-list-caption"><span>Pedidos individuais e registros legados</span><span>Valores negociados · não representam recebimentos</span></div></>}
         {query.isLoading && <p className="cso-state" role="status"><Loader2 className="is-spinning" aria-hidden="true" />Carregando vendas…</p>}
         {errorText && <p className="cso-state is-error" role="alert"><ShieldAlert aria-hidden="true" />{restricted ? 'Acesso restrito às vendas desta organização.' : errorText}{!restricted && <button type="button" className="cso-link" onClick={() => query.refetch()}>Tentar novamente</button>}</p>}
         {!errorText && expandedRecordId && selectedRecord && <SaleOrderDetail key={selectedRecord.recordId} record={selectedRecord} {...props} onReady={detailReady} />}
@@ -135,5 +138,6 @@ export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSection
           <button type="button" disabled={page + 1 >= pages || query.isPlaceholderData} onClick={() => { setPage(page + 1); useSalesOrdersUiStore.getState().rememberListScroll(0); const container = scrollContainer(); if (container) container.scrollTop = 0; }}>Próxima</button>
         </div></nav>}
       </>}
+    {canManageSales && <ContractsExportDialog open={exportOpen} onOpenChange={setExportOpen} projectId={projectId} filters={filters} busy={exportBusy} setBusy={setExportBusy} />}
   </section>;
 }
