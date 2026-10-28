@@ -1,0 +1,13 @@
+.cso-export-dialog .cso-export-options { display: grid; gap: .5rem; }
+.cso-export-options label { display: flex; gap: .65rem; align-items: center; padding: .7rem .8rem; border: 1px solid #dce3d9; border-radius: .6rem; cursor: pointer; }
+.cso-export-options label.is-selected { border-color: #41664a; background: #f3f7ed; }
+.cso-export-options input { width: 1rem; height: 1rem; accent-color: #245b38; }
+.cso-export-summary { padding: .8rem 1rem; border-radius: .6rem; background: #f3f7ef; overflow-wrap: anywhere; }
+.cso-export-summary p { margin: .3rem 0 0; }
+.cso-export-summary svg { display: inline-block; vertical-align: middle; }
+.cso-export-summary button { border: 0; padding: 0; background: none; color: #205039; text-decoration: underline; }
+.cso-export-error { margin: 0; padding: .75rem; border-radius: .5rem; background: #fff2ee; color: #9a3028; }
+.cso-export-submit { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; padding: .7rem 1rem; border: 1px solid #205039; border-radius: .6rem; background: #205039; color: white; font-weight: 650; }
+.cso-export-dialog .is-spinning { animation: cso-export-spin 1s linear infinite; }
+@keyframes cso-export-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .cso-export-dialog .is-spinning { animation-duration: 2s; } }
