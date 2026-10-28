@@ -76,9 +76,10 @@ BEGIN
       (SELECT jsonb_build_object('number',min(c.contract_number),'createdAt',min(c.created_at))
        FROM public.lot_contracts c
        WHERE v_docs AND cardinality(b.lot_ids)>0 AND c.is_active AND ((c.scope='LOT' AND c.lot_id=ANY(b.lot_ids)) OR (c.scope='ORDER_ITEMS' AND c.order_id=b.order_id))
+       -- LOT documents have no sale/order identity; a resold lot can retain an
+       -- older active document. Only an explicit order link can prove ownership.
        HAVING count(*)=1 AND bool_and(
-          (c.scope='LOT' AND cardinality(b.lot_ids)=1 AND c.lot_id=ANY(b.lot_ids)) OR
-          (c.scope='ORDER_ITEMS' AND NOT EXISTS(SELECT 1 FROM unnest(b.lot_ids) lot_id WHERE NOT EXISTS(SELECT 1 FROM public.lot_contract_lots cl WHERE cl.contract_id=c.id AND cl.lot_id=lot_id))
+          (c.scope='ORDER_ITEMS' AND c.order_id=b.order_id AND NOT EXISTS(SELECT 1 FROM unnest(b.lot_ids) lot_id WHERE NOT EXISTS(SELECT 1 FROM public.lot_contract_lots cl WHERE cl.contract_id=c.id AND cl.lot_id=lot_id))
            AND NOT EXISTS(SELECT 1 FROM public.lot_contract_lots cl WHERE cl.contract_id=c.id AND NOT cl.lot_id=ANY(b.lot_ids)))
        )) sole_contract
     FROM base b
@@ -115,3 +116,4 @@ BEGIN
 END $$;
 REVOKE ALL ON FUNCTION public.export_commercial_sale_orders(uuid,text,text,boolean,text,date,date,text) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.export_commercial_sale_orders(uuid,text,text,boolean,text,date,date,text) TO authenticated;
+NOTIFY pgrst, 'reload schema';
