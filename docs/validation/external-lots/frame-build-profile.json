@@ -1,0 +1,281 @@
+{
+  "method": "Node v24/V8 CPU-only, same local QA fixture; no GPU or browser startup timing; 269 eligible official presented lots, fresh geometry identities for cold offset runs; first run reported separately, six subsequent repetitions. Same cadastral rings/status-independent workload. This is not a browser startup or GPU measurement.",
+  "inventory": 269,
+  "optimizations": [
+    "Omit a convex corner disk only when its circumscribed radius is already covered by the two incident edge strips, and no other boundary enters that neighbourhood.",
+    "Represent two single nested erosion rings directly as outer ring + hole; retain boolean difference for split cores or cadastral holes."
+  ],
+  "baseline": {
+    "first": {
+      "repeat": 0,
+      "coldDeriveMs": 109.520083,
+      "warmDeriveMs": 0.010999999999967258,
+      "triangulateMs": 6.306082999999944,
+      "flattenMs": 0.874582999999916,
+      "batchMs": 2.848500000000058,
+      "totalMs": 119.54924899999992,
+      "bySegment": {
+        "industria-comercio-servicos": {
+          "count": 117,
+          "ms": 4.452667999999221
+        },
+        "espaco-automovel": {
+          "count": 52,
+          "ms": 1.7372089999995524
+        },
+        "exporural": {
+          "count": 100,
+          "ms": 102.86583400000006
+        }
+      },
+      "slowest": [
+        {
+          "id": "Q-R-39",
+          "segment": "exporural",
+          "vertices": 25,
+          "ms": 4.5335409999999,
+          "frame": true
+        },
+        {
+          "id": "Q-S-10",
+          "segment": "exporural",
+          "vertices": 26,
+          "ms": 4.511124999999993,
+          "frame": true
+        },
+        {
+          "id": "Q-R-03",
+          "segment": "exporural",
+          "vertices": 13,
+          "ms": 4.364082999999937,
+          "frame": true
+        },
+        {
+          "id": "Q-R-28",
+          "segment": "exporural",
+          "vertices": 22,
+          "ms": 3.553957999999966,
+          "frame": true
+        },
+        {
+          "id": "Q-S-04",
+          "segment": "exporural",
+          "vertices": 19,
+          "ms": 3.2923749999999927,
+          "frame": true
+        },
+        {
+          "id": "Q-R-09",
+          "segment": "exporural",
+          "vertices": 20,
+          "ms": 3.2344590000000153,
+          "frame": true
+        },
+        {
+          "id": "Q-S-25",
+          "segment": "exporural",
+          "vertices": 22,
+          "ms": 2.9080830000000333,
+          "frame": true
+        },
+        {
+          "id": "Q-S-11",
+          "segment": "exporural",
+          "vertices": 18,
+          "ms": 2.5499159999999392,
+          "frame": true
+        },
+        {
+          "id": "Q-S-03",
+          "segment": "exporural",
+          "vertices": 15,
+          "ms": 2.512917000000016,
+          "frame": true
+        },
+        {
+          "id": "Q-S-24",
+          "segment": "exporural",
+          "vertices": 20,
+          "ms": 2.4489589999999453,
+          "frame": true
+        }
+      ]
+    },
+    "summary": {
+      "coldDeriveMs": {
+        "median": 90.46979099999999,
+        "min": 88.33850000000007,
+        "max": 91.07995900000003
+      },
+      "warmDeriveMs": {
+        "median": 0.009457999999995081,
+        "min": 0.007875000000012733,
+        "max": 0.012083999999958905
+      },
+      "triangulateMs": {
+        "median": 2.3197079999999914,
+        "min": 2.1151250000000346,
+        "max": 3.232709
+      },
+      "flattenMs": {
+        "median": 0.3941669999999249,
+        "min": 0.3383330000001479,
+        "max": 0.9848329999999805
+      },
+      "batchMs": {
+        "median": 0.4980420000001686,
+        "min": 0.41916700000001583,
+        "max": 1.9844580000000178
+      },
+      "totalMs": {
+        "median": 93.52545800000007,
+        "min": 91.34066700000017,
+        "max": 97.28195900000003
+      }
+    }
+  },
+  "candidate": {
+    "first": {
+      "repeat": 0,
+      "coldDeriveMs": 84.72958399999999,
+      "warmDeriveMs": 0.011167000000000371,
+      "triangulateMs": 8.641166999999996,
+      "flattenMs": 1.0296669999999608,
+      "batchMs": 4.703540999999973,
+      "totalMs": 99.10395899999992,
+      "bySegment": {
+        "industria-comercio-servicos": {
+          "count": 117,
+          "ms": 1.2946689999999421
+        },
+        "espaco-automovel": {
+          "count": 52,
+          "ms": 0.48204199999975117
+        },
+        "exporural": {
+          "count": 100,
+          "ms": 82.48625000000038
+        }
+      },
+      "slowest": [
+        {
+          "id": "Q-R-03",
+          "segment": "exporural",
+          "vertices": 13,
+          "ms": 4.917834000000028,
+          "frame": true
+        },
+        {
+          "id": "Q-S-10",
+          "segment": "exporural",
+          "vertices": 26,
+          "ms": 3.267791999999986,
+          "frame": true
+        },
+        {
+          "id": "Q-R-25",
+          "segment": "exporural",
+          "vertices": 15,
+          "ms": 3.033999999999992,
+          "frame": true
+        },
+        {
+          "id": "Q-R-39",
+          "segment": "exporural",
+          "vertices": 25,
+          "ms": 2.9100420000000327,
+          "frame": true
+        },
+        {
+          "id": "Q-R-28",
+          "segment": "exporural",
+          "vertices": 22,
+          "ms": 2.800292000000013,
+          "frame": true
+        },
+        {
+          "id": "Q-S-25",
+          "segment": "exporural",
+          "vertices": 22,
+          "ms": 2.698750000000018,
+          "frame": true
+        },
+        {
+          "id": "Q-R-58",
+          "segment": "exporural",
+          "vertices": 11,
+          "ms": 2.3527500000000146,
+          "frame": true
+        },
+        {
+          "id": "Q-R-04",
+          "segment": "exporural",
+          "vertices": 13,
+          "ms": 2.2859169999999835,
+          "frame": true
+        },
+        {
+          "id": "Q-S-16",
+          "segment": "exporural",
+          "vertices": 16,
+          "ms": 2.1550419999999804,
+          "frame": true
+        },
+        {
+          "id": "Q-S-04",
+          "segment": "exporural",
+          "vertices": 19,
+          "ms": 2.1470410000000015,
+          "frame": true
+        }
+      ]
+    },
+    "summary": {
+      "coldDeriveMs": {
+        "median": 64.60683300000005,
+        "min": 63.25687499999992,
+        "max": 69.93462499999998
+      },
+      "warmDeriveMs": {
+        "median": 0.009500000000002728,
+        "min": 0.007791999999994914,
+        "max": 0.009958999999980733
+      },
+      "triangulateMs": {
+        "median": 2.5655419999999367,
+        "min": 1.9106249999999818,
+        "max": 3.6025419999999713
+      },
+      "flattenMs": {
+        "median": 0.42174999999997453,
+        "min": 0.33237499999995634,
+        "max": 0.9274580000000014
+      },
+      "batchMs": {
+        "median": 0.43762500000002547,
+        "min": 0.3764169999999467,
+        "max": 1.2954160000000456
+      },
+      "totalMs": {
+        "median": 67.26008300000001,
+        "min": 66.59462500000006,
+        "max": 75.760041
+      }
+    }
+  },
+  "equivalence": {
+    "count": 269,
+    "mismatches": [],
+    "maxSymmetricDifferenceArea": 1.7053025658242404e-13,
+    "maxCenterAreaDifference": 2.8421709430404007e-13
+  },
+  "sourceSha256": {
+    "before": "c06754e61f4917332ac8283ab35ba9dd82dc4cf4c45cc8c7e99ea5021a81f8c9",
+    "after": "59b47744c558ff95f8f722705b747b81eb2b0fef8c6fe4c872d1d24d0afad821"
+  },
+  "geometryTests": {
+    "count": 18,
+    "status": "passed",
+    "localLog": "/tmp/external-lots-offset-optimization-tests.log"
+  }
+}

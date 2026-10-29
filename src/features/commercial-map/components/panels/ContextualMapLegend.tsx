@@ -1,5 +1,6 @@
 import { memo, useId, useMemo, type CSSProperties } from 'react';
-import { ChevronDown, FilterX } from 'lucide-react';
+import { Check, ChevronDown, FilterX } from 'lucide-react';
+import { EXTERNAL_LOT_PALETTE, externalLotFrameColor, isExternalPresentationLot } from '../../utils/externalLotPresentation';
 import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../../constants';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { toCommercialPhase } from '../../types';
@@ -77,6 +78,14 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
   const summary = useMemo(() => deriveContextualMapSummary(scope, {
     statusFilters, matchingEntityIds, filtersActive,
   }), [scope, statusFilters, matchingEntityIds, filtersActive]);
+  const presentation = useMemo(() => {
+    const byId = new Map(scope.entities.map(entity => [entity.id, entity]));
+    const external = scope.kind === 'interior' ? 0 : scope.lots.filter(lot => {
+      const entity = byId.get(lot.entityId);
+      return entity && isExternalPresentationLot(entity, lot);
+    }).length;
+    return { external: external > 0, mixed: external > 0 && external < scope.lots.length };
+  }, [scope]);
   const statuses = <>
     <div className="commercial-context-status-heading">
       <span>Situação dos {scope.unit}</span>
@@ -99,10 +108,16 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
           onClick={() => toggleStatus(status)}
           style={{ '--status-color': config.color, '--status-border': config.border, '--status-surface': config.surface } as CSSProperties}
         >
-          <i aria-hidden="true" /><span>{config.label}</span><strong>{count.format(summary.byStatus[status])}</strong>
+          {(!presentation.external || presentation.mixed || status === 'BLOCKED') && <i aria-hidden="true" />}
+          {presentation.external && status !== 'BLOCKED' && <i aria-hidden="true" className="external-lot-swatch" style={{
+            '--grass': EXTERNAL_LOT_PALETTE.grass, '--grass-light': EXTERNAL_LOT_PALETTE.lightGrass,
+            '--frame': externalLotFrameColor(status) ?? 'transparent', '--check': EXTERNAL_LOT_PALETTE.check,
+          } as CSSProperties}>{status === 'SOLD' && <Check strokeWidth={3} />}</i>}
+          <span>{config.label}</span><strong>{count.format(summary.byStatus[status])}</strong>
         </button>;
       })}
     </div>
+    {presentation.external && <p className="commercial-context-note">Lotes externos: gramado com moldura na venda em aberto e confirmação nos vendidos.{presentation.mixed && ' Nos módulos internos e demais espaços, a cor preenche a superfície.'}</p>}
     {scope.kind === 'interior' && scope.totalCount === 0 && <p className="commercial-context-note">Nenhum lote interno cadastrado neste local.</p>}
   </>;
 

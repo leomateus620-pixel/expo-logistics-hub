@@ -191,7 +191,7 @@ describe("Exporural presentation boundaries and infrastructure", () => {
       expect(
         shader.vertexShader.match(/attribute float exporuralTurf;/g),
       ).toHaveLength(1);
-      expect(shader.fragmentShader).toContain("if(vExporuralTurf>.5)");
+      expect(shader.fragmentShader).toContain("if(vExporuralTurf>.5 && uExternalTurfDetail>.5)");
     }
     material.dispose();
   });

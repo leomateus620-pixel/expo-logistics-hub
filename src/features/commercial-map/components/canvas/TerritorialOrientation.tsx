@@ -3,31 +3,57 @@ import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { CommercialLot, MapEntity } from '../../types';
 import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
-import { layoutTerritorialOrientation, prepareTerritorialOrientation, type OrientationItem } from '../../utils/territorialOrientation';
+import { layoutTerritorialOrientation, prepareTerritorialOrientation, type OrientationItem, type TerritorialObstacle } from '../../utils/territorialOrientation';
+import { createTerritorialOrientationInputResolver } from '../../utils/territorialOrientationInputs';
 
 const NO_RAYCAST = () => undefined;
 const FONT_FAMILY = 'system-ui, -apple-system, "Segoe UI", sans-serif';
 const ROW_HEIGHT = 80;
 const ATLAS_WIDTH = 2048;
 const PADDING = 12;
+const NO_OBSTACLES: readonly TerritorialObstacle[] = [];
 
 /** All permanent names share one texture, geometry and draw. Rasterization and
  * cadastral fitting happen once per inventory change; navigation needs no DOM. */
-function createTerritorialOrientationResources(items: readonly OrientationItem[], entities: readonly MapEntity[], anisotropy: number) {
+function createTerritorialOrientationResources(items: readonly OrientationItem[], entities: readonly MapEntity[], anisotropy: number,
+  obstacles: readonly TerritorialObstacle[], exteriorBlockObstacles: readonly TerritorialObstacle[]) {
   if (!items.length) return null;
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
   if (!context) return null;
+  context.textBaseline = 'middle';
   const metrics = items.map(item => {
     context.font = `${item.kind === 'road' ? 650 : 750} 52px ${FONT_FAMILY}`;
-    let width = context.measureText(item.name).width;
+    const measured = context.measureText(item.name);
+    let width = measured.width;
+    let ink = { left: 0, right: 1, top: 0, bottom: 1 };
+    if (item.kind === 'road' && [measured.actualBoundingBoxLeft, measured.actualBoundingBoxRight,
+      measured.actualBoundingBoxAscent, measured.actualBoundingBoxDescent].every(Number.isFinite)) {
+      const cellWidth = Math.min(ATLAS_WIDTH - PADDING * 2, Math.ceil(width) + PADDING * 2), edge = 3 / 2 + 1;
+      ink = { left: (PADDING - measured.actualBoundingBoxLeft - edge) / cellWidth,
+        right: (PADDING + measured.actualBoundingBoxRight + edge) / cellWidth,
+        top: (ROW_HEIGHT / 2 - measured.actualBoundingBoxAscent - edge) / ROW_HEIGHT,
+        bottom: (ROW_HEIGHT / 2 + measured.actualBoundingBoxDescent + edge) / ROW_HEIGHT };
+    }
     if (item.kind === 'block') {
       context.font = `600 46px ${FONT_FAMILY}`;
-      const prefix = context.measureText('Quadra ').width;
+      const prefix = context.measureText('Quadra ');
       context.font = `850 58px ${FONT_FAMILY}`;
-      width = prefix + context.measureText(item.name.slice(7)).width;
+      const suffix = context.measureText(item.name.slice(7));
+      width = prefix.width + suffix.width;
+      const cellWidth = Math.min(ATLAS_WIDTH - PADDING * 2, Math.ceil(width) + PADDING * 2);
+      // Exact painted bounds include half the keyline and one antialias pixel.
+      // Transparent atlas padding must not push a label across a parking area.
+      const edge = 3.5 / 2 + 1;
+      if ([prefix.actualBoundingBoxAscent, prefix.actualBoundingBoxDescent,
+        suffix.actualBoundingBoxAscent, suffix.actualBoundingBoxDescent].every(Number.isFinite)) {
+        ink = { left: (PADDING - prefix.actualBoundingBoxLeft - edge) / cellWidth,
+          right: (PADDING + prefix.width + suffix.actualBoundingBoxRight + edge) / cellWidth,
+          top: (ROW_HEIGHT / 2 - Math.max(prefix.actualBoundingBoxAscent, suffix.actualBoundingBoxAscent) - edge) / ROW_HEIGHT,
+          bottom: (ROW_HEIGHT / 2 + Math.max(prefix.actualBoundingBoxDescent, suffix.actualBoundingBoxDescent) + edge) / ROW_HEIGHT };
+      }
     }
-    return { item, width: Math.min(ATLAS_WIDTH - PADDING * 2, Math.ceil(width) + PADDING * 2) };
+    return { item, ink, width: Math.min(ATLAS_WIDTH - PADDING * 2, Math.ceil(width) + PADDING * 2) };
   });
   let nextX = 0, nextY = 0;
   const cells = metrics.map(metric => {
@@ -59,7 +85,8 @@ function createTerritorialOrientationResources(items: readonly OrientationItem[]
       context.fillText(item.name, x + PADDING, y + ROW_HEIGHT / 2, width - PADDING * 2);
     }
   }
-  const labels = layoutTerritorialOrientation(items, entities, new Map(cells.map(cell => [cell.item.id, cell.width / ROW_HEIGHT])));
+  const labels = layoutTerritorialOrientation(items, entities, new Map(cells.map(cell => [cell.item.id, cell.width / ROW_HEIGHT])),
+    obstacles, exteriorBlockObstacles, new Map(cells.map(cell => [cell.item.id, cell.ink])));
   const cellById = new Map(cells.map(cell => [cell.item.id, cell]));
   const positions: number[] = [], uvs: number[] = [], anchors: number[] = [], density: number[] = [], indices: number[] = [];
   labels.forEach((label, index) => {
@@ -119,15 +146,22 @@ function createTerritorialOrientationResources(items: readonly OrientationItem[]
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = 'territorial-world-labels'; mesh.raycast = NO_RAYCAST;
   mesh.userData = { presentationOnly: true, projection: 'world-xz', labelCount: labels.length,
-    labels: labels.map(({ id, name, kind, anchor, angle, width, height, elevation, footprint }) =>
-      ({ id, name, kind, anchor, angle, width, height, elevation, footprint })) };
+    labels: labels.map(({ id, name, kind, anchor, angle, width, height, elevation, footprint, inkFootprint }) =>
+      ({ id, name, kind, anchor, angle, width, height, elevation, footprint, inkFootprint })) };
   return { mesh, geometry, material, texture };
 }
 
-export const TerritorialOrientation = memo(function TerritorialOrientation({ entities, lots, roads, policy }: {
+export const TerritorialOrientation = memo(function TerritorialOrientation({ entities, lots, roads, policy,
+  obstacles = NO_OBSTACLES, exteriorBlockObstacles = NO_OBSTACLES }: {
   entities: readonly MapEntity[]; lots: readonly CommercialLot[]; roads: readonly MapEntity[]; policy?: PublicExternalScenePolicy | null;
+  obstacles?: readonly TerritorialObstacle[];
+  exteriorBlockObstacles?: readonly TerritorialObstacle[];
 }) {
   const gl = useThree(state => state.gl), size = useThree(state => state.size), invalidate = useThree(state => state.invalidate);
+  const resolveInputs = useMemo(createTerritorialOrientationInputResolver, []);
+  const stable = resolveInputs({ entities, lots, roads, policy, obstacles, exteriorBlockObstacles });
+  entities = stable.entities; lots = stable.lots; roads = stable.roads; policy = stable.policy;
+  obstacles = stable.obstacles; exteriorBlockObstacles = stable.exteriorBlockObstacles;
   const items = useMemo(() => {
     const scoped = policy ? entities.filter(entity => policy.activeScope.has(entity.id)) : entities;
     const availableRoads = policy ? roads.filter(road => entities.some(entity => entity.id === road.id)) : roads;
@@ -137,7 +171,8 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
     return prepared.filter(item => item.anchor[0] >= focus.minX - pad && item.anchor[0] <= focus.maxX + pad
       && item.anchor[1] >= focus.minZ - pad && item.anchor[1] <= focus.maxZ + pad);
   }, [entities, lots, roads, policy]);
-  const resources = useMemo(() => createTerritorialOrientationResources(items, entities, gl.capabilities.getMaxAnisotropy()), [items, entities, gl]);
+  const resources = useMemo(() => createTerritorialOrientationResources(items, entities, gl.capabilities.getMaxAnisotropy(),
+    obstacles, exteriorBlockObstacles), [items, entities, gl, obstacles, exteriorBlockObstacles]);
   useLayoutEffect(() => {
     resources?.material.uniforms.viewportSize.value.set(size.width, size.height);
     invalidate();

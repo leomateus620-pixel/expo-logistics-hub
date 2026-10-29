@@ -50,3 +50,11 @@
 @media (prefers-reduced-motion: reduce) {
   .commercial-context-statuses button, .commercial-context-expand > summary svg { transition: none; }
 }
+
+.commercial-context-statuses button > i.external-lot-swatch {
+  display: flex; align-items: center; justify-content: center;
+  width: 21px; height: 21px; flex: 0 0 21px; border-radius: 3px;
+  background: linear-gradient(135deg, var(--grass-light), var(--grass));
+  border: 4px solid var(--frame); box-shadow: 0 0 0 1px #40513b;
+}
+.commercial-context-statuses .external-lot-swatch svg { width: 13px; height: 13px; color: var(--check); background: var(--frame); border-radius: 50%; }

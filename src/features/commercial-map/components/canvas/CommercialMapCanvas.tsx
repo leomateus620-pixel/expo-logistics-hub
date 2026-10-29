@@ -14,13 +14,16 @@ import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePol
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
+import { ExternalLotFrames } from './ExternalLotFrames';
+import { EXTERNAL_LOT_PALETTE, externalLotUsesGrass, isExternalPresentationLot, lotPresentationLift } from '../../utils/externalLotPresentation';
 import { toCommercialPhase, type Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
 import { resolveLotTooltipPresentation } from '../../utils/lotTooltipPresentation';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { PublicMapEnvironment } from './PublicMapEnvironment';
 import { TerritorialOrientation } from './TerritorialOrientation';
-import { arenaVegetationAllowed } from '../../data/arenaCanonicalLayout';
+import { territorialTreeObstacles } from '../../utils/territorialOrientation';
+import { ARENA_CANONICAL_LAYOUT, arenaRect, arenaSourceToLocal, arenaVegetationAllowed } from '../../data/arenaCanonicalLayout';
 import { createArenaParkingGeometry, isArenaParking } from '../../utils/arenaParkingGeometry';
 import { LightingPerformanceProbe } from '../../diagnostics/LightingPerformanceProbe';
 import { beginCommercialMapBoot, getCommercialMapBootSnapshot, markCommercialMapStage, measureCommercialMapSync } from '../../utils/performanceDiagnostics';
@@ -1336,12 +1339,13 @@ function lotColor(
 ) {
   const status = STATUS_CONFIG[toCommercialPhase(entry.lot.status)];
   const soldColor = soldLotSurfaceColor(entry.lot.status);
-  if (soldColor) return target.set(soldColor);
-  const color = target.set(status.color);
+  const grass = isExternalPresentationLot(entry.entity, entry.lot) && externalLotUsesGrass(entry.lot.status);
+  if (soldColor && !grass) return target.set(soldColor);
+  const color = target.set(grass ? EXTERNAL_LOT_PALETTE.grass : status.color);
   if (infrastructureMode) color.lerp(blend.set('#c7d1cf'), 0.98);
   else if (filtersActive && !isMatch && !selected) color.lerp(blend.set('#c7d1c9'), 0.76);
   if (hovered) color.lerp(blend.set('#ffffff'), 0.1);
-  if (selected) color.lerp(blend.set('#fff4b8'), 0.14);
+  if (selected) color.lerp(blend.set(grass ? EXTERNAL_LOT_PALETTE.selection : '#fff4b8'), 0.14);
   return color;
 }
 
@@ -1384,9 +1388,10 @@ function SegmentLotAccents({
 }) {
   const invalidate = useThree((state) => state.invalidate);
   const accents = useMemo(() => {
-    // ExpoRural already communicates status through the entire turf surface.
-    // The old vertex-average rectangles spill over the rounded R/64–65 corners.
+    // Eligible external lots use the inset frame, without a redundant central bar.
+    // Other consumers retain their existing accents.
     const accentedEntries = entries.filter((entry) => !isSoldLot(entry.lot.status)
+      && !(isExternalPresentationLot(entry.entity, entry.lot) && externalLotUsesGrass(entry.lot.status))
       && !isExporuralLandscapeLot(entry.entity) && segmentByEntity.has(entry.entity.id));
     if (accentedEntries.length === 0) return null;
     const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -1469,6 +1474,7 @@ function SegmentLotAccents({
 function BatchedLots({
   entries,
   obstacles,
+  confirmationObstacles,
   selectedEntityId,
   hoveredEntityId,
   matchingEntityIds,
@@ -1484,6 +1490,7 @@ function BatchedLots({
 }: {
   entries: LotEntry[];
   obstacles: readonly Coordinate[][];
+  confirmationObstacles: readonly Coordinate[][];
   selectedEntityId: string | null;
   hoveredEntityId: string | null;
   matchingEntityIds: ReadonlySet<string>;
@@ -1514,12 +1521,15 @@ function BatchedLots({
     matrix: new THREE.Matrix4(),
     color: new THREE.Color(),
     blend: new THREE.Color(),
+    border: new THREE.Color(),
   });
   visualStateRef.current = { selectedEntityId, hoveredEntityId };
   const entryByEntity = useMemo(() => new Map(entries.map((entry) => [entry.entity.id, entry])), [entries]);
   const lockSurfaces = useMemo(() => entries.map(({ entity, lot }) => ({
     id: entity.id, status: lot.status, logoUrl: lot.saleLogoUrl, geometry: entity.geometry,
-  })), [entries]);
+    confirmation: isExternalPresentationLot(entity, lot),
+    hideMarker: Boolean(publicPolicy) && isExternalPresentationLot(entity, lot),
+  })), [entries, publicPolicy]);
   const inspectionOutline = useMemo(() => {
     if (publicPolicy || !saleInspectionLotIds.size) return null;
     const positions = entries.filter(entry => saleInspectionLotIds.has(entry.lot.id)).flatMap(({ entity }) => (
@@ -1530,10 +1540,10 @@ function BatchedLots({
   useEffect(() => () => inspectionOutline?.dispose(), [inspectionOutline]);
   const batch = useMemo(() => {
     if (entries.length === 0) return null;
-    const sourceGeometries = entries.map(({ entity }) => {
+    const sourceGeometries = entries.map(({ entity, lot }) => {
       const geometry = createEntityGeometry(entity);
       geometry.setAttribute('exporuralTurf', new THREE.Float32BufferAttribute(
-        new Float32Array(geometry.getAttribute('position').count).fill(isExporuralLandscapeLot(entity) ? 1 : 0), 1,
+        new Float32Array(geometry.getAttribute('position').count).fill(isExternalPresentationLot(entity, lot) && externalLotUsesGrass(lot.status) ? 1 : !publicPolicy && isExporuralLandscapeLot(entity) ? 2 : 0), 1,
       ));
       if (!geometry.index) return geometry;
       const nonIndexed = geometry.toNonIndexed();
@@ -1549,12 +1559,15 @@ function BatchedLots({
       polygonOffsetFactor: -3,
       polygonOffsetUnits: -2,
     });
-    if (material instanceof THREE.MeshStandardMaterial) applyExporuralTurfMaterial(material);
+    // Standard already receives the park's grain/roughness/normal detail below.
+    // Avoid stacking a second procedural texture over the eligible grass.
+    applyExporuralTurfMaterial(material, reducedGraphics, { reuseExistingSurfaceDetail: !publicPolicy });
     const mesh = new THREE.BatchedMesh(entries.length, vertexCount, 0, material);
     const entityByBatchId = new Map<number, string>();
     const batchIdByEntity = new Map<string, number>();
     const edgePositions: number[] = [];
     const edgeColors: number[] = [];
+    const edgeRanges = new Map<string, { start: number; count: number }>();
     const matrix = new THREE.Matrix4();
     const color = new THREE.Color();
     const blend = new THREE.Color();
@@ -1584,7 +1597,10 @@ function BatchedLots({
         ? new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(publicLotOutlinePositions(entry.entity), 3))
         : new THREE.EdgesGeometry(geometry, 28);
       const positions = edgeGeometry.getAttribute('position');
-      const borderColor = segment
+      edgeRanges.set(entry.entity.id, { start: edgePositions.length / 3, count: positions.count });
+      const borderColor = isExternalPresentationLot(entry.entity, entry.lot) && externalLotUsesGrass(entry.lot.status)
+        ? new THREE.Color(EXTERNAL_LOT_PALETTE.boundary)
+        : segment
         ? new THREE.Color(segment.palette.edge).lerp(new THREE.Color(STATUS_CONFIG[toCommercialPhase(entry.lot.status)].border), 0.12)
         : new THREE.Color(STATUS_CONFIG[toCommercialPhase(entry.lot.status)].border);
       for (let positionIndex = 0; positionIndex < positions.count; positionIndex += 1) {
@@ -1608,13 +1624,14 @@ function BatchedLots({
     mesh.sortObjects = false;
     mesh.castShadow = false;
     mesh.receiveShadow = true;
-    return { mesh, material, edgeGeometry, entityByBatchId, batchIdByEntity, raycast: mesh.raycast };
+    return { mesh, material, edgeGeometry, edgeRanges, entityByBatchId, batchIdByEntity, raycast: mesh.raycast };
   // Entity identities are structurally shared by React Query across price/status updates.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geometryEntities, publicPolicy ? null : segmentByEntity]);
+  }, [geometryEntities, Boolean(publicPolicy)]);
 
   useLayoutEffect(() => {
     if (!batch) return;
+    applyExporuralTurfMaterial(batch.material, reducedGraphics, { reuseExistingSurfaceDetail: batch.material instanceof THREE.MeshStandardMaterial });
     if (batch.material instanceof THREE.MeshStandardMaterial) applyParkSurfaceDetail(batch.material, 'lot', reducedGraphics);
   }, [batch, reducedGraphics]);
 
@@ -1646,33 +1663,43 @@ function BatchedLots({
       scratch.color,
       scratch.blend,
     );
-    // Realce do carrinho: dourado sólido, mantendo geometria e status originais.
-    if (publicPolicy && selected && !isSoldLot(entry.lot.status)) color.set('#ffed91');
-    if (salesSelected) color.lerp(scratch.blend.set('#f2c94c'), 0.62);
+    const external = isExternalPresentationLot(entry.entity, entry.lot);
+    // A lavender cart cue is transient and distinct from the straw sale frame.
+    if (publicPolicy && selected && !external && !isSoldLot(entry.lot.status)) color.set('#ffed91');
+    if (salesSelected) color.lerp(scratch.blend.set(external ? EXTERNAL_LOT_PALETTE.cart : '#f2c94c'), external ? .32 : .62);
+    const range = batch.mesh.getGeometryRangeAt(batch.mesh.getGeometryIdAt(batchId));
+    const turf = batch.mesh.geometry.getAttribute('exporuralTurf') as THREE.BufferAttribute;
+    const turfValue = external && externalLotUsesGrass(entry.lot.status) ? 1 : !publicPolicy && isExporuralLandscapeLot(entry.entity) ? 2 : 0;
+    if (range && turf.getX(range.vertexStart) !== turfValue) {
+      (turf.array as Float32Array).fill(turfValue, range.vertexStart, range.vertexStart + range.vertexCount);
+      turf.addUpdateRange(range.vertexStart, range.vertexCount);
+      turf.needsUpdate = true;
+    }
     batch.mesh.setColorAt(batchId, color);
-    const lift = salesSelected ? 0.09 : selected ? 0.055 : hovered ? 0.035 : 0;
+    const edgeRange = batch.edgeRanges.get(entityId);
+    if (edgeRange) {
+      const segment = publicPolicy ? null : segmentByEntity.get(entityId);
+      const border = scratch.border;
+      if (external && externalLotUsesGrass(entry.lot.status)) border.set(EXTERNAL_LOT_PALETTE.boundary);
+      else if (segment) border.set(segment.palette.edge).lerp(scratch.blend.set(STATUS_CONFIG[toCommercialPhase(entry.lot.status)].border), .12);
+      else border.set(STATUS_CONFIG[toCommercialPhase(entry.lot.status)].border);
+      const colors = batch.edgeGeometry.getAttribute('color') as THREE.BufferAttribute;
+      if (Math.abs(colors.getX(edgeRange.start) - border.r) + Math.abs(colors.getY(edgeRange.start) - border.g) + Math.abs(colors.getZ(edgeRange.start) - border.b) > 1e-6) {
+        for (let i = edgeRange.start; i < edgeRange.start + edgeRange.count; i++) colors.setXYZ(i, border.r, border.g, border.b);
+        colors.addUpdateRange(edgeRange.start * 3, edgeRange.count * 3);
+        colors.needsUpdate = true;
+      }
+    }
+    const lift = lotPresentationLift(selected, hovered, salesSelected);
     scratch.matrix.makeTranslation(0, entry.entity.geometry.elevation + lift, 0);
     batch.mesh.setMatrixAt(batchId, scratch.matrix);
   }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, publicPolicy, salesSelectedLotIds, segmentByEntity]);
 
-  const previousPublicStatuses = useRef<{ batch: typeof batch; statuses: Map<string, CommercialLot['status']> }>({ batch: null, statuses: new Map() });
   useEffect(() => {
     if (!batch) return;
-    const previous = previousPublicStatuses.current;
-    let changed = false;
-    entries.forEach(entry => {
-      if (!publicPolicy || previous.batch !== batch || previous.statuses.get(entry.entity.id) !== entry.lot.status) {
-        applyVisualState(entry.entity.id);
-        changed = true;
-      }
-    });
-    previousPublicStatuses.current = { batch, statuses: new Map(entries.map(entry => [entry.entity.id, entry.lot.status])) };
-    if (!publicPolicy || previous.batch !== batch) {
-      batch.mesh.computeBoundingBox();
-      batch.mesh.computeBoundingSphere();
-    }
-    if (changed) invalidate();
-  }, [applyVisualState, batch, entries, filtersActive, invalidate, matchingEntityIds, publicPolicy, saleInspectionLotIds, salesSelectedLotIds]);
+    entries.forEach(entry => applyVisualState(entry.entity.id));
+    invalidate();
+  }, [applyVisualState, batch, entries, filtersActive, invalidate, matchingEntityIds, saleInspectionLotIds, salesSelectedLotIds]);
 
   useEffect(() => {
     if (!batch) return;
@@ -1725,7 +1752,13 @@ function BatchedLots({
 
   return (
     <>
-      <SoldLotLocks surfaces={lockSurfaces} obstacles={obstacles} selectedId={selectedEntityId} hoveredId={hoveredEntityId} />
+      <SoldLotLocks surfaces={lockSurfaces} obstacles={obstacles} confirmationObstacles={confirmationObstacles} selectedId={selectedEntityId} hoveredId={hoveredEntityId}
+        opacity={entries.length ? layerOpacity[entries[0].entity.layerId] ?? 1 : 1}
+        infrastructureMode={infrastructureMode} matchingIds={matchingEntityIds} filtersActive={filtersActive} publicScene={Boolean(publicPolicy)} />
+      <ExternalLotFrames entries={entries} selectedId={selectedEntityId} hoveredId={hoveredEntityId}
+        cartIds={salesSelectedLotIds} matchingIds={matchingEntityIds} filtersActive={filtersActive}
+        infrastructureMode={infrastructureMode} publicScene={Boolean(publicPolicy)}
+        opacity={entries.length ? layerOpacity[entries[0].entity.layerId] ?? 1 : 1} />
       {!infrastructureMode && !publicPolicy ? (
         <>
           <ExporuralLandscape
@@ -5002,6 +5035,40 @@ const Scene = memo(function Scene({
       : parkAccessCompatibleTrees;
     return rearRoadCompatibleTrees.filter(tree => arenaVegetationAllowed(tree.position, tree.canopyRadius));
   }, [entities, isolatedArea, publicPolicy, publicPavilion, rearParkingAvailable, sceneTrees, ubiretamaPresentation]);
+  // Stable inventory: selecting a landmark or hiding vegetation must not move labels/checks.
+  const territorialTreesRef = useRef(rearRoadCompatibleSceneTrees);
+  if (territorialTreesRef.current.length !== rearRoadCompatibleSceneTrees.length || rearRoadCompatibleSceneTrees.some((tree, i) => {
+    const previous = territorialTreesRef.current[i];
+    return !previous || tree.position[0] !== previous.position[0] || tree.position[1] !== previous.position[1] || tree.canopyRadius !== previous.canopyRadius;
+  })) territorialTreesRef.current = rearRoadCompatibleSceneTrees;
+  const territorialTrees = territorialTreesRef.current;
+  const territorialVegetationObstacles = useMemo(() => territorialTreeObstacles(territorialTrees), [territorialTrees]);
+  const externalMarkerObstacles = useMemo(() => publicPolicy ? lotLockObstacles
+    : [...lotLockObstacles, ...territorialVegetationObstacles.map(polygon => polygon[0])],
+  [lotLockObstacles, publicPolicy, territorialVegetationObstacles]);
+  const territorialExteriorObstacles = useMemo(() => {
+    if (publicPolicy) return [];
+    const localRing = (points: readonly (readonly [number, number])[]) => points.map(point => {
+      const [x, z] = arenaSourceToLocal(point); return [x, z] as Coordinate;
+    });
+    return [
+      ...circulationEntities.map(entity => entity.geometry.coordinates),
+      ...(rearParkingAvailable ? REAR_PARKING_GROUND_SUPPORTS.map(entity => entity.geometry.coordinates) : []),
+      ...PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.map(surface => [surface.polygon.map(([x, z]): Coordinate => [x, z])]),
+      ...PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.map(surface => [surface.polygon.map(([x, z]): Coordinate => [x, z])]),
+      ...(shouldRenderArenaStructures(entities) ? [
+        [localRing(ARENA_CANONICAL_LAYOUT.frontPlaza.sourcePolygon)],
+        [localRing(arenaRect(ARENA_CANONICAL_LAYOUT.stairs.sourceBounds))],
+        [ARENA_CANONICAL_LAYOUT.arenaFootprint.localPolygon.map(([x, z]): Coordinate => [x, z])],
+        ...ARENA_CANONICAL_LAYOUT.pedestrianMasks.map(path => [path.localPolygon.map(([x, z]): Coordinate => [x, z])]),
+      ] : []),
+      ...(shouldRenderArenaCourts(entities) ? [
+        [localRing(arenaRect(ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds))],
+        [localRing(arenaRect(ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds))],
+        [localRing(ARENA_FRONT_LAYOUT.exporuralSmoothConcrete.sourcePolygon)],
+      ] : []),
+    ];
+  }, [publicPolicy, rearParkingAvailable, entities, circulationEntities]);
   const selectedLunarTreeEntity = selectedEntity
     && resolveStrategicLandmarkKind(selectedEntity) === 'lunar-tree'
     ? selectedEntity
@@ -5354,6 +5421,7 @@ const Scene = memo(function Scene({
       )}
       <group userData={{ publicActive: true }}><BatchedLots
         obstacles={lotLockObstacles}
+        confirmationObstacles={externalMarkerObstacles}
         salesSelectedLotIds={interactiveEntityIds ? EMPTY_PUBLIC_SALES : salesSelectedLotIds}
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
@@ -5535,6 +5603,8 @@ const Scene = memo(function Scene({
           entities={territorialLabelEntities}
           lots={lots}
           roads={territorialLabelRoads}
+          obstacles={territorialVegetationObstacles}
+          exteriorBlockObstacles={territorialExteriorObstacles}
         />
       )}
       {visitEnabled && !publicPolicy && !publicPavilion && <VisitFeatureBoundary><Suspense fallback={null}>

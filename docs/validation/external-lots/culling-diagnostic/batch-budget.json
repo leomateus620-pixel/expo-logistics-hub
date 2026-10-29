@@ -1,0 +1,9 @@
+{
+  "multiDrawExtension": true,
+  "trianglesCapacity": 4882,
+  "instances": 269,
+  "visibleInstances": 162,
+  "visibleTriangles": 3198,
+  "perObjectFrustumCulled": true,
+  "sortObjects": false
+}
