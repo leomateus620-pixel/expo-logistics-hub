@@ -1,0 +1,4752 @@
+{
+  "environment": "macOS 26.6 / Apple M5 / ANGLE Metal / headless Chrome; viewport emulation, no physical phone",
+  "browser": "156.0.8078.48",
+  "visual": {
+    "beforePassed": true,
+    "afterPassed": true,
+    "sameData": true,
+    "sameLots": true,
+    "sameGeometry": true,
+    "sameFixture": true,
+    "sameInventory": true,
+    "stages": [
+      {
+        "name": "overview",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "exporural-top",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "exporural-oblique",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "automotive-top",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "industry-roads-top",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "industry-close",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "exporural-cutouts-close",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "r59-close",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "r21-close",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "r40-control",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "selection",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "selection-closed",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "filtered",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "exporural-night",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "exporural-rain",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "exporural-mobile",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "industry-mobile",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "public-industry",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "public-r59",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      },
+      {
+        "name": "public-exporural",
+        "sameCamera": true,
+        "sameViewport": true,
+        "sameBuffer": true,
+        "sameWeather": true
+      }
+    ],
+    "controls": [
+      {
+        "name": "automotive-top",
+        "pngBytesIdentical": true
+      },
+      {
+        "name": "industry-roads-top",
+        "pngBytesIdentical": true
+      },
+      {
+        "name": "industry-close",
+        "pngBytesIdentical": true
+      }
+    ],
+    "coverage": [
+      {
+        "name": "exporural-top",
+        "before": {
+          "inventory": 108,
+          "frameGeometry": 52,
+          "visibleFrames": 5,
+          "checks": 5,
+          "locks": 8
+        },
+        "after": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          },
+          "grass": 108,
+          "frames": 16,
+          "frameColors": {
+            "#8fb7d8": 13,
+            "#d8bd70": 3
+          },
+          "checks": 13,
+          "locks": 0
+        },
+        "expectedLotIds": [
+          "01237376-a323-4301-a21a-62e4782bcbd2",
+          "04b60bf8-fb0c-4b44-9806-324ab06fd9db",
+          "04e9445f-8460-44cf-b451-bcb3a2d2117a",
+          "078b5dbc-e526-4579-b75c-35d4fc63e446",
+          "09c0d847-e2df-4d98-92e4-d6b7ddd40eb4",
+          "0cb9892f-4452-4e6a-bf77-7742dfc922a6",
+          "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "13f68c3f-15f7-467a-9d56-495e95c8cb21",
+          "1b4ce0cc-4062-5fd1-ba48-2ddcfbda62db",
+          "1baea38b-b6ab-46c1-bf04-ea6c53a87544",
+          "1d849c33-d7b1-4170-87ca-7a27dead4376",
+          "21dd495c-0af9-42e2-a5cf-3061e5e43679",
+          "226574ba-b528-41b2-b2f0-3569d4ea1d15",
+          "22c8cd21-e37b-49ba-83c7-acf4704e173c",
+          "26598e4c-1a1d-44c9-802c-3a30dcc84250",
+          "271a71b5-b822-48db-b62b-d74e17471f58",
+          "2b4422a9-a5c0-43b0-a9da-fc293d615d3c",
+          "2f859e78-befa-4994-a295-8b3d1d76c4f2",
+          "2fcaf66f-16aa-4efc-9760-11b937a6b3d1",
+          "310618dc-8323-4713-8928-91cd1be9f2d9",
+          "31c3ea7a-2eea-404a-a9b6-6f514bee4548",
+          "31f964aa-6ad1-4a83-9664-2bc073824c4b",
+          "32f91dba-ac24-41b9-bf87-4613c41c5a00",
+          "37bb772b-ba72-464a-a285-40bb96227714",
+          "381acab8-e28b-487e-b730-0827df5c4c6c",
+          "381e3cfb-d233-5955-aa80-879f26b7a39f",
+          "39542dee-d9c3-4d07-b17e-e3b29e7b081b",
+          "39ea38e4-a7fa-48a4-9f1f-e21d2dafe06d",
+          "3d14000b-a8b6-4fcf-a3e1-14ddd705ba00",
+          "3fc18d72-fd8e-5d60-8745-fba49d5967e8",
+          "3fc5ff27-0aa2-4c47-b423-45de7afba697",
+          "45206196-eb28-4869-ac51-3b4e499df571",
+          "467b0174-db02-4d29-9425-e53955cb20ad",
+          "48aa95ad-c85e-4386-9962-b38d0e466138",
+          "5a88cb56-725a-56a7-b26c-0dbc2016063e",
+          "5c8cfb53-1933-5f38-8d40-923419fd7f3d",
+          "5ef7ff86-57c5-4fad-b076-0ccd2b923c01",
+          "5f351f1c-5039-49fb-91f0-68225a47b483",
+          "607ccd08-8536-4eba-8d4f-d81e56863690",
+          "6443d85b-11f3-4d9e-afeb-e2389d43e04b",
+          "66232508-271a-4256-9f2f-6c40220bd481",
+          "6a848982-f9bf-4d9c-8098-32c123911e04",
+          "6bd8bf19-e2cc-51d0-b98a-057775f5fd86",
+          "6da23f87-d115-524e-9292-dff87add3c51",
+          "6f362dcf-8fce-46a8-b043-8d4348a07f0f",
+          "7142e987-335c-4de9-bd5d-937ec8f737dd",
+          "71d83bb6-3f31-59b8-a0b6-0bd63785c4fc",
+          "723c4ead-8ebf-4306-919a-dc7faf1c7af3",
+          "73fac7d7-224e-457c-8031-4905a28c3850",
+          "787b6559-124f-424c-ab0c-a6f56fdc59d6",
+          "7a0d01b3-08c0-4203-84d9-924fd6a777cf",
+          "7d78a02e-aa2f-52e6-8104-665776ba969e",
+          "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "7e73fba0-6ae1-474a-8813-8c95a9a97226",
+          "86a6f56b-8945-445b-82cc-ca9210fc82f1",
+          "8c57fffe-d21c-4102-9831-6e5ce54959fc",
+          "8e3b2915-d363-4ce9-8fcb-aef57f68a0d9",
+          "8f6f033e-e2ce-573d-9240-d388c627cf20",
+          "930d9495-59e6-5e7c-88ab-aaf9b9977e90",
+          "93b9ec57-5769-4f77-a517-230355a86933",
+          "9503f32f-403e-47b3-b778-bc69583342b8",
+          "9513c21d-06ff-477a-9154-1614a6485fb1",
+          "98980aba-172e-4ade-af34-afabd664f67c",
+          "9d4a7349-5d91-49d7-b60e-fe85f1fe0724",
+          "9dfb2a6e-69da-44ed-b3ec-b5775a2239f5",
+          "9ff3676a-5225-4528-95cf-46224e2657ad",
+          "a39b8f10-a566-484b-a563-7dc66a2b2429",
+          "a4fc0f30-d5d2-4d3d-b6c5-d5ec48256bd8",
+          "a5cb70d7-953e-47e8-b11c-e4903bd4aa1c",
+          "a6ec0be5-593e-406f-a2ef-0fda8c3448f2",
+          "abc42477-735c-44f5-a013-5549b0ebfaa6",
+          "ad437455-0dff-52b5-b585-d5eb5750c23a",
+          "b000ad12-b29b-4650-bfd5-463d58db4823",
+          "b306734c-0beb-493a-8663-2ffa005a8b8e",
+          "b3f1c02f-b2f0-424e-9a0f-7bc33de56e72",
+          "b4110166-cbe8-4d37-8523-514b1c810161",
+          "b59f1b19-f9a3-493a-8d17-9957a6b6ffc8",
+          "c3e1f95b-4970-4607-a62f-33b20a2f5a2f",
+          "c4b77e2d-5277-41ae-8261-cc034c410cf7",
+          "c89ab66d-bda1-4937-8062-cbc9b69d0f89",
+          "cc1a1398-4dfd-4601-92be-395b2c1d5e2f",
+          "cfb0a0b4-462e-4cf6-8065-1455891b03a1",
+          "d0e37c2a-f34d-5923-9cb2-182c8c9e6089",
+          "d707523e-91db-409a-96bf-10c230859937",
+          "d8dd899c-7e3e-4447-8428-81d0ecf5149b",
+          "dae8cc1d-eb76-424f-ada3-2fb39114bf2f",
+          "db1c5104-235d-495e-9a5f-fb1af75d87d0",
+          "dc812568-6591-4138-9e59-82071a39646e",
+          "ddba4474-32f3-4cdf-b97d-64b197abbfb1",
+          "ddc37575-4032-418e-b7d0-7b895db2fe66",
+          "debdd5aa-5b7e-4189-bd79-750b7fc06b24",
+          "dfa66e16-d611-417a-8764-258c3f016515",
+          "e0b1f174-92bb-4184-b418-863139685f7a",
+          "eb60e4e8-71f3-5bb8-a7d7-9420dffa2bb0",
+          "f02bfbfe-990b-443f-b88f-377f34c81976",
+          "f113c951-c359-429a-a7b6-8bde3ddfed8d",
+          "f3d63348-297c-41ef-826d-4c6888dbdd32",
+          "f40a3d5e-e828-4314-aba3-c803bee6fbf4",
+          "f43ba9f1-2fcb-431b-a15f-2efed32e37c7",
+          "f53e2989-747b-437f-9ef6-d4beb31bea33",
+          "f5bc1a1e-828b-43fa-a632-edeea2fe1580",
+          "f9e842cd-b10f-4aa8-9bff-74a623c54dd9",
+          "fa011430-9b79-49e1-a45a-daba0ad03206",
+          "fa2e3ac0-7026-5ca3-92be-8463f5b9c75f",
+          "fb2fb1ad-8505-4a80-9b4a-157e6938887b",
+          "fc528ecf-49d8-4106-a690-95d32c8349da",
+          "fd41e7ab-b9ba-4503-a73e-6256d8608200",
+          "ff9dfbcd-90bd-4c9f-9479-5a9b34da7c00"
+        ],
+        "recognizedLotIds": [
+          "01237376-a323-4301-a21a-62e4782bcbd2",
+          "04b60bf8-fb0c-4b44-9806-324ab06fd9db",
+          "04e9445f-8460-44cf-b451-bcb3a2d2117a",
+          "078b5dbc-e526-4579-b75c-35d4fc63e446",
+          "09c0d847-e2df-4d98-92e4-d6b7ddd40eb4",
+          "0cb9892f-4452-4e6a-bf77-7742dfc922a6",
+          "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "13f68c3f-15f7-467a-9d56-495e95c8cb21",
+          "1b4ce0cc-4062-5fd1-ba48-2ddcfbda62db",
+          "1baea38b-b6ab-46c1-bf04-ea6c53a87544",
+          "1d849c33-d7b1-4170-87ca-7a27dead4376",
+          "21dd495c-0af9-42e2-a5cf-3061e5e43679",
+          "226574ba-b528-41b2-b2f0-3569d4ea1d15",
+          "22c8cd21-e37b-49ba-83c7-acf4704e173c",
+          "26598e4c-1a1d-44c9-802c-3a30dcc84250",
+          "271a71b5-b822-48db-b62b-d74e17471f58",
+          "2b4422a9-a5c0-43b0-a9da-fc293d615d3c",
+          "2f859e78-befa-4994-a295-8b3d1d76c4f2",
+          "2fcaf66f-16aa-4efc-9760-11b937a6b3d1",
+          "310618dc-8323-4713-8928-91cd1be9f2d9",
+          "31c3ea7a-2eea-404a-a9b6-6f514bee4548",
+          "31f964aa-6ad1-4a83-9664-2bc073824c4b",
+          "32f91dba-ac24-41b9-bf87-4613c41c5a00",
+          "37bb772b-ba72-464a-a285-40bb96227714",
+          "381acab8-e28b-487e-b730-0827df5c4c6c",
+          "381e3cfb-d233-5955-aa80-879f26b7a39f",
+          "39542dee-d9c3-4d07-b17e-e3b29e7b081b",
+          "39ea38e4-a7fa-48a4-9f1f-e21d2dafe06d",
+          "3d14000b-a8b6-4fcf-a3e1-14ddd705ba00",
+          "3fc18d72-fd8e-5d60-8745-fba49d5967e8",
+          "3fc5ff27-0aa2-4c47-b423-45de7afba697",
+          "45206196-eb28-4869-ac51-3b4e499df571",
+          "467b0174-db02-4d29-9425-e53955cb20ad",
+          "48aa95ad-c85e-4386-9962-b38d0e466138",
+          "5a88cb56-725a-56a7-b26c-0dbc2016063e",
+          "5c8cfb53-1933-5f38-8d40-923419fd7f3d",
+          "5ef7ff86-57c5-4fad-b076-0ccd2b923c01",
+          "5f351f1c-5039-49fb-91f0-68225a47b483",
+          "607ccd08-8536-4eba-8d4f-d81e56863690",
+          "6443d85b-11f3-4d9e-afeb-e2389d43e04b",
+          "66232508-271a-4256-9f2f-6c40220bd481",
+          "6a848982-f9bf-4d9c-8098-32c123911e04",
+          "6bd8bf19-e2cc-51d0-b98a-057775f5fd86",
+          "6da23f87-d115-524e-9292-dff87add3c51",
+          "6f362dcf-8fce-46a8-b043-8d4348a07f0f",
+          "7142e987-335c-4de9-bd5d-937ec8f737dd",
+          "71d83bb6-3f31-59b8-a0b6-0bd63785c4fc",
+          "723c4ead-8ebf-4306-919a-dc7faf1c7af3",
+          "73fac7d7-224e-457c-8031-4905a28c3850",
+          "787b6559-124f-424c-ab0c-a6f56fdc59d6",
+          "7a0d01b3-08c0-4203-84d9-924fd6a777cf",
+          "7d78a02e-aa2f-52e6-8104-665776ba969e",
+          "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "7e73fba0-6ae1-474a-8813-8c95a9a97226",
+          "86a6f56b-8945-445b-82cc-ca9210fc82f1",
+          "8c57fffe-d21c-4102-9831-6e5ce54959fc",
+          "8e3b2915-d363-4ce9-8fcb-aef57f68a0d9",
+          "8f6f033e-e2ce-573d-9240-d388c627cf20",
+          "930d9495-59e6-5e7c-88ab-aaf9b9977e90",
+          "93b9ec57-5769-4f77-a517-230355a86933",
+          "9503f32f-403e-47b3-b778-bc69583342b8",
+          "9513c21d-06ff-477a-9154-1614a6485fb1",
+          "98980aba-172e-4ade-af34-afabd664f67c",
+          "9d4a7349-5d91-49d7-b60e-fe85f1fe0724",
+          "9dfb2a6e-69da-44ed-b3ec-b5775a2239f5",
+          "9ff3676a-5225-4528-95cf-46224e2657ad",
+          "a39b8f10-a566-484b-a563-7dc66a2b2429",
+          "a4fc0f30-d5d2-4d3d-b6c5-d5ec48256bd8",
+          "a5cb70d7-953e-47e8-b11c-e4903bd4aa1c",
+          "a6ec0be5-593e-406f-a2ef-0fda8c3448f2",
+          "abc42477-735c-44f5-a013-5549b0ebfaa6",
+          "ad437455-0dff-52b5-b585-d5eb5750c23a",
+          "b000ad12-b29b-4650-bfd5-463d58db4823",
+          "b306734c-0beb-493a-8663-2ffa005a8b8e",
+          "b3f1c02f-b2f0-424e-9a0f-7bc33de56e72",
+          "b4110166-cbe8-4d37-8523-514b1c810161",
+          "b59f1b19-f9a3-493a-8d17-9957a6b6ffc8",
+          "c3e1f95b-4970-4607-a62f-33b20a2f5a2f",
+          "c4b77e2d-5277-41ae-8261-cc034c410cf7",
+          "c89ab66d-bda1-4937-8062-cbc9b69d0f89",
+          "cc1a1398-4dfd-4601-92be-395b2c1d5e2f",
+          "cfb0a0b4-462e-4cf6-8065-1455891b03a1",
+          "d0e37c2a-f34d-5923-9cb2-182c8c9e6089",
+          "d707523e-91db-409a-96bf-10c230859937",
+          "d8dd899c-7e3e-4447-8428-81d0ecf5149b",
+          "dae8cc1d-eb76-424f-ada3-2fb39114bf2f",
+          "db1c5104-235d-495e-9a5f-fb1af75d87d0",
+          "dc812568-6591-4138-9e59-82071a39646e",
+          "ddba4474-32f3-4cdf-b97d-64b197abbfb1",
+          "ddc37575-4032-418e-b7d0-7b895db2fe66",
+          "debdd5aa-5b7e-4189-bd79-750b7fc06b24",
+          "dfa66e16-d611-417a-8764-258c3f016515",
+          "e0b1f174-92bb-4184-b418-863139685f7a",
+          "eb60e4e8-71f3-5bb8-a7d7-9420dffa2bb0",
+          "f02bfbfe-990b-443f-b88f-377f34c81976",
+          "f113c951-c359-429a-a7b6-8bde3ddfed8d",
+          "f3d63348-297c-41ef-826d-4c6888dbdd32",
+          "f40a3d5e-e828-4314-aba3-c803bee6fbf4",
+          "f43ba9f1-2fcb-431b-a15f-2efed32e37c7",
+          "f53e2989-747b-437f-9ef6-d4beb31bea33",
+          "f5bc1a1e-828b-43fa-a632-edeea2fe1580",
+          "f9e842cd-b10f-4aa8-9bff-74a623c54dd9",
+          "fa011430-9b79-49e1-a45a-daba0ad03206",
+          "fa2e3ac0-7026-5ca3-92be-8463f5b9c75f",
+          "fb2fb1ad-8505-4a80-9b4a-157e6938887b",
+          "fc528ecf-49d8-4106-a690-95d32c8349da",
+          "fd41e7ab-b9ba-4503-a73e-6256d8608200",
+          "ff9dfbcd-90bd-4c9f-9479-5a9b34da7c00"
+        ]
+      },
+      {
+        "name": "public-exporural",
+        "before": {
+          "inventory": 108,
+          "frameGeometry": 52,
+          "visibleFrames": 5,
+          "checks": 0,
+          "locks": 11
+        },
+        "after": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 16
+          },
+          "grass": 108,
+          "frames": 16,
+          "frameColors": {
+            "#8fb7d8": 16
+          },
+          "checks": 0,
+          "locks": 0
+        },
+        "expectedLotIds": [
+          "01237376-a323-4301-a21a-62e4782bcbd2",
+          "04b60bf8-fb0c-4b44-9806-324ab06fd9db",
+          "04e9445f-8460-44cf-b451-bcb3a2d2117a",
+          "078b5dbc-e526-4579-b75c-35d4fc63e446",
+          "09c0d847-e2df-4d98-92e4-d6b7ddd40eb4",
+          "0cb9892f-4452-4e6a-bf77-7742dfc922a6",
+          "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "13f68c3f-15f7-467a-9d56-495e95c8cb21",
+          "1b4ce0cc-4062-5fd1-ba48-2ddcfbda62db",
+          "1baea38b-b6ab-46c1-bf04-ea6c53a87544",
+          "1d849c33-d7b1-4170-87ca-7a27dead4376",
+          "21dd495c-0af9-42e2-a5cf-3061e5e43679",
+          "226574ba-b528-41b2-b2f0-3569d4ea1d15",
+          "22c8cd21-e37b-49ba-83c7-acf4704e173c",
+          "26598e4c-1a1d-44c9-802c-3a30dcc84250",
+          "271a71b5-b822-48db-b62b-d74e17471f58",
+          "2b4422a9-a5c0-43b0-a9da-fc293d615d3c",
+          "2f859e78-befa-4994-a295-8b3d1d76c4f2",
+          "2fcaf66f-16aa-4efc-9760-11b937a6b3d1",
+          "310618dc-8323-4713-8928-91cd1be9f2d9",
+          "31c3ea7a-2eea-404a-a9b6-6f514bee4548",
+          "31f964aa-6ad1-4a83-9664-2bc073824c4b",
+          "32f91dba-ac24-41b9-bf87-4613c41c5a00",
+          "37bb772b-ba72-464a-a285-40bb96227714",
+          "381acab8-e28b-487e-b730-0827df5c4c6c",
+          "381e3cfb-d233-5955-aa80-879f26b7a39f",
+          "39542dee-d9c3-4d07-b17e-e3b29e7b081b",
+          "39ea38e4-a7fa-48a4-9f1f-e21d2dafe06d",
+          "3d14000b-a8b6-4fcf-a3e1-14ddd705ba00",
+          "3fc18d72-fd8e-5d60-8745-fba49d5967e8",
+          "3fc5ff27-0aa2-4c47-b423-45de7afba697",
+          "45206196-eb28-4869-ac51-3b4e499df571",
+          "467b0174-db02-4d29-9425-e53955cb20ad",
+          "48aa95ad-c85e-4386-9962-b38d0e466138",
+          "5a88cb56-725a-56a7-b26c-0dbc2016063e",
+          "5c8cfb53-1933-5f38-8d40-923419fd7f3d",
+          "5ef7ff86-57c5-4fad-b076-0ccd2b923c01",
+          "5f351f1c-5039-49fb-91f0-68225a47b483",
+          "607ccd08-8536-4eba-8d4f-d81e56863690",
+          "6443d85b-11f3-4d9e-afeb-e2389d43e04b",
+          "66232508-271a-4256-9f2f-6c40220bd481",
+          "6a848982-f9bf-4d9c-8098-32c123911e04",
+          "6bd8bf19-e2cc-51d0-b98a-057775f5fd86",
+          "6da23f87-d115-524e-9292-dff87add3c51",
+          "6f362dcf-8fce-46a8-b043-8d4348a07f0f",
+          "7142e987-335c-4de9-bd5d-937ec8f737dd",
+          "71d83bb6-3f31-59b8-a0b6-0bd63785c4fc",
+          "723c4ead-8ebf-4306-919a-dc7faf1c7af3",
+          "73fac7d7-224e-457c-8031-4905a28c3850",
+          "787b6559-124f-424c-ab0c-a6f56fdc59d6",
+          "7a0d01b3-08c0-4203-84d9-924fd6a777cf",
+          "7d78a02e-aa2f-52e6-8104-665776ba969e",
+          "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "7e73fba0-6ae1-474a-8813-8c95a9a97226",
+          "86a6f56b-8945-445b-82cc-ca9210fc82f1",
+          "8c57fffe-d21c-4102-9831-6e5ce54959fc",
+          "8e3b2915-d363-4ce9-8fcb-aef57f68a0d9",
+          "8f6f033e-e2ce-573d-9240-d388c627cf20",
+          "930d9495-59e6-5e7c-88ab-aaf9b9977e90",
+          "93b9ec57-5769-4f77-a517-230355a86933",
+          "9503f32f-403e-47b3-b778-bc69583342b8",
+          "9513c21d-06ff-477a-9154-1614a6485fb1",
+          "98980aba-172e-4ade-af34-afabd664f67c",
+          "9d4a7349-5d91-49d7-b60e-fe85f1fe0724",
+          "9dfb2a6e-69da-44ed-b3ec-b5775a2239f5",
+          "9ff3676a-5225-4528-95cf-46224e2657ad",
+          "a39b8f10-a566-484b-a563-7dc66a2b2429",
+          "a4fc0f30-d5d2-4d3d-b6c5-d5ec48256bd8",
+          "a5cb70d7-953e-47e8-b11c-e4903bd4aa1c",
+          "a6ec0be5-593e-406f-a2ef-0fda8c3448f2",
+          "abc42477-735c-44f5-a013-5549b0ebfaa6",
+          "ad437455-0dff-52b5-b585-d5eb5750c23a",
+          "b000ad12-b29b-4650-bfd5-463d58db4823",
+          "b306734c-0beb-493a-8663-2ffa005a8b8e",
+          "b3f1c02f-b2f0-424e-9a0f-7bc33de56e72",
+          "b4110166-cbe8-4d37-8523-514b1c810161",
+          "b59f1b19-f9a3-493a-8d17-9957a6b6ffc8",
+          "c3e1f95b-4970-4607-a62f-33b20a2f5a2f",
+          "c4b77e2d-5277-41ae-8261-cc034c410cf7",
+          "c89ab66d-bda1-4937-8062-cbc9b69d0f89",
+          "cc1a1398-4dfd-4601-92be-395b2c1d5e2f",
+          "cfb0a0b4-462e-4cf6-8065-1455891b03a1",
+          "d0e37c2a-f34d-5923-9cb2-182c8c9e6089",
+          "d707523e-91db-409a-96bf-10c230859937",
+          "d8dd899c-7e3e-4447-8428-81d0ecf5149b",
+          "dae8cc1d-eb76-424f-ada3-2fb39114bf2f",
+          "db1c5104-235d-495e-9a5f-fb1af75d87d0",
+          "dc812568-6591-4138-9e59-82071a39646e",
+          "ddba4474-32f3-4cdf-b97d-64b197abbfb1",
+          "ddc37575-4032-418e-b7d0-7b895db2fe66",
+          "debdd5aa-5b7e-4189-bd79-750b7fc06b24",
+          "dfa66e16-d611-417a-8764-258c3f016515",
+          "e0b1f174-92bb-4184-b418-863139685f7a",
+          "eb60e4e8-71f3-5bb8-a7d7-9420dffa2bb0",
+          "f02bfbfe-990b-443f-b88f-377f34c81976",
+          "f113c951-c359-429a-a7b6-8bde3ddfed8d",
+          "f3d63348-297c-41ef-826d-4c6888dbdd32",
+          "f40a3d5e-e828-4314-aba3-c803bee6fbf4",
+          "f43ba9f1-2fcb-431b-a15f-2efed32e37c7",
+          "f53e2989-747b-437f-9ef6-d4beb31bea33",
+          "f5bc1a1e-828b-43fa-a632-edeea2fe1580",
+          "f9e842cd-b10f-4aa8-9bff-74a623c54dd9",
+          "fa011430-9b79-49e1-a45a-daba0ad03206",
+          "fa2e3ac0-7026-5ca3-92be-8463f5b9c75f",
+          "fb2fb1ad-8505-4a80-9b4a-157e6938887b",
+          "fc528ecf-49d8-4106-a690-95d32c8349da",
+          "fd41e7ab-b9ba-4503-a73e-6256d8608200",
+          "ff9dfbcd-90bd-4c9f-9479-5a9b34da7c00"
+        ],
+        "recognizedLotIds": [
+          "01237376-a323-4301-a21a-62e4782bcbd2",
+          "04b60bf8-fb0c-4b44-9806-324ab06fd9db",
+          "04e9445f-8460-44cf-b451-bcb3a2d2117a",
+          "078b5dbc-e526-4579-b75c-35d4fc63e446",
+          "09c0d847-e2df-4d98-92e4-d6b7ddd40eb4",
+          "0cb9892f-4452-4e6a-bf77-7742dfc922a6",
+          "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "13f68c3f-15f7-467a-9d56-495e95c8cb21",
+          "1b4ce0cc-4062-5fd1-ba48-2ddcfbda62db",
+          "1baea38b-b6ab-46c1-bf04-ea6c53a87544",
+          "1d849c33-d7b1-4170-87ca-7a27dead4376",
+          "21dd495c-0af9-42e2-a5cf-3061e5e43679",
+          "226574ba-b528-41b2-b2f0-3569d4ea1d15",
+          "22c8cd21-e37b-49ba-83c7-acf4704e173c",
+          "26598e4c-1a1d-44c9-802c-3a30dcc84250",
+          "271a71b5-b822-48db-b62b-d74e17471f58",
+          "2b4422a9-a5c0-43b0-a9da-fc293d615d3c",
+          "2f859e78-befa-4994-a295-8b3d1d76c4f2",
+          "2fcaf66f-16aa-4efc-9760-11b937a6b3d1",
+          "310618dc-8323-4713-8928-91cd1be9f2d9",
+          "31c3ea7a-2eea-404a-a9b6-6f514bee4548",
+          "31f964aa-6ad1-4a83-9664-2bc073824c4b",
+          "32f91dba-ac24-41b9-bf87-4613c41c5a00",
+          "37bb772b-ba72-464a-a285-40bb96227714",
+          "381acab8-e28b-487e-b730-0827df5c4c6c",
+          "381e3cfb-d233-5955-aa80-879f26b7a39f",
+          "39542dee-d9c3-4d07-b17e-e3b29e7b081b",
+          "39ea38e4-a7fa-48a4-9f1f-e21d2dafe06d",
+          "3d14000b-a8b6-4fcf-a3e1-14ddd705ba00",
+          "3fc18d72-fd8e-5d60-8745-fba49d5967e8",
+          "3fc5ff27-0aa2-4c47-b423-45de7afba697",
+          "45206196-eb28-4869-ac51-3b4e499df571",
+          "467b0174-db02-4d29-9425-e53955cb20ad",
+          "48aa95ad-c85e-4386-9962-b38d0e466138",
+          "5a88cb56-725a-56a7-b26c-0dbc2016063e",
+          "5c8cfb53-1933-5f38-8d40-923419fd7f3d",
+          "5ef7ff86-57c5-4fad-b076-0ccd2b923c01",
+          "5f351f1c-5039-49fb-91f0-68225a47b483",
+          "607ccd08-8536-4eba-8d4f-d81e56863690",
+          "6443d85b-11f3-4d9e-afeb-e2389d43e04b",
+          "66232508-271a-4256-9f2f-6c40220bd481",
+          "6a848982-f9bf-4d9c-8098-32c123911e04",
+          "6bd8bf19-e2cc-51d0-b98a-057775f5fd86",
+          "6da23f87-d115-524e-9292-dff87add3c51",
+          "6f362dcf-8fce-46a8-b043-8d4348a07f0f",
+          "7142e987-335c-4de9-bd5d-937ec8f737dd",
+          "71d83bb6-3f31-59b8-a0b6-0bd63785c4fc",
+          "723c4ead-8ebf-4306-919a-dc7faf1c7af3",
+          "73fac7d7-224e-457c-8031-4905a28c3850",
+          "787b6559-124f-424c-ab0c-a6f56fdc59d6",
+          "7a0d01b3-08c0-4203-84d9-924fd6a777cf",
+          "7d78a02e-aa2f-52e6-8104-665776ba969e",
+          "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "7e73fba0-6ae1-474a-8813-8c95a9a97226",
+          "86a6f56b-8945-445b-82cc-ca9210fc82f1",
+          "8c57fffe-d21c-4102-9831-6e5ce54959fc",
+          "8e3b2915-d363-4ce9-8fcb-aef57f68a0d9",
+          "8f6f033e-e2ce-573d-9240-d388c627cf20",
+          "930d9495-59e6-5e7c-88ab-aaf9b9977e90",
+          "93b9ec57-5769-4f77-a517-230355a86933",
+          "9503f32f-403e-47b3-b778-bc69583342b8",
+          "9513c21d-06ff-477a-9154-1614a6485fb1",
+          "98980aba-172e-4ade-af34-afabd664f67c",
+          "9d4a7349-5d91-49d7-b60e-fe85f1fe0724",
+          "9dfb2a6e-69da-44ed-b3ec-b5775a2239f5",
+          "9ff3676a-5225-4528-95cf-46224e2657ad",
+          "a39b8f10-a566-484b-a563-7dc66a2b2429",
+          "a4fc0f30-d5d2-4d3d-b6c5-d5ec48256bd8",
+          "a5cb70d7-953e-47e8-b11c-e4903bd4aa1c",
+          "a6ec0be5-593e-406f-a2ef-0fda8c3448f2",
+          "abc42477-735c-44f5-a013-5549b0ebfaa6",
+          "ad437455-0dff-52b5-b585-d5eb5750c23a",
+          "b000ad12-b29b-4650-bfd5-463d58db4823",
+          "b306734c-0beb-493a-8663-2ffa005a8b8e",
+          "b3f1c02f-b2f0-424e-9a0f-7bc33de56e72",
+          "b4110166-cbe8-4d37-8523-514b1c810161",
+          "b59f1b19-f9a3-493a-8d17-9957a6b6ffc8",
+          "c3e1f95b-4970-4607-a62f-33b20a2f5a2f",
+          "c4b77e2d-5277-41ae-8261-cc034c410cf7",
+          "c89ab66d-bda1-4937-8062-cbc9b69d0f89",
+          "cc1a1398-4dfd-4601-92be-395b2c1d5e2f",
+          "cfb0a0b4-462e-4cf6-8065-1455891b03a1",
+          "d0e37c2a-f34d-5923-9cb2-182c8c9e6089",
+          "d707523e-91db-409a-96bf-10c230859937",
+          "d8dd899c-7e3e-4447-8428-81d0ecf5149b",
+          "dae8cc1d-eb76-424f-ada3-2fb39114bf2f",
+          "db1c5104-235d-495e-9a5f-fb1af75d87d0",
+          "dc812568-6591-4138-9e59-82071a39646e",
+          "ddba4474-32f3-4cdf-b97d-64b197abbfb1",
+          "ddc37575-4032-418e-b7d0-7b895db2fe66",
+          "debdd5aa-5b7e-4189-bd79-750b7fc06b24",
+          "dfa66e16-d611-417a-8764-258c3f016515",
+          "e0b1f174-92bb-4184-b418-863139685f7a",
+          "eb60e4e8-71f3-5bb8-a7d7-9420dffa2bb0",
+          "f02bfbfe-990b-443f-b88f-377f34c81976",
+          "f113c951-c359-429a-a7b6-8bde3ddfed8d",
+          "f3d63348-297c-41ef-826d-4c6888dbdd32",
+          "f40a3d5e-e828-4314-aba3-c803bee6fbf4",
+          "f43ba9f1-2fcb-431b-a15f-2efed32e37c7",
+          "f53e2989-747b-437f-9ef6-d4beb31bea33",
+          "f5bc1a1e-828b-43fa-a632-edeea2fe1580",
+          "f9e842cd-b10f-4aa8-9bff-74a623c54dd9",
+          "fa011430-9b79-49e1-a45a-daba0ad03206",
+          "fa2e3ac0-7026-5ca3-92be-8463f5b9c75f",
+          "fb2fb1ad-8505-4a80-9b4a-157e6938887b",
+          "fc528ecf-49d8-4106-a690-95d32c8349da",
+          "fd41e7ab-b9ba-4503-a73e-6256d8608200",
+          "ff9dfbcd-90bd-4c9f-9479-5a9b34da7c00"
+        ]
+      }
+    ]
+  },
+  "performance": [
+    {
+      "quality": "MEDIUM",
+      "label": "baseline",
+      "mode": "private",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.7,
+        "median": 16.7,
+        "p95": 18,
+        "max": 18.7
+      },
+      "framesOver50": 0,
+      "draws": {
+        "samples": 80,
+        "min": 569,
+        "median": 616,
+        "p95": 953,
+        "max": 953
+      },
+      "triangles": {
+        "samples": 80,
+        "min": 714285,
+        "median": 732064,
+        "p95": 1016708,
+        "max": 1016708
+      },
+      "startup": [
+        {
+          "trial": 0,
+          "interactiveMs": 4081,
+          "sceneMs": 1912,
+          "shaderDirectMs": 534
+        },
+        {
+          "trial": 3,
+          "interactiveMs": 4008,
+          "sceneMs": 1864,
+          "shaderDirectMs": 526
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 587,
+        "median": 587,
+        "p95": 587,
+        "max": 587
+      },
+      "textures": {
+        "samples": 6,
+        "min": 113,
+        "median": 113,
+        "p95": 113,
+        "max": 113
+      },
+      "programs": {
+        "samples": 6,
+        "min": 244,
+        "median": 244,
+        "p95": 244,
+        "max": 244
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "resourceRows": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "before": {
+            "at": 31078.60000000894,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 164919109,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 37801.40000000596,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 178696268,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "before": {
+            "at": 39160.60000000894,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 180569016,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 45860.20000000298,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 186659923,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "before": {
+            "at": 47220.90000000596,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 162529323,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 53927.29999999702,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 174093209,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "before": {
+            "at": 30988.80000001192,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 160714305,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 37704.80000001192,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 175201746,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "before": {
+            "at": 39064.70000000298,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 177437142,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 45769.60000000894,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 185326569,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "before": {
+            "at": 47129.70000000298,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 161310997,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 53835.5,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 587,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 172814666,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        }
+      ],
+      "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    },
+    {
+      "quality": "MEDIUM",
+      "label": "baseline",
+      "mode": "public",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.7,
+        "median": 16.7,
+        "p95": 17.8,
+        "max": 18.6
+      },
+      "framesOver50": 0,
+      "draws": {
+        "samples": 79,
+        "min": 528,
+        "median": 570,
+        "p95": 583,
+        "max": 583
+      },
+      "triangles": {
+        "samples": 79,
+        "min": 361532,
+        "median": 363146,
+        "p95": 368280,
+        "max": 368280
+      },
+      "startup": [
+        {
+          "trial": 0,
+          "interactiveMs": 2232,
+          "sceneMs": 1113,
+          "shaderDirectMs": 238
+        },
+        {
+          "trial": 3,
+          "interactiveMs": 2283,
+          "sceneMs": 1131,
+          "shaderDirectMs": 263
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 538,
+        "median": 538,
+        "p95": 538,
+        "max": 538
+      },
+      "textures": {
+        "samples": 6,
+        "min": 99,
+        "median": 99,
+        "p95": 99,
+        "max": 99
+      },
+      "programs": {
+        "samples": 6,
+        "min": 121,
+        "median": 121,
+        "p95": 121,
+        "max": 121
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "resourceRows": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "before": {
+            "at": 28575.90000000596,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 245756290,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 35293,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 239233817,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "before": {
+            "at": 36654.70000000298,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 255623281,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 43344,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 243892477,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "before": {
+            "at": 44705.10000000894,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 261461785,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 51409.90000000596,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 252676662,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "before": {
+            "at": 28611.90000000596,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 197912488,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 35312.5,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 212717906,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "before": {
+            "at": 36672.30000001192,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 202101802,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 43363.10000000894,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 213508058,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "before": {
+            "at": 44722.10000000894,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 203679570,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 51412.5,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 218720391,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        }
+      ],
+      "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    },
+    {
+      "quality": "MEDIUM",
+      "label": "candidate",
+      "mode": "private",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.1,
+        "median": 16.7,
+        "p95": 18.1,
+        "max": 19.3
+      },
+      "framesOver50": 0,
+      "draws": {
+        "samples": 78,
+        "min": 568,
+        "median": 615,
+        "p95": 952,
+        "max": 952
+      },
+      "triangles": {
+        "samples": 78,
+        "min": 713263,
+        "median": 731042,
+        "p95": 1015686,
+        "max": 1015686
+      },
+      "startup": [
+        {
+          "trial": 1,
+          "interactiveMs": 4057,
+          "sceneMs": 1894,
+          "shaderDirectMs": 538
+        },
+        {
+          "trial": 2,
+          "interactiveMs": 4036,
+          "sceneMs": 1891,
+          "shaderDirectMs": 523
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 586,
+        "median": 586,
+        "p95": 586,
+        "max": 586
+      },
+      "textures": {
+        "samples": 6,
+        "min": 113,
+        "median": 113,
+        "p95": 113,
+        "max": 113
+      },
+      "programs": {
+        "samples": 6,
+        "min": 244,
+        "median": 244,
+        "p95": 244,
+        "max": 244
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "resourceRows": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "before": {
+            "at": 31087.29999999702,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 140671264,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 37800.40000000596,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 153652203,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "before": {
+            "at": 39163.20000000298,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 155681931,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 45866.79999999702,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 136233819,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "before": {
+            "at": 47224.70000000298,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 138860095,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 53920.5,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 148249140,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "before": {
+            "at": 30972.20000000298,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 130936189,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 37682.90000000596,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 115572082,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "before": {
+            "at": 39044.20000000298,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 127324137,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 45733,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 133425383,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "before": {
+            "at": 47097,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 109093543,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 53813.90000000596,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 111963958,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        }
+      ],
+      "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    },
+    {
+      "quality": "MEDIUM",
+      "label": "candidate",
+      "mode": "public",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.6,
+        "median": 16.7,
+        "p95": 18.2,
+        "max": 18.7
+      },
+      "framesOver50": 0,
+      "draws": {
+        "samples": 80,
+        "min": 526,
+        "median": 569,
+        "p95": 582,
+        "max": 582
+      },
+      "triangles": {
+        "samples": 80,
+        "min": 359760,
+        "median": 361386,
+        "p95": 366520,
+        "max": 366580
+      },
+      "startup": [
+        {
+          "trial": 1,
+          "interactiveMs": 2297,
+          "sceneMs": 1146,
+          "shaderDirectMs": 261
+        },
+        {
+          "trial": 2,
+          "interactiveMs": 2283,
+          "sceneMs": 1152,
+          "shaderDirectMs": 255
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 537,
+        "median": 537,
+        "p95": 537,
+        "max": 537
+      },
+      "textures": {
+        "samples": 6,
+        "min": 99,
+        "median": 99,
+        "p95": 99,
+        "max": 99
+      },
+      "programs": {
+        "samples": 6,
+        "min": 120,
+        "median": 120,
+        "p95": 120,
+        "max": 120
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "resourceRows": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "before": {
+            "at": 28627.70000000298,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 206298964,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 35345.09999999404,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 196096410,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "before": {
+            "at": 36707.79999999702,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 212608238,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 43411,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 197533259,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "before": {
+            "at": 44770.79999999702,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 214154283,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 51466.70000000298,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 201987791,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "before": {
+            "at": 28563.5,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 247634247,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 35281.60000000894,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 264387548,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "before": {
+            "at": 36643.40000000596,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 253707028,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 43331.10000000894,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 265864634,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "before": {
+            "at": 44692.70000000298,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 256497434,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 51393.79999999702,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 271685947,
+            "qualityTier": "MEDIUM",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        }
+      ],
+      "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    },
+    {
+      "quality": "LOW",
+      "label": "baseline",
+      "mode": "private",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "framesMs": {
+        "samples": 1440,
+        "min": 15.5,
+        "median": 16.7,
+        "p95": 17.5,
+        "max": 17.8
+      },
+      "framesOver50": 0,
+      "draws": {
+        "samples": 79,
+        "min": 570,
+        "median": 616,
+        "p95": 953,
+        "max": 953
+      },
+      "triangles": {
+        "samples": 79,
+        "min": 714285,
+        "median": 732064,
+        "p95": 1016708,
+        "max": 1016708
+      },
+      "startup": [
+        {
+          "trial": 0,
+          "interactiveMs": 3981,
+          "sceneMs": 1906,
+          "shaderDirectMs": 505
+        },
+        {
+          "trial": 3,
+          "interactiveMs": 4021,
+          "sceneMs": 1856,
+          "shaderDirectMs": 538
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 586,
+        "median": 586,
+        "p95": 586,
+        "max": 586
+      },
+      "textures": {
+        "samples": 6,
+        "min": 113,
+        "median": 113,
+        "p95": 113,
+        "max": 113
+      },
+      "programs": {
+        "samples": 6,
+        "min": 244,
+        "median": 244,
+        "p95": 244,
+        "max": 244
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "resourceRows": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "before": {
+            "at": 30808.09999999404,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 175388777,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 37527.89999999106,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 161861950,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "before": {
+            "at": 38888.29999999702,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 164365438,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 45575.79999999702,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 170611441,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "before": {
+            "at": 46936.29999999702,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 173512313,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 53624.79999999702,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 185046227,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "before": {
+            "at": 31048.79999999702,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 148815193,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 37764.20000000298,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 171638734,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "before": {
+            "at": 39125.29999999702,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 174231338,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 45814.59999999404,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 166017293,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "before": {
+            "at": 47175.5,
+            "calls": 580,
+            "triangles": 718839,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 169508129,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 53865.20000000298,
+            "calls": 621,
+            "triangles": 736280,
+            "geometries": 586,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 163062430,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        }
+      ],
+      "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    },
+    {
+      "quality": "LOW",
+      "label": "baseline",
+      "mode": "public",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "framesMs": {
+        "samples": 1440,
+        "min": 15.2,
+        "median": 16.7,
+        "p95": 17.1,
+        "max": 17.7
+      },
+      "framesOver50": 0,
+      "draws": {
+        "samples": 79,
+        "min": 528,
+        "median": 570,
+        "p95": 583,
+        "max": 583
+      },
+      "triangles": {
+        "samples": 79,
+        "min": 361532,
+        "median": 363146,
+        "p95": 368280,
+        "max": 368280
+      },
+      "startup": [
+        {
+          "trial": 0,
+          "interactiveMs": 2233,
+          "sceneMs": 1109,
+          "shaderDirectMs": 229
+        },
+        {
+          "trial": 3,
+          "interactiveMs": 2280,
+          "sceneMs": 1116,
+          "shaderDirectMs": 264
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 538,
+        "median": 538,
+        "p95": 538,
+        "max": 538
+      },
+      "textures": {
+        "samples": 6,
+        "min": 99,
+        "median": 99,
+        "p95": 99,
+        "max": 99
+      },
+      "programs": {
+        "samples": 6,
+        "min": 121,
+        "median": 121,
+        "p95": 121,
+        "max": 121
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "resourceRows": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "before": {
+            "at": 28543.30000001192,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 198296825,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 35263.10000000894,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 214080492,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "before": {
+            "at": 36623.90000000596,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 203346868,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 43313.30000001192,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 214837929,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "before": {
+            "at": 44671.80000001192,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 205091245,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 51362.60000000894,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 220023215,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "before": {
+            "at": 28542.20000000298,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 205986409,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 35243.79999999702,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 196758912,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "before": {
+            "at": 36603.10000000894,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 213134572,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 43294.29999999702,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 201465069,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "before": {
+            "at": 44655.20000000298,
+            "calls": 539,
+            "triangles": 363146,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 218404269,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 51339.90000000596,
+            "calls": 574,
+            "triangles": 363491,
+            "geometries": 538,
+            "textures": 99,
+            "programs": 121,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 208831098,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        }
+      ],
+      "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    },
+    {
+      "quality": "LOW",
+      "label": "candidate",
+      "mode": "private",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "framesMs": {
+        "samples": 1440,
+        "min": 15.3,
+        "median": 16.7,
+        "p95": 17.4,
+        "max": 17.8
+      },
+      "framesOver50": 0,
+      "draws": {
+        "samples": 78,
+        "min": 569,
+        "median": 615,
+        "p95": 952,
+        "max": 952
+      },
+      "triangles": {
+        "samples": 78,
+        "min": 713263,
+        "median": 731042,
+        "p95": 1015686,
+        "max": 1015686
+      },
+      "startup": [
+        {
+          "trial": 1,
+          "interactiveMs": 4010,
+          "sceneMs": 1877,
+          "shaderDirectMs": 497
+        },
+        {
+          "trial": 2,
+          "interactiveMs": 4006,
+          "sceneMs": 1885,
+          "shaderDirectMs": 505
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 585,
+        "median": 585,
+        "p95": 585,
+        "max": 585
+      },
+      "textures": {
+        "samples": 6,
+        "min": 113,
+        "median": 113,
+        "p95": 113,
+        "max": 113
+      },
+      "programs": {
+        "samples": 6,
+        "min": 244,
+        "median": 244,
+        "p95": 244,
+        "max": 244
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "resourceRows": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "before": {
+            "at": 30922.79999999702,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 136996741,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 37637.5,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 150357630,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "before": {
+            "at": 38995.5,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 152904930,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 45687,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 160884767,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "before": {
+            "at": 47049.39999999106,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 136875323,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 53737.29999999702,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 147748186,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "before": {
+            "at": 30771.29999999702,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 116046608,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 37486.29999999702,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 121421346,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "before": {
+            "at": 38849.89999999106,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 124030010,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 45537.09999999404,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 130997439,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "before": {
+            "at": 46900.39999999106,
+            "calls": 579,
+            "triangles": 717817,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 133452583,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 53603.19999998808,
+            "calls": 620,
+            "triangles": 735258,
+            "geometries": 585,
+            "textures": 113,
+            "programs": 244,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 109612085,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        }
+      ],
+      "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    },
+    {
+      "quality": "LOW",
+      "label": "candidate",
+      "mode": "public",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.7,
+        "median": 16.7,
+        "p95": 17.4,
+        "max": 18.7
+      },
+      "framesOver50": 0,
+      "draws": {
+        "samples": 80,
+        "min": 527,
+        "median": 569,
+        "p95": 582,
+        "max": 582
+      },
+      "triangles": {
+        "samples": 80,
+        "min": 359772,
+        "median": 361386,
+        "p95": 366520,
+        "max": 366520
+      },
+      "startup": [
+        {
+          "trial": 1,
+          "interactiveMs": 2301,
+          "sceneMs": 1172,
+          "shaderDirectMs": 250
+        },
+        {
+          "trial": 2,
+          "interactiveMs": 2280,
+          "sceneMs": 1132,
+          "shaderDirectMs": 256
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 537,
+        "median": 537,
+        "p95": 537,
+        "max": 537
+      },
+      "textures": {
+        "samples": 6,
+        "min": 99,
+        "median": 99,
+        "p95": 99,
+        "max": 99
+      },
+      "programs": {
+        "samples": 6,
+        "min": 120,
+        "median": 120,
+        "p95": 120,
+        "max": 120
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "resourceRows": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "before": {
+            "at": 28547.09999999404,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 302541936,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 35264.29999999702,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 291914059,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "before": {
+            "at": 36624.90000000596,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 281288287,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 43313.20000000298,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 293373416,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "before": {
+            "at": 44671.40000000596,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 310443212,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 51362.29999999702,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 298219218,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "before": {
+            "at": 28615.39999999106,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 133005043,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 35327.19999998808,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 130918722,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "before": {
+            "at": 36690.5,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 146558906,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 43392,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 141283537,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "before": {
+            "at": 44754.39999999106,
+            "calls": 538,
+            "triangles": 361386,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 130570985,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          },
+          "after": {
+            "at": 51448.19999998808,
+            "calls": 573,
+            "triangles": 361731,
+            "geometries": 537,
+            "textures": 99,
+            "programs": 120,
+            "dpr": 1,
+            "width": 1280,
+            "height": 800,
+            "heapBytes": 128266627,
+            "qualityTier": "LOW",
+            "gpuVendor": "Google Inc. (Apple)",
+            "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+          }
+        }
+      ],
+      "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    }
+  ],
+  "functional": {
+    "steps": [
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SOLD",
+          "normalizedPhase": "SOLD",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#8FB7D8",
+          "frameDerivation": "valid",
+          "confirmationExpected": true,
+          "logoAuthorized": false,
+          "rendered": {
+            "marker": {
+              "type": "sold-lot-confirmations",
+              "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+              "instanceId": 67,
+              "visible": true
+            },
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 9829,
+          "calls": 810,
+          "triangles": 767682,
+          "geometries": 579,
+          "textures": 113,
+          "programs": 244,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 130835520,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 304,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-59-initial"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SOLD",
+          "normalizedPhase": "SOLD",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#8FB7D8",
+          "frameDerivation": "valid",
+          "confirmationExpected": true,
+          "logoAuthorized": true,
+          "rendered": {
+            "marker": {
+              "type": "sold-lot-confirmations",
+              "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+              "instanceId": 67,
+              "visible": true
+            },
+            "logo": {
+              "type": "sold-lot-logos",
+              "meshUuid": "ea613400-59f5-46ea-b620-dbdfe89dd187",
+              "instanceId": 0,
+              "visible": true
+            },
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 11292.5,
+          "calls": 815,
+          "triangles": 767966,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 148001977,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 352,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "R59-local-TEST-logo"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "AVAILABLE",
+          "normalizedPhase": "AVAILABLE",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": null,
+          "frameDerivation": "valid",
+          "confirmationExpected": false,
+          "logoAuthorized": true,
+          "rendered": {
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": false,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 93,
+            "SOLD": 12,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 12746.70000000298,
+          "calls": 813,
+          "triangles": 767930,
+          "geometries": 581,
+          "textures": 113,
+          "programs": 244,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 130983535,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 386,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-59-AVAILABLE"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SALE_OPEN",
+          "normalizedPhase": "SALE_OPEN",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#D8BD70",
+          "frameDerivation": "valid",
+          "confirmationExpected": false,
+          "logoAuthorized": true,
+          "rendered": {
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#d8bd70"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 12,
+            "SALE_OPEN": 4
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 14190.10000000894,
+          "calls": 813,
+          "triangles": 767938,
+          "geometries": 581,
+          "textures": 113,
+          "programs": 244,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 173996598,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 419,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-59-SALE_OPEN"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SOLD",
+          "normalizedPhase": "SOLD",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#8FB7D8",
+          "frameDerivation": "valid",
+          "confirmationExpected": true,
+          "logoAuthorized": true,
+          "rendered": {
+            "marker": {
+              "type": "sold-lot-confirmations",
+              "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+              "instanceId": 67,
+              "visible": true
+            },
+            "logo": {
+              "type": "sold-lot-logos",
+              "meshUuid": "ae168963-d8ff-4d5b-b378-30928c6de96a",
+              "instanceId": 0,
+              "visible": true
+            },
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 15625.800000011921,
+          "calls": 815,
+          "triangles": 767966,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 171586699,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 451,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-59-SOLD"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "AVAILABLE",
+          "normalizedPhase": "AVAILABLE",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": null,
+          "frameDerivation": "valid",
+          "confirmationExpected": false,
+          "logoAuthorized": true,
+          "rendered": {
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": false,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 93,
+            "SOLD": 12,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 17069.5,
+          "calls": 813,
+          "triangles": 767930,
+          "geometries": 581,
+          "textures": 113,
+          "programs": 244,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 174730972,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 483,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-59-AVAILABLE"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "BLOCKED",
+          "normalizedPhase": "BLOCKED",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": false,
+          "frameExpected": null,
+          "frameDerivation": "valid",
+          "confirmationExpected": false,
+          "logoAuthorized": true,
+          "rendered": {
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": false,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#dc2626",
+              "turf": 2,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 12,
+            "BLOCKED": 1,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 18505.60000000894,
+          "calls": 813,
+          "triangles": 767930,
+          "geometries": 581,
+          "textures": 113,
+          "programs": 244,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 176373772,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 516,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-59-BLOCKED"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SOLD",
+          "normalizedPhase": "SOLD",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#8FB7D8",
+          "frameDerivation": "valid",
+          "confirmationExpected": true,
+          "logoAuthorized": true,
+          "rendered": {
+            "marker": {
+              "type": "sold-lot-confirmations",
+              "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+              "instanceId": 67,
+              "visible": true
+            },
+            "logo": {
+              "type": "sold-lot-logos",
+              "meshUuid": "381e0b2b-8486-4007-a69a-61bef2cd37f9",
+              "instanceId": 0,
+              "visible": true
+            },
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 19944,
+          "calls": 815,
+          "triangles": 767966,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 210173317,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 549,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-59-SOLD"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+          "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "publicIdentifier": "Q-R-21",
+          "entityPublicIdentifier": "Q-R-21",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SOLD",
+          "normalizedPhase": "SOLD",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#8FB7D8",
+          "frameDerivation": "valid",
+          "confirmationExpected": true,
+          "logoAuthorized": false,
+          "rendered": {
+            "marker": {
+              "type": "sold-lot-confirmations",
+              "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+              "instanceId": 60,
+              "visible": true
+            },
+            "frame": {
+              "batchId": 190,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 190,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 20453.20000000298,
+          "calls": 815,
+          "triangles": 767966,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 213181747,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 610,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-21-initial"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+          "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "publicIdentifier": "Q-R-21",
+          "entityPublicIdentifier": "Q-R-21",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "AVAILABLE",
+          "normalizedPhase": "AVAILABLE",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": null,
+          "frameDerivation": "valid",
+          "confirmationExpected": false,
+          "logoAuthorized": false,
+          "rendered": {
+            "frame": {
+              "batchId": 190,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": false,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 190,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 93,
+            "SOLD": 12,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 21903.70000000298,
+          "calls": 815,
+          "triangles": 767934,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 214464832,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 617,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-21-AVAILABLE"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+          "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "publicIdentifier": "Q-R-21",
+          "entityPublicIdentifier": "Q-R-21",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SALE_OPEN",
+          "normalizedPhase": "SALE_OPEN",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#D8BD70",
+          "frameDerivation": "valid",
+          "confirmationExpected": false,
+          "logoAuthorized": false,
+          "rendered": {
+            "frame": {
+              "batchId": 190,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#d8bd70"
+            },
+            "surface": {
+              "batchId": 190,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 12,
+            "SALE_OPEN": 4
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 23346.70000000298,
+          "calls": 815,
+          "triangles": 767942,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 251662773,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 645,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-21-SALE_OPEN"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+          "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "publicIdentifier": "Q-R-21",
+          "entityPublicIdentifier": "Q-R-21",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SOLD",
+          "normalizedPhase": "SOLD",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#8FB7D8",
+          "frameDerivation": "valid",
+          "confirmationExpected": true,
+          "logoAuthorized": false,
+          "rendered": {
+            "marker": {
+              "type": "sold-lot-confirmations",
+              "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+              "instanceId": 60,
+              "visible": true
+            },
+            "frame": {
+              "batchId": 190,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 190,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 24795.90000000596,
+          "calls": 815,
+          "triangles": 767966,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 241762926,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 678,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-21-SOLD"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+          "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "publicIdentifier": "Q-R-21",
+          "entityPublicIdentifier": "Q-R-21",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "AVAILABLE",
+          "normalizedPhase": "AVAILABLE",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": null,
+          "frameDerivation": "valid",
+          "confirmationExpected": false,
+          "logoAuthorized": false,
+          "rendered": {
+            "frame": {
+              "batchId": 190,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": false,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 190,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 93,
+            "SOLD": 12,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 26231,
+          "calls": 815,
+          "triangles": 767934,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 241603939,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 711,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-21-AVAILABLE"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+          "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "publicIdentifier": "Q-R-21",
+          "entityPublicIdentifier": "Q-R-21",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "BLOCKED",
+          "normalizedPhase": "BLOCKED",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": false,
+          "frameExpected": null,
+          "frameDerivation": "valid",
+          "confirmationExpected": false,
+          "logoAuthorized": false,
+          "rendered": {
+            "frame": {
+              "batchId": 190,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": false,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 190,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#dc2626",
+              "turf": 2,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 12,
+            "BLOCKED": 1,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 27670.20000000298,
+          "calls": 815,
+          "triangles": 767934,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 275041728,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 744,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-21-BLOCKED"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+          "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+          "publicIdentifier": "Q-R-21",
+          "entityPublicIdentifier": "Q-R-21",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SOLD",
+          "normalizedPhase": "SOLD",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#8FB7D8",
+          "frameDerivation": "valid",
+          "confirmationExpected": true,
+          "logoAuthorized": false,
+          "rendered": {
+            "marker": {
+              "type": "sold-lot-confirmations",
+              "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+              "instanceId": 60,
+              "visible": true
+            },
+            "frame": {
+              "batchId": 190,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 190,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 29119.10000000894,
+          "calls": 815,
+          "triangles": 767966,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 274698193,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 777,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "Q-R-21-SOLD"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SOLD",
+          "normalizedPhase": "SOLD",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#8FB7D8",
+          "frameDerivation": "valid",
+          "confirmationExpected": true,
+          "logoAuthorized": true,
+          "rendered": {
+            "marker": {
+              "type": "sold-lot-confirmations",
+              "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+              "instanceId": 67,
+              "visible": true
+            },
+            "logo": {
+              "type": "sold-lot-logos",
+              "meshUuid": "381e0b2b-8486-4007-a69a-61bef2cd37f9",
+              "instanceId": 0,
+              "visible": true
+            },
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 31627.5,
+          "calls": 815,
+          "triangles": 767966,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 273637539,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 900,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "resource-start"
+      },
+      {
+        "row": {
+          "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+          "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+          "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+          "publicIdentifier": "Q-R-59",
+          "entityPublicIdentifier": "Q-R-59",
+          "block": "R",
+          "segmentId": "exporural",
+          "segmentSource": "database",
+          "resolvedSegment": "exporural",
+          "canonicalRelationMatches": true,
+          "classification": "SELLABLE_LOT",
+          "isSellable": false,
+          "isCovered": false,
+          "isArchived": false,
+          "archivedAt": null,
+          "interiorMetadata": {
+            "pavilionPublicIdentifier": {
+              "type": "null",
+              "value": null
+            },
+            "pavilionModuleKey": {
+              "type": "null",
+              "value": null
+            },
+            "moduleNumber": {
+              "type": "null",
+              "value": null
+            },
+            "interiorOnly": {
+              "type": "null",
+              "value": null
+            }
+          },
+          "status": "SOLD",
+          "normalizedPhase": "SOLD",
+          "expectedRural": true,
+          "eligible": true,
+          "exclusionReasons": [],
+          "grassExpected": true,
+          "frameExpected": "#8FB7D8",
+          "frameDerivation": "valid",
+          "confirmationExpected": true,
+          "logoAuthorized": true,
+          "rendered": {
+            "marker": {
+              "type": "sold-lot-confirmations",
+              "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+              "instanceId": 67,
+              "visible": true
+            },
+            "logo": {
+              "type": "sold-lot-logos",
+              "meshUuid": "bc7a92c6-3d6f-4ecc-b759-5266bf91fcb9",
+              "instanceId": 0,
+              "visible": true
+            },
+            "frame": {
+              "batchId": 228,
+              "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+              "visible": true,
+              "color": "#8fb7d8"
+            },
+            "surface": {
+              "batchId": 228,
+              "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+              "color": "#739455",
+              "turf": 1,
+              "material": "MeshStandardMaterial",
+              "visible": true,
+              "elevation": 0,
+              "opacity": 1
+            }
+          }
+        },
+        "counts": {
+          "expected": 108,
+          "recognized": 108,
+          "excluded": 0,
+          "frameFailures": 0,
+          "byStatus": {
+            "AVAILABLE": 92,
+            "SOLD": 13,
+            "SALE_OPEN": 3
+          }
+        },
+        "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+        "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+        "stats": {
+          "at": 42961,
+          "calls": 815,
+          "triangles": 767966,
+          "geometries": 582,
+          "textures": 114,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1280,
+          "height": 800,
+          "heapBytes": 164890304,
+          "qualityTier": "MEDIUM",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1049,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "name": "resource-end"
+      }
+    ],
+    "checks": [
+      "R59 TEST logo and smaller confirmation coexist; R21 remains sold without logo; no remote/logo authorization inferred",
+      "Q-R-59: exact received isSellable=false preserved; grass/frame/check follow AVAILABLE→SALE_OPEN→SOLD→AVAILABLE/BLOCKED; stable frame batch and geometry; no legacy lock",
+      "Q-R-21: exact received isSellable=false preserved; grass/frame/check follow AVAILABLE→SALE_OPEN→SOLD→AVAILABLE/BLOCKED; stable frame batch and geometry; no legacy lock",
+      "Five repeated status cycles retain warmed geometry/texture allocations and frame UUID",
+      "Emulated native touch at 390×844 selects R59 through frame/check (not a physical device test)"
+    ],
+    "errors": [],
+    "scope": "Authorized sanitized rural inventory. Status transitions and DEMO logo are local in-memory copies; no backend requests or commercial writes.",
+    "manifest": {
+      "revision": "working-tree",
+      "hashes": {
+        "utils/externalLotPresentation.ts": "7bab87882f7399ed72cce8ab7a8779a3383e3d9d2868e2b312bc6d8729f33cce",
+        "components/canvas/CommercialMapCanvas.tsx": "01971989533f78f547af3453629a4acdb4fdb331d7219921372b974dd474322a",
+        "components/canvas/SoldLotLocks.tsx": "946ef9da416bd70de7355dad9c95b8ecbcf200f1123c92292658c6d271409799",
+        "components/canvas/ExternalLotFrames.tsx": "06cc2efc9429020ace5a40a2a102dacbde71cc14f72ca58e219fc83d6c5a8dd0",
+        "components/canvas/exporuralTurfMaterial.ts": "7cc1307c2b5afcf4177d4eb704b8bf6ae53e490fa5ecf6622534647d8ffdf093",
+        "utils/externalLotFrameGeometry.ts": "59b47744c558ff95f8f722705b747b81eb2b0fef8c6fe4c872d1d24d0afad821",
+        "public/publicMapService.ts": "c383051a2227f8e46eb052c9ab4e4891df6cecf03b8d0aa9516e4b132337502c"
+      },
+      "fixtureHash": "4c17e49fe32c736e7b374bc9112a7d82aca1a4c45eec37e9089a19c509910e05",
+      "inventoryHash": "4c4028f2b69bbfd9ee1b6762c17a83bc0d2208f1973b355d9abea06822c7c73e",
+      "mode": "production",
+      "backend": "qa.invalid",
+      "fixture": "authorized sanitized rural inventory and current geometry; reference non-rural controls"
+    },
+    "passed": true
+  },
+  "passed": true
+}

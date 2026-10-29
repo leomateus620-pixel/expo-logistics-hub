@@ -1,0 +1,1834 @@
+{
+  "steps": [
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SOLD",
+        "normalizedPhase": "SOLD",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#8FB7D8",
+        "frameDerivation": "valid",
+        "confirmationExpected": true,
+        "logoAuthorized": false,
+        "rendered": {
+          "marker": {
+            "type": "sold-lot-confirmations",
+            "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+            "instanceId": 67,
+            "visible": true
+          },
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 9829,
+        "calls": 810,
+        "triangles": 767682,
+        "geometries": 579,
+        "textures": 113,
+        "programs": 244,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 130835520,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 304,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-59-initial"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SOLD",
+        "normalizedPhase": "SOLD",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#8FB7D8",
+        "frameDerivation": "valid",
+        "confirmationExpected": true,
+        "logoAuthorized": true,
+        "rendered": {
+          "marker": {
+            "type": "sold-lot-confirmations",
+            "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+            "instanceId": 67,
+            "visible": true
+          },
+          "logo": {
+            "type": "sold-lot-logos",
+            "meshUuid": "ea613400-59f5-46ea-b620-dbdfe89dd187",
+            "instanceId": 0,
+            "visible": true
+          },
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 11292.5,
+        "calls": 815,
+        "triangles": 767966,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 148001977,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 352,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "R59-local-TEST-logo"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "AVAILABLE",
+        "normalizedPhase": "AVAILABLE",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": null,
+        "frameDerivation": "valid",
+        "confirmationExpected": false,
+        "logoAuthorized": true,
+        "rendered": {
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": false,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 93,
+          "SOLD": 12,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 12746.70000000298,
+        "calls": 813,
+        "triangles": 767930,
+        "geometries": 581,
+        "textures": 113,
+        "programs": 244,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 130983535,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 386,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-59-AVAILABLE"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SALE_OPEN",
+        "normalizedPhase": "SALE_OPEN",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#D8BD70",
+        "frameDerivation": "valid",
+        "confirmationExpected": false,
+        "logoAuthorized": true,
+        "rendered": {
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#d8bd70"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 12,
+          "SALE_OPEN": 4
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 14190.10000000894,
+        "calls": 813,
+        "triangles": 767938,
+        "geometries": 581,
+        "textures": 113,
+        "programs": 244,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 173996598,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 419,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-59-SALE_OPEN"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SOLD",
+        "normalizedPhase": "SOLD",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#8FB7D8",
+        "frameDerivation": "valid",
+        "confirmationExpected": true,
+        "logoAuthorized": true,
+        "rendered": {
+          "marker": {
+            "type": "sold-lot-confirmations",
+            "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+            "instanceId": 67,
+            "visible": true
+          },
+          "logo": {
+            "type": "sold-lot-logos",
+            "meshUuid": "ae168963-d8ff-4d5b-b378-30928c6de96a",
+            "instanceId": 0,
+            "visible": true
+          },
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 15625.800000011921,
+        "calls": 815,
+        "triangles": 767966,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 171586699,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 451,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-59-SOLD"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "AVAILABLE",
+        "normalizedPhase": "AVAILABLE",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": null,
+        "frameDerivation": "valid",
+        "confirmationExpected": false,
+        "logoAuthorized": true,
+        "rendered": {
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": false,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 93,
+          "SOLD": 12,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 17069.5,
+        "calls": 813,
+        "triangles": 767930,
+        "geometries": 581,
+        "textures": 113,
+        "programs": 244,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 174730972,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 483,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-59-AVAILABLE"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "BLOCKED",
+        "normalizedPhase": "BLOCKED",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": false,
+        "frameExpected": null,
+        "frameDerivation": "valid",
+        "confirmationExpected": false,
+        "logoAuthorized": true,
+        "rendered": {
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": false,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#dc2626",
+            "turf": 2,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 12,
+          "BLOCKED": 1,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 18505.60000000894,
+        "calls": 813,
+        "triangles": 767930,
+        "geometries": 581,
+        "textures": 113,
+        "programs": 244,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 176373772,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 516,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-59-BLOCKED"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SOLD",
+        "normalizedPhase": "SOLD",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#8FB7D8",
+        "frameDerivation": "valid",
+        "confirmationExpected": true,
+        "logoAuthorized": true,
+        "rendered": {
+          "marker": {
+            "type": "sold-lot-confirmations",
+            "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+            "instanceId": 67,
+            "visible": true
+          },
+          "logo": {
+            "type": "sold-lot-logos",
+            "meshUuid": "381e0b2b-8486-4007-a69a-61bef2cd37f9",
+            "instanceId": 0,
+            "visible": true
+          },
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 19944,
+        "calls": 815,
+        "triangles": 767966,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 210173317,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 549,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-59-SOLD"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+        "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+        "publicIdentifier": "Q-R-21",
+        "entityPublicIdentifier": "Q-R-21",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SOLD",
+        "normalizedPhase": "SOLD",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#8FB7D8",
+        "frameDerivation": "valid",
+        "confirmationExpected": true,
+        "logoAuthorized": false,
+        "rendered": {
+          "marker": {
+            "type": "sold-lot-confirmations",
+            "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+            "instanceId": 60,
+            "visible": true
+          },
+          "frame": {
+            "batchId": 190,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 190,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 20453.20000000298,
+        "calls": 815,
+        "triangles": 767966,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 213181747,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 610,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-21-initial"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+        "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+        "publicIdentifier": "Q-R-21",
+        "entityPublicIdentifier": "Q-R-21",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "AVAILABLE",
+        "normalizedPhase": "AVAILABLE",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": null,
+        "frameDerivation": "valid",
+        "confirmationExpected": false,
+        "logoAuthorized": false,
+        "rendered": {
+          "frame": {
+            "batchId": 190,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": false,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 190,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 93,
+          "SOLD": 12,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 21903.70000000298,
+        "calls": 815,
+        "triangles": 767934,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 214464832,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 617,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-21-AVAILABLE"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+        "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+        "publicIdentifier": "Q-R-21",
+        "entityPublicIdentifier": "Q-R-21",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SALE_OPEN",
+        "normalizedPhase": "SALE_OPEN",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#D8BD70",
+        "frameDerivation": "valid",
+        "confirmationExpected": false,
+        "logoAuthorized": false,
+        "rendered": {
+          "frame": {
+            "batchId": 190,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#d8bd70"
+          },
+          "surface": {
+            "batchId": 190,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 12,
+          "SALE_OPEN": 4
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 23346.70000000298,
+        "calls": 815,
+        "triangles": 767942,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 251662773,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 645,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-21-SALE_OPEN"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+        "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+        "publicIdentifier": "Q-R-21",
+        "entityPublicIdentifier": "Q-R-21",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SOLD",
+        "normalizedPhase": "SOLD",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#8FB7D8",
+        "frameDerivation": "valid",
+        "confirmationExpected": true,
+        "logoAuthorized": false,
+        "rendered": {
+          "marker": {
+            "type": "sold-lot-confirmations",
+            "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+            "instanceId": 60,
+            "visible": true
+          },
+          "frame": {
+            "batchId": 190,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 190,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 24795.90000000596,
+        "calls": 815,
+        "triangles": 767966,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 241762926,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 678,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-21-SOLD"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+        "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+        "publicIdentifier": "Q-R-21",
+        "entityPublicIdentifier": "Q-R-21",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "AVAILABLE",
+        "normalizedPhase": "AVAILABLE",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": null,
+        "frameDerivation": "valid",
+        "confirmationExpected": false,
+        "logoAuthorized": false,
+        "rendered": {
+          "frame": {
+            "batchId": 190,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": false,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 190,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 93,
+          "SOLD": 12,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 26231,
+        "calls": 815,
+        "triangles": 767934,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 241603939,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 711,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-21-AVAILABLE"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+        "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+        "publicIdentifier": "Q-R-21",
+        "entityPublicIdentifier": "Q-R-21",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "BLOCKED",
+        "normalizedPhase": "BLOCKED",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": false,
+        "frameExpected": null,
+        "frameDerivation": "valid",
+        "confirmationExpected": false,
+        "logoAuthorized": false,
+        "rendered": {
+          "frame": {
+            "batchId": 190,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": false,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 190,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#dc2626",
+            "turf": 2,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 12,
+          "BLOCKED": 1,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 27670.20000000298,
+        "calls": 815,
+        "triangles": 767934,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 275041728,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 744,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-21-BLOCKED"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+        "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+        "publicIdentifier": "Q-R-21",
+        "entityPublicIdentifier": "Q-R-21",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SOLD",
+        "normalizedPhase": "SOLD",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#8FB7D8",
+        "frameDerivation": "valid",
+        "confirmationExpected": true,
+        "logoAuthorized": false,
+        "rendered": {
+          "marker": {
+            "type": "sold-lot-confirmations",
+            "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+            "instanceId": 60,
+            "visible": true
+          },
+          "frame": {
+            "batchId": 190,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 190,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 29119.10000000894,
+        "calls": 815,
+        "triangles": 767966,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 274698193,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 777,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "Q-R-21-SOLD"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SOLD",
+        "normalizedPhase": "SOLD",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#8FB7D8",
+        "frameDerivation": "valid",
+        "confirmationExpected": true,
+        "logoAuthorized": true,
+        "rendered": {
+          "marker": {
+            "type": "sold-lot-confirmations",
+            "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+            "instanceId": 67,
+            "visible": true
+          },
+          "logo": {
+            "type": "sold-lot-logos",
+            "meshUuid": "381e0b2b-8486-4007-a69a-61bef2cd37f9",
+            "instanceId": 0,
+            "visible": true
+          },
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 31627.5,
+        "calls": 815,
+        "triangles": 767966,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 273637539,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 900,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "resource-start"
+    },
+    {
+      "row": {
+        "projectId": "0538d132-34dd-4347-a33c-526edac7339c",
+        "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+        "publicIdentifier": "Q-R-59",
+        "entityPublicIdentifier": "Q-R-59",
+        "block": "R",
+        "segmentId": "exporural",
+        "segmentSource": "database",
+        "resolvedSegment": "exporural",
+        "canonicalRelationMatches": true,
+        "classification": "SELLABLE_LOT",
+        "isSellable": false,
+        "isCovered": false,
+        "isArchived": false,
+        "archivedAt": null,
+        "interiorMetadata": {
+          "pavilionPublicIdentifier": {
+            "type": "null",
+            "value": null
+          },
+          "pavilionModuleKey": {
+            "type": "null",
+            "value": null
+          },
+          "moduleNumber": {
+            "type": "null",
+            "value": null
+          },
+          "interiorOnly": {
+            "type": "null",
+            "value": null
+          }
+        },
+        "status": "SOLD",
+        "normalizedPhase": "SOLD",
+        "expectedRural": true,
+        "eligible": true,
+        "exclusionReasons": [],
+        "grassExpected": true,
+        "frameExpected": "#8FB7D8",
+        "frameDerivation": "valid",
+        "confirmationExpected": true,
+        "logoAuthorized": true,
+        "rendered": {
+          "marker": {
+            "type": "sold-lot-confirmations",
+            "meshUuid": "8e7b634d-4d90-49ff-83d0-89ebd51ac3f4",
+            "instanceId": 67,
+            "visible": true
+          },
+          "logo": {
+            "type": "sold-lot-logos",
+            "meshUuid": "bc7a92c6-3d6f-4ecc-b759-5266bf91fcb9",
+            "instanceId": 0,
+            "visible": true
+          },
+          "frame": {
+            "batchId": 228,
+            "meshUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+            "visible": true,
+            "color": "#8fb7d8"
+          },
+          "surface": {
+            "batchId": 228,
+            "meshUuid": "b6638b92-e216-442b-b629-67b4bbe02217",
+            "color": "#739455",
+            "turf": 1,
+            "material": "MeshStandardMaterial",
+            "visible": true,
+            "elevation": 0,
+            "opacity": 1
+          }
+        }
+      },
+      "counts": {
+        "expected": 108,
+        "recognized": 108,
+        "excluded": 0,
+        "frameFailures": 0,
+        "byStatus": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "frameUuid": "1e77c77e-1408-4092-9407-9a6331d043c8",
+      "frameGeometry": "11e8d42c-3c5d-4c5e-bd80-8a2a7c7d9b2a",
+      "stats": {
+        "at": 42961,
+        "calls": 815,
+        "triangles": 767966,
+        "geometries": 582,
+        "textures": 114,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 164890304,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1049,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "resource-end"
+    }
+  ],
+  "checks": [
+    "R59 TEST logo and smaller confirmation coexist; R21 remains sold without logo; no remote/logo authorization inferred",
+    "Q-R-59: exact received isSellable=false preserved; grass/frame/check follow AVAILABLE→SALE_OPEN→SOLD→AVAILABLE/BLOCKED; stable frame batch and geometry; no legacy lock",
+    "Q-R-21: exact received isSellable=false preserved; grass/frame/check follow AVAILABLE→SALE_OPEN→SOLD→AVAILABLE/BLOCKED; stable frame batch and geometry; no legacy lock",
+    "Five repeated status cycles retain warmed geometry/texture allocations and frame UUID",
+    "Emulated native touch at 390×844 selects R59 through frame/check (not a physical device test)"
+  ],
+  "errors": [],
+  "scope": "Authorized sanitized rural inventory. Status transitions and DEMO logo are local in-memory copies; no backend requests or commercial writes.",
+  "manifest": {
+    "revision": "working-tree",
+    "hashes": {
+      "utils/externalLotPresentation.ts": "7bab87882f7399ed72cce8ab7a8779a3383e3d9d2868e2b312bc6d8729f33cce",
+      "components/canvas/CommercialMapCanvas.tsx": "01971989533f78f547af3453629a4acdb4fdb331d7219921372b974dd474322a",
+      "components/canvas/SoldLotLocks.tsx": "946ef9da416bd70de7355dad9c95b8ecbcf200f1123c92292658c6d271409799",
+      "components/canvas/ExternalLotFrames.tsx": "06cc2efc9429020ace5a40a2a102dacbde71cc14f72ca58e219fc83d6c5a8dd0",
+      "components/canvas/exporuralTurfMaterial.ts": "7cc1307c2b5afcf4177d4eb704b8bf6ae53e490fa5ecf6622534647d8ffdf093",
+      "utils/externalLotFrameGeometry.ts": "59b47744c558ff95f8f722705b747b81eb2b0fef8c6fe4c872d1d24d0afad821",
+      "public/publicMapService.ts": "c383051a2227f8e46eb052c9ab4e4891df6cecf03b8d0aa9516e4b132337502c"
+    },
+    "fixtureHash": "4c17e49fe32c736e7b374bc9112a7d82aca1a4c45eec37e9089a19c509910e05",
+    "inventoryHash": "4c4028f2b69bbfd9ee1b6762c17a83bc0d2208f1973b355d9abea06822c7c73e",
+    "mode": "production",
+    "backend": "qa.invalid",
+    "fixture": "authorized sanitized rural inventory and current geometry; reference non-rural controls"
+  },
+  "passed": true
+}
