@@ -83,6 +83,7 @@
 @keyframes public-map-segment-enter { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 .public-map-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .public-map-legend i { display: block; width: 12px; height: 12px; border: 1px solid #495460; border-radius: 3px; }
+.public-map-legend i.is-external-lot { width: 16px; height: 16px; border-color: #66804d; background: linear-gradient(135deg, var(--grass-light), var(--grass)); box-shadow: inset 0 0 0 2px var(--frame); }
 .public-map-legend .is-selection { background: #ffec8b; border: 2px solid #142331; }
 .public-map-legend .is-context { background: #a2a2a2; }
 .public-map-details-expand { display: none; }

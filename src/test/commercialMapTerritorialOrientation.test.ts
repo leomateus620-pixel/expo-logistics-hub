@@ -3,6 +3,8 @@ import { OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features
 import { layoutTerritorialOrientation, localRoadLabelAngle, orientationBoxFits, orientationFootprint, orientationFootprintFits, orientationLevel, prepareTerritorialOrientation, roadLabelFits, TERRITORY_SYMBOLS } from '@/features/commercial-map/utils/territorialOrientation';
 import { lotPointClearance } from '@/features/commercial-map/utils/soldLotPresentation';
 import { COMMERCIAL_MAP_SEGMENT_IDS } from '@/features/commercial-map/data/commercialMapSegments';
+import type { Coordinate, MapEntity } from '@/features/commercial-map/types';
+import clipping from 'polygon-clipping';
 
 const data = prepareTerritorialOrientation(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);
 describe('orientação territorial cadastral', () => {
@@ -78,7 +80,7 @@ describe('orientação territorial cadastral', () => {
       .toEqual(data.filter(item => item.kind === 'block').map(item => item.name).sort());
     for (const label of labels) {
       expect(label.width / label.height).toBeCloseTo(ratios.get(label.id)!);
-      expect(orientationFootprintFits(label.footprint, label.outline!)).toBe(true);
+      if (!label.exteriorBlock) expect(orientationFootprintFits(label.footprint, label.outline!)).toBe(true);
       expect(Number.isFinite(label.angle)).toBe(true);
     }
     expect(labels.filter(item => item.kind === 'road').map(item => item.name)).toContain('Avenida Tuparendi');
@@ -90,5 +92,110 @@ describe('orientação territorial cadastral', () => {
     const item = data.find(item => item.name === 'Quadra D')!;
     expect(layoutTerritorialOrientation([item], [valid, empty, malformed], new Map([[item.id, 3]]))).toHaveLength(1);
     expect(layoutTerritorialOrientation([{ ...item, outline: [] }], [empty], new Map())).toEqual([]);
+  });
+
+  it('posiciona o texto inteiro de S acima e R abaixo dos lotes, sem alterar o cadastro', () => {
+    const snapshot = JSON.stringify(OFFICIAL_REFERENCE_ENTITIES);
+    const labels = layoutTerritorialOrientation(data, OFFICIAL_REFERENCE_ENTITIES, new Map());
+    const ruralLots = OFFICIAL_REFERENCE_ENTITIES.filter(entity => /^Q-[RS]-/.test(entity.publicIdentifier));
+    const points = ruralLots.flatMap(entity => entity.geometry.coordinates[0]);
+    const above = labels.filter(label => label.name === 'Quadra S');
+    const below = labels.filter(label => label.name === 'Quadra R');
+    expect(above).toHaveLength(1); expect(below).toHaveLength(1);
+    expect(Math.max(...above[0].footprint.map(point => point[1]))).toBeLessThan(Math.min(...points.map(point => point[1])));
+    const minTextX = Math.min(...below[0].footprint.map(point => point[0]));
+    const maxTextX = Math.max(...below[0].footprint.map(point => point[0]));
+    const lowerFrontier = ruralLots.flatMap(entity => clipping.intersection(entity.geometry.coordinates,
+      [[[minTextX, -1000], [maxTextX, -1000], [maxTextX, 1000], [minTextX, 1000]]]).flat(2));
+    expect(Math.min(...below[0].footprint.map(point => point[1]))).toBeGreaterThan(Math.max(...lowerFrontier.map(point => point[1])));
+    const terrain: Coordinate[][] = [[[-1000, -1000], [1000, -1000], [1000, 1000], [-1000, 1000]]];
+    const blockers = OFFICIAL_REFERENCE_ENTITIES.filter(entity => entity.metadata.renderMode !== 'outline'
+      && !['QUADRA', 'GREEN_AREA'].includes(entity.classification)).map(entity => entity.geometry.coordinates);
+    for (const label of [...above, ...below]) {
+      expect(orientationFootprintFits(label.footprint, terrain, blockers)).toBe(true);
+      expect(label.height).toBe(2.05);
+    }
+    expect(JSON.stringify(OFFICIAL_REFERENCE_ENTITIES)).toBe(snapshot);
+  });
+
+  it('desvia o footprint externo de cenografia fornecida pela cena e mantém âncoras determinísticas', () => {
+    const ratios = new Map(data.map(item => [item.id, 3.4]));
+    const initial = layoutTerritorialOrientation(data, OFFICIAL_REFERENCE_ENTITIES, ratios);
+    const old = initial.find(label => label.name === 'Quadra S')!;
+    const canopy = [orientationFootprint(old.anchor, old.width + 1, old.height + 1, old.angle)];
+    const actual = layoutTerritorialOrientation(data, OFFICIAL_REFERENCE_ENTITIES, ratios, [canopy]);
+    const moved = actual.find(label => label.name === 'Quadra S')!;
+    expect(moved).toBeDefined(); expect(moved.anchor).not.toEqual(old.anchor);
+    expect(orientationFootprintFits(moved.footprint,
+      [[[-1000, -1000], [1000, -1000], [1000, 1000], [-1000, 1000]]], [canopy])).toBe(true);
+    expect(layoutTerritorialOrientation(data, OFFICIAL_REFERENCE_ENTITIES, ratios, [canopy])).toEqual(actual);
+  });
+
+  it('encaixa os glifos e contornos no gramado estreito sem reduzir fonte ou tratar estacionamento como livre', () => {
+    const item = data.find(item => item.name === 'Quadra S')!;
+    const edge = item.exteriorBlock!.boundaryZ;
+    const parking: Coordinate[][] = [[[-100, edge - 20], [100, edge - 20], [100, edge - 1.6], [-100, edge - 1.6]]];
+    const labels = layoutTerritorialOrientation([item], OFFICIAL_REFERENCE_ENTITIES, new Map([[item.id, 3.4]]), [], [parking],
+      new Map([[item.id, { left: .04, right: .96, top: .2, bottom: .8 }]]));
+    expect(labels).toHaveLength(1);
+    const label = labels[0];
+    expect(label.height).toBe(2.05);
+    expect(Math.max(...label.inkFootprint!.map(p => p[1]))).toBeLessThan(edge);
+    expect(Math.min(...label.inkFootprint!.map(p => p[1]))).toBeGreaterThan(edge - 1.6);
+    expect(label.footprint[0][1]).toBeLessThan(label.inkFootprint![0][1]);
+  });
+
+  it('deduplica trechos pela rua canônica, preservando vias distintas com o mesmo nome', () => {
+    const original = OFFICIAL_REFERENCE_ENTITIES.find(entity => entity.publicIdentifier === 'RUA-URUGUAI')!;
+    const east = OFFICIAL_REFERENCE_ENTITIES.find(entity => entity.publicIdentifier === 'RUA-URUGUAI-LESTE')!;
+    const unrelated = { ...original, id: 'other-road', publicIdentifier: 'OTHER-URUGUAI' };
+    const roads = prepareTerritorialOrientation([original, east, unrelated], [], [east, original, unrelated]);
+    expect(roads).toHaveLength(2);
+    expect(roads.every(item => item.name === 'Rua Uruguai')).toBe(true);
+    expect(new Set(roads.map(item => item.canonicalRoadId)).size).toBe(2);
+    const reversed = prepareTerritorialOrientation([original, east, unrelated], [], [unrelated, original, east]);
+    expect(reversed.find(item => item.canonicalRoadId === 'RUA-URUGUAI')?.anchor)
+      .toEqual(roads.find(item => item.canonicalRoadId === 'RUA-URUGUAI')?.anchor);
+  });
+
+  it('alinha vias paralelas por faixa comum, mantendo cada texto dentro da própria via e longe de cruzamentos', () => {
+    const template = OFFICIAL_REFERENCE_ENTITIES.find(entity => entity.classification === 'ROAD')!;
+    const road = (id: string, x: number, z: number, width: number, depth: number): MapEntity => ({
+      ...template, id, publicIdentifier: id, name: id, metadata: {},
+      geometry: { ...template.geometry, coordinates: [[[x, z], [x + width, z], [x + width, z + depth], [x, z + depth]]] },
+    });
+    const entities = [road('Horizontal A', 0, 0, 40, 2), road('Horizontal B', 0, 8, 40, 2),
+      road('Vertical A', 50, 0, 2, 40), road('Vertical B', 58, 0, 2, 40)];
+    const items = prepareTerritorialOrientation(entities, []);
+    const labels = layoutTerritorialOrientation(items, entities, new Map(items.map(item => [item.id, 4])));
+    expect(labels).toHaveLength(4);
+    expect(labels[0].anchor[0]).toBeCloseTo(labels[1].anchor[0]);
+    expect(labels[2].anchor[1]).toBeCloseTo(labels[3].anchor[1]);
+    for (const label of labels) expect(orientationFootprintFits(label.footprint, label.outline!)).toBe(true);
+    const crossing = road('Crossing', 19, -1, 2, 12);
+    const blocked = layoutTerritorialOrientation(items, [...entities, crossing], new Map(items.map(item => [item.id, 4])));
+    expect(blocked[0].anchor[0]).toBeCloseTo(blocked[1].anchor[0]);
+    for (const label of blocked.slice(0, 2)) {
+      expect(orientationFootprintFits(label.footprint, label.outline!, [crossing.geometry.coordinates])).toBe(true);
+      expect(label.height).toBeCloseTo(labels[0].height);
+    }
+  });
+
+  it('usa a mesma faixa transversal livre em ruas paralelas com copas na margem, sem dispersar nomes ou reduzir fonte', () => {
+    const template = OFFICIAL_REFERENCE_ENTITIES.find(entity => entity.classification === 'ROAD')!;
+    const entities = [0, 8, 16].map((z, index): MapEntity => ({ ...template, id: `road-${index}`,
+      publicIdentifier: `road-${index}`, name: `Rua ${index}`, metadata: {}, geometry: { ...template.geometry,
+        coordinates: [[[0, z], [40, z], [40, z + 2], [0, z + 2]]] } }));
+    const items = prepareTerritorialOrientation(entities, []);
+    const crowns: Coordinate[][][] = [0, 8, 16].map(z => [[[0, z + 1.15], [40, z + 1.15], [40, z + 2], [0, z + 2]]]);
+    const labels = layoutTerritorialOrientation(items, entities, new Map(items.map(item => [item.id, 4])), crowns, [],
+      new Map(items.map(item => [item.id, { left: .04, right: .96, top: .2, bottom: .8 }])));
+    expect(labels).toHaveLength(3);
+    for (const [index, label] of labels.entries()) {
+      expect(label.anchor[0]).toBeCloseTo(20);
+      expect(label.anchor[1] - index * 8).toBeCloseTo(labels[0].anchor[1]);
+      expect(label.height).toBeGreaterThan(.819);
+      expect(orientationFootprintFits(label.inkFootprint!, label.outline!, crowns)).toBe(true);
+    }
   });
 });

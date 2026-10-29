@@ -10,3 +10,9 @@ export function disposeInstancedMesh(mesh: THREE.InstancedMesh | null | undefine
   if (!mesh) return;
   THREE.InstancedMesh.prototype.dispose.call(mesh);
 }
+
+/** Batched primitives have the same R3F dispose={null} ownership contract. */
+export function disposeBatchedMesh(mesh: THREE.BatchedMesh | null | undefined) {
+  if (!mesh) return;
+  THREE.BatchedMesh.prototype.dispose.call(mesh);
+}

@@ -7,6 +7,8 @@ on:
       - 'src/components/portal/PortalPrimaryEntry.tsx'
       - 'src/pages/commissions/CommissionPortalPage.tsx'
       - 'src/test/commercialMap*'
+      - 'src/test/externalLot*'
+      - 'src/test/territorialOrientation*'
       - 'scripts/commercial-map-performance/**'
       - 'scripts/spatial-cleanup/**'
       - 'docs/validation/spatial-cleanup/**'
@@ -55,6 +57,12 @@ jobs:
           src/test/commercialMapGateNineCommunicationTower.test.ts
           src/test/commercialMapCameraTransition.test.ts
           src/test/commercialMapViewport.test.ts
+          src/test/commercialMapTerritorialOrientation.test.ts
+          src/test/externalLotFrameGeometry.test.ts
+          src/test/externalLotPresentation.test.ts
+          src/test/externalLotRendering.test.tsx
+          src/test/territorialOrientationInputs.test.ts
+          src/test/territorialOrientationRealScene.test.ts
       - run: npm run typecheck
       - name: Visit, authorized prewarm and full-content quality contracts
         run: >-

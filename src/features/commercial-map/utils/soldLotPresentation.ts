@@ -15,6 +15,10 @@ export interface SoldLotSurface {
   id: string;
   status: CommercialStatus | null;
   logoUrl?: string | null;
+  /** Only eligible external lots use a confirmation; interiors keep their lock. */
+  confirmation?: boolean;
+  /** Public availability deliberately merges open/confirmed sales; never assert a signature. */
+  hideMarker?: boolean;
   geometry: Pick<PolygonGeometry, 'coordinates' | 'elevation' | 'extrusionHeight'>;
   /** Optional cadastral-space anchor away from an existing central number. */
   preferredAnchor?: Coordinate;

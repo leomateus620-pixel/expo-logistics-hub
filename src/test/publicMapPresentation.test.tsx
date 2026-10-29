@@ -20,6 +20,15 @@ describe('public-only three-condition presentation',()=>{
     expect(screen.getByLabelText('Legenda de disponibilidade').querySelectorAll('i')).toHaveLength(3);
     for(const name of ['Disponível','Vendido','Bloqueado'])expect(screen.getByText(name)).toBeInTheDocument();
     expect(screen.queryByText('Venda em aberto')).toBeNull();
+    const swatches=screen.getByLabelText('Legenda de disponibilidade').querySelectorAll('.is-external-lot');
+    expect(swatches).toHaveLength(['exporural','industria-comercio-servicos-externo','espaco-automovel'].includes(area.slug)?2:0);
+    // The public contract intentionally combines pending and confirmed sales.
+    // A seal would incorrectly assert a signature that this payload cannot prove.
+    expect(screen.getByLabelText('Legenda de disponibilidade').querySelector('svg')).toBeNull();
+  });
+  it('does not apply external swatches to an industry scope that can include pavilion modules',()=>{
+    render(<PublicMapLegend area={{slug:'industria-comercio-servicos',segmentSlug:'industria-comercio-servicos',kind:'SEGMENT',name:'ICS',shortName:'ICS'}}/>);
+    expect(screen.getByLabelText('Legenda de disponibilidade').querySelector('.is-external-lot')).toBeNull();
   });
   it('presents pending sales in blue without buyer, order/contract or pending logo even if a stale endpoint returns one',()=>{
     const hook=renderHook(()=>usePublicCanvasLots([lot],{lot:'https://example.invalid/pending.webp'}));
