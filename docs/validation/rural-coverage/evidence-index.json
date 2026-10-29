@@ -1,0 +1,1088 @@
+{
+  "archive": "/tmp/rural-coverage-full-evidence-2026-10-29",
+  "scope": "Original complete local captures and measurements; selected lossless WebP files and full aggregate report.json.gz are versioned. Every converted image has identical decoded RGBA bytes.",
+  "entries": [
+    {
+      "path": "baseline-medium/automotive-top.png",
+      "bytes": 1065129,
+      "sha256": "3c98a64a79e12472ba30e3dd97bcafd851d34ace833093c8a83f2feb063e96ea",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/automotive-top.png",
+      "versioned": "baseline-medium/automotive-top.webp",
+      "derived": {
+        "bytes": 761704,
+        "sha256": "d9d1504ab6c7f12f29d1922722f0fcbd769feea920328e871145e21cb293ac91",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "29776ca356b6d63c4435957d7ec5c6898edd091cac8e3ef3fe087e4c0b8d8ced",
+        "originalPixelsSha256": "29776ca356b6d63c4435957d7ec5c6898edd091cac8e3ef3fe087e4c0b8d8ced",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "baseline-medium/exporural-cutouts-close.png",
+      "bytes": 1167689,
+      "sha256": "0a436f0d61a87276a902fb30a48cb4a626a7064957f794e07b0a5ec5fbec0f36",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/exporural-cutouts-close.png",
+      "versioned": null
+    },
+    {
+      "path": "baseline-medium/exporural-mobile.png",
+      "bytes": 400279,
+      "sha256": "bb84bd3335c3dbeec33a8ac711be2d8f812bd0e07dc15e7db3e833237a67557b",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/exporural-mobile.png",
+      "versioned": "baseline-medium/exporural-mobile.webp",
+      "derived": {
+        "bytes": 286044,
+        "sha256": "60d8ab5131a3bc887ad1a60cbbbb65061d15b4e64db74d5c95b2736458ecb843",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "8b37971cf3d2a7ea1fdb562e0b6aa41dc0e2eb8d6acbf40acc68b410b71cc692",
+        "originalPixelsSha256": "8b37971cf3d2a7ea1fdb562e0b6aa41dc0e2eb8d6acbf40acc68b410b71cc692",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 390,
+          "height": 844,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 1316640
+        }
+      }
+    },
+    {
+      "path": "baseline-medium/exporural-night.png",
+      "bytes": 1152528,
+      "sha256": "405fd1790ae57887fa1fe7f16f11fb7fac647b5d938a3cb776ac7ef8b1f77468",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/exporural-night.png",
+      "versioned": "baseline-medium/exporural-night.webp",
+      "derived": {
+        "bytes": 877070,
+        "sha256": "354d595e9fadbe360b385a4b7d6e3fdfdfac4d30b1f7596e6b6a36bf3bd4cfe7",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "b2b80967eae1a77f9d31fc4cfed8f54dc458640f91379e23b48d29180229f9ca",
+        "originalPixelsSha256": "b2b80967eae1a77f9d31fc4cfed8f54dc458640f91379e23b48d29180229f9ca",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "baseline-medium/exporural-oblique.png",
+      "bytes": 1467592,
+      "sha256": "4db88b968a9bacb9363e7ee2a1cea2d78d141503c042be810441d33063d1cd85",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/exporural-oblique.png",
+      "versioned": "baseline-medium/exporural-oblique.webp",
+      "derived": {
+        "bytes": 1036858,
+        "sha256": "23d7b0b251e34a8aff3a2df64a1a6485eecbe3787ecb1b104eddcaa5ade1f937",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "10507471168a463f9d6a22534255dca93aa6c53af2adfd144679acab6d950d3a",
+        "originalPixelsSha256": "10507471168a463f9d6a22534255dca93aa6c53af2adfd144679acab6d950d3a",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "baseline-medium/exporural-rain.png",
+      "bytes": 1489062,
+      "sha256": "ac28a2fa07d2cf44f2044043bbb359e147e992e78f680d8fd26065736cdd7e43",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/exporural-rain.png",
+      "versioned": null
+    },
+    {
+      "path": "baseline-medium/exporural-top.png",
+      "bytes": 1284409,
+      "sha256": "336a7e468f8df37a11de182a63d41aa83da2d50e378e6f045ad250e5782757a5",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/exporural-top.png",
+      "versioned": "baseline-medium/exporural-top.webp",
+      "derived": {
+        "bytes": 891912,
+        "sha256": "622c2eacf702477b5b54e8dee8f81801df4128d498bef0a49244feff9ca9d8a8",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "f9115237a71944f86263184c3364a335b26ac77a15a54176d8602ad92aa4019a",
+        "originalPixelsSha256": "f9115237a71944f86263184c3364a335b26ac77a15a54176d8602ad92aa4019a",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "baseline-medium/filtered.png",
+      "bytes": 1320530,
+      "sha256": "e5f115506ed3c645a5fbff1f6aade7e2899f466806433167a6c1038a60efe6e9",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/filtered.png",
+      "versioned": null
+    },
+    {
+      "path": "baseline-medium/industry-close.png",
+      "bytes": 1328595,
+      "sha256": "ca2133f523ab3f67da9050ffb2cb9a2988d010a4d65134142508e9e33441f444",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/industry-close.png",
+      "versioned": null,
+      "derived": {
+        "bytes": 962974,
+        "sha256": "a1631915ce6494fa4cdf07c17080b97bf79d3402e9b9e08b72c9de67297fa4b2",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "a6df53163c03008a83888b50cfe595fae5fae9338203c740c0d66fa5e4fc38c1",
+        "originalPixelsSha256": "a6df53163c03008a83888b50cfe595fae5fae9338203c740c0d66fa5e4fc38c1",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        },
+        "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/industry-close.webp"
+      }
+    },
+    {
+      "path": "baseline-medium/industry-mobile.png",
+      "bytes": 356887,
+      "sha256": "3b84a5dc98d53370d419c65e1a3cbccc325dbee8048c13bca65d186818ef1b4c",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/industry-mobile.png",
+      "versioned": null
+    },
+    {
+      "path": "baseline-medium/industry-roads-top.png",
+      "bytes": 1191574,
+      "sha256": "ec0afe88499dd85d69da302b0583a6ec841e09b8fda08879e9fd90591ec361cb",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/industry-roads-top.png",
+      "versioned": "baseline-medium/industry-roads-top.webp",
+      "derived": {
+        "bytes": 843920,
+        "sha256": "e8915923ec2b1bc5e56b7b41ba722b36ddc327fcfb83c13a870b402853d55c14",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "c9c50668b921de2bb0132e6beadc78c27b31e1c296e09998a52e0f37bfee40f7",
+        "originalPixelsSha256": "c9c50668b921de2bb0132e6beadc78c27b31e1c296e09998a52e0f37bfee40f7",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "baseline-medium/overview.png",
+      "bytes": 1535177,
+      "sha256": "dc3ebf80fc63d8fd43b21d025b6a70944356a1ef6775ec57e0cdae0a4c985eaf",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/overview.png",
+      "versioned": null
+    },
+    {
+      "path": "baseline-medium/public-exporural.png",
+      "bytes": 503031,
+      "sha256": "0629e2f946158213ae59c0bc6fb8ba04b65e89418e7678bcc8a03540517eec11",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/public-exporural.png",
+      "versioned": null
+    },
+    {
+      "path": "baseline-medium/public-industry.png",
+      "bytes": 915531,
+      "sha256": "0a45a33b228b1010aaafe7df338a956bcdf236552810bf5aa3700840576c11c3",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/public-industry.png",
+      "versioned": null
+    },
+    {
+      "path": "baseline-medium/public-r59.png",
+      "bytes": 482590,
+      "sha256": "310851025cd2cb7e5acf985d2f9f0acc8cd457afb3b98006aa14da7c5bd99446",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/public-r59.png",
+      "versioned": null,
+      "derived": {
+        "bytes": 307610,
+        "sha256": "833f3c45cb2a1c6748b4adef0d1f67657dd55822f6a8cf9a9053c5f607a6e454",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "66a31b8c4ec1f3d55765e0dc32b3c82fe4e2dbe5e655bd1e65314daa50491c5b",
+        "originalPixelsSha256": "66a31b8c4ec1f3d55765e0dc32b3c82fe4e2dbe5e655bd1e65314daa50491c5b",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        },
+        "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/public-r59.webp"
+      }
+    },
+    {
+      "path": "baseline-medium/r21-close.png",
+      "bytes": 1232892,
+      "sha256": "981d9ef8c82c613d6be1b5a2b748b8c42d8f5a1868eacb9378c638e15c98addb",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/r21-close.png",
+      "versioned": "baseline-medium/r21-close.webp",
+      "derived": {
+        "bytes": 877552,
+        "sha256": "2a315c84f17e814c74ee9f9f0f64b411a632e046c570f90a971db7575fd862b9",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "e7b578190298015b6425c571737f6d771e7350268d83fa66d6f54b4f13aed8ce",
+        "originalPixelsSha256": "e7b578190298015b6425c571737f6d771e7350268d83fa66d6f54b4f13aed8ce",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "baseline-medium/r40-control.png",
+      "bytes": 1255726,
+      "sha256": "2a88e78695767c9fa6041155d3ce86d94a89e9253297ae68324ae49e7b1829f6",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/r40-control.png",
+      "versioned": null,
+      "derived": {
+        "bytes": 890580,
+        "sha256": "8de3b128274aa6051765cd4d3fc7fc009a6a29882f532ef05f6a9f07f07efa3f",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "508bae0eb11cd77f83afc8d3a21842c4ee0d9cd913279dfc1bb8d3b3cd48654f",
+        "originalPixelsSha256": "508bae0eb11cd77f83afc8d3a21842c4ee0d9cd913279dfc1bb8d3b3cd48654f",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        },
+        "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/r40-control.webp"
+      }
+    },
+    {
+      "path": "baseline-medium/r59-close.png",
+      "bytes": 1231727,
+      "sha256": "3c5cde46b065af0fbba54c89fd1284caff221290a6fe85c790654f05d78ffa88",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/r59-close.png",
+      "versioned": "baseline-medium/r59-close.webp",
+      "derived": {
+        "bytes": 884522,
+        "sha256": "8b4212e38c9aa9fea6e6bac9b26318447cb723c9dd08bf5141a91a9280f3820c",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "5279e564b9dbfa4ad3ce5ce56f361c13f541e1e6bb4e93cab5cf143fb3330385",
+        "originalPixelsSha256": "5279e564b9dbfa4ad3ce5ce56f361c13f541e1e6bb4e93cab5cf143fb3330385",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "baseline-medium/report.json",
+      "bytes": 2261297,
+      "sha256": "a0e7b82db3713dd56a52abb8e97e4057b90344fafdb0045cca246872e569dc1b",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/report.json",
+      "versioned": "baseline-medium/report.json.gz",
+      "gzipSha256": "a492a5d1944a1403389e4105c7b1f5a1fc232bdd4229e3a322d518197e3971a5"
+    },
+    {
+      "path": "baseline-medium/selection-closed.png",
+      "bytes": 1328595,
+      "sha256": "ca2133f523ab3f67da9050ffb2cb9a2988d010a4d65134142508e9e33441f444",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/selection-closed.png",
+      "versioned": null
+    },
+    {
+      "path": "baseline-medium/selection.png",
+      "bytes": 1350351,
+      "sha256": "16497dd255454c5994020690fa48d6092bf2328df64023f710105138ebc35543",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/baseline-medium/selection.png",
+      "versioned": null
+    },
+    {
+      "path": "candidate-medium/automotive-top.png",
+      "bytes": 1065129,
+      "sha256": "3c98a64a79e12472ba30e3dd97bcafd851d34ace833093c8a83f2feb063e96ea",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/automotive-top.png",
+      "versioned": "candidate-medium/automotive-top.webp",
+      "derived": {
+        "bytes": 761704,
+        "sha256": "d9d1504ab6c7f12f29d1922722f0fcbd769feea920328e871145e21cb293ac91",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "29776ca356b6d63c4435957d7ec5c6898edd091cac8e3ef3fe087e4c0b8d8ced",
+        "originalPixelsSha256": "29776ca356b6d63c4435957d7ec5c6898edd091cac8e3ef3fe087e4c0b8d8ced",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "candidate-medium/exporural-cutouts-close.png",
+      "bytes": 961075,
+      "sha256": "a9390b52da28dd786065251b9c0342d7ead7e8ddf063bb1ee438dfd92b18621a",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/exporural-cutouts-close.png",
+      "versioned": null
+    },
+    {
+      "path": "candidate-medium/exporural-mobile.png",
+      "bytes": 387260,
+      "sha256": "a30c36f67c41fe23c6d1bb8db65ab8a3ccb76d4b795007c904b04ea7936ae4c3",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/exporural-mobile.png",
+      "versioned": "candidate-medium/exporural-mobile.webp",
+      "derived": {
+        "bytes": 274576,
+        "sha256": "2ed6ed6790f177a645716f072eeb6947a189def322ea4d299b55b90623968eaf",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "8f2b6984ad1dd18c0a9ac81e702af85bab72ba72c9f6bcd20f277c86fea9745a",
+        "originalPixelsSha256": "8f2b6984ad1dd18c0a9ac81e702af85bab72ba72c9f6bcd20f277c86fea9745a",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 390,
+          "height": 844,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 1316640
+        }
+      }
+    },
+    {
+      "path": "candidate-medium/exporural-night.png",
+      "bytes": 1132992,
+      "sha256": "1482ce0669cb80e59898ffa6aebdd1416e8f67cc4871810a3754e889c5cb5204",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/exporural-night.png",
+      "versioned": "candidate-medium/exporural-night.webp",
+      "derived": {
+        "bytes": 858804,
+        "sha256": "f2b354400a1d09d62421628baed4b5e75454294e2cbd6ed3160d6a8ba78fa602",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "d1f7a152a9cfd1ea28fbdef5382a2d0ee8020a849c88bc0c75afc5f261162534",
+        "originalPixelsSha256": "d1f7a152a9cfd1ea28fbdef5382a2d0ee8020a849c88bc0c75afc5f261162534",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "candidate-medium/exporural-oblique.png",
+      "bytes": 1428730,
+      "sha256": "860bdbc7035ac1002aa6ee15c04715a0c631b11909df36148f2783455cc8cc96",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/exporural-oblique.png",
+      "versioned": "candidate-medium/exporural-oblique.webp",
+      "derived": {
+        "bytes": 995280,
+        "sha256": "3b3c6cfb45aff924ea69dcd715ef327919dd68833b58695bf252d46e86ed80ea",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "823797c95268108ae6380fbf9c6a9728c5ea22c211bb13eece97f7a7494260c3",
+        "originalPixelsSha256": "823797c95268108ae6380fbf9c6a9728c5ea22c211bb13eece97f7a7494260c3",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "candidate-medium/exporural-rain.png",
+      "bytes": 1437753,
+      "sha256": "49b815d00d439316cb0ead2671871f2d49a9df9dbefd241354a340e003b49973",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/exporural-rain.png",
+      "versioned": null
+    },
+    {
+      "path": "candidate-medium/exporural-top.png",
+      "bytes": 1265325,
+      "sha256": "743248ee3fefefaa2992a7a8602589f561796ac45ab58d0d9d3a7430b6ee0c75",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/exporural-top.png",
+      "versioned": "candidate-medium/exporural-top.webp",
+      "derived": {
+        "bytes": 876916,
+        "sha256": "c296bb1ed530e66cb224a7891df154c93e2fa647c1e89f9d49add45610837806",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "dc415f5749993b793a1281e68e630d7bfaa9fdae02486bc5e467a46e94db43ab",
+        "originalPixelsSha256": "dc415f5749993b793a1281e68e630d7bfaa9fdae02486bc5e467a46e94db43ab",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "candidate-medium/filtered.png",
+      "bytes": 1320530,
+      "sha256": "e5f115506ed3c645a5fbff1f6aade7e2899f466806433167a6c1038a60efe6e9",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/filtered.png",
+      "versioned": null
+    },
+    {
+      "path": "candidate-medium/industry-close.png",
+      "bytes": 1328595,
+      "sha256": "ca2133f523ab3f67da9050ffb2cb9a2988d010a4d65134142508e9e33441f444",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/industry-close.png",
+      "versioned": null,
+      "derived": {
+        "bytes": 962974,
+        "sha256": "a1631915ce6494fa4cdf07c17080b97bf79d3402e9b9e08b72c9de67297fa4b2",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "a6df53163c03008a83888b50cfe595fae5fae9338203c740c0d66fa5e4fc38c1",
+        "originalPixelsSha256": "a6df53163c03008a83888b50cfe595fae5fae9338203c740c0d66fa5e4fc38c1",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        },
+        "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/industry-close.webp"
+      }
+    },
+    {
+      "path": "candidate-medium/industry-mobile.png",
+      "bytes": 356887,
+      "sha256": "3b84a5dc98d53370d419c65e1a3cbccc325dbee8048c13bca65d186818ef1b4c",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/industry-mobile.png",
+      "versioned": null
+    },
+    {
+      "path": "candidate-medium/industry-roads-top.png",
+      "bytes": 1191574,
+      "sha256": "ec0afe88499dd85d69da302b0583a6ec841e09b8fda08879e9fd90591ec361cb",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/industry-roads-top.png",
+      "versioned": "candidate-medium/industry-roads-top.webp",
+      "derived": {
+        "bytes": 843920,
+        "sha256": "e8915923ec2b1bc5e56b7b41ba722b36ddc327fcfb83c13a870b402853d55c14",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "c9c50668b921de2bb0132e6beadc78c27b31e1c296e09998a52e0f37bfee40f7",
+        "originalPixelsSha256": "c9c50668b921de2bb0132e6beadc78c27b31e1c296e09998a52e0f37bfee40f7",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "candidate-medium/overview.png",
+      "bytes": 1530405,
+      "sha256": "fa9b69e3b970733204614ee579e75b1c71077b1a416e6c647405d826342ee303",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/overview.png",
+      "versioned": null
+    },
+    {
+      "path": "candidate-medium/public-exporural.png",
+      "bytes": 541875,
+      "sha256": "24e03b89dffeeba3f32a14875c94a58b635aa3d45fe2f8667515bf862a4e12d2",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/public-exporural.png",
+      "versioned": null
+    },
+    {
+      "path": "candidate-medium/public-industry.png",
+      "bytes": 915531,
+      "sha256": "0a45a33b228b1010aaafe7df338a956bcdf236552810bf5aa3700840576c11c3",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/public-industry.png",
+      "versioned": null
+    },
+    {
+      "path": "candidate-medium/public-r59.png",
+      "bytes": 835150,
+      "sha256": "3878398b30cc89ee3ff364aa759c4ebe2e28cc188ecee3eedefc4301c0c24b02",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/public-r59.png",
+      "versioned": null,
+      "derived": {
+        "bytes": 555960,
+        "sha256": "ee26bb1102f4ad5d744b5701ea4091bffafb098f5415916557951604f6f714d8",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "702d05907fc52330ddb4b4ef25460e0dbd360885e178a0ac019307ef11a91f63",
+        "originalPixelsSha256": "702d05907fc52330ddb4b4ef25460e0dbd360885e178a0ac019307ef11a91f63",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        },
+        "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/public-r59.webp"
+      }
+    },
+    {
+      "path": "candidate-medium/r21-close.png",
+      "bytes": 958088,
+      "sha256": "76602cfe6b1bde612957678813f39f8df6a718c79bcebcd99f10c27e6c2abdd7",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/r21-close.png",
+      "versioned": "candidate-medium/r21-close.webp",
+      "derived": {
+        "bytes": 683860,
+        "sha256": "fdace16980238d86f02cb420cd647bd9d7479df0caae92efe06e5cfecbe34c50",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "5c28c818e9e83bb50965564fab32f93cfb033db116f6dbfca4d8e1e43c07f22d",
+        "originalPixelsSha256": "5c28c818e9e83bb50965564fab32f93cfb033db116f6dbfca4d8e1e43c07f22d",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "candidate-medium/r40-control.png",
+      "bytes": 1018452,
+      "sha256": "f2a37ad713f1d9119a56f62f848e21115973bf00546eb7deec6d1ed670728610",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/r40-control.png",
+      "versioned": null,
+      "derived": {
+        "bytes": 741318,
+        "sha256": "88002160bac298d0c4e61389bfb1f715872f9c7b377966201e58a376ec78bf86",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "d151ef4e617d229993742f00b164fea42f0529846ebf93ebc3c08cbf8786c974",
+        "originalPixelsSha256": "d151ef4e617d229993742f00b164fea42f0529846ebf93ebc3c08cbf8786c974",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        },
+        "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/r40-control.webp"
+      }
+    },
+    {
+      "path": "candidate-medium/r59-close.png",
+      "bytes": 945986,
+      "sha256": "bc1667a716bd6833412e8e1388b0d1583d9df514e50df7482b31e67617867a3c",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/r59-close.png",
+      "versioned": "candidate-medium/r59-close.webp",
+      "derived": {
+        "bytes": 676740,
+        "sha256": "7bec8bca8e1ea00826829c8e4cd7262d298f7582a326201d20df5f5e0779cf31",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "436028b867def239d53f09d7b5f2ece519f130e0e768ee7a10245dfa4bae6753",
+        "originalPixelsSha256": "436028b867def239d53f09d7b5f2ece519f130e0e768ee7a10245dfa4bae6753",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 1280,
+          "height": 800,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 4096000
+        }
+      }
+    },
+    {
+      "path": "candidate-medium/report.json",
+      "bytes": 58053223,
+      "sha256": "569a4f2ca847b72e6930fccfa86d6cf76c5885ae65646feebaf408577b962e98",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/report.json",
+      "versioned": "candidate-medium/report.json.gz",
+      "gzipSha256": "e853874e64fa7572e74b3af4fd648be63df73c9bbe28e706b8d92956d491fba2"
+    },
+    {
+      "path": "candidate-medium/selection-closed.png",
+      "bytes": 1328595,
+      "sha256": "ca2133f523ab3f67da9050ffb2cb9a2988d010a4d65134142508e9e33441f444",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/selection-closed.png",
+      "versioned": null
+    },
+    {
+      "path": "candidate-medium/selection.png",
+      "bytes": 1018534,
+      "sha256": "f23868a71080120c4f007a5b104a284d086520b57ad6709df344f5841dec123a",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/candidate-medium/selection.png",
+      "versioned": null
+    },
+    {
+      "path": "functional/r59-mobile-touch.png",
+      "bytes": 468090,
+      "sha256": "c6a1efc1828040c2563e34ae7f68c36f9dd74bf8a90d23b920b5accd9a41db7f",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/functional/r59-mobile-touch.png",
+      "versioned": "functional/r59-mobile-touch.webp",
+      "derived": {
+        "bytes": 346194,
+        "sha256": "6ae77da0e0835b8c086d791f0f340d2b6140aba4c513bbe36507bf39ad38ef1f",
+        "format": "WebP lossless",
+        "decodedPixelsSha256": "c0a39c19f1c0506f93754eda649c197e914dda85c4e4c9771efaf1de8e3e5981",
+        "originalPixelsSha256": "c0a39c19f1c0506f93754eda649c197e914dda85c4e4c9771efaf1de8e3e5981",
+        "pixelIdentical": true,
+        "info": {
+          "format": "raw",
+          "width": 390,
+          "height": 844,
+          "channels": 4,
+          "depth": "uchar",
+          "premultiplied": false,
+          "hasAlpha": true,
+          "size": 1316640
+        }
+      }
+    },
+    {
+      "path": "functional/report.json",
+      "bytes": 54731,
+      "sha256": "663e46349707fe1f8b192edafe84ff1d080b9b41df5eb23e9d64b9a91484ede6",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/functional/report.json",
+      "versioned": "functional/report.json"
+    },
+    {
+      "path": "performance/baseline-medium-0-private-0.json",
+      "bytes": 33678,
+      "sha256": "94da599822ca869dfe4e916274c107687393c6c6740275bc1dbb61b15fec5bc9",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-0-private-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-0-private-1.json",
+      "bytes": 33995,
+      "sha256": "8931b5b63c29c566b763044e579ffce3e623aae3a43355e586fb9d8515fee01c",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-0-private-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-0-private-2.json",
+      "bytes": 33669,
+      "sha256": "95549d94d8e6466f492cfc2f88799f937d702c6715cdc7af9b2af8b88d2911b0",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-0-private-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-0-public-0.json",
+      "bytes": 33669,
+      "sha256": "3a75b1714608c3018eb06da02acc2e546161b581c8332f6d45272507e5352517",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-0-public-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-0-public-1.json",
+      "bytes": 33483,
+      "sha256": "704d24192f534999a82f223a8c862e1aef66179df603ef5bd15bd3f6b5175032",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-0-public-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-0-public-2.json",
+      "bytes": 33552,
+      "sha256": "af97e3359da1bd8e54dfb0289d9c9073af73c862137729f9b352ed983a48d63f",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-0-public-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-3-private-0.json",
+      "bytes": 33732,
+      "sha256": "091898412c045c74ab15ab6c11cfd4b30875dc4e2ab87a8fe6ddc989f4f5ac32",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-3-private-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-3-private-1.json",
+      "bytes": 33482,
+      "sha256": "d71d754b3ee7b592a243297e9b2252551ad7edc9b6d1b2104af4f8752f007a85",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-3-private-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-3-private-2.json",
+      "bytes": 34023,
+      "sha256": "600aee2639c83ee18ba77df2c839510491d43812e5d5715a0d2660a7cffce740",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-3-private-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-3-public-0.json",
+      "bytes": 33933,
+      "sha256": "7d2ede01035adeffe70a8476185c00140bc3d1e25fd04d5b8580e902a32121d2",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-3-public-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-3-public-1.json",
+      "bytes": 33522,
+      "sha256": "249b7b103801ea1a8d57e84fe6930d24ff911f2edf397b59d909edf289f04b16",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-3-public-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/baseline-medium-3-public-2.json",
+      "bytes": 33555,
+      "sha256": "a4ce2a44bf0c1dadc3af2c91136c24ad172c07cc31017998584c72d088787462",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/baseline-medium-3-public-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-1-private-0.json",
+      "bytes": 33551,
+      "sha256": "87312d0943c15c6e897f2002c16b882a0c01e379bb1e7c18c6dc925a80115523",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-1-private-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-1-private-1.json",
+      "bytes": 33639,
+      "sha256": "ac2235109adf77f89030401ae9c9f5a3d4d71318b297432458ec113d24f06940",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-1-private-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-1-private-2.json",
+      "bytes": 33560,
+      "sha256": "442fc61b0197aa6a4ac435b3767d733ec89769e94d94073c91ce69f2518397f3",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-1-private-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-1-public-0.json",
+      "bytes": 33896,
+      "sha256": "7f347da8d1cd2bfa20f951075a010e35913fbe7aa11be4122a7b6ac5325c799d",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-1-public-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-1-public-1.json",
+      "bytes": 33590,
+      "sha256": "207a703938d48efb2db16306d732bbe40eddf34876f98c7bfc47f372285f3258",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-1-public-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-1-public-2.json",
+      "bytes": 33440,
+      "sha256": "26aaa76a0619904f28239cc25760e31cd6e13cd2129afa949b8cf403bc0e21b1",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-1-public-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-2-private-0.json",
+      "bytes": 33695,
+      "sha256": "c15f39c36bd18c9d782af38c9e3860f225b61e054d5dcfe8eb668e407720a4a4",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-2-private-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-2-private-1.json",
+      "bytes": 33603,
+      "sha256": "ae0e4408e8b889f418e64a40f6c43d94760bf0decd0048be08bfae68d20a6e51",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-2-private-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-2-private-2.json",
+      "bytes": 33759,
+      "sha256": "bfade6ba1b490fd7be34c2002fe993834a9e248028d21002d8ec66e88dbd31fd",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-2-private-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-2-public-0.json",
+      "bytes": 33598,
+      "sha256": "307ef8087ba8b91c3f33e08421fa85c1ebe9eac4a3b3849aea5c2cb63de04b5e",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-2-public-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-2-public-1.json",
+      "bytes": 33939,
+      "sha256": "9ad618fe3ef30d710fb98c8d17a11d6a8334aaeda98f2d90b0e8d9a41f688f57",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-2-public-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/candidate-medium-2-public-2.json",
+      "bytes": 33319,
+      "sha256": "d4a40043f2c6dc8b20d3976f049a031449e2c30653bd4d3c3fc2b58a66062066",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/candidate-medium-2-public-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance/report.json",
+      "bytes": 963684,
+      "sha256": "7eafe7336c54447eb2e00786e3d6674e8f1d3400296224637819ddc5ca0acfee",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance/report.json",
+      "versioned": "performance/report.json.gz",
+      "gzipSha256": "b4e1c603864521d694a02bf8fe5bb5f3b7fa35416729246537c5e4ee31cbead8"
+    },
+    {
+      "path": "performance-low/baseline-low-0-private-0.json",
+      "bytes": 33482,
+      "sha256": "80f3b60c8758e2340724078c078d6108ef75df02df3785c11f1b32d0292d4865",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-0-private-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-0-private-1.json",
+      "bytes": 33519,
+      "sha256": "94317797141783c1b1fea60d3fdbcc06210f3f7f2bb2395c0a2cbdff7b261fc1",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-0-private-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-0-private-2.json",
+      "bytes": 33713,
+      "sha256": "62633abc60d69b066dd31d3ffe7a877ec2940be79d9d5f8e50e862b1e9390763",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-0-private-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-0-public-0.json",
+      "bytes": 33344,
+      "sha256": "99e345329dd91f1246b44027eb4daaa26f39325df4809fc08cdc3f864b76a0aa",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-0-public-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-0-public-1.json",
+      "bytes": 33910,
+      "sha256": "32c1525f49e3c44884b63a7b36cabd892786f5b076b0f69545dd23bd1b2eabbc",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-0-public-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-0-public-2.json",
+      "bytes": 33505,
+      "sha256": "5d430fb391e9aae29f4ff19a0e78ac0a82da0627e67405da5a4874e4e5e985c8",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-0-public-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-3-private-0.json",
+      "bytes": 33503,
+      "sha256": "6f8406b36993bb0d7ff16ff9bf59e9f4e13d3432970a7aa966c013081c1b55b7",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-3-private-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-3-private-1.json",
+      "bytes": 33872,
+      "sha256": "ad01ad2fc8a4c8548ff116fe37d36f247e8cc1865639e696c13476df40390730",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-3-private-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-3-private-2.json",
+      "bytes": 33420,
+      "sha256": "190812a3140d1097fdda6d02a4720fcd801f40ef72b26d1dbde512eb94ca7130",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-3-private-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-3-public-0.json",
+      "bytes": 33492,
+      "sha256": "57566cbc4bc5536460d0fa628739fb2f2da190df7195c20dd14fbf4c896964e2",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-3-public-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-3-public-1.json",
+      "bytes": 33467,
+      "sha256": "014f2f5baaa683a89c443fa606f2fe192e70b3da10133720797daecfc20c45b7",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-3-public-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/baseline-low-3-public-2.json",
+      "bytes": 33296,
+      "sha256": "7268cbecb0dacb0f13549fae797ebd65df983f8fa28651940b7821db0816185b",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/baseline-low-3-public-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-1-private-0.json",
+      "bytes": 33549,
+      "sha256": "b9dcbd7c83ee9825fb4f39d732242066dbd6ae2e7cadb13e8286fe245cdd84af",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-1-private-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-1-private-1.json",
+      "bytes": 33514,
+      "sha256": "000f1495cb7f896cb8dbaf44d1b22f0b50f67ffc7127a87f0912763daa583396",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-1-private-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-1-private-2.json",
+      "bytes": 33521,
+      "sha256": "316a68a7cf5e342681df87202c21d3b1ce648b35b124d2b02e6b2d9a2ff0c350",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-1-private-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-1-public-0.json",
+      "bytes": 33463,
+      "sha256": "5462b91d84db97900ea8aeedfdea63c6bfa0ecc9ebfcb3c0782005782c6dee54",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-1-public-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-1-public-1.json",
+      "bytes": 33907,
+      "sha256": "18c9767f771e55676ff4bd3791e3d85a2524b16702c3cccbc65581c8c13baadb",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-1-public-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-1-public-2.json",
+      "bytes": 33398,
+      "sha256": "9c862a9b46553e3e60ce788f150609493fbbe9c2034be3c159ac239c5cec02e7",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-1-public-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-2-private-0.json",
+      "bytes": 33327,
+      "sha256": "948e4e552f27c61715015ae9c4e1cd50cff9133408380d87b303980180df18e6",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-2-private-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-2-private-1.json",
+      "bytes": 33647,
+      "sha256": "8ef45783b241d236561d5b278c127d7f0c31df545be4a11ee3b50c81e8d74baa",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-2-private-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-2-private-2.json",
+      "bytes": 33516,
+      "sha256": "427ea36e0a7547cea40bc5be5ee11d1b4a4403b2e59e4c214acd921a76c0a305",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-2-private-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-2-public-0.json",
+      "bytes": 33877,
+      "sha256": "44e29cb994c0cbf4ebc5f6e92ff9ba368b187911ce0477fd2b505521e7eb1ecd",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-2-public-0.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-2-public-1.json",
+      "bytes": 33426,
+      "sha256": "1fc6759c90b6ec13e7083194c402e3057c302412c01ecfecad49ae399dbf4f3b",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-2-public-1.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/candidate-low-2-public-2.json",
+      "bytes": 33439,
+      "sha256": "5c55591c664b04e0d341c51f727dfaeb20ab3d7a4a91662cae0ea2b288ff76e9",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/candidate-low-2-public-2.json",
+      "versioned": null
+    },
+    {
+      "path": "performance-low/report.json",
+      "bytes": 960846,
+      "sha256": "26dadd42bcf8418226f7a98915562fac5c5e38c295eaefd710fb899105362b96",
+      "archive": "/tmp/rural-coverage-full-evidence-2026-10-29/performance-low/report.json",
+      "versioned": "performance-low/report.json.gz",
+      "gzipSha256": "e6b20f5bbf9d1388d2e7f9e1441af29bde69e1952ca008e3c10a77c0aa097d9c"
+    }
+  ]
+}

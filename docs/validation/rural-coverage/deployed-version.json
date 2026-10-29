@@ -1,0 +1,9 @@
+{
+  "observedAt": "2026-10-29T15:47:18.138Z",
+  "url": "https://fenasojagestao.com/",
+  "mainAsset": "/assets/index-CPBzxRMz.js",
+  "mainAssetSha256": "4d84acac763e67961c0ec19ca4887bca5b10e9e11edd60eedf9a016f1918b478",
+  "embeddedCommit": "68a1140f7415186a454176c0a53b6b3816801e23",
+  "commitContext": "\"production\",PROD:!0,SSR:!1,VITE_APP_VERSION:\"0.0.0\",VITE_GIT_COMMIT:\"68a1140f7415186a454176c0a53b6b3816801e23\",VITE_SUPABASE_PROJECT_ID:\"btfaumhroqtqzxomqorx\",VITE_SUPAB",
+  "note": "Public production HTML and JavaScript fetched read-only; no session or private API request."
+}

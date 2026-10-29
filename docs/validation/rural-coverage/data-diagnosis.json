@@ -1,0 +1,735 @@
+{
+  "observedAt": "2026-10-29T15:43:02.411Z",
+  "queriesWereReadOnly": true,
+  "expectedDefinition": "Same-project active canonical database segment slug exporural + active SELLABLE_LOT entity + active linked CommercialLot with current geometry. Independent of is_sellable and presentation utility. All received108 have is_covered=false and interior metadata null.",
+  "counts": {
+    "entities": 124,
+    "lots": 108,
+    "legacyEligible": 52,
+    "legacyExcluded": 56,
+    "byBlock": {
+      "unnumbered": 1,
+      "R": 72,
+      "S": 35
+    },
+    "byCommercialStatus": {
+      "AVAILABLE": 92,
+      "SOLD": 13,
+      "SALE_OPEN": 3
+    },
+    "byFlagAndStatus": {
+      "true/AVAILABLE": 47,
+      "true/SOLD": 5,
+      "false/AVAILABLE": 45,
+      "false/SOLD": 8,
+      "false/SALE_OPEN": 3
+    },
+    "byGeometryRevision": {
+      "2028-exporural-2026-09-25.1": 68,
+      "2028-exporural-2026-10-20.1": 40
+    },
+    "newPolicyRecognized": 108,
+    "frameGeometryFailures": 0
+  },
+  "segmentCounts": {
+    "rows": [
+      {
+        "classification": "SELLABLE_LOT",
+        "count": 52,
+        "is_covered": false,
+        "is_sellable": true,
+        "slug": "espaco-automovel"
+      },
+      {
+        "classification": "SELLABLE_LOT",
+        "count": 56,
+        "is_covered": false,
+        "is_sellable": false,
+        "slug": "exporural"
+      },
+      {
+        "classification": "SELLABLE_LOT",
+        "count": 52,
+        "is_covered": false,
+        "is_sellable": true,
+        "slug": "exporural"
+      },
+      {
+        "classification": "INTERNAL_STAND",
+        "count": 1063,
+        "is_covered": true,
+        "is_sellable": true,
+        "slug": "industria-comercio-servicos"
+      },
+      {
+        "classification": "SELLABLE_LOT",
+        "count": 105,
+        "is_covered": false,
+        "is_sellable": true,
+        "slug": "industria-comercio-servicos"
+      }
+    ]
+  },
+  "history": {
+    "rows": [
+      {
+        "entity_id": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+        "identifier_before_revision": "Q-R-52",
+        "is_archived_before_revision": false,
+        "is_sellable_before_revision": false,
+        "previous_geometry_revision": "2028-exporural-2026-09-25.1",
+        "source_revision": "2028-exporural-2026-10-20.1"
+      }
+    ]
+  },
+  "salesSemantics": {
+    "rows": [
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-09",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-10",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-11",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-12",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": "VENDA_ATIVA",
+        "public_identifier": "Q-R-21",
+        "sales_view_flag": false,
+        "status": "SOLD"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-23",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-24",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-25",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-32",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-33",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-34",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      },
+      {
+        "entity_flag": false,
+        "ineligible_reason": null,
+        "public_identifier": "Q-R-35",
+        "sales_view_flag": true,
+        "status": "AVAILABLE"
+      }
+    ]
+  },
+  "publicScopes": {
+    "rows": [
+      {
+        "is_active": true,
+        "scope_key": "exporural",
+        "scope_kind": "SEGMENT",
+        "slug": "exporural"
+      }
+    ]
+  },
+  "publicDefinitions": [
+    {
+      "name": "public_map_context",
+      "sha256": "12f94bb8747c5421450232baa520d970418e422b7135b628bd7ad7c446135df6",
+      "identityFields": {
+        "segmentId": "e.segment_id (persisted UUID)",
+        "segmentSource": "not returned",
+        "isSellable": "false"
+      },
+      "contextIsNotCommercial": true
+    },
+    {
+      "name": "public_map_inventory",
+      "sha256": "ebe5716e0c00b5f4740aa3461fc23a581f1c585871f99995b283f786ce0bf8e4",
+      "identityFields": {
+        "segmentId": "e.segment_id (persisted UUID)",
+        "segmentSource": "not returned",
+        "isSellable": "e.is_sellable"
+      },
+      "contextIsNotCommercial": false
+    }
+  ],
+  "snapshotFile": "src/test/fixtures/ruralCoverageAuthorized.json",
+  "snapshotSha256": "4c4028f2b69bbfd9ee1b6762c17a83bc0d2208f1973b355d9abea06822c7c73e",
+  "tests": {
+    "file": "src/test/exporuralPresentationCoverage.test.ts",
+    "passed": 9,
+    "method": "Runtime assertions: exact independent expected entity-ID Set equals presentation accepted Set; baseline policy reproduced; all108 live cadastral polygons passed deriveExternalLotFrame, each with >=75% center; status changes reuse frame references and do not mutate source geometry/status/flags."
+  },
+  "excludedBefore": [
+    {
+      "entityId": "a88633ad-24c6-4258-882a-35a711086778",
+      "lotId": "abc42477-735c-44f5-a013-5549b0ebfaa6",
+      "publicIdentifier": "Q-R-09",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "8016b45c-bac0-4d5f-ab92-eeb4b84166f7",
+      "lotId": "66232508-271a-4256-9f2f-6c40220bd481",
+      "publicIdentifier": "Q-R-10",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "ea64bf15-cec0-4e52-aed1-d94771a28fc1",
+      "lotId": "2fcaf66f-16aa-4efc-9760-11b937a6b3d1",
+      "publicIdentifier": "Q-R-11",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "f72ae6af-a9e6-49f1-aff1-191b5d31f444",
+      "lotId": "1d849c33-d7b1-4170-87ca-7a27dead4376",
+      "publicIdentifier": "Q-R-12",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "c8e902e1-0ee1-4938-b8e1-2c9cde446b36",
+      "lotId": "fc528ecf-49d8-4106-a690-95d32c8349da",
+      "publicIdentifier": "Q-R-20",
+      "status": "SOLD",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "19ace8de-6712-4e02-97bf-2c232e2f64b1",
+      "lotId": "7da744ab-ed19-484b-a52f-f473a120b4a2",
+      "publicIdentifier": "Q-R-21",
+      "status": "SOLD",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "29012ae1-13d3-4818-bb08-9d6feda9e4e4",
+      "lotId": "c3e1f95b-4970-4607-a62f-33b20a2f5a2f",
+      "publicIdentifier": "Q-R-22",
+      "status": "SOLD",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "70f52524-d039-45b1-a6e0-a237543bdd40",
+      "lotId": "7142e987-335c-4de9-bd5d-937ec8f737dd",
+      "publicIdentifier": "Q-R-23",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "48e58517-44d1-4086-a57d-982f3f2151bf",
+      "lotId": "04b60bf8-fb0c-4b44-9806-324ab06fd9db",
+      "publicIdentifier": "Q-R-24",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "840370d2-1835-4645-9108-5772dc27e19d",
+      "lotId": "078b5dbc-e526-4579-b75c-35d4fc63e446",
+      "publicIdentifier": "Q-R-25",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "43948bf5-e7dc-4db0-b5a1-ca45843706a0",
+      "lotId": "310618dc-8323-4713-8928-91cd1be9f2d9",
+      "publicIdentifier": "Q-R-29",
+      "status": "SOLD",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "b2d79c86-1f6d-4ea3-9d8a-c582ec84c6d2",
+      "lotId": "3fc5ff27-0aa2-4c47-b423-45de7afba697",
+      "publicIdentifier": "Q-R-30",
+      "status": "SOLD",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "e26b6763-70fb-49d9-ae30-1014ec3336e3",
+      "lotId": "21dd495c-0af9-42e2-a5cf-3061e5e43679",
+      "publicIdentifier": "Q-R-31",
+      "status": "SOLD",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "f89c605e-5229-44c2-81fa-6284418cad57",
+      "lotId": "ff9dfbcd-90bd-4c9f-9479-5a9b34da7c00",
+      "publicIdentifier": "Q-R-32",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "ff4cd2c3-c05f-4927-8a0f-232c76052991",
+      "lotId": "dc812568-6591-4138-9e59-82071a39646e",
+      "publicIdentifier": "Q-R-33",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "300b4d2d-6313-4e91-8673-4649e5816245",
+      "lotId": "6f362dcf-8fce-46a8-b043-8d4348a07f0f",
+      "publicIdentifier": "Q-R-34",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "17020572-81c2-4e60-abb4-aa453e5022ff",
+      "lotId": "32f91dba-ac24-41b9-bf87-4613c41c5a00",
+      "publicIdentifier": "Q-R-35",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "2c746555-9f06-4dd9-ba78-1cd3f063aba1",
+      "lotId": "5ef7ff86-57c5-4fad-b076-0ccd2b923c01",
+      "publicIdentifier": "Q-R-36",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "20219375-a7c8-4e75-b3ff-a6d175bdc278",
+      "lotId": "2f859e78-befa-4994-a295-8b3d1d76c4f2",
+      "publicIdentifier": "Q-R-37",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "967c0fc2-babc-436d-813c-33fe2c42f0fd",
+      "lotId": "ddc37575-4032-418e-b7d0-7b895db2fe66",
+      "publicIdentifier": "Q-R-38",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "9d38bdfe-d6fc-4b3d-9007-f904d257c4c8",
+      "lotId": "09c0d847-e2df-4d98-92e4-d6b7ddd40eb4",
+      "publicIdentifier": "Q-R-39",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "e1858919-48d4-4677-a7f6-e0ecd7c060af",
+      "lotId": "1baea38b-b6ab-46c1-bf04-ea6c53a87544",
+      "publicIdentifier": "Q-R-55",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "7094a1e3-9216-424c-8010-b4123ae1ee9f",
+      "lotId": "86a6f56b-8945-445b-82cc-ca9210fc82f1",
+      "publicIdentifier": "Q-R-56",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "227ec70d-23b4-4423-ac40-733f2ecb4952",
+      "lotId": "d8dd899c-7e3e-4447-8428-81d0ecf5149b",
+      "publicIdentifier": "Q-R-57",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "4c4e87ec-dcab-4de6-af91-4c200c2b068d",
+      "lotId": "9dfb2a6e-69da-44ed-b3ec-b5775a2239f5",
+      "publicIdentifier": "Q-R-58",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "ed10fb94-8bac-4a21-8a9e-973e2f4295d7",
+      "lotId": "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+      "publicIdentifier": "Q-R-59",
+      "status": "SOLD",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "59c502c4-c85c-4a5b-af68-4a4277064070",
+      "lotId": "37bb772b-ba72-464a-a285-40bb96227714",
+      "publicIdentifier": "Q-R-60",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "83427369-9139-4e54-852e-20dbf9b3dc16",
+      "lotId": "db1c5104-235d-495e-9a5f-fb1af75d87d0",
+      "publicIdentifier": "Q-R-61",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "a5d3887b-6d24-47e5-a355-858bfdfb7b6e",
+      "lotId": "8c57fffe-d21c-4102-9831-6e5ce54959fc",
+      "publicIdentifier": "Q-R-62",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "2c5162d4-09d0-409a-81cd-1c99b20107bb",
+      "lotId": "7a0d01b3-08c0-4203-84d9-924fd6a777cf",
+      "publicIdentifier": "Q-R-63",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "ff71abc7-1341-4d12-8529-cd1766f1dbe7",
+      "lotId": "c4b77e2d-5277-41ae-8261-cc034c410cf7",
+      "publicIdentifier": "Q-R-64",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "bf2cd0ec-3b43-4174-aa02-b08af699f150",
+      "lotId": "13f68c3f-15f7-467a-9d56-495e95c8cb21",
+      "publicIdentifier": "Q-R-65",
+      "status": "SALE_OPEN",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "9f65aadc-0584-41f2-b2a2-82e96a8955fe",
+      "lotId": "f113c951-c359-429a-a7b6-8bde3ddfed8d",
+      "publicIdentifier": "Q-R-66",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "4c181bf7-c0e4-4cf5-ade0-f381b33c0d9b",
+      "lotId": "98980aba-172e-4ade-af34-afabd664f67c",
+      "publicIdentifier": "Q-R-67",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "03e06b2a-6bbf-48c7-8fe0-f60996833e75",
+      "lotId": "b3f1c02f-b2f0-424e-9a0f-7bc33de56e72",
+      "publicIdentifier": "Q-R-68",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "e17fded7-3db4-4d17-9f5d-6da46f61a3a7",
+      "lotId": "93b9ec57-5769-4f77-a517-230355a86933",
+      "publicIdentifier": "Q-S-01",
+      "status": "SOLD",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "61ddaa55-48dc-4f1e-b95e-aa47c0ba79f2",
+      "lotId": "f5bc1a1e-828b-43fa-a632-edeea2fe1580",
+      "publicIdentifier": "Q-S-02",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "c0b4357a-4b3c-4ea6-8491-516cfbff8974",
+      "lotId": "f40a3d5e-e828-4314-aba3-c803bee6fbf4",
+      "publicIdentifier": "Q-S-03",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "f07797a9-ecd1-4571-acdf-feed1442a59a",
+      "lotId": "6443d85b-11f3-4d9e-afeb-e2389d43e04b",
+      "publicIdentifier": "Q-S-04",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "4ecf732a-0a37-497c-8cf7-720da579ad35",
+      "lotId": "d707523e-91db-409a-96bf-10c230859937",
+      "publicIdentifier": "Q-S-05",
+      "status": "SALE_OPEN",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "2b77432f-e619-4c31-97fd-37935048b992",
+      "lotId": "b306734c-0beb-493a-8663-2ffa005a8b8e",
+      "publicIdentifier": "Q-S-06",
+      "status": "SALE_OPEN",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "419a89cd-3d10-4e5b-b562-863f7e23d22d",
+      "lotId": "fa011430-9b79-49e1-a45a-daba0ad03206",
+      "publicIdentifier": "Q-S-07",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "085df238-e422-48c0-be59-d02586bd2960",
+      "lotId": "b4110166-cbe8-4d37-8523-514b1c810161",
+      "publicIdentifier": "Q-S-08",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "14aaae53-3575-4af1-9b5a-ee8a853fb685",
+      "lotId": "271a71b5-b822-48db-b62b-d74e17471f58",
+      "publicIdentifier": "Q-S-09",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "0526b5b8-1f82-46c3-904f-6b52a78d88fb",
+      "lotId": "a4fc0f30-d5d2-4d3d-b6c5-d5ec48256bd8",
+      "publicIdentifier": "Q-S-10",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "f90a686a-ed3b-4ca2-b3ca-cc1656488d2c",
+      "lotId": "a6ec0be5-593e-406f-a2ef-0fda8c3448f2",
+      "publicIdentifier": "Q-S-25",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "e8a68dde-1d1e-4b6e-a472-a18006f5c721",
+      "lotId": "a39b8f10-a566-484b-a563-7dc66a2b2429",
+      "publicIdentifier": "Q-S-26",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "913eacb9-f2bf-42f8-bb8d-18c644219dc1",
+      "lotId": "e0b1f174-92bb-4184-b418-863139685f7a",
+      "publicIdentifier": "Q-S-27",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "07d928a6-8db4-426b-9ee7-7e24d95bee46",
+      "lotId": "226574ba-b528-41b2-b2f0-3569d4ea1d15",
+      "publicIdentifier": "Q-S-28",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "b0484c5e-b476-4789-bf9a-b0553ac27115",
+      "lotId": "2b4422a9-a5c0-43b0-a9da-fc293d615d3c",
+      "publicIdentifier": "Q-S-29",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "3e9a6c89-f4cf-483f-81e9-9106aa8b364a",
+      "lotId": "8e3b2915-d363-4ce9-8fcb-aef57f68a0d9",
+      "publicIdentifier": "Q-S-30",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "98555c63-a740-4432-9412-ef41fcd1f631",
+      "lotId": "dae8cc1d-eb76-424f-ada3-2fb39114bf2f",
+      "publicIdentifier": "Q-S-31",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "2b21566f-9a13-4f1a-87d3-a254b0afb33b",
+      "lotId": "b000ad12-b29b-4650-bfd5-463d58db4823",
+      "publicIdentifier": "Q-S-32",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "db3f2274-fed0-4e3a-b123-06bb7f89cd01",
+      "lotId": "9513c21d-06ff-477a-9154-1614a6485fb1",
+      "publicIdentifier": "Q-S-33",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "46a7f2e1-e2e5-4783-9447-6d286c36b332",
+      "lotId": "0cb9892f-4452-4e6a-bf77-7742dfc922a6",
+      "publicIdentifier": "Q-S-34",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    },
+    {
+      "entityId": "eb503e26-f58b-402d-a864-223111bd4e58",
+      "lotId": "b59f1b19-f9a3-493a-8d17-9957a6b6ffc8",
+      "publicIdentifier": "Q-S-35",
+      "status": "AVAILABLE",
+      "reasons": [
+        "not-sellable"
+      ]
+    }
+  ],
+  "legitimateExclusions": {
+    "activeNonLotClassifications": {
+      "ROAD": 12,
+      "QUADRA": 2,
+      "RESTAURANT": 1,
+      "RURAL_EXHIBITION": 1
+    },
+    "archivedLots": 59,
+    "archivedOtherEntities": 5,
+    "note": "Aggregate SELECT of canonical same-project segment; not added to the active fixture or candidate set."
+  },
+  "provenance": {
+    "flagBeforeOctober": "APPLIED snapshot query shows retained entity ed10fb94-8bac-4a21-8a9e-973e2f4295d7 already is_sellable=false as Q-R-52 before October renumbering to Q-R-59.",
+    "migrationBehavior": "20261021120000_exporural_official_october.sql creates new lots with entity.is_sellable=true; retained entity UPDATE does not replace that flag.",
+    "operationalRule": "sales/salesEntry.ts delegates commercial eligibility to commercial_sale_eligibility. Live SELECT shows R09/R10/R11/R12 entity flag=false yet sales view eligibility=true, without inferring permission from presentation.",
+    "limits": "Initial historical origin of every false flag was not established. No flag/status was repaired. Public RPC definitions were inspected read-only; no token was read, created or rotated."
+  }
+}
