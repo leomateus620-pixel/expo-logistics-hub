@@ -16,6 +16,7 @@ import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
 import { ExternalLotFrames } from './ExternalLotFrames';
 import { EXTERNAL_LOT_PALETTE, externalLotUsesGrass, isExternalPresentationLot, lotPresentationLift } from '../../utils/externalLotPresentation';
+import { installExternalLotPresentationDiagnostics, markExternalLotPresentationBatch } from '../../utils/externalLotPresentationDiagnostics';
 import { toCommercialPhase, type Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
 import { resolveLotTooltipPresentation } from '../../utils/lotTooltipPresentation';
@@ -1640,6 +1641,10 @@ function BatchedLots({
     batch?.material.dispose();
     batch?.mesh.dispose();
   }, [batch]);
+
+  useEffect(() => batch
+    ? markExternalLotPresentationBatch(batch.mesh, batch.batchIdByEntity)
+    : undefined, [batch]);
 
   const applyVisualState = useCallback((entityId: string) => {
     if (!batch) return;
@@ -5108,6 +5113,9 @@ const Scene = memo(function Scene({
       delete gl.domElement.dataset.commercialMapInventoryCounts;
     };
   }, [entities, exteriorRenderedEntities, gl, lots, presentedSceneTrees, rearRoadCompatibleSceneTrees]);
+  useEffect(() => installExternalLotPresentationDiagnostics({
+    entities, lots, scene: sceneObject, publicScene: Boolean(publicPolicy),
+  }), [entities, lots, sceneObject, publicPolicy]);
   const parkAccessScope = parkAccessInfrastructureScopeForArea(isolatedArea);
   const parkAccessPresentation = useMemo(() => {
     const resolveOwners = (identifiers: readonly string[]) => {

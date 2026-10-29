@@ -38,7 +38,27 @@ export async function fetchPublicInventory(slug: string, token: string, signal?:
   const { data, error } = await publicRpc('public_map_inventory', { _slug: slug, _token: token }, signal);
   assertScoped(error);
   if (!data) throw new Error('PUBLIC_MAP_UNAVAILABLE');
-  return data as PublicMapInventory;
+  return normalizePublicRuralPresentationInventory(data as PublicMapInventory);
+}
+
+/**
+ * The authorized rural RPC returns the persisted segment UUID, not the client's
+ * segment slug/source. Resolve only its own commercial entities from that scope;
+ * context geometry and entities from another project never gain this relation.
+ */
+export function normalizePublicRuralPresentationInventory(inventory: PublicMapInventory): PublicMapInventory {
+  if (!['SEGMENT', 'SEGMENT_EXTERNAL'].includes(inventory.scope.kind)
+    || inventory.scope.segmentSlug !== 'exporural') return inventory;
+  const lotEntities = new Set(inventory.lots.map(lot => lot.entityId));
+  let changed = false;
+  const entities = inventory.entities.map(entity => {
+    if (entity.projectId !== inventory.project.id || !lotEntities.has(entity.id)
+      || typeof entity.segmentId !== 'string'
+      || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(entity.segmentId)) return entity;
+    changed = true;
+    return { ...entity, segmentId: 'exporural', segmentSource: 'database' as const };
+  });
+  return changed ? { ...inventory, entities } : inventory;
 }
 
 /**

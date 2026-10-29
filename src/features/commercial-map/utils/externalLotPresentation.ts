@@ -8,16 +8,67 @@ export const EXTERNAL_LOT_PALETTE = Object.freeze({
   selection: '#e8f4ef', cart: '#c28bea',
 });
 
+const PRESENTATION_EXCLUSIONS = {
+  'unresolved-segment': 1 << 0,
+  'non-commercial-classification': 1 << 1,
+  'not-sellable': 1 << 2,
+  'archived-entity': 1 << 3,
+  'archived-lot': 1 << 4,
+  'covered-lot': 1 << 5,
+  'noncanonical-database-segment': 1 << 6,
+  'pavilion-identifier': 1 << 7,
+  'pavilion-module': 1 << 8,
+  'module-number': 1 << 9,
+  'interior-only': 1 << 10,
+  'lot-entity-mismatch': 1 << 11,
+} as const;
+
+function presentationExclusions(
+  entity: MapEntity,
+  lot: CommercialLot,
+  segment: CommercialMapSegmentDefinition | null,
+) {
+  // Retained rural entities can have isSellable=false after cadastral revisions
+  // while still owning an active CommercialLot. The project-scoped DB segment
+  // relation identifies their presentation; this never grants sale permission.
+  const canonicalRuralLot = segment?.id === 'exporural'
+    && entity.segmentSource === 'database' && entity.segmentId === segment.id
+    && lot.entityId === entity.id;
+  let mask = 0;
+  if (!segment) mask |= PRESENTATION_EXCLUSIONS['unresolved-segment'];
+  if (entity.classification !== 'SELLABLE_LOT') mask |= PRESENTATION_EXCLUSIONS['non-commercial-classification'];
+  if (!entity.isSellable && !canonicalRuralLot) mask |= PRESENTATION_EXCLUSIONS['not-sellable'];
+  if (entity.isArchived) mask |= PRESENTATION_EXCLUSIONS['archived-entity'];
+  if (lot.archivedAt) mask |= PRESENTATION_EXCLUSIONS['archived-lot'];
+  if (lot.isCovered) mask |= PRESENTATION_EXCLUSIONS['covered-lot'];
+  if (entity.segmentSource === 'database' && (!segment || entity.segmentId !== segment.id)) mask |= PRESENTATION_EXCLUSIONS['noncanonical-database-segment'];
+  if (entity.metadata.pavilionPublicIdentifier) mask |= PRESENTATION_EXCLUSIONS['pavilion-identifier'];
+  if (entity.metadata.pavilionModuleKey) mask |= PRESENTATION_EXCLUSIONS['pavilion-module'];
+  if (entity.metadata.moduleNumber) mask |= PRESENTATION_EXCLUSIONS['module-number'];
+  if (entity.metadata.interiorOnly) mask |= PRESENTATION_EXCLUSIONS['interior-only'];
+  if (lot.entityId !== entity.id) mask |= PRESENTATION_EXCLUSIONS['lot-entity-mismatch'];
+  return mask;
+}
+
 export function isExternalPresentationLot(
   entity: MapEntity,
   lot: CommercialLot,
   segment: CommercialMapSegmentDefinition | null = resolveCommercialMapSegment(entity, lot),
 ) {
-  return Boolean(segment && entity.classification === 'SELLABLE_LOT' && entity.isSellable
-    && !entity.isArchived && !lot.archivedAt && !lot.isCovered
-    && (entity.segmentSource !== 'database' || entity.segmentId === segment.id)
-    && !entity.metadata.pavilionPublicIdentifier && !entity.metadata.pavilionModuleKey
-    && !entity.metadata.moduleNumber && !entity.metadata.interiorOnly);
+  return presentationExclusions(entity, lot, segment) === 0;
+}
+
+/** Explicit reasons for opt-in diagnostics; the renderer avoids array allocation. */
+export function externalLotPresentationDecision(
+  entity: MapEntity,
+  lot: CommercialLot,
+  segment: CommercialMapSegmentDefinition | null = resolveCommercialMapSegment(entity, lot),
+) {
+  const mask = presentationExclusions(entity, lot, segment);
+  return {
+    eligible: mask === 0,
+    reasons: Object.entries(PRESENTATION_EXCLUSIONS).filter(([, bit]) => mask & bit).map(([reason]) => reason),
+  };
 }
 
 export function externalLotUsesGrass(status: CommercialStatus) {

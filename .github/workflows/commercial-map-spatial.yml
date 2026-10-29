@@ -8,6 +8,8 @@ on:
       - 'src/pages/commissions/CommissionPortalPage.tsx'
       - 'src/test/commercialMap*'
       - 'src/test/externalLot*'
+      - 'src/test/exporuralPresentationCoverage*'
+      - 'src/test/publicRuralPresentation*'
       - 'src/test/territorialOrientation*'
       - 'scripts/commercial-map-performance/**'
       - 'scripts/spatial-cleanup/**'
@@ -60,6 +62,9 @@ jobs:
           src/test/commercialMapTerritorialOrientation.test.ts
           src/test/externalLotFrameGeometry.test.ts
           src/test/externalLotPresentation.test.ts
+          src/test/externalLotPresentationDiagnostics.test.ts
+          src/test/exporuralPresentationCoverage.test.ts
+          src/test/publicRuralPresentation.test.ts
           src/test/externalLotRendering.test.tsx
           src/test/territorialOrientationInputs.test.ts
           src/test/territorialOrientationRealScene.test.ts

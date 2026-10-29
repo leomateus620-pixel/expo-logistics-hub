@@ -135,6 +135,7 @@ function SoldLogoGroup({ url, surfaces, obstacles, confirmationObstacles, placem
   useLayoutEffect(() => {
     const matrix = new THREE.Matrix4(), position = new THREE.Vector3(), rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)), scale = new THREE.Vector3();
     let count = 0;
+    const ids: string[] = [];
     for (const surface of surfaces) {
       if (surface.confirmation && infrastructureMode) continue;
       const placement = placementFor(surface, placements, surface.confirmation ? confirmationObstacles : obstacles);
@@ -146,9 +147,11 @@ function SoldLogoGroup({ url, surfaces, obstacles, confirmationObstacles, placem
       position.y += placement.scale * .12 + .015 + (surface.confirmation ? lotPresentationLift(selectedId === surface.id, hoveredId === surface.id) : 0);
       scale.set(size, size, 1); matrix.compose(position, rotation, scale);
       assets.mesh.setMatrixAt(count++, matrix);
+      ids.push(surface.id);
     }
     assets.material.opacity = surfaces.some(surface => surface.confirmation) ? opacity : 1;
     assets.mesh.count = count; assets.mesh.instanceMatrix.needsUpdate = true;
+    assets.mesh.userData.lotIds = ids;
     assets.mesh.computeBoundingBox(); assets.mesh.computeBoundingSphere(); invalidate();
   }, [assets, surfaces, obstacles, confirmationObstacles, placements, selectedId, hoveredId, opacity, infrastructureMode, invalidate]);
   useEffect(() => () => { disposeInstancedMesh(assets.mesh); assets.geometry.dispose(); assets.material.dispose(); assets.texture.dispose(); }, [assets]);
