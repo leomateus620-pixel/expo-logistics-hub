@@ -1,0 +1,63 @@
+{
+  "scope": "Isolated CPU profile of label layout; does not replace browser ABBA measurements",
+  "environment": "macOS; bundled Node; Vitest jsdom; V8 inspector sampling enabled; sequential runs with browser benchmark paused",
+  "fixture": "Same real inventory/tree/circulation pipeline and captured native text metrics as territorialOrientationRealScene.test.ts",
+  "iterations": 16,
+  "measuredOperation": "layoutTerritorialOrientation, excluding prepare and atlas rasterization",
+  "beforeMs": [
+    102.93099999999981,
+    95.09237500000017,
+    130.15658299999996,
+    253.51312499999995,
+    101.00529199999983,
+    100.28324999999995,
+    99.89266700000007,
+    99.64483300000029,
+    99.67570899999964,
+    99.66920800000025,
+    100.13462500000014,
+    99.62279200000012,
+    99.21799999999985,
+    99.59000000000015,
+    99.22700000000032,
+    99.20466600000009
+  ],
+  "afterMs": [
+    28.736291000000165,
+    19.463292000000138,
+    44.17545899999982,
+    43.39949999999999,
+    37.44870900000001,
+    18.805459000000155,
+    17.250957999999855,
+    17.13499999999999,
+    17.60062499999981,
+    17.482375000000047,
+    16.85962500000005,
+    16.852959000000283,
+    17.340250000000196,
+    16.844666999999845,
+    17.656124999999975,
+    17.018750000000182
+  ],
+  "beforeMedianMs": 99.67245849999995,
+  "afterMedianMs": 17.541499999999928,
+  "beforeFirstMs": 102.93099999999981,
+  "afterFirstMs": 28.736291000000165,
+  "unchangedPrepareMedianMsApprox": 45,
+  "optimizations": [
+    "Per-layout obstacle AABB cache with exact polygon checks retained for overlapping boxes",
+    "Lazy fallback clearance checks preserving identical candidate order"
+  ],
+  "equality": {
+    "labels": 42,
+    "serializedBytes": 105667,
+    "byteIdentical": true,
+    "sha256": "310f5dd92de59fef9cc263b1903b03cd4cf4628f57fafb4d5cc6dffeb0f17427"
+  },
+  "limitations": [
+    "Profiler/JIT/GC introduce variation; compare isolated medians and first calls only as diagnosis",
+    "Final browser ABBA records validate startup and navigation after integration",
+    "prepare/safeLotAnchor left unchanged"
+  ]
+}

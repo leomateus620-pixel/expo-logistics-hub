@@ -1,0 +1,37 @@
+{
+  "errors": [],
+  "checks": [
+    "UI search filters to Q-J-01, opens map detail and preserves BLOCKED / 201,46 m²",
+    "Desktop/mobile lot detail and close via visible controls",
+    "Mixed legend shows external grass/frame/check alongside original interior status sample",
+    "Legend status filter toggles and clears through UI"
+  ],
+  "fixture": "Existing full-interface official reference, all lots BLOCKED. No session, capabilities, checkout or commercial writes.",
+  "manifest": {
+    "revision": "working-tree",
+    "hashes": {
+      "components/canvas/CommercialMapCanvas.tsx": "ed2a2128feb159ce8d882272072263c5f0b95a6a1725de758f9b4e32484d4b25",
+      "components/canvas/SoldLotLocks.tsx": "ca2e6ffe63659514b3bae47a0d27097cfde2b1865f8d9944d1fcc05e3d3d8a2a",
+      "components/canvas/exporuralTurfMaterial.ts": "7cc1307c2b5afcf4177d4eb704b8bf6ae53e490fa5ecf6622534647d8ffdf093",
+      "components/canvas/ExternalLotFrames.tsx": "06cc2efc9429020ace5a40a2a102dacbde71cc14f72ca58e219fc83d6c5a8dd0",
+      "components/canvas/TerritorialOrientation.tsx": "f93acd1eae327ac10d7d052e300eb90ae60069c6ea73a3e63641c9622f03094b",
+      "components/panels/ContextualMapLegend.tsx": "4e951a4b2c812548342188eb838ca1e24509ca1189f8cb4c63bfacfdd4c6b920",
+      "components/panels/contextual-map-legend.css": "1d0600ddbe3983c2ad66b2655f1e2a62c4487e67f685ef675640260a5bf3527d",
+      "utils/externalLotPresentation.ts": "ecdda0f8e19d5ddd956ff64e1ee511a538c9119ac3adcc96797cea304cb8ebf9",
+      "utils/externalLotFrameGeometry.ts": "59b47744c558ff95f8f722705b747b81eb2b0fef8c6fe4c872d1d24d0afad821",
+      "utils/soldCheckGeometry.ts": "4391aaf90aff3158612cea55d8d33a7eca9bfcd9fac411abd43976d8f3a7c013",
+      "utils/soldLotPresentation.ts": "14690c300b7435b2ad65f2c0a88096513a274f08869a8b3f860a75cb23ce68f7",
+      "utils/territorialOrientation.ts": "8de0759cfaea31ad932337e03a55199be87d2e18019dae88f86a9c148ab49f20",
+      "utils/territorialOrientationInputs.ts": "3b252e7e7951239936b28b4ad5e30f8bb95aef91b982379c496feedaddb48119",
+      "public/PublicMapLegend.tsx": "b187a5793ef6fdf8a8b184e5f5328796aa025ed179b44e4d1c4272c9a33a2dc5",
+      "public/public-map.css": "2caadcd30460a287f36e088061e5726056bd7199f621dcba6ea3660563286291",
+      "public/publicMapService.ts": "e9d41177accd1910399129713b2062dc93c641250dd75b8e67f46f6af2b3f873",
+      "public/publicMapTypes.ts": "7231480a08c365334982624d937fbb2ad32b83b6c9de3ac7e573f6275a7f80aa"
+    },
+    "fixtureHash": "24e3a4b92a430c59d0c6828a75bb285aac48940a8b1810df03bfbbfd9ba3f087",
+    "mode": "production",
+    "backend": "qa.invalid",
+    "fixture": "official reference geometry + local sellability/status/logo presentation only"
+  },
+  "passed": true
+}

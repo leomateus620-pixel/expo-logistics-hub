@@ -1,0 +1,3713 @@
+{
+  "environment": "macOS 26.6, Apple M5, ANGLE Metal, headless Chrome, 1280x800 DPR1",
+  "browser": "156.0.8078.48",
+  "qualities": [
+    "MEDIUM",
+    "LOW"
+  ],
+  "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+  "orders": [
+    {
+      "quality": "MEDIUM",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    },
+    {
+      "quality": "LOW",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "quality": "MEDIUM",
+      "mode": "private",
+      "label": "baseline",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "repetitions": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 18.3,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.5,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.5,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.6,
+            "max": 18.4,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.6,
+            "max": 18.5,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.4,
+            "max": 18.2,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        }
+      ],
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.7,
+        "median": 16.7,
+        "p95": 17.7,
+        "max": 18.7
+      },
+      "framesOver50Ms": 0,
+      "draws": {
+        "samples": 78,
+        "min": 573,
+        "median": 619,
+        "p95": 956,
+        "max": 956
+      },
+      "triangles": {
+        "samples": 78,
+        "min": 728000,
+        "median": 745883,
+        "p95": 1030431,
+        "max": 1030431
+      },
+      "readinessMs": {
+        "samples": 2,
+        "min": 3789,
+        "median": 3815.5,
+        "p95": 3842,
+        "max": 3842
+      },
+      "startupMounts": [
+        {
+          "trial": 0,
+          "documentToInteractiveMs": 3789,
+          "sceneMs": 1698,
+          "shaderDirectMs": 520,
+          "textureUploadMs": 983
+        },
+        {
+          "trial": 3,
+          "documentToInteractiveMs": 3842,
+          "sceneMs": 1682,
+          "shaderDirectMs": 534,
+          "textureUploadMs": 984
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 589,
+        "median": 589,
+        "p95": 589,
+        "max": 589
+      },
+      "textures": {
+        "samples": 6,
+        "min": 111,
+        "median": 111,
+        "p95": 111,
+        "max": 111
+      },
+      "programs": {
+        "samples": 6,
+        "min": 244,
+        "median": 244,
+        "p95": 244,
+        "max": 244
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "paths": [
+        "direct"
+      ],
+      "errors": [],
+      "resourceStability": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        }
+      ]
+    },
+    {
+      "quality": "MEDIUM",
+      "mode": "private",
+      "label": "candidate",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "repetitions": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 18.2,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17.2,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17.3,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.8,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 18.4,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 18.1,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        }
+      ],
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.6,
+        "median": 16.7,
+        "p95": 17.2,
+        "max": 18.7
+      },
+      "framesOver50Ms": 0,
+      "draws": {
+        "samples": 78,
+        "min": 573,
+        "median": 620,
+        "p95": 957,
+        "max": 957
+      },
+      "triangles": {
+        "samples": 78,
+        "min": 713296,
+        "median": 731111,
+        "p95": 1015739,
+        "max": 1015739
+      },
+      "readinessMs": {
+        "samples": 2,
+        "min": 3955,
+        "median": 3960.5,
+        "p95": 3966,
+        "max": 3966
+      },
+      "startupMounts": [
+        {
+          "trial": 1,
+          "documentToInteractiveMs": 3966,
+          "sceneMs": 1801,
+          "shaderDirectMs": 532,
+          "textureUploadMs": 982
+        },
+        {
+          "trial": 2,
+          "documentToInteractiveMs": 3955,
+          "sceneMs": 1781,
+          "shaderDirectMs": 534,
+          "textureUploadMs": 991
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 590,
+        "median": 590.5,
+        "p95": 591,
+        "max": 591
+      },
+      "textures": {
+        "samples": 6,
+        "min": 114,
+        "median": 114,
+        "p95": 114,
+        "max": 114
+      },
+      "programs": {
+        "samples": 6,
+        "min": 246,
+        "median": 246,
+        "p95": 246,
+        "max": 246
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "paths": [
+        "direct"
+      ],
+      "errors": [],
+      "resourceStability": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "geometries": [
+            590,
+            590
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "geometries": [
+            590,
+            590
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "geometries": [
+            590,
+            590
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "geometries": [
+            591,
+            591
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "geometries": [
+            591,
+            591
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "geometries": [
+            591,
+            591
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        }
+      ]
+    },
+    {
+      "quality": "MEDIUM",
+      "mode": "public",
+      "label": "baseline",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "repetitions": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.9,
+            "max": 19,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.1,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.3,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17.5,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17.5,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383183,
+            "max": 383183,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        }
+      ],
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.7,
+        "median": 16.7,
+        "p95": 17.2,
+        "max": 19
+      },
+      "framesOver50Ms": 0,
+      "draws": {
+        "samples": 78,
+        "min": 530,
+        "median": 573,
+        "p95": 586,
+        "max": 586
+      },
+      "triangles": {
+        "samples": 78,
+        "min": 376315,
+        "median": 377941,
+        "p95": 383115,
+        "max": 383183
+      },
+      "readinessMs": {
+        "samples": 2,
+        "min": 2100,
+        "median": 2107.5,
+        "p95": 2115,
+        "max": 2115
+      },
+      "startupMounts": [
+        {
+          "trial": 0,
+          "documentToInteractiveMs": 2115,
+          "sceneMs": 974,
+          "shaderDirectMs": 227,
+          "textureUploadMs": 662
+        },
+        {
+          "trial": 3,
+          "documentToInteractiveMs": 2100,
+          "sceneMs": 979,
+          "shaderDirectMs": 236,
+          "textureUploadMs": 653
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 539,
+        "median": 539,
+        "p95": 539,
+        "max": 539
+      },
+      "textures": {
+        "samples": 6,
+        "min": 97,
+        "median": 97,
+        "p95": 97,
+        "max": 97
+      },
+      "programs": {
+        "samples": 6,
+        "min": 121,
+        "median": 121,
+        "p95": 121,
+        "max": 121
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "paths": [
+        "direct"
+      ],
+      "errors": [],
+      "resourceStability": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        }
+      ]
+    },
+    {
+      "quality": "MEDIUM",
+      "mode": "public",
+      "label": "candidate",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "repetitions": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 16.9,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.7,
+            "max": 16.8,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 18.4,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.5,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.1,
+            "max": 18.2,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17,
+            "max": 18.8,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 14,
+            "median": 570,
+            "p95": 586,
+            "max": 586,
+            "over50": 14
+          },
+          "triangles": {
+            "samples": 14,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 14
+          }
+        }
+      ],
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.6,
+        "median": 16.7,
+        "p95": 17.3,
+        "max": 18.8
+      },
+      "framesOver50Ms": 0,
+      "draws": {
+        "samples": 79,
+        "min": 530,
+        "median": 573,
+        "p95": 586,
+        "max": 586
+      },
+      "triangles": {
+        "samples": 79,
+        "min": 359859,
+        "median": 361473,
+        "p95": 366615,
+        "max": 366615
+      },
+      "readinessMs": {
+        "samples": 2,
+        "min": 2183,
+        "median": 2198,
+        "p95": 2213,
+        "max": 2213
+      },
+      "startupMounts": [
+        {
+          "trial": 1,
+          "documentToInteractiveMs": 2183,
+          "sceneMs": 1016,
+          "shaderDirectMs": 265,
+          "textureUploadMs": 653
+        },
+        {
+          "trial": 2,
+          "documentToInteractiveMs": 2213,
+          "sceneMs": 1068,
+          "shaderDirectMs": 252,
+          "textureUploadMs": 647
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 540,
+        "median": 540,
+        "p95": 540,
+        "max": 540
+      },
+      "textures": {
+        "samples": 6,
+        "min": 100,
+        "median": 100,
+        "p95": 100,
+        "max": 100
+      },
+      "programs": {
+        "samples": 6,
+        "min": 122,
+        "median": 122,
+        "p95": 122,
+        "max": 122
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "paths": [
+        "direct"
+      ],
+      "errors": [],
+      "resourceStability": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        }
+      ]
+    },
+    {
+      "quality": "LOW",
+      "mode": "private",
+      "label": "baseline",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "repetitions": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.3,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.2,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 18.1,
+            "max": 18.5,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.3,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.7,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 619,
+            "p95": 956,
+            "max": 956,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 745883,
+            "p95": 1030431,
+            "max": 1030431,
+            "over50": 13
+          }
+        }
+      ],
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.5,
+        "median": 16.7,
+        "p95": 17.4,
+        "max": 18.7
+      },
+      "framesOver50Ms": 0,
+      "draws": {
+        "samples": 78,
+        "min": 572,
+        "median": 619,
+        "p95": 956,
+        "max": 956
+      },
+      "triangles": {
+        "samples": 78,
+        "min": 728000,
+        "median": 745883,
+        "p95": 1030431,
+        "max": 1030431
+      },
+      "readinessMs": {
+        "samples": 2,
+        "min": 3842,
+        "median": 3868,
+        "p95": 3894,
+        "max": 3894
+      },
+      "startupMounts": [
+        {
+          "trial": 0,
+          "documentToInteractiveMs": 3894,
+          "sceneMs": 1717,
+          "shaderDirectMs": 515,
+          "textureUploadMs": 995
+        },
+        {
+          "trial": 3,
+          "documentToInteractiveMs": 3842,
+          "sceneMs": 1679,
+          "shaderDirectMs": 531,
+          "textureUploadMs": 988
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 589,
+        "median": 589,
+        "p95": 589,
+        "max": 589
+      },
+      "textures": {
+        "samples": 6,
+        "min": 111,
+        "median": 111,
+        "p95": 111,
+        "max": 111
+      },
+      "programs": {
+        "samples": 6,
+        "min": 244,
+        "median": 244,
+        "p95": 244,
+        "max": 244
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "paths": [
+        "direct"
+      ],
+      "errors": [],
+      "resourceStability": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "geometries": [
+            589,
+            589
+          ],
+          "textures": [
+            111,
+            111
+          ],
+          "programs": [
+            244,
+            244
+          ]
+        }
+      ]
+    },
+    {
+      "quality": "LOW",
+      "mode": "private",
+      "label": "candidate",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "repetitions": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.9,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.6,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.6,
+            "max": 18.3,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.2,
+            "max": 18.8,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.5,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.1,
+            "max": 18.5,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 620,
+            "p95": 957,
+            "max": 957,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 731111,
+            "p95": 1015739,
+            "max": 1015739,
+            "over50": 13
+          }
+        }
+      ],
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.6,
+        "median": 16.7,
+        "p95": 17.5,
+        "max": 18.8
+      },
+      "framesOver50Ms": 0,
+      "draws": {
+        "samples": 78,
+        "min": 573,
+        "median": 620,
+        "p95": 957,
+        "max": 957
+      },
+      "triangles": {
+        "samples": 78,
+        "min": 713308,
+        "median": 731111,
+        "p95": 1015739,
+        "max": 1015739
+      },
+      "readinessMs": {
+        "samples": 2,
+        "min": 3921,
+        "median": 3937.5,
+        "p95": 3954,
+        "max": 3954
+      },
+      "startupMounts": [
+        {
+          "trial": 1,
+          "documentToInteractiveMs": 3954,
+          "sceneMs": 1789,
+          "shaderDirectMs": 538,
+          "textureUploadMs": 986
+        },
+        {
+          "trial": 2,
+          "documentToInteractiveMs": 3921,
+          "sceneMs": 1780,
+          "shaderDirectMs": 512,
+          "textureUploadMs": 984
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 590,
+        "median": 590,
+        "p95": 590,
+        "max": 590
+      },
+      "textures": {
+        "samples": 6,
+        "min": 114,
+        "median": 114,
+        "p95": 114,
+        "max": 114
+      },
+      "programs": {
+        "samples": 6,
+        "min": 246,
+        "median": 246,
+        "p95": 246,
+        "max": 246
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "paths": [
+        "direct"
+      ],
+      "errors": [],
+      "resourceStability": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "geometries": [
+            590,
+            590
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "geometries": [
+            590,
+            590
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "geometries": [
+            590,
+            590
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "geometries": [
+            590,
+            590
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "geometries": [
+            590,
+            590
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "geometries": [
+            590,
+            590
+          ],
+          "textures": [
+            114,
+            114
+          ],
+          "programs": [
+            246,
+            246
+          ]
+        }
+      ]
+    },
+    {
+      "quality": "LOW",
+      "mode": "public",
+      "label": "baseline",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "repetitions": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 16.8,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17.1,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.9,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 18,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383183,
+            "max": 383183,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.8,
+            "max": 18.5,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 377941,
+            "p95": 383115,
+            "max": 383115,
+            "over50": 13
+          }
+        }
+      ],
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.7,
+        "median": 16.7,
+        "p95": 17.1,
+        "max": 18.7
+      },
+      "framesOver50Ms": 0,
+      "draws": {
+        "samples": 78,
+        "min": 531,
+        "median": 573,
+        "p95": 586,
+        "max": 586
+      },
+      "triangles": {
+        "samples": 78,
+        "min": 376327,
+        "median": 377941,
+        "p95": 383115,
+        "max": 383183
+      },
+      "readinessMs": {
+        "samples": 2,
+        "min": 2112,
+        "median": 2114.5,
+        "p95": 2117,
+        "max": 2117
+      },
+      "startupMounts": [
+        {
+          "trial": 0,
+          "documentToInteractiveMs": 2112,
+          "sceneMs": 970,
+          "shaderDirectMs": 230,
+          "textureUploadMs": 662
+        },
+        {
+          "trial": 3,
+          "documentToInteractiveMs": 2117,
+          "sceneMs": 974,
+          "shaderDirectMs": 236,
+          "textureUploadMs": 659
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 539,
+        "median": 539,
+        "p95": 539,
+        "max": 539
+      },
+      "textures": {
+        "samples": 6,
+        "min": 97,
+        "median": 97,
+        "p95": 97,
+        "max": 97
+      },
+      "programs": {
+        "samples": 6,
+        "min": 121,
+        "median": 121,
+        "p95": 121,
+        "max": 121
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "paths": [
+        "direct"
+      ],
+      "errors": [],
+      "resourceStability": [
+        {
+          "trial": 0,
+          "repeat": 0,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 0,
+          "repeat": 1,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 0,
+          "repeat": 2,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 0,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 1,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        },
+        {
+          "trial": 3,
+          "repeat": 2,
+          "geometries": [
+            539,
+            539
+          ],
+          "textures": [
+            97,
+            97
+          ],
+          "programs": [
+            121,
+            121
+          ]
+        }
+      ]
+    },
+    {
+      "quality": "LOW",
+      "mode": "public",
+      "label": "candidate",
+      "runs": 6,
+      "allValid": true,
+      "sourceMatchesCapture": true,
+      "repetitions": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.8,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 17.8,
+            "max": 18.6,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 18.4,
+            "max": 18.7,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 14,
+            "median": 570,
+            "p95": 586,
+            "max": 586,
+            "over50": 14
+          },
+          "triangles": {
+            "samples": 14,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 14
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17.8,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 13,
+            "median": 573,
+            "p95": 586,
+            "max": 586,
+            "over50": 13
+          },
+          "triangles": {
+            "samples": 13,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 13
+          }
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "frames": {
+            "samples": 240,
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 17.4,
+            "over50": 0
+          },
+          "drawCalls": {
+            "samples": 14,
+            "median": 570,
+            "p95": 586,
+            "max": 586,
+            "over50": 14
+          },
+          "triangles": {
+            "samples": 14,
+            "median": 361473,
+            "p95": 366615,
+            "max": 366615,
+            "over50": 14
+          }
+        }
+      ],
+      "framesMs": {
+        "samples": 1440,
+        "min": 14.7,
+        "median": 16.7,
+        "p95": 17.2,
+        "max": 18.7
+      },
+      "framesOver50Ms": 0,
+      "draws": {
+        "samples": 80,
+        "min": 531,
+        "median": 573,
+        "p95": 586,
+        "max": 586
+      },
+      "triangles": {
+        "samples": 80,
+        "min": 359859,
+        "median": 361473,
+        "p95": 366615,
+        "max": 366615
+      },
+      "readinessMs": {
+        "samples": 2,
+        "min": 2198,
+        "median": 2198,
+        "p95": 2198,
+        "max": 2198
+      },
+      "startupMounts": [
+        {
+          "trial": 1,
+          "documentToInteractiveMs": 2198,
+          "sceneMs": 1043,
+          "shaderDirectMs": 253,
+          "textureUploadMs": 651
+        },
+        {
+          "trial": 2,
+          "documentToInteractiveMs": 2198,
+          "sceneMs": 1047,
+          "shaderDirectMs": 253,
+          "textureUploadMs": 648
+        }
+      ],
+      "geometries": {
+        "samples": 6,
+        "min": 540,
+        "median": 540,
+        "p95": 540,
+        "max": 540
+      },
+      "textures": {
+        "samples": 6,
+        "min": 100,
+        "median": 100,
+        "p95": 100,
+        "max": 100
+      },
+      "programs": {
+        "samples": 6,
+        "min": 122,
+        "median": 122,
+        "p95": 122,
+        "max": 122
+      },
+      "buffers": [
+        "[1280,800]"
+      ],
+      "paths": [
+        "direct"
+      ],
+      "errors": [],
+      "resourceStability": [
+        {
+          "trial": 1,
+          "repeat": 0,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 1,
+          "repeat": 1,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 1,
+          "repeat": 2,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 0,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 1,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        },
+        {
+          "trial": 2,
+          "repeat": 2,
+          "geometries": [
+            540,
+            540
+          ],
+          "textures": [
+            100,
+            100
+          ],
+          "programs": [
+            122,
+            122
+          ]
+        }
+      ]
+    }
+  ],
+  "visuals": {
+    "medium": {
+      "beforePassed": true,
+      "afterPassed": true,
+      "sameGeometry": true,
+      "sameLots": true,
+      "sameData": true,
+      "sameFixture": true,
+      "labelStability": {
+        "identities": 43,
+        "duplicateLabels": false,
+        "movedLabels": []
+      },
+      "stages": [
+        {
+          "name": "overview",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-top",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-oblique",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "automotive-top",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "industry-roads-top",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "industry-close",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-cutouts-close",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "selection-closed",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "filtered",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-night",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 1,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 1,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-rain",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 1
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 1
+          }
+        },
+        {
+          "name": "exporural-mobile",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "industry-mobile",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "public-industry",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {},
+          "afterWeather": {}
+        },
+        {
+          "name": "selection",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        }
+      ]
+    },
+    "low": {
+      "beforePassed": true,
+      "afterPassed": true,
+      "sameGeometry": true,
+      "sameLots": true,
+      "sameData": true,
+      "sameFixture": true,
+      "labelStability": {
+        "identities": 43,
+        "duplicateLabels": false,
+        "movedLabels": []
+      },
+      "stages": [
+        {
+          "name": "overview",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-top",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-oblique",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "automotive-top",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "industry-roads-top",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "industry-close",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-cutouts-close",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "selection-closed",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "filtered",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-night",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 1,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 1,
+            "rain": 0
+          }
+        },
+        {
+          "name": "exporural-rain",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 1
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 1
+          }
+        },
+        {
+          "name": "exporural-mobile",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "industry-mobile",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        },
+        {
+          "name": "public-industry",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {},
+          "afterWeather": {}
+        },
+        {
+          "name": "selection",
+          "sameCamera": true,
+          "sameViewport": true,
+          "sameBuffer": true,
+          "sameWeather": true,
+          "beforeWeather": {
+            "night": 0,
+            "rain": 0
+          },
+          "afterWeather": {
+            "night": 0,
+            "rain": 0
+          }
+        }
+      ]
+    }
+  },
+  "renderTiming": {
+    "quality": "MEDIUM",
+    "method": "Independent ABBA diagnostic. Same viewport, DPR, camera and gesture as navigation trials. One unmeasured 4s gesture; enable/reset existing CPU/GPU diagnostic; one 5s measured gesture per private/public mount. CPU is command submission only. GPU uses existing disjoint timer queries when supported. Each diagnostic retains at most 240 samples. These instrumented samples are not pooled with rAF comparisons.",
+    "order": [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    "rows": [
+      {
+        "label": "baseline",
+        "mode": "private",
+        "trial": 0,
+        "valid": true,
+        "multiDrawExtension": true,
+        "timerExtension": true,
+        "buffer": [
+          1280,
+          800
+        ],
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1395,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "timing": {
+          "enabled": true,
+          "gpuStatus": "supported",
+          "sampleLimit": 240,
+          "pendingQueries": 4,
+          "droppedGpuQueries": 0,
+          "disjointGpuQueries": 0,
+          "cpu": {
+            "samples": 240,
+            "averageMs": 3.87,
+            "p95Ms": 4.2,
+            "p99Ms": 4.8
+          },
+          "gpu": {
+            "samples": 236,
+            "averageMs": 12.679,
+            "p95Ms": 14.524,
+            "p99Ms": 14.615
+          },
+          "paths": {
+            "post": {
+              "cpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              },
+              "gpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              }
+            },
+            "direct": {
+              "cpu": {
+                "samples": 240,
+                "averageMs": 3.87,
+                "p95Ms": 4.2,
+                "p99Ms": 4.8
+              },
+              "gpu": {
+                "samples": 236,
+                "averageMs": 12.679,
+                "p95Ms": 14.524,
+                "p99Ms": 14.615
+              }
+            }
+          }
+        }
+      },
+      {
+        "label": "baseline",
+        "mode": "public",
+        "trial": 0,
+        "valid": true,
+        "multiDrawExtension": true,
+        "timerExtension": true,
+        "buffer": [
+          1280,
+          800
+        ],
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1330,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "timing": {
+          "enabled": true,
+          "gpuStatus": "supported",
+          "sampleLimit": 240,
+          "pendingQueries": 1,
+          "droppedGpuQueries": 0,
+          "disjointGpuQueries": 0,
+          "cpu": {
+            "samples": 240,
+            "averageMs": 3.714,
+            "p95Ms": 4,
+            "p99Ms": 4.3
+          },
+          "gpu": {
+            "samples": 239,
+            "averageMs": 4.715,
+            "p95Ms": 7.934,
+            "p99Ms": 8.184
+          },
+          "paths": {
+            "post": {
+              "cpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              },
+              "gpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              }
+            },
+            "direct": {
+              "cpu": {
+                "samples": 240,
+                "averageMs": 3.714,
+                "p95Ms": 4,
+                "p99Ms": 4.3
+              },
+              "gpu": {
+                "samples": 239,
+                "averageMs": 4.715,
+                "p95Ms": 7.934,
+                "p99Ms": 8.184
+              }
+            }
+          }
+        }
+      },
+      {
+        "label": "candidate",
+        "mode": "private",
+        "trial": 1,
+        "valid": true,
+        "multiDrawExtension": true,
+        "timerExtension": true,
+        "buffer": [
+          1280,
+          800
+        ],
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1392,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "timing": {
+          "enabled": true,
+          "gpuStatus": "supported",
+          "sampleLimit": 240,
+          "pendingQueries": 2,
+          "droppedGpuQueries": 0,
+          "disjointGpuQueries": 0,
+          "cpu": {
+            "samples": 240,
+            "averageMs": 4.144,
+            "p95Ms": 4.5,
+            "p99Ms": 4.6
+          },
+          "gpu": {
+            "samples": 238,
+            "averageMs": 12.17,
+            "p95Ms": 14.431,
+            "p99Ms": 14.524
+          },
+          "paths": {
+            "post": {
+              "cpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              },
+              "gpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              }
+            },
+            "direct": {
+              "cpu": {
+                "samples": 240,
+                "averageMs": 4.144,
+                "p95Ms": 4.5,
+                "p99Ms": 4.6
+              },
+              "gpu": {
+                "samples": 238,
+                "averageMs": 12.17,
+                "p95Ms": 14.431,
+                "p99Ms": 14.524
+              }
+            }
+          }
+        }
+      },
+      {
+        "label": "candidate",
+        "mode": "public",
+        "trial": 1,
+        "valid": true,
+        "multiDrawExtension": true,
+        "timerExtension": true,
+        "buffer": [
+          1280,
+          800
+        ],
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1330,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "timing": {
+          "enabled": true,
+          "gpuStatus": "supported",
+          "sampleLimit": 240,
+          "pendingQueries": 6,
+          "droppedGpuQueries": 0,
+          "disjointGpuQueries": 0,
+          "cpu": {
+            "samples": 240,
+            "averageMs": 3.718,
+            "p95Ms": 4,
+            "p99Ms": 4.3
+          },
+          "gpu": {
+            "samples": 234,
+            "averageMs": 4.72,
+            "p95Ms": 7.829,
+            "p99Ms": 8.072
+          },
+          "paths": {
+            "post": {
+              "cpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              },
+              "gpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              }
+            },
+            "direct": {
+              "cpu": {
+                "samples": 240,
+                "averageMs": 3.718,
+                "p95Ms": 4,
+                "p99Ms": 4.3
+              },
+              "gpu": {
+                "samples": 234,
+                "averageMs": 4.72,
+                "p95Ms": 7.829,
+                "p99Ms": 8.072
+              }
+            }
+          }
+        }
+      },
+      {
+        "label": "candidate",
+        "mode": "private",
+        "trial": 2,
+        "valid": true,
+        "multiDrawExtension": true,
+        "timerExtension": true,
+        "buffer": [
+          1280,
+          800
+        ],
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1395,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "timing": {
+          "enabled": true,
+          "gpuStatus": "supported",
+          "sampleLimit": 240,
+          "pendingQueries": 3,
+          "droppedGpuQueries": 0,
+          "disjointGpuQueries": 0,
+          "cpu": {
+            "samples": 240,
+            "averageMs": 3.997,
+            "p95Ms": 4.4,
+            "p99Ms": 4.9
+          },
+          "gpu": {
+            "samples": 237,
+            "averageMs": 11.301,
+            "p95Ms": 14.468,
+            "p99Ms": 14.733
+          },
+          "paths": {
+            "post": {
+              "cpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              },
+              "gpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              }
+            },
+            "direct": {
+              "cpu": {
+                "samples": 240,
+                "averageMs": 3.997,
+                "p95Ms": 4.4,
+                "p99Ms": 4.9
+              },
+              "gpu": {
+                "samples": 237,
+                "averageMs": 11.301,
+                "p95Ms": 14.468,
+                "p99Ms": 14.733
+              }
+            }
+          }
+        }
+      },
+      {
+        "label": "candidate",
+        "mode": "public",
+        "trial": 2,
+        "valid": true,
+        "multiDrawExtension": true,
+        "timerExtension": true,
+        "buffer": [
+          1280,
+          800
+        ],
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1331,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "timing": {
+          "enabled": true,
+          "gpuStatus": "supported",
+          "sampleLimit": 240,
+          "pendingQueries": 6,
+          "droppedGpuQueries": 0,
+          "disjointGpuQueries": 0,
+          "cpu": {
+            "samples": 240,
+            "averageMs": 3.588,
+            "p95Ms": 4,
+            "p99Ms": 4.2
+          },
+          "gpu": {
+            "samples": 234,
+            "averageMs": 3.382,
+            "p95Ms": 5.156,
+            "p99Ms": 5.204
+          },
+          "paths": {
+            "post": {
+              "cpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              },
+              "gpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              }
+            },
+            "direct": {
+              "cpu": {
+                "samples": 240,
+                "averageMs": 3.588,
+                "p95Ms": 4,
+                "p99Ms": 4.2
+              },
+              "gpu": {
+                "samples": 234,
+                "averageMs": 3.382,
+                "p95Ms": 5.156,
+                "p99Ms": 5.204
+              }
+            }
+          }
+        }
+      },
+      {
+        "label": "baseline",
+        "mode": "private",
+        "trial": 3,
+        "valid": true,
+        "multiDrawExtension": true,
+        "timerExtension": true,
+        "buffer": [
+          1280,
+          800
+        ],
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1395,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "timing": {
+          "enabled": true,
+          "gpuStatus": "supported",
+          "sampleLimit": 240,
+          "pendingQueries": 4,
+          "droppedGpuQueries": 2,
+          "disjointGpuQueries": 0,
+          "cpu": {
+            "samples": 240,
+            "averageMs": 3.925,
+            "p95Ms": 4.6,
+            "p99Ms": 4.8
+          },
+          "gpu": {
+            "samples": 236,
+            "averageMs": 11.367,
+            "p95Ms": 14.236,
+            "p99Ms": 14.343
+          },
+          "paths": {
+            "post": {
+              "cpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              },
+              "gpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              }
+            },
+            "direct": {
+              "cpu": {
+                "samples": 240,
+                "averageMs": 3.925,
+                "p95Ms": 4.6,
+                "p99Ms": 4.8
+              },
+              "gpu": {
+                "samples": 236,
+                "averageMs": 11.367,
+                "p95Ms": 14.236,
+                "p99Ms": 14.343
+              }
+            }
+          }
+        }
+      },
+      {
+        "label": "baseline",
+        "mode": "public",
+        "trial": 3,
+        "valid": true,
+        "multiDrawExtension": true,
+        "timerExtension": true,
+        "buffer": [
+          1280,
+          800
+        ],
+        "health": {
+          "status": "ready",
+          "path": "direct",
+          "presentedFrames": 1328,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "timing": {
+          "enabled": true,
+          "gpuStatus": "supported",
+          "sampleLimit": 240,
+          "pendingQueries": 7,
+          "droppedGpuQueries": 0,
+          "disjointGpuQueries": 0,
+          "cpu": {
+            "samples": 240,
+            "averageMs": 3.774,
+            "p95Ms": 4.3,
+            "p99Ms": 4.7
+          },
+          "gpu": {
+            "samples": 233,
+            "averageMs": 5.092,
+            "p95Ms": 5.169,
+            "p99Ms": 5.19
+          },
+          "paths": {
+            "post": {
+              "cpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              },
+              "gpu": {
+                "samples": 0,
+                "averageMs": null,
+                "p95Ms": null,
+                "p99Ms": null
+              }
+            },
+            "direct": {
+              "cpu": {
+                "samples": 240,
+                "averageMs": 3.774,
+                "p95Ms": 4.3,
+                "p99Ms": 4.7
+              },
+              "gpu": {
+                "samples": 233,
+                "averageMs": 5.092,
+                "p95Ms": 5.169,
+                "p99Ms": 5.19
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

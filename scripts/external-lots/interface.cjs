@@ -1,0 +1,46 @@
+// Exercise the existing read-only full-page fixture through visible controls.
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const url=process.env.LOT_QA_URL||'http://127.0.0.1:4242';
+const output=path.resolve(process.env.LOT_INTERFACE_OUTPUT||'docs/validation/external-lots/interface');
+if(!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(url))throw Error('Loopback required');
+fs.mkdirSync(output,{recursive:true});
+(async()=>{const browser=await chromium.launch({channel:'chrome',headless:true});const page=await browser.newPage({viewport:{width:1280,height:800},deviceScaleFactor:1});
+const report={errors:[],checks:[],fixture:'Existing full-interface official reference, all lots BLOCKED. No session, capabilities, checkout or commercial writes.'};
+page.on('pageerror',e=>report.errors.push(e.message));
+try{
+  await page.goto(url+'/__dev/commercial-map-interface?qualityQa=MEDIUM');
+  await page.waitForFunction(()=>document.querySelector('canvas')?.dataset.commercialMapReady==='true',null,{timeout:180000});
+  report.manifest=await page.evaluate(()=>fetch('/qa-build-manifest.json').then(r=>r.json()));
+  const skip=page.getByRole('button',{name:'Pular animação e restaurar a vista anterior',exact:true});if(await skip.isVisible())await skip.click();
+  await page.getByRole('button',{name:'Gestão',exact:true}).click();
+  await page.getByRole('button',{name:'Lista e tabela',exact:true}).click();
+  await page.getByRole('textbox',{name:'Buscar entidades do parque',exact:true}).fill('Q-J-01');
+  const row=page.getByRole('row').filter({hasText:'Q-J-01'});
+  await row.waitFor();assert.equal(await row.count(),1);assert((await row.innerText()).includes('201,46'));
+  await row.getByRole('button',{name:'Ver no mapa',exact:true}).click();
+  const detail=page.locator('.commercial-map-details-panel');await detail.waitFor({state:'visible'});
+  await page.waitForFunction(()=>{const text=document.querySelector('.commercial-map-details-panel')?.textContent||'';return text.includes('Bloqueado')&&text.includes('201,46');},null,{timeout:15000});
+  assert((await detail.innerText()).includes('Bloqueado'));assert((await detail.innerText()).includes('201,46'));
+  report.checks.push('UI search filters to Q-J-01, opens map detail and preserves BLOCKED / 201,46 m²');
+  await page.screenshot({path:path.join(output,'lot-details.png')});
+  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(700);
+  const detailExpand=detail.getByRole('button',{name:'Expandir detalhes do lote',exact:true});
+  if(await detailExpand.isVisible())await detailExpand.click();
+  await page.screenshot({path:path.join(output,'lot-details-mobile.png')});
+  await detail.getByRole('button',{name:'Fechar painel',exact:true}).click();await detail.waitFor({state:'detached'});
+  report.checks.push('Desktop/mobile lot detail and close via visible controls');
+  const expand=page.getByRole('button',{name:'Expandir painel do mapa',exact:true});if(await expand.isVisible())await expand.click();
+  const legend=page.locator('.commercial-context-legend');await legend.waitFor({state:'visible'});
+  const statuses=legend.locator('summary').filter({hasText:'Situações e legenda'});if(await statuses.count())await statuses.click();
+  const sold=legend.getByRole('button',{name:/^Vendido:/});
+  assert.equal(await sold.locator('.external-lot-swatch svg').count(),1);
+  assert.equal(await sold.locator('i:not(.external-lot-swatch)').count(),1);
+  report.checks.push('Mixed legend shows external grass/frame/check alongside original interior status sample');
+  await legend.screenshot({path:path.join(output,'mixed-legend.png')});
+  await sold.click();assert.equal(await sold.getAttribute('aria-pressed'),'true');
+  await legend.getByRole('button',{name:'Limpar filtro de situação comercial',exact:true}).click();assert.equal(await sold.getAttribute('aria-pressed'),'false');
+  report.checks.push('Legend status filter toggles and clears through UI');
+  assert.equal(report.errors.length,0);report.passed=true;
+}catch(e){report.failure=e.stack;report.passed=false;process.exitCode=1;console.error(e);}finally{fs.writeFileSync(path.join(output,'report.json'),JSON.stringify(report,null,2));await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});

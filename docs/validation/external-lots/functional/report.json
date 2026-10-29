@@ -1,0 +1,1128 @@
+{
+  "errors": [],
+  "steps": [
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": true,
+        "y": 0.14800000190734863,
+        "count": 108,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "d4b471c1-5889-476b-a31b-28588b15e17f"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 10647.60000000894,
+        "calls": 820,
+        "triangles": 770155,
+        "geometries": 605,
+        "textures": 114,
+        "programs": 248,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 115288970,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 366,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "initial-sold-logo"
+    },
+    {
+      "frame": {
+        "visible": false,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 107,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": false,
+          "count": 26,
+          "texture": "c722eca1-d09a-47c8-8909-a5d23841ebbb"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 11857.300000011921,
+        "calls": 1140,
+        "triangles": 1050658,
+        "geometries": 604,
+        "textures": 113,
+        "programs": 246,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 122241355,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 400,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "AVAILABLE"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "d8bd70",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 107,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 26,
+          "texture": "c722eca1-d09a-47c8-8909-a5d23841ebbb"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 13097.20000000298,
+        "calls": 1142,
+        "triangles": 1050770,
+        "geometries": 623,
+        "textures": 114,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 135599455,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 404,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "SALE_OPEN"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": true,
+        "y": 0.14800000190734863,
+        "count": 108,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "183f506a-387e-4dbc-b8a1-28de3c71733d"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 14329.90000000596,
+        "calls": 1142,
+        "triangles": 1050798,
+        "geometries": 624,
+        "textures": 114,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 147555767,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 408,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "SOLD"
+    },
+    {
+      "frame": {
+        "visible": false,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 107,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 26,
+          "texture": "9f4add19-b000-4306-90c7-849be88c11fd"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 15603.60000000894,
+        "calls": 1142,
+        "triangles": 1050774,
+        "geometries": 624,
+        "textures": 114,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 123913412,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 412,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "BLOCKED"
+    },
+    {
+      "frame": {
+        "visible": false,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 107,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 26,
+          "texture": "9f4add19-b000-4306-90c7-849be88c11fd"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 16923.40000000596,
+        "calls": 1142,
+        "triangles": 1050762,
+        "geometries": 623,
+        "textures": 114,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 142792230,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 416,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "AVAILABLE"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": true,
+        "y": 0.14800000190734863,
+        "count": 108,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "d0880700-a335-4dbf-acec-4bd7169ecd68"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 18291.20000000298,
+        "calls": 1142,
+        "triangles": 1050798,
+        "geometries": 624,
+        "textures": 114,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 153339527,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 420,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "sold"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.2029999941587448,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": true,
+        "y": 0.2029999941587448,
+        "count": 108,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "d0880700-a335-4dbf-acec-4bd7169ecd68"
+        }
+      ],
+      "selection": "reference:2026:q-v-04",
+      "cart": [],
+      "stats": {
+        "at": 18836,
+        "calls": 630,
+        "triangles": 697458,
+        "geometries": 606,
+        "textures": 114,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 157129089,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 420,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "selected"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.18299999833106995,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": true,
+        "y": 0.18299999833106995,
+        "count": 108,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "d0880700-a335-4dbf-acec-4bd7169ecd68"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 19345.30000001192,
+        "calls": 955,
+        "triangles": 992837,
+        "geometries": 605,
+        "textures": 114,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 152516767,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 478,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "hover"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": true,
+        "y": 0.14800000190734863,
+        "count": 108,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "d0880700-a335-4dbf-acec-4bd7169ecd68"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 19862.5,
+        "calls": 630,
+        "triangles": 700938,
+        "geometries": 606,
+        "textures": 114,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 155419570,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 478,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "inspection"
+    },
+    {
+      "frame": {
+        "visible": false,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 107,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 26,
+          "texture": "53756784-fa8f-4773-bc2c-cb34d98a50b6"
+        }
+      ],
+      "selection": null,
+      "cart": [
+        "reference:2026:lot:v-04"
+      ],
+      "stats": {
+        "at": 21698.70000000298,
+        "calls": 629,
+        "triangles": 700902,
+        "geometries": 605,
+        "textures": 114,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 176659551,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 484,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "cart"
+    },
+    {
+      "frame": {
+        "visible": false,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 0,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 0,
+          "texture": "53756784-fa8f-4773-bc2c-cb34d98a50b6"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 23117.40000000596,
+        "calls": 788,
+        "triangles": 329351,
+        "geometries": 594,
+        "textures": 115,
+        "programs": 291,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 202679374,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 488,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "infrastructure"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 0.5,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": true,
+        "y": 0.14800000190734863,
+        "count": 108,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "511eaed6-17e9-445b-86c8-0c2ce53f815c"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 26084.30000001192,
+        "calls": 822,
+        "triangles": 799560,
+        "geometries": 611,
+        "textures": 116,
+        "programs": 311,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 240351472,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 490,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "opacity"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": true,
+        "y": 0.14800000190734863,
+        "count": 108,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "147e588c-60c9-4c6e-b1c8-10d6f71b77f7"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 34548.80000001192,
+        "calls": 818,
+        "triangles": 769075,
+        "geometries": 611,
+        "textures": 116,
+        "programs": 309,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 292376483,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 699,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "resource-cycle-start"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "ee31e05c-ba8c-4952-99e3-67fe3809334e",
+        "id": "91c40303-82fd-4712-beb3-da461b579373",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": true,
+        "y": 0.14800000190734863,
+        "count": 108,
+        "geometry": "d24f3308-5aad-4ef5-a415-2cf5ca41ce4d"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "2cf7558a-5df2-4e4e-9ec9-ed49c8d5366c"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 50463.30000001192,
+        "calls": 818,
+        "triangles": 769075,
+        "geometries": 611,
+        "textures": 116,
+        "programs": 309,
+        "dpr": 1,
+        "width": 1280,
+        "height": 800,
+        "heapBytes": 159566775,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 781,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "resource-cycle-end"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "7a5a57f2-4ff8-4f6f-bc23-eb3e6b94b8a7",
+        "id": "d220fe6a-4284-4677-81b1-e19394baf242",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 0,
+        "geometry": "251ca2e9-3833-449f-b902-c4a23661409e"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "3bc4c5eb-4b45-4a99-a68d-3dcc69be7acc"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 7987.0999999940395,
+        "calls": 759,
+        "triangles": 384222,
+        "geometries": 534,
+        "textures": 100,
+        "programs": 122,
+        "dpr": 1,
+        "width": 1280,
+        "height": 672,
+        "heapBytes": 281617810,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 302,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "public"
+    },
+    {
+      "frame": {
+        "visible": false,
+        "color": "8fb7d8",
+        "geometry": "7a5a57f2-4ff8-4f6f-bc23-eb3e6b94b8a7",
+        "id": "d220fe6a-4284-4677-81b1-e19394baf242",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 0,
+        "geometry": "251ca2e9-3833-449f-b902-c4a23661409e"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": false,
+          "count": 26,
+          "texture": "b4f92eec-bc6b-494b-9f28-8e3db13c4110"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 9442.79999999702,
+        "calls": 757,
+        "triangles": 384106,
+        "geometries": 533,
+        "textures": 99,
+        "programs": 74,
+        "dpr": 1,
+        "width": 1280,
+        "height": 672,
+        "heapBytes": 307727699,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 321,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "public-AVAILABLE"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "7a5a57f2-4ff8-4f6f-bc23-eb3e6b94b8a7",
+        "id": "d220fe6a-4284-4677-81b1-e19394baf242",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 0,
+        "geometry": "251ca2e9-3833-449f-b902-c4a23661409e"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "8c34fd47-c8ce-4169-94e6-0a6743623b6a"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 10881.59999999404,
+        "calls": 759,
+        "triangles": 384222,
+        "geometries": 552,
+        "textures": 100,
+        "programs": 76,
+        "dpr": 1,
+        "width": 1280,
+        "height": 672,
+        "heapBytes": 306160651,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 325,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "public-SALE_OPEN"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "7a5a57f2-4ff8-4f6f-bc23-eb3e6b94b8a7",
+        "id": "d220fe6a-4284-4677-81b1-e19394baf242",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 0,
+        "geometry": "251ca2e9-3833-449f-b902-c4a23661409e"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "8c34fd47-c8ce-4169-94e6-0a6743623b6a"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 11406.5,
+        "calls": 759,
+        "triangles": 384222,
+        "geometries": 534,
+        "textures": 100,
+        "programs": 76,
+        "dpr": 1,
+        "width": 1280,
+        "height": 672,
+        "heapBytes": 305032406,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 325,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "public-SOLD"
+    },
+    {
+      "frame": {
+        "visible": false,
+        "color": "8fb7d8",
+        "geometry": "7a5a57f2-4ff8-4f6f-bc23-eb3e6b94b8a7",
+        "id": "d220fe6a-4284-4677-81b1-e19394baf242",
+        "y": 0.14800000190734863,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 0,
+        "geometry": "251ca2e9-3833-449f-b902-c4a23661409e"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 26,
+          "texture": "993e4648-f8a7-4d1b-b683-2c90f5e7ac58"
+        }
+      ],
+      "selection": null,
+      "cart": [],
+      "stats": {
+        "at": 12794.20000000298,
+        "calls": 759,
+        "triangles": 384210,
+        "geometries": 552,
+        "textures": 100,
+        "programs": 76,
+        "dpr": 1,
+        "width": 1280,
+        "height": 672,
+        "heapBytes": 328377347,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 359,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "public-BLOCKED"
+    },
+    {
+      "frame": {
+        "visible": true,
+        "color": "8fb7d8",
+        "geometry": "7a5a57f2-4ff8-4f6f-bc23-eb3e6b94b8a7",
+        "id": "d220fe6a-4284-4677-81b1-e19394baf242",
+        "y": 0.2029999941587448,
+        "opacity": 1,
+        "raycastHits": 0
+      },
+      "check": {
+        "present": false,
+        "y": null,
+        "count": 0,
+        "geometry": "251ca2e9-3833-449f-b902-c4a23661409e"
+      },
+      "locks": {},
+      "logos": [
+        {
+          "visible": true,
+          "count": 27,
+          "texture": "c278d7a4-b0c4-4b68-ae46-98640d235aa4"
+        }
+      ],
+      "selection": "reference:2026:q-v-04",
+      "cart": [],
+      "stats": {
+        "at": 17243.90000000596,
+        "calls": 750,
+        "triangles": 337870,
+        "geometries": 549,
+        "textures": 100,
+        "programs": 77,
+        "dpr": 1,
+        "width": 390,
+        "height": 626,
+        "heapBytes": 327689242,
+        "qualityTier": "MEDIUM",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 424,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "name": "public-mobile-touch"
+    }
+  ],
+  "checks": [
+    "AVAILABLE → SALE_OPEN → SOLD → BLOCKED → AVAILABLE: exact visibility and confirmation; frame batch/geometry and internal locks retained; no frame raycast hits",
+    "Selection/hover retain sold frame color and identical lift delta for frame and confirmation",
+    "Sale inspection does not use cart; cart remains transient; hydrology removes incompatible overlays; layer opacity propagated",
+    "Five sold/available cycles retain frame geometry and geometry/texture allocation totals after warmup",
+    "Public normalization retains three conditions: SALE_OPEN and SOLD share blue frame, with no signature-confirmation symbol",
+    "Native emulated touch selects underlying public lot at 390x844; not a physical device test"
+  ],
+  "limitation": "Fixture presentation only; no authenticated permission, checkout, signed contract or production writes.",
+  "manifest": {
+    "revision": "working-tree",
+    "hashes": {
+      "components/canvas/CommercialMapCanvas.tsx": "ed2a2128feb159ce8d882272072263c5f0b95a6a1725de758f9b4e32484d4b25",
+      "components/canvas/SoldLotLocks.tsx": "ca2e6ffe63659514b3bae47a0d27097cfde2b1865f8d9944d1fcc05e3d3d8a2a",
+      "components/canvas/exporuralTurfMaterial.ts": "7cc1307c2b5afcf4177d4eb704b8bf6ae53e490fa5ecf6622534647d8ffdf093",
+      "components/canvas/ExternalLotFrames.tsx": "06cc2efc9429020ace5a40a2a102dacbde71cc14f72ca58e219fc83d6c5a8dd0",
+      "components/canvas/TerritorialOrientation.tsx": "f93acd1eae327ac10d7d052e300eb90ae60069c6ea73a3e63641c9622f03094b",
+      "components/panels/ContextualMapLegend.tsx": "4e951a4b2c812548342188eb838ca1e24509ca1189f8cb4c63bfacfdd4c6b920",
+      "components/panels/contextual-map-legend.css": "1d0600ddbe3983c2ad66b2655f1e2a62c4487e67f685ef675640260a5bf3527d",
+      "utils/externalLotPresentation.ts": "ecdda0f8e19d5ddd956ff64e1ee511a538c9119ac3adcc96797cea304cb8ebf9",
+      "utils/externalLotFrameGeometry.ts": "59b47744c558ff95f8f722705b747b81eb2b0fef8c6fe4c872d1d24d0afad821",
+      "utils/soldCheckGeometry.ts": "4391aaf90aff3158612cea55d8d33a7eca9bfcd9fac411abd43976d8f3a7c013",
+      "utils/soldLotPresentation.ts": "14690c300b7435b2ad65f2c0a88096513a274f08869a8b3f860a75cb23ce68f7",
+      "utils/territorialOrientation.ts": "8de0759cfaea31ad932337e03a55199be87d2e18019dae88f86a9c148ab49f20",
+      "utils/territorialOrientationInputs.ts": "3b252e7e7951239936b28b4ad5e30f8bb95aef91b982379c496feedaddb48119",
+      "public/PublicMapLegend.tsx": "b187a5793ef6fdf8a8b184e5f5328796aa025ed179b44e4d1c4272c9a33a2dc5",
+      "public/public-map.css": "2caadcd30460a287f36e088061e5726056bd7199f621dcba6ea3660563286291",
+      "public/publicMapService.ts": "e9d41177accd1910399129713b2062dc93c641250dd75b8e67f46f6af2b3f873",
+      "public/publicMapTypes.ts": "7231480a08c365334982624d937fbb2ad32b83b6c9de3ac7e573f6275a7f80aa"
+    },
+    "fixtureHash": "24e3a4b92a430c59d0c6828a75bb285aac48940a8b1810df03bfbbfd9ba3f087",
+    "mode": "production",
+    "backend": "qa.invalid",
+    "fixture": "official reference geometry + local sellability/status/logo presentation only"
+  },
+  "target": {
+    "entityId": "reference:2026:q-v-04",
+    "lotId": "reference:2026:lot:v-04",
+    "identifier": "Q-V-04",
+    "status": "SOLD",
+    "safeAnchor": [
+      -30.916362762451172,
+      0.14800000190734863,
+      -9.257781982421875
+    ]
+  },
+  "touchProjection": {
+    "x": 130.05423392721153,
+    "y": 514.4160239010903,
+    "camera": [
+      13.199155898763479,
+      278.91222717774286,
+      266.1947025600707
+    ],
+    "anchor": [
+      -30.916362762451172,
+      0.14800000190734863,
+      -9.257781982421875
+    ],
+    "hit": {
+      "name": "",
+      "batchId": 2,
+      "point": [
+        -30.91921133322507,
+        0.12999999523157157,
+        -9.275568147491867
+      ],
+      "batched": true
+    }
+  },
+  "passed": true
+}
