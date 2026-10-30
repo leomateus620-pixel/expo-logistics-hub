@@ -1,0 +1,1528 @@
+{
+  "base": "http://127.0.0.1:5201",
+  "mode": "metrics",
+  "fixture": "OFFICIAL_REFERENCE_DATA + versioned soyGatePersistedLayout; not a live authorized query",
+  "gpu": null,
+  "runs": [
+    {
+      "run": 1,
+      "cache": "cold",
+      "readyMs": 3529,
+      "runtime": {
+        "at": 12815.59999999404,
+        "calls": 430,
+        "triangles": 630996,
+        "geometries": 598,
+        "textures": 138,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 175370401,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 240,
+        "averageFrameTimeMs": 16.67,
+        "p95FrameTimeMs": 16.9,
+        "p50FrameTimeMs": 16.7,
+        "p99FrameTimeMs": 17.4,
+        "averageFps": 60,
+        "inverseP99FpsApproximation": 57.5,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 23,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 12815.59999999404,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 175370401,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 119.59999999403954,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 119.59999999403954,
+          "b12-worker:start": 119.70000000298023,
+          "fixture-data-ready": 378.59999999403954,
+          "module-ready": 379.20000000298023,
+          "renderer:create:start": 411.09999999403954,
+          "webgl-context:start": 411.20000000298023,
+          "webgl-context:end": 421.90000000596046,
+          "renderer:create:end": 424.59999999403954,
+          "b12-worker:cached": 433.29999999701977,
+          "canvas-created": 434.29999999701977,
+          "b12-worker-geometry": 670.2999999970198,
+          "b12-worker-contact": 670.2999999970198,
+          "b12-worker:end": 670.2999999970198,
+          "critical-scene:start": 671.4000000059605,
+          "environment:textures:start": 755.0999999940395,
+          "textures:start": 755.2000000029802,
+          "textures:end": 768.5999999940395,
+          "environment:textures:end": 768.7999999970198,
+          "environment:materials:start": 768.7999999970198,
+          "environment:materials:end": 768.9000000059605,
+          "geometry-preparation:start": 1285.0999999940395,
+          "geometry-preparation:end": 1285.2000000029802,
+          "b12-unpack:start": 1418.4000000059605,
+          "b12-unpack:end": 1419.5,
+          "b12-materials:start": 1419.5,
+          "b12-materials:end": 1471,
+          "tree-surface-preparation:start": 1628.0999999940395,
+          "tree-surface-preparation:end": 1628.5,
+          "postprocessing:start": 2023.2999999970198,
+          "postprocessing:end": 2025.5999999940395,
+          "critical-scene:end": 2043,
+          "shader-representatives": 2045.2000000029802,
+          "compile-direct:start": 2045.4000000059605,
+          "program-submission": 2116.2000000029802,
+          "compile-direct-js": 2116.5,
+          "controls-created": 2120.7999999970198,
+          "first-frame-requested": 2121.2000000029802,
+          "program-links-ready": 2275,
+          "program-introspection": 2555.7999999970198,
+          "compile-direct:end": 2556.5999999940395,
+          "texture-upload:programs-ready": 2556.7000000029802,
+          "texture-upload:start": 2571.2999999970198,
+          "texture-upload:end": 3410.9000000059605,
+          "essential-scene:prepared": 3412.0999999940395,
+          "shadow-preparation:start": 3444,
+          "shadow-preparation:end": 3444.2000000029802,
+          "first-draw": 3489.0999999940395,
+          "commercial-map-ready": 3510.2999999970198,
+          "first-interactive": 3510.4000000059605,
+          "critical-post:start": 3593.7999999970198,
+          "deferred-compile-js": 3613.5,
+          "critical-post:end": 5507.5999999940395,
+          "hydrate:rain:start": 5596.0999999940395,
+          "rain-preparation:start": 5598.9000000059605,
+          "rain-preparation:end": 5600.0999999940395,
+          "hydrate:rain:mounted": 5600.79999999702,
+          "hydrate:rain:end": 6293.5999999940395
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 455,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          0.9075,
+          28.2133,
+          -24.3142
+        ],
+        "target": [
+          -7.9855,
+          0.9,
+          19.0909
+        ],
+        "quaternion": [
+          -0.027509,
+          0.957187,
+          0.271327,
+          0.097048
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.21684,
+        "far": 1283.245,
+        "distance": 52.0491,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -7.9854545454545445,
+          0.9,
+          19.09090918674699
+        ],
+        "position": [
+          -1.9087418181818165,
+          28.213309090909092,
+          -24.314181722343918
+        ]
+      },
+      "measure": {
+        "headquarters": {
+          "entityBounds": [
+            2.945454545454538,
+            2.2690909204819363
+          ],
+          "contactBake": {
+            "durationMs": 214,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 1,
+          "lod": 0,
+          "rendersDuringMeasure": 0
+        },
+        "frames": 361,
+        "meanMs": 16.667036011072078,
+        "p95Ms": 16.900000005960464,
+        "renderer": {
+          "at": 12813.90000000596,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 175370401,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 455,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      },
+      "resources": {
+        "count": 591,
+        "transferBytes": 34320623,
+        "encodedBytes": 36212545
+      }
+    },
+    {
+      "run": 1,
+      "cache": "warm",
+      "readyMs": 3306,
+      "runtime": {
+        "at": 12592.20000000298,
+        "calls": 430,
+        "triangles": 630996,
+        "geometries": 598,
+        "textures": 138,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 291973285,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 240,
+        "averageFrameTimeMs": 16.67,
+        "p95FrameTimeMs": 17.3,
+        "p50FrameTimeMs": 16.7,
+        "p99FrameTimeMs": 17.6,
+        "averageFps": 60,
+        "inverseP99FpsApproximation": 56.8,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 22,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 12592.20000000298,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 291973285,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 100.20000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 100.20000000298023,
+          "b12-worker:start": 100.20000000298023,
+          "fixture-data-ready": 286.40000000596046,
+          "module-ready": 286.80000001192093,
+          "renderer:create:start": 304.6000000089407,
+          "webgl-context:start": 304.6000000089407,
+          "webgl-context:end": 309.30000001192093,
+          "renderer:create:end": 310.90000000596046,
+          "b12-worker:cached": 315.6000000089407,
+          "canvas-created": 315.80000001192093,
+          "b12-worker-geometry": 596.8000000119209,
+          "b12-worker-contact": 596.9000000059605,
+          "b12-worker:end": 596.9000000059605,
+          "critical-scene:start": 597.5,
+          "environment:textures:start": 668.9000000059605,
+          "textures:start": 668.9000000059605,
+          "textures:end": 679.7000000029802,
+          "environment:textures:end": 679.7000000029802,
+          "environment:materials:start": 679.7000000029802,
+          "environment:materials:end": 679.8000000119209,
+          "geometry-preparation:start": 1133.6000000089407,
+          "geometry-preparation:end": 1133.7000000029802,
+          "b12-unpack:start": 1237.9000000059605,
+          "b12-unpack:end": 1238.7000000029802,
+          "b12-materials:start": 1238.7000000029802,
+          "b12-materials:end": 1285.2000000029802,
+          "tree-surface-preparation:start": 1434.5,
+          "tree-surface-preparation:end": 1435.2000000029802,
+          "postprocessing:start": 1808.2000000029802,
+          "postprocessing:end": 1809.7000000029802,
+          "critical-scene:end": 1824,
+          "shader-representatives": 1826,
+          "compile-direct:start": 1826.1000000089407,
+          "program-submission": 1964.7000000029802,
+          "compile-direct-js": 1964.800000011921,
+          "controls-created": 1967.6000000089407,
+          "first-frame-requested": 1967.6000000089407,
+          "program-links-ready": 2054.800000011921,
+          "program-introspection": 2334.4000000059605,
+          "compile-direct:end": 2335.5,
+          "texture-upload:programs-ready": 2335.6000000089407,
+          "texture-upload:start": 2350.300000011921,
+          "texture-upload:end": 3187.2000000029802,
+          "essential-scene:prepared": 3188.5,
+          "shadow-preparation:start": 3220.4000000059605,
+          "shadow-preparation:end": 3220.5,
+          "first-draw": 3262.300000011921,
+          "commercial-map-ready": 3286.6000000089407,
+          "first-interactive": 3286.6000000089407,
+          "critical-post:start": 3370.1000000089407,
+          "deferred-compile-js": 3389.800000011921,
+          "critical-post:end": 5234.800000011921,
+          "hydrate:rain:start": 5322.70000000298,
+          "rain-preparation:start": 5325.300000011921,
+          "rain-preparation:end": 5326.20000000298,
+          "hydrate:rain:mounted": 5326.70000000298,
+          "hydrate:rain:end": 6019.800000011921
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 451,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          0.9075,
+          28.2133,
+          -24.3142
+        ],
+        "target": [
+          -7.9855,
+          0.9,
+          19.0909
+        ],
+        "quaternion": [
+          -0.027509,
+          0.957187,
+          0.271327,
+          0.097048
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.21684,
+        "far": 1283.245,
+        "distance": 52.0491,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -7.9854545454545445,
+          0.9,
+          19.09090918674699
+        ],
+        "position": [
+          -1.9087418181818165,
+          28.213309090909092,
+          -24.314181722343918
+        ]
+      },
+      "measure": {
+        "headquarters": {
+          "entityBounds": [
+            2.945454545454538,
+            2.2690909204819363
+          ],
+          "contactBake": {
+            "durationMs": 207.20000000298023,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 1,
+          "lod": 0,
+          "rendersDuringMeasure": 0
+        },
+        "frames": 361,
+        "meanMs": 16.66592797781457,
+        "p95Ms": 17.400000005960464,
+        "renderer": {
+          "at": 12590.40000000596,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 291973285,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 451,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      },
+      "resources": {
+        "count": 591,
+        "transferBytes": 146400,
+        "encodedBytes": 36212545
+      }
+    },
+    {
+      "run": 2,
+      "cache": "cold",
+      "readyMs": 3495,
+      "runtime": {
+        "at": 12764.90000000596,
+        "calls": 430,
+        "triangles": 630996,
+        "geometries": 598,
+        "textures": 138,
+        "programs": 243,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 202404083,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 240,
+        "averageFrameTimeMs": 16.67,
+        "p95FrameTimeMs": 17.2,
+        "p50FrameTimeMs": 16.7,
+        "p99FrameTimeMs": 17.5,
+        "averageFps": 60,
+        "inverseP99FpsApproximation": 57.1,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 11,
+        "reactCommits": 22,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 12764.90000000596,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 243,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 202404083,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 101.5,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 101.59999999403954,
+          "b12-worker:start": 101.70000000298023,
+          "fixture-data-ready": 362.79999999701977,
+          "module-ready": 363.40000000596046,
+          "renderer:create:start": 393.5,
+          "webgl-context:start": 393.5,
+          "webgl-context:end": 397.40000000596046,
+          "renderer:create:end": 400.09999999403954,
+          "b12-worker:cached": 407.79999999701977,
+          "canvas-created": 408.79999999701977,
+          "b12-worker-geometry": 647.2999999970198,
+          "b12-worker-contact": 647.2999999970198,
+          "b12-worker:end": 647.2999999970198,
+          "critical-scene:start": 648.2999999970198,
+          "environment:textures:start": 728.7999999970198,
+          "textures:start": 728.7999999970198,
+          "textures:end": 741.4000000059605,
+          "environment:textures:end": 741.5,
+          "environment:materials:start": 741.5,
+          "environment:materials:end": 741.5,
+          "geometry-preparation:start": 1258.5,
+          "geometry-preparation:end": 1258.5999999940395,
+          "b12-unpack:start": 1371.5,
+          "b12-unpack:end": 1372.5999999940395,
+          "b12-materials:start": 1372.5999999940395,
+          "b12-materials:end": 1427.2999999970198,
+          "tree-surface-preparation:start": 1593.7999999970198,
+          "tree-surface-preparation:end": 1594.0999999940395,
+          "postprocessing:start": 1989,
+          "postprocessing:end": 1991.7000000029802,
+          "critical-scene:end": 2008.2999999970198,
+          "shader-representatives": 2010.4000000059605,
+          "compile-direct:start": 2010.5999999940395,
+          "program-submission": 2154.0999999940395,
+          "compile-direct-js": 2154.4000000059605,
+          "controls-created": 2158.9000000059605,
+          "first-frame-requested": 2159.2000000029802,
+          "program-links-ready": 2239.7999999970198,
+          "program-introspection": 2521.2999999970198,
+          "compile-direct:end": 2522.4000000059605,
+          "texture-upload:programs-ready": 2522.5,
+          "texture-upload:start": 2538.5,
+          "texture-upload:end": 3376.9000000059605,
+          "essential-scene:prepared": 3378,
+          "shadow-preparation:start": 3409.5,
+          "shadow-preparation:end": 3409.5999999940395,
+          "first-draw": 3450.5,
+          "commercial-map-ready": 3476.4000000059605,
+          "first-interactive": 3476.5,
+          "critical-post:start": 3559.7000000029802,
+          "deferred-compile-js": 3579.4000000059605,
+          "critical-post:end": 5171.0999999940395,
+          "hydrate:rain:start": 5252.9000000059605,
+          "rain-preparation:start": 5256.20000000298,
+          "rain-preparation:end": 5257.5,
+          "hydrate:rain:mounted": 5258.20000000298,
+          "hydrate:rain:end": 5925.79999999702
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 436,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          0.8704,
+          28.2133,
+          -24.3142
+        ],
+        "target": [
+          -7.9855,
+          0.9,
+          19.0909
+        ],
+        "quaternion": [
+          -0.027402,
+          0.957216,
+          0.271374,
+          0.096654
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.21681,
+        "far": 1283.245,
+        "distance": 52.0427,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -7.9854545454545445,
+          0.9,
+          19.09090918674699
+        ],
+        "position": [
+          -1.9087418181818165,
+          28.213309090909092,
+          -24.314181722343918
+        ]
+      },
+      "measure": {
+        "headquarters": {
+          "entityBounds": [
+            2.945454545454538,
+            2.2690909204819363
+          ],
+          "contactBake": {
+            "durationMs": 215,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 1,
+          "lod": 0,
+          "rendersDuringMeasure": 0
+        },
+        "frames": 361,
+        "meanMs": 16.66565096956211,
+        "p95Ms": 17.200000002980232,
+        "renderer": {
+          "at": 12762.90000000596,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 243,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 202404083,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 436,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      },
+      "resources": {
+        "count": 591,
+        "transferBytes": 34320559,
+        "encodedBytes": 36212481
+      }
+    },
+    {
+      "run": 2,
+      "cache": "warm",
+      "readyMs": 3326,
+      "runtime": {
+        "at": 12610.39999999106,
+        "calls": 430,
+        "triangles": 630996,
+        "geometries": 598,
+        "textures": 138,
+        "programs": 243,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 321270225,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 240,
+        "averageFrameTimeMs": 16.67,
+        "p95FrameTimeMs": 17.5,
+        "p50FrameTimeMs": 16.7,
+        "p99FrameTimeMs": 17.5,
+        "averageFps": 60,
+        "inverseP99FpsApproximation": 57.1,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 9,
+        "reactCommits": 22,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 12610.39999999106,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 243,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 321270225,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 99,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 99,
+          "b12-worker:start": 99.09999999403954,
+          "fixture-data-ready": 281.5,
+          "module-ready": 282,
+          "renderer:create:start": 297.8999999910593,
+          "webgl-context:start": 297.8999999910593,
+          "webgl-context:end": 300.5,
+          "renderer:create:end": 302.29999999701977,
+          "b12-worker:cached": 308,
+          "canvas-created": 308.20000000298023,
+          "b12-worker-geometry": 620.0999999940395,
+          "b12-worker-contact": 620.0999999940395,
+          "b12-worker:end": 620.0999999940395,
+          "critical-scene:start": 620.7999999970198,
+          "environment:textures:start": 692.5999999940395,
+          "textures:start": 692.5999999940395,
+          "textures:end": 703.3999999910593,
+          "environment:textures:end": 703.5,
+          "environment:materials:start": 703.5,
+          "environment:materials:end": 703.5999999940395,
+          "geometry-preparation:start": 1153.5,
+          "geometry-preparation:end": 1153.5999999940395,
+          "b12-unpack:start": 1256.8999999910593,
+          "b12-unpack:end": 1257.5999999940395,
+          "b12-materials:start": 1257.5999999940395,
+          "b12-materials:end": 1304.0999999940395,
+          "tree-surface-preparation:start": 1440.5,
+          "tree-surface-preparation:end": 1440.7999999970198,
+          "postprocessing:start": 1809.5999999940395,
+          "postprocessing:end": 1810.8999999910593,
+          "critical-scene:end": 1824.7999999970198,
+          "shader-representatives": 1826.7000000029802,
+          "compile-direct:start": 1826.7000000029802,
+          "program-submission": 1967.8999999910593,
+          "compile-direct-js": 1968,
+          "controls-created": 1970.7000000029802,
+          "first-frame-requested": 1970.7000000029802,
+          "program-links-ready": 2057.5,
+          "program-introspection": 2338.8999999910593,
+          "compile-direct:end": 2339.7000000029802,
+          "texture-upload:programs-ready": 2339.8999999910593,
+          "texture-upload:start": 2354.2000000029802,
+          "texture-upload:end": 3206.7999999970198,
+          "essential-scene:prepared": 3208,
+          "shadow-preparation:start": 3236.7999999970198,
+          "shadow-preparation:end": 3236.8999999910593,
+          "first-draw": 3275.2000000029802,
+          "commercial-map-ready": 3306,
+          "first-interactive": 3306,
+          "critical-post:start": 3389.2999999970198,
+          "deferred-compile-js": 3409.0999999940395,
+          "critical-post:end": 5084.79999999702,
+          "hydrate:rain:start": 5176.29999999702,
+          "rain-preparation:start": 5178.70000000298,
+          "rain-preparation:end": 5179.5,
+          "hydrate:rain:mounted": 5179.899999991059,
+          "hydrate:rain:end": 5855.899999991059
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 444,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          0.9087,
+          28.2133,
+          -24.3142
+        ],
+        "target": [
+          -7.9855,
+          0.9,
+          19.0909
+        ],
+        "quaternion": [
+          -0.027513,
+          0.957186,
+          0.271326,
+          0.09706
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.21684,
+        "far": 1283.245,
+        "distance": 52.0493,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -7.9854545454545445,
+          0.9,
+          19.09090918674699
+        ],
+        "position": [
+          -1.9087418181818165,
+          28.213309090909092,
+          -24.314181722343918
+        ]
+      },
+      "measure": {
+        "headquarters": {
+          "entityBounds": [
+            2.945454545454538,
+            2.2690909204819363
+          ],
+          "contactBake": {
+            "durationMs": 216.09999999403954,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 1,
+          "lod": 0,
+          "rendersDuringMeasure": 0
+        },
+        "frames": 361,
+        "meanMs": 16.665927977855848,
+        "p95Ms": 17.5,
+        "renderer": {
+          "at": 12608.79999999702,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 243,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 321270225,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 444,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      },
+      "resources": {
+        "count": 591,
+        "transferBytes": 146400,
+        "encodedBytes": 36212481
+      }
+    },
+    {
+      "run": 3,
+      "cache": "cold",
+      "readyMs": 3454,
+      "runtime": {
+        "at": 12740.5,
+        "calls": 430,
+        "triangles": 630996,
+        "geometries": 598,
+        "textures": 138,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 179537294,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 240,
+        "averageFrameTimeMs": 16.67,
+        "p95FrameTimeMs": 17.4,
+        "p50FrameTimeMs": 16.7,
+        "p99FrameTimeMs": 17.6,
+        "averageFps": 60,
+        "inverseP99FpsApproximation": 56.8,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 9,
+        "reactCommits": 22,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 12740.5,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 179537294,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 102,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 102.09999999403954,
+          "b12-worker:start": 102.20000000298023,
+          "fixture-data-ready": 357.20000000298023,
+          "module-ready": 357.79999999701977,
+          "renderer:create:start": 386.29999999701977,
+          "webgl-context:start": 386.29999999701977,
+          "webgl-context:end": 390.5,
+          "renderer:create:end": 393.09999999403954,
+          "b12-worker:cached": 401,
+          "canvas-created": 402.09999999403954,
+          "b12-worker-geometry": 641.5999999940395,
+          "b12-worker-contact": 641.7000000029802,
+          "b12-worker:end": 641.7000000029802,
+          "critical-scene:start": 642.7000000029802,
+          "environment:textures:start": 723.0999999940395,
+          "textures:start": 723.0999999940395,
+          "textures:end": 736.2000000029802,
+          "environment:textures:end": 736.2999999970198,
+          "environment:materials:start": 736.3999999910593,
+          "environment:materials:end": 736.3999999910593,
+          "geometry-preparation:start": 1224.7000000029802,
+          "geometry-preparation:end": 1224.7000000029802,
+          "b12-unpack:start": 1336.2999999970198,
+          "b12-unpack:end": 1337.2000000029802,
+          "b12-materials:start": 1337.2999999970198,
+          "b12-materials:end": 1384.7000000029802,
+          "tree-surface-preparation:start": 1553.5,
+          "tree-surface-preparation:end": 1553.8999999910593,
+          "postprocessing:start": 1962.3999999910593,
+          "postprocessing:end": 1964.7000000029802,
+          "critical-scene:end": 1981.7999999970198,
+          "shader-representatives": 1984.0999999940395,
+          "compile-direct:start": 1984.2000000029802,
+          "program-submission": 2129.8999999910593,
+          "compile-direct-js": 2130.2000000029802,
+          "controls-created": 2134.5999999940395,
+          "first-frame-requested": 2135,
+          "program-links-ready": 2208.7000000029802,
+          "program-introspection": 2489.7000000029802,
+          "compile-direct:end": 2490.7000000029802,
+          "texture-upload:programs-ready": 2490.8999999910593,
+          "texture-upload:start": 2505.3999999910593,
+          "texture-upload:end": 3350.8999999910593,
+          "essential-scene:prepared": 3351.2000000029802,
+          "shadow-preparation:start": 3373.0999999940395,
+          "shadow-preparation:end": 3373.2000000029802,
+          "first-draw": 3400.5,
+          "commercial-map-ready": 3435,
+          "first-interactive": 3435,
+          "critical-post:start": 3518.5,
+          "deferred-compile-js": 3538.0999999940395,
+          "critical-post:end": 5302.0999999940395,
+          "hydrate:rain:start": 5387.79999999702,
+          "rain-preparation:start": 5390.70000000298,
+          "rain-preparation:end": 5391.899999991059,
+          "hydrate:rain:mounted": 5392.70000000298,
+          "hydrate:rain:end": 6084.899999991059
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 447,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          0.9081,
+          28.2133,
+          -24.3142
+        ],
+        "target": [
+          -7.9855,
+          0.9,
+          19.0909
+        ],
+        "quaternion": [
+          -0.027511,
+          0.957186,
+          0.271326,
+          0.097054
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.21684,
+        "far": 1283.245,
+        "distance": 52.0492,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -7.9854545454545445,
+          0.9,
+          19.09090918674699
+        ],
+        "position": [
+          -1.9087418181818165,
+          28.213309090909092,
+          -24.314181722343918
+        ]
+      },
+      "measure": {
+        "headquarters": {
+          "entityBounds": [
+            2.945454545454538,
+            2.2690909204819363
+          ],
+          "contactBake": {
+            "durationMs": 213.1000000089407,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 1,
+          "lod": 0,
+          "rendersDuringMeasure": 0
+        },
+        "frames": 361,
+        "meanMs": 16.666759002737063,
+        "p95Ms": 17.399999991059303,
+        "renderer": {
+          "at": 12739,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 179537294,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 447,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      },
+      "resources": {
+        "count": 591,
+        "transferBytes": 34565839,
+        "encodedBytes": 36212481
+      }
+    },
+    {
+      "run": 3,
+      "cache": "warm",
+      "readyMs": 3358,
+      "runtime": {
+        "at": 12642.79999999702,
+        "calls": 430,
+        "triangles": 630996,
+        "geometries": 598,
+        "textures": 138,
+        "programs": 245,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 308255030,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 240,
+        "averageFrameTimeMs": 16.67,
+        "p95FrameTimeMs": 17,
+        "p50FrameTimeMs": 16.7,
+        "p99FrameTimeMs": 17.4,
+        "averageFps": 60,
+        "inverseP99FpsApproximation": 57.5,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 22,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 12642.79999999702,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 308255030,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 112.8999999910593,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 113.09999999403954,
+          "b12-worker:start": 113.09999999403954,
+          "fixture-data-ready": 363.8999999910593,
+          "module-ready": 364.19999998807907,
+          "renderer:create:start": 383,
+          "webgl-context:start": 383,
+          "webgl-context:end": 385.79999999701977,
+          "renderer:create:end": 387.69999998807907,
+          "b12-worker:cached": 393.59999999403954,
+          "canvas-created": 393.79999999701977,
+          "b12-worker-geometry": 685.8999999910593,
+          "b12-worker-contact": 685.8999999910593,
+          "b12-worker:end": 686,
+          "critical-scene:start": 686.5999999940395,
+          "environment:textures:start": 758.8999999910593,
+          "textures:start": 758.8999999910593,
+          "textures:end": 769.7999999970198,
+          "environment:textures:end": 769.8999999910593,
+          "environment:materials:start": 769.8999999910593,
+          "environment:materials:end": 769.8999999910593,
+          "geometry-preparation:start": 1235.3999999910593,
+          "geometry-preparation:end": 1235.3999999910593,
+          "b12-unpack:start": 1340.0999999940395,
+          "b12-unpack:end": 1341,
+          "b12-materials:start": 1341,
+          "b12-materials:end": 1388,
+          "tree-surface-preparation:start": 1545.5,
+          "tree-surface-preparation:end": 1545.7999999970198,
+          "postprocessing:start": 1931,
+          "postprocessing:end": 1932.3999999910593,
+          "critical-scene:end": 1947.199999988079,
+          "shader-representatives": 1949.0999999940395,
+          "compile-direct:start": 1949.0999999940395,
+          "program-submission": 2061.7999999970198,
+          "compile-direct-js": 2061.8999999910593,
+          "controls-created": 2064.5999999940395,
+          "first-frame-requested": 2064.7999999970198,
+          "program-links-ready": 2116.7999999970198,
+          "program-introspection": 2379.5,
+          "compile-direct:end": 2380.0999999940395,
+          "texture-upload:programs-ready": 2380.0999999940395,
+          "texture-upload:start": 2388.8999999910593,
+          "texture-upload:end": 3238,
+          "essential-scene:prepared": 3239.199999988079,
+          "shadow-preparation:start": 3271.0999999940395,
+          "shadow-preparation:end": 3271.199999988079,
+          "first-draw": 3313.5999999940395,
+          "commercial-map-ready": 3338.2999999970198,
+          "first-interactive": 3338.2999999970198,
+          "critical-post:start": 3421.5999999940395,
+          "deferred-compile-js": 3441.3999999910593,
+          "critical-post:end": 5302.899999991059,
+          "hydrate:rain:start": 5391.0999999940395,
+          "rain-preparation:start": 5393.699999988079,
+          "rain-preparation:end": 5394.5,
+          "hydrate:rain:mounted": 5395,
+          "hydrate:rain:end": 6088.29999999702
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 455,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          0.9081,
+          28.2133,
+          -24.3142
+        ],
+        "target": [
+          -7.9855,
+          0.9,
+          19.0909
+        ],
+        "quaternion": [
+          -0.027511,
+          0.957186,
+          0.271326,
+          0.097054
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.21684,
+        "far": 1283.245,
+        "distance": 52.0492,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -7.9854545454545445,
+          0.9,
+          19.09090918674699
+        ],
+        "position": [
+          -1.9087418181818165,
+          28.213309090909092,
+          -24.314181722343918
+        ]
+      },
+      "measure": {
+        "headquarters": {
+          "entityBounds": [
+            2.945454545454538,
+            2.2690909204819363
+          ],
+          "contactBake": {
+            "durationMs": 210.40000000596046,
+            "samples": 16167,
+            "rays": 8,
+            "maxDistanceMeters": 0.85
+          },
+          "resources": {
+            "materialCount": 24,
+            "geometryBatches": 33,
+            "instancedBatches": 3,
+            "instanceCapacity": 2652,
+            "geometryBufferBytes": 4189038,
+            "textureCount": 15,
+            "estimatedTextureBytes": 17476266.666666664,
+            "transparentBatches": 1
+          },
+          "renderCount": 1,
+          "lod": 0,
+          "rendersDuringMeasure": 0
+        },
+        "frames": 361,
+        "meanMs": 16.666204986149584,
+        "p95Ms": 17.099999994039536,
+        "renderer": {
+          "at": 12641.39999999106,
+          "calls": 430,
+          "triangles": 630996,
+          "geometries": 598,
+          "textures": 138,
+          "programs": 245,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 308255030,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        },
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 455,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "visible": "visible",
+        "focused": true
+      },
+      "resources": {
+        "count": 591,
+        "transferBytes": 146400,
+        "encodedBytes": 36212481
+      }
+    }
+  ],
+  "views": [],
+  "errors": [],
+  "medians": {
+    "cold": {
+      "readyMs": 3495,
+      "frameMeanMs": 16.666759002737063,
+      "frameP95Ms": 17.200000002980232,
+      "calls": 430,
+      "geometries": 598,
+      "textures": 138,
+      "programs": 245,
+      "transferBytes": 34320623,
+      "heapBytes": 179537294
+    },
+    "warm": {
+      "readyMs": 3326,
+      "frameMeanMs": 16.665927977855848,
+      "frameP95Ms": 17.400000005960464,
+      "calls": 430,
+      "geometries": 598,
+      "textures": 138,
+      "programs": 245,
+      "transferBytes": 146400,
+      "heapBytes": 308255030
+    }
+  }
+}

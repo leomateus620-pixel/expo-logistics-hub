@@ -1,0 +1,91 @@
+{
+  "queriedOn": "2026-10-30",
+  "boundsOnly": true,
+  "note": "Sanitized live bounds compared with the versioned fixture; does not assert equality of current commercial contents.",
+  "rows": [
+    {
+      "publicIdentifier": "B1",
+      "activeChildren": 189,
+      "maxBoundDifference": 0,
+      "deltas": {
+        "minX": 0,
+        "maxX": 0,
+        "minZ": 0,
+        "maxZ": 0
+      },
+      "match": true
+    },
+    {
+      "publicIdentifier": "B3",
+      "activeChildren": 257,
+      "maxBoundDifference": 0,
+      "deltas": {
+        "minX": 0,
+        "maxX": 0,
+        "minZ": 0,
+        "maxZ": 0
+      },
+      "match": true
+    },
+    {
+      "publicIdentifier": "B4",
+      "activeChildren": 114,
+      "maxBoundDifference": 0,
+      "deltas": {
+        "minX": 0,
+        "maxX": 0,
+        "minZ": 0,
+        "maxZ": 0
+      },
+      "match": true
+    },
+    {
+      "publicIdentifier": "B5",
+      "activeChildren": 104,
+      "maxBoundDifference": 0,
+      "deltas": {
+        "minX": 0,
+        "maxX": 0,
+        "minZ": 0,
+        "maxZ": 0
+      },
+      "match": true
+    },
+    {
+      "publicIdentifier": "B6",
+      "activeChildren": 214,
+      "maxBoundDifference": 0,
+      "deltas": {
+        "minX": 0,
+        "maxX": 0,
+        "minZ": 0,
+        "maxZ": 0
+      },
+      "match": true
+    },
+    {
+      "publicIdentifier": "B19",
+      "activeChildren": null,
+      "maxBoundDifference": 0,
+      "deltas": {
+        "minX": 0,
+        "maxX": 0,
+        "minZ": 0,
+        "maxZ": 0
+      },
+      "match": true
+    },
+    {
+      "publicIdentifier": "B11",
+      "activeChildren": null,
+      "maxBoundDifference": 0,
+      "deltas": {
+        "minX": 0,
+        "maxX": 0,
+        "minZ": 0,
+        "maxZ": 0
+      },
+      "match": true
+    }
+  ]
+}

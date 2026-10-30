@@ -1,0 +1,42 @@
+{
+  "queriedOn": "2026-10-30",
+  "source": "Read-only existing FENASOJA database; no commercial or personal data",
+  "rows": [
+    {
+      "classification": "ADMINISTRATION",
+      "elevation": "0.000000",
+      "extrusion_height": "0.620000",
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              8.399999999999991,
+              19.090909186746984
+            ],
+            [
+              11.127272727272725,
+              19.090909186746984
+            ],
+            [
+              11.127272727272725,
+              25.63636376506024
+            ],
+            [
+              8.399999999999991,
+              25.63636376506024
+            ],
+            [
+              8.399999999999991,
+              19.090909186746984
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "name": "Centro administrativo / auditório",
+      "public_identifier": "B11",
+      "rotation": "0.000000",
+      "version": 1
+    }
+  ]
+}

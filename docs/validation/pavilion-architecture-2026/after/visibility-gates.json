@@ -1,0 +1,311 @@
+{
+  "base": "http://127.0.0.1:8080",
+  "fixture": true,
+  "errors": [],
+  "states": [
+    {
+      "name": "default",
+      "objects": {
+        "architecture-2026:B1": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B3": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B4": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B5": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B6": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "pavilion-complex:p8-p13": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "pavilion-complex:p13-p3": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "brigada-military-wing:B19": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "brigada-military-wing:construction-join": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "administrative-center-entrance:B11": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "administrative-center-photo-tree:B11": {
+          "exists": true,
+          "effectiveVisible": true
+        }
+      },
+      "state": {
+        "salesPresentationActive": false,
+        "treesVisible": true,
+        "reducedGraphics": false
+      },
+      "runtime": {
+        "at": 7142.29999999702,
+        "calls": 779,
+        "triangles": 1032088,
+        "geometries": 616,
+        "textures": 115,
+        "programs": 206,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 205066511,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "sales",
+      "objects": {
+        "architecture-2026:B1": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B3": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B4": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B5": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B6": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "pavilion-complex:p8-p13": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "pavilion-complex:p13-p3": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "brigada-military-wing:B19": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "brigada-military-wing:construction-join": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "administrative-center-entrance:B11": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "administrative-center-photo-tree:B11": {
+          "exists": true,
+          "effectiveVisible": false
+        }
+      },
+      "state": {
+        "salesPresentationActive": true,
+        "treesVisible": true,
+        "reducedGraphics": false
+      },
+      "runtime": {
+        "at": 8086.79999999702,
+        "calls": 358,
+        "triangles": 320297,
+        "geometries": 503,
+        "textures": 115,
+        "programs": 200,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 200541642,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 46,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "trees-off",
+      "objects": {
+        "architecture-2026:B1": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B3": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B4": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B5": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B6": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "pavilion-complex:p8-p13": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "pavilion-complex:p13-p3": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "brigada-military-wing:B19": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "brigada-military-wing:construction-join": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "administrative-center-entrance:B11": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "administrative-center-photo-tree:B11": {
+          "exists": true,
+          "effectiveVisible": false
+        }
+      },
+      "state": {
+        "salesPresentationActive": false,
+        "treesVisible": false,
+        "reducedGraphics": false
+      },
+      "runtime": {
+        "at": 9120.20000000298,
+        "calls": 718,
+        "triangles": 370254,
+        "geometries": 559,
+        "textures": 115,
+        "programs": 214,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 218881995,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 48,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "restored",
+      "objects": {
+        "architecture-2026:B1": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B3": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B4": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B5": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "architecture-2026:B6": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "pavilion-complex:p8-p13": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "pavilion-complex:p13-p3": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "brigada-military-wing:B19": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "brigada-military-wing:construction-join": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "administrative-center-entrance:B11": {
+          "exists": true,
+          "effectiveVisible": true
+        },
+        "administrative-center-photo-tree:B11": {
+          "exists": true,
+          "effectiveVisible": true
+        }
+      },
+      "state": {
+        "salesPresentationActive": false,
+        "treesVisible": true,
+        "reducedGraphics": false
+      },
+      "runtime": {
+        "at": 10127.20000000298,
+        "calls": 462,
+        "triangles": 634636,
+        "geometries": 562,
+        "textures": 141,
+        "programs": 248,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 205049965,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 52,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ]
+}

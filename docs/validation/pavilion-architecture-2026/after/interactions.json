@@ -1,0 +1,117 @@
+{
+  "fixture": true,
+  "base": "http://127.0.0.1:8080",
+  "errors": [],
+  "pavilions": [
+    {
+      "id": "B1",
+      "point": {
+        "candidate": {
+          "instance": 79,
+          "x": 689.1993443730189,
+          "y": 408.98339764660193,
+          "score": 0.0004792118393840465
+        },
+        "count": 188,
+        "interiorEntityId": "reference:2026:b1"
+      },
+      "selected": {
+        "selectedModuleId": "B1:module:080",
+        "interiorEntityId": "reference:2026:b1"
+      },
+      "closed": {
+        "selectedModuleId": null,
+        "interiorEntityId": "reference:2026:b1"
+      },
+      "pass": true
+    },
+    {
+      "id": "B3",
+      "point": {
+        "candidate": {
+          "instance": 144,
+          "x": 682.2053708504177,
+          "y": 384.20180180378236,
+          "score": 0.003724504710393262
+        },
+        "count": 257,
+        "interiorEntityId": "reference:2026:b3"
+      },
+      "selected": {
+        "selectedModuleId": "B3:module:145",
+        "interiorEntityId": "reference:2026:b3"
+      },
+      "closed": {
+        "selectedModuleId": null,
+        "interiorEntityId": "reference:2026:b3"
+      },
+      "pass": true
+    },
+    {
+      "id": "B4",
+      "point": {
+        "candidate": {
+          "instance": 83,
+          "x": 653.395080602896,
+          "y": 411.8546961391621,
+          "score": 0.0013324185557257989
+        },
+        "count": 113,
+        "interiorEntityId": "reference:2026:b4"
+      },
+      "selected": {
+        "selectedModuleId": "B4:module:084",
+        "interiorEntityId": "reference:2026:b4"
+      },
+      "closed": {
+        "selectedModuleId": null,
+        "interiorEntityId": "reference:2026:b4"
+      },
+      "pass": true
+    },
+    {
+      "id": "B5",
+      "point": {
+        "candidate": {
+          "instance": 31,
+          "x": 696.6933688493303,
+          "y": 405.5960999932375,
+          "score": 0.000985594301736047
+        },
+        "count": 98,
+        "interiorEntityId": "reference:2026:b5"
+      },
+      "selected": {
+        "selectedModuleId": "B5:module:034",
+        "interiorEntityId": "reference:2026:b5"
+      },
+      "closed": {
+        "selectedModuleId": null,
+        "interiorEntityId": "reference:2026:b5"
+      },
+      "pass": true
+    },
+    {
+      "id": "B6",
+      "point": {
+        "candidate": {
+          "instance": 88,
+          "x": 697.6715711017735,
+          "y": 408.8801522468936,
+          "score": 0.0011406152827663375
+        },
+        "count": 213,
+        "interiorEntityId": "reference:2026:b6"
+      },
+      "selected": {
+        "selectedModuleId": "B6:module:090",
+        "interiorEntityId": "reference:2026:b6"
+      },
+      "closed": {
+        "selectedModuleId": null,
+        "interiorEntityId": "reference:2026:b6"
+      },
+      "pass": true
+    }
+  ]
+}

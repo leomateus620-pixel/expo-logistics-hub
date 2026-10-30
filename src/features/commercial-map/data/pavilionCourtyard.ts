@@ -73,7 +73,10 @@ const b1RootRadius = gap * 0.17;
 const b1RootOpening = root(treePositionB1, b1RootRadius);
 const requested = polygonClipping.union(
   [rectangle(p1.minX, p1.maxZ, cornerX, sidewalkEdgeZ)],
-  [rectangle(p1.maxX, treePositionB1[1] - b1RootRadius * 1.6, cornerX, sidewalkEdgeZ)],
+  // Photo 30/10/2026: the entire P1 entrance face opens onto concrete.
+  // Extend only the existing apron width, keeping its street edge, tree
+  // opening, cadastral protection masks and all other surface owners.
+  [rectangle(p1.maxX, p1.minZ, cornerX, sidewalkEdgeZ)],
   [rectangle(p14.maxX, p14.minZ, p12.minX, courtyardAvenueEdgeZ)],
   // Annex 5: inner frontage up to actual facades; B4/B6 have narrow thresholds.
   [rectangle(p12.minX, argentina.maxZ, p3.maxX, p12.minZ)],
@@ -92,11 +95,13 @@ const trees = [
 ];
 
 export const PAVILION_COURTYARD = Object.freeze({
-  revision: '2026.9-benvenuto-pavilion-surfaces.4',
+  revision: '2026.10-pavilion-1-continuous-front-apron.1',
   evidence: ['fdc85e65-5dc2-43b4-a0a8-970c6908e1c3.jpg', '7db5c4bb-32aa-4f1d-93c4-a3a9ae5fdce5.jpg',
     'c4037d48-20fa-4a38-8292-042506f51f75.jpg',
     'codex-clipboard-6ab48a88-adaf-4ecb-a7f0-0201f950ebb9.png',
     'codex-clipboard-4958e7fa-f7ea-4021-b175-84202b101a98.png'] as const,
+  pavilion1FrontApron: { minX: p1.maxX, maxX: cornerX, minZ: p1.minZ, maxZ: sidewalkEdgeZ,
+    evidence: 'WhatsApp Image 2026-10-30 at 10.39.51 (2).jpeg', measured: false },
   anchorIdentifiers: ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B23', 'B34', 'B41', 'ALAMEDA-MERCOSUL'] as const,
   protectedPolygons, officialMeasurements: false,
   retiredFrontageMasks,

@@ -1,0 +1,178 @@
+{
+  "note": "Requested exterior/cutaway poses use identical viewports, graphic modes and stable daylight. Interiors use the existing CameraRig.",
+  "maxPoseDifference": 0,
+  "comparisons": [
+    {
+      "view": "desktop-all-five",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-complex",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-roofs",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B1-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B1-side",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B1-pedestrian",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B3-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B3-side",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B3-pedestrian",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B4-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B4-pedestrian",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B5-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B5-pedestrian",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B6-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B6-pedestrian",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-night",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-rain",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-reduced",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B1-selected",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B3-selected",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B4-selected",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B5-selected",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B6-selected",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "notebook-all-five",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "notebook-complex",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "notebook-B1-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "notebook-B3-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "notebook-B4-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "notebook-B5-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "notebook-B6-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "mobile-all-five",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "mobile-complex",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "mobile-B1-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "mobile-B3-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "mobile-B4-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "mobile-B5-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "mobile-B6-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B19-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B19-oblique",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B19-pedestrian",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B11-front",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B11-oblique",
+      "maxPoseDifference": 0
+    },
+    {
+      "view": "desktop-B11-pedestrian",
+      "maxPoseDifference": 0
+    }
+  ]
+}

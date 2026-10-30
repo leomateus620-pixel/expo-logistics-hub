@@ -1,0 +1,78 @@
+{
+  "queriedOn": "2026-10-30",
+  "source": "Read-only query of the existing FENASOJA database; appearance-only annex requested by the owner",
+  "rows": [
+    {
+      "classification": "SECURITY",
+      "elevation": "0.000000",
+      "extrusion_height": "0.620000",
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              6.981818181818184,
+              17.541818269879514
+            ],
+            [
+              8.334545454545449,
+              17.541818269879514
+            ],
+            [
+              8.334545454545449,
+              19.37454555180723
+            ],
+            [
+              6.981818181818184,
+              19.37454555180723
+            ],
+            [
+              6.981818181818184,
+              17.541818269879514
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "name": "Brigada Militar",
+      "public_identifier": "B19",
+      "rotation": "0.000000",
+      "version": 1
+    },
+    {
+      "classification": "PAVILION",
+      "elevation": "0.000000",
+      "extrusion_height": "1.350000",
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              2.4000000000000057,
+              17.694545543373494
+            ],
+            [
+              6.981818181818184,
+              17.694545543373494
+            ],
+            [
+              6.981818181818184,
+              24.50181830481928
+            ],
+            [
+              2.4000000000000057,
+              24.50181830481928
+            ],
+            [
+              2.4000000000000057,
+              17.694545543373494
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "name": "Pavilhão 3 — Comércio",
+      "public_identifier": "B6",
+      "rotation": "0.000000",
+      "version": 1
+    }
+  ]
+}

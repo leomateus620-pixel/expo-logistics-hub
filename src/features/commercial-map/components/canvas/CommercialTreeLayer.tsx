@@ -32,6 +32,7 @@ import { VegetationPilotTreeLayer } from './VegetationPilotTreeLayer';
 import { VegetationPilotGroundLayer } from './VegetationPilotGroundLayer';
 import { createInternalFoliageMaterial, createInternalLeafAtlas, createInternalLeafLobe, internalTreeCrownCastsShadow, isInternalParkVegetationPoint, INTERNAL_TREE_TRUNK_RADIUS_FACTOR } from '../../utils/internalTreeVisuals';
 import { createPilotBarkMaterial } from './vegetationPilotMaterial';
+import { commercialTreeWoodStructure } from '../../utils/commercialTreeWoodStructure';
 
 const NO_RAYCAST = () => undefined;
 const SHADOW_OPACITY = 0.105;
@@ -398,7 +399,7 @@ function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = fa
  * jitter. The canopy reads as foliage instead of one opaque green mass, and it
  * hides less of the lots and labels underneath.
  */
-function crownLobeTransform(tree: CommercialMapTree, lobeIndex: number, lobeCount: number, referenceQuadras = false) {
+export function crownLobeTransform(tree: CommercialMapTree, lobeIndex: number, lobeCount: number, referenceQuadras = false) {
   const profile = commercialTreePresentationProfile(tree);
   const seed = profile.seed * 997 + tree.visualVariant * 13.7 + 1;
   const isCentral = lobeIndex === 0;
@@ -654,12 +655,13 @@ function CommercialTreeInstances({
       const trunkPalette = (referenceQuadras ? QUADRAS_AB_TRUNK_PALETTES : TRUNK_PALETTES)[tree.speciesGroup];
       const foliagePalette = (referenceQuadras ? QUADRAS_AB_FOLIAGE_PALETTES : COMMERCIAL_TREE_FOLIAGE_PALETTES)[tree.speciesGroup];
       const profile = commercialTreePresentationProfile(tree);
+      const wood = commercialTreeWoodStructure(tree);
 
-      transform.position.set(x, groundY + tree.trunkHeight / 2, z);
+      transform.position.set(x, groundY + wood.trunkHeight / 2, z);
       transform.rotation.set(0, profile.rotation, 0);
       transform.scale.set(
         tree.trunkRadius * profile.trunkScaleX * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
-        tree.trunkHeight,
+        wood.trunkHeight,
         tree.trunkRadius * profile.trunkScaleZ * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
       );
       transform.updateMatrix();
@@ -670,11 +672,10 @@ function CommercialTreeInstances({
       for (let branchIndex = 0; branchIndex < COMMERCIAL_TREE_BRANCHES; branchIndex += 1) {
         const instanceIndex = treeIndex * COMMERCIAL_TREE_BRANCHES + branchIndex;
         const angle = profile.rotation + tree.visualVariant * 0.71 + branchIndex * Math.PI * 0.93;
-        const branchLength = tree.crownHeight * (0.34 + branchIndex * 0.045);
-        start.set(x, groundY + tree.trunkHeight * (0.58 + branchIndex * 0.08), z);
+        start.set(x, groundY + wood.branches[branchIndex].startY, z);
         end.set(
           x + Math.cos(angle) * tree.canopyRadius * 0.3,
-          start.y + branchLength,
+          groundY + wood.branches[branchIndex].endY,
           z + Math.sin(angle) * tree.canopyRadius * 0.3,
         );
         direction.subVectors(end, start);
