@@ -1,0 +1,54 @@
+{
+  "base": "http://127.0.0.1:8080",
+  "fixture": true,
+  "id": "reference:2026:b11",
+  "errors": [],
+  "clicks": [
+    {
+      "name": "sign",
+      "point": {
+        "world": [
+          9.800061805139885,
+          0.5955000221729279,
+          17.89502714286528
+        ],
+        "x": 746.9029940782139,
+        "y": 623.103231267238
+      },
+      "state": {
+        "selectedEntityId": "reference:2026:b11",
+        "interiorEntityId": null,
+        "selectedModuleId": null
+      },
+      "pass": true
+    },
+    {
+      "name": "roof",
+      "point": {
+        "world": [
+          9.574616795371874,
+          0.6337499916553497,
+          18.666327339512925
+        ],
+        "x": 747.0456799019081,
+        "y": 545.6547255928132
+      },
+      "state": {
+        "selectedEntityId": "reference:2026:b11",
+        "interiorEntityId": null,
+        "selectedModuleId": null
+      },
+      "pass": true
+    }
+  ],
+  "dragPoint": {
+    "world": [
+      9.574616795371874,
+      0.6337499916553497,
+      18.666327339512925
+    ],
+    "x": 747.0456799019081,
+    "y": 545.6547255928132
+  },
+  "dragGuard": true
+}

@@ -20,7 +20,8 @@ import {
   createFenasojaRestaurantLayout,
 } from '../../utils/fenasojaRestaurant';
 import { PAVILION_FOUR_SOY_KITCHEN_LAYOUT } from '../../utils/pavilionFourSoyKitchen';
-import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
+import { commercialPavilionModelBounds, createCommercialPavilionLayout, resolveCommercialPavilionDefinition } from '../../utils/commercialPavilions';
+import { pavilionArchitectureHeight } from '../../utils/pavilionArchitectureLayout';
 import {
   VIA_EXPRESSA_LAYOUT,
   VIA_EXPRESSA_RENDER_BUDGET,
@@ -67,6 +68,8 @@ import {
 import { fitRotatedStructureBounds } from '../../utils/fenasojaReferenceStructures';
 import { CampeiraTrack } from './CampeiraTrack';
 import { CommercialPavilion } from './CommercialPavilion';
+import { resolvePavilionArchitecturePalette } from '../../data/pavilionArchitecturePalettes';
+import { applyPavilionMaterialPresentation, usePavilionArchitectureMaterials } from './pavilions/PavilionArchitectureMaterials';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { ThirdAgePavilion } from './ThirdAgePavilion';
 import { LactalisCulturalStage } from './LactalisCulturalStage';
@@ -90,6 +93,9 @@ import type { CommercialMapSegmentDefinition } from '../../data/commercialMapSeg
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 import { createInternalFoliageMaterial, createInternalLeafAtlas, createInternalLeafLobe } from '../../utils/internalTreeVisuals';
 import { createPilotBarkMaterial } from './vegetationPilotMaterial';
+import { AdministrativeCenterEntrance } from './AdministrativeCenterEntrance';
+import { createAdministrativeCenterEntranceLayout } from '../../utils/administrativeCenterEntrance';
+import { COMMERCIAL_MAP_GROUND_ELEVATION } from '../../constants';
 
 const NO_RAYCAST = () => undefined;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
@@ -510,11 +516,13 @@ function useLandmarkMaterials(
   selected: boolean,
   hovered: boolean,
   segment: CommercialMapSegmentDefinition | null,
+  publicIdentifier?: string,
 ): LandmarkMaterialSet {
   const invalidate = useThree((state) => state.invalidate);
   const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
+  const architecturePalette = kind === 'commercial-pavilion' ? resolvePavilionArchitecturePalette(publicIdentifier) : null;
   const materials = useMemo<LandmarkMaterialSet>(() => {
-    const palette = LANDMARK_PALETTES[kind];
+    const palette = architecturePalette ?? LANDMARK_PALETTES[kind];
     const result = {
       wall: material(palette.wall, 0.84),
       accent: material(palette.accent, 0.8),
@@ -710,9 +718,14 @@ function useLandmarkMaterials(
     applyParkSurfaceDetail(result.dark, 'metal', reducedGraphics);
     applyParkSurfaceDetail(result.trim, 'metal', reducedGraphics);
     return result;
-  }, [kind, reducedGraphics]);
+  }, [architecturePalette, kind, reducedGraphics]);
 
   useEffect(() => {
+    if (architecturePalette) {
+      applyPavilionMaterialPresentation(materials, architecturePalette, { toneDown, selected, hovered });
+      invalidate();
+      return;
+    }
     const palette = LANDMARK_PALETTES[kind];
     (Object.keys(materials) as Array<keyof LandmarkMaterialSet>).forEach((key) => {
       const item = materials[key];
@@ -766,7 +779,7 @@ function useLandmarkMaterials(
       item.emissiveIntensity = selected ? 0.04 : hovered ? 0.012 : 0;
     });
     invalidate();
-  }, [hovered, invalidate, kind, materials, segment, selected, toneDown]);
+  }, [architecturePalette, hovered, invalidate, kind, materials, segment, selected, toneDown]);
 
   useEffect(() => () => {
     Object.values(materials).forEach((item) => item.dispose());
@@ -1609,14 +1622,19 @@ function AdministrativeCenter({
     () => createGableFacadeGeometry(bodyDepth, roofRise),
     [bodyDepth, roofRise],
   );
+  const entranceLayout = useMemo(() => createAdministrativeCenterEntranceLayout(bounds, height), [bounds, height]);
 
   useEffect(() => () => endGableGeometry.dispose(), [endGableGeometry]);
 
   return (
     <group dispose={null}>
-      <mesh geometry={UNIT_BOX} material={materials.green} position={[0, 0.028, 0]} scale={[width, 0.055, depth]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, 0.055, frontZ + depth * 0.19]} scale={[width * 0.9, 0.045, depth * 0.18]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={UNIT_BOX} material={materials.accent} position={[0, baseY + wallHeight * 0.055, bodyZ]} scale={[bodyWidth, wallHeight * 0.11, bodyDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
+      <AdministrativeCenterEntrance layout={entranceLayout} materials={materials} showDetail={showDetail} />
+      <mesh geometry={UNIT_BOX} material={materials.platform}
+        position={[0, (COMMERCIAL_MAP_GROUND_ELEVATION + 0.0775) / 2, frontZ + depth * 0.19]}
+        scale={[width * 0.9, 0.0775 - COMMERCIAL_MAP_GROUND_ELEVATION, depth * 0.18]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
+      <mesh geometry={UNIT_BOX} material={materials.accent}
+        position={[0, (COMMERCIAL_MAP_GROUND_ELEVATION + baseY + wallHeight * 0.11) / 2, bodyZ]}
+        scale={[bodyWidth, baseY + wallHeight * 0.11 - COMMERCIAL_MAP_GROUND_ELEVATION, bodyDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
       <mesh geometry={UNIT_BOX} material={materials.wall} position={[0, baseY + wallHeight / 2, bodyZ]} scale={[bodyWidth, wallHeight, bodyDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
       <ScaledInstances material={materials.roof} castShadow receiveShadow items={[
         { position: [0, baseY + wallHeight + roofRise * 0.5, bodyZ + bodyDepth * 0.25], scale: [bodyWidth + width * 0.04, 0.065, roofHalfDepth], rotation: [roofPitch, 0, 0] },
@@ -1637,39 +1655,18 @@ function AdministrativeCenter({
         { position: [-bodyWidth * 0.497, baseY + wallHeight * 0.94, bodyZ], scale: [0.045, 0.045, bodyDepth * 0.92] },
       ]} />
       <ScaledInstances material={materials.platform} items={accessSteps} receiveShadow />
+      <ReferenceMuralPanel
+        variant="administrative"
+        position={[bodyWidth / 2 + 0.027, baseY + wallHeight * 0.64, bodyZ - bodyDepth * 0.03]}
+        rotation={[0, Math.PI / 2, 0]}
+        size={[bodyDepth * 0.86, wallHeight * 0.60]}
+      />
 
       {showDetail && (
         <>
           <ScaledInstances material={materials.metal} items={airConditioners} />
           <ScaledInstances material={materials.dark} items={acVents} />
           <ScaledInstances geometry={UNIT_CYLINDER} material={materials.dark} items={acFans} />
-          <ReferenceMuralPanel
-            variant="administrative"
-            position={[-bodyWidth / 2 - 0.027, baseY + wallHeight * 0.64, bodyZ - bodyDepth * 0.03]}
-            rotation={[0, -Math.PI / 2, 0]}
-            size={[bodyDepth * 0.86, wallHeight * 0.62]}
-          />
-          <mesh
-            geometry={UNIT_BOX}
-            material={materials.glass}
-            position={[-bodyWidth / 2 - 0.028, baseY + wallHeight * 0.22, bodyZ + bodyDepth * 0.29]}
-            scale={[0.028, wallHeight * 0.36, bodyDepth * 0.2]}
-            raycast={NO_RAYCAST}
-            dispose={null}
-          />
-          <mesh
-            geometry={UNIT_BOX}
-            material={materials.trim}
-            position={[-bodyWidth / 2 - width * 0.055, baseY + wallHeight * 0.45, bodyZ + bodyDepth * 0.29]}
-            scale={[width * 0.11, 0.05, bodyDepth * 0.3]}
-            castShadow
-            raycast={NO_RAYCAST}
-            dispose={null}
-          />
-          <ScaledInstances material={materials.platform} items={[0, 1].map((index) => ({
-            position: [-bodyWidth / 2 - width * (0.035 + index * 0.035), 0.035 + index * 0.028, bodyZ + bodyDepth * 0.29] as Vector3Tuple,
-            scale: [width * 0.07, 0.04, bodyDepth * (0.27 - index * 0.025)] as Vector3Tuple,
-          }))} />
           <ScaledInstances geometry={UNIT_SHRUB} material={materials.green} items={[-0.33, -0.18, 0.16, 0.32].map((x, index) => ({
             position: [x * width, 0.18 + (index % 2) * 0.03, frontZ + depth * 0.25] as Vector3Tuple,
             scale: [depth * 0.16, depth * (0.18 + (index % 2) * 0.04), depth * 0.14] as Vector3Tuple,
@@ -3200,22 +3197,44 @@ export function StrategicLandmarkMesh({
   );
   const baseHitVolumeScale = kind === 'lunar-tree' ? LUNAR_MEMORIAL_HIT_SCALE : 1;
   const hitVolumeScale = kind === 'crioulos-center' ? 1.35 : baseHitVolumeScale;
+  const hitVolumeHeight = useMemo(() => {
+    const definition = kind === 'commercial-pavilion' && resolvePavilionArchitecturePalette(entity.publicIdentifier)
+      ? resolveCommercialPavilionDefinition(entity) : null;
+    return definition ? pavilionArchitectureHeight(createCommercialPavilionLayout(
+      commercialPavilionModelBounds(bounds, facingRadians), definition, height,
+    )) : height;
+  }, [bounds, entity, facingRadians, height, kind]);
   const hitVolume = useMemo(
     () => createLocalHitVolumeGeometry(
       interactionEntity,
       bounds,
-      height,
+      hitVolumeHeight,
       hitVolumeScale,
     ),
-    [bounds, height, hitVolumeScale, interactionEntity],
+    [bounds, hitVolumeHeight, hitVolumeScale, interactionEntity],
   );
+  const entranceHitVolume = useMemo(() => {
+    if (kind !== 'administrative-center' || entity.publicIdentifier !== 'B11') return null;
+    const access = createAdministrativeCenterEntranceLayout(commercialPavilionModelBounds(bounds, facingRadians), height);
+    const { canopy, walkway } = access;
+    const frontX = canopy.maxX + 0.03;
+    const top = canopy.ridgeY + 0.02;
+    return new THREE.BoxGeometry(frontX - canopy.minX, top - walkway.elevation, canopy.maxZ - canopy.minZ)
+      .translate((canopy.minX + frontX) / 2, (walkway.elevation + top) / 2, (canopy.minZ + canopy.maxZ) / 2)
+      .rotateY(facingRadians);
+  }, [bounds, entity.publicIdentifier, facingRadians, height, kind]);
   const outline = useMemo(
     () => createLocalFootprintOutline(interactionEntity, bounds),
     [bounds, interactionEntity],
   );
   const filterStrength = filtersActive && !isMatch && !selected ? 0.42 : 1;
   const toneDown = 1 - THREE.MathUtils.clamp(layerOpacity * filterStrength, 0, 1);
-  const materials = useLandmarkMaterials(kind ?? 'german-pavilion', toneDown, selected, hovered, segment);
+  const baseMaterials = useLandmarkMaterials(kind ?? 'german-pavilion', toneDown, selected, hovered, segment, entity.publicIdentifier);
+  const materials = usePavilionArchitectureMaterials(
+    kind === 'commercial-pavilion' ? entity.publicIdentifier : '',
+    baseMaterials,
+    { toneDown, selected, hovered },
+  );
   const segmentOutlineColor = useMemo(() => (
     segment
       ? new THREE.Color(segment.palette.edge).lerp(MAP_BACKGROUND_COLOR, toneDown * 0.82)
@@ -3251,6 +3270,7 @@ export function StrategicLandmarkMesh({
     hitVolume.dispose();
     outline.dispose();
   }, [footprint, hitVolume, outline]);
+  useEffect(() => () => entranceHitVolume?.dispose(), [entranceHitVolume]);
 
   useEffect(() => () => segmentOutlineMaterial?.dispose(), [segmentOutlineMaterial]);
 
@@ -3334,6 +3354,22 @@ export function StrategicLandmarkMesh({
         } : {})}
         dispose={null}
       />
+      {entranceHitVolume && <mesh
+        name="administrative-center-entrance-hit:B11"
+        geometry={entranceHitVolume}
+        material={SHARED_INVISIBLE_HIT_MATERIAL}
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+        {...(hoverEnabled ? {
+          onPointerOver: (event: ThreeEvent<PointerEvent>) => {
+            event.stopPropagation();
+            if (useCommercialMapStore.getState().cameraNavigating) return;
+            onCursor('pointer'); onHover(entity.id);
+          },
+          onPointerOut: () => { onCursor('grab'); onHover(null); },
+        } : {})}
+        dispose={null}
+      />}
       <group rotation={[0, facingRadians, 0]} dispose={null}>
         {import.meta.env.DEV && (entity.publicIdentifier === 'B12' || entity.publicIdentifier === 'B13') && new URLSearchParams(window.location.search).has('complexDebug') && <FenasojaComplexOverlay identifier={entity.publicIdentifier} bounds={bounds} />}
         {kind === 'soy-restroom' && <SoyRestroom materials={materials} />}

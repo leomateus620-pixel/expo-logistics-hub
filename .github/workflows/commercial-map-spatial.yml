@@ -55,6 +55,11 @@ jobs:
           src/test/commercialMapUbiretamaPresentation.test.ts
           src/test/commercialMapUbiretamaVisitTrees.test.ts
           src/test/commercialMapPavilion12FrontTrees.test.ts
+          src/test/commercialMapPavilion12TreeCrownConnection.test.ts
+          src/test/commercialMapPavilionArchitecture
+          src/test/commercialMapPavilionConnectedComplex.test.ts
+          src/test/commercialMapBrigada
+          src/test/commercialMapAdministrative
           src/test/commercialMapExporuralSouthRoad.test.ts
           src/test/commercialMapGateNineCommunicationTower.test.ts
           src/test/commercialMapCameraTransition.test.ts

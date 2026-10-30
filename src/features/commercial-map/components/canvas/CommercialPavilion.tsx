@@ -1,5 +1,6 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
   createCommercialPavilionLayout,
   resolveCommercialPavilionDefinition,
@@ -10,6 +11,9 @@ import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 import { createCommercialPavilionTexture } from './commercialPavilionTextures';
 import { CommercialPavilionModuleLayer } from './CommercialPavilionModuleLayer';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
+import { resolvePavilionArchitecture2026 } from '../../data/pavilionArchitecture2026';
+import { PhotoReferencedPavilion } from './pavilions/PhotoReferencedPavilion';
+import { pavilionArchitectureSignPose } from '../../utils/pavilionArchitectureLayout';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
@@ -32,6 +36,8 @@ export interface CommercialPavilionMaterials {
   white: THREE.MeshStandardMaterial;
   platform: THREE.MeshStandardMaterial;
   metal: THREE.MeshStandardMaterial;
+  brick?: THREE.MeshStandardMaterial;
+  cladding?: THREE.MeshStandardMaterial;
 }
 
 function PavilionInstances({
@@ -75,16 +81,27 @@ function PavilionInstances({
   );
 }
 
-function createIdentityTexture(pavilionNumber: number, activity: string) {
+function createIdentityTexture(pavilionNumber: number, activity: string, photographed = false) {
   if (typeof document === 'undefined') return null;
   const canvas = document.createElement('canvas');
-  canvas.width = 768;
-  canvas.height = 192;
+  canvas.width = photographed ? 512 : 768;
+  canvas.height = photographed ? 128 : 192;
   const context = canvas.getContext('2d');
   if (!context) return null;
 
-  context.fillStyle = '#f2f0e8';
+  context.fillStyle = photographed ? '#193e36' : '#f2f0e8';
   context.fillRect(0, 0, canvas.width, canvas.height);
+  if (photographed) {
+    context.textBaseline = 'middle';
+    context.fillStyle = '#a8c56d';
+    context.font = '900 104px Arial, sans-serif';
+    context.fillText(String(pavilionNumber).padStart(2, '0'), 18, 70);
+    context.fillStyle = '#eceee6';
+    context.font = '700 25px Arial, sans-serif';
+    context.fillText('PAVILHÃO', 166, 35);
+    context.font = '800 39px Arial, sans-serif';
+    context.fillText('COMÉRCIO', 166, 84, 324);
+  } else {
   context.fillStyle = '#173f2d';
   context.fillRect(0, 0, 18, canvas.height);
   context.fillStyle = '#d8ad37';
@@ -96,6 +113,7 @@ function createIdentityTexture(pavilionNumber: number, activity: string) {
   context.fillStyle = '#5a6660';
   context.font = '700 29px Arial, sans-serif';
   context.fillText(activity.toLocaleUpperCase('pt-BR'), 66, 139);
+  }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -109,13 +127,23 @@ function PavilionIdentity({
   activity,
   position,
   width,
+  photographed = false,
+  rotation = [0, 0, 0],
+  supportDepth = 0,
+  supportAnchorY = 0,
+  publicIdentifier,
 }: {
   number: number;
   activity: string;
   position: Vector3Tuple;
   width: number;
+  photographed?: boolean;
+  rotation?: Vector3Tuple;
+  supportDepth?: number;
+  supportAnchorY?: number;
+  publicIdentifier: string;
 }) {
-  const texture = useMemo(() => createIdentityTexture(number, activity), [activity, number]);
+  const texture = useMemo(() => createIdentityTexture(number, activity, photographed), [activity, number, photographed]);
   const material = useMemo(() => new THREE.MeshStandardMaterial({
     color: texture ? '#ffffff' : '#f2f0e8',
     map: texture,
@@ -125,21 +153,33 @@ function PavilionIdentity({
     polygonOffsetFactor: -2,
     polygonOffsetUnits: -2,
   }), [texture]);
+  const frameGeometry = useMemo(() => {
+    if (!photographed) return new THREE.BoxGeometry(width + 0.1, width * 0.25 + 0.1, 0.07).translate(0, 0, -0.035);
+    const height = width / 4;
+    const border = height * 0.035, depth = height * 0.075, gap = height * 0.01;
+    const parts = [new THREE.BoxGeometry(width + border * 2, height + border * 2, depth).translate(0, 0, -gap - depth / 2)];
+    const bracketDepth = supportDepth - depth - gap;
+    if (bracketDepth > 0) for (const side of [-1, 1]) parts.push(new THREE.BoxGeometry(height * 0.05, height * 0.32, bracketDepth)
+      .translate(side * width * 0.34, supportAnchorY, -(supportDepth + depth + gap) / 2));
+    const geometry = mergeGeometries(parts, false)!;
+    parts.forEach(part => part.dispose());
+    return geometry;
+  }, [photographed, supportAnchorY, supportDepth, width]);
+  const faceGeometry = useMemo(() => new THREE.PlaneGeometry(width, width * 0.25), [width]);
+  const frameMaterial = useMemo(() => new THREE.MeshStandardMaterial({ color: '#4d5654', roughness: 0.62, metalness: 0.16 }), []);
 
   useEffect(() => () => {
     texture?.dispose();
     material.dispose();
   }, [material, texture]);
+  useEffect(() => () => frameGeometry.dispose(), [frameGeometry]);
+  useEffect(() => () => faceGeometry.dispose(), [faceGeometry]);
+  useEffect(() => () => frameMaterial.dispose(), [frameMaterial]);
 
   return (
-    <group position={position} raycast={NO_RAYCAST}>
-      <mesh position={[0, 0, -0.035]} castShadow>
-        <boxGeometry args={[width + 0.1, width * 0.25 + 0.1, 0.07]} />
-        <meshStandardMaterial color="#4d5654" roughness={0.62} metalness={0.16} />
-      </mesh>
-      <mesh material={material}>
-        <planeGeometry args={[width, width * 0.25]} />
-      </mesh>
+    <group name={`pavilion-identity:${publicIdentifier}`} position={position} rotation={rotation} raycast={NO_RAYCAST} dispose={null}>
+      <mesh name="pavilion-identity-support" geometry={frameGeometry} material={frameMaterial} castShadow dispose={null} />
+      <mesh name="pavilion-identity-face" geometry={faceGeometry} material={material} dispose={null} />
     </group>
   );
 }
@@ -701,19 +741,23 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
 }) {
   const definition = resolveCommercialPavilionDefinition({ publicIdentifier });
+  const architecture = resolvePavilionArchitecture2026(publicIdentifier);
   const modulePlan = resolveCommercialPavilionModulePlan({ publicIdentifier });
   const layout = useMemo(() => definition
     ? createCommercialPavilionLayout(bounds, definition, height, modulePlan)
     : null, [bounds, definition, height, modulePlan]);
   const textures = useMemo(() => ({
-    concrete: createCommercialPavilionTexture('concrete'),
-    zinc: createCommercialPavilionTexture('zinc'),
-  }), []);
+    concrete: architecture ? null : createCommercialPavilionTexture('concrete'),
+    zinc: architecture ? null : createCommercialPavilionTexture('zinc'),
+  }), [architecture]);
 
   // Program-defining maps must be installed before the scene warmup sibling's
   // layout effect. Installing them passively compiled five cold variants in
   // the first presented draw on the measured renderer.
   useLayoutEffect(() => {
+    // These five buildings have a single dedicated material/texture owner.
+    // Do not let the legacy shell install or clear maps owned by that library.
+    if (architecture) return;
     materials.wall.bumpMap = textures.concrete;
     materials.wall.bumpScale = 0.012;
     materials.roof.map = textures.zinc;
@@ -736,7 +780,7 @@ export const CommercialPavilion = memo(function CommercialPavilion({
       textures.concrete?.dispose();
       textures.zinc?.dispose();
     };
-  }, [materials, textures]);
+  }, [architecture, materials, textures]);
 
   if (!definition || !layout) return null;
   const identityWidth = THREE.MathUtils.clamp(
@@ -748,17 +792,19 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   const identityY = definition.pavilionNumber === 14
     ? Math.min(layout.height * 0.72, layout.exterior.facade.centralMass?.height ?? layout.height * 0.72)
     : Math.min(layout.exterior.roof.eaveY - 0.18, layout.height * 0.73);
+  const architecturalSign = architecture ? pavilionArchitectureSignPose(layout) : null;
 
   return (
     <group dispose={null}>
-      <PavilionShell
-        layout={layout}
-        materials={materials}
-        showDetail={showDetail}
-        cutaway={showFocusDetail}
-      />
-      {!showFocusDetail && <PavilionRoof layout={layout} materials={materials} showDetail={showDetail} />}
-      {showDetail && !showFocusDetail && <PavilionDetail layout={layout} materials={materials} />}
+      {(!architecture || showFocusDetail) && <PavilionShell
+          layout={layout}
+          materials={materials}
+          showDetail={showDetail}
+          cutaway={showFocusDetail}
+        />}
+      {architecture && <PhotoReferencedPavilion layout={layout} materials={materials} showDetail={showDetail} cutaway={showFocusDetail} />}
+      {!architecture && !showFocusDetail && <PavilionRoof layout={layout} materials={materials} showDetail={showDetail} />}
+      {!architecture && showDetail && !showFocusDetail && <PavilionDetail layout={layout} materials={materials} />}
       {showFocusDetail && modulePlan && (
         <CommercialPavilionModuleLayer
           layout={layout}
@@ -767,12 +813,17 @@ export const CommercialPavilion = memo(function CommercialPavilion({
           moduleStateById={moduleStateById}
         />
       )}
-      {showDetail && !showFocusDetail && (
+      {(showDetail || Boolean(architecture)) && !showFocusDetail && (
         <PavilionIdentity
+          publicIdentifier={publicIdentifier}
           number={definition.pavilionNumber}
           activity={definition.activity}
-          width={identityWidth}
-          position={[
+          width={architecturalSign?.width ?? identityWidth}
+          photographed={Boolean(architecture)}
+          rotation={architecturalSign?.rotation}
+          supportDepth={architecturalSign?.supportDepth}
+          supportAnchorY={architecturalSign?.supportAnchorY}
+          position={architecturalSign?.position ?? [
             identityX,
             identityY,
             layout.exterior.facade.frontZ + 0.125 + (layout.exterior.facade.centralMass?.depth ?? 0) * 0.48,

@@ -32,7 +32,7 @@ function LivestockMaterials(props: ComponentProps<typeof LivestockPavilion>) { L
 function WarmupSibling({ inspect }: { inspect: () => void }) { useLayoutEffect(inspect, [inspect]); return null; }
 
 describe('program features are final before scene compilation', () => {
-  it('publishes the existing commercial pavilion maps before the later warmup layout effect and preserves material identities', () => {
+  it('publishes the unchanged pavilion family maps before the later warmup layout effect and preserves material identities', () => {
     const surface = materials(), before = { ...surface }, inspect = vi.fn(() => {
       expect(surface.wall.bumpMap).toBeInstanceOf(THREE.Texture);
       expect(surface.roof.map).toBeInstanceOf(THREE.Texture);
@@ -40,7 +40,9 @@ describe('program features are final before scene compilation', () => {
       expect(surface.platform.bumpMap).toBe(surface.wall.bumpMap);
       expect(surface).toEqual(before);
     });
-    const view = render(<><PavilionMaterials publicIdentifier="B1" bounds={bounds} height={1.2}
+    // B2 retains the generic family. The five photo profiles have a dedicated
+    // owner, exercised by commercialMapPavilionArchitectureMaterials.test.tsx.
+    const view = render(<><PavilionMaterials publicIdentifier="B2" bounds={bounds} height={1.2}
       materials={surface as CommercialPavilionMaterials} showDetail showFocusDetail={false} />
     <WarmupSibling inspect={inspect} /></>);
     expect(inspect).toHaveBeenCalledOnce();

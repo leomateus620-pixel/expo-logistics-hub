@@ -1,0 +1,759 @@
+{
+  "base": "http://127.0.0.1:8080",
+  "mode": "annex",
+  "fixture": "OFFICIAL_REFERENCE_DATA + versioned soyGatePersistedLayout; not a live authorized query",
+  "gpu": null,
+  "runs": [],
+  "views": [
+    {
+      "device": "desktop",
+      "name": "B19-front",
+      "runtime": {
+        "at": 7409.5,
+        "calls": 539,
+        "triangles": 918044,
+        "geometries": 612,
+        "textures": 115,
+        "programs": 213,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 189702507,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 8,
+        "averageFrameTimeMs": 15.79,
+        "p95FrameTimeMs": 17.7,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 17.7,
+        "averageFps": 63.3,
+        "inverseP99FpsApproximation": 56.5,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 13,
+        "reactCommits": 17,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 7409.5,
+          "calls": 539,
+          "triangles": 918044,
+          "geometries": 612,
+          "textures": 115,
+          "programs": 213,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 189702507,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 268.59999999403954,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 268.70000000298023,
+          "b12-worker:start": 268.90000000596046,
+          "fixture-data-ready": 792.2999999970198,
+          "module-ready": 793.2000000029802,
+          "renderer:create:start": 827.7999999970198,
+          "webgl-context:start": 827.7999999970198,
+          "webgl-context:end": 849,
+          "renderer:create:end": 852.7000000029802,
+          "b12-worker:cached": 866,
+          "canvas-created": 867.2999999970198,
+          "b12-worker-geometry": 1260.7000000029802,
+          "b12-worker-contact": 1260.7000000029802,
+          "b12-worker:end": 1260.7000000029802,
+          "critical-scene:start": 1262.2000000029802,
+          "environment:textures:start": 1382.7999999970198,
+          "textures:start": 1382.9000000059605,
+          "textures:end": 1402.2999999970198,
+          "environment:textures:end": 1402.5,
+          "environment:materials:start": 1402.5,
+          "environment:materials:end": 1402.5,
+          "geometry-preparation:start": 2138.2000000029802,
+          "geometry-preparation:end": 2138.5,
+          "b12-unpack:start": 2313.7000000029802,
+          "b12-unpack:end": 2314.9000000059605,
+          "b12-materials:start": 2315.0999999940395,
+          "b12-materials:end": 2383,
+          "tree-surface-preparation:start": 2595.5999999940395,
+          "tree-surface-preparation:end": 2596.2000000029802,
+          "postprocessing:start": 3195.2000000029802,
+          "postprocessing:end": 3198.2999999970198,
+          "critical-scene:end": 3240.5,
+          "shader-representatives": 3243.5999999940395,
+          "compile-direct:start": 3243.9000000059605,
+          "program-submission": 3340.0999999940395,
+          "compile-direct-js": 3340.2999999970198,
+          "controls-created": 3346.4000000059605,
+          "first-frame-requested": 3346.9000000059605,
+          "program-links-ready": 3598.9000000059605,
+          "program-introspection": 3901.2999999970198,
+          "compile-direct:end": 3901.5999999940395,
+          "texture-upload:programs-ready": 3901.7000000029802,
+          "texture-upload:start": 3908.0999999940395,
+          "texture-upload:end": 4787.4000000059605,
+          "essential-scene:prepared": 4787.9000000059605,
+          "shadow-preparation:start": 4810.5999999940395,
+          "shadow-preparation:end": 4810.70000000298,
+          "first-draw": 4865.29999999702,
+          "commercial-map-ready": 4887.29999999702,
+          "first-interactive": 4887.4000000059605,
+          "critical-post:start": 4987.5999999940395,
+          "deferred-compile-js": 5008.20000000298,
+          "program-links-pending": 6407.9000000059605
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 19,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          8.8582,
+          2.6,
+          12.3091
+        ],
+        "target": [
+          7.6582,
+          0.75,
+          18.5591
+        ],
+        "quaternion": [
+          -0.013351,
+          0.985563,
+          0.140342,
+          0.093758
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.66651,
+        "far": 1283.245,
+        "distance": 6.6276,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          7.658181818181816,
+          0.75,
+          18.559090997918947
+        ],
+        "position": [
+          8.858181818181816,
+          2.6,
+          12.309090997918947
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11385731,
+        "encodedBytes": 11314752
+      },
+      "signGeometry": {
+        "id": "B19",
+        "meshesChecked": 4,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              7.806981818181815,
+              0.6708746858187734,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              8.178305466276946,
+              0.6343117781230031,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              8.178305466276946,
+              0.7074375935145437,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              7.435658170086684,
+              0.6343117781230031,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              7.435658170086684,
+              0.7074375935145437,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B19-oblique",
+      "runtime": {
+        "at": 8119.0999999940395,
+        "calls": 252,
+        "triangles": 516398,
+        "geometries": 614,
+        "textures": 115,
+        "programs": 243,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 182398823,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 8,
+        "averageFrameTimeMs": 15.79,
+        "p95FrameTimeMs": 17.7,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 17.7,
+        "averageFps": 63.3,
+        "inverseP99FpsApproximation": 56.5,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 13,
+        "reactCommits": 17,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 8119.0999999940395,
+          "calls": 252,
+          "triangles": 516398,
+          "geometries": 614,
+          "textures": 115,
+          "programs": 243,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 182398823,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 268.59999999403954,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 268.70000000298023,
+          "b12-worker:start": 268.90000000596046,
+          "fixture-data-ready": 792.2999999970198,
+          "module-ready": 793.2000000029802,
+          "renderer:create:start": 827.7999999970198,
+          "webgl-context:start": 827.7999999970198,
+          "webgl-context:end": 849,
+          "renderer:create:end": 852.7000000029802,
+          "b12-worker:cached": 866,
+          "canvas-created": 867.2999999970198,
+          "b12-worker-geometry": 1260.7000000029802,
+          "b12-worker-contact": 1260.7000000029802,
+          "b12-worker:end": 1260.7000000029802,
+          "critical-scene:start": 1262.2000000029802,
+          "environment:textures:start": 1382.7999999970198,
+          "textures:start": 1382.9000000059605,
+          "textures:end": 1402.2999999970198,
+          "environment:textures:end": 1402.5,
+          "environment:materials:start": 1402.5,
+          "environment:materials:end": 1402.5,
+          "geometry-preparation:start": 2138.2000000029802,
+          "geometry-preparation:end": 2138.5,
+          "b12-unpack:start": 2313.7000000029802,
+          "b12-unpack:end": 2314.9000000059605,
+          "b12-materials:start": 2315.0999999940395,
+          "b12-materials:end": 2383,
+          "tree-surface-preparation:start": 2595.5999999940395,
+          "tree-surface-preparation:end": 2596.2000000029802,
+          "postprocessing:start": 3195.2000000029802,
+          "postprocessing:end": 3198.2999999970198,
+          "critical-scene:end": 3240.5,
+          "shader-representatives": 3243.5999999940395,
+          "compile-direct:start": 3243.9000000059605,
+          "program-submission": 3340.0999999940395,
+          "compile-direct-js": 3340.2999999970198,
+          "controls-created": 3346.4000000059605,
+          "first-frame-requested": 3346.9000000059605,
+          "program-links-ready": 3598.9000000059605,
+          "program-introspection": 3901.2999999970198,
+          "compile-direct:end": 3901.5999999940395,
+          "texture-upload:programs-ready": 3901.7000000029802,
+          "texture-upload:start": 3908.0999999940395,
+          "texture-upload:end": 4787.4000000059605,
+          "essential-scene:prepared": 4787.9000000059605,
+          "shadow-preparation:start": 4810.5999999940395,
+          "shadow-preparation:end": 4810.70000000298,
+          "first-draw": 4865.29999999702,
+          "commercial-map-ready": 4887.29999999702,
+          "first-interactive": 4887.4000000059605,
+          "critical-post:start": 4987.5999999940395,
+          "deferred-compile-js": 5008.20000000298,
+          "program-links-pending": 6407.9000000059605
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 19,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          11.6582,
+          2.4,
+          14.3091
+        ],
+        "target": [
+          7.6582,
+          0.75,
+          18.5591
+        ],
+        "quaternion": [
+          -0.050625,
+          0.920763,
+          0.127654,
+          0.365154
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 6.0651,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          7.658181818181816,
+          0.75,
+          18.559090997918947
+        ],
+        "position": [
+          11.658181818181816,
+          2.4,
+          14.309090997918947
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11385731,
+        "encodedBytes": 11314752
+      },
+      "signGeometry": {
+        "id": "B19",
+        "meshesChecked": 4,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              7.806981818181815,
+              0.6708746858187734,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              8.178305466276946,
+              0.6343117781230031,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              8.178305466276946,
+              0.7074375935145437,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              7.435658170086684,
+              0.6343117781230031,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              7.435658170086684,
+              0.7074375935145437,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B19-pedestrian",
+      "runtime": {
+        "at": 8818.29999999702,
+        "calls": 186,
+        "triangles": 422965,
+        "geometries": 615,
+        "textures": 141,
+        "programs": 256,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 195816778,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 8,
+        "averageFrameTimeMs": 15.79,
+        "p95FrameTimeMs": 17.7,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 17.7,
+        "averageFps": 63.3,
+        "inverseP99FpsApproximation": 56.5,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 13,
+        "reactCommits": 19,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 8818.29999999702,
+          "calls": 186,
+          "triangles": 422965,
+          "geometries": 615,
+          "textures": 141,
+          "programs": 256,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 195816778,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 268.59999999403954,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 268.70000000298023,
+          "b12-worker:start": 268.90000000596046,
+          "fixture-data-ready": 792.2999999970198,
+          "module-ready": 793.2000000029802,
+          "renderer:create:start": 827.7999999970198,
+          "webgl-context:start": 827.7999999970198,
+          "webgl-context:end": 849,
+          "renderer:create:end": 852.7000000029802,
+          "b12-worker:cached": 866,
+          "canvas-created": 867.2999999970198,
+          "b12-worker-geometry": 1260.7000000029802,
+          "b12-worker-contact": 1260.7000000029802,
+          "b12-worker:end": 1260.7000000029802,
+          "critical-scene:start": 1262.2000000029802,
+          "environment:textures:start": 1382.7999999970198,
+          "textures:start": 1382.9000000059605,
+          "textures:end": 1402.2999999970198,
+          "environment:textures:end": 1402.5,
+          "environment:materials:start": 1402.5,
+          "environment:materials:end": 1402.5,
+          "geometry-preparation:start": 2138.2000000029802,
+          "geometry-preparation:end": 2138.5,
+          "b12-unpack:start": 2313.7000000029802,
+          "b12-unpack:end": 2314.9000000059605,
+          "b12-materials:start": 2315.0999999940395,
+          "b12-materials:end": 2383,
+          "tree-surface-preparation:start": 2595.5999999940395,
+          "tree-surface-preparation:end": 2596.2000000029802,
+          "postprocessing:start": 3195.2000000029802,
+          "postprocessing:end": 3198.2999999970198,
+          "critical-scene:end": 3240.5,
+          "shader-representatives": 3243.5999999940395,
+          "compile-direct:start": 3243.9000000059605,
+          "program-submission": 3340.0999999940395,
+          "compile-direct-js": 3340.2999999970198,
+          "controls-created": 3346.4000000059605,
+          "first-frame-requested": 3346.9000000059605,
+          "program-links-ready": 3598.9000000059605,
+          "program-introspection": 3901.2999999970198,
+          "compile-direct:end": 3901.5999999940395,
+          "texture-upload:programs-ready": 3901.7000000029802,
+          "texture-upload:start": 3908.0999999940395,
+          "texture-upload:end": 4787.4000000059605,
+          "essential-scene:prepared": 4787.9000000059605,
+          "shadow-preparation:start": 4810.5999999940395,
+          "shadow-preparation:end": 4810.70000000298,
+          "first-draw": 4865.29999999702,
+          "commercial-map-ready": 4887.29999999702,
+          "first-interactive": 4887.4000000059605,
+          "critical-post:start": 4987.5999999940395,
+          "deferred-compile-js": 5008.20000000298,
+          "program-links-pending": 6407.9000000059605,
+          "critical-post:end": 8136.29999999702,
+          "hydrate:rain:start": 8217.40000000596,
+          "rain-preparation:start": 8223.29999999702,
+          "rain-preparation:end": 8224.90000000596,
+          "hydrate:rain:mounted": 8225.79999999702
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 53,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          8.161,
+          0.8,
+          14.9936
+        ],
+        "target": [
+          7.6582,
+          0.8,
+          17.8091
+        ],
+        "quaternion": [
+          0,
+          0.996099,
+          0,
+          0.08824
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 2.8601,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          7.658181818181816,
+          0.8,
+          17.809090997918947
+        ],
+        "position": [
+          8.158181818181816,
+          0.5,
+          15.009090997918946
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11385731,
+        "encodedBytes": 11314752
+      },
+      "signGeometry": {
+        "id": "B19",
+        "meshesChecked": 4,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              7.806981818181815,
+              0.6708746858187734,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              8.178305466276946,
+              0.6343117781230031,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              8.178305466276946,
+              0.7074375935145437,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              7.435658170086684,
+              0.6343117781230031,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              7.435658170086684,
+              0.7074375935145437,
+              17.778621907009857
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    }
+  ],
+  "errors": []
+}

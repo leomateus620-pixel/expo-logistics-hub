@@ -1,0 +1,69 @@
+{
+  "base": "http://127.0.0.1:8080",
+  "fixture": true,
+  "data": {
+    "id": "reference:2026:b19",
+    "classification": "SECURITY",
+    "front": 17.809090997918947,
+    "bounds": {
+      "minX": 6.981818181818184,
+      "maxX": 8.334545454545449,
+      "minZ": 17.541818269879514,
+      "maxZ": 19.37454555180723,
+      "width": 1.3527272727272646,
+      "depth": 1.832727281927717,
+      "centerX": 7.658181818181816,
+      "centerZ": 18.458181910843372
+    },
+    "p3Id": "reference:2026:b6"
+  },
+  "errors": [],
+  "clicks": [
+    {
+      "name": "existing-body",
+      "world": [
+        7.658181818181816,
+        0.65,
+        18.458181910843372
+      ],
+      "point": {
+        "x": 678.7344700915799,
+        "y": 405.02604116860505,
+        "ndc": [
+          0.004788260683315763,
+          -0.05475531554324231,
+          0.9888926155653219
+        ]
+      },
+      "state": {
+        "selectedEntityId": "reference:2026:b19",
+        "interiorEntityId": null,
+        "selectedModuleId": null
+      },
+      "pass": true
+    },
+    {
+      "name": "front-extension",
+      "world": [
+        7.658181818181816,
+        0.65,
+        17.929090997918948
+      ],
+      "point": {
+        "x": 697.35582868906,
+        "y": 433.44208235041043,
+        "ndc": [
+          0.032355038769889044,
+          -0.12875542278752716,
+          0.9879736077455565
+        ]
+      },
+      "state": {
+        "selectedEntityId": "reference:2026:b19",
+        "interiorEntityId": null,
+        "selectedModuleId": null
+      },
+      "pass": true
+    }
+  ]
+}

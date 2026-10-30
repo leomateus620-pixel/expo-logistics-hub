@@ -1,4 +1,9 @@
 import { InteriorViewControls } from '../InteriorViewControls';
+import { PavilionConnectedComplex } from './pavilions/PavilionConnectedComplex';
+import { PavilionTreePitEdges } from './pavilions/PavilionTreePitEdges';
+import { BrigadaMilitaryWing } from './pavilions/BrigadaMilitaryWing';
+import { BrigadaMilitaryWingConnection } from './pavilions/BrigadaMilitaryWingConnection';
+import { createBrigadaMilitaryWingLayout } from '../../utils/brigadaMilitaryWing';
 import { useVisitStore } from '../../visit/useVisitStore';
 import { useVisitCameraLease } from '../../visit/useVisitCameraLease';
 import { useSoyHarvestCameraLease } from '../../harvest/useSoyHarvestCameraLease';
@@ -887,6 +892,7 @@ interface EntityMeshProps {
   infrastructureMode: boolean;
   nationsDistrictPresentationAvailable: boolean;
   exporuralSteakhousePresentationAvailable: boolean;
+  brigadaWingPresentationHeight?: number;
   exporuralRestroomEntityId?: string;
   isMatch: boolean;
   layerOpacity: number;
@@ -909,6 +915,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   infrastructureMode,
   nationsDistrictPresentationAvailable,
   exporuralSteakhousePresentationAvailable,
+  brigadaWingPresentationHeight,
   isMatch,
   layerOpacity,
   sceneCenter,
@@ -934,6 +941,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const usesExporuralSteakhouseAnnexPresentation = exporuralSteakhousePresentationAvailable
     && isRestroom
     && isExporuralSteakhouseRestroomAnnex(entity);
+  const usesBrigadaWingPresentation = entity.publicIdentifier === 'B19' && brigadaWingPresentationHeight !== undefined;
   const isFlat = entity.geometry.extrusionHeight < 0.3 || isRoad || isQuadra || isNationsPresentationSurface;
   const isInteractive = isSelectableMapClassification(entity.classification);
   const solidRendering = requiresSolidRendering(entity.classification);
@@ -982,11 +990,11 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
       ? null
       : createEntityGeometry(
         entity,
-        openGroundProfile
+        usesBrigadaWingPresentation ? brigadaWingPresentationHeight : openGroundProfile
           ? openGroundProfile.presentationHeight ?? OPEN_GROUND_PRESENTATION_HEIGHT
           : undefined,
       ),
-    [entity, isGate, isNationsPresentationSurface, isQuadra, openGroundProfile],
+    [brigadaWingPresentationHeight, entity, isGate, isNationsPresentationSurface, isQuadra, openGroundProfile, usesBrigadaWingPresentation],
   );
   const hitSurface = useMemo(
     () => isQuadra || isNationsPresentationSurface ? createHitSurfaceGeometry(entity) : null,
@@ -1026,7 +1034,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   // even while selected. Selection is already conveyed by emissive tint and
   // outline; lifting the whole slab made it overtake roads at oblique angles.
   const selectedLift = selected
-    ? openGroundProfile ? 0 : isFlat ? 0.055 : 0.11
+    ? openGroundProfile || usesBrigadaWingPresentation ? 0 : isFlat ? 0.055 : 0.11
     : 0;
   const displayColor = useMemo(() => {
     if (!solidRendering || selected) return baseColor;
@@ -1047,7 +1055,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
       : '#e9c84b';
   const outlineGeometry = naturalParking
     ? selected || hovered ? edges : null
-    : usesExporuralSteakhouseAnnexPresentation
+    : usesExporuralSteakhouseAnnexPresentation || usesBrigadaWingPresentation
     ? selected || hovered ? edges : null
     : isNationsPresentationSurface
       ? selected || hovered ? footprint : null
@@ -1113,13 +1121,13 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
       {!isQuadra && !isGate && !isNationsPresentationSurface && (
         <mesh
           geometry={geometry!}
-          castShadow={!usesExporuralSteakhouseAnnexPresentation
+          castShadow={!usesExporuralSteakhouseAnnexPresentation && !usesBrigadaWingPresentation
             && !isFlat
             && (solidRendering || visualOpacity > 0.45)}
-          receiveShadow={!usesExporuralSteakhouseAnnexPresentation}
+          receiveShadow={!usesExporuralSteakhouseAnnexPresentation && !usesBrigadaWingPresentation}
           {...interactionProps}
         >
-          {usesExporuralSteakhouseAnnexPresentation || naturalParking ? (
+          {usesExporuralSteakhouseAnnexPresentation || usesBrigadaWingPresentation || naturalParking ? (
             // Natural parking is a semantic/picking area over the continuous
             // environment ground. A second coloured top made false cadastral
             // tiles and seams beside the Etnias. Keep the same ID, road-cut
@@ -5010,6 +5018,20 @@ const Scene = memo(function Scene({
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )).map((entity) => rearParkingEnabled ? rearParkingEntityForPresentation(entity) : entity), [nonLotEntities, rearParkingEnabled]);
+  const pavilionComplexEntities = useMemo(() => publicPolicy
+    ? structuralEntities.filter(entity => publicPolicy.activeScope.has(entity.id))
+    : structuralEntities, [publicPolicy, structuralEntities]);
+  const brigadaWing = useMemo(() => {
+    const wing = pavilionComplexEntities.find(entity => entity.publicIdentifier === 'B19');
+    return wing ? createBrigadaMilitaryWingLayout(wing,
+      pavilionComplexEntities.find(entity => entity.publicIdentifier === 'B6')) : null;
+  }, [pavilionComplexEntities]);
+  const pavilionArchitectureVisible = !interiorEntity && !hydrologicalModeActive;
+  const brigadaWingPresentationAvailable = Boolean(brigadaWing && !hydrologicalModeActive);
+  const brigadaWingOpacity = brigadaWing ? Math.min(...brigadaWing.entityIds.map(id => {
+    const owner = pavilionComplexEntities.find(entity => entity.id === id)!;
+    return layerOpacity[owner.layerId] ?? 1;
+  })) : 0;
   const exporuralRestroomEntityId = useMemo(() => entities.find(isExporuralSteakhouseRestroomAnnex)?.id, [entities]);
   const exporuralSteakhousePresentationAvailable = useMemo(() => {
     const steakhouse = structuralEntities.find((entity) => (
@@ -5445,6 +5467,31 @@ const Scene = memo(function Scene({
         onCursor={setCanvasCursor}
       />
       </group>
+      <PavilionConnectedComplex
+        entities={pavilionComplexEntities}
+        visible={pavilionArchitectureVisible}
+        selectedEntityId={selectedEntityId}
+        layerOpacity={layerOpacity}
+      />
+      <PavilionTreePitEdges
+        entities={pavilionComplexEntities}
+        visible={pavilionArchitectureVisible}
+      />
+      {brigadaWing && <BrigadaMilitaryWing
+        layout={brigadaWing}
+        visible={!interiorEntity && brigadaWingPresentationAvailable && brigadaWingOpacity > 0.015}
+        toneDown={1 - brigadaWingOpacity * (entityFiltersActive
+          && !presentedMatchingEntityIds.has(brigadaWing.entityId) && selectedEntityId !== brigadaWing.entityId ? 0.42 : 1)}
+        selected={selectedEntityId === brigadaWing.entityId}
+        hovered={hoveredEntityId === brigadaWing.entityId}
+        cutaway={selectedEntityId === brigadaWing.pavilion3EntityId && !COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics}
+      />}
+      <BrigadaMilitaryWingConnection
+        entities={pavilionComplexEntities}
+        visible={!interiorEntity && brigadaWingPresentationAvailable}
+        selectedEntityId={selectedEntityId}
+        layerOpacity={layerOpacity}
+      />
       {structuralEntities.map((entity) => {
         const kind = resolveStrategicLandmarkKind(entity);
         const mesh = (
@@ -5458,6 +5505,8 @@ const Scene = memo(function Scene({
           infrastructureMode={hydrologicalModeActive}
           nationsDistrictPresentationAvailable={nationsDistrictPresentationAvailable}
           exporuralSteakhousePresentationAvailable={exporuralSteakhousePresentationAvailable}
+          brigadaWingPresentationHeight={brigadaWingPresentationAvailable && entity.id === brigadaWing?.entityId
+            ? brigadaWing.height : undefined}
           exporuralRestroomEntityId={exporuralRestroomEntityId}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           layerOpacity={layerOpacity[entity.layerId] ?? 1}

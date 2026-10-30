@@ -33,6 +33,14 @@ import { isInternalParkVegetationPoint, INTERNAL_TREE_TRUNK_RADIUS_FACTOR } from
 import { createFenasojaRestaurantLayout } from '../utils/fenasojaRestaurant';
 import { UBIRETAMA_PRESENTATION_HANDOFF, buildUbiretamaRoadPresentation, ubiretamaPresentationDistance } from '../utils/ubiretamaRoadPresentation';
 import { buildGateNineCommunicationTowerPlan } from '../utils/gateNineCommunicationTower';
+import { commercialPavilionModelBounds, createCommercialPavilionLayout, resolveCommercialPavilionDefinition } from '../utils/commercialPavilions';
+import { createPavilionGroundInterfaces, pavilionGroundRectPolygon, pavilionGroundRampHeight } from '../utils/pavilionGroundInterfaces';
+import { buildPavilionConnectedComplex } from '../utils/pavilionConnectedComplex';
+import { resolvePavilionArchitecture2026 } from '../data/pavilionArchitecture2026';
+import { pavilionArchitectureHeight } from '../utils/pavilionArchitectureLayout';
+import { buildBrigadaMilitaryWingPresentation } from '../utils/brigadaMilitaryWingConnection';
+import { createAdministrativeCenterEntranceLayout, administrativeEntranceLawnHeight } from '../utils/administrativeCenterEntrance';
+import { commercialTreeWoodStructure } from '../utils/commercialTreeWoodStructure';
 import { GATE_NINE_COMMUNICATION_TOWER } from '../data/gateNineCommunicationTower';
 
 const SOLID_CLASSIFICATIONS = new Set(['PAVILION', 'BUILDING', 'RESTAURANT', 'RESTROOM', 'CHEMICAL_RESTROOM', 'ADMINISTRATION', 'SECURITY', 'EMERGENCY', 'SERVICE', 'EVENT_VENUE']);
@@ -101,6 +109,18 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
   if (tower) polygon(GATE_NINE_COMMUNICATION_TOWER.presentationId, tower.footprint,
     tower.position[1] + GATE_NINE_COMMUNICATION_TOWER.foundationPadTop - GATE_NINE_COMMUNICATION_TOWER.foundationPadHeight,
     GATE_NINE_COMMUNICATION_TOWER.height + GATE_NINE_COMMUNICATION_TOWER.foundationPadHeight - GATE_NINE_COMMUNICATION_TOWER.foundationPadTop);
+  for (const join of buildPavilionConnectedComplex(entities)) {
+    polygon(join.owner, [[join.minX, join.minZ], [join.maxX, join.minZ], [join.maxX, join.maxZ], [join.minX, join.maxZ]], 0, Math.max(join.westEaveY, join.eastEaveY));
+  }
+  const brigadaPresentation = buildBrigadaMilitaryWingPresentation(entities);
+  if (brigadaPresentation) {
+    const { layout, join } = brigadaPresentation;
+    polygon(join.owner, [[join.minX, join.minZ], [join.maxX, join.minZ], [join.maxX, join.maxZ], [join.minX, join.maxZ]], 0,
+      Math.max(join.westEaveY, join.eastEaveY, join.westRearEaveY ?? 0, join.eastRearEaveY ?? 0));
+    surfaces.push(visitGroundSurface('brigada-military-wing:front-apron',
+      [[layout.apronMinX, layout.apronMinZ], [layout.apronMaxX, layout.apronMinZ],
+        [layout.apronMaxX, layout.apronMaxZ], [layout.apronMinX, layout.apronMaxZ]], layout.floorY));
+  }
   for (const entity of entities) {
     if (entity.isArchived) continue;
     const kind = resolveStrategicLandmarkKind(entity);
@@ -248,6 +268,86 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
       });
       continue;
     }
+    if (kind === 'administrative-center' && entity.publicIdentifier === 'B11') {
+      const bounds = strategicLandmarkBounds(entity), yaw = strategicLandmarkFacingRadians(entity);
+      const height = strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight;
+      const modelBounds = commercialPavilionModelBounds(bounds, yaw);
+      const access = createAdministrativeCenterEntranceLayout(modelBounds, height);
+      const base = entity.geometry.elevation, c = Math.cos(yaw), s = Math.sin(yaw);
+      const point = (x: number, z: number): readonly [number, number] => [bounds.centerX + x * c + z * s, bounds.centerZ - x * s + z * c];
+      const rectRing = (part: typeof access.walkway) => [[part.minX, part.minZ], [part.maxX, part.minZ], [part.maxX, part.maxZ], [part.minX, part.maxZ]].map(([x, z]) => point(x, z));
+      surfaces.push(visitGroundSurface('B11:entrance-lawn', rectRing(access.lawn), (x, z) => {
+        const localX = (x - bounds.centerX) * c - (z - bounds.centerZ) * s;
+        const localZ = (x - bounds.centerX) * s + (z - bounds.centerZ) * c;
+        return base + administrativeEntranceLawnHeight(access, localX, localZ);
+      }, [access.walkway, ...access.steps].map(rectRing), base + access.lawn.elevation));
+      for (const [index, part] of [access.walkway, ...access.steps].entries()) {
+        surfaces.push(visitGroundSurface(`B11:entrance-pavement:${index}`,
+          [[part.minX, part.minZ], [part.maxX, part.minZ], [part.maxX, part.maxZ], [part.minX, part.maxZ]].map(([x, z]) => point(x, z)),
+          base + part.elevation));
+      }
+      // Preserve the owner ID while freeing the documented forecourt inside
+      // its cadastral marker. Entry through the closed door remains explicit.
+      const bodyCenter = point(0, access.body.centerZ);
+      box(entity.id, bodyCenter[0], base + height / 2, bodyCenter[1], access.body.width, height, access.body.depth, yaw);
+      const postBase = access.hedgeRows[0]?.elevation ?? access.walkway.elevation;
+      access.posts.forEach(([x, z], index) => {
+        const p = point(x, z);
+        trunk(`${entity.id}:entrance-post:${index}`, p[0], p[1], .018, base + postBase, access.canopy.eaveY - postBase);
+      });
+      access.hedgeRows.forEach((hedge, index) => {
+        const p = point((hedge.minX + hedge.maxX) / 2, (hedge.minZ + hedge.maxZ) / 2);
+        box(`${entity.id}:entrance-hedge:${index}`, p[0], base + hedge.elevation + hedge.height / 2, p[1], hedge.maxX - hedge.minX, hedge.height, hedge.maxZ - hedge.minZ, yaw);
+      });
+      const entranceTree = point(access.tree.x, access.tree.z);
+      trunk(`${entity.id}:entrance-tree`, entranceTree[0], entranceTree[1], access.tree.trunkRadius,
+        base + access.tree.groundY, access.tree.trunkHeight);
+      crown(`${entity.id}:entrance-tree`, entranceTree[0], entranceTree[1], access.tree.crownRadius,
+        base + access.tree.crownCenterY - access.tree.crownHalfHeight,
+        base + access.tree.crownCenterY + access.tree.crownHalfHeight);
+      const canopyCenter = point((access.canopy.minX + access.canopy.maxX) / 2, (access.canopy.minZ + access.canopy.maxZ) / 2);
+      const roofBottom = access.canopy.eaveY - .025, roofTop = access.canopy.ridgeY + .025;
+      // One broad roof slab is enough for the follow-camera boom; the walking
+      // capsule remains well below it. No collider per truss or roof sheet.
+      box(`${entity.id}:entrance-roof`, canopyCenter[0], base + (roofBottom + roofTop) / 2, canopyCenter[1],
+        access.canopy.maxX - access.canopy.minX, roofTop - roofBottom, access.canopy.maxZ - access.canopy.minZ, yaw);
+      continue;
+    }
+    if (brigadaPresentation?.wing.id === entity.id) {
+      const { layout } = brigadaPresentation;
+      // The B19 marker's front protrudes into the cartographic road. The
+      // photo-derived building is recessed to P3's facade; keep this exact
+      // display envelope solid and its shared entrance apron walkable.
+      polygon(entity.id, [[layout.minX, layout.minZ], [layout.maxX, layout.minZ],
+        [layout.maxX, layout.maxZ], [layout.minX, layout.maxZ]], entity.geometry.elevation, layout.height);
+      continue;
+    }
+    if (kind === 'commercial-pavilion' && resolvePavilionArchitecture2026(entity.publicIdentifier)) {
+      const definition = resolveCommercialPavilionDefinition(entity)!;
+      const bounds = strategicLandmarkBounds(entity), yaw = strategicLandmarkFacingRadians(entity);
+      const layout = createCommercialPavilionLayout(commercialPavilionModelBounds(bounds, yaw), definition, strategicLandmarkVisualHeight(entity) ?? undefined);
+      const base = entity.geometry.elevation, c = Math.cos(yaw), s = Math.sin(yaw);
+      const transform = ([x, z]: readonly [number, number]): readonly [number, number] => [bounds.centerX + x * c + z * s, bounds.centerZ - x * s + z * c];
+      const ground = createPavilionGroundInterfaces(layout);
+      for (const part of [...ground.landings, ...ground.steps]) {
+        surfaces.push(visitGroundSurface(part.id, pavilionGroundRectPolygon(part).map(transform), base + part.topY));
+      }
+      for (const ramp of ground.ramps) {
+        surfaces.push(visitGroundSurface(ramp.id, pavilionGroundRectPolygon(ramp).map(transform),
+          (x, z) => base + pavilionGroundRampHeight(ramp, (x - bounds.centerX) * c - (z - bounds.centerZ) * s), undefined, base + Math.max(ramp.startY, ramp.endY)));
+      }
+      const physicalHeight = pavilionArchitectureHeight(layout);
+      if (entity.publicIdentifier === 'B6') {
+        // Only the documented P3 inset access strip becomes walkable. Its
+        // physical shell stays closed; entry remains explicit navigation.
+        box(entity.id, bounds.centerX, base + physicalHeight / 2, bounds.centerZ,
+          layout.exterior.shell.width, physicalHeight, layout.exterior.shell.depth, yaw);
+      } else {
+        // Retain the established solid cadastral boundary on other buildings.
+        polygon(entity.id, entity.geometry.coordinates[0], base, physicalHeight);
+      }
+      continue;
+    }
     if (kind === 'campeira-track' || kind === 'nations-square' || entity.classification === 'GATE') continue;
     if (SOLID_CLASSIFICATIONS.has(entity.classification) || (kind && entity.classification !== 'GREEN_AREA')) {
       const base = entity.geometry.elevation;
@@ -264,7 +364,7 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
   for (const tree of trees) {
     const base = commercialTreeGroundElevation(tree, treeSupportEntities);
     trunk(tree.id, tree.position[0], tree.position[1], tree.trunkRadius
-      * (isInternalParkVegetationPoint(tree.position) ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1), base, tree.trunkHeight);
+      * (isInternalParkVegetationPoint(tree.position) ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1), base, commercialTreeWoodStructure(tree).trunkHeight);
     crown(tree.id, tree.position[0], tree.position[1], tree.canopyRadius, base + tree.trunkHeight * 0.85, base + tree.trunkHeight + tree.crownHeight);
   }
   const wellLot = entities.find(entity => entity.publicIdentifier === 'Q-R-02' && isExporuralLandscapeLot(entity) && visitPointInRing(...EXPORURAL_WELL.position, entity.geometry.coordinates[0]));

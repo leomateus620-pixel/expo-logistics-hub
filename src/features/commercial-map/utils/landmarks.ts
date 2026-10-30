@@ -2,6 +2,7 @@ import { ARENA_CANONICAL_LAYOUT } from '../data/arenaCanonicalLayout';
 import { SOY_RESTROOM_PRESENTATION } from './soyGatePresentation';
 import { SOY_RESTROOM } from '../data/soyGateInfrastructure';
 import type { MapEntity } from '../types';
+import { ADMINISTRATIVE_CENTER_ENTRANCE_REFERENCE } from '../data/administrativeCenterEntranceReference';
 import { resolveCrioulosArchitectureEnvelope } from '../data/gateFourDistrict';
 import { livestockPavilionVisualHeight } from './livestockPavilion';
 import { miranteVisualHeight } from './mirante';
@@ -309,7 +310,7 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     // abre para leste e a empena com mural encerra o conjunto ao sul.
     facingRadians: Math.PI / 2,
     focusDirection: [0.78, 0.4, 0.68],
-    visualHeight: ({ width, depth }) => Math.min(3.15, Math.max(width, depth) * 0.42),
+    visualHeight: ({ width, depth }) => Math.min(3.15, Math.min(width, depth) * ADMINISTRATIVE_CENTER_ENTRANCE_REFERENCE.heightToShortSide),
   },
   B12: {
     kind: 'fenasoja-headquarters',

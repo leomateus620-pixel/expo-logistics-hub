@@ -1,0 +1,4007 @@
+{
+  "base": "http://127.0.0.1:8080",
+  "mode": "signs",
+  "fixture": "OFFICIAL_REFERENCE_DATA + versioned soyGatePersistedLayout; not a live authorized query",
+  "gpu": null,
+  "runs": [],
+  "views": [
+    {
+      "device": "desktop",
+      "name": "B1-front",
+      "runtime": {
+        "at": 6127,
+        "calls": 207,
+        "triangles": 371224,
+        "geometries": 596,
+        "textures": 138,
+        "programs": 247,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 193072817,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 19,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 6127,
+          "calls": 207,
+          "triangles": 371224,
+          "geometries": 596,
+          "textures": 138,
+          "programs": 247,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 193072817,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 33,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -11.1605,
+          1.05,
+          10.4325
+        ],
+        "target": [
+          -15.1636,
+          1.05,
+          15.3709
+        ],
+        "quaternion": [
+          0,
+          0.942558,
+          0,
+          0.334042
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.66651,
+        "far": 1283.245,
+        "distance": 6.3571,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -15.163636363636364,
+          1.05,
+          15.370909168072291
+        ],
+        "position": [
+          -11.163636363636364,
+          0.8,
+          10.436363704819275
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B1",
+        "meshesChecked": 9,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              -15.124305545257101,
+              1.107333823740726,
+              14.810650983441567
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              -15.124305545257101,
+              1.044057604372745,
+              15.095393970597481
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              -15.124305545257101,
+              1.170610043108707,
+              15.095393970597481
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              -15.124305545257101,
+              1.044057604372745,
+              14.525907996285653
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              -15.124305545257101,
+              1.170610043108707,
+              14.525907996285653
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B1-oblique",
+      "runtime": {
+        "at": 6820.29999999702,
+        "calls": 355,
+        "triangles": 384388,
+        "geometries": 608,
+        "textures": 140,
+        "programs": 258,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 195528736,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 23,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 6820.29999999702,
+          "calls": 355,
+          "triangles": 384388,
+          "geometries": 608,
+          "textures": 140,
+          "programs": 258,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 195528736,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 88,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -12.2635,
+          1.05,
+          19.1057
+        ],
+        "target": [
+          -15.1636,
+          1.05,
+          15.3709
+        ],
+        "quaternion": [
+          0,
+          0.32417,
+          0,
+          0.945999
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 4.7286,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -15.163636363636364,
+          1.05,
+          15.370909168072291
+        ],
+        "position": [
+          -12.263636363636364,
+          1,
+          19.10545463132531
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B1",
+        "meshesChecked": 9,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              -15.124305545257101,
+              1.107333823740726,
+              14.810650983441567
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              -15.124305545257101,
+              1.044057604372745,
+              15.095393970597481
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              -15.124305545257101,
+              1.170610043108707,
+              15.095393970597481
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              -15.124305545257101,
+              1.044057604372745,
+              14.525907996285653
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              -15.124305545257101,
+              1.170610043108707,
+              14.525907996285653
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B1-pedestrian",
+      "runtime": {
+        "at": 7526.79999999702,
+        "calls": 193,
+        "triangles": 365818,
+        "geometries": 610,
+        "textures": 140,
+        "programs": 265,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 184149549,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 25,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 7526.79999999702,
+          "calls": 193,
+          "triangles": 365818,
+          "geometries": 610,
+          "textures": 140,
+          "programs": 265,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 184149549,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 88,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -12.247,
+          0.95,
+          12.319
+        ],
+        "target": [
+          -15.1636,
+          0.95,
+          15.3709
+        ],
+        "quaternion": [
+          0,
+          0.928157,
+          0,
+          0.372188
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 4.2215,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -15.163636363636364,
+          0.95,
+          15.370909168072291
+        ],
+        "position": [
+          -12.263636363636364,
+          0.5,
+          12.336363704819274
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B1",
+        "meshesChecked": 9,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              -15.124305545257101,
+              1.107333823740726,
+              14.810650983441567
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              -15.124305545257101,
+              1.044057604372745,
+              15.095393970597481
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              -15.124305545257101,
+              1.170610043108707,
+              15.095393970597481
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              -15.124305545257101,
+              1.044057604372745,
+              14.525907996285653
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              -15.124305545257101,
+              1.170610043108707,
+              14.525907996285653
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B3-front",
+      "runtime": {
+        "at": 8226.29999999702,
+        "calls": 211,
+        "triangles": 413713,
+        "geometries": 612,
+        "textures": 140,
+        "programs": 265,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 194482370,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 27,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 8226.29999999702,
+          "calls": 211,
+          "triangles": 413713,
+          "geometries": 612,
+          "textures": 140,
+          "programs": 265,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 194482370,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 145,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -8.3018,
+          5.3908,
+          9.2945
+        ],
+        "target": [
+          -8.3018,
+          0.95,
+          21.4473
+        ],
+        "quaternion": [
+          0,
+          0.984697,
+          0.174278,
+          0
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 12.9387,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -8.30181818181818,
+          0.95,
+          21.447272834939767
+        ],
+        "position": [
+          -8.301818181818179,
+          5.390836363636361,
+          9.294545547864194
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B3",
+        "meshesChecked": 12,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              -9.942938181502518,
+              1.2800735997537827,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              -9.617996418220695,
+              1.2078643190244889,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              -9.617996418220695,
+              1.3522828804830764,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              -10.26787994478434,
+              1.2078643190244889,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              -10.26787994478434,
+              1.3522828804830764,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B3-oblique",
+      "runtime": {
+        "at": 8905.09999999404,
+        "calls": 234,
+        "triangles": 390380,
+        "geometries": 612,
+        "textures": 141,
+        "programs": 265,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 201960112,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 28,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 8905.09999999404,
+          "calls": 234,
+          "triangles": 390380,
+          "geometries": 612,
+          "textures": 141,
+          "programs": 265,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 201960112,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 145,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -13.8785,
+          5.3908,
+          9.2945
+        ],
+        "target": [
+          -8.3018,
+          0.95,
+          21.4473
+        ],
+        "quaternion": [
+          0.034077,
+          0.964423,
+          0.155964,
+          -0.210717
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.05391,
+        "far": 1283.245,
+        "distance": 14.0893,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -8.30181818181818,
+          0.95,
+          21.447272834939767
+        ],
+        "position": [
+          -13.87854545454545,
+          5.390836363636361,
+          9.294545547864194
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B3",
+        "meshesChecked": 12,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              -9.942938181502518,
+              1.2800735997537827,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              -9.617996418220695,
+              1.2078643190244889,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              -9.617996418220695,
+              1.3522828804830764,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              -10.26787994478434,
+              1.2078643190244889,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              -10.26787994478434,
+              1.3522828804830764,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B3-pedestrian",
+      "runtime": {
+        "at": 9602,
+        "calls": 553,
+        "triangles": 816176,
+        "geometries": 611,
+        "textures": 141,
+        "programs": 265,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 205543349,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 29,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 9602,
+          "calls": 553,
+          "triangles": 816176,
+          "geometries": 611,
+          "textures": 141,
+          "programs": 265,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 205543349,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 197,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -8.3018,
+          1.05,
+          9.2821
+        ],
+        "target": [
+          -8.3018,
+          1.05,
+          21.4473
+        ],
+        "quaternion": [
+          0,
+          1,
+          0,
+          0
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.05871,
+        "far": 1283.245,
+        "distance": 12.1652,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -8.30181818181818,
+          1.05,
+          21.447272834939767
+        ],
+        "position": [
+          -8.301818181818179,
+          0.5,
+          9.294545547864194
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B3",
+        "meshesChecked": 12,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              -9.942938181502518,
+              1.2800735997537827,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              -9.617996418220695,
+              1.2078643190244889,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              -9.617996418220695,
+              1.3522828804830764,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              -10.26787994478434,
+              1.2078643190244889,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              -10.26787994478434,
+              1.3522828804830764,
+              18.027039934160207
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B4-front",
+      "runtime": {
+        "at": 10280.40000000596,
+        "calls": 517,
+        "triangles": 787468,
+        "geometries": 609,
+        "textures": 141,
+        "programs": 265,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 208286499,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 30,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 10280.40000000596,
+          "calls": 517,
+          "triangles": 787468,
+          "geometries": 609,
+          "textures": 141,
+          "programs": 265,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 208286499,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 197,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -2.5309,
+          2.7638,
+          12.9731
+        ],
+        "target": [
+          -2.5309,
+          0.95,
+          21.1418
+        ],
+        "quaternion": [
+          0,
+          0.994039,
+          0.109029,
+          0
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.05069,
+        "far": 1283.245,
+        "distance": 8.3677,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -2.530909090909091,
+          0.95,
+          21.141818287951814
+        ],
+        "position": [
+          -2.5309090909090903,
+          2.7637527411469893,
+          12.97309097421687
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B4",
+        "meshesChecked": 10,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              -2.5309090909090908,
+              0.7463807999999995,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              -2.2866390016404066,
+              0.6920985579402918,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              -2.2866390016404066,
+              0.8006630420597072,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              -2.775179180177775,
+              0.6920985579402918,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              -2.775179180177775,
+              0.8006630420597072,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B4-oblique",
+      "runtime": {
+        "at": 10957.90000000596,
+        "calls": 187,
+        "triangles": 381854,
+        "geometries": 609,
+        "textures": 141,
+        "programs": 265,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 210273111,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 30,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 10957.90000000596,
+          "calls": 187,
+          "triangles": 381854,
+          "geometries": 609,
+          "textures": 141,
+          "programs": 265,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 210273111,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 201,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -5.39,
+          2.7638,
+          12.9731
+        ],
+        "target": [
+          -2.5309,
+          0.95,
+          21.1418
+        ],
+        "quaternion": [
+          0.017275,
+          0.98061,
+          0.101649,
+          -0.166651
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 8.8426,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -2.530909090909091,
+          0.95,
+          21.141818287951814
+        ],
+        "position": [
+          -5.389963650716321,
+          2.7637527411469893,
+          12.97309097421687
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B4",
+        "meshesChecked": 10,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              -2.5309090909090908,
+              0.7463807999999995,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              -2.2866390016404066,
+              0.6920985579402918,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              -2.2866390016404066,
+              0.8006630420597072,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              -2.775179180177775,
+              0.6920985579402918,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              -2.775179180177775,
+              0.8006630420597072,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B4-pedestrian",
+      "runtime": {
+        "at": 11628.90000000596,
+        "calls": 175,
+        "triangles": 386307,
+        "geometries": 609,
+        "textures": 141,
+        "programs": 265,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 211081431,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 30,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 11628.90000000596,
+          "calls": 175,
+          "triangles": 386307,
+          "geometries": 609,
+          "textures": 141,
+          "programs": 265,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 211081431,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 201,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -2.5309,
+          1.05,
+          12.9546
+        ],
+        "target": [
+          -2.5309,
+          1.05,
+          21.1418
+        ],
+        "quaternion": [
+          0,
+          1,
+          0,
+          0
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.03684,
+        "far": 1283.245,
+        "distance": 8.1872,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          -2.530909090909091,
+          1.05,
+          21.141818287951814
+        ],
+        "position": [
+          -2.5309090909090903,
+          0.5,
+          12.97309097421687
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B4",
+        "meshesChecked": 10,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              -2.5309090909090908,
+              0.7463807999999995,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              -2.2866390016404066,
+              0.6920985579402918,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              -2.2866390016404066,
+              0.8006630420597072,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              -2.775179180177775,
+              0.6920985579402918,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              -2.775179180177775,
+              0.8006630420597072,
+              17.563232350865285
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B5-front",
+      "runtime": {
+        "at": 12318,
+        "calls": 176,
+        "triangles": 383291,
+        "geometries": 610,
+        "textures": 141,
+        "programs": 266,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 160728073,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 31,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 12318,
+          "calls": 176,
+          "triangles": 383291,
+          "geometries": 610,
+          "textures": 141,
+          "programs": 266,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 160728073,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 206,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          0.5673,
+          2.3297,
+          13.7215
+        ],
+        "target": [
+          0.5673,
+          0.95,
+          20.6073
+        ],
+        "quaternion": [
+          0,
+          0.995116,
+          0.098714,
+          0
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 7.0227,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          0.5672727272727229,
+          0.95,
+          20.6072728307229
+        ],
+        "position": [
+          0.5672727272727237,
+          2.32970182987711,
+          13.72145461433735
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B5",
+        "meshesChecked": 9,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              0.5672727272727233,
+              0.8529604363636335,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              0.8267649159648162,
+              0.7952955055431684,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              0.8267649159648162,
+              0.9106253671840986,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              0.30778053858063037,
+              0.7952955055431684,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              0.30778053858063037,
+              0.9106253671840986,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B5-oblique",
+      "runtime": {
+        "at": 13003.59999999404,
+        "calls": 195,
+        "triangles": 377572,
+        "geometries": 610,
+        "textures": 141,
+        "programs": 266,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 161866735,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 31,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 13003.59999999404,
+          "calls": 195,
+          "triangles": 377572,
+          "geometries": 610,
+          "textures": 141,
+          "programs": 266,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 161866735,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 206,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          -1.8428,
+          2.3297,
+          13.7215
+        ],
+        "target": [
+          0.5673,
+          0.95,
+          20.6073
+        ],
+        "quaternion": [
+          0.015635,
+          0.981563,
+          0.092001,
+          -0.166812
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 7.4247,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          0.5672727272727229,
+          0.95,
+          20.6072728307229
+        ],
+        "position": [
+          -1.8427636484622174,
+          2.32970182987711,
+          13.72145461433735
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B5",
+        "meshesChecked": 9,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              0.5672727272727233,
+              0.8529604363636335,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              0.8267649159648162,
+              0.7952955055431684,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              0.8267649159648162,
+              0.9106253671840986,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              0.30778053858063037,
+              0.7952955055431684,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              0.30778053858063037,
+              0.9106253671840986,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B5-pedestrian",
+      "runtime": {
+        "at": 13683.20000000298,
+        "calls": 176,
+        "triangles": 383303,
+        "geometries": 610,
+        "textures": 141,
+        "programs": 266,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 163308147,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 31,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 13683.20000000298,
+          "calls": 176,
+          "triangles": 383303,
+          "geometries": 610,
+          "textures": 141,
+          "programs": 266,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 163308147,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 210,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          0.5673,
+          1.05,
+          13.6995
+        ],
+        "target": [
+          0.5673,
+          1.05,
+          20.6073
+        ],
+        "quaternion": [
+          0,
+          1,
+          0,
+          0
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 6.9077,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          0.5672727272727229,
+          1.05,
+          20.6072728307229
+        ],
+        "position": [
+          0.5672727272727237,
+          0.5,
+          13.72145461433735
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B5",
+        "meshesChecked": 9,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              0.5672727272727233,
+              0.8529604363636335,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              0.8267649159648162,
+              0.7952955055431684,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              0.8267649159648162,
+              0.9106253671840986,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              0.30778053858063037,
+              0.7952955055431684,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              0.30778053858063037,
+              0.9106253671840986,
+              17.56699105631983
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B6-front",
+      "runtime": {
+        "at": 14355,
+        "calls": 537,
+        "triangles": 877975,
+        "geometries": 615,
+        "textures": 141,
+        "programs": 266,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 164260282,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 32,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 14355,
+          "calls": 537,
+          "triangles": 877975,
+          "geometries": 615,
+          "textures": 141,
+          "programs": 266,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 164260282,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 210,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          4.6909,
+          3.1889,
+          12.1964
+        ],
+        "target": [
+          4.6909,
+          0.95,
+          21.0982
+        ],
+        "quaternion": [
+          0,
+          0.99242,
+          0.122891,
+          0
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.035,
+        "far": 1283.245,
+        "distance": 9.1791,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          4.690909090909095,
+          0.95,
+          21.098181924096387
+        ],
+        "position": [
+          4.690909090909096,
+          3.188945454545452,
+          12.19636372519168
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B6",
+        "meshesChecked": 12,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              3.668018181818187,
+              1.0237614545454539,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              3.8945011402301817,
+              0.9575411785650829,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              3.901231331618386,
+              1.0596958692789038,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              3.434805032017988,
+              0.9878270398120039,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              3.4415352234061927,
+              1.0899817305258248,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B6-oblique",
+      "runtime": {
+        "at": 15039.79999999702,
+        "calls": 210,
+        "triangles": 501978,
+        "geometries": 618,
+        "textures": 141,
+        "programs": 266,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 165620409,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 32,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 15039.79999999702,
+          "calls": 210,
+          "triangles": 501978,
+          "geometries": 618,
+          "textures": 141,
+          "programs": 266,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 165620409,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 214,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          1.392,
+          3.1889,
+          12.1964
+        ],
+        "target": [
+          4.6909,
+          0.95,
+          21.0982
+        ],
+        "quaternion": [
+          0.020396,
+          0.977705,
+          0.113732,
+          -0.175337
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.03825,
+        "far": 1283.245,
+        "distance": 9.7539,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          4.690909090909095,
+          0.95,
+          21.098181924096387
+        ],
+        "position": [
+          1.392000000000008,
+          3.188945454545452,
+          12.19636372519168
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B6",
+        "meshesChecked": 12,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              3.668018181818187,
+              1.0237614545454539,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              3.8945011402301817,
+              0.9575411785650829,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              3.901231331618386,
+              1.0596958692789038,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              3.434805032017988,
+              0.9878270398120039,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              3.4415352234061927,
+              1.0899817305258248,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    },
+    {
+      "device": "desktop",
+      "name": "B6-pedestrian",
+      "runtime": {
+        "at": 15712.79999999702,
+        "calls": 183,
+        "triangles": 419814,
+        "geometries": 618,
+        "textures": 141,
+        "programs": 266,
+        "dpr": 1,
+        "width": 1905,
+        "height": 1080,
+        "heapBytes": 166586632,
+        "qualityTier": "HIGH",
+        "gpuVendor": "Google Inc. (Apple)",
+        "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+      },
+      "summary": {
+        "sampledFrames": 11,
+        "averageFrameTimeMs": 14.47,
+        "p95FrameTimeMs": 20,
+        "p50FrameTimeMs": 16.6,
+        "p99FrameTimeMs": 20,
+        "averageFps": 69.1,
+        "inverseP99FpsApproximation": 50,
+        "stallsOver250Ms": 0,
+        "stallDurationMs": 0,
+        "jankFrames": 0,
+        "longTasks": 10,
+        "reactCommits": 32,
+        "qualityChanges": 1,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "renderer": {
+          "at": 15712.79999999702,
+          "calls": 183,
+          "triangles": 419814,
+          "geometries": 618,
+          "textures": 141,
+          "programs": 266,
+          "dpr": 1,
+          "width": 1905,
+          "height": 1080,
+          "heapBytes": 166586632,
+          "qualityTier": "HIGH",
+          "gpuVendor": "Google Inc. (Apple)",
+          "gpuRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+        }
+      },
+      "boot": {
+        "startedAt": 121.70000000298023,
+        "preparationAttempt": 1,
+        "marks": {
+          "module-requested": 121.79999999701977,
+          "b12-worker:start": 122,
+          "fixture-data-ready": 413.5,
+          "module-ready": 414.09999999403954,
+          "renderer:create:start": 443,
+          "webgl-context:start": 443,
+          "webgl-context:end": 452.59999999403954,
+          "renderer:create:end": 455.40000000596046,
+          "b12-worker:cached": 465.40000000596046,
+          "canvas-created": 466.5,
+          "b12-worker-geometry": 714.7999999970198,
+          "b12-worker-contact": 714.7999999970198,
+          "b12-worker:end": 714.7999999970198,
+          "critical-scene:start": 715.9000000059605,
+          "environment:textures:start": 802.5999999940395,
+          "textures:start": 802.5999999940395,
+          "textures:end": 816,
+          "environment:textures:end": 816.0999999940395,
+          "environment:materials:start": 816.0999999940395,
+          "environment:materials:end": 816.2000000029802,
+          "geometry-preparation:start": 1309.4000000059605,
+          "geometry-preparation:end": 1309.5,
+          "b12-unpack:start": 1423.5999999940395,
+          "b12-unpack:end": 1424.7000000029802,
+          "b12-materials:start": 1424.7000000029802,
+          "b12-materials:end": 1473.9000000059605,
+          "tree-surface-preparation:start": 1651.7000000029802,
+          "tree-surface-preparation:end": 1652.0999999940395,
+          "postprocessing:start": 2064.2999999970198,
+          "postprocessing:end": 2066.5999999940395,
+          "critical-scene:end": 2096.2000000029802,
+          "shader-representatives": 2098.5,
+          "compile-direct:start": 2098.7000000029802,
+          "program-submission": 2170.4000000059605,
+          "compile-direct-js": 2170.5999999940395,
+          "controls-created": 2175.2999999970198,
+          "first-frame-requested": 2175.5999999940395,
+          "program-links-ready": 2349.5,
+          "program-introspection": 2636.9000000059605,
+          "compile-direct:end": 2637.5,
+          "texture-upload:programs-ready": 2637.5999999940395,
+          "texture-upload:start": 2647.7999999970198,
+          "texture-upload:end": 3491,
+          "essential-scene:prepared": 3492.2999999970198,
+          "shadow-preparation:start": 3523,
+          "shadow-preparation:end": 3523.0999999940395,
+          "first-draw": 3569.7999999970198,
+          "commercial-map-ready": 3590,
+          "first-interactive": 3590.0999999940395,
+          "critical-post:start": 3673.9000000059605,
+          "deferred-compile-js": 3693.5,
+          "critical-post:end": 5653.70000000298,
+          "hydrate:rain:start": 5741.79999999702,
+          "rain-preparation:start": 5745.29999999702,
+          "rain-preparation:end": 5746.5,
+          "hydrate:rain:mounted": 5747.20000000298,
+          "hydrate:rain:end": 6440.70000000298,
+          "hydrate:hydrology:start": 6522.5999999940395,
+          "hydrology-cpu:start": 6527.9000000059605,
+          "hydrology-cpu:end": 6553.5,
+          "hydrate:hydrology:mounted": 6557,
+          "hydrate:hydrology:end": 7223.70000000298,
+          "hydrate:interior-shaders:start": 7305.4000000059605,
+          "hydrate:interior-shaders:mounted": 7306.29999999702,
+          "interior-preparation:start": 7306.4000000059605,
+          "interior-preparation:end": 7322.20000000298,
+          "hydrate:interior-shaders:end": 7923.70000000298,
+          "hydrate:physics-module:start": 8005.5999999940395,
+          "hydrate:physics-module:mounted": 8006.4000000059605,
+          "physics-preparation:start": 8006.4000000059605,
+          "physics-preparation:end": 8024.70000000298,
+          "hydrate:physics-module:end": 8623.59999999404,
+          "secondary-hydration-complete": 8623.70000000298
+        },
+        "interactive": true,
+        "commercialMapReady": true,
+        "failed": false
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 214,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "camera": {
+        "position": [
+          4.6909,
+          1.05,
+          12.1794
+        ],
+        "target": [
+          4.6909,
+          1.05,
+          21.0982
+        ],
+        "quaternion": [
+          0,
+          1,
+          0,
+          0
+        ],
+        "controlsEnabled": true,
+        "interiorEntityId": null,
+        "fov": 38,
+        "zoom": 1,
+        "viewOffset": {
+          "x": 0,
+          "y": 0
+        },
+        "near": 0.04064,
+        "far": 1283.245,
+        "distance": 8.9188,
+        "minDistance": 8.7889,
+        "maxDistance": 328.6701,
+        "desiredMinDistance": 8.7889,
+        "desiredMaxDistance": 328.6701,
+        "calculatedMaxDistance": 328.6701,
+        "navigationBounds": {
+          "minX": -77,
+          "maxX": 77,
+          "minZ": -62.2727275,
+          "maxZ": 62.2727275,
+          "width": 154,
+          "depth": 124.545455,
+          "centerX": 0,
+          "centerZ": 0,
+          "maxHeight": 6.2,
+          "diagonal": 198.05951217035
+        },
+        "boundingSphereRadius": 79.8989,
+        "viewport": {
+          "width": 1905,
+          "height": 1080,
+          "aspect": 1.76389,
+          "dpr": 1
+        }
+      },
+      "pose": {
+        "target": [
+          4.690909090909095,
+          1.05,
+          21.098181924096387
+        ],
+        "position": [
+          4.690909090909096,
+          0.5,
+          12.19636372519168
+        ]
+      },
+      "measure": null,
+      "resources": {
+        "count": 250,
+        "transferBytes": 11291496,
+        "encodedBytes": 11220517
+      },
+      "signGeometry": {
+        "id": "B6",
+        "meshesChecked": 12,
+        "points": [
+          {
+            "name": "center",
+            "world": [
+              3.668018181818187,
+              1.0237614545454539,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-left",
+            "world": [
+              3.8945011402301817,
+              0.9575411785650829,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-left",
+            "world": [
+              3.901231331618386,
+              1.0596958692789038,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "bottom-right",
+            "world": [
+              3.434805032017988,
+              0.9878270398120039,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          },
+          {
+            "name": "top-right",
+            "world": [
+              3.4415352234061927,
+              1.0899817305258248,
+              17.541525397918946
+            ],
+            "clear": true,
+            "occluder": null
+          }
+        ],
+        "clear": true,
+        "scope": "Own building, sign support and canopy only; external trees/poles remain in screenshots."
+      }
+    }
+  ],
+  "errors": []
+}
