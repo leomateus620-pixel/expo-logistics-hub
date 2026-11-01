@@ -57,22 +57,24 @@ function placementFor(surface: SoldLotSurface, placements: PlacementCache, obsta
   return placements.get(surface.geometry);
 }
 
-function SoldMarkerBatch({ surfaces, confirmation, obstacles, placements, selectedId, hoveredId, opacity = 1, infrastructureMode = false, matchingIds, filtersActive, publicScene }: Presentation & {
+function SoldMarkerBatch({ surfaces, confirmation, obstacles, placements, selectedId, hoveredId, opacity = 1, infrastructureMode = false, matchingIds, filtersActive }: Presentation & {
   surfaces: readonly SoldLotSurface[]; confirmation: boolean;
   obstacles: readonly Coordinate[][]; placements: PlacementCache;
 }) {
   const invalidate = useThree(state => state.invalidate);
   const resources = useMemo(() => {
     const geometry = confirmation ? createSoldCheckGeometry() : createSoldLockGeometry();
-    const material = confirmation && publicScene
-      ? new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -4 })
-      : new THREE.MeshStandardMaterial({ vertexColors: true, roughness: confirmation ? 1 : .48, metalness: confirmation ? 0 : .16, polygonOffset: confirmation, polygonOffsetFactor: -3, polygonOffsetUnits: -4 });
+    // Only the external confirmation seal uses an unlit status colour. The
+    // original pavilion/other-consumer locks retain their lit metal material.
+    const material = confirmation
+      ? new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false, depthTest: true, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -4 })
+      : new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .48, metalness: .16, polygonOffset: false, polygonOffsetFactor: -3, polygonOffsetUnits: -4 });
     const mesh = new THREE.InstancedMesh(geometry, material, Math.max(1, surfaces.length));
     mesh.name = confirmation ? 'sold-lot-confirmations' : 'sold-lot-locks'; mesh.raycast = NO_RAYCAST;
     mesh.count = 0; mesh.castShadow = false; mesh.receiveShadow = false;
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     return { mesh, geometry, material };
-  }, [surfaces.length, confirmation, publicScene]);
+  }, [surfaces.length, confirmation]);
   useLayoutEffect(() => {
     const matrix = new THREE.Matrix4(), quaternion = new THREE.Quaternion();
     const position = new THREE.Vector3(), scale = new THREE.Vector3(), color = new THREE.Color();

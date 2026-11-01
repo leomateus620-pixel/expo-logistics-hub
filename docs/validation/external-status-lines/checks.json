@@ -1,0 +1,605 @@
+{
+  "baseline": {
+    "tests": 4231,
+    "passed": 4132,
+    "failed": 99,
+    "failedFiles": 58
+  },
+  "candidate": {
+    "tests": 4243,
+    "passed": 4152,
+    "failed": 91,
+    "failedFiles": 52
+  },
+  "addedFailures": [],
+  "targeted": {
+    "tests": 78,
+    "passed": 78,
+    "failed": 0,
+    "files": [
+      "test/commercialMapExporuralLandscape.test.ts",
+      "test/exporuralPresentationCoverage.test.ts",
+      "test/externalLotFrameGeometry.test.ts",
+      "test/externalLotPresentation.test.ts",
+      "test/externalLotPresentationDiagnostics.test.ts",
+      "test/externalLotRendering.test.tsx",
+      "test/externalLotStatusMaterial.test.ts",
+      "test/publicRuralPresentation.test.ts",
+      "test/soldLotPresentation.test.ts"
+    ]
+  },
+  "baselineFailures": [
+    {
+      "file": "test/agendaMeetingWorkspace.test.tsx",
+      "title": "AgendaMeetingWorkspace > bloqueia seed/offline sem fabricar um UUID ou montar captura",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/ata vinculada/i`"
+    },
+    {
+      "file": "test/agendaMeetingWorkspace.test.tsx",
+      "title": "AgendaMeetingWorkspace > exige consentimento informado antes de iniciar a sessão canônica",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/ata vinculada/i`"
+    },
+    {
+      "file": "test/agendaMeetingWorkspace.test.tsx",
+      "title": "AgendaMeetingWorkspace > expõe estado inequívoco, telemetria real e proteção de captura ativa",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/ata vinculada/i`"
+    },
+    {
+      "file": "test/agendaMeetingWorkspace.test.tsx",
+      "title": "AgendaMeetingWorkspace > renderiza conhecimento tipado, lacunas e ações sem superfície de áudio histórico",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/ata vinculada/i`"
+    },
+    {
+      "file": "test/alvoradaAccessContract.test.ts",
+      "title": "contrato de acesso: ecossistema direto e introdução embutida na contagem > não cria rota, deep link, menu, atalho ou registry paralelo",
+      "error": "AssertionError: expected 'import { NavLink as RouterNavLink } f…' not to match /\\/alvora…/alvorada|o-nascer-da-alvorada"
+    },
+    {
+      "file": "test/alvoradaPortalIntegration.test.tsx",
+      "title": "integração do portal: ecossistema direto e introdução embutida na contagem > abre o Ecossistema Fenasoja diretamente pelo bloco de marca, sem planeta nem alvorada",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialDashboardNavigationPerformance.test.tsx",
+      "title": "Dashboard presentation across discarded navigation views > restores scope, selection, metric, status, zoom, comparison, scroll and entry focus after sales",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialDashboardPresentation.test.tsx",
+      "title": "integrated Commercial Dashboard presentation > keeps registered partial values global across scopes, including blocked prices and excluding unavailable prices",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialDashboardSpaces.test.tsx",
+      "title": "managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialMap2026Reference.test.ts",
+      "title": "referência cartográfica oficial Fenasoja 2026 > inclui a rede viária e todas as instâncias repetidas da legenda",
+      "error": "AssertionError: expected [ Array(1) ] to have a length of +0 but got 1"
+    },
+    {
+      "file": "test/commercialMap2026Reference.test.ts",
+      "title": "referência cartográfica oficial Fenasoja 2026 > mantém os 26 centros sanitários vetoriais oficiais e nenhum volume renderizado",
+      "error": "AssertionError: expected [ Array(1) ] to deeply equal []"
+    },
+    {
+      "file": "test/commercialMapArenaCanonical.test.ts",
+      "title": "Arena canônica: implantação, arquitetura e preservação da main 8783fea7 > preserva todas as entidades exceto F, os lotes e integralmente o Mirante #151",
+      "error": "AssertionError: expected [ { …(15) }, { …(15) }, …(1577) ] to have a length of 1692 but got 1579"
+    },
+    {
+      "file": "test/commercialMapAtmospherePersistence.test.tsx",
+      "title": "atmosphere resource lifetime is independent of Hydrological visibility > keeps hidden vegetation and electrical geometry on their normal physical inputs",
+      "error": "AssertionError: expected 'import { InteriorViewControls } from …' to contain 'visible={treesVisible && !hydrologica…'"
+    },
+    {
+      "file": "test/commercialMapBootLoader.test.tsx",
+      "title": "Commercial Map real readiness loader > does not advance for elapsed time, module availability, or an unfinished data request",
+      "error": "AssertionError: expected +0 to be 23 // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapBootLoader.test.tsx",
+      "title": "Commercial Map real readiness loader > reports overlapping real spans and preserves failed then successful data retry",
+      "error": "AssertionError: expected false to be true // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapElectricalInfrastructure.test.ts",
+      "title": "infraestrutura elétrica cartográfica do Mapa Comercial > preserva as 13 âncoras conflitantes e projeta só sua apresentação à fachada livre",
+      "error": "AssertionError: transformer-ref-007: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapElectricalInfrastructure.test.ts",
+      "title": "infraestrutura elétrica cartográfica do Mapa Comercial > mantém todas as fases acima da folga técnica mínima em estruturas existentes",
+      "error": "AssertionError: expected [ …(996) ] to deeply equal []"
+    },
+    {
+      "file": "test/commercialMapExplorer.test.ts",
+      "title": "explorador compartilhado de entidades do mapa comercial > filtra cada situação comercial e combina texto, tipo, local e verificação",
+      "error": "AssertionError: RESERVED: expected false to be true // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapExplorer.test.ts",
+      "title": "explorador compartilhado de entidades do mapa comercial > ordena por relevância, nome, localização e situação com desempate estável",
+      "error": "AssertionError: expected [ 'AVAILABLE', 'SOLD', …(4) ] to deeply equal [ 'AVAILABLE', 'RESERVED', …(4) ]"
+    },
+    {
+      "file": "test/commercialMapExplorer.test.ts",
+      "title": "explorador compartilhado de entidades do mapa comercial > expõe somente facetas derivadas dos metadados existentes",
+      "error": "AssertionError: expected 264 to be 262 // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapExporuralArchitecture.test.ts",
+      "title": "C4 / E-06 architecture and selection activity > preserves the complete approved official inventory and compound placement",
+      "error": "AssertionError: expected '9cbb43e1800cdf5ea8b2da754cd1cae37ee35…' to be '5abf0ed204b10d98e17d1a6f171add3a6c3b6…' // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapExporuralCartographicFidelity.test.ts",
+      "title": "fidelidade cartográfica dourada da Exporural 2026.4 > preserva os 95 lotes dentro do mesmo perímetro canônico e fora das sete ruas",
+      "error": "AssertionError: expected [ { …(38) }, { …(38) }, …(1464) ] to have a length of 1577 but got 1466"
+    },
+    {
+      "file": "test/commercialMapExporuralLandscape.test.ts",
+      "title": "Exporural presentation boundaries and infrastructure > joins a single rising cut face to a level terrace without a reverse berm or parcel overlap",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialMapFenasojaReferenceStructures.test.ts",
+      "title": "reconstrução arquitetônica de B28 e D1 > mantém D1 reta no eixo oficial e orienta sua fachada para leste, diante da Arena",
+      "error": "AssertionError: expected 0.9265810104734122 to be greater than 0.9659258262890683"
+    },
+    {
+      "file": "test/commercialMapLoadingPipeline.test.ts",
+      "title": "commercial map initial data pipeline > loads all 1205 entities and lots through stable 1000-row pages",
+      "error": "AssertionError: expected { id: 'lot-1204', …(43) } to match object { sales: [ { …(4) } ], …(1) }"
+    },
+    {
+      "file": "test/commercialMapLoadingPipeline.test.ts",
+      "title": "commercial map initial data pipeline > preserves prices, reservation, negotiation, sale and active contract fields with explicit relation columns",
+      "error": "AssertionError: expected '*,\\n  lot_prices(is_active,pricing_mo…' to be '*,\\n  lot_prices(is_active,pricing_mo…' // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapLoadingPipeline.test.ts",
+      "title": "commercial map initial data pipeline > reads persisted open amounts without an item, signature, selected lot or price row",
+      "error": "AssertionError: expected { id: 'open', …(43) } to match object { status: 'SALE_OPEN', …(3) }"
+    },
+    {
+      "file": "test/commercialMapMobileExperience.test.ts",
+      "title": "arquitetura mobile-first do Mapa Comercial > mantém antialias, gestos GIS completos e DPR adaptativo no canvas compartilhado",
+      "error": "AssertionError: expected 'import { InteriorViewControls } from …' to contain 'dpr={initialPixelRatio}'"
+    },
+    {
+      "file": "test/commercialMapNeCloverleaf.test.ts",
+      "title": "NE cloverleaf BR-344 × BR-472 > writes a top-down plan of the real NE and SE meshes",
+      "error": "Error: EACCES: permission denied, mkdir '/opt/cursor/artifacts'"
+    },
+    {
+      "file": "test/commercialMapNonPermanentCleanup.test.ts",
+      "title": "limpeza estrutural dos blocos não permanentes > mantém ruas, quadras, lotes e pavilhões intocados",
+      "error": "AssertionError: expected 29 to be 30 // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapPavilion12PlanPresentation.test.ts",
+      "title": "planta comercial fixa do Pavilhão 12 > mantém lotes planos, seleção comercial e atlas numérico único",
+      "error": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'const heightScale = flatModules ? 1'"
+    },
+    {
+      "file": "test/commercialMapPavilion3PlanPresentation.test.ts",
+      "title": "planta comercial fixa do Pavilhão 3 > mantém instancing, remove elevação dinâmica e prioriza números apenas no perfil plano",
+      "error": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'const heightScale = flatModules ? 1'"
+    },
+    {
+      "file": "test/commercialMapPavilion5PlanPresentation.test.ts",
+      "title": "planta comercial fixa do Pavilhão 5 > preserva apoios legíveis, lotes planos, seleção, Vendas e renderização eficiente",
+      "error": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'const heightScale = flatModules ? 1'"
+    },
+    {
+      "file": "test/commercialMapPavilion8PlanPresentation.test.ts",
+      "title": "planta comercial fixa do Pavilhão 8 > usa o motor compartilhado de pan, zoom, fit, números e lotes planos",
+      "error": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'const heightScale = flatModules ? 1'"
+    },
+    {
+      "file": "test/commercialMapPavilionFourSoyKitchen.test.ts",
+      "title": "Pavilhão 4 — Cozinha da Soja B7 > reutiliza os postes frontais e a recepção elétrica oficiais sem duplicá-los",
+      "error": "AssertionError: expected 3.163636363636364 to be less than 3.000945454545455"
+    },
+    {
+      "file": "test/commercialMapPavilionModuleCard.test.tsx",
+      "title": "cartão operacional do módulo interno > mantém o módulo 'B1' neutro e sem área individual inventada",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "test/commercialMapPavilionModuleCard.test.tsx",
+      "title": "cartão operacional do módulo interno > mantém o módulo 'B2' neutro e sem área individual inventada",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "test/commercialMapPavilionModuleCard.test.tsx",
+      "title": "cartão operacional do módulo interno > mantém o módulo 'B3' neutro e sem área individual inventada",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "test/commercialMapPavilionModuleCard.test.tsx",
+      "title": "cartão operacional do módulo interno > mantém o módulo 'B8' neutro e sem área individual inventada",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "test/commercialMapPavilionModuleCard.test.tsx",
+      "title": "cartão operacional do módulo interno > não converte a área modular total em medida individual",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: Não informada. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "test/commercialMapPavilionModuleCard.test.tsx",
+      "title": "cartão operacional do módulo interno > oferece somente operações válidas para um módulo disponível e persistido",
+      "error": "Error: [vitest] No \"useLotActivity\" export is defined on the \"@/features/commercial-map/hooks/useCommercialMap\" mock. Did you forget to return it from \"vi.mock\"?"
+    },
+    {
+      "file": "test/commercialMapPavilionModuleCard.test.tsx",
+      "title": "cartão operacional do módulo interno > expõe versões privadas de contrato no próprio cartão do módulo",
+      "error": "Error: [vitest] No \"useLotActivity\" export is defined on the \"@/features/commercial-map/hooks/useCommercialMap\" mock. Did you forget to return it from \"vi.mock\"?"
+    },
+    {
+      "file": "test/commercialMapPavilionModuleCard.test.tsx",
+      "title": "cartão operacional do módulo interno > não oferece venda direta enquanto o módulo permanece bloqueado",
+      "error": "Error: [vitest] No \"useLotActivity\" export is defined on the \"@/features/commercial-map/hooks/useCommercialMap\" mock. Did you forget to return it from \"vi.mock\"?"
+    },
+    {
+      "file": "test/commercialMapPavilionModuleCard.test.tsx",
+      "title": "cartão operacional do módulo interno > abre no dock com resumo, expande voluntariamente e descarta formulário ao selecionar outro módulo",
+      "error": "Error: [vitest] No \"useLotActivity\" export is defined on the \"@/features/commercial-map/hooks/useCommercialMap\" mock. Did you forget to return it from \"vi.mock\"?"
+    },
+    {
+      "file": "test/commercialMapPavilionRendering.test.ts",
+      "title": "renderização compartilhada dos módulos internos > usa instancing e um atlas numérico único em vez de centenas de textos DOM",
+      "error": "AssertionError: expected 'import { memo, useCallback, useEffect…' to contain 'context.fillText(cell.label'"
+    },
+    {
+      "file": "test/commercialMapPavilions135Migration.contract.test.ts",
+      "title": "contrato persistido dos Pavilhões 1, 3 e 5 > mantém o bbox e a âncora deslocada do módulo irregular P1-141 separados",
+      "error": "AssertionError: expected 0.935370018975332 to be close to 0.9371916508538899, received difference is 0.0018216318785578833, but expected 5e-13"
+    },
+    {
+      "file": "test/commercialMapPavilions813Migration.contract.test.ts",
+      "title": "contrato persistido dos Pavilhões 8 e 13 > persiste os cinco módulos irregulares como polígonos oficiais e render parts leves",
+      "error": "AssertionError: expected [ 25, 26, 79, 80 ] to deeply equal [ 25, 26, 78, 79 ]"
+    },
+    {
+      "file": "test/commercialMapPresentation.test.ts",
+      "title": "modelo de apresentação do mapa comercial > mantém histerese entre níveis de rótulo durante pequenos movimentos de zoom",
+      "error": "AssertionError: expected 'near' to be 'medium' // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapPresentation.test.ts",
+      "title": "modelo de apresentação do mapa comercial > mantém os limites exatos e normaliza entradas inválidas da histerese",
+      "error": "AssertionError: expected 'detail' to be 'near' // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapRearParking.test.ts",
+      "title": "rear parking map integration > resolves owner layers from the global collection while Expo Rural geometry remains scoped",
+      "error": "AssertionError: expected 'import { commercialMapDiagnosticsEnab…' to contain 'parkingOwnerEntities={data.entities}'"
+    },
+    {
+      "file": "test/commercialMapRearRoadNetwork.test.ts",
+      "title": "área posterior — exclusões espaciais, profundidade e ambiente > não cruza nenhuma exclusão não autorizada com pista ou acostamento",
+      "error": "AssertionError: [\"ubiretama-registered-north:electrical:pole-ref-056\",\"portao5-north-approach:electrical:pole-ref-164\"]: expected [ …(2) ] to deeply equal []"
+    },
+    {
+      "file": "test/commercialMapRearRoadTreeClearance.test.ts",
+      "title": "rear-road rendered vegetation clearance > clears only the official poles still crossed by the corrected roads without changing records or links",
+      "error": "AssertionError: expected [ 'pole-ref-145', …(11) ] to deeply equal [ 'pole-ref-056', …(17) ]"
+    },
+    {
+      "file": "test/commercialMapRegionalHighways.test.ts",
+      "title": "rodovias regionais — contrato compartilhado e BR-472 exterior > expande zoom/pan regionais e mantém o enquadramento padrão no parque",
+      "error": "AssertionError: expected 'import { InteriorViewControls } from …' to contain 'expandFramingBoundsWithRegionalHighwa…'"
+    },
+    {
+      "file": "test/commercialMapRoadPrecision.test.ts",
+      "title": "September 13 precision road correction > preserves every complete official record except the explicitly shortened road",
+      "error": "AssertionError: expected [ { …(15) }, { …(15) }, …(1577) ] to have a length of 1692 but got 1579"
+    },
+    {
+      "file": "test/commercialMapRuntimeStability.test.ts",
+      "title": "contrato de estabilidade do mapa comercial > mantém os drafts comerciais restritos à entidade sem remontar o painel",
+      "error": "AssertionError: expected 'import { useLayoutEffect, useMemo, us…' to contain 'setEditingLot(false);'"
+    },
+    {
+      "file": "test/commercialMapSiteEnvironment.test.ts",
+      "title": "commercial site environment presentation layer > composes every reusable no-environment mask family and accepts no intersecting cell",
+      "error": "AssertionError: expected 3 to be 1 // Object.is equality"
+    },
+    {
+      "file": "test/commercialMapSiteEnvironment.test.ts",
+      "title": "commercial site environment presentation layer > reuses the full plan in the industrial route and limits it to owners present in that segment",
+      "error": "AssertionError: expected 'import { commercialMapDiagnosticsEnab…' to contain 'siteEnvironmentEntities={data.entitie…'"
+    },
+    {
+      "file": "test/commercialMapSoyGateInfrastructure.test.ts",
+      "title": "E07 / Montevideo / A9 reference-aligned infrastructure > preserves every existing entity except the authorized E07 footprint",
+      "error": "AssertionError: QUADRA-V: expected { Object (id, projectId, ...) } to deeply equal { Object (id, projectId, ...) }"
+    },
+    {
+      "file": "test/commercialMapSpatialBounds.test.ts",
+      "title": "canonical Commercial Map spatial policy > preserves all unrelated official entities, lot IDs and calibration against main 42e89d1b",
+      "error": "AssertionError: expected [ 'EXPORURAL', 'QUADRA-S', …(1577) ] to deeply equal [ 'EXPORURAL', 'QUADRA-S', …(1690) ]"
+    },
+    {
+      "file": "test/commercialMapVegetationPilot.test.ts",
+      "title": "controlled three-zone vegetation pilot > keeps every complete grass tuft within authorized free cells and parking collars",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialMapVisitInteraction.test.tsx",
+      "title": "Visit HUD official values and independent touch controls > shows the authorized canonical segment only in expanded details, ahead of divergent legacy metadata",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: Segmento: Indústria, Comércio e Serviços. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "file": "test/commercialMapVisitWorld.test.ts",
+      "title": "Visit canonical world coverage > keeps the source trunk inventory separate from camera-only crowns",
+      "error": "AssertionError: tree-exporural-r01-01: expected 0.08120000000000001 to be 0.14 // Object.is equality"
+    },
+    {
+      "file": "test/commercialPavilionGroupingMigration.test.ts",
+      "title": "project revision observes order documents without changing commercial data > ships the same read-only function through both supported migration paths",
+      "error": "AssertionError: expected '0026_commercial_sales_analytics' to be '0024_commercial_revision_order_contra…' // Object.is equality"
+    },
+    {
+      "file": "test/commissionMapMigration.contract.test.ts",
+      "title": "contrato persistido dos mapas por comissão > consulta somente o segment_id persistido e falha fechado sem fallback local",
+      "error": "AssertionError: expected 'async function fetchCommissionCommerc…' to contain '.in(\\'entity_id\\', entityIds)'"
+    },
+    {
+      "file": "test/commissionMapPortals.test.ts",
+      "title": "portais comerciais por comissão > isola inventário, busca e métricas entre Exporural e Indústria",
+      "error": "AssertionError: expected [ { …(15) }, { …(15) }, …(106) ] to have a length of 111 but got 108"
+    },
+    {
+      "file": "test/commissionPortal.test.tsx",
+      "title": "CommissionPortalPage > presents Administrador fifth and preserves the Comissões expansion immediately below",
+      "error": "AssertionError: expected [ 'Agenda Fenasoja', …(5) ] to deeply equal [ 'Agenda Fenasoja', …(5) ]"
+    },
+    {
+      "file": "test/commissionPortal.test.tsx",
+      "title": "CommissionPortalPage > keeps the existing anonymous Admin destination and selected module from the fifth card",
+      "error": "Error: expect(element).toHaveTextContent()"
+    },
+    {
+      "file": "test/cronogramaDashboardIntegration.test.tsx",
+      "title": "Dashboard executivo do cronograma > renderiza indicadores reais e mantém o recorte exato no drill-down",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Eventos atrasados: 1\\./`"
+    },
+    {
+      "file": "test/cronogramaDataIntegrity.test.ts",
+      "title": "integridade do cronograma oficial > preserva os totais oficiais por ano e os registros sem data",
+      "error": "AssertionError: expected [ { …(16) }, { …(22) }, …(113) ] to have a length of 145 but got 115"
+    },
+    {
+      "file": "test/cronogramaDataIntegrity.test.ts",
+      "title": "integridade do cronograma oficial > mescla banco e seed sem apagar oficiais ou eventos manuais",
+      "error": "AssertionError: expected [ { …(19) }, { …(19) }, …(114) ] to have a length of 146 but got 116"
+    },
+    {
+      "file": "test/cronogramaMobilePresentation.test.tsx",
+      "title": "cadastro móvel e histórico > remove a entrada duplicada do histórico ao desmontar um overlay ainda aberto",
+      "error": "Error: useAuthContext must be used within AuthProvider"
+    },
+    {
+      "file": "test/cronogramaMobilePresentation.test.tsx",
+      "title": "cadastro móvel e histórico > mantém o defaultYear informado ao criar um evento sem data",
+      "error": "Error: useAuthContext must be used within AuthProvider"
+    },
+    {
+      "file": "test/cronogramaMobilePresentation.test.tsx",
+      "title": "cadastro móvel e histórico > fecha pelo voltar quando limpo e mantém o cadastro quando voltar encontra alterações",
+      "error": "Error: useAuthContext must be used within AuthProvider"
+    },
+    {
+      "file": "test/cronogramaPlanEditor.test.tsx",
+      "title": "workspace de planejamento em tela inteira > protege Escape, permite continuar, mantém/restaura e descarta rascunhos com confirmação",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/cronogramaPlanEditor.test.tsx",
+      "title": "workspace de planejamento em tela inteira > preserva checklist, moeda, fornecedores, convidados e chaves ao remover linhas",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/cronogramaPlanEditor.test.tsx",
+      "title": "workspace de planejamento em tela inteira > seleciona registros oficiais dentro de outro diálogo e mantém o planejamento aberto",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"dialog\""
+    },
+    {
+      "file": "test/cronogramaRegistrationInteractions.test.tsx",
+      "title": "interações do cadastro do cronograma > abre o popover desktop, agrupa unidades e busca sem acento pelo contexto institucional",
+      "error": "TestingLibraryElementError: Found multiple elements with the text: Comissões"
+    },
+    {
+      "file": "test/cronogramaRegistrationInteractions.test.tsx",
+      "title": "interações do cadastro do cronograma > mantém seleção semântica, opera por teclado e gerencia múltiplos responsáveis sem duplicar nome externo",
+      "error": "Error: expect(element).toHaveAttribute(\"data-primary\", \"true\") // element.getAttribute(\"data-primary\") === \"true\""
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > renderiza ano atual, etapas, totais e mantém botões semanticamente focáveis",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"list\" and name \"Anos do planejamento institucional\""
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > seleciona 2027 e 2028 rapidamente, abre o mês correto e não limpa filtros",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação/i`"
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > mostra contagem filtrada e recuperação explícita sem trocar o ano",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação, 1 evento, 0 correspondem/i`"
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > mantém anos sem eventos visíveis, identificados e indisponíveis",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação, 0 eventos, ano indisponível/i`"
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > reconcilia uma URL persistida para um ano que ficou indisponível",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/2026 selecionado/i`"
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > Ir para hoje restaura julho de 2026 e atualiza o ano",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name \"Ir para o período de hoje\""
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > restaura ano e mês ao navegar pelo histórico externo",
+      "error": "Error: Unable to find role=\"button\" and name `/2028 selecionado/i`"
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > acompanha rolagem manual e bloqueia realimentação durante navegação programática",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/2027 selecionado/i`"
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > sincroniza filtros temporais com o ano do período principal",
+      "error": "Error: Unable to find role=\"button\" and name `/2026 selecionado/i`"
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > mantém o ano após refetch e abertura de detalhes",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação/i`"
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "navegador do ciclo na linha do tempo > usa movimento reduzido e mantém um único seletor horizontal no mobile",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Selecionar 2027, etapa Consolidação/i`"
+    },
+    {
+      "file": "test/cronogramaTimeline.test.tsx",
+      "title": "componentes críticos preservados > separa leitura e edição e protege alterações não salvas",
+      "error": "Error: useAuthContext must be used within AuthProvider"
+    },
+    {
+      "file": "test/currentOrgRouteStability.test.tsx",
+      "title": "protected map lifetime during real React Query membership revalidation > remains fail-closed after a failed revalidation even with previously cached membership",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/eventHarvestCompletion.test.tsx",
+      "title": "gatilho explícito no detalhe desktop > bloqueia cliques repetidos, conclui uma vez e fecha somente após sucesso",
+      "error": "Error: useAuthContext must be used within AuthProvider"
+    },
+    {
+      "file": "test/eventHarvestCompletion.test.tsx",
+      "title": "gatilho explícito no detalhe desktop > mantém o detalhe e exibe a falha quando o backend rejeita a conclusão",
+      "error": "Error: useAuthContext must be used within AuthProvider"
+    },
+    {
+      "file": "test/exporural2028Revision.test.ts",
+      "title": "proposta Exporural 2028, isolada da referência persistida > não apresenta auto-interseção, lotes sobrepostos ou invasão de vias e estruturas protegidas",
+      "error": "AssertionError: Q-S-22/B37: expected 0.02314430750664087 to be less than 1e-8"
+    },
+    {
+      "file": "test/lotPricing2028.test.ts",
+      "title": "Pavilhão 7 e pendências > lote excluído não recebe valor e exibe rótulo institucional",
+      "error": "AssertionError: expected 'Valor ainda não definido' to be 'Ainda não definido' // Object.is equality"
+    },
+    {
+      "file": "test/venueEventsPresentation.test.ts",
+      "title": "contrato de apresentação de Eventos Restaurante e Arena > organiza a navegação em planejamento, gestão e controle",
+      "error": "AssertionError: expected 'import { useEffect, useMemo, useState…' to contain '{ id: \"planejamento\", label: \"Planeja…'"
+    },
+    {
+      "file": "test/venueEventsPresentation.test.ts",
+      "title": "contrato de apresentação de Eventos Restaurante e Arena > exibe o seletor de workspaces em duas metades sem ações do hero",
+      "error": "AssertionError: expected 'import {\\n  VENUE_WORKSPACES,\\n  type…' not to contain '<small>'"
+    },
+    {
+      "file": "test/venueEventsPresentation.test.ts",
+      "title": "contrato de apresentação de Eventos Restaurante e Arena > expõe etapas, obrigatoriedade e foco de contexto para tecnologias assistivas",
+      "error": "AssertionError: expected 'import { useCallback, useEffect, useM…' to contain 'aria-current={index === step ? \"step\"…'"
+    },
+    {
+      "file": "features/alvorada/AlvoradaBrandHero.test.tsx",
+      "title": "Alvorada brand composition > presents the unchanged official symbol and a single edition without location bands",
+      "error": "Error: expect(element).toHaveAttribute(\"src\", \"/alvorada/fenasoja-symbol-official.png\") // element.getAttribute(\"src\") === \"/alvorada/fenasoja-symbol-official.png\""
+    }
+  ],
+  "baselineOnlyFailures": [
+    {
+      "file": "test/alvoradaPortalIntegration.test.tsx",
+      "title": "integração do portal: ecossistema direto e introdução embutida na contagem > abre o Ecossistema Fenasoja diretamente pelo bloco de marca, sem planeta nem alvorada",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialDashboardNavigationPerformance.test.tsx",
+      "title": "Dashboard presentation across discarded navigation views > restores scope, selection, metric, status, zoom, comparison, scroll and entry focus after sales",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialDashboardPresentation.test.tsx",
+      "title": "integrated Commercial Dashboard presentation > keeps registered partial values global across scopes, including blocked prices and excluding unavailable prices",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialDashboardSpaces.test.tsx",
+      "title": "managerial scopes in the existing dashboard > selects every pavilion from the common selector, including the official Pavilion 13 B5 identity",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/commercialMapVegetationPilot.test.ts",
+      "title": "controlled three-zone vegetation pilot > keeps every complete grass tuft within authorized free cells and parking collars",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/cronogramaPlanEditor.test.tsx",
+      "title": "workspace de planejamento em tela inteira > protege Escape, permite continuar, mantém/restaura e descarta rascunhos com confirmação",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/cronogramaPlanEditor.test.tsx",
+      "title": "workspace de planejamento em tela inteira > preserva checklist, moeda, fornecedores, convidados e chaves ao remover linhas",
+      "error": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "file": "test/cronogramaPlanEditor.test.tsx",
+      "title": "workspace de planejamento em tela inteira > seleciona registros oficiais dentro de outro diálogo e mantém o planejamento aberto",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"dialog\""
+    }
+  ],
+  "note": "The complete-suite failure comparison uses exact file and full test titles. All 91 candidate failures also fail on the unchanged baseline; baseline-only failures are timing/environment variation, not fixes by this PR. Final directed tests were rerun after the final rendering adjustments.",
+  "commands": [
+    "npm install",
+    "npm run typecheck",
+    "npm run build",
+    "npm test",
+    "npm test -- src/test/commercialMapExporuralLandscape.test.ts src/test/exporuralPresentationCoverage.test.ts src/test/externalLotFrameGeometry.test.ts src/test/externalLotPresentation.test.ts src/test/externalLotPresentationDiagnostics.test.ts src/test/externalLotRendering.test.tsx src/test/externalLotStatusMaterial.test.ts src/test/publicRuralPresentation.test.ts src/test/soldLotPresentation.test.ts --reporter=json --outputFile=/tmp/status-lines-targeted-tests.json",
+    "npm test -- --reporter=json --outputFile=/tmp/status-lines-baseline-tests.json (unchanged baseline)",
+    "npm run dev -- --host 127.0.0.1 --port 8080"
+  ],
+  "environment": "Node v24.22.1; npm10.9.4 loaded in /tmp because npm was absent from PATH. No dependency/lockfile change retained.",
+  "typecheck": {
+    "passed": true,
+    "command": "npm run typecheck"
+  },
+  "build": {
+    "passed": true,
+    "command": "npm run build",
+    "warnings": [
+      "Existing chunk-size warnings above 500kB",
+      "Outdated Browserslist data"
+    ]
+  },
+  "dev": {
+    "command": "npm run dev -- --host 127.0.0.1 --port 8080",
+    "loginRouteHttpStatus": 200,
+    "dependencyScannerWarning": "Existing __QA_ENTRY__ placeholder in scripts/dashboard/presentation-qa.html"
+  },
+  "qaIntegrity": {
+    "sourceHashesMatchFinalTree": true,
+    "visualAndPerformanceUseSameSourceHashes": true,
+    "performanceRows": 36,
+    "validPerformanceRows": 36,
+    "visualPairs": 33
+  }
+}

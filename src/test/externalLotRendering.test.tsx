@@ -115,7 +115,12 @@ describe('external frame instance lifecycle', () => {
       infrastructureMode: false, opacity: 1, publicScene: false };
     const { result, rerender, unmount } = renderHook(input => ExternalLotFrames(input), { initialProps: props });
     const mesh = result.current!.props.object as THREE.BatchedMesh;
-    const geometry = mesh.geometry, material = mesh.material as THREE.MeshStandardMaterial, color = new THREE.Color(), matrix = new THREE.Matrix4();
+    const geometry = mesh.geometry, material = mesh.material as THREE.MeshBasicMaterial, color = new THREE.Color(), matrix = new THREE.Matrix4();
+    expect(material.isMeshBasicMaterial).toBe(true);
+    expect(material.toneMapped).toBe(false);
+    expect(material.depthTest).toBe(true);
+    expect(mesh.castShadow).toBe(false);
+    expect(mesh.receiveShadow).toBe(false);
     expect(mesh.getVisibleAt(0)).toBe(false);
     const dispose = vi.spyOn(THREE.BatchedMesh.prototype, 'dispose');
     // R3F applies this prop to the primitive itself. Cleanup must still release GPU resources.
@@ -147,6 +152,16 @@ describe('external frame instance lifecycle', () => {
     unmount();
     expect(dispose).toHaveBeenCalledOnce();
     dispose.mockRestore();
+  });
+
+  it('never creates the new status overlay for an internal module, even while shown in the outside cut', () => {
+    const props = { entries: [{ entity: module, lot: { ...moduleLot, status: 'SOLD' as CommercialStatus } }],
+      selectedId: null, hoveredId: null, cartIds: new Set<string>(), matchingIds: new Set<string>(),
+      filtersActive: false, infrastructureMode: false, opacity: 1, publicScene: false };
+    const { result, rerender } = renderHook(input => ExternalLotFrames(input), { initialProps: props });
+    expect(result.current).toBeNull();
+    rerender({ ...props, entries: [{ entity: module, lot: { ...moduleLot, status: 'SALE_OPEN' as const } }] });
+    expect(result.current).toBeNull();
   });
 });
 

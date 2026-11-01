@@ -4,9 +4,11 @@ import { toCommercialPhase, type CommercialLot, type MapEntity } from '../types'
 import { deriveExternalLotFrame } from './externalLotFrameGeometry';
 import { externalLotFrameColor, externalLotPresentationDecision, externalLotUsesGrass } from './externalLotPresentation';
 import { commercialMapDiagnosticsEnabled } from './performanceDiagnostics';
+import { externalLotStatusValue } from './externalLotStatus';
 
 const INTERIOR_KEYS = ['pavilionPublicIdentifier', 'pavilionModuleKey', 'moduleNumber', 'interiorOnly'] as const;
 const BATCH_DIAGNOSTIC_KEY = 'externalLotPresentationBatch';
+const EXTERNAL_SEGMENTS = new Set<string>(Object.values(COMMERCIAL_MAP_SEGMENT_IDS));
 
 /** Explicit local/QA opt-in. Never installs on an ordinary production/public map. */
 export function externalLotPresentationDiagnosticsEnabled() {
@@ -56,9 +58,12 @@ export function captureExternalLotPresentationDiagnostics({ entities, lots, scen
         object.getMatrixAt(batchId, matrix);
         const range = object.getGeometryRangeAt(object.getGeometryIdAt(batchId));
         const turf = object.geometry.getAttribute('exporuralTurf');
+        const status = object.geometry.getAttribute('externalLotStatus');
         rendered.set(entityId, { ...rendered.get(entityId), surface: {
           batchId, meshUuid: object.uuid, color: `#${color.getHexString()}`,
           turf: range && turf ? turf.getX(range.vertexStart) : null,
+          externalLotStatus: range && status ? status.getX(range.vertexStart) : null,
+          externalLotStatusStrength: range && status ? status.getY(range.vertexStart) : null,
           material: Array.isArray(object.material) ? object.material.map(material => material.type) : object.material.type,
           visible: effectivelyVisible(object) && object.getVisibleAt(batchId), elevation: matrix.elements[13],
           opacity: Array.isArray(object.material) ? object.material.map(material => material.opacity) : object.material.opacity,
@@ -95,6 +100,9 @@ export function captureExternalLotPresentationDiagnostics({ entities, lots, scen
     const expectedRural = entity.segmentId === COMMERCIAL_MAP_SEGMENT_IDS.exporural
       && entity.classification === 'SELLABLE_LOT' && !entity.isArchived && !lot.archivedAt
       && (!projectId || entity.projectId === projectId);
+    const expectedExternal = Boolean(entity.segmentId && EXTERNAL_SEGMENTS.has(entity.segmentId))
+      && entity.classification === 'SELLABLE_LOT' && !entity.isArchived && !lot.archivedAt && !lot.isCovered
+      && (!projectId || entity.projectId === projectId);
     const frame = decision.eligible ? deriveExternalLotFrame(entity.geometry) : null;
     return [{
       projectId: entity.projectId, entityId: entity.id, lotId: lot.id,
@@ -105,9 +113,11 @@ export function captureExternalLotPresentationDiagnostics({ entities, lots, scen
       classification: entity.classification, isSellable: entity.isSellable, isCovered: lot.isCovered,
       isArchived: entity.isArchived, archivedAt: lot.archivedAt,
       interiorMetadata: Object.fromEntries(INTERIOR_KEYS.map(key => [key, typedValue(entity.metadata[key])])),
-      status: lot.status, normalizedPhase: toCommercialPhase(lot.status), expectedRural,
+      status: lot.status, normalizedPhase: toCommercialPhase(lot.status), expectedRural, expectedExternal,
       eligible: decision.eligible, exclusionReasons: decision.reasons,
       grassExpected: decision.eligible && externalLotUsesGrass(lot.status),
+      hatchExpected: externalLotStatusValue(entity, lot),
+      hatchDerivation: !decision.eligible ? 'not-eligible' : frame ? 'valid-polygon-surface' : 'invalid-or-unrenderable-polygon',
       frameExpected: decision.eligible ? externalLotFrameColor(lot.status) : null,
       frameDerivation: !decision.eligible ? 'not-eligible' : frame ? 'valid' : 'failed',
       confirmationExpected: decision.eligible && lot.status === 'SOLD' && !publicScene,
@@ -116,10 +126,34 @@ export function captureExternalLotPresentationDiagnostics({ entities, lots, scen
     }];
   });
   const expected = rows.filter(row => row.expectedRural);
+  const expectedExternal = rows.filter(row => row.expectedExternal);
+  const observedSurface = (row: typeof rows[number]) => row.rendered?.surface as { externalLotStatus?: number; visible?: boolean } | undefined;
+  const observedExternal = expectedExternal.filter(row => observedSurface(row));
+  const observedHatches = observedExternal.filter(row => {
+    const surface = observedSurface(row);
+    return surface?.visible && (surface.externalLotStatus === 1 || surface.externalLotStatus === 2);
+  });
   const entityIds = new Set(entities.map(entity => entity.id));
   return {
     publicScene, projectIds: [...new Set(entities.map(entity => entity.projectId))].sort(),
-    inventoryRule: 'Active CommercialLot + active SELLABLE_LOT + canonical segmentId=exporural, independent of isSellable/presentation; conflicts are reported, not silently removed.',
+    inventoryRule: 'Active CommercialLot + active uncovered SELLABLE_LOT + canonical external segmentId, independent of isSellable/presentation; conflicts are reported, not silently removed. Rural compatibility totals also retain covered conflicts.',
+    expectedExternalLotIds: expectedExternal.map(row => row.lotId).sort(),
+    recognizedExternalLotIds: expectedExternal.filter(row => row.eligible).map(row => row.lotId).sort(),
+    renderedExternalLotIds: observedExternal.map(row => row.lotId).sort(),
+    renderedHatchLotIds: observedHatches.map(row => row.lotId).sort(),
+    externalCounts: {
+      expected: expectedExternal.length, recognized: expectedExternal.filter(row => row.eligible).length,
+      excluded: expectedExternal.filter(row => !row.eligible).length,
+      rendered: observedExternal.length, visibleHatches: observedHatches.length,
+      renderedHatchesBySegmentStatus: observedHatches.reduce<Record<string, Record<string, number>>>((counts, row) => {
+        const segment = counts[row.segmentId!] ??= {};
+        segment[row.status] = (segment[row.status] ?? 0) + 1; return counts;
+      }, {}),
+      bySegmentStatus: expectedExternal.reduce<Record<string, Record<string, number>>>((counts, row) => {
+        const segment = counts[row.segmentId!] ??= {};
+        segment[row.status] = (segment[row.status] ?? 0) + 1; return counts;
+      }, {}),
+    },
     expectedRuralLotIds: expected.map(row => row.lotId).sort(),
     recognizedRuralLotIds: expected.filter(row => row.eligible).map(row => row.lotId).sort(),
     orphanLotIds: lots.filter(lot => !entityIds.has(lot.entityId)).map(lot => lot.id).sort(),

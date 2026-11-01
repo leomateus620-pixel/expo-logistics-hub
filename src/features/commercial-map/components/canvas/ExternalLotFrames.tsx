@@ -12,7 +12,7 @@ const FRAME_SURFACE_OFFSET = .018;
 type Entry = { entity: MapEntity; lot: CommercialLot };
 
 /** One batch for both phases. Geometry survives status/selection/filter changes. */
-export function ExternalLotFrames({ entries, selectedId, hoveredId, cartIds, matchingIds, filtersActive, infrastructureMode, opacity, publicScene }: {
+export function ExternalLotFrames({ entries, selectedId, hoveredId, cartIds, matchingIds, filtersActive, infrastructureMode, opacity }: {
   entries: readonly Entry[];
   selectedId: string | null; hoveredId: string | null;
   cartIds: ReadonlySet<string>; matchingIds: ReadonlySet<string>;
@@ -34,12 +34,13 @@ export function ExternalLotFrames({ entries, selectedId, hoveredId, cartIds, mat
       return [{ entity, geometry: flat }];
     });
     if (!sources.length) return null;
-    const material = publicScene
-      ? new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 })
-      : new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, metalness: 0, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+    // Commercial overlays keep their colour in shadow/night. Depth testing is
+    // retained, so vegetation, roofs and vehicles still occlude the frame.
+    const material = new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false,
+      depthTest: true, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
     const mesh = new THREE.BatchedMesh(sources.length, sources.reduce((n, s) => n + s.geometry.getAttribute('position').count, 0), 0, material);
     mesh.name = 'external-lot-status-frames'; mesh.raycast = NO_RAYCAST;
-    mesh.castShadow = false; mesh.receiveShadow = !publicScene;
+    mesh.castShadow = false; mesh.receiveShadow = false;
     mesh.sortObjects = false;
     const ids = new Map<string, number>();
     const matrix = new THREE.Matrix4();
@@ -53,7 +54,7 @@ export function ExternalLotFrames({ entries, selectedId, hoveredId, cartIds, mat
     mesh.userData.instanceIdsByEntityId = Object.fromEntries(ids);
     mesh.computeBoundingBox(); mesh.computeBoundingSphere();
     return { mesh, material, ids };
-  }, [entities, publicScene]);
+  }, [entities]);
   useLayoutEffect(() => {
     if (!resources) return;
     const matrix = new THREE.Matrix4(), color = new THREE.Color(), muted = new THREE.Color('#c7d1c9');

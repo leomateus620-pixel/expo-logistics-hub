@@ -15,8 +15,10 @@ export function createSoldCheckGeometry() {
   };
   const seal = addColor(new THREE.CircleGeometry(.56, 20).rotateX(-Math.PI / 2), EXTERNAL_LOT_PALETTE.sold);
   const check = new THREE.Shape();
-  check.moveTo(-.34, -.01); check.lineTo(-.23, .1); check.lineTo(-.075, -.055);
-  check.lineTo(.26, .3); check.lineTo(.38, .185); check.lineTo(-.075, -.29); check.closePath();
+  // Broad, six-vertex silhouette remains recognisable when the seal is small;
+  // keep its footprint inside the existing clearance-controlled disk.
+  check.moveTo(-.36, -.005); check.lineTo(-.225, .13); check.lineTo(-.075, -.025);
+  check.lineTo(.255, .315); check.lineTo(.395, .18); check.lineTo(-.075, -.31); check.closePath();
   const mark = addColor(new THREE.ShapeGeometry(check).rotateX(-Math.PI / 2).translate(0, .003, 0), EXTERNAL_LOT_PALETTE.check);
   const geometry = mergeGeometries([seal, mark])!;
   seal.dispose(); mark.dispose();

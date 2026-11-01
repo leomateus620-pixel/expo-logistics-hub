@@ -71,6 +71,7 @@ jobs:
           src/test/exporuralPresentationCoverage.test.ts
           src/test/publicRuralPresentation.test.ts
           src/test/externalLotRendering.test.tsx
+          src/test/externalLotStatusMaterial.test.ts
           src/test/territorialOrientationInputs.test.ts
           src/test/territorialOrientationRealScene.test.ts
       - run: npm run typecheck

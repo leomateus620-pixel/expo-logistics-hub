@@ -117,7 +117,7 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
         </button>;
       })}
     </div>
-    {presentation.external && <p className="commercial-context-note">Lotes externos: gramado com moldura na venda em aberto e confirmação nos vendidos.{presentation.mixed && ' Nos módulos internos e demais espaços, a cor preenche a superfície.'}</p>}
+    {presentation.external && <p className="commercial-context-note">Lotes externos: gramado com borda e linhas amarelas na venda em aberto; azuis e confirmação nos vendidos.{presentation.mixed && ' Nos módulos internos e demais espaços, a cor preenche a superfície.'}</p>}
     {scope.kind === 'interior' && scope.totalCount === 0 && <p className="commercial-context-note">Nenhum lote interno cadastrado neste local.</p>}
   </>;
 
