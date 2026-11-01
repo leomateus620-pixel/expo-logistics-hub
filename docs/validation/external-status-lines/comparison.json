@@ -1,0 +1,3013 @@
+{
+  "dataHash": "bb27be9a74b64c1bd569772bd4eacb2f23612d74c64e6271cd5b051a2858e436",
+  "geometryHash": "9c1b9284ae0b1d2af5335649cd702e77f4e5f429346a5e48151c53a0ef1214fa",
+  "lotsHash": "9ca94afe55411bc3888ca0d1645ddecfd2e197f0a714c67dd3897c449775e5e6",
+  "baselineManifest": {
+    "revision": "1fd60a8378db2f234573a917ab171371c9f262f5",
+    "hashes": {
+      "utils/externalLotPresentation.ts": "7bab87882f7399ed72cce8ab7a8779a3383e3d9d2868e2b312bc6d8729f33cce",
+      "utils/externalLotStatus.ts": null,
+      "utils/soldCheckGeometry.ts": "4391aaf90aff3158612cea55d8d33a7eca9bfcd9fac411abd43976d8f3a7c013",
+      "utils/soldLotPresentation.ts": "14690c300b7435b2ad65f2c0a88096513a274f08869a8b3f860a75cb23ce68f7",
+      "components/canvas/CommercialMapCanvas.tsx": "f79d415aab1df3239fa6eb6543f50067138d8c3da47c69e81b3ad8173a142574",
+      "components/canvas/SoldLotLocks.tsx": "946ef9da416bd70de7355dad9c95b8ecbcf200f1123c92292658c6d271409799",
+      "components/canvas/ExternalLotFrames.tsx": "06cc2efc9429020ace5a40a2a102dacbde71cc14f72ca58e219fc83d6c5a8dd0",
+      "components/canvas/exporuralTurfMaterial.ts": "7cc1307c2b5afcf4177d4eb704b8bf6ae53e490fa5ecf6622534647d8ffdf093",
+      "utils/externalLotFrameGeometry.ts": "59b47744c558ff95f8f722705b747b81eb2b0fef8c6fe4c872d1d24d0afad821",
+      "public/publicMapService.ts": "c383051a2227f8e46eb052c9ab4e4891df6cecf03b8d0aa9516e4b132337502c"
+    },
+    "fixtureHash": "76e8e1249ab9a103f65cd393cfa2a048b0c8e179acb95aa9b0f30eb2fe997972",
+    "inventoryHash": "4c4028f2b69bbfd9ee1b6762c17a83bc0d2208f1973b355d9abea06822c7c73e",
+    "mode": "production",
+    "backend": "qa.invalid",
+    "fixture": "authorized sanitized rural inventory and current geometry; reference non-rural controls"
+  },
+  "candidateManifest": {
+    "revision": "working-tree",
+    "hashes": {
+      "utils/externalLotPresentation.ts": "2e5b4555fb10b868b426a3ad5cc280bf6b58a4c2695ea2910bb0e881112cb88a",
+      "utils/externalLotStatus.ts": "bc1cc7005e965a2a106174c8f6048ae2ff098dc7e718b2ca76d2c79b861543c1",
+      "utils/soldCheckGeometry.ts": "91b4e958cb25a6d4173d4c60499b21eb77f35f9b9f26dd5bede4b72a78a85cdf",
+      "utils/soldLotPresentation.ts": "14690c300b7435b2ad65f2c0a88096513a274f08869a8b3f860a75cb23ce68f7",
+      "components/canvas/CommercialMapCanvas.tsx": "93d4eb72d6888bc266d37c376c789ee1580572676d072b6454dc802f7b34abce",
+      "components/canvas/SoldLotLocks.tsx": "794384ff66d558b5d52aff158ad1bee9ec4697de87b20d52922c02ef7ec8852a",
+      "components/canvas/ExternalLotFrames.tsx": "e230eec6e64bf972598876854c35c911a5fadef72786e78f62f9505631bd838c",
+      "components/canvas/exporuralTurfMaterial.ts": "b11fef2948aa8aadcd661e0c76ee01042aaece072e21496e648fb52be1349a88",
+      "utils/externalLotFrameGeometry.ts": "59b47744c558ff95f8f722705b747b81eb2b0fef8c6fe4c872d1d24d0afad821",
+      "public/publicMapService.ts": "c383051a2227f8e46eb052c9ab4e4891df6cecf03b8d0aa9516e4b132337502c"
+    },
+    "fixtureHash": "76e8e1249ab9a103f65cd393cfa2a048b0c8e179acb95aa9b0f30eb2fe997972",
+    "inventoryHash": "4c4028f2b69bbfd9ee1b6762c17a83bc0d2208f1973b355d9abea06822c7c73e",
+    "mode": "production",
+    "backend": "qa.invalid",
+    "fixture": "authorized sanitized rural inventory and current geometry; reference non-rural controls"
+  },
+  "visualPairs": [
+    {
+      "name": "overview",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        0,
+        100,
+        69.99999999999999
+      ],
+      "target": [
+        0,
+        0,
+        -10
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 417,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 414,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "distant",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        0,
+        245,
+        -9.9900000001149
+      ],
+      "target": [
+        0,
+        0,
+        -10
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 473,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 531,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "exporural-top",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        29,
+        75,
+        -23.990000000019233
+      ],
+      "target": [
+        29,
+        0,
+        -24
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 592,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 587,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "exporural-oblique",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        37,
+        38,
+        8
+      ],
+      "target": [
+        29,
+        0,
+        -23
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 650,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 705,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "automotive-top",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        -25,
+        27,
+        -2.99
+      ],
+      "target": [
+        -25,
+        0,
+        -3
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 707,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 705,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "industry-roads-top",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        0,
+        34,
+        5.01
+      ],
+      "target": [
+        0,
+        0,
+        5
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 729,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 733,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "industry-close",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        -5,
+        15,
+        17
+      ],
+      "target": [
+        -5,
+        0,
+        7
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 731,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 735,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "exporural-cutouts-close",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        43,
+        20,
+        -15.98999999999883
+      ],
+      "target": [
+        43,
+        0,
+        -16
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 795,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 799,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "r59-close",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        50.16608048406823,
+        12,
+        -10.235180943967528
+      ],
+      "target": [
+        50.16608048406823,
+        0,
+        -18.235180943967528
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 795,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 799,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "r21-close",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        22.706959322499998,
+        14,
+        -7.940703641500001
+      ],
+      "target": [
+        22.706959322499998,
+        0,
+        -16.9407036415
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 826,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 829,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "r40-control",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        41.85194813227369,
+        14,
+        -15.911453348435792
+      ],
+      "target": [
+        41.85194813227369,
+        0,
+        -24.911453348435792
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 829,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 832,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "yellow-close",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        27.7518171795,
+        9,
+        -23.5183129635
+      ],
+      "target": [
+        27.7518171795,
+        0,
+        -29.5183129635
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 831,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 834,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "selection",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        25.973859360589472,
+        13.425967803130545,
+        -20.673239028246307
+      ],
+      "target": [
+        25.973859360589472,
+        0.14,
+        -29.530550897
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 834,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 837,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "selection-closed",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        -5,
+        15,
+        17
+      ],
+      "target": [
+        -5,
+        0,
+        7
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 871,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 875,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "filtered",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        -5,
+        15,
+        17
+      ],
+      "target": [
+        -5,
+        0,
+        7
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 874,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 878,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "exporural-night",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        37,
+        38,
+        8
+      ],
+      "target": [
+        29,
+        0,
+        -23
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1120,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1124,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "exporural-rain",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        37,
+        38,
+        8
+      ],
+      "target": [
+        29,
+        0,
+        -23
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1238,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1242,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "exporural-mobile",
+      "viewport": [
+        390,
+        844,
+        1
+      ],
+      "buffer": [
+        390,
+        844
+      ],
+      "camera": [
+        29,
+        75,
+        -23.990000000019233
+      ],
+      "target": [
+        29,
+        0,
+        -24
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1417,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1421,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "industry-mobile",
+      "viewport": [
+        390,
+        844,
+        1
+      ],
+      "buffer": [
+        390,
+        844
+      ],
+      "camera": [
+        0,
+        34,
+        5.01
+      ],
+      "target": [
+        0,
+        0,
+        5
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1473,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1476,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "overview-mobile",
+      "viewport": [
+        390,
+        844,
+        1
+      ],
+      "buffer": [
+        390,
+        844
+      ],
+      "camera": [
+        0,
+        100,
+        70
+      ],
+      "target": [
+        0,
+        0,
+        -10
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1491,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1494,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "distant-mobile",
+      "viewport": [
+        390,
+        844,
+        1
+      ],
+      "buffer": [
+        390,
+        844
+      ],
+      "camera": [
+        0,
+        245,
+        -9.9900000001149
+      ],
+      "target": [
+        0,
+        0,
+        -10
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1554,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1557,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "automotive-mobile",
+      "viewport": [
+        390,
+        844,
+        1
+      ],
+      "buffer": [
+        390,
+        844
+      ],
+      "camera": [
+        -25,
+        27,
+        -2.99
+      ],
+      "target": [
+        -25,
+        0,
+        -3
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1554,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1615,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "overview-desktop",
+      "viewport": [
+        1920,
+        1080,
+        1
+      ],
+      "buffer": [
+        1881,
+        1058
+      ],
+      "camera": [
+        0,
+        100,
+        69.99999999999999
+      ],
+      "target": [
+        0,
+        0,
+        -10
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1638,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1628,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "distant-desktop",
+      "viewport": [
+        1920,
+        1080,
+        1
+      ],
+      "buffer": [
+        1881,
+        1058
+      ],
+      "camera": [
+        0,
+        245,
+        -9.9900000001149
+      ],
+      "target": [
+        0,
+        0,
+        -10
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1681,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1730,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "exporural-top-desktop",
+      "viewport": [
+        1920,
+        1080,
+        1
+      ],
+      "buffer": [
+        1881,
+        1058
+      ],
+      "camera": [
+        29,
+        75,
+        -23.990000000019233
+      ],
+      "target": [
+        29,
+        0,
+        -24
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1785,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1843,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "automotive-top-desktop",
+      "viewport": [
+        1920,
+        1080,
+        1
+      ],
+      "buffer": [
+        1881,
+        1058
+      ],
+      "camera": [
+        -25,
+        27,
+        -2.990000000000852
+      ],
+      "target": [
+        -25,
+        0,
+        -3
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1827,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1869,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "industry-roads-top-desktop",
+      "viewport": [
+        1920,
+        1080,
+        1
+      ],
+      "buffer": [
+        1881,
+        1058
+      ],
+      "camera": [
+        0,
+        34,
+        5.01
+      ],
+      "target": [
+        0,
+        0,
+        5
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1828,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1870,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "r59-close-desktop",
+      "viewport": [
+        1920,
+        1080,
+        1
+      ],
+      "buffer": [
+        1881,
+        1058
+      ],
+      "camera": [
+        50.16608048406823,
+        12,
+        -10.235180943967528
+      ],
+      "target": [
+        50.16608048406823,
+        0,
+        -18.235180943967528
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1830,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1872,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "pavilion-interior",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        0.5672727272727229,
+        9.875465345886587,
+        20.31815026566098
+      ],
+      "target": [
+        0.5672727272727229,
+        0.08736,
+        20.6072728307229
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1893,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1935,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "pavilion-cut",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        -2.2716733711948787,
+        9.064436340701088,
+        12.24468005577192
+      ],
+      "target": [
+        -0.9051064727343607,
+        0.5824,
+        20.841329674488037
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1944,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1986,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "public-industry",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        -5,
+        15,
+        17
+      ],
+      "target": [
+        -5,
+        0,
+        7
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 423,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 422,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "public-r59",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        50.16608048406823,
+        12,
+        -10.235180943967528
+      ],
+      "target": [
+        50.16608048406823,
+        0,
+        -18.235180943967528
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 451,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 448,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "name": "public-exporural",
+      "viewport": [
+        1366,
+        768,
+        1
+      ],
+      "buffer": [
+        1366,
+        768
+      ],
+      "camera": [
+        29,
+        75,
+        -23.990000000019233
+      ],
+      "target": [
+        29,
+        0,
+        -24
+      ],
+      "healthBefore": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 514,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "healthAfter": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 511,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "coverage": {
+    "externalCounts": {
+      "expected": 277,
+      "recognized": 277,
+      "excluded": 0,
+      "rendered": 277,
+      "visibleHatches": 128,
+      "renderedHatchesBySegmentStatus": {
+        "industria-comercio-servicos": {
+          "SALE_OPEN": 39,
+          "SOLD": 39
+        },
+        "espaco-automovel": {
+          "SALE_OPEN": 17,
+          "SOLD": 17
+        },
+        "exporural": {
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      },
+      "bySegmentStatus": {
+        "industria-comercio-servicos": {
+          "AVAILABLE": 39,
+          "SALE_OPEN": 39,
+          "SOLD": 39
+        },
+        "espaco-automovel": {
+          "AVAILABLE": 18,
+          "SALE_OPEN": 17,
+          "SOLD": 17
+        },
+        "exporural": {
+          "AVAILABLE": 92,
+          "SOLD": 13,
+          "SALE_OPEN": 3
+        }
+      }
+    },
+    "expectedLotIds": [
+      "01237376-a323-4301-a21a-62e4782bcbd2",
+      "04b60bf8-fb0c-4b44-9806-324ab06fd9db",
+      "04e9445f-8460-44cf-b451-bcb3a2d2117a",
+      "078b5dbc-e526-4579-b75c-35d4fc63e446",
+      "09c0d847-e2df-4d98-92e4-d6b7ddd40eb4",
+      "0cb9892f-4452-4e6a-bf77-7742dfc922a6",
+      "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+      "13f68c3f-15f7-467a-9d56-495e95c8cb21",
+      "1b4ce0cc-4062-5fd1-ba48-2ddcfbda62db",
+      "1baea38b-b6ab-46c1-bf04-ea6c53a87544",
+      "1d849c33-d7b1-4170-87ca-7a27dead4376",
+      "21dd495c-0af9-42e2-a5cf-3061e5e43679",
+      "226574ba-b528-41b2-b2f0-3569d4ea1d15",
+      "22c8cd21-e37b-49ba-83c7-acf4704e173c",
+      "26598e4c-1a1d-44c9-802c-3a30dcc84250",
+      "271a71b5-b822-48db-b62b-d74e17471f58",
+      "2b4422a9-a5c0-43b0-a9da-fc293d615d3c",
+      "2f859e78-befa-4994-a295-8b3d1d76c4f2",
+      "2fcaf66f-16aa-4efc-9760-11b937a6b3d1",
+      "310618dc-8323-4713-8928-91cd1be9f2d9",
+      "31c3ea7a-2eea-404a-a9b6-6f514bee4548",
+      "31f964aa-6ad1-4a83-9664-2bc073824c4b",
+      "32f91dba-ac24-41b9-bf87-4613c41c5a00",
+      "37bb772b-ba72-464a-a285-40bb96227714",
+      "381acab8-e28b-487e-b730-0827df5c4c6c",
+      "381e3cfb-d233-5955-aa80-879f26b7a39f",
+      "39542dee-d9c3-4d07-b17e-e3b29e7b081b",
+      "39ea38e4-a7fa-48a4-9f1f-e21d2dafe06d",
+      "3d14000b-a8b6-4fcf-a3e1-14ddd705ba00",
+      "3fc18d72-fd8e-5d60-8745-fba49d5967e8",
+      "3fc5ff27-0aa2-4c47-b423-45de7afba697",
+      "45206196-eb28-4869-ac51-3b4e499df571",
+      "467b0174-db02-4d29-9425-e53955cb20ad",
+      "48aa95ad-c85e-4386-9962-b38d0e466138",
+      "5a88cb56-725a-56a7-b26c-0dbc2016063e",
+      "5c8cfb53-1933-5f38-8d40-923419fd7f3d",
+      "5ef7ff86-57c5-4fad-b076-0ccd2b923c01",
+      "5f351f1c-5039-49fb-91f0-68225a47b483",
+      "607ccd08-8536-4eba-8d4f-d81e56863690",
+      "6443d85b-11f3-4d9e-afeb-e2389d43e04b",
+      "66232508-271a-4256-9f2f-6c40220bd481",
+      "6a848982-f9bf-4d9c-8098-32c123911e04",
+      "6bd8bf19-e2cc-51d0-b98a-057775f5fd86",
+      "6da23f87-d115-524e-9292-dff87add3c51",
+      "6f362dcf-8fce-46a8-b043-8d4348a07f0f",
+      "7142e987-335c-4de9-bd5d-937ec8f737dd",
+      "71d83bb6-3f31-59b8-a0b6-0bd63785c4fc",
+      "723c4ead-8ebf-4306-919a-dc7faf1c7af3",
+      "73fac7d7-224e-457c-8031-4905a28c3850",
+      "787b6559-124f-424c-ab0c-a6f56fdc59d6",
+      "7a0d01b3-08c0-4203-84d9-924fd6a777cf",
+      "7d78a02e-aa2f-52e6-8104-665776ba969e",
+      "7da744ab-ed19-484b-a52f-f473a120b4a2",
+      "7e73fba0-6ae1-474a-8813-8c95a9a97226",
+      "86a6f56b-8945-445b-82cc-ca9210fc82f1",
+      "8c57fffe-d21c-4102-9831-6e5ce54959fc",
+      "8e3b2915-d363-4ce9-8fcb-aef57f68a0d9",
+      "8f6f033e-e2ce-573d-9240-d388c627cf20",
+      "930d9495-59e6-5e7c-88ab-aaf9b9977e90",
+      "93b9ec57-5769-4f77-a517-230355a86933",
+      "9503f32f-403e-47b3-b778-bc69583342b8",
+      "9513c21d-06ff-477a-9154-1614a6485fb1",
+      "98980aba-172e-4ade-af34-afabd664f67c",
+      "9d4a7349-5d91-49d7-b60e-fe85f1fe0724",
+      "9dfb2a6e-69da-44ed-b3ec-b5775a2239f5",
+      "9ff3676a-5225-4528-95cf-46224e2657ad",
+      "a39b8f10-a566-484b-a563-7dc66a2b2429",
+      "a4fc0f30-d5d2-4d3d-b6c5-d5ec48256bd8",
+      "a5cb70d7-953e-47e8-b11c-e4903bd4aa1c",
+      "a6ec0be5-593e-406f-a2ef-0fda8c3448f2",
+      "abc42477-735c-44f5-a013-5549b0ebfaa6",
+      "ad437455-0dff-52b5-b585-d5eb5750c23a",
+      "b000ad12-b29b-4650-bfd5-463d58db4823",
+      "b306734c-0beb-493a-8663-2ffa005a8b8e",
+      "b3f1c02f-b2f0-424e-9a0f-7bc33de56e72",
+      "b4110166-cbe8-4d37-8523-514b1c810161",
+      "b59f1b19-f9a3-493a-8d17-9957a6b6ffc8",
+      "c3e1f95b-4970-4607-a62f-33b20a2f5a2f",
+      "c4b77e2d-5277-41ae-8261-cc034c410cf7",
+      "c89ab66d-bda1-4937-8062-cbc9b69d0f89",
+      "cc1a1398-4dfd-4601-92be-395b2c1d5e2f",
+      "cfb0a0b4-462e-4cf6-8065-1455891b03a1",
+      "d0e37c2a-f34d-5923-9cb2-182c8c9e6089",
+      "d707523e-91db-409a-96bf-10c230859937",
+      "d8dd899c-7e3e-4447-8428-81d0ecf5149b",
+      "dae8cc1d-eb76-424f-ada3-2fb39114bf2f",
+      "db1c5104-235d-495e-9a5f-fb1af75d87d0",
+      "dc812568-6591-4138-9e59-82071a39646e",
+      "ddba4474-32f3-4cdf-b97d-64b197abbfb1",
+      "ddc37575-4032-418e-b7d0-7b895db2fe66",
+      "debdd5aa-5b7e-4189-bd79-750b7fc06b24",
+      "dfa66e16-d611-417a-8764-258c3f016515",
+      "e0b1f174-92bb-4184-b418-863139685f7a",
+      "eb60e4e8-71f3-5bb8-a7d7-9420dffa2bb0",
+      "f02bfbfe-990b-443f-b88f-377f34c81976",
+      "f113c951-c359-429a-a7b6-8bde3ddfed8d",
+      "f3d63348-297c-41ef-826d-4c6888dbdd32",
+      "f40a3d5e-e828-4314-aba3-c803bee6fbf4",
+      "f43ba9f1-2fcb-431b-a15f-2efed32e37c7",
+      "f53e2989-747b-437f-9ef6-d4beb31bea33",
+      "f5bc1a1e-828b-43fa-a632-edeea2fe1580",
+      "f9e842cd-b10f-4aa8-9bff-74a623c54dd9",
+      "fa011430-9b79-49e1-a45a-daba0ad03206",
+      "fa2e3ac0-7026-5ca3-92be-8463f5b9c75f",
+      "fb2fb1ad-8505-4a80-9b4a-157e6938887b",
+      "fc528ecf-49d8-4106-a690-95d32c8349da",
+      "fd41e7ab-b9ba-4503-a73e-6256d8608200",
+      "ff9dfbcd-90bd-4c9f-9479-5a9b34da7c00",
+      "reference:2026:lot:d-01",
+      "reference:2026:lot:d-02",
+      "reference:2026:lot:d-03",
+      "reference:2026:lot:d-04",
+      "reference:2026:lot:d-05",
+      "reference:2026:lot:d-06",
+      "reference:2026:lot:d-07",
+      "reference:2026:lot:d-08",
+      "reference:2026:lot:d-09",
+      "reference:2026:lot:d-10",
+      "reference:2026:lot:d-11",
+      "reference:2026:lot:d-12",
+      "reference:2026:lot:e-01",
+      "reference:2026:lot:e-02",
+      "reference:2026:lot:e-03",
+      "reference:2026:lot:e-04",
+      "reference:2026:lot:e-05",
+      "reference:2026:lot:e-06",
+      "reference:2026:lot:e-07",
+      "reference:2026:lot:e-08",
+      "reference:2026:lot:e-09",
+      "reference:2026:lot:e-10",
+      "reference:2026:lot:e-11",
+      "reference:2026:lot:e-12",
+      "reference:2026:lot:e-13",
+      "reference:2026:lot:f-01",
+      "reference:2026:lot:f-02",
+      "reference:2026:lot:f-03",
+      "reference:2026:lot:f-04",
+      "reference:2026:lot:f-05",
+      "reference:2026:lot:f-06",
+      "reference:2026:lot:f-07",
+      "reference:2026:lot:f-08",
+      "reference:2026:lot:g-01",
+      "reference:2026:lot:g-02",
+      "reference:2026:lot:g-03",
+      "reference:2026:lot:g-04",
+      "reference:2026:lot:g-05",
+      "reference:2026:lot:g-06",
+      "reference:2026:lot:g-07",
+      "reference:2026:lot:g-08",
+      "reference:2026:lot:i-01",
+      "reference:2026:lot:i-02",
+      "reference:2026:lot:i-03",
+      "reference:2026:lot:i-04",
+      "reference:2026:lot:i-05",
+      "reference:2026:lot:i-06",
+      "reference:2026:lot:i-07",
+      "reference:2026:lot:i-08",
+      "reference:2026:lot:i-09",
+      "reference:2026:lot:i-10",
+      "reference:2026:lot:i-11",
+      "reference:2026:lot:i-12",
+      "reference:2026:lot:i-13",
+      "reference:2026:lot:i-14",
+      "reference:2026:lot:i-15",
+      "reference:2026:lot:i-16",
+      "reference:2026:lot:j-01",
+      "reference:2026:lot:j-02",
+      "reference:2026:lot:j-03",
+      "reference:2026:lot:j-04",
+      "reference:2026:lot:j-05",
+      "reference:2026:lot:j-06",
+      "reference:2026:lot:j-07",
+      "reference:2026:lot:j-08",
+      "reference:2026:lot:j-09",
+      "reference:2026:lot:j-10",
+      "reference:2026:lot:j-11",
+      "reference:2026:lot:j-12",
+      "reference:2026:lot:j-13",
+      "reference:2026:lot:j-14",
+      "reference:2026:lot:j-15",
+      "reference:2026:lot:j-16",
+      "reference:2026:lot:l-01",
+      "reference:2026:lot:l-02",
+      "reference:2026:lot:l-03",
+      "reference:2026:lot:l-04",
+      "reference:2026:lot:l-05",
+      "reference:2026:lot:l-06",
+      "reference:2026:lot:l-07",
+      "reference:2026:lot:l-08",
+      "reference:2026:lot:l-09",
+      "reference:2026:lot:l-10",
+      "reference:2026:lot:l-11",
+      "reference:2026:lot:l-12",
+      "reference:2026:lot:l-13",
+      "reference:2026:lot:l-14",
+      "reference:2026:lot:l-15",
+      "reference:2026:lot:l-16",
+      "reference:2026:lot:m-01",
+      "reference:2026:lot:m-02",
+      "reference:2026:lot:m-03",
+      "reference:2026:lot:m-04",
+      "reference:2026:lot:m-05",
+      "reference:2026:lot:m-06",
+      "reference:2026:lot:m-07",
+      "reference:2026:lot:m-08",
+      "reference:2026:lot:m-09",
+      "reference:2026:lot:m-10",
+      "reference:2026:lot:m-11",
+      "reference:2026:lot:m-12",
+      "reference:2026:lot:m-13",
+      "reference:2026:lot:m-14",
+      "reference:2026:lot:m-15",
+      "reference:2026:lot:m-16",
+      "reference:2026:lot:o-01",
+      "reference:2026:lot:o-02",
+      "reference:2026:lot:o-03",
+      "reference:2026:lot:o-04",
+      "reference:2026:lot:o-05",
+      "reference:2026:lot:o-06",
+      "reference:2026:lot:o-07",
+      "reference:2026:lot:o-08",
+      "reference:2026:lot:o-09",
+      "reference:2026:lot:o-10",
+      "reference:2026:lot:o-11",
+      "reference:2026:lot:o-12",
+      "reference:2026:lot:o-13",
+      "reference:2026:lot:o-14",
+      "reference:2026:lot:p-01",
+      "reference:2026:lot:p-02",
+      "reference:2026:lot:p-03",
+      "reference:2026:lot:p-04",
+      "reference:2026:lot:p-05",
+      "reference:2026:lot:p-06",
+      "reference:2026:lot:p-07",
+      "reference:2026:lot:p-08",
+      "reference:2026:lot:p-09",
+      "reference:2026:lot:p-10",
+      "reference:2026:lot:p-11",
+      "reference:2026:lot:p-12",
+      "reference:2026:lot:p-13",
+      "reference:2026:lot:p-14",
+      "reference:2026:lot:q-01",
+      "reference:2026:lot:q-02",
+      "reference:2026:lot:q-03",
+      "reference:2026:lot:q-04",
+      "reference:2026:lot:q-05",
+      "reference:2026:lot:q-06",
+      "reference:2026:lot:t-01",
+      "reference:2026:lot:t-02",
+      "reference:2026:lot:t-03",
+      "reference:2026:lot:t-04",
+      "reference:2026:lot:t-05",
+      "reference:2026:lot:t-06",
+      "reference:2026:lot:t-07",
+      "reference:2026:lot:t-08",
+      "reference:2026:lot:t-09",
+      "reference:2026:lot:t-10",
+      "reference:2026:lot:t-11",
+      "reference:2026:lot:t-12",
+      "reference:2026:lot:u-01",
+      "reference:2026:lot:u-02",
+      "reference:2026:lot:u-03",
+      "reference:2026:lot:u-04",
+      "reference:2026:lot:u-05",
+      "reference:2026:lot:u-06",
+      "reference:2026:lot:u-07",
+      "reference:2026:lot:u-08",
+      "reference:2026:lot:u-09",
+      "reference:2026:lot:u-10",
+      "reference:2026:lot:u-11",
+      "reference:2026:lot:u-12",
+      "reference:2026:lot:v-01",
+      "reference:2026:lot:v-02",
+      "reference:2026:lot:v-03",
+      "reference:2026:lot:v-04",
+      "reference:2026:lot:v-05",
+      "reference:2026:lot:v-06"
+    ],
+    "renderedLotIds": [
+      "01237376-a323-4301-a21a-62e4782bcbd2",
+      "04b60bf8-fb0c-4b44-9806-324ab06fd9db",
+      "04e9445f-8460-44cf-b451-bcb3a2d2117a",
+      "078b5dbc-e526-4579-b75c-35d4fc63e446",
+      "09c0d847-e2df-4d98-92e4-d6b7ddd40eb4",
+      "0cb9892f-4452-4e6a-bf77-7742dfc922a6",
+      "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+      "13f68c3f-15f7-467a-9d56-495e95c8cb21",
+      "1b4ce0cc-4062-5fd1-ba48-2ddcfbda62db",
+      "1baea38b-b6ab-46c1-bf04-ea6c53a87544",
+      "1d849c33-d7b1-4170-87ca-7a27dead4376",
+      "21dd495c-0af9-42e2-a5cf-3061e5e43679",
+      "226574ba-b528-41b2-b2f0-3569d4ea1d15",
+      "22c8cd21-e37b-49ba-83c7-acf4704e173c",
+      "26598e4c-1a1d-44c9-802c-3a30dcc84250",
+      "271a71b5-b822-48db-b62b-d74e17471f58",
+      "2b4422a9-a5c0-43b0-a9da-fc293d615d3c",
+      "2f859e78-befa-4994-a295-8b3d1d76c4f2",
+      "2fcaf66f-16aa-4efc-9760-11b937a6b3d1",
+      "310618dc-8323-4713-8928-91cd1be9f2d9",
+      "31c3ea7a-2eea-404a-a9b6-6f514bee4548",
+      "31f964aa-6ad1-4a83-9664-2bc073824c4b",
+      "32f91dba-ac24-41b9-bf87-4613c41c5a00",
+      "37bb772b-ba72-464a-a285-40bb96227714",
+      "381acab8-e28b-487e-b730-0827df5c4c6c",
+      "381e3cfb-d233-5955-aa80-879f26b7a39f",
+      "39542dee-d9c3-4d07-b17e-e3b29e7b081b",
+      "39ea38e4-a7fa-48a4-9f1f-e21d2dafe06d",
+      "3d14000b-a8b6-4fcf-a3e1-14ddd705ba00",
+      "3fc18d72-fd8e-5d60-8745-fba49d5967e8",
+      "3fc5ff27-0aa2-4c47-b423-45de7afba697",
+      "45206196-eb28-4869-ac51-3b4e499df571",
+      "467b0174-db02-4d29-9425-e53955cb20ad",
+      "48aa95ad-c85e-4386-9962-b38d0e466138",
+      "5a88cb56-725a-56a7-b26c-0dbc2016063e",
+      "5c8cfb53-1933-5f38-8d40-923419fd7f3d",
+      "5ef7ff86-57c5-4fad-b076-0ccd2b923c01",
+      "5f351f1c-5039-49fb-91f0-68225a47b483",
+      "607ccd08-8536-4eba-8d4f-d81e56863690",
+      "6443d85b-11f3-4d9e-afeb-e2389d43e04b",
+      "66232508-271a-4256-9f2f-6c40220bd481",
+      "6a848982-f9bf-4d9c-8098-32c123911e04",
+      "6bd8bf19-e2cc-51d0-b98a-057775f5fd86",
+      "6da23f87-d115-524e-9292-dff87add3c51",
+      "6f362dcf-8fce-46a8-b043-8d4348a07f0f",
+      "7142e987-335c-4de9-bd5d-937ec8f737dd",
+      "71d83bb6-3f31-59b8-a0b6-0bd63785c4fc",
+      "723c4ead-8ebf-4306-919a-dc7faf1c7af3",
+      "73fac7d7-224e-457c-8031-4905a28c3850",
+      "787b6559-124f-424c-ab0c-a6f56fdc59d6",
+      "7a0d01b3-08c0-4203-84d9-924fd6a777cf",
+      "7d78a02e-aa2f-52e6-8104-665776ba969e",
+      "7da744ab-ed19-484b-a52f-f473a120b4a2",
+      "7e73fba0-6ae1-474a-8813-8c95a9a97226",
+      "86a6f56b-8945-445b-82cc-ca9210fc82f1",
+      "8c57fffe-d21c-4102-9831-6e5ce54959fc",
+      "8e3b2915-d363-4ce9-8fcb-aef57f68a0d9",
+      "8f6f033e-e2ce-573d-9240-d388c627cf20",
+      "930d9495-59e6-5e7c-88ab-aaf9b9977e90",
+      "93b9ec57-5769-4f77-a517-230355a86933",
+      "9503f32f-403e-47b3-b778-bc69583342b8",
+      "9513c21d-06ff-477a-9154-1614a6485fb1",
+      "98980aba-172e-4ade-af34-afabd664f67c",
+      "9d4a7349-5d91-49d7-b60e-fe85f1fe0724",
+      "9dfb2a6e-69da-44ed-b3ec-b5775a2239f5",
+      "9ff3676a-5225-4528-95cf-46224e2657ad",
+      "a39b8f10-a566-484b-a563-7dc66a2b2429",
+      "a4fc0f30-d5d2-4d3d-b6c5-d5ec48256bd8",
+      "a5cb70d7-953e-47e8-b11c-e4903bd4aa1c",
+      "a6ec0be5-593e-406f-a2ef-0fda8c3448f2",
+      "abc42477-735c-44f5-a013-5549b0ebfaa6",
+      "ad437455-0dff-52b5-b585-d5eb5750c23a",
+      "b000ad12-b29b-4650-bfd5-463d58db4823",
+      "b306734c-0beb-493a-8663-2ffa005a8b8e",
+      "b3f1c02f-b2f0-424e-9a0f-7bc33de56e72",
+      "b4110166-cbe8-4d37-8523-514b1c810161",
+      "b59f1b19-f9a3-493a-8d17-9957a6b6ffc8",
+      "c3e1f95b-4970-4607-a62f-33b20a2f5a2f",
+      "c4b77e2d-5277-41ae-8261-cc034c410cf7",
+      "c89ab66d-bda1-4937-8062-cbc9b69d0f89",
+      "cc1a1398-4dfd-4601-92be-395b2c1d5e2f",
+      "cfb0a0b4-462e-4cf6-8065-1455891b03a1",
+      "d0e37c2a-f34d-5923-9cb2-182c8c9e6089",
+      "d707523e-91db-409a-96bf-10c230859937",
+      "d8dd899c-7e3e-4447-8428-81d0ecf5149b",
+      "dae8cc1d-eb76-424f-ada3-2fb39114bf2f",
+      "db1c5104-235d-495e-9a5f-fb1af75d87d0",
+      "dc812568-6591-4138-9e59-82071a39646e",
+      "ddba4474-32f3-4cdf-b97d-64b197abbfb1",
+      "ddc37575-4032-418e-b7d0-7b895db2fe66",
+      "debdd5aa-5b7e-4189-bd79-750b7fc06b24",
+      "dfa66e16-d611-417a-8764-258c3f016515",
+      "e0b1f174-92bb-4184-b418-863139685f7a",
+      "eb60e4e8-71f3-5bb8-a7d7-9420dffa2bb0",
+      "f02bfbfe-990b-443f-b88f-377f34c81976",
+      "f113c951-c359-429a-a7b6-8bde3ddfed8d",
+      "f3d63348-297c-41ef-826d-4c6888dbdd32",
+      "f40a3d5e-e828-4314-aba3-c803bee6fbf4",
+      "f43ba9f1-2fcb-431b-a15f-2efed32e37c7",
+      "f53e2989-747b-437f-9ef6-d4beb31bea33",
+      "f5bc1a1e-828b-43fa-a632-edeea2fe1580",
+      "f9e842cd-b10f-4aa8-9bff-74a623c54dd9",
+      "fa011430-9b79-49e1-a45a-daba0ad03206",
+      "fa2e3ac0-7026-5ca3-92be-8463f5b9c75f",
+      "fb2fb1ad-8505-4a80-9b4a-157e6938887b",
+      "fc528ecf-49d8-4106-a690-95d32c8349da",
+      "fd41e7ab-b9ba-4503-a73e-6256d8608200",
+      "ff9dfbcd-90bd-4c9f-9479-5a9b34da7c00",
+      "reference:2026:lot:d-01",
+      "reference:2026:lot:d-02",
+      "reference:2026:lot:d-03",
+      "reference:2026:lot:d-04",
+      "reference:2026:lot:d-05",
+      "reference:2026:lot:d-06",
+      "reference:2026:lot:d-07",
+      "reference:2026:lot:d-08",
+      "reference:2026:lot:d-09",
+      "reference:2026:lot:d-10",
+      "reference:2026:lot:d-11",
+      "reference:2026:lot:d-12",
+      "reference:2026:lot:e-01",
+      "reference:2026:lot:e-02",
+      "reference:2026:lot:e-03",
+      "reference:2026:lot:e-04",
+      "reference:2026:lot:e-05",
+      "reference:2026:lot:e-06",
+      "reference:2026:lot:e-07",
+      "reference:2026:lot:e-08",
+      "reference:2026:lot:e-09",
+      "reference:2026:lot:e-10",
+      "reference:2026:lot:e-11",
+      "reference:2026:lot:e-12",
+      "reference:2026:lot:e-13",
+      "reference:2026:lot:f-01",
+      "reference:2026:lot:f-02",
+      "reference:2026:lot:f-03",
+      "reference:2026:lot:f-04",
+      "reference:2026:lot:f-05",
+      "reference:2026:lot:f-06",
+      "reference:2026:lot:f-07",
+      "reference:2026:lot:f-08",
+      "reference:2026:lot:g-01",
+      "reference:2026:lot:g-02",
+      "reference:2026:lot:g-03",
+      "reference:2026:lot:g-04",
+      "reference:2026:lot:g-05",
+      "reference:2026:lot:g-06",
+      "reference:2026:lot:g-07",
+      "reference:2026:lot:g-08",
+      "reference:2026:lot:i-01",
+      "reference:2026:lot:i-02",
+      "reference:2026:lot:i-03",
+      "reference:2026:lot:i-04",
+      "reference:2026:lot:i-05",
+      "reference:2026:lot:i-06",
+      "reference:2026:lot:i-07",
+      "reference:2026:lot:i-08",
+      "reference:2026:lot:i-09",
+      "reference:2026:lot:i-10",
+      "reference:2026:lot:i-11",
+      "reference:2026:lot:i-12",
+      "reference:2026:lot:i-13",
+      "reference:2026:lot:i-14",
+      "reference:2026:lot:i-15",
+      "reference:2026:lot:i-16",
+      "reference:2026:lot:j-01",
+      "reference:2026:lot:j-02",
+      "reference:2026:lot:j-03",
+      "reference:2026:lot:j-04",
+      "reference:2026:lot:j-05",
+      "reference:2026:lot:j-06",
+      "reference:2026:lot:j-07",
+      "reference:2026:lot:j-08",
+      "reference:2026:lot:j-09",
+      "reference:2026:lot:j-10",
+      "reference:2026:lot:j-11",
+      "reference:2026:lot:j-12",
+      "reference:2026:lot:j-13",
+      "reference:2026:lot:j-14",
+      "reference:2026:lot:j-15",
+      "reference:2026:lot:j-16",
+      "reference:2026:lot:l-01",
+      "reference:2026:lot:l-02",
+      "reference:2026:lot:l-03",
+      "reference:2026:lot:l-04",
+      "reference:2026:lot:l-05",
+      "reference:2026:lot:l-06",
+      "reference:2026:lot:l-07",
+      "reference:2026:lot:l-08",
+      "reference:2026:lot:l-09",
+      "reference:2026:lot:l-10",
+      "reference:2026:lot:l-11",
+      "reference:2026:lot:l-12",
+      "reference:2026:lot:l-13",
+      "reference:2026:lot:l-14",
+      "reference:2026:lot:l-15",
+      "reference:2026:lot:l-16",
+      "reference:2026:lot:m-01",
+      "reference:2026:lot:m-02",
+      "reference:2026:lot:m-03",
+      "reference:2026:lot:m-04",
+      "reference:2026:lot:m-05",
+      "reference:2026:lot:m-06",
+      "reference:2026:lot:m-07",
+      "reference:2026:lot:m-08",
+      "reference:2026:lot:m-09",
+      "reference:2026:lot:m-10",
+      "reference:2026:lot:m-11",
+      "reference:2026:lot:m-12",
+      "reference:2026:lot:m-13",
+      "reference:2026:lot:m-14",
+      "reference:2026:lot:m-15",
+      "reference:2026:lot:m-16",
+      "reference:2026:lot:o-01",
+      "reference:2026:lot:o-02",
+      "reference:2026:lot:o-03",
+      "reference:2026:lot:o-04",
+      "reference:2026:lot:o-05",
+      "reference:2026:lot:o-06",
+      "reference:2026:lot:o-07",
+      "reference:2026:lot:o-08",
+      "reference:2026:lot:o-09",
+      "reference:2026:lot:o-10",
+      "reference:2026:lot:o-11",
+      "reference:2026:lot:o-12",
+      "reference:2026:lot:o-13",
+      "reference:2026:lot:o-14",
+      "reference:2026:lot:p-01",
+      "reference:2026:lot:p-02",
+      "reference:2026:lot:p-03",
+      "reference:2026:lot:p-04",
+      "reference:2026:lot:p-05",
+      "reference:2026:lot:p-06",
+      "reference:2026:lot:p-07",
+      "reference:2026:lot:p-08",
+      "reference:2026:lot:p-09",
+      "reference:2026:lot:p-10",
+      "reference:2026:lot:p-11",
+      "reference:2026:lot:p-12",
+      "reference:2026:lot:p-13",
+      "reference:2026:lot:p-14",
+      "reference:2026:lot:q-01",
+      "reference:2026:lot:q-02",
+      "reference:2026:lot:q-03",
+      "reference:2026:lot:q-04",
+      "reference:2026:lot:q-05",
+      "reference:2026:lot:q-06",
+      "reference:2026:lot:t-01",
+      "reference:2026:lot:t-02",
+      "reference:2026:lot:t-03",
+      "reference:2026:lot:t-04",
+      "reference:2026:lot:t-05",
+      "reference:2026:lot:t-06",
+      "reference:2026:lot:t-07",
+      "reference:2026:lot:t-08",
+      "reference:2026:lot:t-09",
+      "reference:2026:lot:t-10",
+      "reference:2026:lot:t-11",
+      "reference:2026:lot:t-12",
+      "reference:2026:lot:u-01",
+      "reference:2026:lot:u-02",
+      "reference:2026:lot:u-03",
+      "reference:2026:lot:u-04",
+      "reference:2026:lot:u-05",
+      "reference:2026:lot:u-06",
+      "reference:2026:lot:u-07",
+      "reference:2026:lot:u-08",
+      "reference:2026:lot:u-09",
+      "reference:2026:lot:u-10",
+      "reference:2026:lot:u-11",
+      "reference:2026:lot:u-12",
+      "reference:2026:lot:v-01",
+      "reference:2026:lot:v-02",
+      "reference:2026:lot:v-03",
+      "reference:2026:lot:v-04",
+      "reference:2026:lot:v-05",
+      "reference:2026:lot:v-06"
+    ],
+    "renderedHatchLotIds": [
+      "04e9445f-8460-44cf-b451-bcb3a2d2117a",
+      "137a7fe9-1724-42b0-adc6-64c46b91a7e8",
+      "13f68c3f-15f7-467a-9d56-495e95c8cb21",
+      "21dd495c-0af9-42e2-a5cf-3061e5e43679",
+      "310618dc-8323-4713-8928-91cd1be9f2d9",
+      "3fc5ff27-0aa2-4c47-b423-45de7afba697",
+      "5a88cb56-725a-56a7-b26c-0dbc2016063e",
+      "6bd8bf19-e2cc-51d0-b98a-057775f5fd86",
+      "7da744ab-ed19-484b-a52f-f473a120b4a2",
+      "93b9ec57-5769-4f77-a517-230355a86933",
+      "b306734c-0beb-493a-8663-2ffa005a8b8e",
+      "c3e1f95b-4970-4607-a62f-33b20a2f5a2f",
+      "d707523e-91db-409a-96bf-10c230859937",
+      "f3d63348-297c-41ef-826d-4c6888dbdd32",
+      "f9e842cd-b10f-4aa8-9bff-74a623c54dd9",
+      "fc528ecf-49d8-4106-a690-95d32c8349da",
+      "reference:2026:lot:d-01",
+      "reference:2026:lot:d-02",
+      "reference:2026:lot:d-03",
+      "reference:2026:lot:d-04",
+      "reference:2026:lot:d-07",
+      "reference:2026:lot:d-08",
+      "reference:2026:lot:d-09",
+      "reference:2026:lot:d-10",
+      "reference:2026:lot:e-01",
+      "reference:2026:lot:e-04",
+      "reference:2026:lot:e-05",
+      "reference:2026:lot:e-06",
+      "reference:2026:lot:e-07",
+      "reference:2026:lot:e-10",
+      "reference:2026:lot:e-12",
+      "reference:2026:lot:e-13",
+      "reference:2026:lot:f-02",
+      "reference:2026:lot:f-03",
+      "reference:2026:lot:f-05",
+      "reference:2026:lot:f-06",
+      "reference:2026:lot:f-08",
+      "reference:2026:lot:g-01",
+      "reference:2026:lot:g-02",
+      "reference:2026:lot:g-03",
+      "reference:2026:lot:g-06",
+      "reference:2026:lot:g-07",
+      "reference:2026:lot:g-08",
+      "reference:2026:lot:i-02",
+      "reference:2026:lot:i-03",
+      "reference:2026:lot:i-04",
+      "reference:2026:lot:i-05",
+      "reference:2026:lot:i-08",
+      "reference:2026:lot:i-09",
+      "reference:2026:lot:i-10",
+      "reference:2026:lot:i-11",
+      "reference:2026:lot:i-14",
+      "reference:2026:lot:i-15",
+      "reference:2026:lot:i-16",
+      "reference:2026:lot:j-01",
+      "reference:2026:lot:j-04",
+      "reference:2026:lot:j-05",
+      "reference:2026:lot:j-06",
+      "reference:2026:lot:j-07",
+      "reference:2026:lot:j-10",
+      "reference:2026:lot:j-11",
+      "reference:2026:lot:j-12",
+      "reference:2026:lot:j-13",
+      "reference:2026:lot:j-16",
+      "reference:2026:lot:l-01",
+      "reference:2026:lot:l-02",
+      "reference:2026:lot:l-03",
+      "reference:2026:lot:l-06",
+      "reference:2026:lot:l-07",
+      "reference:2026:lot:l-08",
+      "reference:2026:lot:l-09",
+      "reference:2026:lot:l-12",
+      "reference:2026:lot:l-13",
+      "reference:2026:lot:l-14",
+      "reference:2026:lot:l-15",
+      "reference:2026:lot:m-02",
+      "reference:2026:lot:m-03",
+      "reference:2026:lot:m-04",
+      "reference:2026:lot:m-05",
+      "reference:2026:lot:m-08",
+      "reference:2026:lot:m-09",
+      "reference:2026:lot:m-10",
+      "reference:2026:lot:m-11",
+      "reference:2026:lot:m-14",
+      "reference:2026:lot:m-15",
+      "reference:2026:lot:m-16",
+      "reference:2026:lot:o-01",
+      "reference:2026:lot:o-03",
+      "reference:2026:lot:o-04",
+      "reference:2026:lot:o-06",
+      "reference:2026:lot:o-07",
+      "reference:2026:lot:o-09",
+      "reference:2026:lot:o-10",
+      "reference:2026:lot:o-12",
+      "reference:2026:lot:o-13",
+      "reference:2026:lot:p-02",
+      "reference:2026:lot:p-03",
+      "reference:2026:lot:p-05",
+      "reference:2026:lot:p-06",
+      "reference:2026:lot:p-08",
+      "reference:2026:lot:p-09",
+      "reference:2026:lot:p-11",
+      "reference:2026:lot:p-12",
+      "reference:2026:lot:p-14",
+      "reference:2026:lot:q-01",
+      "reference:2026:lot:q-02",
+      "reference:2026:lot:q-04",
+      "reference:2026:lot:q-05",
+      "reference:2026:lot:t-02",
+      "reference:2026:lot:t-03",
+      "reference:2026:lot:t-04",
+      "reference:2026:lot:t-05",
+      "reference:2026:lot:t-08",
+      "reference:2026:lot:t-09",
+      "reference:2026:lot:t-10",
+      "reference:2026:lot:t-12",
+      "reference:2026:lot:u-02",
+      "reference:2026:lot:u-03",
+      "reference:2026:lot:u-04",
+      "reference:2026:lot:u-05",
+      "reference:2026:lot:u-08",
+      "reference:2026:lot:u-09",
+      "reference:2026:lot:u-10",
+      "reference:2026:lot:u-12",
+      "reference:2026:lot:v-01",
+      "reference:2026:lot:v-02",
+      "reference:2026:lot:v-04",
+      "reference:2026:lot:v-05"
+    ]
+  },
+  "functional": {
+    "passed": true,
+    "checks": [
+      "Independent active uncovered inventory equals rendered eligibility; each surface mask follows received status; all internal modules excluded.",
+      "Three segments AVAILABLE→SALE_OPEN→SOLD→AVAILABLE→BLOCKED→SOLD update mask/frame/check without geometry rebuild.",
+      "Hover/selection preserve commercial identity; selected filtered lot strength remains 1; infrastructure clears mask and hides accessories, then restores.",
+      "Hidden lot layer hides surface/status, frame and confirmation together.",
+      "Five warmed status cycles retain geometry, texture and program allocations.",
+      "Public three-state normalization: open/confirmed share permitted blue and never reveal a confirmation check."
+    ]
+  },
+  "pavilionControls": {
+    "passed": true,
+    "rows": [
+      {
+        "label": "baseline",
+        "mode": "interior",
+        "groups": 2,
+        "internalRows": 1202,
+        "soldInternal": 1,
+        "openInternal": 1
+      },
+      {
+        "label": "baseline",
+        "mode": "cut",
+        "groups": 1,
+        "internalRows": 1202,
+        "soldInternal": 1,
+        "openInternal": 1
+      },
+      {
+        "label": "candidate",
+        "mode": "interior",
+        "groups": 2,
+        "internalRows": 1202,
+        "soldInternal": 1,
+        "openInternal": 1
+      },
+      {
+        "label": "candidate",
+        "mode": "cut",
+        "groups": 1,
+        "internalRows": 1202,
+        "soldInternal": 1,
+        "openInternal": 1
+      }
+    ]
+  },
+  "geometry": {
+    "passed": true,
+    "views": [
+      {
+        "label": "baseline",
+        "name": "top",
+        "count": 6
+      },
+      {
+        "label": "baseline",
+        "name": "oblique",
+        "count": 6
+      },
+      {
+        "label": "baseline",
+        "name": "rotated-camera",
+        "count": 6
+      },
+      {
+        "label": "candidate",
+        "name": "top",
+        "count": 6
+      },
+      {
+        "label": "candidate",
+        "name": "oblique",
+        "count": 6
+      },
+      {
+        "label": "candidate",
+        "name": "rotated-camera",
+        "count": 6
+      }
+    ]
+  },
+  "performance": {
+    "order": [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline",
+      "baseline",
+      "candidate"
+    ],
+    "method": "One scene at a time. Complete hydration + 2s idle, two unmeasured 4s gestures separated by 4s idle, then 3 repeated 5s rotations. Native pointer down/up; elapsed-time pointer trajectory. Frame durations from the existing bounded diagnostics: last 240 active navigation/damping samples per repetition; idle frames excluded. Fixed quality and DPR; no quality compensation. Public fixture mounts independently with existing scene policy; no live token. Boot reports the existing first-interactive readiness marker (controls installed and presented frames), not end-to-end user task completion.",
+    "environment": "macOS 26.6, Apple M5, ANGLE Metal, headless Chrome, 1366x768 DPR1",
+    "browser": "156.0.8078.76",
+    "groups": [
+      {
+        "label": "baseline",
+        "mode": "private",
+        "mounts": 3,
+        "gestures": 9,
+        "frameMs": {
+          "n": 2160,
+          "median": 16.7,
+          "p95": 16.9,
+          "min": 15.6,
+          "max": 17.8
+        },
+        "drawCalls": {
+          "n": 118,
+          "median": 662,
+          "p95": 681,
+          "min": 644,
+          "max": 681
+        },
+        "triangles": {
+          "n": 118,
+          "median": 735522,
+          "p95": 749296,
+          "min": 725504,
+          "max": 749296
+        },
+        "openingMarkerMs": {
+          "n": 3,
+          "median": 4007,
+          "p95": 4113,
+          "min": 3948,
+          "max": 4113
+        },
+        "eventToTwoFramesMs": {
+          "n": 9,
+          "median": 31,
+          "p95": 32,
+          "min": 30.400000005960464,
+          "max": 32
+        },
+        "shadowPassesPerGesture": {
+          "n": 9,
+          "median": 1,
+          "p95": 1,
+          "min": 1,
+          "max": 1
+        },
+        "shadowDrawCallsPerGesture": {
+          "n": 9,
+          "median": 326,
+          "p95": 326,
+          "min": 326,
+          "max": 326
+        },
+        "resources": [
+          {
+            "trial": 0,
+            "repeat": 0,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 262,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 7,
+              "totalShadowDrawCalls": 2282
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 0,
+            "repeat": 1,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 262,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 9,
+              "totalShadowDrawCalls": 2934
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 0,
+            "repeat": 2,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 262,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 11,
+              "totalShadowDrawCalls": 3586
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 3,
+            "repeat": 0,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 262,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 7,
+              "totalShadowDrawCalls": 2282
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 3,
+            "repeat": 1,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 262,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 9,
+              "totalShadowDrawCalls": 2934
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 3,
+            "repeat": 2,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 262,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 11,
+              "totalShadowDrawCalls": 3586
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 4,
+            "repeat": 0,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 262,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 7,
+              "totalShadowDrawCalls": 2282
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 4,
+            "repeat": 1,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 262,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 9,
+              "totalShadowDrawCalls": 2934
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 4,
+            "repeat": 2,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 262,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 11,
+              "totalShadowDrawCalls": 3586
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          }
+        ],
+        "errors": []
+      },
+      {
+        "label": "candidate",
+        "mode": "private",
+        "mounts": 3,
+        "gestures": 9,
+        "frameMs": {
+          "n": 2160,
+          "median": 16.7,
+          "p95": 17.7,
+          "min": 14.7,
+          "max": 18.7
+        },
+        "drawCalls": {
+          "n": 118,
+          "median": 662,
+          "p95": 681,
+          "min": 644,
+          "max": 681
+        },
+        "triangles": {
+          "n": 118,
+          "median": 735522,
+          "p95": 749296,
+          "min": 725504,
+          "max": 749296
+        },
+        "openingMarkerMs": {
+          "n": 3,
+          "median": 3941,
+          "p95": 4005,
+          "min": 3940,
+          "max": 4005
+        },
+        "eventToTwoFramesMs": {
+          "n": 9,
+          "median": 30.700000017881393,
+          "p95": 31.80000001192093,
+          "min": 30.5,
+          "max": 31.80000001192093
+        },
+        "shadowPassesPerGesture": {
+          "n": 9,
+          "median": 1,
+          "p95": 1,
+          "min": 1,
+          "max": 1
+        },
+        "shadowDrawCallsPerGesture": {
+          "n": 9,
+          "median": 326,
+          "p95": 326,
+          "min": 326,
+          "max": 326
+        },
+        "resources": [
+          {
+            "trial": 1,
+            "repeat": 0,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 264,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 7,
+              "totalShadowDrawCalls": 2282
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 1,
+            "repeat": 1,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 264,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 9,
+              "totalShadowDrawCalls": 2934
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 1,
+            "repeat": 2,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 264,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 11,
+              "totalShadowDrawCalls": 3586
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 2,
+            "repeat": 0,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 264,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 7,
+              "totalShadowDrawCalls": 2282
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 2,
+            "repeat": 1,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 264,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 9,
+              "totalShadowDrawCalls": 2934
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 2,
+            "repeat": 2,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 264,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 11,
+              "totalShadowDrawCalls": 3586
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 5,
+            "repeat": 0,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 264,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 7,
+              "totalShadowDrawCalls": 2282
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 5,
+            "repeat": 1,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 264,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 9,
+              "totalShadowDrawCalls": 2934
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 5,
+            "repeat": 2,
+            "geometries": 606,
+            "textures": 117,
+            "programs": 264,
+            "materials": 742,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 11,
+              "totalShadowDrawCalls": 3586
+            },
+            "networkResources": 54,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          }
+        ],
+        "errors": []
+      },
+      {
+        "label": "baseline",
+        "mode": "public",
+        "mounts": 3,
+        "gestures": 9,
+        "frameMs": {
+          "n": 2160,
+          "median": 16.7,
+          "p95": 17.4,
+          "min": 15.4,
+          "max": 18.4
+        },
+        "drawCalls": {
+          "n": 118,
+          "median": 605,
+          "p95": 625,
+          "min": 585,
+          "max": 625
+        },
+        "triangles": {
+          "n": 118,
+          "median": 371795,
+          "p95": 378821,
+          "min": 370453,
+          "max": 378821
+        },
+        "openingMarkerMs": {
+          "n": 3,
+          "median": 2317,
+          "p95": 2368,
+          "min": 2269,
+          "max": 2368
+        },
+        "eventToTwoFramesMs": {
+          "n": 9,
+          "median": 30.900000005960464,
+          "p95": 32.400000005960464,
+          "min": 29,
+          "max": 32.400000005960464
+        },
+        "shadowPassesPerGesture": {
+          "n": 9,
+          "median": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "shadowDrawCallsPerGesture": {
+          "n": 9,
+          "median": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "resources": [
+          {
+            "trial": 0,
+            "repeat": 0,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 0,
+            "repeat": 1,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 0,
+            "repeat": 2,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 3,
+            "repeat": 0,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 3,
+            "repeat": 1,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 3,
+            "repeat": 2,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 4,
+            "repeat": 0,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 4,
+            "repeat": 1,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 4,
+            "repeat": 2,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          }
+        ],
+        "errors": []
+      },
+      {
+        "label": "candidate",
+        "mode": "public",
+        "mounts": 3,
+        "gestures": 9,
+        "frameMs": {
+          "n": 2160,
+          "median": 16.7,
+          "p95": 17.3,
+          "min": 14.7,
+          "max": 18.6
+        },
+        "drawCalls": {
+          "n": 119,
+          "median": 605,
+          "p95": 625,
+          "min": 585,
+          "max": 625
+        },
+        "triangles": {
+          "n": 119,
+          "median": 371795,
+          "p95": 378821,
+          "min": 370453,
+          "max": 378821
+        },
+        "openingMarkerMs": {
+          "n": 3,
+          "median": 2318,
+          "p95": 2319,
+          "min": 2301,
+          "max": 2319
+        },
+        "eventToTwoFramesMs": {
+          "n": 9,
+          "median": 30.400000005960464,
+          "p95": 32.5,
+          "min": 27.799999982118607,
+          "max": 32.5
+        },
+        "shadowPassesPerGesture": {
+          "n": 9,
+          "median": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "shadowDrawCallsPerGesture": {
+          "n": 9,
+          "median": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "resources": [
+          {
+            "trial": 1,
+            "repeat": 0,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 1,
+            "repeat": 1,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 1,
+            "repeat": 2,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 2,
+            "repeat": 0,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 2,
+            "repeat": 1,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 2,
+            "repeat": 2,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 5,
+            "repeat": 0,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 5,
+            "repeat": 1,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          },
+          {
+            "trial": 5,
+            "repeat": 2,
+            "geometries": 543,
+            "textures": 100,
+            "programs": 125,
+            "materials": 673,
+            "shadows": {
+              "lastShadowDrawCalls": 0,
+              "lastShadowPasses": 0,
+              "totalShadowPasses": 0,
+              "totalShadowDrawCalls": 0
+            },
+            "networkResources": 47,
+            "buffer": [
+              1366,
+              768
+            ],
+            "dpr": 1
+          }
+        ],
+        "errors": []
+      }
+    ]
+  }
+}

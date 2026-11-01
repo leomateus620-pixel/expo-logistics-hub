@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { resolveCommercialMapSegment } from '@/features/commercial-map/data/commercialMapSegments';
 import { deriveExternalLotFrame } from '@/features/commercial-map/utils/externalLotFrameGeometry';
 import { externalLotFrameColor, externalLotPresentationDecision, externalLotUsesGrass, isExternalPresentationLot } from '@/features/commercial-map/utils/externalLotPresentation';
+import { externalLotStatusValue } from '@/features/commercial-map/utils/externalLotStatus';
 import { isSoldLot } from '@/features/commercial-map/utils/soldLotPresentation';
 import type { MapClassification, MapEntity } from '@/features/commercial-map/types';
 import { createRuralCoverageFixture, ruralCoverageSnapshot } from './fixtures/ruralCoverageFixture';
@@ -91,20 +92,33 @@ describe('authorized ExpoRural inventory presentation coverage', () => {
         const nextLot = { ...lot, status, currentBuyer: null, currentSaleStatus: null, activeContractNumber: null };
         expect(isExternalPresentationLot(entity, nextLot)).toBe(true);
         expect(deriveExternalLotFrame(entity.geometry)).toBe(frame);
-        return { grass: externalLotUsesGrass(status), frame: externalLotFrameColor(status), confirmation: isSoldLot(status) };
+        return { grass: externalLotUsesGrass(status), frame: externalLotFrameColor(status), confirmation: isSoldLot(status), hatch: externalLotStatusValue(entity, nextLot) };
       });
-      expect(stages[0]).toEqual({ grass: true, frame: null, confirmation: false });
-      expect(stages[1]).toMatchObject({ grass: true, confirmation: false });
+      expect(stages[0]).toEqual({ grass: true, frame: null, confirmation: false, hatch: 0 });
+      expect(stages[1]).toMatchObject({ grass: true, confirmation: false, hatch: 1 });
       expect(stages[1].frame).not.toBeNull();
-      expect(stages[2]).toMatchObject({ grass: true, confirmation: true });
+      expect(stages[2]).toMatchObject({ grass: true, confirmation: true, hatch: 2 });
       expect(stages[2].frame).not.toBeNull();
       expect(stages[2].frame).not.toBe(stages[1].frame);
       expect(stages[3]).toEqual(stages[0]);
-      expect(stages[4]).toEqual({ grass: false, frame: null, confirmation: false });
+      expect(stages[4]).toEqual({ grass: false, frame: null, confirmation: false, hatch: 0 });
       expect(entity.geometry).toBe(geometry);
     }
     expect(JSON.stringify(fixture)).toBe(before);
     expect(JSON.stringify(ruralCoverageSnapshot)).toBe(sourceBefore);
+  });
+
+  it('derives stripes from every authorized current or future rural lot, without relying on identifiers or revision counts', () => {
+    for (const entity of fixture.entities.filter(record => expectedEntityIds.has(record.id))) {
+      const lot = lotByEntity.get(entity.id)!;
+      const futureEntity = { ...entity, id: `future:${entity.id}`, publicIdentifier: 'new-external-parcel' };
+      for (const status of ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'AVAILABLE', 'BLOCKED', 'RESERVED', 'IN_NEGOTIATION', 'UNAVAILABLE'] as const) {
+        const expected = status === 'SALE_OPEN' ? 1 : status === 'SOLD' ? 2 : 0;
+        const futureLot = { ...lot, entityId: futureEntity.id, status, publicIdentifier: 'future-commercial-id' };
+        expect(externalLotStatusValue(entity, { ...lot, status }), entity.publicIdentifier).toBe(expected);
+        expect(externalLotStatusValue(futureEntity, futureLot), entity.publicIdentifier).toBe(expected);
+      }
+    }
   });
 
   it('retains every exclusion for buildings, internal modules, covered and archived spaces', () => {

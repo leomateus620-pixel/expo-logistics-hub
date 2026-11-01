@@ -1,0 +1,382 @@
+[
+  {
+    "file": "baseline-medium/automotive-mobile.png",
+    "bytes": 311654,
+    "sha256": "2f3964539ca6619e189e586d0adb3d41417a05b6e3ad65396be69e787e0c2b8c"
+  },
+  {
+    "file": "baseline-medium/automotive-top-desktop.png",
+    "bytes": 1955863,
+    "sha256": "9dc2e4b785726c0b6c5927602cf2dfe38f5efa50a4b4c3841f7a2d6357e3d3cb"
+  },
+  {
+    "file": "baseline-medium/automotive-top.png",
+    "bytes": 1087348,
+    "sha256": "11af46773f40e162689d26e1b350e5a7ec3577c4877e4ff49ed658a63d5398a7"
+  },
+  {
+    "file": "baseline-medium/distant-desktop.png",
+    "bytes": 2504142,
+    "sha256": "29831236152639dde273cab0fa6d61d30156e6ce9636949064abdc8abbd2d3e4"
+  },
+  {
+    "file": "baseline-medium/distant-mobile.png",
+    "bytes": 437358,
+    "sha256": "db7792d14afba4a88552169b99e3af5fb03e9e1bfcdf3c206e4de536e6a58efe"
+  },
+  {
+    "file": "baseline-medium/distant.png",
+    "bytes": 1448019,
+    "sha256": "f706e18b25767820053a47f9a652e90bdad1f8f4ce2d47aa31d986eb13495cb0"
+  },
+  {
+    "file": "baseline-medium/exporural-cutouts-close.png",
+    "bytes": 997268,
+    "sha256": "8a2442f809d2c927cfefc76fd4ec5689138a247af2ed196b6f32f7c092457622"
+  },
+  {
+    "file": "baseline-medium/exporural-mobile.png",
+    "bytes": 387274,
+    "sha256": "8f72b338680f5a2eb05749e92b728096a94668c1954cab78fac03fa66ea7e343"
+  },
+  {
+    "file": "baseline-medium/exporural-night.png",
+    "bytes": 1194789,
+    "sha256": "8fc5853a1e39bc1fd16ea2b74b8afe160f661518194ae2e69a58cfcd560dd45c"
+  },
+  {
+    "file": "baseline-medium/exporural-oblique.png",
+    "bytes": 1494878,
+    "sha256": "d75f2140ca252a5e779aecd872d12463ff45d09606a5e1f95b3d0ce4bfa34acd"
+  },
+  {
+    "file": "baseline-medium/exporural-rain.png",
+    "bytes": 1497267,
+    "sha256": "76c76cfeedc5e2532c7435e23860053254694120beb6b7c8be45cb23651e9fbb"
+  },
+  {
+    "file": "baseline-medium/exporural-top-desktop.png",
+    "bytes": 2240537,
+    "sha256": "7fc116b6fde64bd20f6a5075c4b6ee3ca94a8aed1acefc7347ff68e218ea0c6a"
+  },
+  {
+    "file": "baseline-medium/exporural-top.png",
+    "bytes": 1307919,
+    "sha256": "1732ab7350a0f319e6c94e9c5ba9a838cdca530aa854e1d7dbd187da01b77e6d"
+  },
+  {
+    "file": "baseline-medium/filtered.png",
+    "bytes": 1393870,
+    "sha256": "edcaf21306ef47be065a516865f18e9a05ced93680e006deb725fbacab911a03"
+  },
+  {
+    "file": "baseline-medium/industry-close.png",
+    "bytes": 1402066,
+    "sha256": "513e3905d0a747ece733cb0efcd9f0850b59b2a88104f86b9edf7e5c03bee4b4"
+  },
+  {
+    "file": "baseline-medium/industry-mobile.png",
+    "bytes": 356887,
+    "sha256": "3b84a5dc98d53370d419c65e1a3cbccc325dbee8048c13bca65d186818ef1b4c"
+  },
+  {
+    "file": "baseline-medium/industry-roads-top-desktop.png",
+    "bytes": 2135622,
+    "sha256": "e1e6aca89a7817833a1c40608df7ee6ee7c4379d18c0e61207b41e234ff92c08"
+  },
+  {
+    "file": "baseline-medium/industry-roads-top.png",
+    "bytes": 1213957,
+    "sha256": "bc193ff9a3e3de38731b2238840d7f3e60122228a7ad07a65fe765f0935dbb1a"
+  },
+  {
+    "file": "baseline-medium/overview-desktop.png",
+    "bytes": 2693338,
+    "sha256": "a8b3a8417265a04d7637de990f45fac877dbbdcb0c5b8f0230a8be378a911c20"
+  },
+  {
+    "file": "baseline-medium/overview-mobile.png",
+    "bytes": 452018,
+    "sha256": "6b9dff8bca4e22e640487f397e497194559f3375b76280061dc6f951a4715f50"
+  },
+  {
+    "file": "baseline-medium/overview.png",
+    "bytes": 1564041,
+    "sha256": "6dac2ba81fff2f71a7e7b8a6f88c4333998861c1fc8b2ed50b1dc180b1e39511"
+  },
+  {
+    "file": "baseline-medium/pavilion-cut.png",
+    "bytes": 1063863,
+    "sha256": "74542fd27cd81bd27145d455621668673b3b0674efcbc253d8ec57a8fab0a51d"
+  },
+  {
+    "file": "baseline-medium/pavilion-interior.png",
+    "bytes": 159514,
+    "sha256": "2c10e2628dbe32685d76d674c5385e4f33cad535effc339ffdb83269768771e7"
+  },
+  {
+    "file": "baseline-medium/public-exporural.png",
+    "bytes": 549986,
+    "sha256": "79021bc5f21ab2577451bc82ff8a5aac04cc272ff16b066d5eb76467fb360cea"
+  },
+  {
+    "file": "baseline-medium/public-industry.png",
+    "bytes": 928363,
+    "sha256": "f8b22b51b7d4a5283dec9f4f142265d5877d9cd606f0c4f9c12044e764026eb4"
+  },
+  {
+    "file": "baseline-medium/public-r59.png",
+    "bytes": 839974,
+    "sha256": "44d6f6a502149b4f78a1ad1e4787589db617fde869ed7deabea84c926b7fc00f"
+  },
+  {
+    "file": "baseline-medium/r21-close.png",
+    "bytes": 1018147,
+    "sha256": "33db245069c034e38bd1f00f46da10a4016d3d9a7ccde3fc478a37c7e0456b22"
+  },
+  {
+    "file": "baseline-medium/r40-control.png",
+    "bytes": 1055570,
+    "sha256": "a96133899e1a52cdeb53ded500a2752d8827698b3d193887757dd52706138d88"
+  },
+  {
+    "file": "baseline-medium/r59-close-desktop.png",
+    "bytes": 1684443,
+    "sha256": "99e5a8d7ca9c2051839ce55edcb4af7aef0f0ecd1f163d56c106767963b3a220"
+  },
+  {
+    "file": "baseline-medium/r59-close.png",
+    "bytes": 982787,
+    "sha256": "97eaedac6a2adfd51bbb83e704b676ce815dbc5ec04eb94f8724b200ea72f1e9"
+  },
+  {
+    "file": "baseline-medium/selection-closed.png",
+    "bytes": 1402066,
+    "sha256": "513e3905d0a747ece733cb0efcd9f0850b59b2a88104f86b9edf7e5c03bee4b4"
+  },
+  {
+    "file": "baseline-medium/selection.png",
+    "bytes": 994807,
+    "sha256": "7fbec7f57ed2fd86ea17bca127951abc3f3b5ea8775688da59cc796fa92a5b34"
+  },
+  {
+    "file": "baseline-medium/yellow-close.png",
+    "bytes": 915869,
+    "sha256": "8c635b31be864bde2a057db146c3b5966c3a26f9c116dfbbda2b3121282cab4f"
+  },
+  {
+    "file": "candidate-medium/automotive-mobile.png",
+    "bytes": 344038,
+    "sha256": "a5e5812ed7c3120676d2bdf3e227bf6a170d5fd2c77afb4b9a4321e7b7d7b3d0"
+  },
+  {
+    "file": "candidate-medium/automotive-top-desktop.png",
+    "bytes": 2204500,
+    "sha256": "c3604dbf0e2846ff31eca8346e547f9ed67712304e55440e6a86ec8d43c56c41"
+  },
+  {
+    "file": "candidate-medium/automotive-top.png",
+    "bytes": 1187017,
+    "sha256": "27c3113efecda737d1c526c99b6f91640c02e0502815d54bec12e01bf4e35a56"
+  },
+  {
+    "file": "candidate-medium/distant-desktop.png",
+    "bytes": 2519706,
+    "sha256": "3ffa499b99ab16f4ff0740ffc3878a4f03edd9d926c2bae134bdb30e2565327b"
+  },
+  {
+    "file": "candidate-medium/distant-mobile.png",
+    "bytes": 439752,
+    "sha256": "594a0fe77f23d5ed4949f8dfd5dfd6c47fa6741b6dcdda76b640ce9fdaeabf0f"
+  },
+  {
+    "file": "candidate-medium/distant.png",
+    "bytes": 1450257,
+    "sha256": "fce4fcfbf39ec2f3b930006f73b4d4f783a301fec38f4b8f31c1c9f56a8cded3"
+  },
+  {
+    "file": "candidate-medium/exporural-cutouts-close.png",
+    "bytes": 1006428,
+    "sha256": "f79be1962f0400fc4e3d2b440f2b067f72a6076c71980551ce786e5990269448"
+  },
+  {
+    "file": "candidate-medium/exporural-mobile.png",
+    "bytes": 406833,
+    "sha256": "fb7d7b4c87093627c4042a301da43f2b4d540febfd56917a892ff0e0196d93fc"
+  },
+  {
+    "file": "candidate-medium/exporural-night.png",
+    "bytes": 1246466,
+    "sha256": "14368f727074edfa7da7ad6f8a5f8924fbef889464becc14e97cc85de2a76ac3"
+  },
+  {
+    "file": "candidate-medium/exporural-oblique.png",
+    "bytes": 1534476,
+    "sha256": "d623d4df55d0e5483af64b57a89315f436d8e14ca83cfd2c5d4f25c728969638"
+  },
+  {
+    "file": "candidate-medium/exporural-rain.png",
+    "bytes": 1536349,
+    "sha256": "f45007128c4f89e79aad5e806674ebe51adc7c54c6e58c74be11357ae55d3a5a"
+  },
+  {
+    "file": "candidate-medium/exporural-top-desktop.png",
+    "bytes": 2375706,
+    "sha256": "b26ab142190d567da9241cb501d40ab148b111679eade3910b07e2970419788e"
+  },
+  {
+    "file": "candidate-medium/exporural-top.png",
+    "bytes": 1372220,
+    "sha256": "aa3b841ca7ed969dc7b2035254b47feae39baefa0455c27da326961be5925d76"
+  },
+  {
+    "file": "candidate-medium/filtered.png",
+    "bytes": 1478517,
+    "sha256": "6038b757a0ac59f7013f1aa092a03d36c59c0ac4a023f00a010f252b76c489f9"
+  },
+  {
+    "file": "candidate-medium/industry-close.png",
+    "bytes": 1526496,
+    "sha256": "2293f92b1893973dc4a7e4224722d529850105c0d743fd9b1e8f17c5351b0894"
+  },
+  {
+    "file": "candidate-medium/industry-mobile.png",
+    "bytes": 416844,
+    "sha256": "85df94c3ebd7e7938f13e8521a0a9a06eaab584a6127a1b1e07b26761133527d"
+  },
+  {
+    "file": "candidate-medium/industry-roads-top-desktop.png",
+    "bytes": 2463616,
+    "sha256": "28ac24b71e801f91c1eb315b1d3ad482e35ffc0f137c96ddf5881639a46376bc"
+  },
+  {
+    "file": "candidate-medium/industry-roads-top.png",
+    "bytes": 1354841,
+    "sha256": "3026997ffad0b0eef392c489c8fd888ce0f80fe5febd7e156b73bc6fefdb7c97"
+  },
+  {
+    "file": "candidate-medium/overview-desktop.png",
+    "bytes": 2775738,
+    "sha256": "507d323598f24167f64f698c6851ccc2fbcb410090dd9a784671f38ac77e72f1"
+  },
+  {
+    "file": "candidate-medium/overview-mobile.png",
+    "bytes": 481097,
+    "sha256": "663777c87770ae3afc1482ec3e2f908c5d8684523450a24bf08cab21cd78b4e8"
+  },
+  {
+    "file": "candidate-medium/overview.png",
+    "bytes": 1597483,
+    "sha256": "e1de3bab8301474b809b37454dc51d15eff68d28d87c4337a13651a5cc753cde"
+  },
+  {
+    "file": "candidate-medium/pavilion-cut.png",
+    "bytes": 1064339,
+    "sha256": "6f7db5918c1d19412718e1918307d5993988f68f9c3286a17a5323bfeef6f89d"
+  },
+  {
+    "file": "candidate-medium/pavilion-interior.png",
+    "bytes": 159514,
+    "sha256": "2c10e2628dbe32685d76d674c5385e4f33cad535effc339ffdb83269768771e7"
+  },
+  {
+    "file": "candidate-medium/public-exporural.png",
+    "bytes": 612906,
+    "sha256": "b04d34d2818e71096a3135f0f0438dca9b4ea4f1751bdc9752912faf9c25a7f4"
+  },
+  {
+    "file": "candidate-medium/public-industry.png",
+    "bytes": 1086361,
+    "sha256": "12cfbb92d2dea2e7dc8dc0d44117e4b3276e5d6d1ad4a1dbdf032a73986f551d"
+  },
+  {
+    "file": "candidate-medium/public-r59.png",
+    "bytes": 876261,
+    "sha256": "70c49075231a6f98e7fb28d61de3a7ab8d93a2f9943233862d5986a61e83c271"
+  },
+  {
+    "file": "candidate-medium/r21-close.png",
+    "bytes": 1091036,
+    "sha256": "10412133be67ec634a4147517e5fc1402da47b585ca9722a8d6344464eaf0f25"
+  },
+  {
+    "file": "candidate-medium/r40-control.png",
+    "bytes": 1072455,
+    "sha256": "8b098fcc51d7cc5327d81472d83d80579f4c1bc099a7e5f3582ebb5079de07bd"
+  },
+  {
+    "file": "candidate-medium/r59-close-desktop.png",
+    "bytes": 1742655,
+    "sha256": "3807e535bab092762fb4f80f392ce67596ba493420f1b1ceba0bdd9438e99257"
+  },
+  {
+    "file": "candidate-medium/r59-close.png",
+    "bytes": 1010862,
+    "sha256": "3f849ca600cf3eb8c08b04bb19d641e84d14105428ac77ff8590ccafbeca0d3a"
+  },
+  {
+    "file": "candidate-medium/selection-closed.png",
+    "bytes": 1526496,
+    "sha256": "2293f92b1893973dc4a7e4224722d529850105c0d743fd9b1e8f17c5351b0894"
+  },
+  {
+    "file": "candidate-medium/selection.png",
+    "bytes": 1040597,
+    "sha256": "61b4248132f72ff960dae38f770561c09d80d5af2c6340015244f59939411156"
+  },
+  {
+    "file": "candidate-medium/yellow-close.png",
+    "bytes": 947291,
+    "sha256": "3d82913f0d64c3300ab45d8ce5ba36ee0221103712a29831f9a169c60a595365"
+  },
+  {
+    "file": "geometry/baseline-oblique.png",
+    "bytes": 808350,
+    "sha256": "81512b81a9704a60345a0ed68e826fa10efe3f51ea1c1b5b315de49a5e3bcd31"
+  },
+  {
+    "file": "geometry/baseline-rotated-camera.png",
+    "bytes": 904993,
+    "sha256": "5b717bc3d302199e1ccc685797c33a1d5a29271414928b1c18a39e44e3738428"
+  },
+  {
+    "file": "geometry/baseline-top.png",
+    "bytes": 728009,
+    "sha256": "e84fe2b9ea9a78d37d2177cda629e877753966389351782e5031928807113197"
+  },
+  {
+    "file": "geometry/candidate-oblique.png",
+    "bytes": 838177,
+    "sha256": "f1dcf52beeec0045b2721eb778335ad66f8589f4466254c96e57ce77d3d553a7"
+  },
+  {
+    "file": "geometry/candidate-rotated-camera.png",
+    "bytes": 903308,
+    "sha256": "f414bd14ec169f1e2a1e53276accf897237c71e3b8f4f7e5f2285c2a6000e31b"
+  },
+  {
+    "file": "geometry/candidate-top.png",
+    "bytes": 760082,
+    "sha256": "991b6689814ab5a2168c10b4aee725e31884e2be4d41e793d86db18fe8a26e53"
+  },
+  {
+    "file": "pavilion-controls/baseline-cut.png",
+    "bytes": 1122653,
+    "sha256": "f7702cd3cb5f6424c649c230888131d8067af0f33b38107a95f534082f08d80e"
+  },
+  {
+    "file": "pavilion-controls/baseline-interior.png",
+    "bytes": 166383,
+    "sha256": "08607100fdaf70c1a4572f60a53c8160611df4e979fc6cd8a28c85ec4a19da63"
+  },
+  {
+    "file": "pavilion-controls/candidate-cut.png",
+    "bytes": 1170204,
+    "sha256": "253658dec2719415c2c4236cb59b419f586bc66e29f4a97a6c6746629a6e37aa"
+  },
+  {
+    "file": "pavilion-controls/candidate-interior.png",
+    "bytes": 166383,
+    "sha256": "08607100fdaf70c1a4572f60a53c8160611df4e979fc6cd8a28c85ec4a19da63"
+  }
+]

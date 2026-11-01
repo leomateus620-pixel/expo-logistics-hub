@@ -21,6 +21,7 @@ import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
 import { ExternalLotFrames } from './ExternalLotFrames';
 import { EXTERNAL_LOT_PALETTE, externalLotUsesGrass, isExternalPresentationLot, lotPresentationLift } from '../../utils/externalLotPresentation';
+import { createExternalLotStatusAttributes, updateExternalLotStatusAttributes } from '../../utils/externalLotStatus';
 import { installExternalLotPresentationDiagnostics, markExternalLotPresentationBatch } from '../../utils/externalLotPresentationDiagnostics';
 import { toCommercialPhase, type Coordinate } from '../../types';
 import { isSoldLot, soldLotSurfaceColor } from '../../utils/soldLotPresentation';
@@ -1515,6 +1516,7 @@ function BatchedLots({
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }) {
   const publicPolicy = usePublicScenePolicy();
+  const statusPixelRatio = useThree((state) => state.viewport.dpr);
   const saleInspectionLotIds = useSaleInspectionStore((state) => state.lotIdSet);
   const geometryEntitiesRef = useRef<MapEntity[]>([]);
   if (geometryEntitiesRef.current.length !== entries.length || entries.some((entry, i) => entry.entity !== geometryEntitiesRef.current[i])) geometryEntitiesRef.current = entries.map(entry => entry.entity);
@@ -1554,6 +1556,7 @@ function BatchedLots({
       geometry.setAttribute('exporuralTurf', new THREE.Float32BufferAttribute(
         new Float32Array(geometry.getAttribute('position').count).fill(isExternalPresentationLot(entity, lot) && externalLotUsesGrass(lot.status) ? 1 : !publicPolicy && isExporuralLandscapeLot(entity) ? 2 : 0), 1,
       ));
+      createExternalLotStatusAttributes(geometry, entity, lot);
       if (!geometry.index) return geometry;
       const nonIndexed = geometry.toNonIndexed();
       geometry.dispose();
@@ -1570,7 +1573,7 @@ function BatchedLots({
     });
     // Standard already receives the park's grain/roughness/normal detail below.
     // Avoid stacking a second procedural texture over the eligible grass.
-    applyExporuralTurfMaterial(material, reducedGraphics, { reuseExistingSurfaceDetail: !publicPolicy });
+    applyExporuralTurfMaterial(material, reducedGraphics, { reuseExistingSurfaceDetail: !publicPolicy, pixelRatio: statusPixelRatio });
     const mesh = new THREE.BatchedMesh(entries.length, vertexCount, 0, material);
     const entityByBatchId = new Map<number, string>();
     const batchIdByEntity = new Map<string, number>();
@@ -1624,6 +1627,8 @@ function BatchedLots({
       geometry.dispose();
     });
 
+    // BatchedMesh allocates its own attribute and does not copy source usage.
+    (mesh.geometry.getAttribute('externalLotStatus') as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
     const edgeGeometry = new THREE.BufferGeometry();
     edgeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
     edgeGeometry.setAttribute('color', new THREE.Float32BufferAttribute(edgeColors, 3));
@@ -1640,9 +1645,9 @@ function BatchedLots({
 
   useLayoutEffect(() => {
     if (!batch) return;
-    applyExporuralTurfMaterial(batch.material, reducedGraphics, { reuseExistingSurfaceDetail: batch.material instanceof THREE.MeshStandardMaterial });
+    applyExporuralTurfMaterial(batch.material, reducedGraphics, { reuseExistingSurfaceDetail: batch.material instanceof THREE.MeshStandardMaterial, pixelRatio: statusPixelRatio });
     if (batch.material instanceof THREE.MeshStandardMaterial) applyParkSurfaceDetail(batch.material, 'lot', reducedGraphics);
-  }, [batch, reducedGraphics]);
+  }, [batch, reducedGraphics, statusPixelRatio]);
 
   useEffect(() => () => {
     batch?.edgeGeometry.dispose();
@@ -1677,6 +1682,9 @@ function BatchedLots({
       scratch.blend,
     );
     const external = isExternalPresentationLot(entry.entity, entry.lot);
+    updateExternalLotStatusAttributes(batch.mesh, batchId, entry.entity, entry.lot, {
+      hidden: infrastructureMode, dimmed: filtersActive && !matchingEntityIds.has(entityId) && !selected,
+    });
     // A lavender cart cue is transient and distinct from the straw sale frame.
     if (publicPolicy && selected && !external && !isSoldLot(entry.lot.status)) color.set('#ffed91');
     if (salesSelected) color.lerp(scratch.blend.set(external ? EXTERNAL_LOT_PALETTE.cart : '#f2c94c'), external ? .32 : .62);

@@ -4,7 +4,8 @@ import type { CommercialLot, CommercialStatus, MapEntity } from '../types';
 /** Presentation only. Never changes the persisted four-phase commercial model. */
 export const EXTERNAL_LOT_PALETTE = Object.freeze({
   grass: '#739455', lightGrass: '#88A56B', darkGrass: '#5F7D45',
-  open: '#D8BD70', sold: '#8FB7D8', check: '#355F82', boundary: '#40513b',
+  open: '#FFD400', openHighlight: '#FFE66A', sold: '#1677FF', soldHighlight: '#66B0FF',
+  check: '#FFFFFF', boundary: '#40513b',
   selection: '#e8f4ef', cart: '#c28bea',
 });
 

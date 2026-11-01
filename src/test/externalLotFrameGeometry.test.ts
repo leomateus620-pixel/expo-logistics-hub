@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import polygonClipping from 'polygon-clipping';
 import { createExternalLotFrameGeometry, deriveExternalLotFrame } from '@/features/commercial-map/utils/externalLotFrameGeometry';
 import { createSoldCheckGeometry } from '@/features/commercial-map/utils/soldCheckGeometry';
+import { EXTERNAL_LOT_PALETTE } from '@/features/commercial-map/utils/externalLotPresentation';
+import * as THREE from 'three';
 import { lotPointClearance } from '@/features/commercial-map/utils/soldLotPresentation';
 import { polygonAreaMapUnits } from '@/features/commercial-map/utils/geometry';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
@@ -172,6 +174,28 @@ describe('external lot presentation offsets', () => {
 });
 
 describe('external sold confirmation geometry', () => {
+  it('draws a robust white check over the saturated blue disk inside the same clearance footprint', () => {
+    const geometry = createSoldCheckGeometry(), positions = geometry.getAttribute('position');
+    const colors = geometry.getAttribute('color'), blue = new THREE.Color(EXTERNAL_LOT_PALETTE.sold);
+    let markArea = 0, diskArea = 0;
+    for (let i = 0; i < positions.count; i += 3) {
+      const isCheck = positions.getY(i) > .002;
+      const vertices = [0, 1, 2].map(j => {
+        const k = i + j;
+        expect(colors.getX(k)).toBeCloseTo(isCheck ? 1 : blue.r);
+        expect(colors.getY(k)).toBeCloseTo(isCheck ? 1 : blue.g);
+        expect(colors.getZ(k)).toBeCloseTo(isCheck ? 1 : blue.b);
+        return [positions.getX(k), positions.getZ(k)] as Coordinate;
+      });
+      const triangleArea = polygonAreaMapUnits({ coordinates: [vertices] });
+      if (isCheck) markArea += triangleArea; else diskArea += triangleArea;
+    }
+    // A substantial mark survives small seals without enlarging the footprint.
+    expect(markArea / diskArea).toBeGreaterThan(.17);
+    expect(markArea / diskArea).toBeLessThan(.3);
+    geometry.dispose();
+  });
+
   it('uses one bounded, flat, vertex-coloured shared model without texture or groups', () => {
     const geometry = createSoldCheckGeometry(), positions = geometry.getAttribute('position');
     expect(geometry.groups).toHaveLength(0);
