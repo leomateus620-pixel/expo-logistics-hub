@@ -12810,6 +12810,19 @@ export type Database = {
         Args: { p_segment_id: string }
         Returns: number
       }
+      export_commercial_sale_orders: {
+        Args: {
+          p_from?: string
+          p_has_document?: boolean
+          p_payment_method?: string
+          p_project_id: string
+          p_search?: string
+          p_signature_selection?: string
+          p_status?: string
+          p_to?: string
+        }
+        Returns: Json
+      }
       financial_accessible_org_ids: { Args: never; Returns: string[] }
       financial_assert_plan_settlement: {
         Args: { _obligation: string }
