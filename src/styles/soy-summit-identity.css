@@ -1,0 +1,26 @@
+@font-face{font-family:'Soy Archivo';src:url('../assets/fonts/archivo-black.ttf') format('truetype');font-weight:900;font-display:swap}
+.soy-countdown{--soy-cream:#f5f1e5;--soy-green:#073d32;position:relative;isolation:isolate;display:grid;justify-items:center;align-content:center;width:100%;height:100%;padding:12px 18px;color:var(--soy-green);background:var(--soy-cream);border-radius:18px;overflow:hidden;gap:8px;box-shadow:inset 0 0 0 1px #fff8dcaa,0 10px 30px #021e1918}
+.soy-countdown::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 50% 25%,#fffef9b8,#fffef97a 45%,transparent),url('/soy-summit/grain-sky-portal.webp') center bottom/cover no-repeat;z-index:-2;pointer-events:none}
+.soy-countdown::after{content:'';position:absolute;inset:7px;border:1px solid #fffdf45c;border-radius:12px;z-index:-1;pointer-events:none}
+.soy-countdown__brand{width:clamp(118px,15vw,190px);height:clamp(28px,3.6vw,46px);object-fit:contain}
+.soy-countdown h2{font-family:'Soy Archivo',Arial,sans-serif;font-size:clamp(20px,3vw,35px);font-style:italic;line-height:1.1;letter-spacing:-.035em;margin:0;color:#073d32;text-shadow:0 1px 0 #ffffff80}
+.soy-countdown__date{font-size:clamp(12px,1.3vw,17px);font-weight:600;margin:0}
+.soy-countdown__digits{width:100%;max-width:800px;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:10px;margin-top:8px;padding:0 4px 7px;perspective:800px}
+.soy-countdown .soy-time-card{position:relative;isolation:isolate;overflow:hidden;display:grid;justify-items:center;align-content:center;min-width:0;min-height:110px;gap:0;padding:12px 6px 11px;border:2px solid var(--soy-gold);border-radius:14px;color:var(--soy-gold-light);background:radial-gradient(ellipse at 20% 0%,#42775b80,transparent 72%),linear-gradient(145deg,#194f40,var(--soy-green) 48%,var(--soy-card-shadow));box-shadow:inset 0 2px 0 #fff1b380,inset 0 -3px 8px #0005,0 4px 0 var(--soy-gold-dark),0 8px 13px #48321140;transition:transform 180ms,box-shadow 180ms;cursor:pointer}
+.soy-time-card::before{content:'';position:absolute;inset:5px;border:1px solid #d8a52d55;border-radius:8px;pointer-events:none}
+.soy-time-card::after{content:'';position:absolute;right:-18px;bottom:-15px;width:85px;height:52px;border:1px solid #e8c76a20;border-radius:50%;transform:rotate(-38deg);box-shadow:0 0 0 7px #e8c76a08;pointer-events:none;z-index:-1}
+.soy-countdown .soy-time-card:hover,.soy-countdown .soy-time-card[aria-pressed='true']{transform:translateY(-2px) rotateX(2deg);box-shadow:inset 0 2px 0 #fff1b388,inset 0 -3px 8px #0005,0 6px 0 var(--soy-gold-dark),0 12px 18px #48321140}
+.soy-countdown .soy-time-card:focus-visible{outline:3px solid #073d32;outline-offset:4px}
+.soy-countdown__digits strong{font-size:clamp(28px,5.4vw,66px);font-family:Arial,sans-serif;line-height:1.05;letter-spacing:-.04em;font-weight:800;font-variant-numeric:tabular-nums;font-feature-settings:'tnum';min-width:2ch;text-align:center;background:linear-gradient(180deg,#fff8d8,var(--soy-gold-light) 28%,#e3b642 68%,#bf8727);background-clip:text;-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 2px 1px #0005)}
+.soy-countdown__digits span{font-size:clamp(9px,.9vw,12px);font-weight:700;letter-spacing:.13em;text-transform:uppercase;margin-top:9px;color:#f7df9a}
+.soy-countdown__status{font-size:12px;min-height:18px;margin:0}
+.portal-event-switcher{position:relative;width:100%;max-width:940px;margin-inline:auto}
+.portal-event-switcher__toggle{position:absolute;right:0;top:0;width:44px;height:44px;display:grid;place-content:center;z-index:5;color:#f5df9d;border:1px solid #f5df9d66;border-radius:50%;background:#071e39c9;transition:background 180ms}
+.portal-event-switcher__toggle svg{width:18px;height:18px}
+.portal-event-switcher__toggle:focus-visible{outline:3px solid #e1b23a;outline-offset:3px}
+.portal-event-switcher[data-event='soy'] .portal-event-switcher__toggle{color:#073d32;background:#f5f1e5;border-color:#073d3255;right:8px;top:8px}
+.portal-event-switcher__soy{position:absolute;inset:0;z-index:4}
+.portal-event-switcher[data-event='soy'] .portal-official-countdown{visibility:hidden}
+@media(max-width:480px){.soy-countdown{padding:12px 10px;gap:6px}.soy-countdown__brand{width:114px;height:28px}.soy-countdown h2{font-size:20px}.soy-countdown__digits{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:2px;max-width:340px}.soy-countdown .soy-time-card{min-height:69px;padding:7px 5px 6px;border-radius:10px}.soy-countdown__digits strong{font-size:33px}.soy-countdown__digits span{font-size:8px;letter-spacing:.1em;margin-top:4px}.soy-countdown__date{font-size:11px}.soy-countdown__status{font-size:10px;min-height:12px}.portal-event-switcher__toggle{top:-17px;right:-8px}}
+@media(max-width:480px){.soy-countdown::before{background-image:radial-gradient(ellipse 90% 70% at 50% 25%,#fffef9b8,#fffef94d 50%,transparent),url('/soy-summit/grain-sky-mobile.webp')}}
+@media(prefers-reduced-motion:reduce){.portal-event-switcher__toggle,.soy-countdown .soy-time-card{transition:none}.soy-countdown .soy-time-card:hover,.soy-countdown .soy-time-card[aria-pressed='true']{transform:none}}

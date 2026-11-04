@@ -1,0 +1,145 @@
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const fs = require('node:fs');
+const path = require('node:path');
+const base=process.env.SOY_BASE||'http://127.0.0.1:8081';
+const out=path.resolve('docs/soy-summit/evidence');
+const assert=(condition,message)=>{if(!condition)throw new Error(message)};
+(async()=>{
+  const browser=await chromium.launch({channel:'chrome',headless:true});
+  const report={browser:browser.version(),base,device:'Windows desktop; mobile viewports emulate layout/input only',scenes:[],portal:[],failures:[]};
+  const save=()=>fs.writeFileSync(path.join(out,'browser-validation.json'),JSON.stringify(report,null,2));
+  try {
+    const context=await browser.newContext({viewport:{width:1440,height:960},deviceScaleFactor:1,reducedMotion:'reduce'});
+    const page=await context.newPage(), errors=[];
+    page.on('pageerror',e=>errors.push(e.message));
+    const requests=[];page.on('request',r=>requests.push(r.url()));
+    await page.goto(base+'/__dev/soy-summit',{waitUntil:'domcontentloaded',timeout:120000});
+    await page.locator('.soy-visit[data-ready="true"]').waitFor({timeout:90000});
+    await page.getByRole('button',{name:'Dispensar instrução'}).click();
+    const capture=async(name)=>{
+      await page.waitForTimeout(120);
+      await page.screenshot({path:path.join(out,name+'.png')});
+      if(name==='facade'){
+        const png=await page.evaluate(()=>{const v=window.__soyVisit;v.renderer.render(v.scene,v.camera);return v.renderer.domElement.toDataURL('image/png')});
+        fs.writeFileSync(path.join(out,'exterior-canvas.png'),Buffer.from(png.split(',')[1],'base64'));
+      }
+      const data=await page.evaluate(()=>window.__soyVisit.diagnostics());
+      report.scenes.push({name,...data});save();console.log(name,JSON.stringify({calls:data.calls,triangles:data.triangles,geometries:data.geometries,textures:data.textures}));
+    };
+    const go=async(node,label)=>{
+      await page.locator('nav[aria-label="Percurso da visita"]').getByRole('button',{name:label,exact:true}).click();
+      await page.waitForFunction(n=>window.__soyVisit?.diagnostics().node===n&&!window.__soyVisit.diagnostics().moving,node,{timeout:30000});
+    };
+    await capture('facade');
+    assert(!requests.some(r=>r.includes('stage-static.webp')),'Stage must not transfer before approaching hall');
+    await go('corner','Esquina e entorno');await capture('corner');await go('exterior','Fachada');
+    await go('tree','Árvore e entorno');await capture('tree');await go('exterior','Fachada');
+    await go('entrance','Porta principal');await capture('entrance');
+    await go('hall','Hall de entrada');await capture('hall');
+    await go('leftDoor','Entrada esquerda');await capture('left-door');
+    await go('leftArrival','Auditório · esquerda');await capture('auditorium-left');
+    await go('panel','Painel do Soy Summit');await capture('panel-frontal');
+    await page.locator('canvas.soy-visit__canvas').focus();await page.keyboard.press('1');
+    assert((await page.evaluate(()=>window.__soyVisit.diagnostics())).panel.selectedUnit===0,'Keyboard card highlight failed');
+    await page.keyboard.press('1');
+    await page.getByRole('button',{name:'Olhar à esquerda',exact:true}).click();await capture('panel-oblique');
+    await go('leftArrival','Auditório · esquerda');await go('leftDoor','Entrada esquerda');await go('hall','Hall de entrada');
+    await go('rightDoor','Entrada direita');await capture('right-door');
+    await go('rightArrival','Auditório · direita');await capture('auditorium-right');
+    await go('panel','Painel do Soy Summit');
+    const warm=await page.evaluate(()=>window.__soyVisit.diagnostics());
+    for(let i=0;i<4;i++){await go('leftArrival','Auditório · esquerda');await go('panel','Painel do Soy Summit');await go('rightArrival','Auditório · direita');await go('panel','Painel do Soy Summit');}
+    const after=await page.evaluate(()=>window.__soyVisit.diagnostics());
+    assert(after.geometries===warm.geometries&&after.textures===warm.textures,'Warmed resources must stay stable');
+    report.resources={warm,after};
+    const tickBefore=await page.evaluate(()=>window.__soyVisit.diagnostics());
+    await page.waitForTimeout(2200);
+    const tickAfter=await page.evaluate(()=>window.__soyVisit.diagnostics());
+    assert(JSON.stringify(tickBefore.camera)===JSON.stringify(tickAfter.camera),'Clock moved camera');
+    assert(tickAfter.geometries===tickBefore.geometries&&tickAfter.textures===tickBefore.textures,'Clock recreated resources');
+    report.tick={before:tickBefore,after:tickAfter};
+    for(const quality of ['economy','balanced','high','auto']){
+      await page.getByRole('combobox').selectOption(quality);await page.waitForTimeout(100);report.scenes.push({profile:quality,...await page.evaluate(()=>window.__soyVisit.diagnostics())});
+    }
+    await page.getByRole('button',{name:'Versão leve',exact:true}).click();
+    await page.waitForFunction(()=>!window.__soyVisit);
+    assert(await page.locator('canvas.soy-visit__canvas').count()===0,'Light fallback must release canvas');
+    await page.getByRole('button',{name:'Abrir visita 3D',exact:true}).click();
+    await page.locator('.soy-visit[data-ready="true"]').waitFor();await capture('repeat-visit');
+    await page.evaluate(()=>window.__soyVisit.renderer.forceContextLoss());
+    await page.getByRole('heading',{name:'Vamos tentar novamente?'}).waitFor();
+    assert(await page.getByRole('timer').count()===1,'Context loss must preserve accessible countdown');
+    report.failures.push('Context loss: useful lightweight fallback and countdown; renderer disposed');
+    await page.getByRole('button',{name:'Tentar novamente',exact:true}).click();
+    await page.locator('.soy-visit[data-ready="true"]').waitFor();report.failures.push('Context loss retry: new scene ready');
+    report.errors=errors;await context.close();save();
+
+    for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
+      const c=await browser.newContext({viewport,deviceScaleFactor:1});const p=await c.newPage();
+      const urls=[];p.on('request',r=>urls.push(r.url()));
+      await p.goto(base+'/portal',{waitUntil:'domcontentloaded',timeout:120000});
+      const skip=p.getByRole('button',{name:'Pular animação e mostrar a contagem oficial'});
+      await p.locator('.portal-official-countdown').first().waitFor({state:'attached',timeout:90000});
+      await p.waitForFunction(()=>document.querySelector('.portal-event-switcher__toggle')||Array.from(document.querySelectorAll('button')).some(b=>b.getAttribute('aria-label')==='Pular animação e mostrar a contagem oficial'),{timeout:90000});
+      if(await skip.isVisible())await skip.click();
+      await p.getByRole('button',{name:'Ver contagem do Soy Summit'}).waitFor({timeout:60000});
+      await p.waitForTimeout(500);
+      await p.evaluate(()=>window.scrollTo(0,0));await p.waitForTimeout(100);
+      const before=await p.locator('.portal-event-switcher').boundingBox();
+      await p.screenshot({path:path.join(out,`portal-fenasoja-${viewport.width}.png`)});
+      const prior=new Set(urls);
+      const toggle=p.getByRole('button',{name:'Ver contagem do Soy Summit'});await toggle.focus();await p.keyboard.press('Enter');
+      await p.getByRole('heading',{name:'SOY SUMMIT 2027'}).waitFor();await p.waitForTimeout(400);
+      const card=p.getByRole('button',{name:/Destacar dias:/});await card.focus();await p.keyboard.press('Enter');
+      assert(await card.getAttribute('aria-pressed')==='true','Portal card keyboard highlight failed');
+      await p.keyboard.press('Enter');
+      const after=await p.locator('.portal-event-switcher').boundingBox();
+      assert(before.width===after.width&&before.height===after.height&&before.y===after.y,'Portal toggle changed layout');
+      await p.screenshot({path:path.join(out,`portal-soy-${viewport.width}.png`)});
+      const added=urls.filter(u=>!prior.has(u));
+      assert(!added.some(u=>/VenueScene|venue-renderer|stage-static|stage-reveal|GLTFLoader|people\/|banner\.webp|mural-|maps-three|three\/|auditorium/.test(u)),'Toggle fetched 3D resources');
+      assert(await p.getByRole('timer').count()===1,'Two visible countdowns');
+      await p.getByRole('button',{name:'Ver contagem da Fenasoja'}).click();
+      assert(await p.getByRole('button',{name:'Abrir contagem oficial da Fenasoja 2028'}).isVisible(),'Fenasoja expansion lost');
+      await p.reload();
+      await p.locator('.portal-official-countdown').first().waitFor({state:'attached',timeout:90000});
+      if(await skip.isVisible())await skip.click();
+      await p.getByRole('button',{name:'Ver contagem do Soy Summit'}).waitFor({timeout:60000});
+      report.portal.push({viewport,before,after,added,allRequests:urls});await c.close();save();
+    }
+    const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,reducedMotion:'reduce'});
+    const mp=await mobile.newPage();await mp.goto(base+'/__dev/soy-summit',{waitUntil:'domcontentloaded'});
+    await mp.locator('.soy-visit[data-ready="true"]').waitFor({timeout:60000});
+    await mp.screenshot({path:path.join(out,'mobile-exterior.png')});
+    await mp.getByRole('button',{name:'Ver contagem',exact:true}).tap();
+    await mp.waitForFunction(()=>window.__soyVisit?.diagnostics().node==='panel'&&!window.__soyVisit.diagnostics().moving);
+    await mp.screenshot({path:path.join(out,'mobile-panel.png')});
+    assert(await mp.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Mobile horizontal overflow');
+    const look=await mp.locator('canvas').boundingBox(),touch=await mobile.newCDPSession(mp);
+    const orientation=await mp.evaluate(()=>window.__soyVisit.camera.quaternion.toArray());
+    await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:look.x+120,y:look.y+230}]});
+    await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:look.x+180,y:look.y+240}]});
+    await touch.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+    const rotated=await mp.evaluate(()=>window.__soyVisit.camera.quaternion.toArray());
+    assert(JSON.stringify(orientation)!==JSON.stringify(rotated),'Touch drag did not rotate view');
+    await mp.mouse.move(look.x+220,look.y+260);
+    assert(JSON.stringify(rotated)===JSON.stringify(await mp.evaluate(()=>window.__soyVisit.camera.quaternion.toArray())),'Touch cancel left dragging active');
+    report.mobile={...await mp.evaluate(()=>window.__soyVisit.diagnostics()),touchDrag:true,touchCancel:true};await mobile.close();save();
+    const failure=await browser.newContext({reducedMotion:'reduce'}),fp=await failure.newPage();
+    await fp.route('**/soy-summit/banner.webp',r=>r.abort());await fp.goto(base+'/__dev/soy-summit');
+    await fp.getByRole('heading',{name:'Vamos tentar novamente?'}).waitFor();
+    assert(await fp.getByRole('timer').count()===1,'Asset error lost countdown');report.failures.push('Banner load failure: fallback with clock');
+    await failure.close();
+    const unsupported=await browser.newContext(),up=await unsupported.newPage();
+    await up.addInitScript(()=>{const get=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){return /webgl/.test(type)?null:get.call(this,type,...args)}});
+    await up.goto(base+'/__dev/soy-summit');await up.getByRole('heading',{name:'Vamos tentar novamente?'}).waitFor();
+    assert(await up.getByRole('timer').count()===1,'No-WebGL fallback lost clock');report.failures.push('WebGL unavailable: accessible clock and useful fallback');await unsupported.close();
+    const auth=await browser.newContext(),ap=await auth.newPage();const protectedRequests=[];ap.on('request',r=>protectedRequests.push(r.url()));
+    await ap.goto(base+'/comissoes/soy-summit/centro-civico-3d');await ap.getByRole('button',{name:/Entrar no sistema/}).waitFor({timeout:60000});
+    assert(!protectedRequests.some(u=>u.includes('VenueScene')),'Unauthorized route loaded scene');
+    await ap.reload();await ap.getByRole('button',{name:/Entrar no sistema/}).waitFor();
+    report.access={unauthenticated:'login after direct access and reload',sceneLoaded:false,authorizedSession:'not available; local dev route exercises the same scene'};
+    await auth.close();save();
+    console.log('Validation complete');
+  } finally {save();await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1});

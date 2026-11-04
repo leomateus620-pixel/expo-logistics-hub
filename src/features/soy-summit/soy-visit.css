@@ -1,0 +1,61 @@
+.soy-visit{--soy-green:#073d32;--soy-cream:#f5f1e5;background:#f5f1e5;color:#173b32;min-height:100dvh;display:flex;flex-direction:column;font-family:Inter,Arial,sans-serif}
+.soy-visit:fullscreen{height:100dvh;overflow:auto}
+.soy-visit button,.soy-visit a,.soy-visit select{touch-action:manipulation}
+.soy-visit button:focus-visible,.soy-visit a:focus-visible,.soy-visit select:focus-visible,.soy-visit canvas:focus-visible{outline:3px solid #ba8521;outline-offset:3px}
+.soy-visit button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:44px;min-height:44px;border-radius:8px;font-size:12px;font-weight:600;padding:8px 12px;transition:background 160ms}
+.soy-visit button:disabled{opacity:.48;cursor:default}
+.soy-visit button svg{width:18px;height:18px;flex-shrink:0}
+.soy-visit__header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 24px;border-bottom:1px solid #073d321a;background:#f5f1e5;z-index:4}
+.soy-visit__back{display:flex;align-items:center;gap:8px;min-height:44px;font-size:12px;font-weight:600;color:#174d3f;text-decoration:none;flex-shrink:0}
+.soy-visit__back svg{width:18px}
+.soy-visit__identity{text-align:center}
+.soy-visit__identity>span{font-size:10px;letter-spacing:.18em;font-weight:800;color:#7b642f}
+.soy-visit__identity h1{font-family:'Soy Archivo',Arial,sans-serif;font-size:22px;letter-spacing:-.04em;line-height:1.2;margin:3px 0}
+.soy-visit__identity p{font-size:10px;color:#64736a;margin:0}
+.soy-visit__header-actions{display:flex;align-items:center;gap:6px}
+.soy-visit__header-actions button{border:1px solid #073d3222}
+.soy-visit__viewport{position:relative;min-height:400px;height:calc(100dvh - 210px);flex:1;background:#c5deec;overflow:hidden;isolation:isolate}
+.soy-visit__canvas{width:100%;height:100%;display:block;touch-action:none;position:absolute;inset:0;outline-offset:-4px!important}
+.soy-visit__hotspots{position:absolute;inset:0;pointer-events:none;z-index:2}
+.soy-visit .soy-visit__hotspot{position:absolute;pointer-events:auto;transform:translate(-50%,-50%);min-height:44px;background:#073d32e8;color:#fff9e5;border:1px solid #fff8;box-shadow:0 4px 18px #0003;padding:8px 14px;border-radius:24px;white-space:nowrap;font-size:11px}
+.soy-visit .soy-visit__hotspot[hidden]{display:none}
+.soy-visit__hotspot:before{content:'';width:7px;height:7px;border-radius:50%;background:#e4c266}
+.soy-visit__location{position:absolute;left:24px;top:22px;display:grid;gap:4px;background:#f5f1e5ec;border:1px solid #fff9;backdrop-filter:blur(8px);border-radius:10px;padding:12px 16px;box-shadow:0 4px 22px #0001;pointer-events:none}
+.soy-visit__location span{font-size:9px;letter-spacing:.16em;font-weight:700;color:#7c6b44}
+.soy-visit__location strong{font-size:14px;font-weight:600}
+.soy-visit__quick{position:absolute;top:22px;right:24px;display:flex;gap:6px}
+.soy-visit__quick button{background:#f5f1e5ec;border:1px solid #fff9;box-shadow:0 4px 22px #0001}
+.soy-visit__help{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;max-width:90%;padding:4px 6px 4px 18px;background:#f5f1e5f2;border:1px solid #fff9;border-radius:30px;box-shadow:0 4px 24px #0002}
+.soy-visit__help p{font-size:12px;line-height:1.5;max-width:420px;margin:0}
+.soy-visit__moving{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);font-size:12px;background:#073d32eb;color:#f5f1e5;padding:10px 18px;border-radius:24px;white-space:nowrap}
+.soy-visit__presentation{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;padding:8px 10px 8px 20px;background:#f5f1e5f2;border:1px solid #bca35c;border-radius:14px;box-shadow:0 4px 24px #0003;max-width:calc(100% - 24px)}
+.soy-visit__presentation>span{font-size:12px;white-space:nowrap}.soy-visit__presentation button{background:#073d32;color:#fff3cb;min-height:44px;white-space:nowrap}
+.soy-visit__replay{position:absolute;left:24px;bottom:22px;background:#f5f1e5ee;font-size:11px;min-height:44px}
+@media(max-width:600px){.soy-visit__presentation{bottom:80px;gap:6px;padding:7px 8px;flex-direction:column;width:max-content}.soy-visit__replay{left:12px;bottom:18px}.soy-visit__help:has(+.soy-visit__replay){bottom:78px}}
+.soy-visit__loading{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;gap:12px;background:#f5f1e5;color:#073d32;font-size:14px}
+.soy-visit__loader{width:20px;height:20px;border:2px solid #073d3233;border-top-color:#073d32;border-radius:50%;animation:soy-prepare 1s linear infinite}
+@keyframes soy-prepare{to{transform:rotate(360deg)}}
+.soy-visit__controls{display:flex;justify-content:space-between;gap:16px;padding:13px 24px;border-top:1px solid #073d3220;background:#f5f1e5;z-index:4}
+.soy-visit__paths{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.soy-visit__paths button{background:#073d32;color:#f5f1e5;min-height:46px}
+.soy-visit__tools{display:flex;align-items:center;gap:18px}
+.soy-visit__look{display:flex;gap:2px;border:1px solid #073d3222;border-radius:8px}
+.soy-visit__look button{padding:7px;min-width:40px}
+.soy-visit__quality{display:grid;gap:2px;font-size:10px;color:#64736a}
+.soy-visit__quality>span{position:absolute;width:1px;height:1px;overflow:hidden}
+.soy-visit__quality select{color:#173b32;background:transparent;min-height:32px;font-size:12px;border:0;max-width:160px;padding:3px}
+.soy-visit__quality small{font-size:9px;padding-left:3px}
+.soy-visit__note{padding:2px 20px 10px;margin:0;text-align:center;font-size:10px;color:#64736a;background:#f5f1e5}
+.soy-visit__fallback{min-height:100%;padding:36px max(20px,calc((100% - 1000px)/2));display:grid;gap:24px;background:#eee9db;overflow:auto;height:100%}
+.soy-visit__fallback h2{font-size:26px;font-weight:700;margin:8px 0}
+.soy-visit__fallback p{font-size:14px;line-height:1.6}
+.soy-visit__fallback button{background:#073d32;color:#f5f1e5;margin-top:12px}
+.soy-visit__fallback .soy-countdown{min-height:300px}
+.soy-visit__fallback figure img{width:100%;border-radius:12px;max-height:300px;object-fit:cover}
+.soy-visit__fallback figcaption{font-size:11px;margin-top:8px}
+.soy-visit__eyebrow{letter-spacing:.15em;font-size:10px!important;color:#7b642f;font-weight:700}
+.soy-visit-entry{display:flex;align-items:center;gap:14px;margin:0 0 20px;padding:16px 20px;border:1px solid #c7b77f;border-radius:14px;background:linear-gradient(110deg,#f5f1e5,#e7e8d5);color:#073d32;text-decoration:none}
+.soy-visit-entry>svg{width:26px;height:26px}.soy-visit-entry span{display:grid;gap:4px}.soy-visit-entry strong{font-size:15px}.soy-visit-entry small{font-size:12px}.soy-visit-entry:focus-visible{outline:3px solid #c59b34;outline-offset:3px}
+@media(max-width:900px){.soy-visit__header{padding:12px 16px;gap:10px}.soy-visit__identity p{max-width:260px}.soy-visit__back span{display:none}.soy-visit__controls{flex-wrap:wrap;padding:10px 16px;gap:10px}.soy-visit__paths{flex:1}.soy-visit__tools{gap:10px}.soy-visit__viewport{height:calc(100dvh - 240px)}.soy-visit__location{left:14px;top:14px}.soy-visit__quick{right:14px;top:14px}.soy-visit__quick button span{display:none}}
+@media(max-width:600px){.soy-visit__header{padding:10px 12px}.soy-visit__identity{text-align:left;flex:1}.soy-visit__identity h1{font-size:18px}.soy-visit__identity p{font-size:9px;max-width:220px}.soy-visit__header-actions button span{display:none}.soy-visit__viewport{min-height:410px;height:calc(100svh - 290px)}.soy-visit__location{padding:9px 12px}.soy-visit__location strong{font-size:12px}.soy-visit__quick{top:auto;bottom:18px;right:12px}.soy-visit__help{bottom:78px;min-width:90%;padding-left:12px}.soy-visit__help p{font-size:11px}.soy-visit__moving{bottom:132px}.soy-visit__paths{flex-basis:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.soy-visit__paths button{font-size:11px;padding:8px}.soy-visit__tools{width:100%;justify-content:space-between}.soy-visit__look button{min-width:44px}.soy-visit__controls{padding:10px 12px calc(5px + env(safe-area-inset-bottom))}.soy-visit__note{font-size:9px;padding:6px 16px}.soy-visit__fallback{padding:24px 16px}}
+@media(prefers-reduced-motion:reduce){.soy-visit button{transition:none}.soy-visit__loader{animation:none}}

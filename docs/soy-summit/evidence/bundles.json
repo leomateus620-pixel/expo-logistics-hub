@@ -1,0 +1,122 @@
+{
+  "baseline": [
+    {
+      "name": "CommissionPortalPage-INafbYjf.css",
+      "bytes": 62949,
+      "gzipBytes": 11990
+    },
+    {
+      "name": "CommissionPortalPage-ZYKsLuyy.js",
+      "bytes": 68525,
+      "gzipBytes": 23397
+    },
+    {
+      "name": "index-BuRC0o2_.css",
+      "bytes": 461839,
+      "gzipBytes": 73850
+    },
+    {
+      "name": "index-jguQwfnF.js",
+      "bytes": 657531,
+      "gzipBytes": 177126
+    },
+    {
+      "name": "maps-three-DEtfz4-t.js",
+      "bytes": 1209425,
+      "gzipBytes": 362008
+    }
+  ],
+  "head": [
+    {
+      "name": "auditorium-DcsN08k_.js",
+      "bytes": 3419,
+      "gzipBytes": 1597
+    },
+    {
+      "name": "CommissionPortalPage-D2alA04d.js",
+      "bytes": 69748,
+      "gzipBytes": 23822
+    },
+    {
+      "name": "CommissionPortalPage-INafbYjf.css",
+      "bytes": 62949,
+      "gzipBytes": 11990
+    },
+    {
+      "name": "hall--VKAwoQj.js",
+      "bytes": 2538,
+      "gzipBytes": 1220
+    },
+    {
+      "name": "index-BEAef2x6.css",
+      "bytes": 462224,
+      "gzipBytes": 73912
+    },
+    {
+      "name": "index-BuAUyCJk.js",
+      "bytes": 658044,
+      "gzipBytes": 177292
+    },
+    {
+      "name": "maps-three-CqmvnFd9.js",
+      "bytes": 1211280,
+      "gzipBytes": 362788
+    },
+    {
+      "name": "soy-summit-jKN30lwE.js",
+      "bytes": 873,
+      "gzipBytes": 555
+    },
+    {
+      "name": "SoySummitCountdown-bIyAI7VL.css",
+      "bytes": 5179,
+      "gzipBytes": 1784
+    },
+    {
+      "name": "SoySummitCountdown-BJk0Cnn5.js",
+      "bytes": 3370,
+      "gzipBytes": 1647
+    },
+    {
+      "name": "SoySummitVisitPage-CTSDZqn2.css",
+      "bytes": 8321,
+      "gzipBytes": 2239
+    },
+    {
+      "name": "SoySummitVisitPage-DalV5Ajc.js",
+      "bytes": 12158,
+      "gzipBytes": 4638
+    },
+    {
+      "name": "stage-reveal-J2puJ78A.js",
+      "bytes": 8676,
+      "gzipBytes": 3733
+    },
+    {
+      "name": "VenueScene-CdRfgsl6.js",
+      "bytes": 35458,
+      "gzipBytes": 13147
+    }
+  ],
+  "portalStaticGraph": [
+    "CommissionPortalPage-D2alA04d.js",
+    "module-runtime-CEDABylm.js",
+    "react-vendor-DTjdp-YJ.js",
+    "index-BuAUyCJk.js",
+    "personPhotos-fuUHi2HM.js",
+    "log-in-pKTBQ-YT.js",
+    "fenasoja-symbol-144-BrliEKTf.js",
+    "SoySummitCountdown-BJk0Cnn5.js",
+    "fenasoja-countdown-navigation-DeqNFomk.js",
+    "arrow-up-right-Bct83BO6.js",
+    "skip-forward-5TM4T_Cs.js",
+    "data-vendor-CBNA2-i9.js",
+    "commercialMapQueryKey-blkUQKRg.js",
+    "play-CwrVQFSI.js",
+    "pause-CfmRokLr.js",
+    "ui-radix-Cn1D5iha.js",
+    "soy-summit-jKN30lwE.js"
+  ],
+  "venueInPortalGraph": [],
+  "note": "Static bundle sizes are not traffic measurements. The pre-existing Alvorada intro can dynamically load maps-three."
+}
