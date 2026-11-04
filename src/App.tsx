@@ -115,6 +115,7 @@ const UnsubscribePage = lazyWithRetry(() => import('./pages/UnsubscribePage'));
 const CommissionPortalPage = lazyWithRetry(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazyWithRetry(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
 const CommissionWorkspacePage = lazyWithRetry(() => import('./pages/commissions/CommissionWorkspacePage'));
+const SoySummitVisitPage = lazyWithRetry(() => import('./features/soy-summit/SoySummitVisitPage'));
 const CommissionAgendaPreviewPage = (import.meta.env.DEV || import.meta.env.VITE_COMMERCIAL_MAP_DIAGNOSTICS === 'true')
   ? lazyWithRetry(() => import('./features/commission-agenda/dev/CommissionAgendaPreviewPage'))
   : null;
@@ -355,7 +356,10 @@ function CommissionModuleRoutes() {
         <OrgGuard>
           <ModuleAccessGuard module={module}>
             <Suspended>
-              <CommissionWorkspacePage module={module} entry={officialUnit.entry} />
+              {officialUnit.entry.id === 'soy-summit' ? <Routes>
+                <Route path="centro-civico-3d" element={<SoySummitVisitPage />} />
+                <Route path="*" element={<CommissionWorkspacePage module={module} entry={officialUnit.entry} />} />
+              </Routes> : <CommissionWorkspacePage module={module} entry={officialUnit.entry} />}
             </Suspended>
           </ModuleAccessGuard>
         </OrgGuard>
@@ -507,6 +511,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<RootRoute />} />
               <Route path="/portal" element={<Suspended><CommissionPortalPage /></Suspended>} />
+              {import.meta.env.DEV && <Route path="/__dev/soy-summit" element={<Suspended><SoySummitVisitPage /></Suspended>} />}
               <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
               <Route path="/unsubscribe" element={<Suspended><UnsubscribePage /></Suspended>} />
               <Route path="/login/admin" element={<LoginPage />} />

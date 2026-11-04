@@ -1,0 +1,16 @@
+[
+  {
+    "file": "public/soy-summit/people/usher-left.glb",
+    "bytes": 4018336,
+    "sourceBytes": 8444180,
+    "textures": 9,
+    "triangles": 46820
+  },
+  {
+    "file": "public/soy-summit/people/usher-right.glb",
+    "bytes": 4094680,
+    "sourceBytes": 8471828,
+    "textures": 9,
+    "triangles": 47154
+  }
+]

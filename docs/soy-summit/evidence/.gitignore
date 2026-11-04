@@ -1,0 +1,9 @@
+# Keep compact, reviewed evidence in Git. Raw local runs remain available here.
+*.log
+*.png
+baseline.json
+baseline-tests.json
+browser-validation.json
+first-inspection.json
+focused-tests.json
+integration-tests-raw.json

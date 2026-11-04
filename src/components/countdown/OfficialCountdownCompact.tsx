@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, CalendarDays } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, ArrowLeftRight } from 'lucide-react';
+import { SoySummitCountdown } from './SoySummitCountdown';
 import { useNavigate } from 'react-router-dom';
 import { OfficialCountdownDigits } from '@/components/countdown/OfficialCountdownDigits';
 import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
@@ -24,7 +25,7 @@ interface OfficialCountdownCompactProps {
   concealed?: boolean;
 }
 
-export const OfficialCountdownCompact = memo(function OfficialCountdownCompact({
+const FenasojaCountdownCompact = memo(function FenasojaCountdownCompact({
   concealed = false,
 }: OfficialCountdownCompactProps) {
   const navigate = useNavigate();
@@ -119,4 +120,21 @@ export const OfficialCountdownCompact = memo(function OfficialCountdownCompact({
       )}
     </section>
   );
+});
+
+/** The Fenasoja layout reserves identical space for both events; selection is view-local. */
+export const OfficialCountdownCompact = memo(function OfficialCountdownCompact(props: OfficialCountdownCompactProps) {
+  const [soy, setSoy] = useState(false);
+  return <div className="portal-event-switcher" data-event={soy ? 'soy' : 'fenasoja'}
+    {...(props.concealed ? { 'aria-hidden': true, inert: '' } as Record<string, unknown> : {})}>
+    <div style={{ display: 'contents' }} {...(soy ? { 'aria-hidden': true, inert: '' } as Record<string, unknown> : {})}>
+      <FenasojaCountdownCompact {...props} />
+    </div>
+    {soy && <div className="portal-event-switcher__soy"><SoySummitCountdown compact /></div>}
+    {!props.concealed && <button type="button" className="portal-event-switcher__toggle"
+      aria-label={soy ? 'Ver contagem da Fenasoja' : 'Ver contagem do Soy Summit'}
+      title={soy ? 'Ver contagem da Fenasoja' : 'Ver contagem do Soy Summit'} onClick={() => setSoy(current => !current)}>
+      <ArrowLeftRight aria-hidden="true" />
+    </button>}
+  </div>;
 });

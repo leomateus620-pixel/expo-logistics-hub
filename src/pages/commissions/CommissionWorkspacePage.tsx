@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { CalendarPlus, MapPinned } from 'lucide-react';
+import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { CalendarPlus, MapPinned, Building2, ArrowUpRight } from 'lucide-react';
+import { SOY_SUMMIT_ROUTE } from '@/config/soy-summit';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { getCommissionMapPortal } from '@/modules/commissions/commissionMapPortalRegistry';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
@@ -129,8 +130,11 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
       mapPortal && hasCapability(mapPortal.capability)
         ? [{ label: 'Mapa Comercial', path: mapPortal.mapPath, description: 'Mapa comercial do segmento.', icon: MapPinned }]
         : [],
+      entry.id === 'soy-summit'
+        ? [{ label: 'Centro Cívico 3D', path: SOY_SUMMIT_ROUTE, description: 'Visita ao Centro Cívico e contagem do Soy Summit 2027.', icon: Building2 }]
+        : [],
     ),
-    [navigation, mapPortal, hasCapability],
+    [navigation, mapPortal, hasCapability, entry.id],
   );
 
   const agendaPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.agenda}`;
@@ -287,6 +291,12 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         action={{ label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
       >
         <PageTransition>
+          {entry.id === 'soy-summit' && section === 'overview' && <Link to={SOY_SUMMIT_ROUTE}
+            className="mb-5 flex min-h-16 items-center gap-3 rounded-xl border border-amber-700/20 bg-amber-50 p-4 text-emerald-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
+            <Building2 className="h-6 w-6 shrink-0" aria-hidden="true" />
+            <span className="flex-1"><strong className="block text-sm">Centro Cívico 3D</strong><span className="text-xs">Conheça o espaço do Soy Summit 2027 e acompanhe a contagem oficial.</span></span>
+            <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
+          </Link>}
           <Routes>
             <Route index element={<Navigate to={overviewPath} replace />} />
             <Route

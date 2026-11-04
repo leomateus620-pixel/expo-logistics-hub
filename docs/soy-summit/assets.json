@@ -1,0 +1,72 @@
+[
+  {
+    "file": "public/soy-summit/banner.webp",
+    "destination": "exterior",
+    "width": 1400,
+    "height": 1200,
+    "format": "webp",
+    "alpha": false,
+    "bytes": 54742,
+    "source": "Creative Production deterministic 7:6 static event banner"
+  },
+  {
+    "file": "public/soy-summit/brand.webp",
+    "destination": "portal and lightweight fallback",
+    "width": 480,
+    "height": 116,
+    "format": "webp",
+    "alpha": true,
+    "bytes": 11846,
+    "source": "Official repository symbol unchanged; institutional wordmark composed with existing Archivo Black (substitute, not an original logo vector)"
+  },
+  {
+    "file": "public/soy-summit/exterior-preview.webp",
+    "destination": "lightweight fallback",
+    "width": 1200,
+    "height": 635,
+    "format": "webp",
+    "alpha": false,
+    "bytes": 61562,
+    "source": "Screenshot of actual reconstructed scene; lightweight fallback only"
+  },
+  {
+    "file": "public/soy-summit/grain-sky-mobile.webp",
+    "destination": "portal and lightweight fallback",
+    "width": 720,
+    "height": 720,
+    "format": "webp",
+    "alpha": false,
+    "bytes": 17604,
+    "source": "Central square crop of the same ImageGen master, 720×720; clear sky and grains retain contrast behind mobile cards"
+  },
+  {
+    "file": "public/soy-summit/grain-sky-portal.webp",
+    "destination": "portal and lightweight fallback",
+    "width": 1400,
+    "height": 700,
+    "format": "webp",
+    "alpha": false,
+    "bytes": 53762,
+    "source": "Native ImageGen decorative master: abundant natural golden soybeans and pale blue/white sky; resized 1400px, no generated text or logo"
+  },
+  {
+    "file": "public/soy-summit/mural-reference-v2.webp",
+    "destination": "exterior",
+    "width": 2020,
+    "height": 778,
+    "format": "webp",
+    "alpha": false,
+    "bytes": 429458,
+    "source": "ImageGen rectification/reconstruction of user facade crop, approximate artwork; no original mural file available"
+  },
+  {
+    "file": "public/soy-summit/stage-static.webp",
+    "destination": "auditorium",
+    "width": 2000,
+    "height": 900,
+    "format": "webp",
+    "alpha": false,
+    "bytes": 123468,
+    "source": "Creative Production deterministic 20:9 composition: generated soybean/sky background, central ivory light, official symbol and exact title/date; dynamic values and physical cards remain separate"
+  }
+]
