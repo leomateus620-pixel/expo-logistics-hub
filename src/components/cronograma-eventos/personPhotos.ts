@@ -46,6 +46,11 @@ import miltonRacho from '@/assets/person-milton-racho.webp.asset.json';
 import vanessaPeripolli from '@/assets/person-vanessa-peripolli.webp.asset.json';
 import dianaSchmidtNedel from '@/assets/person-diana-schmidt-nedel.png.asset.json';
 import robertoRacho from '@/assets/person-roberto-racho.jpeg.asset.json';
+import carlaServat from '@/assets/person-carla-servat.webp.asset.json';
+import paolaKulzer from '@/assets/person-paola-kulzer.webp.asset.json';
+import andressaKunzler from '@/assets/person-andressa-kunzler.webp.asset.json';
+import diovanaLorenzato from '@/assets/person-diovana-lorenzato.webp.asset.json';
+import lucasTolazzi from '@/assets/person-lucas-tolazzi.webp.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
@@ -111,6 +116,12 @@ const PERSON_PHOTOS: Record<string, string> = {
   'diana schmidt nedel': dianaSchmidtNedel.url,
   'roberto adriano racho': robertoRacho.url,
   'roberto racho': robertoRacho.url,
+  // Equipe Soja Store.
+  'carla freisleben servat': carlaServat.url,
+  'paola johann kulzer': paolaKulzer.url,
+  'andressa kunzler': andressaKunzler.url,
+  'diovana lorenzato': diovanaLorenzato.url,
+  'lucas tolazzi': lucasTolazzi.url,
 };
 
 const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
@@ -175,6 +186,7 @@ const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
   '2e229647-0db7-451d-800c-395190471751': vanessaPeripolli.url,
   'd2966417-dc6b-405d-813d-682a780c33c5': dianaSchmidtNedel.url,
   'e639a24f-e68d-48ab-a76e-1763b966b3ed': robertoRacho.url,
+  'f0520c35-6ce5-470d-b7ce-d8bc62c45d2f': carlaServat.url,
 };
 
 function normalize(value: string): string {
