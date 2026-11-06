@@ -2157,6 +2157,50 @@ export type Database = {
           },
         ]
       }
+      commission_people: {
+        Row: {
+          avatar_path: string | null
+          created_at: string
+          display_name: string
+          id: string
+          legacy_photo: boolean
+          org_id: string
+          updated_at: string
+          user_id: string | null
+          version: number
+        }
+        Insert: {
+          avatar_path?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          legacy_photo?: boolean
+          org_id: string
+          updated_at?: string
+          user_id?: string | null
+          version?: number
+        }
+        Update: {
+          avatar_path?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          legacy_photo?: boolean
+          org_id?: string
+          updated_at?: string
+          user_id?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commission_people_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commission_responsibles: {
         Row: {
           active: boolean
@@ -2168,10 +2212,12 @@ export type Database = {
           is_primary: boolean
           normalized_name: string | null
           org_id: string
+          person_id: string
           relationship_role: string
           responsible_type: string
           updated_at: string
           user_id: string | null
+          version: number
         }
         Insert: {
           active?: boolean
@@ -2183,10 +2229,12 @@ export type Database = {
           is_primary?: boolean
           normalized_name?: string | null
           org_id: string
+          person_id: string
           relationship_role?: string
           responsible_type?: string
           updated_at?: string
           user_id?: string | null
+          version?: number
         }
         Update: {
           active?: boolean
@@ -2198,10 +2246,12 @@ export type Database = {
           is_primary?: boolean
           normalized_name?: string | null
           org_id?: string
+          person_id?: string
           relationship_role?: string
           responsible_type?: string
           updated_at?: string
           user_id?: string | null
+          version?: number
         }
         Relationships: [
           {
@@ -2217,6 +2267,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_person_org_fk"
+            columns: ["person_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "commission_people"
+            referencedColumns: ["id", "org_id"]
           },
         ]
       }
@@ -2598,6 +2655,7 @@ export type Database = {
           name_snapshot: string | null
           org_id: string
           org_member_user_id: string | null
+          person_id: string | null
           responsible_type: string
           role: string | null
           updated_at: string
@@ -2610,6 +2668,7 @@ export type Database = {
           name_snapshot?: string | null
           org_id: string
           org_member_user_id?: string | null
+          person_id?: string | null
           responsible_type?: string
           role?: string | null
           updated_at?: string
@@ -2622,6 +2681,7 @@ export type Database = {
           name_snapshot?: string | null
           org_id?: string
           org_member_user_id?: string | null
+          person_id?: string | null
           responsible_type?: string
           role?: string | null
           updated_at?: string
@@ -2639,6 +2699,13 @@ export type Database = {
             columns: ["event_id", "org_id"]
             isOneToOne: false
             referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "cronograma_evento_responsaveis_person_org_fk"
+            columns: ["person_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "commission_people"
             referencedColumns: ["id", "org_id"]
           },
         ]
@@ -3122,6 +3189,7 @@ export type Database = {
           name_snapshot: string | null
           org_id: string
           org_member_user_id: string | null
+          person_id: string | null
           responsible_type: string
           role: string | null
           subevent_id: string
@@ -3134,6 +3202,7 @@ export type Database = {
           name_snapshot?: string | null
           org_id: string
           org_member_user_id?: string | null
+          person_id?: string | null
           responsible_type?: string
           role?: string | null
           subevent_id: string
@@ -3146,12 +3215,20 @@ export type Database = {
           name_snapshot?: string | null
           org_id?: string
           org_member_user_id?: string | null
+          person_id?: string | null
           responsible_type?: string
           role?: string | null
           subevent_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "cronograma_subevento_responsaveis_person_org_fk"
+            columns: ["person_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "commission_people"
+            referencedColumns: ["id", "org_id"]
+          },
           {
             foreignKeyName: "cronograma_subevento_responsaveis_subevent_id_fkey"
             columns: ["subevent_id"]
@@ -13858,6 +13935,68 @@ export type Database = {
         Args: { _form_id: string }
         Returns: undefined
       }
+      team_access_requests: { Args: { _org_id: string }; Returns: Json }
+      team_admin_contacts: { Args: { _commission_id: string }; Returns: Json }
+      team_avatar_commit: {
+        Args: {
+          _actor_id: string
+          _commission_id: string
+          _expected_version: number
+          _path: string
+          _person_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
+      team_avatar_forget: { Args: { _paths: string[] }; Returns: undefined }
+      team_avatar_orphans: { Args: never; Returns: string[] }
+      team_avatar_prepare: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _person_id: string
+          _request_id: string
+        }
+        Returns: Json
+      }
+      team_deactivate_volunteer: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _person_id: string
+        }
+        Returns: undefined
+      }
+      team_link_existing_person: {
+        Args: { _commission_id: string; _email: string; _person_id: string }
+        Returns: undefined
+      }
+      team_manageable_commission_ids: { Args: never; Returns: string[] }
+      team_reconciliation_requests: { Args: { _org_id: string }; Returns: Json }
+      team_request_access: {
+        Args: { _commission_id: string; _person_id: string }
+        Returns: Json
+      }
+      team_resolve_reconciliation: {
+        Args: { _person_id: string; _request_id: string }
+        Returns: undefined
+      }
+      team_save_volunteer: {
+        Args: {
+          _commission_id: string
+          _email: string
+          _expected_version?: number
+          _name: string
+          _person_id?: string
+          _request_id: string
+        }
+        Returns: Json
+      }
+      team_update_access_request: {
+        Args: { _expected_state: string; _request_id: string; _state: string }
+        Returns: undefined
+      }
+      team_visible_org_ids: { Args: never; Returns: string[] }
       update_commercial_lot: {
         Args: {
           p_expected_updated_at: string
