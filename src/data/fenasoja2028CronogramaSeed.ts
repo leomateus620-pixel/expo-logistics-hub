@@ -95,6 +95,9 @@ export interface CronogramaSubeventSeed {
     isPrimary?: boolean;
   }>;
   responsiblesRel?: Array<{
+    personId?: string | null;
+    avatarPath?: string | null;
+    legacyPhoto?: boolean;
     userId?: string | null;
     name?: string | null;
     role?: string | null;
@@ -147,6 +150,9 @@ export interface CronogramaEventSeed {
     isPrimary?: boolean;
   }>;
   responsiblesRel?: Array<{
+    personId?: string | null;
+    avatarPath?: string | null;
+    legacyPhoto?: boolean;
     userId?: string | null;
     name?: string | null;
     role?: string | null;

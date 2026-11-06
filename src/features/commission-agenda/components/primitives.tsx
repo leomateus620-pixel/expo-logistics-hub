@@ -1,3 +1,4 @@
+import {useInstitutionalIdentity} from '@/features/volunteers/InstitutionalPeopleProvider';
 import { forwardRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import {
   Ban,
@@ -36,9 +37,8 @@ interface PersonAvatarProps {
 }
 
 export function PersonAvatar({ person, size = 'md', tone = 'dark', primary = false, className }: PersonAvatarProps) {
-  const [failed, setFailed] = useState(false);
-  const photo = (person.userId ? getPersonPhoto(null, person.userId) : null)
-    ?? person.photoUrl ?? getPersonPhoto(person.name, person.userId);
+  const [failed, setFailed] = useState<string | null>(null);
+  const {photoUrl:photo} = useInstitutionalIdentity(person.personId,person.userId,person.name,person.photoUrl,person.legacyPhoto!==false);
   const label = person.role ? `${person.name} — ${person.role}` : person.name;
 
   return (
@@ -51,8 +51,8 @@ export function PersonAvatar({ person, size = 'md', tone = 'dark', primary = fal
       aria-label={label}
       title={label}
     >
-      {photo && !failed ? (
-        <img src={photo} alt="" aria-hidden="true" loading="lazy" decoding="async" draggable={false} onError={() => setFailed(true)} />
+      {photo && failed !== photo ? (
+        <img src={photo} alt="" aria-hidden="true" loading="lazy" decoding="async" draggable={false} onError={() => setFailed(photo)} />
       ) : (
         <span aria-hidden="true">{getInitials(person.name)}</span>
       )}

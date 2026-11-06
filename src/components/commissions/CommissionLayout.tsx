@@ -1,3 +1,4 @@
+import { withTeamMenu } from '@/features/volunteers/teamRoutes';
 import { type CSSProperties, type ReactNode, useState } from 'react';
 import CommissionSidebar from './CommissionSidebar';
 import CommissionWorkspaceSidebar from '@/features/commission-agenda/components/CommissionWorkspaceSidebar';
@@ -45,7 +46,7 @@ export default function CommissionLayout({ module, children, variant = 'standard
       <OfflineBanner />
       <Sidebar
         module={module}
-        menuItems={menuItems}
+        menuItems={module.sensitive ? menuItems : withTeamMenu(menuItems ?? module.menus)}
         mobileOpen={mobileOpen}
         onMobileOpen={() => setMobileOpen(true)}
         onMobileClose={() => setMobileOpen(false)}

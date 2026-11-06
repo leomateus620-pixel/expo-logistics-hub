@@ -1,3 +1,4 @@
+import { InstitutionalPeopleProvider } from '@/features/volunteers/InstitutionalPeopleProvider';
 import { deserializeQueryCache } from './lib/queryPersistence';
 import { Suspense, type ReactNode } from 'react';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
@@ -112,6 +113,8 @@ const PublicAreaMapPage = lazyWithRetry(async () => {
 });
 const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
 const UnsubscribePage = lazyWithRetry(() => import('./pages/UnsubscribePage'));
+const CommissionVolunteerTeamPage = lazyWithRetry(() => import('./pages/commissions/CommissionVolunteerTeamPage'));
+const TeamsDirectoryPage = lazyWithRetry(() => import('./pages/commissions/TeamsDirectoryPage'));
 const CommissionPortalPage = lazyWithRetry(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazyWithRetry(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
 const CommissionWorkspacePage = lazyWithRetry(() => import('./pages/commissions/CommissionWorkspacePage'));
@@ -504,12 +507,14 @@ const App = () => (
     <AuthProvider>
       <LogisticsCycleProvider>
        <CapabilitiesProvider>
-        <TooltipProvider>
+        <InstitutionalPeopleProvider><TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<RootRoute />} />
+              <Route path="/equipes" element={<AuthGuard><OrgGuard><Suspended><TeamsDirectoryPage /></Suspended></OrgGuard></AuthGuard>} />
+              <Route path="/comissoes/:moduleSlug/equipe" element={<AuthGuard><OrgGuard><Suspended><CommissionVolunteerTeamPage /></Suspended></OrgGuard></AuthGuard>} />
               <Route path="/portal" element={<Suspended><CommissionPortalPage /></Suspended>} />
               {import.meta.env.DEV && <Route path="/__dev/soy-summit" element={<Suspended><SoySummitVisitPage /></Suspended>} />}
               <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
@@ -551,7 +556,7 @@ const App = () => (
             <WorkersLauncher />
             <PushPermissionPrompt />
           </BrowserRouter>
-        </TooltipProvider>
+        </TooltipProvider></InstitutionalPeopleProvider>
        </CapabilitiesProvider>
       </LogisticsCycleProvider>
     </AuthProvider>

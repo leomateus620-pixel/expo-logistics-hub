@@ -47,3 +47,6 @@ project_id = "btfaumhroqtqzxomqorx"
   [functions.workers-commercial-reports]
     # User JWT is checked inside; the cron route requires an independent private token.
     verify_jwt = false
+
+  [functions.team-avatar]
+    verify_jwt = true

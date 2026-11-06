@@ -3,6 +3,9 @@ import { getPersonPhoto } from '@/components/cronograma-eventos/personPhotos';
 
 export interface CommissionPerson {
   id: string;
+  personId?: string;
+  photoUrl?: string | null;
+  legacyPhoto?: boolean;
   name: string;
   userId?: string | null;
   role?: string | null;
@@ -24,7 +27,7 @@ interface AvatarProps {
 }
 
 export function CommissionPersonAvatar({ person, variant = 'stack' }: AvatarProps) {
-  const photo = getPersonPhoto(person.name, person.userId);
+  const photo = person.photoUrl ?? (person.legacyPhoto !== false ? getPersonPhoto(person.name, person.userId) : null);
   const label = person.role ? `${person.name} — ${person.role}` : person.name;
 
   return (

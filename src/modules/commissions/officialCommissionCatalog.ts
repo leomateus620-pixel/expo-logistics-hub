@@ -563,6 +563,7 @@ for (const resolution of resolutions) {
   const keys = [
     resolution.entry.id,
     resolution.entry.moduleSlug,
+    resolution.entry.mapPortalSlug,
     ...resolution.entry.aliases,
     resolution.entry.name,
   ].filter(Boolean) as string[];

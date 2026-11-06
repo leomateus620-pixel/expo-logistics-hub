@@ -40,7 +40,7 @@ export function getEventResponsibleItems(event: CronogramaEvent): EventRelationI
   }
   return links
     .map((link, index) => ({
-      key: link.userId ?? `external-${index}`,
+      key: link.personId ? `person:${link.personId}` : link.userId ?? `external-${index}`,
       label: link.name?.trim() || 'Responsável',
       isPrimary: Boolean(link.isPrimary),
       isExternal: link.responsibleType === 'external' || !link.userId,
@@ -100,6 +100,7 @@ export function EventRelationList({
             >
               <PersonAvatar
                 name={item.label}
+                personId={item.key}
                 size="md"
                 className="cronograma-relation-item-icon"
                 fallback={(

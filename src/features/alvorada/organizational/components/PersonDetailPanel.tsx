@@ -6,6 +6,7 @@ import {
 } from '@/lib/org-units';
 import type { OrganizationalGraph, OrgNode, OrgPerson } from '../types';
 import { optimizedPortraitUrl } from '../optimizedPortrait';
+import { isSupportResponsibility, supportPersonIds } from '../teamPresentation';
 
 interface PersonDetailPanelProps {
   graph: OrganizationalGraph;
@@ -90,6 +91,23 @@ export function PersonDetailPanel({ graph, node, selectedPersonId, onPersonSelec
     || !node.personIds.includes(responsibility.personId)
     || !graph.people[responsibility.personId]
   ));
+  const supportIds = supportPersonIds(node);
+  const leaders = people.filter((person) => !supportIds.has(person.id));
+  const support = people.filter((person) => supportIds.has(person.id));
+  const peopleSections = [
+    {
+      id: 'leaders',
+      people: leaders,
+      label: leaders.length === 1 ? 'RESPONSÁVEL' : `${leaders.length} RESPONSÁVEIS`,
+      contextual: contextualResponsibilities.filter((item) => !isSupportResponsibility(item)),
+    },
+    {
+      id: 'support',
+      people: support,
+      label: 'EQUIPE DE APOIO — VOLUNTÁRIOS',
+      contextual: contextualResponsibilities.filter(isSupportResponsibility),
+    },
+  ];
   const selectedPerson = selectedPersonId ? graph.people[selectedPersonId] : null;
   const allowedNodeIds = new Set(graph.renderableNodeIds);
   const memberships = selectedPerson
@@ -142,14 +160,14 @@ export function PersonDetailPanel({ graph, node, selectedPersonId, onPersonSelec
         </section>
       )}
 
-      {people.length > 0 && (
-        <section className="org-detail__section" aria-labelledby="org-detail-people">
-          <div className="org-detail__section-title" id="org-detail-people">
+      {peopleSections.filter((section) => section.people.length > 0 || section.contextual.length > 0).map((section) => (
+        <section key={section.id} className="org-detail__section" aria-labelledby={`org-detail-${section.id}`}>
+          <div className="org-detail__section-title" id={`org-detail-${section.id}`}>
             <UsersRound aria-hidden="true" />
-            <span>{people.length === 1 ? 'RESPONSÁVEL' : `${people.length} RESPONSÁVEIS`}</span>
+            <span>{section.id === 'leaders' && section.people.length === 0 ? 'RESPONSABILIDADE REGISTRADA' : section.label}</span>
           </div>
           <div className="org-detail__people">
-            {people.map((person) => {
+            {section.people.map((person) => {
               const relationship = node.responsibilities.find((item) => item.personId === person.id);
               const roleSummary = node.type === 'executive'
                 ? presentationText(node.subtitle ?? 'PRESIDÊNCIA')
@@ -173,17 +191,8 @@ export function PersonDetailPanel({ graph, node, selectedPersonId, onPersonSelec
               );
             })}
           </div>
-        </section>
-      )}
-
-      {contextualResponsibilities.length > 0 && (
-        <section className="org-detail__section">
-          <div className="org-detail__section-title">
-            <UsersRound aria-hidden="true" />
-            <span>RESPONSABILIDADE REGISTRADA</span>
-          </div>
           <div className="org-detail__responsibilities">
-            {contextualResponsibilities.map((responsibility) => (
+            {section.contextual.map((responsibility) => (
               <p key={responsibility.id}>
                 <strong>{presentationText(responsibility.displayName)}</strong>
                 <span>{relationshipRoleLabel(responsibility.relationshipRole)}</span>
@@ -191,7 +200,7 @@ export function PersonDetailPanel({ graph, node, selectedPersonId, onPersonSelec
             ))}
           </div>
         </section>
-      )}
+      ))}
 
       {people.length === 0 && contextualResponsibilities.length === 0 && (
         <p className="org-detail__empty">

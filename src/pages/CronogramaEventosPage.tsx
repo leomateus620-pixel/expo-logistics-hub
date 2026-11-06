@@ -830,7 +830,8 @@ export default function CronogramaEventosPage() {
             relation_role: link.isPrimary ? ('principal' as const) : ('participante' as const),
           })),
           responsibles: (item.responsiblesRel ?? []).map((link) => ({
-            user_id: link.userId ?? null,
+            person_id: link.personId ?? null,
+            user_id: link.personId ? null : link.userId ?? null,
             name: link.name ?? null,
             role: link.role ?? null,
             is_primary: link.isPrimary ?? false,

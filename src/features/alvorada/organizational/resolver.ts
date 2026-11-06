@@ -1,4 +1,5 @@
 import { getPersonPhoto } from '@/components/cronograma-eventos/personPhotos';
+import { isSupportResponsibility } from './teamPresentation';
 import type {
   AuthorityLevel,
   OrgDataAnomaly,
@@ -95,6 +96,8 @@ interface PersonRegistry {
 }
 
 interface UpsertPersonInput {
+  personId?: string;
+  legacyPhoto?: boolean;
   fullName: string | null | undefined;
   userId?: string | null;
   avatarUrl?: string | null;
@@ -321,7 +324,7 @@ function upsertPerson(
   const byUniqueInstitutionalName = byUserId || byName
     ? undefined
     : findUniqueLikelyPersonId(registry, fullName, userId);
-  let personId = byUserId ?? byName ?? byUniqueInstitutionalName;
+  let personId = input.personId ? byUserId ?? `person:${input.personId}` : byUserId ?? byName ?? byUniqueInstitutionalName;
 
   if (nameHasConflictingUser && nameCandidateId) {
     addAnomaly(anomalies, {
@@ -332,7 +335,7 @@ function upsertPerson(
     });
   }
 
-  if (byUserId && byName && byUserId !== byName) {
+  if (!input.personId && byUserId && byName && byUserId !== byName) {
     // This is intentionally conservative: keep the user-backed identity and
     // report the competing name identity rather than silently joining graphs.
     personId = byUserId;
@@ -344,10 +347,10 @@ function upsertPerson(
     });
   }
 
-  if (!personId) {
-    personId = stablePersonId(userId, normalizedName);
+  if (!personId || !registry.people.has(personId)) {
+    personId = personId ?? stablePersonId(userId, normalizedName);
     if (!registry.people.has(personId)) {
-      const photo = input.avatarUrl ?? getPersonPhoto(fullName, userId);
+      const photo = input.avatarUrl ?? (input.legacyPhoto !== false ? getPersonPhoto(fullName, userId) : null);
       registry.people.set(personId, {
         id: personId,
         userId,
@@ -386,7 +389,8 @@ function upsertPerson(
     });
   }
 
-  chooseDisplayName(person, fullName, input.sourcePriority);
+  if (input.personId) person.fullName = fullName;
+  else chooseDisplayName(person, fullName, input.sourcePriority);
   person.normalizedNames.add(normalizedName);
   if (userId) {
     person.sourceUserIds.add(userId);
@@ -409,11 +413,8 @@ function upsertPerson(
     const value = nonEmpty(sourceId);
     if (value) person.sourceIdSet.add(value);
   });
-  // An explicitly registered institutional portrait (by user ID) wins everywhere.
-  const institutional = person.userId ? getPersonPhoto(null, person.userId) : null;
-  if (institutional) person.avatarUrl = institutional;
-  if (input.avatarUrl && !person.avatarUrl) person.avatarUrl = input.avatarUrl;
-  if (!person.avatarUrl) person.avatarUrl = getPersonPhoto(person.fullName, person.userId);
+  if(input.personId) person.avatarUrl=input.avatarUrl??(input.legacyPhoto!==false?getPersonPhoto(fullName,userId):null);
+  else if(!person.avatarUrl) person.avatarUrl=input.avatarUrl??getPersonPhoto(person.fullName,person.userId);
 
   return personId;
 }
@@ -856,6 +857,9 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
         registry,
         {
           fullName: responsible.displayName,
+          personId: responsible.personId,
+          avatarUrl: responsible.photoUrl,
+          legacyPhoto: responsible.legacyPhoto,
           userId: responsible.userId,
           roles: [responsible.relationshipRole, unit.name],
           sourceIds: [responsible.id, responsible.userId],
@@ -886,6 +890,9 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
     if (responsible.responsibleType !== 'pessoa') return [];
     const personId = upsertPerson(registry, {
       fullName: responsible.displayName,
+          personId: responsible.personId,
+          avatarUrl: responsible.photoUrl,
+          legacyPhoto: responsible.legacyPhoto,
       userId: responsible.userId,
       roles: [CCPF_SHORT_LABEL],
       sourceIds: [responsible.id, responsible.userId],
@@ -1093,7 +1100,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
       id: responsible.id,
       personId:
         responsible.responsibleType === 'pessoa'
-          ? personIdForIdentity(registry, responsible.displayName, responsible.userId)
+          ? (responsible.personId ? (responsible.userId ? registry.byUserId.get(responsible.userId) : undefined) ?? `person:${responsible.personId}` : personIdForIdentity(registry, responsible.displayName, responsible.userId))
           : null,
       displayName: responsible.displayName,
       responsibleType: responsible.responsibleType,
@@ -1108,7 +1115,10 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
       unit.type === 'assessoria'
       || (registry.people.get(personId)?.highestAuthorityLevel ?? 5) >= 4
     ));
-    personIds.forEach((personId) => addAuthority(registry.people.get(personId), 4));
+    personIds.forEach((personId) => {
+      const hasLeadership = responsibilities.some((item) => item.personId === personId && !isSupportResponsibility(item));
+      addAuthority(registry.people.get(personId), hasLeadership ? 4 : 5);
+    });
 
     nodes.push(
       node({

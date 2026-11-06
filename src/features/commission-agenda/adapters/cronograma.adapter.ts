@@ -85,7 +85,7 @@ function normalizeDate(value: string | null | undefined): string | null {
 }
 
 export function toPersonSummary(person: CommissionPerson): PersonSummary {
-  return { id: person.id, name: person.name, role: person.role ?? null, userId: person.userId ?? null };
+  return { id: person.id, personId: person.personId, photoUrl: person.photoUrl, legacyPhoto: person.legacyPhoto, name: person.name, role: person.role ?? null, userId: person.userId ?? null };
 }
 
 export function toUnitSummary(entry: Pick<OfficialUnitEntry, 'id' | 'name' | 'shortName' | 'type'>): UnitSummary {

@@ -646,6 +646,7 @@ export function RelationalMultiSelect({
                     ) : (
                       <PersonAvatar
                         name={option.label}
+                        personId={option.id}
                         size="md"
                         className="cronograma-relation-option__identity"
                         fallback={(
@@ -799,6 +800,7 @@ export function RelationalMultiSelect({
                 ) : (
                   <PersonAvatar
                     name={item.label}
+                    personId={item.id}
                     size="md"
                     className="cronograma-relation-selected__identity"
                     fallback={(

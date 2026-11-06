@@ -1,0 +1,137 @@
+{
+  "date": "2026-11-06",
+  "frontend": "local checkout codex/commission-volunteers at http://127.0.0.1:8080",
+  "backend": "btfaumhroqtqzxomqorx",
+  "lovableProject": "756eeb64-0d44-4171-b445-f8a60f0492c0",
+  "fixture": {
+    "organization": "4ddfc4ad-32a1-4f19-83dd-95f3d1db27f6",
+    "authenticatedUser": "c66a0ac3-ef21-413a-8aae-787907edb44e",
+    "role": "admin of isolated synthetic organization only",
+    "commission": "b871f293-ba22-438e-9d87-87da2c8ae5a6",
+    "person": "ffb523eb-1762-4dc4-9d5c-031c00491794",
+    "membership": "f360440c-0b07-4719-b72e-33f6033dd079"
+  },
+  "observed": {
+    "login": true,
+    "saveNameEmailPhoto": true,
+    "nativeFileChooser": true,
+    "circularCrop": true,
+    "serverConfirmed": true,
+    "persistedAfterReload": true,
+    "teamAvatar": true,
+    "unitAgendaOption": true,
+    "fenasojaAgendaNameAvatarUnit": true,
+    "ecosystemSupportSection": true,
+    "noEmailInPublicSelectors": true,
+    "signOutReturnedToLogin": true
+  },
+  "persistedBeforeCleanup": {
+    "people": 1,
+    "personVersion": 2,
+    "userId": null,
+    "memberships": 1,
+    "membershipVersion": 1,
+    "relationshipRole": "equipe_apoio",
+    "privateContacts": 1,
+    "storageObjects": 1,
+    "avatarRequests": 1,
+    "saveRequests": 1,
+    "auditRecords": 2,
+    "accessRequests": 0,
+    "reconciliationRequests": 0
+  },
+  "visualRegression": {
+    "finding": "The legacy Ecosystem rendered all memberships under Responsible, including support.",
+    "fix": "Separate leadership and support; keep unit title when only support exists; show volunteer count and preserve support authority level 5.",
+    "regressionTests": 2,
+    "relatedTestsPassed": 109
+  },
+  "events": {
+    "eventFormSubmissions": 0,
+    "automaticSeedEvents": 27,
+    "source": "Existing useCronogramaEventos auto-seed on initial Agenda opening as admin",
+    "years": {
+      "2026": 6,
+      "2027": 12,
+      "2028": 9
+    },
+    "allRemovedWithFixture": true,
+    "externalInvitesSent": 0
+  },
+  "fixtureInstitutionalVisibility": "Marked only the isolated synthetic commission official for the Ecosystem check; no real unit visibility changed.",
+  "cleanup": {
+    "lovableMessage": "umsg_01m6r7qcc3eh18qcpsbvqtewya",
+    "completed": true,
+    "storageDeleteStatus": 200,
+    "authDeleteStatus": 200,
+    "authReadAfterDeleteStatus": 404,
+    "remaining": {
+      "organizations": 0,
+      "members": 0,
+      "commissions": 0,
+      "people": 0,
+      "memberships": 0,
+      "events": 0,
+      "storage": 0,
+      "privateRows": 0,
+      "authUsers": 0,
+      "profiles": 0,
+      "capabilities": 0
+    },
+    "temporaryCredentialFileDeleted": true
+  },
+  "afterCleanupLegacyFingerprints": [
+    {
+      "checksum": "0c810489e8c162ed9f1a882e771f476f",
+      "relation": "commissions",
+      "rows": 39
+    },
+    {
+      "checksum": "5bc732b6b8d827d7424674727aaadbb7",
+      "relation": "commission_responsibles",
+      "rows": 64
+    },
+    {
+      "checksum": "6c4ed350ecaa397502083c0b34a62e32",
+      "relation": "cronograma_eventos",
+      "rows": 329
+    },
+    {
+      "checksum": "b88c164cca8792e64ef94f01d784d377",
+      "relation": "cronograma_evento_responsaveis",
+      "rows": 570
+    },
+    {
+      "checksum": "59edf1824e6189afe033ac8110c9d633",
+      "relation": "cronograma_subeventos",
+      "rows": 6
+    },
+    {
+      "checksum": "edf240ad96ec601685d00cf16ee70289",
+      "relation": "cronograma_subevento_responsaveis",
+      "rows": 1
+    },
+    {
+      "checksum": "a9c2f2ad965dd3d01e59b297e6c3594d",
+      "relation": "cronograma_evento_comissoes",
+      "rows": 377
+    },
+    {
+      "checksum": "e9feeab56842d41a8a67100cfa00f807",
+      "relation": "cronograma_subevento_comissoes",
+      "rows": 13
+    },
+    {
+      "checksum": "013979406da694b9231a4f9b7ae975a5",
+      "relation": "cronograma_subevento_convidados",
+      "rows": 2
+    }
+  ],
+  "allNineLegacyFingerprintsUnchanged": true,
+  "screenshots": [
+    "10-live-team.jpg",
+    "11-live-unit-agenda.jpg",
+    "12-live-agenda-selector.jpg",
+    "13-live-ecosystem.jpg"
+  ]
+}

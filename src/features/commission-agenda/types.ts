@@ -12,6 +12,8 @@ export type OrganizationalUnitType = 'comissao' | 'assessoria';
 export type OrganizationalUnitStatus = 'active' | 'structuring' | 'restricted';
 
 export interface PersonSummary {
+  personId?: string;
+  legacyPhoto?: boolean;
   id: string;
   name: string;
   role?: string | null;

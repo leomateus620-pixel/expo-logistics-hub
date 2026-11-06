@@ -13942,7 +13942,7 @@ export type Database = {
           _actor_id: string
           _commission_id: string
           _expected_version: number
-          _path: string
+          _path: string | null
           _person_id: string
           _request_id: string
         }
@@ -13978,16 +13978,16 @@ export type Database = {
         Returns: Json
       }
       team_resolve_reconciliation: {
-        Args: { _person_id: string; _request_id: string }
+        Args: { _person_id: string | null; _request_id: string }
         Returns: undefined
       }
       team_save_volunteer: {
         Args: {
           _commission_id: string
           _email: string
-          _expected_version?: number
+          _expected_version?: number | null
           _name: string
-          _person_id?: string
+          _person_id?: string | null
           _request_id: string
         }
         Returns: Json

@@ -106,6 +106,9 @@ export interface CronogramaEventCommissionLink {
 }
 
 export interface CronogramaEventResponsibleLink {
+  personId?: string | null;
+  avatarPath?: string | null;
+  legacyPhoto?: boolean;
   userId?: string | null;
   name?: string | null;
   role?: string | null;

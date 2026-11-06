@@ -1,3 +1,4 @@
+import {useInstitutionalIdentity} from '@/features/volunteers/InstitutionalPeopleProvider';
 import { useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { getPersonPhoto } from './personPhotos';
@@ -5,7 +6,10 @@ import '@/styles/cronograma-registration-interactions.css';
 
 interface PersonAvatarProps {
   name?: string | null;
+  personId?: string | null;
   userId?: string | null;
+  photoUrl?: string | null;
+  legacyPhoto?: boolean;
   /** Rendered when the person has no portrait or the image fails to load. */
   fallback: ReactNode;
   size?: 'xs' | 'sm' | 'md' | 'lg';
@@ -16,11 +20,11 @@ interface PersonAvatarProps {
  * Circular portrait for the members that have an official photo, with a safe
  * fallback to the module's existing initials/icon treatment.
  */
-export function PersonAvatar({ name, userId, fallback, size = 'md', className }: PersonAvatarProps) {
-  const [failed, setFailed] = useState(false);
-  const photo = getPersonPhoto(name, userId);
+export function PersonAvatar({ name, userId, personId, photoUrl, legacyPhoto=true, fallback, size = 'md', className }: PersonAvatarProps) {
+  const [failed, setFailed] = useState<string | null>(null);
+  const {photoUrl:photo} = useInstitutionalIdentity(personId??userId,userId,name,photoUrl,legacyPhoto);
 
-  if (!photo || failed) return <>{fallback}</>;
+  if (!photo || failed === photo) return <>{fallback}</>;
 
   return (
     <img
@@ -30,7 +34,7 @@ export function PersonAvatar({ name, userId, fallback, size = 'md', className }:
       loading="lazy"
       decoding="async"
       draggable={false}
-      onError={() => setFailed(true)}
+      onError={() => setFailed(photo)}
       data-size={size}
       className={cn('cronograma-person-avatar', className)}
     />
@@ -51,7 +55,7 @@ interface EventPeopleAvatarsProps {
  * Renders nothing when none of the linked people has an official photo.
  */
 export function EventPeopleAvatars({ people, className, size = 'sm' }: EventPeopleAvatarsProps) {
-  const withPhoto = people.filter((person) => getPersonPhoto(person.label, person.userId));
+  const withPhoto = people;
   if (withPhoto.length === 0) return null;
 
   return (
@@ -60,6 +64,7 @@ export function EventPeopleAvatars({ people, className, size = 'sm' }: EventPeop
         <PersonAvatar
           key={person.key}
           name={person.label}
+          personId={person.key}
           userId={person.userId}
           size={size}
           className={index === 0 && person.isPrimary ? 'is-primary' : undefined}

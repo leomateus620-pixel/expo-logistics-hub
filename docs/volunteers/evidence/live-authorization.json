@@ -1,0 +1,25 @@
+{
+  "mechanism": "Lovable query_database, SET LOCAL ROLE authenticated/anon and verified actor claims; synthetic creation and leadership revocation rolled back; not an interactive browser login",
+  "rows": [
+    {
+      "passed": true,
+      "test": "Anonymous cannot execute private contact RPC"
+    },
+    {
+      "passed": true,
+      "test": "Current Soja Store president creates transactional identity/contact/membership and retries safely"
+    },
+    {
+      "passed": true,
+      "test": "President cannot forge a different unit"
+    },
+    {
+      "passed": true,
+      "test": "Revocation immediately blocks the former principal, including their own creation"
+    },
+    {
+      "passed": true,
+      "test": "Unrelated principal and ordinary volunteer cannot read contacts through RPC or join"
+    }
+  ]
+}
