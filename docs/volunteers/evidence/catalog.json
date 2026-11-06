@@ -1,0 +1,1081 @@
+[
+  {
+    "entry": {
+      "id": "acolhimento-e-bem-comum",
+      "name": "Acolhimento e Bem Comum",
+      "type": "comissao",
+      "order": 1,
+      "aliases": [
+        "acolhimento"
+      ],
+      "icon": {},
+      "tone": "rose",
+      "responsible": "Bruna Pacheco de Quadros",
+      "description": "Acolhimento institucional, voluntariado e ações de bem comum da Fenasoja."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "acolhimento-e-bem-comum",
+      "basePath": "/comissoes/acolhimento-e-bem-comum",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "agricultura-soja-e-derivados",
+      "name": "Agricultura, Soja e Derivados",
+      "shortName": "Agricultura e Soja",
+      "type": "comissao",
+      "order": 2,
+      "aliases": [
+        "agricultura",
+        "soja e derivados"
+      ],
+      "icon": {},
+      "tone": "lime",
+      "responsible": "Vanessa Matraszek Gnoatto",
+      "description": "Programação técnica, parcerias e conteúdo do setor agrícola e da cadeia da soja."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "agricultura-soja-e-derivados",
+      "basePath": "/comissoes/agricultura-soja-e-derivados",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "arte-e-cultura",
+      "name": "Arte e Cultura",
+      "type": "comissao",
+      "order": 3,
+      "moduleSlug": "arte-cultura",
+      "aliases": [
+        "arte-cultura",
+        "arte e cultura"
+      ],
+      "icon": {},
+      "tone": "rose",
+      "responsible": "Leonardo Chitolina",
+      "description": "Atrações, artistas, palcos, agenda cultural e demandas técnicas."
+    },
+    "reusesExistingModule": true,
+    "module": {
+      "slug": "arte-cultura",
+      "basePath": "/comissoes/arte-cultura",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        },
+        {
+          "label": "Atrações",
+          "path": "atracoes"
+        },
+        {
+          "label": "Artistas",
+          "path": "artistas"
+        },
+        {
+          "label": "Palcos",
+          "path": "palcos"
+        },
+        {
+          "label": "Agenda",
+          "path": "agenda"
+        },
+        {
+          "label": "Demandas Técnicas",
+          "path": "demandas-tecnicas"
+        },
+        {
+          "label": "Contratos",
+          "path": "contratos"
+        },
+        {
+          "label": "Relatórios",
+          "path": "relatorios"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "bilheteria",
+      "name": "Bilheteria",
+      "type": "comissao",
+      "order": 4,
+      "aliases": [],
+      "icon": {},
+      "tone": "amber",
+      "responsible": "José Fernando Borella",
+      "description": "Ingressos, pontos de venda, controle de acesso pago e prestação de contas."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "bilheteria",
+      "basePath": "/comissoes/bilheteria",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "credenciamento",
+      "name": "Credenciamento",
+      "type": "comissao",
+      "order": 5,
+      "aliases": [],
+      "icon": {},
+      "tone": "sky",
+      "responsible": "Larissa Mello Dallalba",
+      "description": "Credenciais, acessos, cadastros e identificação de equipes e convidados."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "credenciamento",
+      "basePath": "/comissoes/credenciamento",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "cooperativismo",
+      "name": "Cooperativismo",
+      "type": "comissao",
+      "order": 6,
+      "aliases": [],
+      "icon": {},
+      "tone": "emerald",
+      "responsible": "Alexandre Dall'Agnese",
+      "description": "Relação com cooperativas, programação conjunta e ações do movimento cooperativista."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "cooperativismo",
+      "basePath": "/comissoes/cooperativismo",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "espaco-do-automovel",
+      "name": "Espaço do Automóvel",
+      "type": "comissao",
+      "order": 7,
+      "mapPortalSlug": "espaco-automovel",
+      "aliases": [
+        "automovel",
+        "espaco automovel"
+      ],
+      "icon": {},
+      "tone": "cyan",
+      "responsible": "Elton Luis Walker",
+      "description": "Expositores automotivos, test drive e organização do espaço do automóvel."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "espaco-do-automovel",
+      "basePath": "/comissoes/espaco-do-automovel",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "exporural",
+      "name": "Exporural",
+      "type": "comissao",
+      "order": 8,
+      "moduleSlug": "exporural",
+      "aliases": [
+        "expo rural"
+      ],
+      "icon": {},
+      "tone": "emerald",
+      "responsible": "Germano Tessmer Büttow",
+      "description": "Gestão comercial e operacional das quadras rurais da Exporural."
+    },
+    "reusesExistingModule": true,
+    "module": {
+      "slug": "exporural",
+      "basePath": "/comissoes/exporural",
+      "menus": [
+        {
+          "label": "Mapa Comercial",
+          "path": "mapa-comercial"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "gastronomia",
+      "name": "Gastronomia",
+      "type": "comissao",
+      "order": 9,
+      "moduleSlug": "gastronomia",
+      "aliases": [],
+      "icon": {},
+      "tone": "amber",
+      "responsible": "Rodrigo Calixto",
+      "description": "Fichas, refeições, consumo por comissão, estoque e devoluções."
+    },
+    "reusesExistingModule": true,
+    "module": {
+      "slug": "gastronomia",
+      "basePath": "/comissoes/gastronomia",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        },
+        {
+          "label": "Fichas",
+          "path": "fichas"
+        },
+        {
+          "label": "Refeições",
+          "path": "refeicoes"
+        },
+        {
+          "label": "Consumo por Comissão",
+          "path": "consumo"
+        },
+        {
+          "label": "Estoque",
+          "path": "estoque"
+        },
+        {
+          "label": "Devoluções",
+          "path": "devolucoes"
+        },
+        {
+          "label": "Relatórios",
+          "path": "relatorios"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "industria-comercio-e-servicos",
+      "name": "Indústria, Comércio e Serviços",
+      "shortName": "Indústria e Comércio",
+      "type": "comissao",
+      "order": 10,
+      "moduleSlug": "industria-comercio-servicos",
+      "aliases": [
+        "ics",
+        "industria comercio servicos"
+      ],
+      "icon": {},
+      "tone": "cyan",
+      "responsible": "Felipe Bortoli",
+      "description": "Gestão comercial dos pavilhões e das frentes de indústria, comércio e serviços."
+    },
+    "reusesExistingModule": true,
+    "module": {
+      "slug": "industria-comercio-servicos",
+      "basePath": "/comissoes/industria-comercio-servicos",
+      "menus": [
+        {
+          "label": "Mapa Comercial",
+          "path": "mapa-comercial"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "infraestrutura-e-seguranca-do-trabalho",
+      "name": "Infraestrutura e Segurança do Trabalho",
+      "shortName": "Infraestrutura",
+      "type": "comissao",
+      "order": 11,
+      "moduleSlug": "infraestrutura",
+      "aliases": [
+        "infraestrutura"
+      ],
+      "icon": {},
+      "tone": "lime",
+      "responsible": "Roberto Steffen",
+      "description": "Obras, materiais, demandas, equipes, fornecedores e segurança do trabalho."
+    },
+    "reusesExistingModule": true,
+    "module": {
+      "slug": "infraestrutura",
+      "basePath": "/comissoes/infraestrutura",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        },
+        {
+          "label": "Obras",
+          "path": "obras"
+        },
+        {
+          "label": "Materiais",
+          "path": "materiais"
+        },
+        {
+          "label": "Demandas",
+          "path": "demandas"
+        },
+        {
+          "label": "Equipes",
+          "path": "equipes"
+        },
+        {
+          "label": "Fornecedores",
+          "path": "fornecedores"
+        },
+        {
+          "label": "Avanço Físico",
+          "path": "avanco-fisico"
+        },
+        {
+          "label": "Anexos",
+          "path": "anexos"
+        },
+        {
+          "label": "Relatórios",
+          "path": "relatorios"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "inovacao-e-experiencia",
+      "name": "Inovação e Tecnologia",
+      "type": "comissao",
+      "order": 12,
+      "aliases": [
+        "inovacao",
+        "inovacao e tecnologia",
+        "inovacao-e-tecnologia"
+      ],
+      "icon": {},
+      "tone": "sky",
+      "responsible": "Felipe Carpenedo Gabriel",
+      "description": "Projetos de inovação, tecnologia aplicada e experiências digitais do parque."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "inovacao-e-experiencia",
+      "basePath": "/comissoes/inovacao-e-experiencia",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "logistica-hotelaria-e-turismo",
+      "name": "Logística, Hotelaria e Turismo",
+      "shortName": "Logística",
+      "type": "comissao",
+      "order": 13,
+      "moduleSlug": "logistica",
+      "aliases": [
+        "logistica",
+        "logistica hotelaria turismo"
+      ],
+      "icon": {},
+      "tone": "emerald",
+      "responsible": "Eduardo Santos",
+      "description": "Transportes, frota, carrinhos, agenda, hóspedes e operação da mobilidade."
+    },
+    "reusesExistingModule": true,
+    "module": {
+      "slug": "logistica",
+      "basePath": "/comissoes/logistica",
+      "menus": [
+        {
+          "label": "Painel Operacional",
+          "path": "dashboard"
+        },
+        {
+          "label": "Transportes",
+          "path": "transportes"
+        },
+        {
+          "label": "Veículos",
+          "path": "veiculos"
+        },
+        {
+          "label": "Carrinhos Elétricos",
+          "path": "carrinhos-eletricos"
+        },
+        {
+          "label": "Hóspedes",
+          "path": "hospedes"
+        },
+        {
+          "label": "Agenda",
+          "path": "agenda"
+        },
+        {
+          "label": "Equipe",
+          "path": "equipe"
+        },
+        {
+          "label": "Checklist",
+          "path": "checklist"
+        },
+        {
+          "label": "Despesas",
+          "path": "despesas"
+        },
+        {
+          "label": "Relatório do Sistema",
+          "path": "relatorio"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "mercosul",
+      "name": "Mercosul",
+      "type": "comissao",
+      "order": 14,
+      "aliases": [],
+      "icon": {},
+      "tone": "sky",
+      "responsible": "Raul Dário Nunez",
+      "description": "Relações com países do Mercosul, delegações e programação internacional."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "mercosul",
+      "basePath": "/comissoes/mercosul",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "novas-geracoes",
+      "name": "Novas Gerações",
+      "type": "comissao",
+      "order": 15,
+      "moduleSlug": "novas-geracoes",
+      "aliases": [],
+      "icon": {},
+      "tone": "sky",
+      "responsible": "Josyane Cristina Heck",
+      "description": "Programação para crianças, jovens e escolas durante a feira."
+    },
+    "reusesExistingModule": true,
+    "module": {
+      "slug": "novas-geracoes",
+      "basePath": "/comissoes/novas-geracoes",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        },
+        {
+          "label": "Escolas",
+          "path": "escolas"
+        },
+        {
+          "label": "Participantes",
+          "path": "participantes"
+        },
+        {
+          "label": "Atividades",
+          "path": "atividades"
+        },
+        {
+          "label": "Lanches",
+          "path": "lanches"
+        },
+        {
+          "label": "Agenda",
+          "path": "agenda"
+        },
+        {
+          "label": "Relatórios",
+          "path": "relatorios"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "pecuaria",
+      "name": "Pecuária",
+      "type": "comissao",
+      "order": 16,
+      "aliases": [],
+      "icon": {},
+      "tone": "lime",
+      "responsible": "Elisandra Simão Reis",
+      "description": "Exposição animal, julgamentos, remates e estrutura pecuária."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "pecuaria",
+      "basePath": "/comissoes/pecuaria",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "prevencao-e-combate-a-incendio",
+      "name": "Prevenção e Combate a Incêndio",
+      "shortName": "PPCI",
+      "type": "comissao",
+      "order": 17,
+      "aliases": [
+        "ppci",
+        "incendio"
+      ],
+      "icon": {},
+      "tone": "red",
+      "responsible": "Cap. Leonardo Ruy Dambroz",
+      "description": "Plano de prevenção, brigadas, vistorias e resposta a emergências."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "prevencao-e-combate-a-incendio",
+      "basePath": "/comissoes/prevencao-e-combate-a-incendio",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "recepcao-e-cerimonial",
+      "name": "Recepção e Eventos",
+      "type": "comissao",
+      "order": 18,
+      "aliases": [
+        "recepcao",
+        "cerimonial",
+        "recepcao e eventos"
+      ],
+      "icon": {},
+      "tone": "gold",
+      "responsible": "Thaís Bróglio",
+      "description": "Recepção de autoridades, cerimonial e organização dos eventos oficiais."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "recepcao-e-cerimonial",
+      "basePath": "/comissoes/recepcao-e-cerimonial",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "relacionamento-e-experiencia",
+      "name": "Relacionamento e Experiência",
+      "type": "comissao",
+      "order": 19,
+      "aliases": [
+        "relacionamento"
+      ],
+      "icon": {},
+      "tone": "rose",
+      "responsible": "Fernanda Matarucco Meinertz",
+      "description": "Experiência do público, relacionamento institucional e jornada do visitante."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "relacionamento-e-experiencia",
+      "basePath": "/comissoes/relacionamento-e-experiencia",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "relacoes-estrategicas",
+      "name": "Relações Estratégicas",
+      "type": "comissao",
+      "order": 20,
+      "aliases": [
+        "relacoes estrategicas"
+      ],
+      "icon": {},
+      "tone": "gold",
+      "responsible": "Paulo Miguel Nedel e Diana Schmidt Nedel",
+      "description": "Articulação institucional, parcerias estratégicas e relacionamento executivo."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "relacoes-estrategicas",
+      "basePath": "/comissoes/relacoes-estrategicas",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "saude-bem-estar-e-acessibilidade",
+      "name": "Saúde, Bem-Estar e Acessibilidade",
+      "shortName": "Saúde e Acessibilidade",
+      "type": "comissao",
+      "order": 21,
+      "aliases": [
+        "saude",
+        "acessibilidade"
+      ],
+      "icon": {},
+      "tone": "teal",
+      "responsible": "Rosa Zorzan de Paula",
+      "description": "Atendimento em saúde, bem-estar das equipes e acessibilidade do parque."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "saude-bem-estar-e-acessibilidade",
+      "basePath": "/comissoes/saude-bem-estar-e-acessibilidade",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "seguranca",
+      "name": "Segurança",
+      "type": "comissao",
+      "order": 22,
+      "moduleSlug": "seguranca",
+      "aliases": [],
+      "icon": {},
+      "tone": "red",
+      "responsible": "Ten. Cel. Vanessa Peripolli",
+      "description": "Escalas, ocorrências, pontos críticos e coordenação da segurança."
+    },
+    "reusesExistingModule": true,
+    "module": {
+      "slug": "seguranca",
+      "basePath": "/comissoes/seguranca",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        },
+        {
+          "label": "Escalas",
+          "path": "escalas"
+        },
+        {
+          "label": "Ocorrências",
+          "path": "ocorrencias"
+        },
+        {
+          "label": "Pontos Críticos",
+          "path": "pontos-criticos"
+        },
+        {
+          "label": "Equipes",
+          "path": "equipes"
+        },
+        {
+          "label": "Relatórios",
+          "path": "relatorios"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "servicos",
+      "name": "Serviços",
+      "type": "comissao",
+      "order": 23,
+      "moduleSlug": "servicos",
+      "aliases": [],
+      "icon": {},
+      "tone": "cyan",
+      "responsible": "Valtair Dornelles",
+      "description": "Chamados, demandas, equipes, status de execução e ocorrências operacionais."
+    },
+    "reusesExistingModule": true,
+    "module": {
+      "slug": "servicos",
+      "basePath": "/comissoes/servicos",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        },
+        {
+          "label": "Chamados",
+          "path": "chamados"
+        },
+        {
+          "label": "Demandas",
+          "path": "demandas"
+        },
+        {
+          "label": "Equipes",
+          "path": "equipes"
+        },
+        {
+          "label": "Status de Execução",
+          "path": "status"
+        },
+        {
+          "label": "Ocorrências",
+          "path": "ocorrencias"
+        },
+        {
+          "label": "Relatórios",
+          "path": "relatorios"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "shows",
+      "name": "Shows",
+      "type": "comissao",
+      "order": 24,
+      "aliases": [],
+      "icon": {},
+      "tone": "rose",
+      "responsible": "Daniel U. Ribeiro da Silva",
+      "description": "Grade de shows, contratos artísticos, produção e operação de palco."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "shows",
+      "basePath": "/comissoes/shows",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "soja-store",
+      "name": "Soja Store",
+      "type": "comissao",
+      "order": 25,
+      "aliases": [
+        "sojastore"
+      ],
+      "icon": {},
+      "tone": "amber",
+      "responsible": "Cristina Beatriz Manjabosco Scheuermann",
+      "description": "Produtos oficiais, loja da feira, estoque e vendas institucionais."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "soja-store",
+      "basePath": "/comissoes/soja-store",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "soy-summit",
+      "name": "Soy Summit",
+      "type": "comissao",
+      "order": 26,
+      "aliases": [
+        "soysummit"
+      ],
+      "icon": {},
+      "tone": "gold",
+      "responsible": "Cassio Ricardo Feltes",
+      "description": "Congresso técnico, painéis, palestrantes e conteúdo estratégico do Soy Summit."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "soy-summit",
+      "basePath": "/comissoes/soy-summit",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "assessoria-de-sustentabilidade",
+      "name": "Assessoria de Sustentabilidade",
+      "type": "assessoria",
+      "order": 1,
+      "aliases": [
+        "sustentabilidade"
+      ],
+      "icon": {},
+      "tone": "emerald",
+      "responsible": "Estela Zamberlam Schwerz",
+      "description": "Diretrizes ambientais, resíduos, compensações e práticas sustentáveis."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "assessoria-de-sustentabilidade",
+      "basePath": "/comissoes/assessoria-de-sustentabilidade",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "assessoria-de-imprensa",
+      "name": "Assessoria de Imprensa",
+      "type": "assessoria",
+      "order": 2,
+      "aliases": [
+        "imprensa"
+      ],
+      "icon": {},
+      "tone": "sky",
+      "responsible": "Deise Anelise Froelich e Francine Maria Boijink",
+      "responsibles": [
+        "Deise Anelise Froelich",
+        "Francine Maria Boijink"
+      ],
+      "description": "Relacionamento com a imprensa, pauta oficial e cobertura da feira."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "assessoria-de-imprensa",
+      "basePath": "/comissoes/assessoria-de-imprensa",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "assessoria-juridica",
+      "name": "Assessoria Jurídica",
+      "type": "assessoria",
+      "order": 3,
+      "aliases": [
+        "juridica",
+        "juridico"
+      ],
+      "icon": {},
+      "tone": "gold",
+      "responsible": "José Mauro Barbieri e Sandra Lameira",
+      "responsibles": [
+        "José Mauro Barbieri",
+        "Sandra Lameira"
+      ],
+      "description": "Contratos, pareceres, conformidade legal e apoio jurídico às comissões."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "assessoria-juridica",
+      "basePath": "/comissoes/assessoria-juridica",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "assessoria-de-relacoes-internacionais",
+      "name": "Assessoria de Relações Internacionais",
+      "shortName": "Relações Internacionais",
+      "type": "assessoria",
+      "order": 4,
+      "aliases": [
+        "relacoes internacionais"
+      ],
+      "icon": {},
+      "tone": "cyan",
+      "responsible": "Júlio Bravo, Roberto Adriano Racho e Sara Kirchhof Varela",
+      "responsibles": [
+        "Júlio Bravo",
+        "Roberto Adriano Racho",
+        "Sara Kirchhof Varela"
+      ],
+      "description": "Delegações estrangeiras, missões e agenda internacional da Fenasoja."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "assessoria-de-relacoes-internacionais",
+      "basePath": "/comissoes/assessoria-de-relacoes-internacionais",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "assessoria-de-protocolo",
+      "name": "Assessoria de Protocolo",
+      "type": "assessoria",
+      "order": 5,
+      "aliases": [
+        "protocolo"
+      ],
+      "icon": {},
+      "tone": "gold",
+      "responsible": "Jorge Luiz Viana",
+      "description": "Protocolo oficial, precedência de autoridades e ritos institucionais."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "assessoria-de-protocolo",
+      "basePath": "/comissoes/assessoria-de-protocolo",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "assessoria-de-marketing",
+      "name": "Assessoria de Marketing/Comunicação",
+      "shortName": "Marketing/Comunicação",
+      "type": "assessoria",
+      "order": 6,
+      "aliases": [
+        "marketing",
+        "marketing e comunicacao",
+        "marketing comunicacao",
+        "assessoria de marketing",
+        "assessoria de marketing e comunicacao",
+        "assessoria de marketing comunicacao"
+      ],
+      "icon": {},
+      "tone": "rose",
+      "responsible": "Zélia Savoldi",
+      "responsibleRole": "Diretora de Marketing e Comunicação",
+      "description": "Marca, campanhas, conteúdo, fotografia e comunicação institucional da Fenasoja."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "assessoria-de-marketing",
+      "basePath": "/comissoes/assessoria-de-marketing",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  },
+  {
+    "entry": {
+      "id": "assessoria-de-sistemas",
+      "name": "Assessoria de Sistemas",
+      "shortName": "Sistemas",
+      "type": "assessoria",
+      "order": 7,
+      "aliases": [
+        "sistemas",
+        "assessoria de sistemas",
+        "ti",
+        "tecnologia da informacao"
+      ],
+      "icon": {},
+      "tone": "cyan",
+      "responsible": "Jeferson Araújo",
+      "description": "Sistemas, infraestrutura de TI, acessos e suporte tecnológico da Fenasoja."
+    },
+    "reusesExistingModule": false,
+    "module": {
+      "slug": "assessoria-de-sistemas",
+      "basePath": "/comissoes/assessoria-de-sistemas",
+      "menus": [
+        {
+          "label": "Painel da Comissão",
+          "path": "dashboard"
+        }
+      ]
+    }
+  }
+]

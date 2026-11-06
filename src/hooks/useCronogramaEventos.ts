@@ -304,6 +304,9 @@ function mapResponsibleRel(item: unknown) {
   const record = item as Record<string, unknown>;
   return {
     userId: readString(record, 'user_id'),
+    personId: readString(record, 'person_id'),
+    avatarPath: readString(record, 'avatar_path'),
+    legacyPhoto: readBoolean(record, 'legacy_photo') !== false,
     name: readString(record, 'name'),
     role: readString(record, 'role'),
     isPrimary: readBoolean(record, 'is_primary') === true,
@@ -599,7 +602,8 @@ function toRpcEventPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: 
       relation_role: commission.isPrimary ? 'principal' : 'participante',
     })),
     responsibles: (event.responsiblesRel ?? []).map((responsible) => ({
-      user_id: responsible.userId ?? null,
+      person_id: responsible.personId ?? null,
+      user_id: responsible.personId ? null : responsible.userId ?? null,
       name: responsible.name ?? null,
       role: responsible.role ?? null,
       is_primary: responsible.isPrimary ?? false,

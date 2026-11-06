@@ -1,0 +1,46 @@
+-- Disposable PostgreSQL fixture. Minimal existing schema, no production data.
+CREATE ROLE anon NOLOGIN;
+CREATE ROLE authenticated NOLOGIN;
+CREATE ROLE service_role NOLOGIN BYPASSRLS;
+CREATE SCHEMA auth;
+CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+GRANT USAGE ON SCHEMA auth TO authenticated,anon,service_role;
+GRANT EXECUTE ON FUNCTION auth.uid() TO PUBLIC;
+CREATE TABLE auth.users(id uuid PRIMARY KEY);
+CREATE TYPE public.org_role AS ENUM('admin','gestor','operador','leitura');
+CREATE TABLE public.organizations(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),nome text);
+CREATE TABLE public.org_members(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),org_id uuid REFERENCES organizations(id),user_id uuid REFERENCES auth.users(id),role org_role,is_active boolean DEFAULT true,nome_exibicao text,UNIQUE(org_id,user_id));
+CREATE FUNCTION public.is_org_member(_user_id uuid,_org_id uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $$ SELECT EXISTS(SELECT 1 FROM public.org_members WHERE user_id=_user_id AND org_id=_org_id AND is_active) $$;
+CREATE FUNCTION public.get_user_org_role(_user_id uuid,_org_id uuid) RETURNS org_role LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $$ SELECT role FROM public.org_members WHERE user_id=_user_id AND org_id=_org_id AND is_active $$;
+CREATE TABLE public.commissions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),org_id uuid REFERENCES organizations(id),nome text,slug text,unit_type text DEFAULT 'comissao',is_active boolean DEFAULT true,UNIQUE(id,org_id));
+CREATE TABLE public.commission_responsibles(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),org_id uuid NOT NULL,commission_id uuid NOT NULL,user_id uuid REFERENCES auth.users(id),display_name text NOT NULL,
+ normalized_name text GENERATED ALWAYS AS (lower(display_name)) STORED,responsible_type text DEFAULT 'pessoa',relationship_role text DEFAULT 'principal',is_primary boolean DEFAULT false,active boolean DEFAULT true,display_order integer DEFAULT 1,created_at timestamptz DEFAULT now(),updated_at timestamptz DEFAULT now(),FOREIGN KEY(commission_id,org_id) REFERENCES commissions(id,org_id));
+CREATE UNIQUE INDEX commission_responsibles_unique_person ON public.commission_responsibles(commission_id,normalized_name);
+ALTER TABLE public.commission_responsibles ENABLE ROW LEVEL SECURITY;
+GRANT SELECT,INSERT,UPDATE,DELETE ON commission_responsibles TO authenticated;
+CREATE FUNCTION public.sync_official_units_2028(uuid) RETURNS jsonb LANGUAGE sql AS $$ SELECT '{}'::jsonb $$;
+CREATE SCHEMA storage;
+CREATE TABLE storage.buckets(id text PRIMARY KEY,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+CREATE TABLE storage.objects(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),bucket_id text,name text,UNIQUE(bucket_id,name));
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+GRANT USAGE ON SCHEMA storage TO authenticated,anon,service_role;
+GRANT SELECT ON storage.objects TO authenticated;
+CREATE TABLE public.cronograma_eventos(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),org_id uuid REFERENCES organizations(id),
+ source_key text,title text,description text,category text,event_type text,source_year integer,start_date date,end_date date,month_label text,week_label text,status text,priority text,location text,event_time time,days_remaining integer,commission_slug text,commission_name text,responsible_name text,source_sheet text,source_row integer,source_cell text,source_note text,is_official_seed boolean,has_exact_date boolean,linked_commissions jsonb,subevents jsonb,created_by_user_id uuid,created_at timestamptz DEFAULT now(),updated_at timestamptz DEFAULT now(),category_key text,start_time time,end_time time,pending_reason text,decision_needed text,lock_version bigint,origin_source text,origin_commission_id uuid,location_code text);
+CREATE TABLE public.cronograma_evento_responsaveis(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),event_id uuid REFERENCES cronograma_eventos(id),org_id uuid,org_member_user_id uuid,responsible_type text,name_snapshot text,role text,is_primary boolean DEFAULT false,created_at timestamptz DEFAULT now(),updated_at timestamptz DEFAULT now());
+CREATE UNIQUE INDEX event_one_primary ON public.cronograma_evento_responsaveis(event_id) WHERE is_primary;
+CREATE TABLE public.cronograma_subeventos(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),org_id uuid,parent_event_id uuid REFERENCES cronograma_eventos(id),title text,description text,start_date date,end_date date,start_time time,end_time time,status text,priority text,commission_slug text,responsible_name text,sort_order integer,lock_version bigint,created_at timestamptz DEFAULT now(),updated_at timestamptz DEFAULT now());
+CREATE TABLE public.cronograma_subevento_responsaveis(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),subevent_id uuid REFERENCES cronograma_subeventos(id),org_id uuid,org_member_user_id uuid,responsible_type text,name_snapshot text,role text,is_primary boolean,created_at timestamptz DEFAULT now(),updated_at timestamptz DEFAULT now());
+CREATE TABLE public.cronograma_evento_comissoes(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),event_id uuid,commission_id uuid,commission_slug text,commission_name_snapshot text,relation_role text,created_at timestamptz DEFAULT now());
+CREATE TABLE public.cronograma_subevento_comissoes(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),subevent_id uuid,commission_id uuid,commission_slug text,commission_name_snapshot text,relation_role text);
+CREATE TABLE public.cronograma_evento_anexos(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),event_id uuid);
+CREATE TABLE public.cronograma_subevento_acoes(id uuid,subevent_id uuid,start_time time,title text,notes text,responsible_user_id uuid,responsible_name text,commission_slug text,commission_name text,is_done boolean,sort_order integer,created_at timestamptz);
+CREATE TABLE public.cronograma_subevento_providencias(id uuid,subevent_id uuid,description text,responsible_user_id uuid,responsible_name text,commission_slug text,commission_name text,note text,is_done boolean,sort_order integer,created_at timestamptz);
+CREATE TABLE public.cronograma_subevento_convidados(id uuid,subevent_id uuid,name text,category text,sort_order integer,created_at timestamptz);
+CREATE TABLE public.cronograma_subevento_orcamento_itens(id uuid,subevent_id uuid,item text,supplier text,amount numeric,sort_order integer,created_at timestamptz);
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticated;
+GRANT SELECT,INSERT,UPDATE,DELETE ON cronograma_evento_responsaveis,cronograma_subevento_responsaveis TO authenticated;
+ALTER TABLE cronograma_evento_responsaveis ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cronograma_subevento_responsaveis ENABLE ROW LEVEL SECURITY;
+CREATE POLICY event_link_write ON cronograma_evento_responsaveis TO authenticated USING(org_id IN (SELECT org_id FROM org_members WHERE user_id=auth.uid() AND is_active)) WITH CHECK(org_id IN (SELECT org_id FROM org_members WHERE user_id=auth.uid() AND is_active));
+CREATE POLICY subevent_link_write ON cronograma_subevento_responsaveis TO authenticated USING(org_id IN (SELECT org_id FROM org_members WHERE user_id=auth.uid() AND is_active)) WITH CHECK(org_id IN (SELECT org_id FROM org_members WHERE user_id=auth.uid() AND is_active));

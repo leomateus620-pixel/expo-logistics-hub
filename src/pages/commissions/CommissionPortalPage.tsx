@@ -1,3 +1,4 @@
+import {Link} from 'react-router-dom';
 import { WorkersLauncherSlot } from '@/components/WorkersLauncherSlot';
 import {
   lazy,
@@ -422,6 +423,7 @@ export default function CommissionPortalPage() {
         </header>
 
         <FenasojaPortalHero onIntroReleased={releaseHistory} />
+        {user && <Link to="/equipes" className="my-4 inline-flex min-h-11 items-center rounded-lg border border-white/30 bg-white/10 px-4 text-sm font-medium text-white focus-visible:outline focus-visible:outline-2">Diretório de equipes</Link>}
 
         <p
           className="portal-access-sr-only"

@@ -1,0 +1,773 @@
+{
+  "rows": [
+    {
+      "active_count": 3,
+      "id": "ed23de8f-6293-4321-a8c2-852a1f83f5ec",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "af134b19-983b-4187-b901-b2d1ff9cf934",
+          "role": "principal",
+          "user_id": "74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f"
+        }
+      ],
+      "nome": "ASSESSORIA DE MARKETING/COMUNICAÇÃO",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "assessoria-de-marketing",
+      "unit_type": "assessoria"
+    },
+    {
+      "active_count": 4,
+      "id": "0f2b084c-1795-429b-a00a-5e3717d9efac",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "f900df12-8b86-4c69-a76d-26fdb711705f",
+          "role": "corresponsavel",
+          "user_id": "f7b108d9-10a6-4b87-953b-783e7bfa05ff"
+        },
+        {
+          "id": "2b4d0e8a-db8f-4435-b77a-d8312c5e354b",
+          "role": "corresponsavel",
+          "user_id": "823f010b-c4b1-4d9f-a8c7-6d66d58f4670"
+        },
+        {
+          "id": "d1c137ac-4157-4870-8eec-a52d7bcb29ef",
+          "role": "corresponsavel",
+          "user_id": "f9ed4ab9-0ef3-4ee4-9707-36288dbc828f"
+        },
+        {
+          "id": "3c629648-8081-413b-8b2b-3e0a2af11845",
+          "role": "corresponsavel",
+          "user_id": "2b76c299-e357-4597-bf22-acd307990cb7"
+        }
+      ],
+      "nome": "CCPF — Conselho Consultivo Permanente Fenasoja",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "ccpf",
+      "unit_type": "conselho"
+    },
+    {
+      "active_count": 10,
+      "id": "d85594df-142b-46f1-a5af-598b7d504efd",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "7e43cf84-ae86-460e-ac6d-07087e76a745",
+          "role": "corresponsavel",
+          "user_id": "557dacc6-7fcf-42de-ac23-d555d9072d07"
+        },
+        {
+          "id": "73b5cd0a-9356-4c08-b6dc-c4938e56e0b4",
+          "role": "corresponsavel",
+          "user_id": "f7b108d9-10a6-4b87-953b-783e7bfa05ff"
+        },
+        {
+          "id": "31c57ca9-ec3f-4278-bcfd-72287d888b2e",
+          "role": "corresponsavel",
+          "user_id": "d251d7d6-389f-42f3-afef-8b94db02a47b"
+        },
+        {
+          "id": "9e0084e8-9e5a-4aba-833e-01a60e42d37f",
+          "role": "corresponsavel",
+          "user_id": "e0ada2e5-4440-4d15-91bd-aa4160247113"
+        },
+        {
+          "id": "540b4245-5e8b-4cfa-9f1f-270f4671c4c6",
+          "role": "corresponsavel",
+          "user_id": "823f010b-c4b1-4d9f-a8c7-6d66d58f4670"
+        },
+        {
+          "id": "535289bf-3793-4a66-92b8-b0b9bb8a68ef",
+          "role": "corresponsavel",
+          "user_id": "b8fd1e36-b46c-4eff-bb75-372b676ce123"
+        },
+        {
+          "id": "69a5485c-5862-42d2-8b86-abcb4c47de8e",
+          "role": "corresponsavel",
+          "user_id": "c00d04b3-6b33-48f7-80c8-14c28bf7c90a"
+        },
+        {
+          "id": "857ae254-8cd4-4fec-ae45-14c97f9b7146",
+          "role": "corresponsavel",
+          "user_id": "f9ed4ab9-0ef3-4ee4-9707-36288dbc828f"
+        },
+        {
+          "id": "e883b9ce-cc6e-4510-82c2-545bc20f622b",
+          "role": "principal",
+          "user_id": "cc1fe83d-41f1-4df2-8604-9bb8b2f9abda"
+        },
+        {
+          "id": "558236e1-4220-4000-ba53-4b02a403dd2e",
+          "role": "corresponsavel",
+          "user_id": "74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f"
+        }
+      ],
+      "nome": "Comissão Central",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "central",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "8cd0f332-4f42-4bb6-9252-0a60e62eaca2",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "9bb55059-eaf6-4374-a37b-2d92d8d661fa",
+          "role": "principal",
+          "user_id": "1538ad1e-a9da-458e-8057-d3477e25f973"
+        }
+      ],
+      "nome": "Agricultura, Soja e Derivados",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "agricultura-soja-e-derivados",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "07fb35ca-cfb9-45fd-9638-f86872fdfca4",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "11df1b45-91ca-4642-b2a0-b5422ed3a3b1",
+          "role": "principal",
+          "user_id": "7e2422a6-91e8-428c-9cdd-f25eb503e9c3"
+        }
+      ],
+      "nome": "Assessoria de Sistemas",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "assessoria-de-sistemas",
+      "unit_type": "assessoria"
+    },
+    {
+      "active_count": 1,
+      "id": "db726fd0-eb47-4161-9a87-c7976925dc9e",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "91d912b9-c584-4d8b-b1b2-92f8c0620c97",
+          "role": "principal",
+          "user_id": "008d7233-5b75-4547-ae2c-8e885d918294"
+        }
+      ],
+      "nome": "Assessoria de Sustentabilidade",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "assessoria-de-sustentabilidade",
+      "unit_type": "assessoria"
+    },
+    {
+      "active_count": 1,
+      "id": "8837250f-0ad6-410f-8fec-8c123e2e5d79",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "632fa3fa-5151-4d3b-86c8-a8f6697d2720",
+          "role": "principal",
+          "user_id": "62fec475-8ad4-4db2-8464-c3863f2edb09"
+        }
+      ],
+      "nome": "Soy Summit",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "soy-summit",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 2,
+      "id": "57378343-21cf-4ac9-82ed-e85904f52541",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "214d2f80-dc74-460c-ae32-aeb403a4233c",
+          "role": "principal",
+          "user_id": "be5eee02-5e1a-4c75-93d9-b6400746cca4"
+        },
+        {
+          "id": "8230b07a-3235-4831-ad8f-273ed111fbd2",
+          "role": "principal",
+          "user_id": "d53cbc3e-01b2-46a3-923e-a36d50e6de3f"
+        }
+      ],
+      "nome": "Assessoria de Imprensa",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "assessoria-de-imprensa",
+      "unit_type": "assessoria"
+    },
+    {
+      "active_count": 1,
+      "id": "98740251-32de-440c-8c75-b0c25f0ef653",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "f6facff9-ff18-4e5d-a5b0-60b652993e2a",
+          "role": "principal",
+          "user_id": "8dce325e-91b4-4ed5-ba7d-c52cecac1c29"
+        }
+      ],
+      "nome": "Inovação e Tecnologia",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "inovacao-e-experiencia",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "a78d8c79-1f27-40c2-8125-43450705bc22",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "d8475a13-8ec6-472a-8636-719d63abfe3b",
+          "role": "principal",
+          "user_id": "17a834e4-3ae6-4842-9306-b19dd0559a3c"
+        }
+      ],
+      "nome": "Arte e Cultura",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "arte-e-cultura",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 2,
+      "id": "1a8d4f15-448f-43cc-9e4b-b17776c34846",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "2a550434-bd0c-40ef-b633-c4b2a8c3bb91",
+          "role": "principal",
+          "user_id": "4bcae9c8-e85a-4cb9-b0e0-4cda3031750a"
+        }
+      ],
+      "nome": "Assessoria de Projetos e Captações",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "assessoria-projetos-e-captacoes-institucionais",
+      "unit_type": "assessoria"
+    },
+    {
+      "active_count": 2,
+      "id": "0e396dd8-016f-4748-b278-3b65956a33d9",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "67a47dcc-c92d-4e88-a2f5-92844b471d89",
+          "role": "principal",
+          "user_id": "88093b7d-6133-44a3-bb03-5a01e9285eb2"
+        },
+        {
+          "id": "e1bae47d-9b86-461c-8e92-ea7b0601ddcc",
+          "role": "principal",
+          "user_id": "b4960db1-9ca3-46fb-8a07-67c5efec8173"
+        }
+      ],
+      "nome": "Assessoria Jurídica",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "assessoria-juridica",
+      "unit_type": "assessoria"
+    },
+    {
+      "active_count": 1,
+      "id": "573c6cff-cb11-4b37-8855-a920b933778c",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "9054d273-f70f-4fe2-8cda-e96b881aa90d",
+          "role": "principal",
+          "user_id": "6e758caf-f424-4a1c-9295-0b41f16e359f"
+        }
+      ],
+      "nome": "Bilheteria",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "bilheteria",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 3,
+      "id": "92170d2f-27e4-4f81-ba26-40a9fa06b5a3",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "6fcc730c-91ca-482e-b8b1-cfd42b1819b7",
+          "role": "principal",
+          "user_id": "628ab8aa-ba36-42ce-906c-77d496be2090"
+        },
+        {
+          "id": "eba9b954-2528-4b5c-b3d8-ab7005a43d31",
+          "role": "principal",
+          "user_id": "e639a24f-e68d-48ab-a76e-1763b966b3ed"
+        },
+        {
+          "id": "acd21e70-3048-4b19-a89a-2f4e538f542c",
+          "role": "principal",
+          "user_id": "ad37de44-c925-4add-b96a-9fdcc76411ed"
+        }
+      ],
+      "nome": "Assessoria de Relações Internacionais",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "assessoria-de-relacoes-internacionais",
+      "unit_type": "assessoria"
+    },
+    {
+      "active_count": 1,
+      "id": "39a30458-ab9a-4aa0-8d1a-4dfa3a5041ce",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "2464f145-7164-4aa5-8738-9a7b581b6335",
+          "role": "principal",
+          "user_id": "ae54d98d-472b-4aa7-b064-e1331505da3b"
+        }
+      ],
+      "nome": "Credenciamento",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "credenciamento",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "c112962d-dddd-4836-a95e-23c84ee5dcfa",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "a9037c4c-effb-44ed-89c7-360e7737e6e9",
+          "role": "principal",
+          "user_id": "5085afb8-f0a8-4641-a795-9f1113d456e7"
+        }
+      ],
+      "nome": "Assessoria de Protocolo",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "assessoria-de-protocolo",
+      "unit_type": "assessoria"
+    },
+    {
+      "active_count": 1,
+      "id": "bdffa0d2-f0dc-4080-849d-8f2ee2bae723",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "f97f10ec-e65a-43fe-9eb0-a64ed96f46fa",
+          "role": "principal",
+          "user_id": "3832dcf4-f7f7-4a7e-93fd-71261b5742a9"
+        }
+      ],
+      "nome": "Cooperativismo",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "cooperativismo",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "73228ac5-a18d-404e-89a1-475ef15a8564",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "035080f7-9a05-41c5-96f4-6fe7aae9b3f6",
+          "role": "principal",
+          "user_id": "308e4b27-d361-40af-ac2d-36d95a043279"
+        }
+      ],
+      "nome": "Espaço do Automóvel",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "espaco-do-automovel",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 0,
+      "id": "0734ec46-4b1c-4240-ba5a-553615f6048e",
+      "is_active": false,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": null,
+      "nome": "Fotografia",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "fotografia",
+      "unit_type": "assessoria"
+    },
+    {
+      "active_count": 1,
+      "id": "2fc57f56-96ce-4c49-963b-3a0a4f794908",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "8481fedc-0524-45c3-88e9-fcb27c03533c",
+          "role": "principal",
+          "user_id": "b431453a-322c-4f2f-b962-bc5d6f508ec1"
+        }
+      ],
+      "nome": "Exporural",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "exporural",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "6c9d59a8-2ff9-4909-89d6-044a1fe1b393",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "1eeb89df-28c7-4665-836a-f8e5efbe2a03",
+          "role": "principal",
+          "user_id": "6dde1d6f-ee4a-4d49-ad4d-d20986d73515"
+        }
+      ],
+      "nome": "Indústria, Comércio e Serviços",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "industria-comercio-e-servicos",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "913feda9-df46-4cd4-82e7-e2cf48cdd165",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "4dcb62bd-72ce-4c0d-bc2b-cfb9f5d27ff1",
+          "role": "principal",
+          "user_id": "92596009-b530-4e31-b21f-fa3cbcbc8350"
+        }
+      ],
+      "nome": "Infraestrutura e Segurança do Trabalho",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "infraestrutura-e-seguranca-do-trabalho",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "c66810cf-5be2-48e0-826b-6dd1865fbd11",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "eb7980e4-6f7e-4492-8fbb-22041164453a",
+          "role": "principal",
+          "user_id": "a3b62599-3f3e-4e56-ab79-dbff4dca60e3"
+        }
+      ],
+      "nome": "Relacionamento e Experiência",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "relacionamento-e-experiencia",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "a2af4952-6867-43ba-a1d4-5fc223a9db09",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "b061739d-43dc-408b-8b1a-1ce37d700363",
+          "role": "principal",
+          "user_id": "87d4fa05-375e-4e8f-9b56-d1b0c5d442b2"
+        }
+      ],
+      "nome": "Logística, Hotelaria e Turismo",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "logistica-hotelaria-e-turismo",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "6fed6627-d1bb-464f-be35-e5f90c50468d",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "ce6afa15-fdec-497b-b7ba-447711c871ea",
+          "role": "principal",
+          "user_id": "f2eca357-8825-441e-99a0-5c4657553166"
+        }
+      ],
+      "nome": "Novas Gerações",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "novas-geracoes",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "f4e5766f-81f3-4ee1-b871-84403eaea322",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "5de7c471-db2c-4d07-914b-0aee79491729",
+          "role": "principal",
+          "user_id": "cea6a057-6eaf-4778-97a5-78982f7058d4"
+        }
+      ],
+      "nome": "Pecuária",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "pecuaria",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "41233e20-f343-49c5-b802-2c2455081b06",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "d00d4e84-eb79-4320-b719-32fec637ee48",
+          "role": "principal",
+          "user_id": "338f2835-ab00-4033-b390-aa185634979f"
+        }
+      ],
+      "nome": "Prevenção e Combate a Incêndio",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "prevencao-e-combate-a-incendio",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "2a8c091b-db23-4874-8bb6-19707dec0184",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "8d08f710-6d43-4a49-a62b-a163afa4eb09",
+          "role": "principal",
+          "user_id": "eafd6b31-61d5-45a9-bba0-190fa06f30d6"
+        }
+      ],
+      "nome": "Recepção e Eventos",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "recepcao-e-cerimonial",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 2,
+      "id": "b876af2b-a67e-4f3c-85c3-460dc2db58d4",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "ae568894-e130-4a93-b398-5b81335abf5e",
+          "role": "copresidente",
+          "user_id": "d2966417-dc6b-405d-813d-682a780c33c5"
+        },
+        {
+          "id": "0423c1b7-c02a-4be2-91fd-261a5d521e9e",
+          "role": "principal",
+          "user_id": "0ff212de-11b9-431a-b4e0-166c07b6987b"
+        }
+      ],
+      "nome": "Relações Estratégicas",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "relacoes-estrategicas",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "b11c767d-2b89-4d05-81b3-cfe2209f919e",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "20e1d061-39b4-49b3-8dc8-5c5da0b7ba98",
+          "role": "principal",
+          "user_id": "aafa8fd8-97cf-4e5b-8ade-3b4fe1e206a2"
+        }
+      ],
+      "nome": "Saúde, Bem-Estar e Acessibilidade",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "saude-bem-estar-e-acessibilidade",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "cba9ca3a-350e-45a8-a511-78a106f71d3b",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "3d22d407-28c9-4fef-97e5-252bf1a9a9d5",
+          "role": "principal",
+          "user_id": "2e229647-0db7-451d-800c-395190471751"
+        }
+      ],
+      "nome": "Segurança",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "seguranca",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "72906f8b-2be3-4a8b-abb0-e5dee0178151",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "2416e40f-87b3-4444-8e78-5bded5c1d143",
+          "role": "principal",
+          "user_id": "3f4c603a-31e0-48dd-82bb-27571b81e3c8"
+        }
+      ],
+      "nome": "Mercosul",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "mercosul",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "225b4fd1-ac34-44b6-99ac-c58f133a66ea",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "dac0489b-cebe-4764-aafe-62790c241bad",
+          "role": "principal",
+          "user_id": "fde6a374-cb22-4ac9-999f-d04229cd1517"
+        }
+      ],
+      "nome": "Serviços",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "servicos",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 9,
+      "id": "63baa491-c2c7-4e24-8db1-af1cfd6236bf",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "59739b90-e541-4965-952e-5269c61374b0",
+          "role": "principal",
+          "user_id": "c3e01950-00ba-497a-b2b0-e13debce41e2"
+        }
+      ],
+      "nome": "Soja Store",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "soja-store",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "ee7c2dcc-08cc-4ec6-9dd2-3e50655252e6",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "1f31e923-509d-4281-a166-94eb9eb006b4",
+          "role": "principal",
+          "user_id": "c44eb392-a0b1-4e26-a779-172dda834a93"
+        }
+      ],
+      "nome": "Shows",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "shows",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "e70ac6b3-9aa7-425e-aff9-69420d30c2df",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "a1d479e5-ea76-46e6-8933-5f6998acd2d8",
+          "role": "principal",
+          "user_id": "742319f2-448c-48e9-8688-65cb84911768"
+        }
+      ],
+      "nome": "Gastronomia",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "gastronomia",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 1,
+      "id": "156275a6-8d25-4dd5-a702-ef0e9a5bf618",
+      "is_active": true,
+      "is_legacy": false,
+      "is_official": true,
+      "leads": [
+        {
+          "id": "3e74a236-32e5-4123-b282-9829f17d3c7b",
+          "role": "principal",
+          "user_id": "fae623bc-2149-47c9-a59b-1899f406227c"
+        }
+      ],
+      "nome": "Acolhimento e Bem Comum",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "acolhimento-e-bem-comum",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 0,
+      "id": "39d18a2a-b2e0-4756-9896-53e261cbde45",
+      "is_active": true,
+      "is_legacy": true,
+      "is_official": false,
+      "leads": null,
+      "nome": "ETNIAS",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "etnias",
+      "unit_type": "comissao"
+    },
+    {
+      "active_count": 0,
+      "id": "0e5be0f4-1af8-421e-9ce0-f9521c9cf02b",
+      "is_active": true,
+      "is_legacy": true,
+      "is_official": false,
+      "leads": null,
+      "nome": "RELAÇÕES INSTITUCIONAIS",
+      "org_id": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+      "slug": "relacoes-institucionais",
+      "unit_type": "comissao"
+    }
+  ]
+}

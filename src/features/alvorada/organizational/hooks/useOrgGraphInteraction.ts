@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { OrganizationalGraph, OrgNode } from '../types';
+import { supportPersonIds } from '../teamPresentation';
 
 export type OrgGraphFilter =
   | 'all'
@@ -155,6 +156,7 @@ export function useOrgGraphInteraction({
     const candidate = nodeId ? nodeById.get(nodeId) ?? null : null;
     const node = candidate && matchesFilter(candidate, filter) ? candidate : null;
     const individualNode = node && node.personIds.length === 1
+      && !supportPersonIds(node).has(node.personIds[0])
       && node.type !== 'ccp' && node.type !== 'central-commission';
     const requestedPerson = personId === undefined && individualNode ? node.personIds[0] : personId;
     const validPerson = requestedPerson && node && graph.people[requestedPerson]

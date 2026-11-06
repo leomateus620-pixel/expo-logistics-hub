@@ -1,0 +1,24 @@
+{
+  "baselineCommit": "19d54148",
+  "baseline": {
+    "failedFiles": 52,
+    "passedFiles": 448,
+    "failedTests": 91,
+    "passedTests": 4184
+  },
+  "initialImplementation": {
+    "failedFiles": 52,
+    "passedFiles": 448,
+    "failedTests": 91,
+    "passedTests": 4184
+  },
+  "addedFailures": [],
+  "removedFailures": [],
+  "finalImplementation": {
+    "failedFiles": 52,
+    "passedFiles": 451,
+    "failedTests": 91,
+    "passedTests": 4240
+  },
+  "comparedFailureGroups": 91
+}

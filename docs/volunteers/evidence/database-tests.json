@@ -1,0 +1,28 @@
+{
+  "database": "disposable PostgreSQL",
+  "executedAt": "2026-11-06T10:27:19.794Z",
+  "passed": 21,
+  "tests": [
+    "Backfill preserves membership IDs, historical event IDs and snapshots",
+    "Leader creates a person, private contact and membership without auth account",
+    "Retry is idempotent and detects changed payload",
+    "Same-unit duplicate rejected; homonyms keep distinct identities",
+    "Cross-unit match creates only a private reconciliation request",
+    "otherLead cannot read private contacts or forge writes",
+    "volunteer cannot read private contacts or forge writes",
+    "oldLead cannot read private contacts or forge writes",
+    "Organization admin cannot write another organization",
+    "Anonymous cannot use RPC or contact schema",
+    "Names/emails cannot change auth identity and stale update fails",
+    "Invitation failure/retry never creates another person or account",
+    "Agenda links the stable person, returns no email and preserves IDs on edit",
+    "Admin can link another unit; leaders cannot change shared identity/contact of other unit",
+    "Inactivation preserves events and membership in other units",
+    "Revocation follows active leadership, never created_by",
+    "Storage denies writes and private RPCs; public projections contain no contact",
+    "Photo commits/removals are idempotent; stale versions and shared identity edits fail",
+    "Reconciliation and access queues are admin-only and never provision an account",
+    "Legacy trusted inserts get an identity; direct contact joins/exports remain denied",
+    "Concurrent identical requests insert exactly once"
+  ]
+}

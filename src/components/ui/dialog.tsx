@@ -46,11 +46,11 @@ DialogViewport.displayName = "DialogViewport";
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { viewportStyle?: React.CSSProperties }
+>(({ className, children, viewportStyle, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
-    <DialogViewport>
+    <DialogViewport style={viewportStyle}>
       <DialogPrimitive.Content
         ref={ref}
         className={cn(

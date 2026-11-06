@@ -25,21 +25,22 @@ export function useCommissionPeople() {
       const official = resolveOfficialUnit(unit.slug) ?? resolveOfficialUnit(unit.name);
       const key = official?.entry.id ?? unit.slug;
       const people: CommissionPerson[] = unit.responsibles.map((item) => ({
-        id: item.id,
+        id: item.personId ?? item.id,
+        personId: item.personId,
+        photoUrl: item.photoUrl,
+        legacyPhoto: item.legacyPhoto,
         name: item.displayName,
         userId: item.userId,
         role: responsibleRoleLabel(item.relationshipRole),
       }));
       const leads = people.filter(
-        (_, index) => unit.responsibles[index].relationshipRole === 'principal',
+        (_, index) => ['principal','corresponsavel','copresidente'].includes(unit.responsibles[index].relationshipRole),
       );
-      const responsible = leads[0]
-        ?? people.find((_, index) => unit.responsibles[index].isPrimary)
-        ?? people[0];
-      const leadIds = new Set((leads.length > 0 ? leads : responsible ? [responsible] : []).map((p) => p.id));
+      const responsible = leads[0];
+      const leadIds = new Set(leads.map((p) => p.id));
       map.set(key, {
         responsible,
-        leads: leads.length > 0 ? leads : responsible ? [responsible] : [],
+        leads,
         members: people.filter((person) => !leadIds.has(person.id)),
       });
     }

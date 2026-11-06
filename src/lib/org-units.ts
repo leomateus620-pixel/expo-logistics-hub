@@ -14,6 +14,11 @@ export type OrgUnitResponsibleRole =
   | 'equipe_apoio';
 
 export interface OrgUnitResponsible {
+  personId?: string;
+  photoUrl?: string | null;
+  legacyPhoto?: boolean;
+  version?: number;
+  membershipVersion?: number;
   id: string;
   displayName: string;
   responsibleType: 'pessoa' | 'equipe';

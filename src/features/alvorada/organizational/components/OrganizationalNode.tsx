@@ -14,6 +14,7 @@ import type { OrgNodeVisualState } from '../hooks/useOrgGraphInteraction';
 import { presentationStage } from '../presentationPlan';
 import { organizationalPresentationLevel } from '../layout/organizationalLayout';
 import { optimizedPortraitUrl } from '../optimizedPortrait';
+import { isSupportResponsibility, supportPersonIds } from '../teamPresentation';
 
 interface OrganizationalNodeProps {
   active: boolean;
@@ -131,11 +132,15 @@ function OrganizationalNodeComponent({
   const peopleForNode = node.personIds
     .map((personId) => people[personId])
     .filter((person): person is OrgPerson => Boolean(person));
+  const supportIds = supportPersonIds(node);
+  const leaders = peopleForNode.filter((person) => !supportIds.has(person.id));
+  const support = peopleForNode.filter((person) => supportIds.has(person.id));
   const responsibilityNames = node.responsibilities
+    .filter((responsibility) => !isSupportResponsibility(responsibility))
     .map((responsibility) => responsibility.displayName)
     .filter(Boolean);
   const names = uniqueNames([
-    ...peopleForNode.map((person) => person.fullName),
+    ...leaders.map((person) => person.fullName),
     ...responsibilityNames,
   ]).map(presentationText);
   const primaryName = focusedPerson?.fullName ?? names[0] ?? node.title;
@@ -167,6 +172,11 @@ function OrganizationalNodeComponent({
     primaryLabel,
     presentedOrganizationLabel !== primaryLabel ? presentedOrganizationLabel : null,
     names.filter((name) => name !== primaryLabel).join(', '),
+    node.responsibilities
+      .filter((item) => item.responsibleType === 'equipe' && isSupportResponsibility(item))
+      .map((item) => presentationText(item.displayName))
+      .join(', '),
+    support.length > 0 ? `${support.length} ${support.length === 1 ? 'VOLUNTÁRIO' : 'VOLUNTÁRIOS'}` : null,
   ].filter(Boolean).join('. ');
   const nodeStyle: NodeStyle = {
     '--org-node-delay': `${stage.start}ms`,
@@ -177,7 +187,7 @@ function OrganizationalNodeComponent({
     '--org-node-width': `${position.width}px`,
     '--org-node-height': `${position.height}px`,
   };
-  const visiblePeople = focusedPerson ? [focusedPerson] : peopleForNode.slice(0, isCluster ? 3 : 1);
+  const visiblePeople = focusedPerson ? [focusedPerson] : [...leaders, ...support].slice(0, isCluster ? 3 : 1);
 
   return (
     <article
@@ -261,6 +271,11 @@ function OrganizationalNodeComponent({
           {additionalCount > 0 && (
             <span className="org-node__additional">
               {isRoot ? `${additionalCount} INTEGRANTES` : `+${additionalCount} RESPONSÁVEIS`}
+            </span>
+          )}
+          {support.length > 0 && (
+            <span className="org-node__additional">
+              {support.length} {support.length === 1 ? 'VOLUNTÁRIO' : 'VOLUNTÁRIOS'}
             </span>
           )}
           <span className="org-node__organization">{isGroup ? node.subtitle : visibleOrganizationLabel}</span>

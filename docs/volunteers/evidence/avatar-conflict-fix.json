@@ -1,0 +1,44 @@
+{
+  "migration": "20261106103000",
+  "sha256": "c3c08364a4a5101aa042e1fcdf90fc41e00f8745f659b1f15a86ef307805400b",
+  "messageId": "umsg_01m6r6d7m3fafamhqq2r4tkct2",
+  "status": "completed",
+  "results": {
+    "prepareStale": [
+      {
+        "status": 409,
+        "code": "PT409",
+        "seconds": 0.25
+      },
+      {
+        "status": 409,
+        "code": "PT409",
+        "seconds": 0.59
+      },
+      {
+        "status": 409,
+        "code": "PT409",
+        "seconds": 0.26
+      }
+    ],
+    "edgeStale": {
+      "status": 409,
+      "seconds": 1.78,
+      "message": "Cadastro alterado. Reabra a edição."
+    },
+    "saveStale": {
+      "status": 409,
+      "code": "PT409",
+      "seconds": 0.56
+    },
+    "prepareCurrent": {
+      "status": 200,
+      "seconds": 0.24
+    },
+    "noRejectedMutationWritten": true,
+    "versionPreserved": 2,
+    "cleanupConfirmed": true,
+    "fixtureResidue": 0,
+    "emailsSent": 0
+  }
+}

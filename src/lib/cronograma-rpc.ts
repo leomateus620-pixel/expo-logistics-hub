@@ -85,6 +85,7 @@ export interface CronogramaCommissionLinkInput {
 }
 
 export interface CronogramaResponsibleLinkInput {
+  person_id?: string | null;
   user_id?: string | null;
   name?: string | null;
   role?: string | null;

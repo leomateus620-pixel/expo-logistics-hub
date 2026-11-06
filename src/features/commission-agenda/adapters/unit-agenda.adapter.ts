@@ -17,6 +17,8 @@ export interface UnitAgendaUnitJson {
 }
 
 export interface UnitAgendaPersonJson {
+  person_id?: string | null;
+  legacy_photo?: boolean;
   id: string | null;
   user_id: string | null;
   name: string | null;
@@ -107,7 +109,9 @@ export function toUnitAgendaEvent(
   }
 
   const people: PersonSummary[] = (row.people ?? []).map((person, index) => ({
-    id: person.id ?? `${row.id}-person-${index}`,
+    id: person.person_id ?? person.id ?? `${row.id}-person-${index}`,
+    personId: person.person_id ?? undefined,
+    legacyPhoto: person.legacy_photo,
     name: person.name ?? 'Sem nome',
     role: person.role ?? null,
     userId: person.user_id ?? null,

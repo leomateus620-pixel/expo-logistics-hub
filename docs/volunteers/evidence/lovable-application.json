@@ -1,0 +1,129 @@
+{
+  "environment": {
+    "lovableProject": "756eeb64-0d44-4171-b445-f8a60f0492c0",
+    "supabaseProject": "btfaumhroqtqzxomqorx",
+    "organization": "985888b8-155f-4bbe-b6b9-6bef2893d99b",
+    "repository": "leomateus620-pixel/expo-logistics-hub",
+    "previewAndProductionShareBackend": true
+  },
+  "mechanism": "Lovable query_database; atomic transaction, advisory lock, exact SQL in supabase_migrations.schema_migrations and SHA256; short lock timeout and preservation assertions.",
+  "appliedAt": "2026-11-06T10:06:07.140Z",
+  "migrations": [
+    {
+      "version": "20261106090000",
+      "name": "commission_volunteers",
+      "sha256": "ad1e1f27c95dc48d1acf32aea9b85132c678876823fcc853c764a565c1f3cd04"
+    },
+    {
+      "version": "20261106091000",
+      "name": "commission_people_agenda",
+      "sha256": "a38a076b51e1705e15447024cd8c799ebad2010344f1c909966ba587d5bc8134"
+    },
+    {
+      "version": "20261106092000",
+      "name": "team_reconciliation_cleanup",
+      "sha256": "51ec71fe1943ba0b731bbf291c5ebc24b71f345625e42c719eaf807761e03302"
+    },
+    {
+      "version": "20261106103000",
+      "name": "team_conflict_response",
+      "sha256": "c3c08364a4a5101aa042e1fcdf90fc41e00f8745f659b1f15a86ef307805400b"
+    }
+  ],
+  "verification": {
+    "anonymousContactsDenied": true,
+    "baseWriteDenied": true,
+    "browserCommitDenied": true,
+    "bucketPublic": false,
+    "history": [
+      {
+        "sha256": "ad1e1f27c95dc48d1acf32aea9b85132c678876823fcc853c764a565c1f3cd04",
+        "version": "20261106090000"
+      },
+      {
+        "sha256": "a38a076b51e1705e15447024cd8c799ebad2010344f1c909966ba587d5bc8134",
+        "version": "20261106091000"
+      },
+      {
+        "sha256": "51ec71fe1943ba0b731bbf291c5ebc24b71f345625e42c719eaf807761e03302",
+        "version": "20261106092000"
+      },
+      {
+        "sha256": "c3c08364a4a5101aa042e1fcdf90fc41e00f8745f659b1f15a86ef307805400b",
+        "version": "20261106103000"
+      }
+    ],
+    "memberships": 64,
+    "missingPersonLinks": 0,
+    "people": 60,
+    "privateContacts": 0,
+    "privatePublished": 0,
+    "soja": {
+      "distinctPeople": 9,
+      "members": 9,
+      "support": 8,
+      "withoutAccount": 7
+    }
+  },
+  "preservation": [
+    {
+      "checksum": "0c810489e8c162ed9f1a882e771f476f",
+      "relation": "commissions",
+      "rows": 39,
+      "unchanged": true
+    },
+    {
+      "checksum": "5bc732b6b8d827d7424674727aaadbb7",
+      "relation": "commission_responsibles",
+      "rows": 64,
+      "unchanged": true
+    },
+    {
+      "checksum": "6c4ed350ecaa397502083c0b34a62e32",
+      "relation": "cronograma_eventos",
+      "rows": 329,
+      "unchanged": true
+    },
+    {
+      "checksum": "b88c164cca8792e64ef94f01d784d377",
+      "relation": "cronograma_evento_responsaveis",
+      "rows": 570,
+      "unchanged": true
+    },
+    {
+      "checksum": "59edf1824e6189afe033ac8110c9d633",
+      "relation": "cronograma_subeventos",
+      "rows": 6,
+      "unchanged": true
+    },
+    {
+      "checksum": "edf240ad96ec601685d00cf16ee70289",
+      "relation": "cronograma_subevento_responsaveis",
+      "rows": 1,
+      "unchanged": true
+    },
+    {
+      "checksum": "a9c2f2ad965dd3d01e59b297e6c3594d",
+      "relation": "cronograma_evento_comissoes",
+      "rows": 377,
+      "unchanged": true
+    },
+    {
+      "checksum": "e9feeab56842d41a8a67100cfa00f807",
+      "relation": "cronograma_subevento_comissoes",
+      "rows": 13,
+      "unchanged": true
+    },
+    {
+      "checksum": "013979406da694b9231a4f9b7ae975a5",
+      "relation": "cronograma_subevento_convidados",
+      "rows": 2,
+      "unchanged": true
+    }
+  ],
+  "notes": [
+    "All original columns, including timestamps, compared. Only added person_id/version columns excluded.",
+    "No real invitation or notification sent; application triggers restored after metadata backfill.",
+    "Frontend publication is outside this backend application; delivered in PR."
+  ]
+}

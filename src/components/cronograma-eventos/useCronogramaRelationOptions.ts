@@ -41,7 +41,7 @@ export function responsibleLinksToSelections(
   links: CronogramaEventResponsibleLink[] | undefined,
 ): RelationalSelection[] {
   return (links ?? []).map((link) => ({
-    id: link.userId ?? `external:${(link.name ?? '').toLocaleLowerCase('pt-BR')}`,
+    id: link.personId ? `person:${link.personId}` : link.userId ?? `external:${(link.name ?? '').toLocaleLowerCase('pt-BR')}`,
     label: link.name ?? 'Responsável',
     hint: link.role ?? (link.responsibleType === 'external' ? 'Externo' : 'Membro'),
     isPrimary: link.isPrimary ?? false,
@@ -67,8 +67,10 @@ export function selectionsToResponsibleLinks(
   selections: RelationalSelection[],
 ): CronogramaEventResponsibleLink[] {
   return selections.map((selection) => {
-    const isExternal = selection.id.startsWith('external:') || selection.id.startsWith('custom:');
+    const isPerson = selection.id.startsWith('person:');
+    const isExternal = isPerson || selection.id.startsWith('external:') || selection.id.startsWith('custom:') || selection.id.startsWith('legacy:');
     return {
+      personId: isPerson ? selection.id.slice(7) : null,
       userId: isExternal ? null : selection.id,
       name: selection.label,
       role: selection.hint ?? null,
@@ -86,18 +88,11 @@ export function reconcileResponsibleSelections(
   next: RelationalSelection[],
   options: RelationalOption[],
 ): RelationalSelection[] {
-  const reconciled = next.map((selection) => {
-    if (!selection.id.startsWith('custom:') && !selection.id.startsWith('external:')) return selection;
-    const match = options.find(
-      (option) => normalizeSearchTerm(option.label) === normalizeSearchTerm(selection.label),
-    );
-    return match ? { ...selection, id: match.id, hint: selection.hint ?? match.hint } : selection;
-  });
+  // A name is not an identity: never merge homonyms or promote typed text to an account.
   const seen = new Set<string>();
-  return reconciled.filter((selection) => {
-    const key = normalizeSearchTerm(selection.label);
-    if (seen.has(key)) return false;
-    seen.add(key);
+  return next.filter(selection => {
+    if (seen.has(selection.id)) return false;
+    seen.add(selection.id);
     return true;
   });
 }
@@ -157,88 +152,7 @@ export function useCronogramaRelationOptions(linkedUnitIds: string[] = []) {
     [units, linkedSignature],
   );
 
-  const responsibleOptions = useMemo<RelationalOption[]>(() => {
-    const options: RelationalOption[] = [];
-    const seenUserIds = new Set<string>();
-    const seenExternalNames = new Set<string>();
-    const typedMembers = (members ?? []) as CronogramaRelationMember[];
-    const typedLoginMembers = (loginMembers ?? []) as CronogramaRelationMember[];
-    const memberByUserId = resolveOfficialMembers([...typedLoginMembers, ...typedMembers]);
-    const institutionalByName = new Map<string, {
-      label: string;
-      userId: string | null;
-      firstUnitName: string;
-      unitNames: Set<string>;
-      roles: Set<string>;
-    }>();
-
-    units.forEach((unit) => {
-      unit.responsibles.forEach((person) => {
-        const label = (person.displayName ?? '').trim();
-        if (!label) return;
-        const key = normalizeSearchTerm(label);
-        const existing = institutionalByName.get(key);
-        if (existing) {
-          existing.unitNames.add(unit.name);
-          existing.roles.add(responsibleRoleLabel(person.relationshipRole));
-          return;
-        }
-        institutionalByName.set(key, {
-          label,
-          userId: person.userId,
-          firstUnitName: unit.name,
-          unitNames: new Set([unit.name]),
-          roles: new Set([responsibleRoleLabel(person.relationshipRole)]),
-        });
-      });
-    });
-
-    Array.from(resolveOfficialMembers(typedLoginMembers).values())
-      .sort((a, b) => (a.nome_exibicao ?? '').localeCompare(b.nome_exibicao ?? '', 'pt-BR'))
-      .forEach((member) => {
-        const label = (member?.nome_exibicao ?? '').trim();
-        if (!label || !member?.user_id) return;
-        if (seenUserIds.has(member.user_id)) return;
-        seenUserIds.add(member.user_id);
-        const key = normalizeSearchTerm(label);
-        const memberProfile = memberByUserId.get(member.user_id);
-        const institutional = institutionalByName.get(key);
-        const persistedRole = member.cargo || undefined;
-        const displayRole = member.cargo || memberProfile?.cargo || member.role || undefined;
-        const contexts = new Set<string>();
-        if (memberProfile?.commission_nome) contexts.add(memberProfile.commission_nome);
-        institutional?.unitNames.forEach((unitName) => contexts.add(unitName));
-        options.push({
-          id: member.user_id as string,
-          label,
-          hint: persistedRole,
-          description: displayRole || 'Membro do sistema',
-          context: contexts.size > 0 ? Array.from(contexts).join(' · ') : 'Membro do sistema',
-          searchText: [member.role, memberProfile?.role, ...(institutional?.roles ?? [])].filter(Boolean).join(' '),
-          group: 'Membros do sistema',
-        });
-      });
-
-    institutionalByName.forEach((person, key) => {
-      if (person.userId && seenUserIds.has(person.userId)) return;
-      if (!person.userId && seenExternalNames.has(key)) return;
-      if (person.userId) seenUserIds.add(person.userId);
-      else seenExternalNames.add(key);
-      const unitNames = Array.from(person.unitNames);
-      const roles = Array.from(person.roles);
-      options.push({
-        id: person.userId ?? `custom:${person.label.toLocaleLowerCase('pt-BR')}`,
-        label: person.label,
-        hint: person.firstUnitName,
-        description: roles.join(' · ') || 'Responsável institucional',
-        context: unitNames.join(' · '),
-        searchText: [...unitNames, ...roles].join(' '),
-        group: 'Responsáveis institucionais',
-      });
-    });
-
-    return options;
-  }, [loginMembers, members, units]);
+  const responsibleOptions = useMemo<RelationalOption[]>(() => buildInstitutionalPersonOptions(units, loginMembers as CronogramaRelationMember[]), [units,loginMembers]);
 
   return {
     units,
@@ -252,4 +166,25 @@ export function useCronogramaRelationOptions(linkedUnitIds: string[] = []) {
     membersLoading: membersLoading || isLoadingLoginMembers,
     membersError: membersError || loginMembersError,
   };
+}
+
+/** Deduplicate only by the persisted person ID or a verified account relationship. */
+export function buildInstitutionalPersonOptions(units: ReturnType<typeof useOrgCommissions>['units'], loginMembers:CronogramaRelationMember[]=[]):RelationalOption[]{
+  const people=new Map<string,{label:string;userId:string|null;units:Set<string>;roles:Set<string>}>();
+  const seenUsers=new Set<string>();
+  for(const unit of units) for(const p of unit.responsibles){
+    if(p.responsibleType!=='pessoa')continue;
+    const id=p.personId?`person:${p.personId}`:p.userId??`legacy:${p.id}`;
+    const existing=people.get(id);
+    if(existing){existing.units.add(unit.name);existing.roles.add(responsibleRoleLabel(p.relationshipRole));}
+    else people.set(id,{label:p.displayName,userId:p.userId,units:new Set([unit.name]),roles:new Set([responsibleRoleLabel(p.relationshipRole)])});
+    if(p.userId)seenUsers.add(p.userId);
+  }
+  const options:RelationalOption[]=[...people].map(([id,p])=>({id,label:p.label,hint:[...p.units].join(' · '),description:[...p.roles].join(' · '),context:[...p.units].join(' · '),searchText:[...p.units,...p.roles].join(' '),group:'Equipe institucional'}));
+  for(const m of loginMembers){
+    if(!m.user_id||!m.nome_exibicao||seenUsers.has(m.user_id))continue;
+    seenUsers.add(m.user_id);
+    options.push({id:m.user_id,label:m.nome_exibicao,hint:m.cargo??undefined,context:m.commission_nome??'Membro do sistema',group:'Membros do sistema'});
+  }
+  return options.sort((a,b)=>a.label.localeCompare(b.label,'pt-BR')||a.id.localeCompare(b.id));
 }

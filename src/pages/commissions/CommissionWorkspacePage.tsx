@@ -1,3 +1,4 @@
+import { VolunteerTeamById } from '@/features/volunteers/VolunteerTeam';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { CalendarPlus, MapPinned, Building2, ArrowUpRight } from 'lucide-react';
@@ -20,7 +21,6 @@ import {
   CommissionDocumentsPage,
   CommissionOverviewPage,
   CommissionTasksPage,
-  CommissionTeamPage,
   CommissionWorkspaceShell,
   WORKSPACE_SECTION_PATHS,
   buildWorkspaceNavigation,
@@ -288,7 +288,7 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         unit={unit}
         navigation={navigation}
         section={section}
-        action={{ label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
+        action={section === 'team' ? undefined : { label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
       >
         <PageTransition>
           {entry.id === 'soy-summit' && section === 'overview' && <Link to={SOY_SUMMIT_ROUTE}
@@ -350,7 +350,7 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
                 />
               }
             />
-            <Route path={WORKSPACE_SECTION_PATHS.team} element={<CommissionTeamPage unit={unit} state={peopleLoading ? 'loading' : 'ready'} />} />
+            <Route path={WORKSPACE_SECTION_PATHS.team} element={<VolunteerTeamById commissionId={commissionId} />} />
             <Route path={WORKSPACE_SECTION_PATHS.tasks} element={<CommissionTasksPage unit={unit} />} />
             <Route path="*" element={<Navigate to={overviewPath} replace />} />
           </Routes>

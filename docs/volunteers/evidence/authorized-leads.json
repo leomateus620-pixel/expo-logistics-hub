@@ -1,0 +1,553 @@
+{
+  "rows": [
+    {
+      "id": "156275a6-8d25-4dd5-a702-ef0e9a5bf618",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "3e74a236-32e5-4123-b282-9829f17d3c7b",
+          "name": "Bruna Pacheco de Quadros",
+          "role": "principal"
+        }
+      ],
+      "slug": "acolhimento-e-bem-comum"
+    },
+    {
+      "id": "8cd0f332-4f42-4bb6-9252-0a60e62eaca2",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "9bb55059-eaf6-4374-a37b-2d92d8d661fa",
+          "name": "Vanessa Matraszek Gnoatto",
+          "role": "principal"
+        }
+      ],
+      "slug": "agricultura-soja-e-derivados"
+    },
+    {
+      "id": "a78d8c79-1f27-40c2-8125-43450705bc22",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "d8475a13-8ec6-472a-8636-719d63abfe3b",
+          "name": "Leonardo Chitolina",
+          "role": "principal"
+        }
+      ],
+      "slug": "arte-e-cultura"
+    },
+    {
+      "id": "57378343-21cf-4ac9-82ed-e85904f52541",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "214d2f80-dc74-460c-ae32-aeb403a4233c",
+          "name": "Deise Anelise Froelich",
+          "role": "principal"
+        },
+        {
+          "authorized": true,
+          "membershipId": "8230b07a-3235-4831-ad8f-273ed111fbd2",
+          "name": "Francine Maria Boijink",
+          "role": "principal"
+        }
+      ],
+      "slug": "assessoria-de-imprensa"
+    },
+    {
+      "id": "ed23de8f-6293-4321-a8c2-852a1f83f5ec",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "af134b19-983b-4187-b901-b2d1ff9cf934",
+          "name": "Zélia Savoldi",
+          "role": "principal"
+        }
+      ],
+      "slug": "assessoria-de-marketing"
+    },
+    {
+      "id": "c112962d-dddd-4836-a95e-23c84ee5dcfa",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "a9037c4c-effb-44ed-89c7-360e7737e6e9",
+          "name": "Jorge Luiz Viana",
+          "role": "principal"
+        }
+      ],
+      "slug": "assessoria-de-protocolo"
+    },
+    {
+      "id": "92170d2f-27e4-4f81-ba26-40a9fa06b5a3",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "6fcc730c-91ca-482e-b8b1-cfd42b1819b7",
+          "name": "Julio Bravo",
+          "role": "principal"
+        },
+        {
+          "authorized": true,
+          "membershipId": "acd21e70-3048-4b19-a89a-2f4e538f542c",
+          "name": "Sara Kirchhof Varela",
+          "role": "principal"
+        },
+        {
+          "authorized": true,
+          "membershipId": "eba9b954-2528-4b5c-b3d8-ab7005a43d31",
+          "name": "Roberto Adriano Racho",
+          "role": "principal"
+        }
+      ],
+      "slug": "assessoria-de-relacoes-internacionais"
+    },
+    {
+      "id": "07fb35ca-cfb9-45fd-9638-f86872fdfca4",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "11df1b45-91ca-4642-b2a0-b5422ed3a3b1",
+          "name": "Jeferson Araújo",
+          "role": "principal"
+        }
+      ],
+      "slug": "assessoria-de-sistemas"
+    },
+    {
+      "id": "db726fd0-eb47-4161-9a87-c7976925dc9e",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "91d912b9-c584-4d8b-b1b2-92f8c0620c97",
+          "name": "Estela Zamberlan Schwerz",
+          "role": "principal"
+        }
+      ],
+      "slug": "assessoria-de-sustentabilidade"
+    },
+    {
+      "id": "0e396dd8-016f-4748-b278-3b65956a33d9",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "67a47dcc-c92d-4e88-a2f5-92844b471d89",
+          "name": "José Mauro Barbieri",
+          "role": "principal"
+        },
+        {
+          "authorized": true,
+          "membershipId": "e1bae47d-9b86-461c-8e92-ea7b0601ddcc",
+          "name": "Sandra Lameira",
+          "role": "principal"
+        }
+      ],
+      "slug": "assessoria-juridica"
+    },
+    {
+      "id": "1a8d4f15-448f-43cc-9e4b-b17776c34846",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "2a550434-bd0c-40ef-b633-c4b2a8c3bb91",
+          "name": "Jardel Hillesheim",
+          "role": "principal"
+        }
+      ],
+      "slug": "assessoria-projetos-e-captacoes-institucionais"
+    },
+    {
+      "id": "573c6cff-cb11-4b37-8855-a920b933778c",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "9054d273-f70f-4fe2-8cda-e96b881aa90d",
+          "name": "José Fernando Borella",
+          "role": "principal"
+        }
+      ],
+      "slug": "bilheteria"
+    },
+    {
+      "id": "0f2b084c-1795-429b-a00a-5e3717d9efac",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "3c629648-8081-413b-8b2b-3e0a2af11845",
+          "name": "Milton Racho",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "2b4d0e8a-db8f-4435-b77a-d8312c5e354b",
+          "name": "Elemar Antonio Lenz",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "f900df12-8b86-4c69-a76d-26fdb711705f",
+          "name": "Dário Júnior da Motta Germano",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "d1c137ac-4157-4870-8eec-a52d7bcb29ef",
+          "name": "Marcos Eduardo Servat",
+          "role": "corresponsavel"
+        }
+      ],
+      "slug": "ccpf"
+    },
+    {
+      "id": "d85594df-142b-46f1-a5af-598b7d504efd",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "7e43cf84-ae86-460e-ac6d-07087e76a745",
+          "name": "Cléo Antonio Rockenbach",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "558236e1-4220-4000-ba53-4b02a403dd2e",
+          "name": "Zélia Savoldi",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "540b4245-5e8b-4cfa-9f1f-270f4671c4c6",
+          "name": "Elemar Antonio Lenz",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "535289bf-3793-4a66-92b8-b0b9bb8a68ef",
+          "name": "Fabiano Soltis",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "69a5485c-5862-42d2-8b86-abcb4c47de8e",
+          "name": "Fernanda Seckler Eich",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "e883b9ce-cc6e-4510-82c2-545bc20f622b",
+          "name": "Roque Vanderlei Lugoch",
+          "role": "principal"
+        },
+        {
+          "authorized": true,
+          "membershipId": "31c57ca9-ec3f-4278-bcfd-72287d888b2e",
+          "name": "Débora Letícia Bamberg",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "9e0084e8-9e5a-4aba-833e-01a60e42d37f",
+          "name": "Djeison Drey",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "73b5cd0a-9356-4c08-b6dc-c4938e56e0b4",
+          "name": "Dário Júnior da Motta Germano",
+          "role": "corresponsavel"
+        },
+        {
+          "authorized": true,
+          "membershipId": "857ae254-8cd4-4fec-ae45-14c97f9b7146",
+          "name": "Marcos Eduardo Servat",
+          "role": "corresponsavel"
+        }
+      ],
+      "slug": "central"
+    },
+    {
+      "id": "bdffa0d2-f0dc-4080-849d-8f2ee2bae723",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "f97f10ec-e65a-43fe-9eb0-a64ed96f46fa",
+          "name": "Alexandre Dall'Agnese",
+          "role": "principal"
+        }
+      ],
+      "slug": "cooperativismo"
+    },
+    {
+      "id": "39a30458-ab9a-4aa0-8d1a-4dfa3a5041ce",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "2464f145-7164-4aa5-8738-9a7b581b6335",
+          "name": "Larissa Mello Dallalba",
+          "role": "principal"
+        }
+      ],
+      "slug": "credenciamento"
+    },
+    {
+      "id": "73228ac5-a18d-404e-89a1-475ef15a8564",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "035080f7-9a05-41c5-96f4-6fe7aae9b3f6",
+          "name": "Elton Luis Walker",
+          "role": "principal"
+        }
+      ],
+      "slug": "espaco-do-automovel"
+    },
+    {
+      "id": "39d18a2a-b2e0-4756-9896-53e261cbde45",
+      "leads": null,
+      "slug": "etnias"
+    },
+    {
+      "id": "2fc57f56-96ce-4c49-963b-3a0a4f794908",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "8481fedc-0524-45c3-88e9-fcb27c03533c",
+          "name": "Germano Tessmer Büttow",
+          "role": "principal"
+        }
+      ],
+      "slug": "exporural"
+    },
+    {
+      "id": "0734ec46-4b1c-4240-ba5a-553615f6048e",
+      "leads": null,
+      "slug": "fotografia"
+    },
+    {
+      "id": "e70ac6b3-9aa7-425e-aff9-69420d30c2df",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "a1d479e5-ea76-46e6-8933-5f6998acd2d8",
+          "name": "Rodrigo Calixto",
+          "role": "principal"
+        }
+      ],
+      "slug": "gastronomia"
+    },
+    {
+      "id": "6c9d59a8-2ff9-4909-89d6-044a1fe1b393",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "1eeb89df-28c7-4665-836a-f8e5efbe2a03",
+          "name": "Felipe Bortoli",
+          "role": "principal"
+        }
+      ],
+      "slug": "industria-comercio-e-servicos"
+    },
+    {
+      "id": "913feda9-df46-4cd4-82e7-e2cf48cdd165",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "4dcb62bd-72ce-4c0d-bc2b-cfb9f5d27ff1",
+          "name": "Roberto Steffen",
+          "role": "principal"
+        }
+      ],
+      "slug": "infraestrutura-e-seguranca-do-trabalho"
+    },
+    {
+      "id": "98740251-32de-440c-8c75-b0c25f0ef653",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "f6facff9-ff18-4e5d-a5b0-60b652993e2a",
+          "name": "Felipe Carpenedo Gabriel",
+          "role": "principal"
+        }
+      ],
+      "slug": "inovacao-e-experiencia"
+    },
+    {
+      "id": "a2af4952-6867-43ba-a1d4-5fc223a9db09",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "b061739d-43dc-408b-8b1a-1ce37d700363",
+          "name": "Eduardo Santos",
+          "role": "principal"
+        }
+      ],
+      "slug": "logistica-hotelaria-e-turismo"
+    },
+    {
+      "id": "72906f8b-2be3-4a8b-abb0-e5dee0178151",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "2416e40f-87b3-4444-8e78-5bded5c1d143",
+          "name": "Raul Dário Nunez",
+          "role": "principal"
+        }
+      ],
+      "slug": "mercosul"
+    },
+    {
+      "id": "6fed6627-d1bb-464f-be35-e5f90c50468d",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "ce6afa15-fdec-497b-b7ba-447711c871ea",
+          "name": "Josyane Cristina Heck",
+          "role": "principal"
+        }
+      ],
+      "slug": "novas-geracoes"
+    },
+    {
+      "id": "f4e5766f-81f3-4ee1-b871-84403eaea322",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "5de7c471-db2c-4d07-914b-0aee79491729",
+          "name": "Elisandra Simão Reis",
+          "role": "principal"
+        }
+      ],
+      "slug": "pecuaria"
+    },
+    {
+      "id": "41233e20-f343-49c5-b802-2c2455081b06",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "d00d4e84-eb79-4320-b719-32fec637ee48",
+          "name": "Cap. Leonardo Ruy Dambroz",
+          "role": "principal"
+        }
+      ],
+      "slug": "prevencao-e-combate-a-incendio"
+    },
+    {
+      "id": "2a8c091b-db23-4874-8bb6-19707dec0184",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "8d08f710-6d43-4a49-a62b-a163afa4eb09",
+          "name": "Thaís Bróglio",
+          "role": "principal"
+        }
+      ],
+      "slug": "recepcao-e-cerimonial"
+    },
+    {
+      "id": "c66810cf-5be2-48e0-826b-6dd1865fbd11",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "eb7980e4-6f7e-4492-8fbb-22041164453a",
+          "name": "Fernanda Matarucco Meinertz",
+          "role": "principal"
+        }
+      ],
+      "slug": "relacionamento-e-experiencia"
+    },
+    {
+      "id": "b876af2b-a67e-4f3c-85c3-460dc2db58d4",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "0423c1b7-c02a-4be2-91fd-261a5d521e9e",
+          "name": "Paulo Miguel Nedel",
+          "role": "principal"
+        },
+        {
+          "authorized": true,
+          "membershipId": "ae568894-e130-4a93-b398-5b81335abf5e",
+          "name": "Diana Schmidt Nedel",
+          "role": "copresidente"
+        }
+      ],
+      "slug": "relacoes-estrategicas"
+    },
+    {
+      "id": "0e5be0f4-1af8-421e-9ce0-f9521c9cf02b",
+      "leads": null,
+      "slug": "relacoes-institucionais"
+    },
+    {
+      "id": "b11c767d-2b89-4d05-81b3-cfe2209f919e",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "20e1d061-39b4-49b3-8dc8-5c5da0b7ba98",
+          "name": "Rosa Zorzan de Paula",
+          "role": "principal"
+        }
+      ],
+      "slug": "saude-bem-estar-e-acessibilidade"
+    },
+    {
+      "id": "cba9ca3a-350e-45a8-a511-78a106f71d3b",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "3d22d407-28c9-4fef-97e5-252bf1a9a9d5",
+          "name": "Ten. Cel. Vanessa Peripolli",
+          "role": "principal"
+        }
+      ],
+      "slug": "seguranca"
+    },
+    {
+      "id": "225b4fd1-ac34-44b6-99ac-c58f133a66ea",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "dac0489b-cebe-4764-aafe-62790c241bad",
+          "name": "Valtair Dornelles",
+          "role": "principal"
+        }
+      ],
+      "slug": "servicos"
+    },
+    {
+      "id": "ee7c2dcc-08cc-4ec6-9dd2-3e50655252e6",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "1f31e923-509d-4281-a166-94eb9eb006b4",
+          "name": "Daniel U. Ribeiro da Silva",
+          "role": "principal"
+        }
+      ],
+      "slug": "shows"
+    },
+    {
+      "id": "63baa491-c2c7-4e24-8db1-af1cfd6236bf",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "59739b90-e541-4965-952e-5269c61374b0",
+          "name": "Cristina Beatriz Manjabosco Scheuermann",
+          "role": "principal"
+        }
+      ],
+      "slug": "soja-store"
+    },
+    {
+      "id": "8837250f-0ad6-410f-8fec-8c123e2e5d79",
+      "leads": [
+        {
+          "authorized": true,
+          "membershipId": "632fa3fa-5151-4d3b-86c8-a8f6697d2720",
+          "name": "Cassio Ricardo Feltes",
+          "role": "principal"
+        }
+      ],
+      "slug": "soy-summit"
+    }
+  ]
+}

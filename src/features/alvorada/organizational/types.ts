@@ -97,6 +97,9 @@ export interface OrganizationalMemberRecord {
 }
 
 export interface OrganizationalResponsibleRecord {
+  personId?: string;
+  photoUrl?: string | null;
+  legacyPhoto?: boolean;
   id: string;
   displayName: string;
   responsibleType: 'pessoa' | 'equipe';

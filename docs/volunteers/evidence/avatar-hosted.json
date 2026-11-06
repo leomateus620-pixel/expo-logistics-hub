@@ -1,0 +1,71 @@
+{
+  "project": "756eeb64-0d44-4171-b445-f8a60f0492c0",
+  "backend": "btfaumhroqtqzxomqorx",
+  "deploymentMessage": "umsg_01m6r3gasrfcs81ha7vj6tbn0x",
+  "testMessage": "umsg_01m6r54epce36vqvqgnq6k1nf4",
+  "function": "team-avatar",
+  "mechanism": "Lovable deploy_edge_functions",
+  "bundleSha256": "d00c1a915ce26de90d5e5999fb4964ef53a5e4ee8807dee802a130a0931c2bf6",
+  "numericDeploymentVersion": "Not exposed by connector",
+  "verifyJwt": true,
+  "tests": {
+    "authenticatedPng": {
+      "status": 200,
+      "version": 2,
+      "format": "image/webp",
+      "width": 256,
+      "height": 256,
+      "bytes": 196,
+      "sha256": "db1114162943903d68f8d46ada2efd851e2a59fd066e8423e50d243ebba8b9eb"
+    },
+    "sameRequestRetry": {
+      "status": 200,
+      "version": 2,
+      "files": 1
+    },
+    "replaceJpeg": {
+      "status": 200,
+      "version": 3,
+      "files": 1
+    },
+    "replaceWebp": {
+      "status": 200,
+      "version": 4,
+      "files": 1
+    },
+    "remove": {
+      "status": 200,
+      "version": 5,
+      "files": 0
+    },
+    "invalidGif": 400,
+    "forgedPng": 400,
+    "forgedPerson": 403,
+    "forgedUnit": 403,
+    "anonymousFunction": 401,
+    "anonymousStorageDenied": true,
+    "invalidCrop": 400,
+    "staleVersionInitial": {
+      "status": 409,
+      "message": "upstream request timeout",
+      "followup": "umsg_01m6r5s61weep8ftd8z5nxrvvy"
+    }
+  },
+  "fixture": {
+    "org": "bf664349-0478-4991-9ce3-fd5fa40fb308",
+    "unit": "54a346ed-40bc-4333-8d4a-3c210301047c",
+    "person": "2e6e9702-1607-4541-bcc5-805fbe6622d8",
+    "accountLinkedToPerson": false,
+    "syntheticAuthAccountsCreatedAndDeleted": 3,
+    "syntheticOrganizationsCreatedAndDeleted": 2,
+    "cleanupConfirmed": true,
+    "privateResidue": 0,
+    "storageResidue": 0,
+    "realMessagesSent": 0
+  },
+  "notes": [
+    "Only synthetic data and example.invalid contacts.",
+    "No temporary privileged endpoint, borrowed real-user session or frontend deploy.",
+    "Final stale-version follow-up is recorded separately."
+  ]
+}

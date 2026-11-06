@@ -68,7 +68,8 @@ export function draftToSaveEventPayload(
     const person = resolvePerson(personId);
     if (!person) return;
     responsibles.push({
-      user_id: person.userId ?? null,
+      person_id: person.personId ?? null,
+      user_id: person.personId ? null : person.userId ?? null,
       name: person.name,
       role: person.role ?? null,
       is_primary: index === 0,

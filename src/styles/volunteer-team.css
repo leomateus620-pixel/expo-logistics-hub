@@ -1,0 +1,467 @@
+.vt-page {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+  color: var(--text-primary, #102033);
+  font-family: Inter, sans-serif;
+}
+.vt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 8px 0;
+}
+.vt-eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #586576);
+  margin-bottom: 6px;
+}
+.vt-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+}
+.vt-header h2 span {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: #e9edf2;
+  letter-spacing: 0;
+}
+.vt-header p:last-child {
+  font-size: 14px;
+  color: var(--text-secondary, #586576);
+  margin-top: 8px;
+}
+.vt-add {
+  min-height: 44px;
+  white-space: nowrap;
+}
+.vt-section {
+  padding: 24px;
+  background: var(--surface-primary, #fff);
+  border: 1px solid var(--border-subtle, #e1e5eb);
+  border-radius: 16px;
+}
+.vt-section__heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  font-size: 15px;
+  font-weight: 650;
+}
+.vt-section__heading svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  color: #667389;
+}
+.vt-section__heading--search {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.vt-section__heading h3 span {
+  font-weight: 400;
+  color: #657184;
+}
+.vt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.vt-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  min-width: 0;
+  border: 1px solid #e5e9ef;
+  border-radius: 12px;
+  background: #fff;
+}
+.vt-person--lead {
+  background: #f8fafc;
+  border-color: #e4e8ee;
+}
+.vt-person .ws-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #e9eff3;
+  border: 2px solid white;
+  color: #3f5968;
+  font-size: 14px;
+  font-weight: 650;
+}
+.vt-person .ws-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.vt-person--lead .ws-avatar {
+  background: #e6f0ec;
+  color: #285e4a;
+}
+.vt-person__name {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.vt-person__role {
+  font-size: 12px;
+  color: #657184;
+  line-height: 1.5;
+  margin-top: 3px;
+}
+.vt-person--saved {
+  outline: 2px solid #2e8662;
+  outline-offset: 2px;
+}
+.vt-search {
+  position: relative;
+  width: 240px;
+  font-weight: 400;
+}
+.vt-search svg {
+  position: absolute;
+  top: 13px;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+}
+.vt-search input {
+  padding-left: 37px;
+  min-height: 44px;
+}
+.vt-empty {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 32px 16px;
+  color: #647084;
+  font-size: 14px;
+}
+.vt-empty > svg {
+  width: 32px;
+  height: 32px;
+  color: #8a97a8;
+}
+.vt-empty h4 {
+  color: #25354a;
+  font-weight: 650;
+  font-size: 16px;
+}
+.vt-empty button {
+  margin-top: 6px;
+}
+.vt-admin {
+  border: 1px solid #e1e5eb;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 13px;
+  background: #fafbfc;
+}
+.vt-admin summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  font-weight: 550;
+}
+.vt-admin svg {
+  width: 16px;
+  height: 16px;
+}
+.vt-admin summary span {
+  margin-left: auto;
+  font-size: 11px;
+  color: #657184;
+}
+.vt-admin ul {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+.vt-admin li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  justify-content: space-between;
+  overflow-wrap: anywhere;
+}
+.vt-admin li span {
+  color: #556378;
+}
+.vt-dialog.vt-dialog {
+  max-width: 560px;
+  background: #fff;
+  backdrop-filter: none;
+  padding: 24px 0 0;
+  gap: 0;
+  color: #17253a;
+}
+.vt-dialog > div:first-child {
+  padding: 0 28px 18px;
+  text-align: left;
+}
+.vt-form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.vt-form__body {
+  padding: 0 28px 24px;
+  display: grid;
+  gap: 22px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.vt-form__body input:not([type="checkbox"]):not([type="range"]) {
+  min-height: 46px;
+  font-size: 16px;
+}
+.vt-form__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  gap: 8px;
+  border-top: 1px solid #e7eaf0;
+  background: #fafbfc;
+  flex-shrink: 0;
+}
+.vt-form__footer button {
+  min-height: 44px;
+  font-size: 13px;
+}
+.vt-destination {
+  background: #f3f6f8;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+}
+.vt-destination span {
+  font-size: 11px;
+  color: #657184;
+}
+.vt-destination strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.vt-privacy {
+  font-size: 12px;
+  line-height: 1.6;
+  display: flex;
+  gap: 8px;
+  color: #657184;
+}
+.vt-privacy svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.vt-invite {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 0;
+}
+.vt-invite input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  accent-color: #183e51;
+}
+.vt-invite small {
+  display: block;
+  font-size: 12px;
+  color: #657184;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+.vt-photo {
+  display: grid;
+  gap: 12px;
+}
+.vt-photo__preview {
+  height: 72px;
+  width: 72px;
+  border-radius: 50%;
+  background: #f1f4f7;
+  border: 1px dashed #bcc7d3;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  color: #748295;
+}
+.vt-photo__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.vt-photo button {
+  min-height: 44px;
+  font-size: 13px;
+}
+.vt-crop {
+  display: grid;
+  gap: 12px;
+  background: #f7f9fb;
+  border-radius: 12px;
+  padding: 16px;
+}
+.vt-crop__viewport {
+  position: relative;
+  width: 256px;
+  height: 256px;
+  margin: auto;
+  overflow: hidden;
+  cursor: move;
+  background: #17253a;
+  max-width: 100%;
+}
+.vt-crop__viewport img {
+  position: absolute;
+  pointer-events: none;
+}
+.vt-crop__mask {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 55px #09172a99;
+  pointer-events: none;
+}
+.vt-range {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+.vt-range input {
+  width: 100%;
+  min-height: 32px;
+  accent-color: #1d6656;
+}
+.vt-error,
+.vt-success,
+.vt-notice {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.vt-error,
+.vt-field-error {
+  color: #a12525;
+  background: #fff4f3;
+}
+.vt-field-error {
+  background: none;
+  font-size: 12px;
+}
+.vt-success {
+  background: #edf8f2;
+  color: #205d40;
+}
+.vt-notice {
+  background: #fff8e7;
+  color: #77571b;
+}
+.vt-loading {
+  padding: 32px;
+}
+.vt-page :focus-visible,
+.vt-dialog :focus-visible {
+  outline: 2px solid #276b62;
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .vt-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .vt-header h2 {
+    font-size: 24px;
+  }
+  .vt-add {
+    width: 100%;
+  }
+  .vt-page {
+    gap: 20px;
+  }
+  .vt-section {
+    padding: 18px 14px;
+  }
+  .vt-grid {
+    grid-template-columns: 1fr;
+  }
+  .vt-section__heading--search {
+    display: grid;
+  }
+  .vt-search {
+    width: 100%;
+  }
+  .vt-person {
+    padding: 14px 12px;
+  }
+  .vt-dialog.vt-dialog {
+    max-height: 94dvh;
+    padding-top: 20px;
+    border-radius: 16px;
+  }
+  .vt-dialog > div:first-child {
+    padding: 0 20px 16px;
+  }
+  .vt-form__body {
+    padding: 0 20px 20px;
+    gap: 18px;
+  }
+  .vt-form__footer {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+  .vt-form__footer > div {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 86px;
+  }
+  .vt-form__footer > button {
+    display: none;
+  }
+  .vt-admin li {
+    display: grid;
+  }
+  .vt-header p:last-child {
+    line-height: 1.5;
+  }
+}
