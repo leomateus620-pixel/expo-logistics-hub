@@ -9,7 +9,10 @@ describe('Soja Store portraits', () => {
     ['Carla Freisleben Servat', 'carla-servat'],
     ['Paola Johann Külzer', 'paola-kulzer'],
     ['Andressa Kunzler', 'andressa-kunzler'],
-    ['Diovana Lorenzato', 'diovana-lorenzato'],
+    ['Diovanna Lorenzato', 'diovana-lorenzato'],
+    ['Fernanda Reis Rauber', 'fernanda-reis-rauber'],
+    ['Alessandra Schaefer', 'alessandra-schaefer'],
+    ['Tatiane Raquel Meinhart', 'tatiane-raquel-meinhart'],
     ['Lucas Tolazzi', 'lucas-tolazzi'],
   ])('resolves %s by name', (name, file) => {
     expect(getPersonPhoto(name)).toContain(`person-${file}`);
