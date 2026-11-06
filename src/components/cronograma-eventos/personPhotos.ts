@@ -50,6 +50,9 @@ import carlaServat from '@/assets/person-carla-servat.webp.asset.json';
 import paolaKulzer from '@/assets/person-paola-kulzer.webp.asset.json';
 import andressaKunzler from '@/assets/person-andressa-kunzler.webp.asset.json';
 import diovanaLorenzato from '@/assets/person-diovana-lorenzato.webp.asset.json';
+import fernandaReisRauber from '@/assets/person-fernanda-reis-rauber.webp.asset.json';
+import alessandraSchaefer from '@/assets/person-alessandra-schaefer.webp.asset.json';
+import tatianeMeinhart from '@/assets/person-tatiane-raquel-meinhart.webp.asset.json';
 import lucasTolazzi from '@/assets/person-lucas-tolazzi.webp.asset.json';
 
 /**
@@ -120,7 +123,11 @@ const PERSON_PHOTOS: Record<string, string> = {
   'carla freisleben servat': carlaServat.url,
   'paola johann kulzer': paolaKulzer.url,
   'andressa kunzler': andressaKunzler.url,
+  'diovanna lorenzato': diovanaLorenzato.url,
   'diovana lorenzato': diovanaLorenzato.url,
+  'fernanda reis rauber': fernandaReisRauber.url,
+  'alessandra schaefer': alessandraSchaefer.url,
+  'tatiane raquel meinhart': tatianeMeinhart.url,
   'lucas tolazzi': lucasTolazzi.url,
 };
 
