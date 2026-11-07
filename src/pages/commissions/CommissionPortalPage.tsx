@@ -1,4 +1,4 @@
-import {Link} from 'react-router-dom';
+import {Link, useSearchParams} from 'react-router-dom';
 import { WorkersLauncherSlot } from '@/components/WorkersLauncherSlot';
 import {
   lazy,
@@ -24,6 +24,7 @@ import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { resolveModuleAccess } from '@/hooks/useModuleAccess';
 import { useFinancialModuleAccess } from '@/hooks/useFinancialModuleAccess';
 import { dismissAlvoradaIntro } from '@/features/alvorada/introSession';
+import { readEcosystemLocation, writeEcosystemLocation, type EcosystemLocation } from '@/features/alvorada/ecosystemNavigation';
 import {
   ECOSYSTEM_CLOSE_LABEL,
   ECOSYSTEM_DIALOG_LABEL,
@@ -122,7 +123,9 @@ export default function CommissionPortalPage() {
   const { hasOrg, orgId, myRole, isLoading: orgLoading } = useCurrentOrg();
   const financialAccess = useFinancialModuleAccess(orgId);
   const [expandedEntry, setExpandedEntry] = useState<PortalEntryId | null>(null);
-  const [ecosystemOpen, setEcosystemOpen] = useState(false);
+  const [ecosystemParams, setEcosystemParams] = useSearchParams();
+  const ecosystemLocation = readEcosystemLocation(ecosystemParams);
+  const ecosystemOpen = ecosystemLocation !== null;
   const [historyReleased, setHistoryReleased] = useState(false);
   const [historyUserPaused, setHistoryUserPaused] = useState(() => readGallerySession()?.userPaused ?? false);
   const [historyMotionAvailable, setHistoryMotionAvailable] = useState(false);
@@ -281,20 +284,25 @@ export default function CommissionPortalPage() {
     // the countdown card: the card reveals the countdown and stops rendering.
     dismissAlvoradaIntro();
     preloadEcosystem();
-    setEcosystemOpen(true);
-  }, [preloadEcosystem]);
+    setEcosystemParams(current => writeEcosystemLocation(current, { view: 'organization' }));
+  }, [preloadEcosystem, setEcosystemParams]);
+
+  const navigateEcosystem = useCallback((target: EcosystemLocation) => {
+    setEcosystemParams(current => writeEcosystemLocation(current, target));
+  }, [setEcosystemParams]);
 
   const closeEcosystem = useCallback(() => {
-    setEcosystemOpen(false);
-    window.requestAnimationFrame(() => {
-      ecosystemLauncherRef.current?.focus({ preventScroll: true });
-    });
-  }, []);
+    setEcosystemParams(current => writeEcosystemLocation(current, null));
+  }, [setEcosystemParams]);
+  const closeEcosystemRef = useRef(closeEcosystem);
+  closeEcosystemRef.current = closeEcosystem;
 
   useLayoutEffect(() => {
     if (!ecosystemOpen) return undefined;
+    dismissAlvoradaIntro();
 
     const portal = portalRef.current;
+    const ecosystemLauncher = ecosystemLauncherRef.current;
     const bodyOverflow = document.body.style.overflow;
     const documentOverflow = document.documentElement.style.overflow;
     const documentScrollbarGutter = document.documentElement.style.scrollbarGutter;
@@ -320,7 +328,7 @@ export default function CommissionPortalPage() {
       if (event.key === 'Escape') {
         event.preventDefault();
         event.stopImmediatePropagation();
-        closeEcosystem();
+        closeEcosystemRef.current();
       }
     };
 
@@ -335,8 +343,9 @@ export default function CommissionPortalPage() {
       if (previousAriaHidden === null) portal?.removeAttribute('aria-hidden');
       else portal?.setAttribute('aria-hidden', previousAriaHidden);
       if (!hadInert) portal?.removeAttribute('inert');
+      window.requestAnimationFrame(() => ecosystemLauncher?.focus({ preventScroll: true }));
     };
-  }, [ecosystemOpen, closeEcosystem]);
+  }, [ecosystemOpen]);
 
   const getEntryAccess = (entryId: PortalEntryId): PortalAccessPresentation => {
     if (entryId === 'comissoes') {
@@ -422,7 +431,7 @@ export default function CommissionPortalPage() {
           </button>}
         </header>
 
-        <FenasojaPortalHero onIntroReleased={releaseHistory} />
+        <FenasojaPortalHero onIntroReleased={releaseHistory} introSuppressed={ecosystemOpen} />
         {user && <Link to="/equipes" className="my-4 inline-flex min-h-11 items-center rounded-lg border border-white/30 bg-white/10 px-4 text-sm font-medium text-white focus-visible:outline focus-visible:outline-2">Diretório de equipes</Link>}
 
         <p
@@ -526,7 +535,7 @@ export default function CommissionPortalPage() {
             </section>
           ), document.body)}
         >
-          <FenasojaEcosystemExperience onComplete={closeEcosystem} />
+          <FenasojaEcosystemExperience onComplete={closeEcosystem} navigation={ecosystemLocation!} onNavigate={navigateEcosystem} />
         </Suspense>
       )}
     </div>

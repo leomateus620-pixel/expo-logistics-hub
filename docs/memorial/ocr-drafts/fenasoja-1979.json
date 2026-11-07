@@ -1,0 +1,184 @@
+﻿{
+    "status":  "UNREVIEWED_DRAFT",
+    "engine":  "Windows.Media.Ocr pt-BR",
+    "lines":  [
+                  {
+                      "text":  "4a",
+                      "words":  [
+                                    {
+                                        "y":  162,
+                                        "height":  37,
+                                        "width":  48,
+                                        "text":  "4a",
+                                        "x":  206
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "COORbEÑÀDOR",
+                      "words":  [
+                                    {
+                                        "y":  467,
+                                        "height":  23,
+                                        "width":  162,
+                                        "text":  "COORbEÑÀDOR",
+                                        "x":  296
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRESIDENTE, s.",
+                      "words":  [
+                                    {
+                                        "y":  729,
+                                        "height":  14,
+                                        "width":  119,
+                                        "text":  "PRESIDENTE,",
+                                        "x":  460
+                                    },
+                                    {
+                                        "y":  731,
+                                        "height":  12,
+                                        "width":  9,
+                                        "text":  "s.",
+                                        "x":  581
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ANNES",
+                      "words":  [
+                                    {
+                                        "y":  832,
+                                        "height":  19,
+                                        "width":  68,
+                                        "text":  "ANNES",
+                                        "x":  687
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "\u0027E HEIMEADINGÉR\"•",
+                      "words":  [
+                                    {
+                                        "y":  874,
+                                        "height":  16,
+                                        "width":  20,
+                                        "text":  "\u0027E",
+                                        "x":  385
+                                    },
+                                    {
+                                        "y":  875,
+                                        "height":  20,
+                                        "width":  166,
+                                        "text":  "HEIMEADINGÉR\"•",
+                                        "x":  667
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "E I 5 : TSSfsbt)RlVALANDkADE",
+                      "words":  [
+                                    {
+                                        "y":  898,
+                                        "height":  15,
+                                        "width":  10,
+                                        "text":  "E",
+                                        "x":  396
+                                    },
+                                    {
+                                        "y":  895,
+                                        "height":  23,
+                                        "width":  5,
+                                        "text":  "I",
+                                        "x":  454
+                                    },
+                                    {
+                                        "y":  897,
+                                        "height":  17,
+                                        "width":  20,
+                                        "text":  "5",
+                                        "x":  503
+                                    },
+                                    {
+                                        "y":  897,
+                                        "height":  18,
+                                        "width":  13,
+                                        "text":  ":",
+                                        "x":  525
+                                    },
+                                    {
+                                        "y":  895,
+                                        "height":  25,
+                                        "width":  277,
+                                        "text":  "TSSfsbt)RlVALANDkADE",
+                                        "x":  539
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• \u0027 \"T\u0026fS+dOMlNCOSFRANC1seopASA",
+                      "words":  [
+                                    {
+                                        "y":  924,
+                                        "height":  2,
+                                        "width":  2,
+                                        "text":  "•",
+                                        "x":  455
+                                    },
+                                    {
+                                        "y":  921,
+                                        "height":  2,
+                                        "width":  2,
+                                        "text":  "\u0027",
+                                        "x":  499
+                                    },
+                                    {
+                                        "y":  918,
+                                        "height":  26,
+                                        "width":  385,
+                                        "text":  "\"T\u0026fS+dOMlNCOSFRANC1seopASA",
+                                        "x":  519
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "AGRICtQLTOãE BEATI",
+                      "words":  [
+                                    {
+                                        "y":  938,
+                                        "height":  21,
+                                        "width":  140,
+                                        "text":  "AGRICtQLTOãE",
+                                        "x":  161
+                                    },
+                                    {
+                                        "y":  948,
+                                        "height":  17,
+                                        "width":  56,
+                                        "text":  "BEATI",
+                                        "x":  722
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "úSÀVL.DANTE LiãERALi-",
+                      "words":  [
+                                    {
+                                        "y":  964,
+                                        "height":  23,
+                                        "width":  133,
+                                        "text":  "úSÀVL.DANTE",
+                                        "x":  604
+                                    },
+                                    {
+                                        "y":  965,
+                                        "height":  23,
+                                        "width":  95,
+                                        "text":  "LiãERALi-",
+                                        "x":  742
+                                    }
+                                ]
+                  }
+              ]
+}

@@ -1,0 +1,420 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "WILLY KLAUS",
+          "status": "verified",
+          "sourceRegion": [
+            0.38,
+            0.247,
+            0.34,
+            0.019
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "PEDRO CARPENEDO",
+          "status": "verified",
+          "sourceRegion": [
+            0.315,
+            0.263,
+            0.47,
+            0.019
+          ],
+          "note": "Primeiro dos três nomes impressos sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "ADELKI CAMILO BELTRAME",
+          "status": "verified",
+          "sourceRegion": [
+            0.58,
+            0.279,
+            0.265,
+            0.019
+          ],
+          "note": "Segundo nome sob o cargo compartilhado VICE-PRESIDENTES, que aparece apenas na primeira linha."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "EDGAR DESSUY",
+          "status": "verified",
+          "sourceRegion": [
+            0.58,
+            0.294,
+            0.17,
+            0.019
+          ],
+          "note": "Terceiro nome sob o cargo compartilhado VICE-PRESIDENTES, que aparece apenas na primeira linha."
+        },
+        {
+          "role": "SECRETÁRIO GERAL",
+          "name": "AQUILES GIOVELLI",
+          "status": "verified",
+          "sourceRegion": [
+            0.313,
+            0.309,
+            0.46,
+            0.019
+          ]
+        },
+        {
+          "role": "1º SECRETÁRIO",
+          "name": "VANDERLEY GIACOMINI",
+          "status": "verified",
+          "sourceRegion": [
+            0.355,
+            0.326,
+            0.46,
+            0.019
+          ]
+        },
+        {
+          "role": "2º SECRETÁRIO",
+          "name": "HÉLIO VETTORATO",
+          "status": "verified",
+          "sourceRegion": [
+            0.355,
+            0.342,
+            0.415,
+            0.019
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "CLÉLIO MARQUES BRANDÃO",
+          "status": "verified",
+          "sourceRegion": [
+            0.355,
+            0.357,
+            0.505,
+            0.019
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "MILTON CASQUEIRO DA SILVA",
+          "status": "verified",
+          "sourceRegion": [
+            0.355,
+            0.373,
+            0.52,
+            0.019
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "TENDAS E BEBIDAS",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [
+            0.31,
+            0.495,
+            0.425,
+            0.019
+          ],
+          "note": "O prenome EUGÊNIO está legível. O sobrenome à direita está encoberto pelo reflexo e não foi confirmado visualmente."
+        },
+        {
+          "role": "GADO LEITEIRO",
+          "name": "MILTON ALMEIDA",
+          "status": "verified",
+          "sourceRegion": [
+            0.345,
+            0.511,
+            0.425,
+            0.019
+          ]
+        },
+        {
+          "role": "INGRESSOS",
+          "name": "EGÍDIO LAVARDA",
+          "status": "verified",
+          "sourceRegion": [
+            0.385,
+            0.527,
+            0.38,
+            0.019
+          ]
+        },
+        {
+          "role": "RECEPÇÃO",
+          "name": "ANTÔNIO CARLOS BORGES",
+          "status": "verified",
+          "sourceRegion": [
+            0.385,
+            0.543,
+            0.46,
+            0.019
+          ]
+        },
+        {
+          "role": "ORNAMENTAÇÃO DA CIDADE",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [
+            0.215,
+            0.56,
+            0.555,
+            0.019
+          ],
+          "note": "O prenome ARNO está legível. O sobrenome depois de ARNO está sob o reflexo e não pôde ser confirmado; não foi completado por inferência."
+        },
+        {
+          "role": "ORNAMENTAÇÃO DO PARQUE",
+          "name": "RUY MAGALHÃES",
+          "status": "verified",
+          "sourceRegion": [
+            0.205,
+            0.576,
+            0.55,
+            0.019
+          ]
+        },
+        {
+          "role": "FEIRA DO ARTESANATO",
+          "name": "ARMÍNIO ELISEU ARENDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.268,
+            0.592,
+            0.565,
+            0.019
+          ]
+        },
+        {
+          "role": "ILUMINAÇÃO E SOM",
+          "name": "LUIZ POLLO",
+          "status": "verified",
+          "sourceRegion": [
+            0.3,
+            0.608,
+            0.415,
+            0.019
+          ]
+        },
+        {
+          "role": "SUINOCULTURA",
+          "name": "PAULO SÉRGIO KAPPEL",
+          "status": "verified",
+          "sourceRegion": [
+            0.338,
+            0.624,
+            0.475,
+            0.019
+          ]
+        },
+        {
+          "role": "RAINHA E CORTE DE RECEPÇÃO",
+          "name": "WILSON PEDRO SEGER E ESPOSA",
+          "status": "verified",
+          "sourceRegion": [
+            0.19,
+            0.641,
+            0.705,
+            0.019
+          ],
+          "note": "A expressão E ESPOSA integra a inscrição original; a fotografia não fornece o nome da esposa."
+        },
+        {
+          "role": "SOJA NA ALIMENTAÇÃO",
+          "name": "JOSÉ LIMA",
+          "status": "verified",
+          "sourceRegion": [
+            0.261,
+            0.657,
+            0.425,
+            0.019
+          ]
+        },
+        {
+          "role": "ASSUNTOS CIENTÍFICOS DA SOJA",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [
+            0.178,
+            0.673,
+            0.665,
+            0.019
+          ],
+          "note": "O trecho LUIZ CARLOS PINTO está legível. O último sobrenome depois de PINTO está sob reflexo e não pôde ser confirmado com segurança."
+        },
+        {
+          "role": "LAVOURAS DEMONSTRATIVAS",
+          "name": "JUAREZ PINTO GUTIERREZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.204,
+            0.689,
+            0.64,
+            0.019
+          ]
+        },
+        {
+          "role": "HOSPEDAGEM E ALIMENTAÇÃO",
+          "name": "IRINEU JOSÉ BIGOLIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.19,
+            0.705,
+            0.61,
+            0.019
+          ]
+        },
+        {
+          "role": "ANIMAIS DE PEQUENO PORTE",
+          "name": "OLÍVIO S. MACHADO",
+          "status": "verified",
+          "sourceRegion": [
+            0.202,
+            0.722,
+            0.59,
+            0.019
+          ]
+        },
+        {
+          "role": "ORNAMENTAÇÃO DE VITRINES",
+          "name": "AGOSTINHO ZENNI",
+          "status": "verified",
+          "sourceRegion": [
+            0.199,
+            0.738,
+            0.58,
+            0.019
+          ]
+        },
+        {
+          "role": "ASSUNTOS INTERNOS DA INDÚSTRIA E COMÉRCIO",
+          "name": "ANTENOR GRISOTTI",
+          "status": "verified",
+          "sourceRegion": [
+            0.015,
+            0.754,
+            0.765,
+            0.019
+          ]
+        },
+        {
+          "role": "RODOVIAS",
+          "name": "JESUS DOS SANTOS RODRIGUES",
+          "status": "verified",
+          "sourceRegion": [
+            0.38,
+            0.77,
+            0.515,
+            0.019
+          ]
+        },
+        {
+          "role": "PRÊMIOS",
+          "name": "UBIRAJARA MENDES SERRÃO",
+          "status": "verified",
+          "sourceRegion": [
+            0.4,
+            0.787,
+            0.475,
+            0.019
+          ]
+        },
+        {
+          "role": "VENDA DE ESPAÇOS",
+          "name": "NORBERTO SUDBRACK",
+          "status": "verified",
+          "sourceRegion": [
+            0.292,
+            0.803,
+            0.53,
+            0.019
+          ]
+        },
+        {
+          "role": "INFORMAÇÕES E RECLAMAÇÕES",
+          "name": "ELIAS SCALCO",
+          "status": "verified",
+          "sourceRegion": [
+            0.145,
+            0.819,
+            0.59,
+            0.019
+          ]
+        },
+        {
+          "role": "ASSUNTOS INTERNACIONAIS",
+          "name": "CLÁUDIO CAMARGO",
+          "status": "verified",
+          "sourceRegion": [
+            0.211,
+            0.835,
+            0.575,
+            0.019
+          ]
+        },
+        {
+          "role": "DESFILE DE CARROS ALEGÓRICOS",
+          "name": "SIMÕES RANGEL",
+          "status": "verified",
+          "sourceRegion": [
+            0.16,
+            0.851,
+            0.585,
+            0.019
+          ]
+        },
+        {
+          "role": "PROMOÇÃO CULTURAL E RECREAÇÃO",
+          "name": "RÉGIS ANTÔNIO AGUADO DE ARAÚJO",
+          "status": "verified",
+          "sourceRegion": [
+            0.123,
+            0.868,
+            0.82,
+            0.019
+          ]
+        },
+        {
+          "role": "TRÂNSITO E POLICIAMENTO OSTENSIVO",
+          "name": "EDSON PADILHA",
+          "status": "verified",
+          "sourceRegion": [
+            0.105,
+            0.884,
+            0.64,
+            0.019
+          ]
+        },
+        {
+          "role": "ESPORTES",
+          "name": "PLÍNIO MUNDSTOCK",
+          "status": "verified",
+          "sourceRegion": [
+            0.385,
+            0.901,
+            0.4,
+            0.019
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Título original: 2ª FENASOJA.",
+    "DE 02 A 10 DE MARÇO DE 1974",
+    "Transcrição visual da fotografia IMG_1148.jpeg e da face retificada fenasoja-1974.webp. O rascunho automático de OCR não foi tratado como fonte verificada.",
+    "Os três vice-presidentes estão sob um único cargo impresso. O cargo foi repetido nas entradas para preservar a associação e a ordem dos nomes.",
+    "O status de cada linha confirma o nome. Todos os cargos desta placa estão integralmente visíveis; não há cargo completado a partir de trecho cortado.",
+    "O reflexo sobre a primeira parte da coluna de nomes de PRESIDENTES DE ÁREA impede confirmar três nomes completos: o sobrenome de EUGÊNIO, o sobrenome de ARNO e o último sobrenome depois de LUIZ CARLOS PINTO.",
+    "Os prenomes e fragmentos confirmados dos nomes ilegíveis foram preservados nas notas das respectivas linhas; nenhum sobrenome foi completado por outra placa ou por fonte externa.",
+    "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+    "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida.",
+    "Status global parcial devido aos três nomes completos não confirmados na região do reflexo."
+  ]
+}

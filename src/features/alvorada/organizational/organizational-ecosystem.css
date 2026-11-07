@@ -199,6 +199,15 @@
 .org-filters button:hover .org-filter-label, .org-filters button:focus-visible .org-filter-label { display: block; }
 .org-filters button:active { background: #d8b87028; }
 
+/* Memorial shortcut: same Lucide family, persistent desktop and mobile label. */
+.org-filters .org-memorial-shortcut {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: auto;
+  min-height: 44px; max-width: 100%; padding: 7px 11px; color: #e8d3a1;
+  border: 1px solid #d8b87050; background: #d8b87012; font-size: 11px; line-height: 1.4;
+}
+.org-ecosystem__top-controls:has(.org-memorial-shortcut) .org-filters { position: relative; top: auto; flex-wrap: wrap; margin-top: 8px; }
+.org-filters.org-entry-shortcuts { position: absolute; z-index: 6; top: 25px; left: 24px; max-width: calc(100% - 100px); }
+
 .org-viewport {
   position: absolute;
   z-index: 2;

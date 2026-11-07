@@ -1,0 +1,206 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE DE HONRA",
+          "name": "JAIRTON LUIS DEZORDI",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.297, 0.78, 0.021]
+        },
+        {
+          "role": "PRESIDENTE CCPF",
+          "name": "GERSON MIGUEL LAUERMANN",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.316, 0.78, 0.021]
+        },
+        {
+          "role": "PRESIDENTE",
+          "name": "ALEXANDRE RODRIGO MARONEZ",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.336, 0.78, 0.021]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "ELIAS DALLALBA",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.355, 0.78, 0.021]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "RICARDO EMÍLIO ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.374, 0.78, 0.021]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "LUIS ELEMAR LUNKES MIELKE",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.393, 0.78, 0.021]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CLÉO ANTONIO ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.412, 0.78, 0.021]
+        },
+        {
+          "role": "AUXILIAR ADMINISTRATIVA",
+          "name": "LUCIANA SAWCZUK MALEICO",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.432, 0.78, 0.021]
+        },
+        {
+          "role": "AUXILIAR ADMINISTRATIVA",
+          "name": "CAROLINA DE CONTI",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.451, 0.78, 0.021]
+        },
+        {
+          "role": "ASSESSORIA DE IMPRENSA",
+          "name": "MARISTANI WEIAND NEUMANN",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.47, 0.78, 0.021]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JOSÉ MAURO BARBIERI",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.489, 0.78, 0.021]
+        },
+        {
+          "role": "PROTOCOLO",
+          "name": "JORGE LUIZ VIANA",
+          "status": "verified",
+          "sourceRegion": [0.1, 0.509, 0.78, 0.021]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "AGRICULTURA, SOJA e DERIVADOS",
+          "name": "GILMAR FRANCISCO VIONE",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.585, 0.89, 0.021]
+        },
+        {
+          "role": "BILHETERIA",
+          "name": "SÉRGIO IVAN DE SOUZA GRIZA",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.604, 0.89, 0.021]
+        },
+        {
+          "role": "CREDENCIAMENTO",
+          "name": "ROGÉRIO DOS SANTOS FERREIRA",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.624, 0.89, 0.021]
+        },
+        {
+          "role": "CULTURA e TURISMO",
+          "name": "VÍTOR DANIEL DE CONTI",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.643, 0.89, 0.021]
+        },
+        {
+          "role": "DESENVOLVIMENTO e TECNOLOGIA",
+          "name": "ODAYLSON EDER",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.663, 0.89, 0.021]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "PAULO GILBERTO MADALOZZO DA ROSA",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.682, 0.89, 0.021]
+        },
+        {
+          "role": "ETNIAS",
+          "name": "SÉRGIO OSTAPIUK",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.702, 0.89, 0.021]
+        },
+        {
+          "role": "EXPORURAL",
+          "name": "ROBERTO ADRIANO RACHO",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.721, 0.89, 0.021]
+        },
+        {
+          "role": "INDÚSTRIA, COMÉRCIO e SERVIÇOS",
+          "name": "JORGE VINICIUS FEIX",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.741, 0.89, 0.021]
+        },
+        {
+          "role": "INFRAESTRUTURA e MANUTENÇÃO",
+          "name": "DANIEL DALLALBA",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.76, 0.89, 0.021]
+        },
+        {
+          "role": "LOGÍSTICA",
+          "name": "JOSÉLIO VENDRÚSCULO",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.78, 0.89, 0.021]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "GUSTAVO EDUARDO SAUTER GROFF",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.799, 0.89, 0.021]
+        },
+        {
+          "role": "PROJETOS E CAPTAÇÃO",
+          "name": "GERSON MIGUEL LAUERMANN",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.819, 0.89, 0.021]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "VÍTOR HUGO NOGUEIRA DUTRA",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.838, 0.89, 0.021]
+        },
+        {
+          "role": "RECEPÇÃO",
+          "name": "MARIA VANICE ESCHER SEGER",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.858, 0.89, 0.021]
+        },
+        {
+          "role": "RELAÇÕES INTERNACIONAIS",
+          "name": "DANIEL ZIMMERMANN FÜHR",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.877, 0.89, 0.021]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "Major VALTAIR DORNELLES",
+          "status": "verified",
+          "sourceRegion": [0.03, 0.897, 0.89, 0.021],
+          "note": "O prefixo 'Major' integra a inscrição do nome na fotografia e foi preservado."
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [0.03, 0.916, 0.89, 0.021],
+          "note": "O nome inicial 'CASSIO ROBERTO' é legível; a fotografia não permite distinguir com segurança todas as letras do sobrenome final, iniciado por 'SCHUAS'. Nenhum sobrenome foi completado por inferência."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Transcrição visual conferida na fotografia original 22a_Fenasoja_2018.jpeg e na face retificada fenasoja-2018.webp; o OCR foi consultado apenas como rascunho não confiável.",
+    "A fotografia imprime apenas o ano '2018' junto à marca FENASOJA; não é visível um intervalo de datas ou período completo de gestão.",
+    "Foram preservados a ordem das linhas, as duas ocorrências do cargo AUXILIAR ADMINISTRATIVA e a repetição de GERSON MIGUEL LAUERMANN em seções distintas.",
+    "Grafias e acentos foram transcritos conforme a leitura visível da placa, sem pesquisa externa ou correção de nomes por cadastros.",
+    "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+    "O estado geral permanece parcial por uma linha com sobrenome não resolvido na seção PRESIDENTES DE ÁREA."
+  ]
+}

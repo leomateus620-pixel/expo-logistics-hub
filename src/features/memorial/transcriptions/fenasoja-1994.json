@@ -1,0 +1,157 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 30 DE ABRIL A 08 DE MAIO DE 1994",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "ROGÉRIO JACOB KERBER",
+          "status": "verified",
+          "sourceRegion": [0.27, 0.26, 0.59, 0.025]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "ERNANI DENARDIN",
+          "status": "verified",
+          "sourceRegion": [0.27, 0.279, 0.59, 0.024]
+        },
+        {
+          "role": "COORDENADOR",
+          "name": "PAULO MOACIR SOARES",
+          "status": "verified",
+          "sourceRegion": [0.27, 0.292, 0.59, 0.024]
+        },
+        {
+          "role": "TESOUREIRO",
+          "name": "DERQUI GNATTA",
+          "status": "verified",
+          "sourceRegion": [0.27, 0.313, 0.59, 0.022]
+        },
+        {
+          "role": "SECRETÁRIA",
+          "name": "IRME SCHMIDT",
+          "status": "verified",
+          "sourceRegion": [0.27, 0.328, 0.59, 0.025]
+        },
+        {
+          "role": "JURÍDICO",
+          "name": "PEDRO PAULO PRIMO BARIL",
+          "status": "verified",
+          "sourceRegion": [0.27, 0.345, 0.59, 0.025],
+          "note": "Cargo compartilhado com a linha seguinte. A terminação visível é BARIL; não foi acrescentada letra final com base em nomes de outras placas."
+        },
+        {
+          "role": "JURÍDICO",
+          "name": "JORGE QUERUZ",
+          "status": "verified",
+          "sourceRegion": [0.54, 0.358, 0.29, 0.023],
+          "note": "Segunda linha do cargo compartilhado JURÍDICO; o rótulo não é repetido na fotografia."
+        },
+        {
+          "role": "CONTÁBIL",
+          "name": "BENALDO LIBERALI",
+          "status": "verified",
+          "sourceRegion": [0.27, 0.377, 0.59, 0.023]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "AGRICULTURA",
+          "name": "SÉRGIO SECCHI",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.506, 0.68, 0.022]
+        },
+        {
+          "role": "CONESUL",
+          "name": "OSCAR IGNÁCIO BÜTTENBENDER",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.522, 0.68, 0.022]
+        },
+        {
+          "role": "CULTURA",
+          "name": "ALCIDES VICINI",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.541, 0.68, 0.022]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "ARTUR LORENTZ",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.558, 0.68, 0.023]
+        },
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "VALDIR TURRA CARPENEDO",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.574, 0.68, 0.023]
+        },
+        {
+          "role": "INFRAESTRUTURA",
+          "name": "RUBENS ZAMBERLAN",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.591, 0.68, 0.023]
+        },
+        {
+          "role": "INTEGRAÇÃO REGIONAL",
+          "name": "LEOPOLDO JUSTINO GIRARDI",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.608, 0.68, 0.023]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "RUY MACHADO MAGALHÃES",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.623, 0.68, 0.023]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "SÉRGIO LUNARDI",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.64, 0.68, 0.025]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "VALDIR SCHULTZ DA SILVA",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.659, 0.68, 0.024]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "JAIME ADEMAR MATIAZZI",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.676, 0.68, 0.024]
+        },
+        {
+          "role": "SOCIAL",
+          "name": "FRANCISCO HAAS",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.693, 0.68, 0.023]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "AURI O. COPETTI JUNIOR",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.71, 0.68, 0.024]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Transcrição visual conferida na fotografia original IMG_1156.jpeg e na face retificada fenasoja-1994.webp; o OCR foi consultado apenas como rascunho não confiável.",
+    "Período gravado: 'DE 30 DE ABRIL A 08 DE MAIO DE 1994', exibido em duas linhas na fotografia. A edição aparece como '10ª FENASOJA'.",
+    "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita; namesFirst é false. A ordem de cima para baixo foi preservada.",
+    "Foram confirmados 8 nomes em COMISSÃO CENTRAL e 13 nomes em PRESIDENTES DE ÁREA. JURÍDICO é compartilhado por duas linhas de nomes, com um único rótulo na fotografia.",
+    "Reflexos e diferenças de contraste atravessam alguns cargos e a região direita de COMISSÃO CENTRAL. As linhas foram conferidas em ampliações da fotografia original, sem correção de grafia por dados externos ou outras edições.",
+    "A extremidade inferior física da placa está fora do enquadramento original, e a face retificada conserva esse limite. Há uma grande faixa sem inscrições visíveis abaixo de SUPRIMENTOS / AURI O. COPETTI JUNIOR, mas não é possível confirmar o contorno completo nem excluir inscrições fora da área fotografada. Nenhum conteúdo hipotético foi criado.",
+    "Grafias, acentos e trema seguem a inscrição visível. Foram preservados IRME SCHMIDT, PEDRO PAULO PRIMO BARIL, BENALDO LIBERALI e JUNIOR sem acrescentar letras ou acentos de variantes atuais.",
+    "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+    "O estado geral permanece parcial pelo limite inferior não fotografado, embora todos os 21 nomes e respectivos cargos visíveis tenham sido confirmados."
+  ]
+}

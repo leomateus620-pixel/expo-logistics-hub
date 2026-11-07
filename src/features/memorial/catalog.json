@@ -1,0 +1,1574 @@
+[
+  {
+    "id": "fenasoja-1966",
+    "kind": "edition",
+    "edition": 1,
+    "year": 1966,
+    "sourceFile": "IMG_1147.jpeg",
+    "crop": [
+      [
+        0,
+        62
+      ],
+      [
+        971,
+        58
+      ],
+      [
+        991,
+        1498
+      ],
+      [
+        0,
+        1488
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 04 A 11 DE DEZEMBRO DE 1966",
+    "visual": "Placa escura fosca, cabeçalho dourado, duas colunas e lista extensa de áreas.",
+    "notes": [
+      "A fotografia corta o lado esquerdo e o início de três cargos nas linhas finais. Necessária captura complementar lateral.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1966.json",
+    "art": {
+      "periodLines": [
+        "DE 04 A 11 DE",
+        "DEZEMBRO DE 1966"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1147.jpeg"
+  },
+  {
+    "id": "fenasoja-1974",
+    "kind": "edition",
+    "edition": 2,
+    "year": 1974,
+    "sourceFile": "IMG_1148.jpeg",
+    "crop": [
+      [
+        0,
+        140
+      ],
+      [
+        965,
+        117
+      ],
+      [
+        995,
+        1490
+      ],
+      [
+        0,
+        1481
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 02 A 10 DE MARÇO DE 1974",
+    "visual": "Composição vertical, blocos dourados e lista densa; reflexo sobre os nomes.",
+    "notes": [
+      "Reflexo ou definição limitada em parte das inscrições; trechos sem confirmação permanecem sinalizados.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1974.json",
+    "art": {
+      "periodLines": [
+        "DE 02 A 10 DE",
+        "MARÇO DE 1974"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1148.jpeg"
+  },
+  {
+    "id": "fenasoja-1976",
+    "kind": "edition",
+    "edition": 3,
+    "year": 1976,
+    "sourceFile": "IMG_1149.jpeg",
+    "crop": [
+      [
+        25,
+        82
+      ],
+      [
+        1035,
+        80
+      ],
+      [
+        1065,
+        1510
+      ],
+      [
+        20,
+        1505
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 27 DE MARÇO A 01 DE ABRIL DE 1976",
+    "visual": "Cabeçalho e período em blocos separados, faixas de seção e colunas alinhadas.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1976.json",
+    "art": {
+      "periodLines": [
+        "DE 27 DE MARÇO",
+        "A 01 DE ABRIL DE 1976"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1149.jpeg"
+  },
+  {
+    "id": "fenasoja-1979",
+    "kind": "edition",
+    "edition": 4,
+    "year": 1979,
+    "sourceFile": "IMG_1150.jpeg",
+    "crop": [
+      [
+        28,
+        85
+      ],
+      [
+        1037,
+        101
+      ],
+      [
+        1046,
+        1516
+      ],
+      [
+        12,
+        1510
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 21 A 29 DE ABRIL DE 1979",
+    "visual": "Títulos dourados e área inferior livre; brilho da fotografia preservado como limitação.",
+    "notes": [
+      "Reflexo ou definição limitada em parte das inscrições; trechos sem confirmação permanecem sinalizados.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1979.json",
+    "art": {
+      "namesFirst": false,
+      "periodLines": [
+        "DE 21 A 29 DE",
+        "ABRIL DE 1979"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1150.jpeg"
+  },
+  {
+    "id": "fenasoja-1981",
+    "kind": "edition",
+    "edition": 5,
+    "year": 1981,
+    "sourceFile": "IMG_1151.jpeg",
+    "crop": [
+      [
+        64,
+        133
+      ],
+      [
+        1054,
+        137
+      ],
+      [
+        1105,
+        1535
+      ],
+      [
+        20,
+        1535
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 01 A 13 DE AGOSTO DE 1981",
+    "visual": "Inscrições concentradas no alto e grande campo fosco inferior.",
+    "notes": [
+      "Reflexo ou definição limitada em parte das inscrições; trechos sem confirmação permanecem sinalizados.",
+      "A extremidade inferior está no limite da fotografia. Não foi preenchida com conteúdo inventado.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1981.json",
+    "art": {
+      "namesFirst": false,
+      "periodLines": [
+        "DE 01 A 13 DE",
+        "AGOSTO DE 1981"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1151.jpeg"
+  },
+  {
+    "id": "fenasoja-1984",
+    "kind": "edition",
+    "edition": 6,
+    "year": 1984,
+    "sourceFile": "IMG_1152.jpeg",
+    "crop": [
+      [
+        35,
+        255
+      ],
+      [
+        1067,
+        253
+      ],
+      [
+        1103,
+        1535
+      ],
+      [
+        0,
+        1535
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 07 A 15 DE ABRIL DE 1984",
+    "visual": "Cabeçalho e Comissão Central no alto; área inferior livre.",
+    "notes": [
+      "A extremidade inferior está no limite da fotografia. Não foi preenchida com conteúdo inventado.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1984.json",
+    "art": {
+      "namesFirst": false,
+      "periodLines": [
+        "DE 07 A 15 DE",
+        "ABRIL DE 1984"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1152.jpeg"
+  },
+  {
+    "id": "fenasoja-1987",
+    "kind": "edition",
+    "edition": 7,
+    "year": 1987,
+    "sourceFile": "IMG_1153.jpeg",
+    "crop": [
+      [
+        46,
+        149
+      ],
+      [
+        1035,
+        165
+      ],
+      [
+        1063,
+        1535
+      ],
+      [
+        22,
+        1535
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 01 A 10 DE MAIO DE 1987",
+    "visual": "Duas faixas de seção e distribuição compacta no alto.",
+    "notes": [
+      "A extremidade inferior está no limite da fotografia. Não foi preenchida com conteúdo inventado.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1987.json",
+    "art": {
+      "namesFirst": false,
+      "periodLines": [
+        "DE 01 A 10 DE",
+        "MAIO DE 1987"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1153.jpeg"
+  },
+  {
+    "id": "fenasoja-1990",
+    "kind": "edition",
+    "edition": 8,
+    "year": 1990,
+    "sourceFile": "IMG_1154.jpeg",
+    "crop": [
+      [
+        112,
+        191
+      ],
+      [
+        1008,
+        196
+      ],
+      [
+        1044,
+        1488
+      ],
+      [
+        31,
+        1472
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 31 DE MARÇO A\n08 DE ABRIL DE 1990",
+    "visual": "Cantos arredondados, duas seções e espaço inferior livre.",
+    "notes": [
+      "Reflexo ou definição limitada em parte das inscrições; trechos sem confirmação permanecem sinalizados.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1990.json",
+    "art": {
+      "namesFirst": false,
+      "periodLines": [
+        "DE 31 DE MARÇO A",
+        "08 DE ABRIL DE 1990"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1154.jpeg"
+  },
+  {
+    "id": "fenasoja-1992",
+    "kind": "edition",
+    "edition": 9,
+    "year": 1992,
+    "sourceFile": "IMG_1155.jpeg",
+    "crop": [
+      [
+        79,
+        176
+      ],
+      [
+        1048,
+        179
+      ],
+      [
+        1090,
+        1535
+      ],
+      [
+        29,
+        1535
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 01 A 10 DE AGOSTO DE 1992",
+    "visual": "Hierarquia do cabeçalho e listas com alinhamentos originais.",
+    "notes": [
+      "A extremidade inferior está no limite da fotografia. Não foi preenchida com conteúdo inventado.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1992.json",
+    "art": {
+      "namesFirst": false,
+      "periodLines": [
+        "DE 01 A 10 DE",
+        "AGOSTO DE 1992"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1155.jpeg"
+  },
+  {
+    "id": "fenasoja-1994",
+    "kind": "edition",
+    "edition": 10,
+    "year": 1994,
+    "sourceFile": "IMG_1156.jpeg",
+    "crop": [
+      [
+        61,
+        111
+      ],
+      [
+        1045,
+        129
+      ],
+      [
+        1125,
+        1535
+      ],
+      [
+        15,
+        1535
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 30 DE ABRIL A 08 DE MAIO DE 1994",
+    "visual": "Seções douradas e margens originais da lista.",
+    "notes": [
+      "Reflexo ou definição limitada em parte das inscrições; trechos sem confirmação permanecem sinalizados.",
+      "A extremidade inferior está no limite da fotografia. Não foi preenchida com conteúdo inventado.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1994.json",
+    "art": {
+      "namesFirst": false,
+      "periodLines": [
+        "DE 30 DE ABRIL A",
+        "08 DE MAIO DE 1994"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1966_a_1994_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "IMG_1156.jpeg"
+  },
+  {
+    "id": "fenasoja-1996",
+    "kind": "edition",
+    "edition": 11,
+    "year": 1996,
+    "sourceFile": "11a_Fenasoja_1996.jpeg",
+    "crop": [
+      [
+        50,
+        275
+      ],
+      [
+        1031,
+        257
+      ],
+      [
+        1008,
+        1535
+      ],
+      [
+        15,
+        1535
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 27 DE ABRIL A 05 DE MAIO DE 1996",
+    "visual": "Placa fosca, cabeçalho dourado e duas colunas; placa vizinha excluída.",
+    "notes": [
+      "A extremidade inferior está no limite da fotografia. Não foi preenchida com conteúdo inventado.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-1996.json",
+    "art": {
+      "namesFirst": false,
+      "periodLines": [
+        "DE 27 DE ABRIL A",
+        "05 DE MAIO DE 1996"
+      ]
+    },
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/11a_Fenasoja_1996.jpeg"
+  },
+  {
+    "id": "fenasoja-1998",
+    "kind": "edition",
+    "edition": 12,
+    "year": 1998,
+    "sourceFile": "12a_Fenasoja_1998.jpeg",
+    "crop": [
+      [
+        34,
+        252
+      ],
+      [
+        975,
+        246
+      ],
+      [
+        928,
+        1496
+      ],
+      [
+        80,
+        1465
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "25 de Abril a 03 de Maio de 1998",
+    "visual": "Moldura escalonada dourada, fixações, marca de época e conexão com o novo século.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "ornamental",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-1998.json",
+    "art": {
+      "namesFirst": false,
+      "headerCrop": [
+        0.08,
+        0.055,
+        0.92,
+        0.26
+      ]
+    },
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/12a_Fenasoja_1998.jpeg"
+  },
+  {
+    "id": "fenasoja-2000",
+    "kind": "edition",
+    "edition": 13,
+    "year": 2000,
+    "sourceFile": "13a_Fenasoja_2000.jpeg",
+    "crop": [
+      [
+        78,
+        264
+      ],
+      [
+        974,
+        275
+      ],
+      [
+        923,
+        1492
+      ],
+      [
+        118,
+        1497
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "01 A 09 DE ABRIL DE 2000",
+    "visual": "Moldura geométrica e duas marcas, com destaque para 2000.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "ornamental",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2000.json",
+    "art": {
+      "namesFirst": false,
+      "headerCrop": [
+        0.08,
+        0.08,
+        0.92,
+        0.265
+      ],
+      "headerAsset": "artwork/header-2000.png",
+      "headerAssetBounds": [
+        0.112808,
+        0.073409,
+        0.902467,
+        0.207177
+      ]
+    },
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/13a_Fenasoja_2000.jpeg"
+  },
+  {
+    "id": "fenasoja-2002",
+    "kind": "edition",
+    "edition": 14,
+    "year": 2002,
+    "sourceFile": "14a_Fenasoja_2002.jpeg",
+    "crop": [
+      [
+        87,
+        319
+      ],
+      [
+        956,
+        319
+      ],
+      [
+        914,
+        1484
+      ],
+      [
+        126,
+        1465
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "6 a 14 de Abril de 2002",
+    "visual": "Moldura ornamental, ilustração linear e campanha na posição original.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "ornamental",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2002.json",
+    "art": {
+      "namesFirst": false,
+      "headerCrop": [
+        0.3,
+        0.04,
+        0.9,
+        0.2
+      ],
+      "illustrationAsset": "artwork/illustration-2002.png",
+      "illustrationAssetBounds": [
+        0.089264,
+        0.028547,
+        0.375151,
+        0.291523
+      ]
+    },
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/14a_Fenasoja_2002.jpeg"
+  },
+  {
+    "id": "fenasoja-2004",
+    "kind": "edition",
+    "edition": 15,
+    "year": 2004,
+    "sourceFile": "15a_Fenasoja_2004.jpeg",
+    "crop": [
+      [
+        75,
+        235
+      ],
+      [
+        1061,
+        252
+      ],
+      [
+        982,
+        1531
+      ],
+      [
+        103,
+        1515
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "01 a 09 de maio de 2004",
+    "visual": "Marca verde e amarela, frisos horizontais e divisórias douradas.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "brass",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2004.json",
+    "art": {},
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/15a_Fenasoja_2004.jpeg"
+  },
+  {
+    "id": "fenasoja-2006",
+    "kind": "edition",
+    "edition": 16,
+    "year": 2006,
+    "sourceFile": "16a_Fenasoja_2006.jpeg",
+    "crop": [
+      [
+        51,
+        212
+      ],
+      [
+        973,
+        215
+      ],
+      [
+        924,
+        1434
+      ],
+      [
+        98,
+        1419
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "29 de abril a 07 de maio de 2006",
+    "visual": "Cartaz vertical colorido à esquerda, frisos verticais e fixações.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "brass",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2006.json",
+    "art": {
+      "namesFirst": true,
+      "headerBottom": 0,
+      "posterCrop": [
+        0.035,
+        0.108,
+        0.292,
+        0.382
+      ],
+      "headerCrop": [
+        0.43,
+        0.005,
+        0.86,
+        0.037
+      ],
+      "posterAsset": "artwork/poster-2006.png",
+      "posterAssetBounds": [
+        0.0274599542,
+        0.1054365733,
+        0.2768878718,
+        0.3509060955
+      ]
+    },
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/16a_Fenasoja_2006.jpeg"
+  },
+  {
+    "id": "fenasoja-2008",
+    "kind": "edition",
+    "edition": 17,
+    "year": 2008,
+    "sourceFile": "17a_Fenasoja_2008.jpeg",
+    "crop": [
+      [
+        0,
+        222
+      ],
+      [
+        958,
+        231
+      ],
+      [
+        909,
+        1481
+      ],
+      [
+        52,
+        1475
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "26 de abril a 04 maio de 2008",
+    "visual": "Cartaz de época à esquerda e recorte curvo entre metal e campo escuro.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "brass",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2008.json",
+    "art": {
+      "posterCrop": [
+        0.02,
+        0.02,
+        0.304,
+        0.3
+      ],
+      "headerCrop": [
+        0.33,
+        0.018,
+        0.94,
+        0.094
+      ],
+      "headerBottom": 0.11,
+      "namesFirst": true,
+      "campaignLines": [
+        {
+          "text": "17ª FENASOJA",
+          "y": 0.04,
+          "size": 0.044,
+          "width": 0.62,
+          "font": "serif"
+        },
+        {
+          "text": "Unindo Forças Colhendo Resultados",
+          "y": 0.075,
+          "size": 0.025,
+          "width": 0.62,
+          "font": "serif"
+        },
+        {
+          "text": "26 de abril a 04 maio de 2008",
+          "y": 0.104,
+          "size": 0.018,
+          "width": 0.62,
+          "font": "serif"
+        }
+      ]
+    },
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/17a_Fenasoja_2008.jpeg"
+  },
+  {
+    "id": "fenasoja-2010",
+    "kind": "edition",
+    "edition": 18,
+    "year": 2010,
+    "sourceFile": "18a_Fenasoja_2010.jpeg",
+    "crop": [
+      [
+        47,
+        248
+      ],
+      [
+        1011,
+        255
+      ],
+      [
+        940,
+        1535
+      ],
+      [
+        77,
+        1510
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "30 de abril a 9 de maio de 2010 (no cartaz)",
+    "visual": "Arte colorida com figuras e recorte curvo sobre o corpo escuro.",
+    "notes": [
+      "A extremidade inferior está no limite da fotografia. Não foi preenchida com conteúdo inventado.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "brass",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2010.json",
+    "art": {
+      "posterCrop": [
+        0.045,
+        0.053,
+        0.285,
+        0.312
+      ],
+      "headerCrop": [
+        0.36,
+        0.03,
+        0.91,
+        0.135
+      ],
+      "headerBottom": 0.16,
+      "namesFirst": true,
+      "campaignLines": [
+        {
+          "text": "18ª Fenasoja",
+          "y": 0.055,
+          "size": 0.055,
+          "width": 0.62
+        },
+        {
+          "text": "Somos frutos desta semente",
+          "y": 0.112,
+          "size": 0.033,
+          "width": 0.68
+        }
+      ]
+    },
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/18a_Fenasoja_2010.jpeg"
+  },
+  {
+    "id": "fenasoja-2012",
+    "kind": "edition",
+    "edition": 19,
+    "year": 2012,
+    "sourceFile": "20a_Fenasoja_2014.jpeg",
+    "crop": [
+      [
+        76,
+        273
+      ],
+      [
+        991,
+        292
+      ],
+      [
+        922,
+        1507
+      ],
+      [
+        93,
+        1473
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "27 DE ABRIL A 6 DE MAIO (no cartaz de 2012)",
+    "visual": "Cartaz botânico à esquerda e cabeçalho dourado; marca Fenasoja 2012.",
+    "notes": [
+      "Nome de arquivo de origem trocado. A associação do catálogo segue a marca e a edição visíveis na placa, com confirmação no histórico institucional.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "brass",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2012.json",
+    "art": {
+      "posterCrop": [
+        0.032,
+        0.04,
+        0.295,
+        0.285
+      ],
+      "headerCrop": [
+        0.35,
+        0.015,
+        0.93,
+        0.125
+      ],
+      "headerBottom": 0.135
+    },
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/20a_Fenasoja_2014.jpeg",
+    "context": {
+      "text": "O histórico institucional identifica a 19ª edição em 2012. A fotografia também confirma esta associação pela marca e pelo número impressos.",
+      "decision": "O nome trocado do arquivo de origem foi preservado. Ano, ordinal, catálogo e link seguem a identidade visível da peça. Nomes e cargos seguem a fotografia, sem substituição por listas institucionais.",
+      "sources": [
+        {
+          "title": "Histórico institucional · edições anteriores",
+          "url": "https://ftp.fenasoja.com.br/edicoes-anteriores"
+        }
+      ]
+    }
+  },
+  {
+    "id": "fenasoja-2014",
+    "kind": "edition",
+    "edition": 20,
+    "year": 2014,
+    "sourceFile": "19a_Fenasoja_2012.jpeg",
+    "crop": [
+      [
+        44,
+        230
+      ],
+      [
+        973,
+        233
+      ],
+      [
+        919,
+        1473
+      ],
+      [
+        73,
+        1475
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "25 DE ABRIL A 4 DE MAIO DE 2014 (no cartaz)",
+    "visual": "Arte com medalhas e cabeçalho dourado; inscrição da 20ª Fenasoja.",
+    "notes": [
+      "Nome de arquivo de origem trocado. A associação do catálogo segue a marca e a edição visíveis na placa, com confirmação no histórico institucional.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "brass",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2014.json",
+    "art": {
+      "posterCrop": [
+        0.04,
+        0.052,
+        0.3,
+        0.314
+      ],
+      "headerCrop": [
+        0.36,
+        0.033,
+        0.95,
+        0.138
+      ],
+      "headerBottom": 0.16,
+      "campaignLines": [
+        {
+          "text": "20ª Fenasoja",
+          "y": 0.054,
+          "size": 0.055,
+          "width": 0.62
+        },
+        {
+          "text": "Negócios Vencedores",
+          "y": 0.111,
+          "size": 0.037,
+          "width": 0.62
+        }
+      ]
+    },
+    "sourceArchive": "Fenasoja_1996_a_2014_10_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_1996_a_2014/19a_Fenasoja_2012.jpeg",
+    "context": {
+      "text": "O histórico institucional identifica a 20ª edição em 2014. A fotografia também confirma esta associação pela marca e pelo número impressos.",
+      "decision": "O nome trocado do arquivo de origem foi preservado. Ano, ordinal, catálogo e link seguem a identidade visível da peça. Nomes e cargos seguem a fotografia, sem substituição por listas institucionais.",
+      "sources": [
+        {
+          "title": "Histórico institucional · edições anteriores",
+          "url": "https://ftp.fenasoja.com.br/edicoes-anteriores"
+        }
+      ]
+    }
+  },
+  {
+    "id": "fenasoja-2016",
+    "kind": "edition",
+    "edition": 21,
+    "year": 2016,
+    "sourceFile": "21a_Fenasoja_2016.jpeg",
+    "crop": [
+      [
+        23,
+        91
+      ],
+      [
+        1104,
+        79
+      ],
+      [
+        978,
+        1323
+      ],
+      [
+        188,
+        1324
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 29 DE ABRIL A 08 DE MAIO DE 2016 (no cartaz)",
+    "visual": "Cartaz de 50 anos, faixas e recorte curvo dourado.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "brass",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2016.json",
+    "art": {
+      "posterCrop": [
+        0.035,
+        0.05,
+        0.31,
+        0.28
+      ],
+      "headerCrop": [
+        0.33,
+        0.022,
+        0.95,
+        0.126
+      ],
+      "headerBottom": 0.14,
+      "namesFirst": true,
+      "campaignLines": [
+        {
+          "text": "21ª Fenasoja",
+          "y": 0.054,
+          "size": 0.055,
+          "width": 0.62
+        },
+        {
+          "text": "Quem tem história cultiva o futuro!",
+          "y": 0.111,
+          "size": 0.031,
+          "width": 0.66
+        }
+      ]
+    },
+    "sourceArchive": "Fenasoja_2016_a_2026_6_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_2016_a_2026/21a_Fenasoja_2016.jpeg"
+  },
+  {
+    "id": "fenasoja-2018",
+    "kind": "edition",
+    "edition": 22,
+    "year": 2018,
+    "sourceFile": "22a_Fenasoja_2018.jpeg",
+    "crop": [
+      [
+        104,
+        404
+      ],
+      [
+        894,
+        389
+      ],
+      [
+        864,
+        1304
+      ],
+      [
+        214,
+        1330
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "2018 (marca da edição; sem intervalo gravado)",
+    "visual": "Marca original e grafismos lineares dourados nas bordas.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "partial",
+    "model": {
+      "profile": "brass",
+      "cornerRadius": 0.004,
+      "depth": 0.027,
+      "screws": true
+    },
+    "transcriptionFile": "fenasoja-2018.json",
+    "art": {},
+    "sourceArchive": "Fenasoja_2016_a_2026_6_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_2016_a_2026/22a_Fenasoja_2018.jpeg"
+  },
+  {
+    "id": "fenasoja-2022",
+    "kind": "edition",
+    "edition": 23,
+    "year": 2022,
+    "sourceFile": "23a_Fenasoja_2022.jpeg",
+    "crop": [
+      [
+        29,
+        190
+      ],
+      [
+        1035,
+        239
+      ],
+      [
+        917,
+        1380
+      ],
+      [
+        113,
+        1434
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 28 DE ABRIL A 08 DE MAIO DE 2022",
+    "visual": "Placa fosca, período gravado em 2022 e extensa lista de áreas.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-2022.json",
+    "art": {
+      "periodLines": [
+        "DE 28 DE ABRIL A",
+        "08 DE MAIO DE 2022"
+      ]
+    },
+    "sourceArchive": "Fenasoja_2016_a_2026_6_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_2016_a_2026/23a_Fenasoja_2022.jpeg",
+    "context": {
+      "text": "A Prefeitura de Santa Rosa registra a cerimônia de abertura oficial da 23ª edição em 30 de abril de 2022. A placa traz o período de 28 de abril a 08 de maio de 2022.",
+      "decision": "Cerimônia oficial e período gravado são informações distintas. A inscrição da peça foi mantida; o documento de 2020 tem ficha e visualização próprias.",
+      "sources": [
+        {
+          "title": "Prefeitura de Santa Rosa · abertura oficial em 2022",
+          "url": "https://prefeitura.santarosa.rs.gov.br/?p=4473"
+        },
+        {
+          "title": "FENASOJA · relato institucional do adiamento",
+          "url": "https://fenasoja.com.br/portal-oficial/geral/um-presidente-que-representa-a-forca-voluntaria-da-regiao/"
+        }
+      ]
+    }
+  },
+  {
+    "id": "fenasoja-2024",
+    "kind": "edition",
+    "edition": 24,
+    "year": 2024,
+    "sourceFile": "24a_Fenasoja_2024.jpeg",
+    "crop": [
+      [
+        0,
+        240
+      ],
+      [
+        1061,
+        242
+      ],
+      [
+        984,
+        1466
+      ],
+      [
+        122,
+        1535
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 29 DE NOVEMBRO A\n08 DE DEZEMBRO DE 2024",
+    "visual": "Período gravado entre novembro e dezembro, seções e colunas densas.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-2024.json",
+    "art": {
+      "periodLines": [
+        "DE 29 DE NOVEMBRO A",
+        "08 DE DEZEMBRO DE 2024"
+      ],
+      "namesFirst": false
+    },
+    "sourceArchive": "Fenasoja_2016_a_2026_6_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_2016_a_2026/24a_Fenasoja_2024.jpeg"
+  },
+  {
+    "id": "fenasoja-2026",
+    "kind": "edition",
+    "edition": 25,
+    "year": 2026,
+    "sourceFile": "25a_Fenasoja_2026.jpeg",
+    "crop": [
+      [
+        0,
+        257
+      ],
+      [
+        916,
+        257
+      ],
+      [
+        864,
+        1319
+      ],
+      [
+        116,
+        1440
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 01 A 10 DE MAIO DE 2026",
+    "visual": "Inscrição da 25ª edição e composição densa de cargos e áreas.",
+    "notes": [
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "fenasoja-2026.json",
+    "art": {
+      "periodLines": [
+        "DE 01 A 10 DE",
+        "MAIO DE 2026"
+      ]
+    },
+    "sourceArchive": "Fenasoja_2016_a_2026_6_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_2016_a_2026/25a_Fenasoja_2026.jpeg",
+    "context": {
+      "text": "A FENASOJA publicou em 16 de junho de 2026 o relato do encerramento e da prestação de contas da edição realizada de 1º a 10 de maio.",
+      "decision": "A 25ª edição encerra a sequência histórica. A apresentação de 2028 é um epílogo sem novo ordinal histórico.",
+      "sources": [
+        {
+          "title": "FENASOJA · encerramento e prestação de contas de 2026",
+          "url": "https://fenasoja.com.br/portal-oficial/geral/resultados-da-fenasoja-2026-sao-enaltecidos-em-evento-de-encerramento/"
+        }
+      ]
+    }
+  },
+  {
+    "id": "documento-2020",
+    "kind": "document",
+    "edition": 23,
+    "year": 2020,
+    "parentId": "fenasoja-2022",
+    "sourceFile": "23a_Fenasoja_2020_Placa_Historica.jpeg",
+    "crop": [
+      [
+        0,
+        149
+      ],
+      [
+        1048,
+        173
+      ],
+      [
+        950,
+        1387
+      ],
+      [
+        105,
+        1439
+      ]
+    ],
+    "whiteBalance": [
+      0.99,
+      1,
+      1.02
+    ],
+    "engravedPeriod": "DE 28 DE ABRIL A\n08 DE MAIO 2020",
+    "visual": "Placa fosca da edição prevista para 2020, com datas e conteúdo próprios.",
+    "notes": [
+      "Documento associado à 23ª edição adiada. As datas gravadas são mantidas e não substituídas pelas datas de realização em 2022.",
+      "A face de exposição é uma recomposição determinística limpa; fotografia original e fotografia retificada permanecem disponíveis. Tipografia e relevo são interpretações visuais, não uma digitalização física."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "matte",
+      "cornerRadius": 0.018,
+      "depth": 0.018,
+      "screws": false
+    },
+    "transcriptionFile": "documento-2020.json",
+    "art": {
+      "namesFirst": false,
+      "periodLines": [
+        "DE 28 DE ABRIL A",
+        "08 DE MAIO 2020"
+      ]
+    },
+    "sourceArchive": "Fenasoja_2016_a_2026_6_Fotos_Originais_Alta_Qualidade(1).zip",
+    "archiveEntry": "Fenasoja_2016_a_2026/23a_Fenasoja_2020_Placa_Historica.jpeg",
+    "context": {
+      "text": "O relato institucional descreve o adiamento da edição prevista para 2020 em razão da pandemia. O documento permanece associado à 23ª edição realizada em 2022.",
+      "decision": "As datas gravadas de 2020 e o rodapé sobre a pandemia pertencem a este documento. Não foram substituídos pelas datas da placa de 2022.",
+      "sources": [
+        {
+          "title": "FENASOJA · relato institucional do adiamento",
+          "url": "https://fenasoja.com.br/portal-oficial/geral/um-presidente-que-representa-a-forca-voluntaria-da-regiao/"
+        },
+        {
+          "title": "Prefeitura de Santa Rosa · abertura oficial em 2022",
+          "url": "https://prefeitura.santarosa.rs.gov.br/?p=4473"
+        }
+      ]
+    }
+  },
+  {
+    "id": "fenasoja-2028",
+    "kind": "epilogue",
+    "year": 2028,
+    "engravedPeriod": null,
+    "visual": "Moldura dourada e face escura. FENASOJA 2028 · LOADING…",
+    "notes": [
+      "Conteúdo estático da exposição; não representa o estado de carregamento do sistema."
+    ],
+    "reviewStatus": "verified",
+    "model": {
+      "profile": "brass",
+      "cornerRadius": 0.012,
+      "depth": 0.03,
+      "screws": false
+    },
+    "art": {}
+  }
+]

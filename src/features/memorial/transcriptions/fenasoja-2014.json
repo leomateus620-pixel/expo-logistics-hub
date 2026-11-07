@@ -1,0 +1,349 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE DE HONRA",
+          "name": "ROGÉRIO JACOB KERBER",
+          "status": "verified",
+          "sourceRegion": [
+            0.03183,
+            0.24686,
+            0.96817,
+            0.02999
+          ]
+        },
+        {
+          "role": "PRESIDENTE CCPF",
+          "name": "ELEMAR ANTONIO LENZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.03213,
+            0.2697,
+            0.96787,
+            0.02939
+          ]
+        },
+        {
+          "role": "PRESIDENTE",
+          "name": "ÂNGELA DE FARIA MARASCHIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.03242,
+            0.2925,
+            0.96758,
+            0.02878
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "GERSON MIGUEL LAUERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.03272,
+            0.31527,
+            0.96728,
+            0.02818
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "ATEMIR ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.03301,
+            0.338,
+            0.96699,
+            0.02758
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "JAIME LUÍS PATIAS",
+          "status": "verified",
+          "sourceRegion": [
+            0.0333,
+            0.36071,
+            0.9667,
+            0.02698
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CLÉO ANTONIO ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.0336,
+            0.38338,
+            0.9664,
+            0.02638
+          ]
+        },
+        {
+          "role": "SECRETÁRIA",
+          "name": "LUCIANA SAWCZUK MALEICO",
+          "status": "verified",
+          "sourceRegion": [
+            0.03389,
+            0.40602,
+            0.96611,
+            0.02579
+          ]
+        },
+        {
+          "role": "AUXILIAR ADMINISTRATIVO",
+          "name": "FRANCIELI ALINE DA SILVA",
+          "status": "verified",
+          "sourceRegion": [
+            0.03418,
+            0.42863,
+            0.96555,
+            0.02519
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "AGRICULTURA",
+          "name": "GILMAR FRANCISCO VIONE",
+          "status": "verified",
+          "sourceRegion": [
+            0.03515,
+            0.50345,
+            0.96334,
+            0.02323
+          ]
+        },
+        {
+          "role": "EXPORURAL",
+          "name": "CARLOS CÉSAR HERMANNS",
+          "status": "verified",
+          "sourceRegion": [
+            0.03545,
+            0.5264,
+            0.96266,
+            0.02263
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "MILTON RACHO",
+          "status": "verified",
+          "sourceRegion": [
+            0.03574,
+            0.54932,
+            0.96198,
+            0.02204
+          ]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "Major VLADIMIR F. D. COSTA RIBAS",
+          "status": "verified",
+          "sourceRegion": [
+            0.03604,
+            0.5722,
+            0.9613,
+            0.02144
+          ]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "ALEXANDRE RODRIGO MARONEZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.03634,
+            0.59506,
+            0.96062,
+            0.02085
+          ]
+        },
+        {
+          "role": "ETNIAS",
+          "name": "JOSÉ ALBINO ROHR",
+          "status": "verified",
+          "sourceRegion": [
+            0.03663,
+            0.61788,
+            0.95995,
+            0.02025
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "PAULO GILBERTO DA ROSA",
+          "status": "verified",
+          "sourceRegion": [
+            0.03693,
+            0.64066,
+            0.95927,
+            0.01966
+          ]
+        },
+        {
+          "role": "BILHETERIA",
+          "name": "SÉRGIO IVAN DE SOUZA GRIZA",
+          "status": "verified",
+          "sourceRegion": [
+            0.03722,
+            0.66342,
+            0.9586,
+            0.01907
+          ]
+        },
+        {
+          "role": "CULTURA E TURISMO",
+          "name": "BERNARDETE ALVES CARVALHO",
+          "status": "verified",
+          "sourceRegion": [
+            0.03751,
+            0.68614,
+            0.95793,
+            0.01848
+          ]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "VÍTOR HUGO NOGUEIRA DUTRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.03781,
+            0.70883,
+            0.95726,
+            0.0179
+          ]
+        },
+        {
+          "role": "CREDENCIAMENTO",
+          "name": "FABIANE VOLKMER GROSSMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.0381,
+            0.73149,
+            0.95659,
+            0.01731
+          ]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "JOSÉ CLAUDEOMIRO AURÉLIO",
+          "status": "verified",
+          "sourceRegion": [
+            0.03839,
+            0.75412,
+            0.95592,
+            0.01673
+          ]
+        },
+        {
+          "role": "LOGÍSTICA",
+          "name": "JOSÉLIO VENDRÚSCULO",
+          "status": "verified",
+          "sourceRegion": [
+            0.03869,
+            0.77671,
+            0.95525,
+            0.01615
+          ]
+        },
+        {
+          "role": "INDÚSTRIA e COMÉRCIO",
+          "name": "CAROLINE N. MOLINARI KOSLOWSKI",
+          "status": "verified",
+          "sourceRegion": [
+            0.03898,
+            0.79927,
+            0.95458,
+            0.01557
+          ]
+        },
+        {
+          "role": "RECEPÇÃO",
+          "name": "MARIA VANICE ESCHER SEGER",
+          "status": "verified",
+          "sourceRegion": [
+            0.03927,
+            0.8218,
+            0.95391,
+            0.01499
+          ]
+        },
+        {
+          "role": "INFRA-ESTRUTURA",
+          "name": "ELIAS DALLALBA",
+          "status": "verified",
+          "sourceRegion": [
+            0.03956,
+            0.8443,
+            0.95325,
+            0.01441
+          ]
+        },
+        {
+          "role": "RELAÇÕES INTERNACIONAIS",
+          "name": "EDSON LUÍS LAUTHARTE",
+          "status": "verified",
+          "sourceRegion": [
+            0.03985,
+            0.86676,
+            0.95258,
+            0.01384
+          ]
+        },
+        {
+          "role": "SOJA E DERIVADOS",
+          "name": "VANESSA MATRASZEK GNOATTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.04014,
+            0.8892,
+            0.95192,
+            0.01327
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JOSÉ MAURO BARBIERI",
+          "status": "verified",
+          "sourceRegion": [
+            0.04043,
+            0.9116,
+            0.95125,
+            0.01269
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE IMPRENSA",
+          "name": "RAFAELA HELENA SULZBACH SECCHI",
+          "status": "verified",
+          "sourceRegion": [
+            0.04072,
+            0.93397,
+            0.95059,
+            0.01212
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE PROJETOS",
+          "name": "ELISABETE ESTELA MYSKO",
+          "status": "verified",
+          "sourceRegion": [
+            0.04101,
+            0.95631,
+            0.94993,
+            0.01155
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados, em coordenadas normalizadas. A arte limpa mantém as inscrições; cartazes e marcas vêm dos pixels originais."
+  ]
+}

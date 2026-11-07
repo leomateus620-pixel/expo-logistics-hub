@@ -1,0 +1,1260 @@
+{
+  "desktopGallery": {
+    "canvasCount": 0,
+    "columns": "313.021px 313.035px 313.021px",
+    "dpr": 1.1399999856948853,
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial",
+    "viewport": [
+      1263,
+      789
+    ],
+    "assets": [
+      {
+        "id": "a688991118b10bd4",
+        "kind": "script",
+        "name": "MemorialExperience-DCy8woOW.js",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "script"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 2967,
+            "property": "href"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/assets/MemorialExperience-DCy8woOW.js"
+      },
+      {
+        "id": "492eb38c0ea045f5",
+        "kind": "stylesheet",
+        "name": "MemorialExperience-C_bhFADk.css",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "link"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 2973,
+            "property": "href"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/assets/MemorialExperience-C_bhFADk.css"
+      },
+      {
+        "id": "4d83fb70483ae013",
+        "kind": "image",
+        "name": "fenasoja-1966-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4758,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1966-240.webp?v=15e21f5a8d03"
+      },
+      {
+        "id": "66dac6b3ceeead8e",
+        "kind": "image",
+        "name": "graphite.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "css"
+          },
+          {
+            "kind": "computedStyle",
+            "nodeId": 4643,
+            "property": "background-image"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/environment/graphite.webp"
+      },
+      {
+        "id": "83dce5de616b5574",
+        "kind": "image",
+        "name": "edge-left.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "css"
+          },
+          {
+            "kind": "computedStyle",
+            "nodeId": 4644,
+            "property": "background-image"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/environment/edge-left.webp"
+      },
+      {
+        "id": "4e0101bea7437947",
+        "kind": "image",
+        "name": "edge-right.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "css"
+          },
+          {
+            "kind": "computedStyle",
+            "nodeId": 4644,
+            "property": "background-image"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/environment/edge-right.webp"
+      },
+      {
+        "id": "0458bf71d75cd977",
+        "kind": "image",
+        "name": "fenasoja-1974-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4773,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1974-240.webp?v=69f957da9cc2"
+      },
+      {
+        "id": "705919d8b5b981e6",
+        "kind": "image",
+        "name": "fenasoja-1979-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4795,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1979-240.webp?v=5c102868d638"
+      },
+      {
+        "id": "509dc77b2facc347",
+        "kind": "image",
+        "name": "fenasoja-1976-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4784,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1976-240.webp?v=5ad816030370"
+      },
+      {
+        "id": "0343ba03c5ade063",
+        "kind": "image",
+        "name": "fenasoja-1981-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4806,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1981-240.webp?v=c910f2c68f84"
+      },
+      {
+        "id": "383360507d7ceace",
+        "kind": "image",
+        "name": "fenasoja-1984-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4817,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1984-240.webp?v=0b9ee44de1c0"
+      },
+      {
+        "id": "b6b449335b5b91ca",
+        "kind": "image",
+        "name": "fenasoja-1990-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4839,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1990-240.webp?v=7cefcc2264dc"
+      },
+      {
+        "id": "5ac19b85fe35dbef",
+        "kind": "image",
+        "name": "fenasoja-1987-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4828,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1987-240.webp?v=141eb1c51a47"
+      },
+      {
+        "id": "0c5d4417cd366a72",
+        "kind": "image",
+        "name": "fenasoja-1994-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4861,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1994-240.webp?v=bc6f33bc9659"
+      },
+      {
+        "id": "8168572b5c197dc3",
+        "kind": "image",
+        "name": "fenasoja-1992-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4850,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1992-240.webp?v=8fca4c07ce07"
+      },
+      {
+        "id": "19504457e9c14196",
+        "kind": "image",
+        "name": "fenasoja-1996-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4872,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1996-240.webp?v=9b597e4507ae"
+      },
+      {
+        "id": "751c2aa9356e28b5",
+        "kind": "image",
+        "name": "fenasoja-1998-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4883,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1998-240.webp?v=2e57d46b017a"
+      }
+    ]
+  },
+  "beforeDetail": {
+    "base": "/",
+    "focus": "fenasoja-2004",
+    "scroll": 2045.614013671875
+  },
+  "desktop2004": {
+    "canvasCount": 1,
+    "metrics": {
+      "engine": "three.js r170",
+      "frames": "3",
+      "geometries": "3",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "423",
+      "reducedMotion": "true",
+      "textureSize": "1118×1536",
+      "textures": "2"
+    },
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial&edicao=fenasoja-2004",
+    "viewport": [
+      1263,
+      789
+    ],
+    "assets": [
+      {
+        "id": "a688991118b10bd4",
+        "kind": "script",
+        "name": "MemorialExperience-DCy8woOW.js",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "script"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 2967,
+            "property": "href"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/assets/MemorialExperience-DCy8woOW.js"
+      },
+      {
+        "id": "492eb38c0ea045f5",
+        "kind": "stylesheet",
+        "name": "MemorialExperience-C_bhFADk.css",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "link"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 2973,
+            "property": "href"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/assets/MemorialExperience-C_bhFADk.css"
+      },
+      {
+        "id": "4d83fb70483ae013",
+        "kind": "image",
+        "name": "fenasoja-1966-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4758,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1966-240.webp?v=15e21f5a8d03"
+      },
+      {
+        "id": "66dac6b3ceeead8e",
+        "kind": "image",
+        "name": "graphite.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "css"
+          },
+          {
+            "kind": "computedStyle",
+            "nodeId": 4643,
+            "property": "background-image"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/environment/graphite.webp"
+      },
+      {
+        "id": "83dce5de616b5574",
+        "kind": "image",
+        "name": "edge-left.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "css"
+          },
+          {
+            "kind": "computedStyle",
+            "nodeId": 4644,
+            "property": "background-image"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/environment/edge-left.webp"
+      },
+      {
+        "id": "4e0101bea7437947",
+        "kind": "image",
+        "name": "edge-right.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "css"
+          },
+          {
+            "kind": "computedStyle",
+            "nodeId": 4644,
+            "property": "background-image"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/environment/edge-right.webp"
+      },
+      {
+        "id": "0458bf71d75cd977",
+        "kind": "image",
+        "name": "fenasoja-1974-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4773,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1974-240.webp?v=69f957da9cc2"
+      },
+      {
+        "id": "705919d8b5b981e6",
+        "kind": "image",
+        "name": "fenasoja-1979-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4795,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1979-240.webp?v=5c102868d638"
+      },
+      {
+        "id": "509dc77b2facc347",
+        "kind": "image",
+        "name": "fenasoja-1976-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4784,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1976-240.webp?v=5ad816030370"
+      },
+      {
+        "id": "0343ba03c5ade063",
+        "kind": "image",
+        "name": "fenasoja-1981-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4806,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1981-240.webp?v=c910f2c68f84"
+      },
+      {
+        "id": "383360507d7ceace",
+        "kind": "image",
+        "name": "fenasoja-1984-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4817,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1984-240.webp?v=0b9ee44de1c0"
+      },
+      {
+        "id": "b6b449335b5b91ca",
+        "kind": "image",
+        "name": "fenasoja-1990-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4839,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1990-240.webp?v=7cefcc2264dc"
+      },
+      {
+        "id": "5ac19b85fe35dbef",
+        "kind": "image",
+        "name": "fenasoja-1987-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4828,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1987-240.webp?v=141eb1c51a47"
+      },
+      {
+        "id": "0c5d4417cd366a72",
+        "kind": "image",
+        "name": "fenasoja-1994-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4861,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1994-240.webp?v=bc6f33bc9659"
+      },
+      {
+        "id": "8168572b5c197dc3",
+        "kind": "image",
+        "name": "fenasoja-1992-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4850,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1992-240.webp?v=8fca4c07ce07"
+      },
+      {
+        "id": "19504457e9c14196",
+        "kind": "image",
+        "name": "fenasoja-1996-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4872,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1996-240.webp?v=9b597e4507ae"
+      },
+      {
+        "id": "751c2aa9356e28b5",
+        "kind": "image",
+        "name": "fenasoja-1998-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4883,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1998-240.webp?v=2e57d46b017a"
+      },
+      {
+        "id": "7958d923af95d2f4",
+        "kind": "image",
+        "name": "fenasoja-2000-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4894,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2000-240.webp?v=d707565558fb"
+      },
+      {
+        "id": "3faabbafea69d6b2",
+        "kind": "image",
+        "name": "fenasoja-2002-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4905,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2002-240.webp?v=609a8a59acd9"
+      },
+      {
+        "id": "5606c8287a5b0f42",
+        "kind": "image",
+        "name": "fenasoja-2006-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4927,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2006-240.webp?v=b75604754785"
+      },
+      {
+        "id": "f90e4ff144341a12",
+        "kind": "image",
+        "name": "fenasoja-2004-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4916,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2004-240.webp?v=542a33d9b1de"
+      },
+      {
+        "id": "295be920bd12efb8",
+        "kind": "image",
+        "name": "fenasoja-2008-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4938,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2008-240.webp?v=96f60b2018d4"
+      },
+      {
+        "id": "cc5b075d2910cea6",
+        "kind": "image",
+        "name": "fenasoja-2012-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4960,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2012-240.webp?v=a985e1eb36fb"
+      },
+      {
+        "id": "821eb500ef9c0c13",
+        "kind": "image",
+        "name": "fenasoja-2010-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4949,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2010-240.webp?v=26e648ee40a4"
+      },
+      {
+        "id": "db3fb27c162aa07a",
+        "kind": "image",
+        "name": "fenasoja-2014-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4971,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2014-240.webp?v=773de14989f4"
+      },
+      {
+        "id": "c37a5392872c7ec6",
+        "kind": "image",
+        "name": "fenasoja-2016-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4982,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2016-240.webp?v=00fc2a36cbd8"
+      },
+      {
+        "id": "b82378b532e413f1",
+        "kind": "image",
+        "name": "fenasoja-2018-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 4993,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2018-240.webp?v=72c62afed6f2"
+      },
+      {
+        "id": "cf6e1649329db628",
+        "kind": "image",
+        "name": "fenasoja-2022-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 5004,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2022-240.webp?v=055e0c0b39e6"
+      },
+      {
+        "id": "56d87814baf163ab",
+        "kind": "image",
+        "name": "fenasoja-2024-240.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 5015,
+            "property": "srcset"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2024-240.webp?v=6aadf31fec11"
+      },
+      {
+        "id": "070cf4e4f0ee4761",
+        "kind": "script",
+        "name": "MemorialViewer-CcH6KckX.js",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "script"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 5945,
+            "property": "href"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/assets/MemorialViewer-CcH6KckX.js"
+      },
+      {
+        "id": "6499aca00df6a0d9",
+        "kind": "image",
+        "name": "fenasoja-2004.webp",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "img"
+          },
+          {
+            "kind": "resource",
+            "property": "fetch"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/art/fenasoja-2004.webp?v=5834e0ef7101"
+      },
+      {
+        "id": "5b5b76cd53be6bb5",
+        "kind": "script",
+        "name": "fenasoja-2004-BbptfRcf.js",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "script"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/assets/fenasoja-2004-BbptfRcf.js"
+      },
+      {
+        "id": "8ae6c2f07350fc70",
+        "kind": "script",
+        "name": "PlateRenderer-B3qjUBLf.js",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "script"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 6090,
+            "property": "href"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/assets/PlateRenderer-B3qjUBLf.js"
+      },
+      {
+        "id": "51e44d8ca7aa8346",
+        "kind": "script",
+        "name": "maps-three-CqmvnFd9.js",
+        "sources": [
+          {
+            "kind": "resource",
+            "property": "script"
+          },
+          {
+            "kind": "attribute",
+            "nodeId": 6091,
+            "property": "href"
+          }
+        ],
+        "url": "http://127.0.0.1:8080/assets/maps-three-CqmvnFd9.js"
+      }
+    ]
+  },
+  "rotation": {
+    "engine": "three.js r170",
+    "frames": "6",
+    "geometries": "3",
+    "pose": "inspection",
+    "quality": "economy",
+    "readyMs": "354",
+    "reducedMotion": "true",
+    "textureSize": "1118×1536",
+    "textures": "2"
+  },
+  "returnFromDetail": {
+    "canvasCount": 0,
+    "focus": "fenasoja-2004",
+    "scroll": 2045.614013671875,
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial"
+  },
+  "historyBack": {
+    "detail": "2004 15ª FENASOJA",
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial&edicao=fenasoja-2004"
+  },
+  "historyForward": {
+    "focus": "fenasoja-2004",
+    "scroll": 2045.614013671875,
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial"
+  },
+  "returnHome": {
+    "canvasCount": 0,
+    "focus": "org-memorial-shortcut",
+    "url": "http://127.0.0.1:8080/?ecossistema=organizacao"
+  },
+  "mobileGallery": {
+    "clientWidth": 377,
+    "columns": "288.226px",
+    "dpr": 1.1399999856948853,
+    "scrollWidth": 377,
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial",
+    "viewport": [
+      390,
+      844
+    ]
+  },
+  "mobileBeforeDetail": {
+    "focus": "fenasoja-2018",
+    "scroll": 9332.4560546875
+  },
+  "mobile2018": {
+    "canvasCount": 1,
+    "metrics": {
+      "engine": "three.js r170",
+      "frames": "2",
+      "geometries": "3",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "180",
+      "reducedMotion": "true",
+      "textureSize": "798×1024",
+      "textures": "2"
+    },
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial&edicao=fenasoja-2018",
+    "viewport": [
+      390,
+      844
+    ]
+  },
+  "mobileTranscription": {
+    "canvasCount": 0,
+    "overflow": false,
+    "selectable": "text"
+  },
+  "mobilePhoto": {
+    "container": 312,
+    "pan": 1152,
+    "source": "/memorial-voluntariado/originals/22a_Fenasoja_2018.jpeg",
+    "width": 1151.9874267578125
+  },
+  "mobileReturn": {
+    "canvasCount": 0,
+    "focus": "fenasoja-2018",
+    "scroll": 9332.4560546875
+  },
+  "document2020": {
+    "canvasCount": 1,
+    "metrics": {
+      "engine": "three.js r170",
+      "geometries": "2",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "129",
+      "reducedMotion": "true",
+      "textureSize": "772×1024",
+      "textures": "2"
+    },
+    "title": "DOCUMENTO ASSOCIADO À 23ª EDIÇÃO2020 Placa histórica de 2020Período gravado: DE 28 DE ABRIL A\n08 DE MAIO 2020Placa da edição prevista para 2020, adiada para 2022. As datas e inscrições deste documento foram preservadas.",
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial&edicao=fenasoja-2022&documento=2020"
+  },
+  "mobile2026": {
+    "metrics": {
+      "engine": "three.js r170",
+      "geometries": "2",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "135",
+      "reducedMotion": "true",
+      "textureSize": "761×1024",
+      "textures": "2"
+    },
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial&edicao=fenasoja-2026"
+  },
+  "epilogue": {
+    "metrics": {
+      "engine": "three.js r170",
+      "geometries": "2",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "82",
+      "reducedMotion": "true",
+      "textureSize": "768×1024",
+      "textures": "2"
+    },
+    "status": "",
+    "title": "EPÍLOGO2028 FENASOJA 2028 · LOADING…O próximo capítulo está sendo preparado.",
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial&edicao=fenasoja-2028"
+  },
+  "mapping2012": {
+    "caption": "20a_Fenasoja_2014.jpeg · JPEG preservado, 1152 × 1536 px. O tamanho original permite consultar as inscrições sem ampliação artificial.",
+    "title": "2012 19ª FENASOJA",
+    "url": "http://127.0.0.1:8080/portal?ecossistema=memorial&edicao=fenasoja-2012"
+  },
+  "mapping2014": {
+    "caption": "19a_Fenasoja_2012.jpeg · JPEG preservado, 1152 × 1536 px. O tamanho original permite consultar as inscrições sem ampliação artificial.",
+    "title": "2014 20ª FENASOJA",
+    "url": "http://127.0.0.1:8080/portal?ecossistema=memorial&edicao=fenasoja-2014"
+  },
+  "reload": {
+    "url": "http://127.0.0.1:8080/portal?ecossistema=memorial&edicao=fenasoja-2014",
+    "preservedEdition": 2014
+  },
+  "orientationBeforeFix": {
+    "columns": "268.777px 268.791px",
+    "focus": "fenasoja-2004",
+    "focusedBottom": -2180.3590698242188,
+    "focusedTop": -2540.350830078125,
+    "scroll": 6286.84228515625,
+    "viewport": [
+      768,
+      1024
+    ]
+  },
+  "orientationAfterFix": {
+    "columns": "268.777px 268.791px",
+    "focus": "fenasoja-2004",
+    "focusedBottom": 708.2373657226562,
+    "focusedTop": 348.24560546875,
+    "scroll": 3398.24560546875,
+    "viewport": [
+      768,
+      1024
+    ]
+  },
+  "noWebGL": {
+    "fallback": "/memorial-voluntariado/art/fenasoja-1966.webp?v=05c7828105be",
+    "state": "failed",
+    "tabs": [
+      "Quadro 3D",
+      "Transcrição",
+      "Foto original"
+    ]
+  },
+  "contextLossRecovery": {
+    "canvasCount": 1,
+    "metrics": {
+      "engine": "three.js r170",
+      "geometries": "2",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "100",
+      "reducedMotion": "true",
+      "textureSize": "701×1024",
+      "textures": "2"
+    },
+    "state": "ready"
+  },
+  "textureFailure": {
+    "state": "failed",
+    "title": "1966 1ª FENASOJA"
+  },
+  "slowNetwork": {
+    "metrics": {
+      "engine": "three.js r170",
+      "frames": "2",
+      "geometries": "2",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "3307",
+      "reducedMotion": "true",
+      "textureSize": "701×1024",
+      "textures": "2"
+    },
+    "state": "ready"
+  },
+  "motionFullBefore": {
+    "observedAt": 1794013104475,
+    "engine": "three.js r170",
+    "frames": "43",
+    "geometries": "2",
+    "pose": "frontal",
+    "quality": "economy",
+    "readyMs": "191",
+    "reducedMotion": "false",
+    "textureSize": "701×1024",
+    "textures": "2"
+  },
+  "motionFullAfter": {
+    "observedAt": 1794013159668,
+    "engine": "three.js r170",
+    "frames": "43",
+    "geometries": "2",
+    "pose": "frontal",
+    "quality": "economy",
+    "readyMs": "191",
+    "reducedMotion": "false",
+    "textureSize": "701×1024",
+    "textures": "2"
+  },
+  "reducedMotion": {
+    "metrics": {
+      "engine": "three.js r170",
+      "frames": "2",
+      "geometries": "2",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "151",
+      "reducedMotion": "true",
+      "textureSize": "701×1024",
+      "textures": "2"
+    },
+    "state": "ready"
+  },
+  "reflow320": {
+    "globalOverflow": false,
+    "tabWidths": [
+      85.08771514892578,
+      85.08771514892578,
+      85.08771514892578
+    ],
+    "transcriptWidth": 257.0175476074219,
+    "viewport": [
+      320,
+      750
+    ]
+  },
+  "organizationBefore": {
+    "camera": "transform: translate3d(-26.5493px, 60.2224px, 0px) scale(1.07251); transform-origin: 0px 0px; width: 1202px; height: 541px;",
+    "filters": [
+      "TODO O ECOSSISTEMA",
+      "CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA",
+      "PRESIDÊNCIA",
+      "COMISSÃO CENTRAL",
+      "COMISSÕES",
+      "ASSESSORIAS",
+      "Memorial do Voluntariado"
+    ],
+    "label": "Memorial do Voluntariado"
+  },
+  "organizationAfter": {
+    "camera": "transform: translate3d(-26.5493px, 60.2224px, 0px) scale(1.07251); transform-origin: 0px 0px; width: 1202px; height: 541px;",
+    "filters": [
+      "TODO O ECOSSISTEMA",
+      "CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA",
+      "PRESIDÊNCIA",
+      "COMISSÃO CENTRAL",
+      "COMISSÕES",
+      "ASSESSORIAS",
+      "Memorial do Voluntariado"
+    ],
+    "focus": "org-memorial-shortcut"
+  },
+  "organizationMobile": {
+    "button": {
+      "bottom": 147.94407653808594,
+      "height": 43.99671173095703,
+      "left": 11.99287223815918,
+      "right": 193.11952018737793,
+      "top": 103.9473648071289,
+      "width": 181.12664794921875,
+      "x": 11.99287223815918,
+      "y": 103.9473648071289
+    },
+    "label": "Memorial do Voluntariado",
+    "viewport": [
+      390,
+      844
+    ],
+    "visible": "block"
+  },
+  "finalHistory": {
+    "back": {
+      "canvasCount": 0,
+      "focus": "fenasoja-2018",
+      "scroll": 9332.4560546875
+    },
+    "forwardUrl": "http://127.0.0.1:8080/?ecossistema=memorial&edicao=fenasoja-2018"
+  },
+  "closedToPortal": {
+    "canvasCount": 0,
+    "dialogCount": 0,
+    "focus": "portal-ecosystem-launcher",
+    "url": "http://127.0.0.1:8080/"
+  },
+  "finalConsole": [],
+  "finalEntry": {
+    "canvasCount": 0,
+    "scroll": 0,
+    "url": "http://127.0.0.1:8080/?ecossistema=memorial"
+  },
+  "backgroundBefore": {
+    "metrics": {
+      "engine": "three.js r170",
+      "frames": "3",
+      "geometries": "3",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "423",
+      "reducedMotion": "true",
+      "textureSize": "1118×1536",
+      "textures": "2"
+    },
+    "viewer": "ready"
+  },
+  "backgroundDuring": {
+    "metrics": {
+      "engine": "three.js r170",
+      "frames": "3",
+      "geometries": "3",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "423",
+      "reducedMotion": "true",
+      "textureSize": "1118×1536",
+      "textures": "2"
+    },
+    "viewer": "ready"
+  },
+  "backgroundAfter": {
+    "canvasCount": 1,
+    "metrics": {
+      "engine": "three.js r170",
+      "frames": "3",
+      "geometries": "3",
+      "pose": "frontal",
+      "quality": "economy",
+      "readyMs": "423",
+      "reducedMotion": "true",
+      "textureSize": "1118×1536",
+      "textures": "2"
+    },
+    "viewer": "ready"
+  }
+}

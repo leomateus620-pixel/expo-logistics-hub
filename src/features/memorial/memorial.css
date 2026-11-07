@@ -1,0 +1,198 @@
+.memorial {
+  --memorial-ivory: #f2ead9;
+  --memorial-muted: #c8c0ad;
+  --memorial-gold: #d8b778;
+  position: absolute; inset: 0; z-index: 5; isolation: isolate;
+  background: #151715; color: var(--memorial-ivory); font-family: inherit;
+}
+.memorial *, .memorial *::before, .memorial *::after { box-sizing: border-box; }
+.memorial button, .memorial select, .memorial a { -webkit-tap-highlight-color: transparent; }
+.memorial button, .memorial a, .memorial select { touch-action: manipulation; }
+.memorial button { font: inherit; cursor: pointer; }
+.memorial button:disabled { cursor: default; opacity: .42; }
+.memorial :is(button, a, select, [tabindex]):focus-visible { outline: 2px solid #f5d68d; outline-offset: 5px; border-radius: 3px; }
+.memorial a { color: inherit; text-decoration: none; }
+.memorial-environment { position: absolute; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; }
+.memorial-environment > div { position: absolute; inset: 0; }
+.memorial-environment__mineral { background: #151715 url('/memorial-voluntariado/environment/graphite.webp') center / cover no-repeat; opacity: .68; }
+.memorial-environment__edges { background: url('/memorial-voluntariado/environment/edge-left.webp') left top / clamp(30px, 4.5vw, 78px) 100% no-repeat, url('/memorial-voluntariado/environment/edge-right.webp') right top / clamp(30px, 4.5vw, 78px) 100% no-repeat; }
+.memorial-environment__light { background: radial-gradient(ellipse at 12% 0%, #d69b4526, transparent 44%), radial-gradient(ellipse at 88% 0%, #d69b451f, transparent 43%), linear-gradient(90deg, #0005, transparent 12% 88%, #0005); }
+.memorial-environment__veil { background: #050705; opacity: 0; transition: opacity 320ms ease; }
+.memorial[data-detail-open='true'] .memorial-environment__veil { opacity: .52; }
+.memorial-scroll { position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain; scrollbar-color: #74623f #181b18; scroll-padding-top: 32px; }
+.memorial-gallery { padding: max(22px, env(safe-area-inset-top)) clamp(44px, 7.4vw, 120px) 64px; }
+.memorial-gallery__header { position: relative; max-width: 1320px; margin: 0 auto 44px; }
+.memorial-back, .memorial-home-link { display: inline-flex; min-height: 44px; align-items: center; gap: 10px; padding: 8px 0; border: 0; background: transparent; color: var(--memorial-muted); font-size: 13px !important; }
+.memorial-back:hover, .memorial-home-link:hover { color: #fff7e4; }
+.memorial-gallery__intro { padding-top: 38px; }
+.memorial-eyebrow { display: flex; align-items: center; gap: 9px; color: var(--memorial-gold); font-size: 10px; font-weight: 600; letter-spacing: .18em; line-height: 1.7; }
+.memorial-gallery h1 { max-width: 790px; margin: 14px 0 16px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(36px, 4.1vw, 64px); font-weight: 400; line-height: 1; letter-spacing: .045em; }
+.memorial-gallery h1 span { display: block; margin-top: 9px; font-family: inherit; font-size: .48em; letter-spacing: .095em; }
+.memorial-gallery h1:focus { outline: none; }
+.memorial-gallery__intro > p { margin: 0; color: var(--memorial-muted); font-size: 15px; line-height: 1.6; }
+.memorial-gallery__guide { display: flex; flex-wrap: wrap; gap: 15px 30px; align-items: center; margin-top: 27px; padding-bottom: 24px; border-bottom: 1px solid #b592502b; color: #bfb7a4; font-size: 11px; }
+.memorial-gallery__guide a { display: inline-flex; align-items: center; gap: 9px; color: var(--memorial-gold); min-height: 32px; }
+.memorial-index { position: absolute; right: 0; top: 85px; display: flex; flex-direction: column; gap: 8px; color: var(--memorial-muted); font-size: 11px; }
+.memorial-index select { min-height: 44px; width: 200px; max-width: 100%; border: 1px solid #bfa16560; border-radius: 4px; padding: 10px 28px 10px 12px; color: var(--memorial-ivory); background: #1a1c18; font: inherit; }
+.memorial-index option { background: #1a1c18; color: var(--memorial-ivory); }
+.memorial-timeline { position: relative; display: grid; grid-template-columns: repeat(var(--memorial-columns), minmax(0, 1fr)); gap: 112px 20px; max-width: 1400px; margin: 0 auto; padding: 0 42px 40px; list-style: none; }
+.memorial-timeline > li { position: relative; min-width: 0; scroll-margin: 30px; }
+.memorial-route { position: absolute; z-index: 0; inset: 0; overflow: visible; pointer-events: none; color: #b7985a8f; }
+.memorial-piece { position: relative; display: flex; flex-direction: column; align-items: center; min-height: 360px; padding: 0 0 12px; text-align: center; }
+.memorial-piece__image { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 258px; margin: 0 0 22px; perspective: 900px; }
+.memorial-piece__image img { position: relative; z-index: 1; display: block; width: auto; max-width: min(100% - 4px, 204px); height: auto; max-height: 100%; object-fit: contain; border: 1px solid #baa56d45; border-radius: 3px; transform: rotateY(-5deg) rotateX(2deg); box-shadow: 3px 2px 0 #4e4835, 6px 4px 0 #111712, 13px 16px 17px #0008; transition: transform 220ms ease, box-shadow 220ms ease; }
+.memorial-piece__image[data-profile='matte'] img { border-color: #77785e3b; box-shadow: 3px 2px 0 #42443b, 6px 4px 0 #131613, 13px 16px 18px #0009; }
+.memorial-piece__unavailable { display: none; padding: 24px; color: var(--memorial-muted); font-size: 13px; }
+.memorial-piece__image[data-media-failed='true'] .memorial-piece__unavailable { position: absolute; display: block; }
+.memorial-piece__caption { position: relative; display: grid; justify-items: center; gap: 5px; width: 100%; }
+.memorial-piece__caption strong { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(34px, 3vw, 44px); font-weight: 400; letter-spacing: -.025em; color: #efdfb8; line-height: 1.05; font-variant-numeric: lining-nums; }
+.memorial-piece__caption > span { color: #d1c4a8; font-size: 10px; letter-spacing: .13em; line-height: 1.6; }
+.memorial-piece__caption > svg { position: absolute; right: 8%; top: 13px; color: var(--memorial-gold); opacity: .55; }
+.memorial-piece__marker { position: absolute; z-index: 1; bottom: -25px; left: calc(50% - 5px); width: 10px; height: 10px; background: #b79a60; border: 2px solid #292b24; border-radius: 50%; box-shadow: 0 0 0 3px #b79a6033; transition: background-color 180ms, box-shadow 180ms; }
+.memorial-piece:is(:hover, :focus-visible) .memorial-piece__image img { transform: rotateY(0) rotateX(0) translateY(-5px); box-shadow: 3px 3px 0 #75613b, 17px 21px 25px #000b, 0 0 22px #b9913e1f; }
+.memorial-piece:is(:hover, :focus-visible) .memorial-piece__marker { background: #ffe1a0; box-shadow: 0 0 0 5px #d0ab6740, 0 0 18px #d0ab6770; }
+.memorial-piece__start { display: flex; justify-content: center; align-items: center; gap: 7px; position: absolute; bottom: -60px; left: 0; right: 0; color: #c3b798; font-size: 9px; }
+.memorial-timeline__epilogue { margin-top: -12px; }
+.memorial-timeline:not([data-columns='1']) .memorial-timeline__epilogue .memorial-piece__marker { top: -35px; bottom: auto; }
+.memorial-timeline[data-columns='1'] { gap: 75px 0; padding: 0 0 20px 35px; }
+.memorial-timeline[data-columns='1'] .memorial-piece__marker { left: -29px; bottom: 44px; }
+.memorial-timeline[data-columns='1'] .memorial-piece__caption { justify-items: start; padding-left: 10px; }
+.memorial-timeline[data-columns='1'] .memorial-piece__start { justify-content: flex-start; left: 10px; bottom: -33px; }
+.memorial-gallery__footer { max-width: 1320px; margin: 110px auto 0; padding: 25px 0; border-top: 1px solid #bfa1653d; text-align: center; color: var(--memorial-muted); font-size: 11px; line-height: 1.8; }
+.memorial-gallery__footer > span:first-child { font-size: 10px; letter-spacing: .12em; color: var(--memorial-gold); }
+.memorial-gallery__footer p { margin: 10px 0; }
+.memorial-not-found { max-width: 800px; margin: 0 auto 30px; padding: 20px; border: 1px solid #a68a57; }
+.memorial-not-found button { min-height: 44px; background: transparent; border: 0; color: var(--memorial-gold); }
+.memorial-detail { max-width: 1460px; margin: auto; padding: max(20px, env(safe-area-inset-top)) clamp(40px, 7.3vw, 115px) 55px; }
+.memorial-detail__header { display: flex; justify-content: space-between; gap: 15px; padding-right: 24px; }
+.memorial-detail__title { margin: 28px 0 22px; }
+.memorial-detail__title h2 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px 20px; margin: 9px 0; color: #e6d5af; font-size: 14px; font-weight: 500; letter-spacing: .06em; }
+.memorial-detail__title h2 > span { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(40px, 4.5vw, 64px); font-weight: 400; line-height: 1; letter-spacing: -.03em; }
+.memorial-detail__title > p { max-width: 750px; color: var(--memorial-muted); font-size: 12px; line-height: 1.8; }
+.memorial-tabs-list { display: flex !important; justify-content: flex-start !important; width: max-content; max-width: 100%; height: auto !important; gap: 0; padding: 0 !important; border: 1px solid #b99c5b45; border-radius: 4px !important; background: #10130f !important; }
+.memorial-tabs-list > button { flex: 1; min-height: 44px; padding: 10px 19px; color: #c9c2ae; font-size: 12px; border: 0; border-radius: 3px; box-shadow: none !important; }
+.memorial-tabs-list > button[data-state='active'] { background: #d4b575 !important; color: #171b14 !important; }
+.memorial-detail__body { margin-top: 20px; }
+.memorial-detail__body--inspection { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .8fr); gap: 32px; align-items: start; }
+.memorial-detail__primary { min-width: 0; }
+.memorial-detail__primary > [role='tabpanel'] { margin: 0; }
+.memorial-piece-record { min-width: 0; padding: 18px 0; color: var(--memorial-muted); font-size: 13px; line-height: 1.8; }
+.memorial-piece-record > h3 { margin: 12px 0; color: var(--memorial-ivory); font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 400; line-height: 1.25; }
+.memorial-piece-record > p { margin: 12px 0 22px; }
+.memorial-viewer__stage { position: relative; height: clamp(380px, 44vw, 570px); isolation: isolate; }
+.memorial-viewer__stage::before { position: absolute; z-index: -1; content: ''; inset: 2% 0 0; background: radial-gradient(ellipse at 50% 45%, #ad813132, #9274310c 40%, transparent 69%); }
+.memorial-viewer__stage::after { position: absolute; z-index: -1; content: ''; bottom: 6%; left: 25%; width: 50%; height: 16px; border-radius: 50%; background: #000b; filter: blur(12px); }
+.memorial-viewer canvas { display: block; width: 100%; height: 100%; touch-action: pan-y pinch-zoom; cursor: grab; transition: opacity 180ms; }
+.memorial-viewer canvas:active { cursor: grabbing; }
+.memorial-viewer canvas[hidden] { display: none; }
+.memorial-viewer__fallback { display: block; position: absolute; top: 10%; left: 20%; width: 60%; height: 75%; object-fit: contain; filter: drop-shadow(10px 16px 17px #0009); }
+.memorial-viewer__status { position: absolute; bottom: 0; left: 5%; right: 5%; margin: 0; padding: 8px; background: #0a0e09e8; border-radius: 4px; color: #dfd3b8; font-size: 12px; text-align: center; }
+.memorial-viewer__status button { min-height: 44px; padding: 8px 15px; border: 1px solid #a88e54; border-radius: 4px; background: transparent; color: var(--memorial-gold); }
+.memorial-viewer__controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 7px; margin: 15px 0 0; }
+.memorial-viewer__controls button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 44px; min-height: 44px; padding: 9px 11px; border: 1px solid #b89c5f59; border-radius: 4px; background: #151912; color: #e4d0a4; font-size: 12px; }
+.memorial-viewer__controls button:hover:not(:disabled) { background: #3a3020; }
+.memorial-helper { margin: 15px 0; color: #bbb5a2; font-size: 11px; line-height: 1.8; }
+.memorial-viewer > .memorial-helper { max-width: 440px; margin: 16px auto; text-align: center; }
+.memorial-transcript { max-width: 940px; color: var(--memorial-ivory); user-select: text; }
+.memorial-editorial-state { color: #c8b994; font-size: 11px; line-height: 1.8; }
+.memorial-transcript section { margin-top: 24px; }
+.memorial-transcript h3 { margin-bottom: 18px; color: #ddc18a; font-size: 12px; letter-spacing: .08em; line-height: 1.8; }
+.memorial-transcript dl { margin: 0; }
+.memorial-transcript dl > div { display: grid; grid-template-columns: minmax(145px, .85fr) minmax(0, 1.15fr); gap: 18px; padding: 13px 0; border-bottom: 1px solid #b6a77b26; font-size: 14px; line-height: 1.8; overflow-wrap: anywhere; }
+.memorial-transcript dt { color: #c5bca4; }
+.memorial-transcript dd { margin: 0; color: #f1e9d6; white-space: pre-line; }
+.memorial-transcript dd small { display: block; color: #c8b994; font-size: 11px; }
+.memorial-piece-record .memorial-transcript dl > div { display: block; padding: 8px 0; font-size: 12px; }
+.memorial-piece-record .memorial-transcript dt { font-size: 10px; }
+.memorial-text-link { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; margin-top: 16px; padding: 8px 0; border: 0; background: transparent; color: var(--memorial-gold); font-size: 12px !important; }
+.memorial-document-link { display: flex; width: 100%; gap: 12px; align-items: center; margin: 22px 0; padding: 15px; border: 1px solid #b89e6754; border-radius: 4px; background: #b3985810; color: #e9d5a8 !important; text-align: left; }
+.memorial-document-link span { flex: 1; }
+.memorial-document-link strong, .memorial-document-link small { display: block; }
+.memorial-document-link small { margin-top: 4px; font-size: 11px; color: #c3b89c; }
+.memorial-provenance { margin-top: 30px; padding-top: 18px; border-top: 1px solid #b89e673b; font-size: 11px; }
+.memorial-provenance summary { min-height: 44px; color: var(--memorial-gold); cursor: pointer; }
+.memorial-provenance p { overflow-wrap: anywhere; }
+.memorial-provenance ul { padding-left: 16px; }
+.memorial-provenance li { margin: 12px 0; }
+.memorial-provenance a { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; }
+.memorial-detail__navigation { display: flex; justify-content: space-between; gap: 20px; margin-top: 30px; padding-top: 22px; border-top: 1px solid #b89e6740; }
+.memorial-detail__navigation :is(a, button) { display: flex; align-items: center; gap: 12px; min-height: 44px; border: 0; background: transparent; color: #e1cea4; font-size: 11px; }
+.memorial-detail__navigation > :last-child { text-align: right; }
+.memorial-detail__navigation strong { display: block; margin-top: 6px; color: #f2e5c5; font-size: 12px; font-weight: 500; }
+.memorial-original { margin: 0; }
+.memorial-original__toolbar { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-bottom: 18px; }
+.memorial-original__toolbar :is(a,button) { display: inline-flex; min-height: 44px; gap: 9px; align-items: center; padding: 8px 12px; border: 1px solid #b89e6740; border-radius: 4px; color: #e1cea4; background: #161912; font-size: 12px; }
+.memorial-original__pan { max-height: 70vh; overflow: auto; border: 1px solid #b89e6730; border-radius: 4px; background: #0e120d; }
+.memorial-original__pan img { display: block; width: auto; max-width: 100%; height: auto; max-height: none; margin: 0 auto; }
+.memorial-original__pan[data-full-size='true'] img { width: 1152px; max-width: none; min-width: 1152px; margin: 0; }
+.memorial-original figcaption { margin-top: 13px; color: #c8bea6; font-size: 11px; line-height: 1.8; overflow-wrap: anywhere; }
+.memorial-3d-error { min-height: 400px; padding: 20px; text-align: center; }
+.memorial-3d-error img { display: block; height: 340px; max-width: 100%; object-fit: contain; margin: auto; }
+.memorial-3d-error p { color: var(--memorial-muted); font-size: 12px; }
+@media (max-width: 1150px) {
+  .memorial-index { position: static; margin-top: 22px; max-width: 240px; }
+  .memorial-gallery__intro { padding-top: 25px; }
+  .memorial-detail__body--inspection { grid-template-columns: minmax(0,1.25fr) minmax(240px,.8fr); gap: 22px; }
+}
+@media (max-width: 760px) {
+  .memorial-detail__body--inspection { display: block; }
+  .memorial-detail { padding-left: 30px; padding-right: 30px; }
+  .memorial-detail__header { flex-wrap: wrap; gap: 0; padding-right: 30px; }
+  .memorial-home-link { font-size: 11px !important; }
+  .memorial-piece-record { max-width: 640px; }
+  .memorial-viewer__stage { height: 450px; }
+}
+@media (max-width: 639px) {
+  .memorial-environment__edges { background-size: 14px 100%, 14px 100%; opacity: .68; }
+  .memorial-environment__light { background: radial-gradient(ellipse at 50% 0%, #cda1591c, transparent 60%); }
+  .memorial-gallery { padding: max(14px,env(safe-area-inset-top)) 27px 35px; }
+  .memorial-gallery__header { margin-bottom: 38px; }
+  .memorial-gallery__header > .memorial-back { margin-right: 35px; }
+  .memorial-gallery h1 { font-size: clamp(30px,9.8vw,48px); }
+  .memorial-gallery h1 span { font-size: .48em; letter-spacing: .06em; }
+  .memorial-gallery__intro > p { max-width: 275px; font-size: 13px; }
+  .memorial-gallery__guide { margin-top: 19px; font-size: 10px; gap: 4px; }
+  .memorial-gallery__guide > span { width: 100%; }
+  .memorial-eyebrow { font-size: 9px; letter-spacing: .12em; }
+  .memorial-index { margin-top: 17px; }
+  .memorial-index select { width: 235px; }
+  .memorial-timeline { gap: 75px 0; padding: 0 0 20px 35px; }
+  .memorial-piece { min-height: 348px; padding-bottom: 0; }
+  .memorial-piece__image { height: 275px; margin-bottom: 20px; }
+  .memorial-piece__image img { max-width: min(100% - 8px,210px); }
+  .memorial-piece__caption { justify-items: start; padding-left: 10px; }
+  .memorial-piece__caption strong { font-size: 42px; }
+  .memorial-piece__caption > span { font-size: 10px; }
+  .memorial-piece__marker { left: -29px; bottom: 44px; }
+  .memorial-piece__caption > svg { right: 8px; top: 12px; }
+  .memorial-piece__start { justify-content: flex-start; left: 10px; bottom: -33px; }
+  .memorial-timeline__epilogue { margin-top: 0; }
+  .memorial-gallery__footer { margin-top: 65px; font-size: 10px; }
+  .memorial-detail { padding: max(14px,env(safe-area-inset-top)) 25px 35px; }
+  .memorial-detail__header { gap: 0; padding-right: 33px; }
+  .memorial-detail__title { margin-top: 23px; }
+  .memorial-detail__title h2 { gap: 10px; font-size: 11px; }
+  .memorial-detail__title h2 > span { font-size: 48px; }
+  .memorial-tabs-list { width: 100%; }
+  .memorial-tabs-list > button { padding: 9px 8px; font-size: 11px; }
+  .memorial-viewer__stage { height: clamp(330px,110vw,450px); }
+  .memorial-viewer__controls { gap: 5px; }
+  .memorial-viewer__controls button { padding-left: 8px; padding-right: 8px; }
+  .memorial-viewer__controls button:last-child { font-size: 11px; }
+  .memorial-detail__navigation { gap: 12px; }
+  .memorial-detail__navigation strong { font-size: 10px; }
+  .memorial-transcript dl > div { grid-template-columns: 1fr; gap: 3px; padding: 14px 0; }
+  .memorial-transcript dt { font-size: 11px; }
+  .memorial-transcript dd { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .memorial *, .memorial *::before, .memorial *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .memorial-piece__image img { transform: none !important; }
+}
+@media (forced-colors: active) {
+  .memorial-environment { display: none; }
+  .memorial { background: Canvas; color: CanvasText; }
+  .memorial-piece__marker { background: Highlight; }
+  .memorial-piece__caption strong, .memorial-eyebrow, .memorial a, .memorial button { color: CanvasText; }
+  .memorial-route { color: CanvasText; }
+}

@@ -1,0 +1,1158 @@
+﻿{
+    "status":  "UNREVIEWED_DRAFT",
+    "engine":  "Windows.Media.Ocr pt-BR",
+    "lines":  [
+                  {
+                      "text":  "Fenasoja",
+                      "words":  [
+                                    {
+                                        "y":  20,
+                                        "height":  43,
+                                        "width":  183,
+                                        "text":  "Fenasoja",
+                                        "x":  53
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "18a Fenasoja",
+                      "words":  [
+                                    {
+                                        "y":  1,
+                                        "height":  42,
+                                        "width":  95,
+                                        "text":  "18a",
+                                        "x":  368
+                                    },
+                                    {
+                                        "y":  3,
+                                        "height":  56,
+                                        "width":  233,
+                                        "text":  "Fenasoja",
+                                        "x":  478
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Somos frutos desta semente",
+                      "words":  [
+                                    {
+                                        "y":  71,
+                                        "height":  26,
+                                        "width":  103,
+                                        "text":  "Somos",
+                                        "x":  317
+                                    },
+                                    {
+                                        "y":  72,
+                                        "height":  31,
+                                        "width":  94,
+                                        "text":  "frutos",
+                                        "x":  430
+                                    },
+                                    {
+                                        "y":  74,
+                                        "height":  26,
+                                        "width":  83,
+                                        "text":  "desta",
+                                        "x":  535
+                                    },
+                                    {
+                                        "y":  80,
+                                        "height":  23,
+                                        "width":  132,
+                                        "text":  "semente",
+                                        "x":  628
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "COMISSÃO CENTRAL",
+                      "words":  [
+                                    {
+                                        "y":  241,
+                                        "height":  31,
+                                        "width":  139,
+                                        "text":  "COMISSÃO",
+                                        "x":  405
+                                    },
+                                    {
+                                        "y":  248,
+                                        "height":  22,
+                                        "width":  116,
+                                        "text":  "CENTRAL",
+                                        "x":  552
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MARLON Luís SALING PRESIDENTE",
+                      "words":  [
+                                    {
+                                        "y":  287,
+                                        "height":  18,
+                                        "width":  82,
+                                        "text":  "MARLON",
+                                        "x":  360
+                                    },
+                                    {
+                                        "y":  285,
+                                        "height":  20,
+                                        "width":  40,
+                                        "text":  "Luís",
+                                        "x":  449
+                                    },
+                                    {
+                                        "y":  289,
+                                        "height":  18,
+                                        "width":  69,
+                                        "text":  "SALING",
+                                        "x":  495
+                                    },
+                                    {
+                                        "y":  291,
+                                        "height":  17,
+                                        "width":  111,
+                                        "text":  "PRESIDENTE",
+                                        "x":  578
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HERBERTO WERNER PRESIPENTE DE HONRA",
+                      "words":  [
+                                    {
+                                        "y":  317,
+                                        "height":  18,
+                                        "width":  98,
+                                        "text":  "HERBERTO",
+                                        "x":  380
+                                    },
+                                    {
+                                        "y":  318,
+                                        "height":  18,
+                                        "width":  82,
+                                        "text":  "WERNER",
+                                        "x":  483
+                                    },
+                                    {
+                                        "y":  320,
+                                        "height":  18,
+                                        "width":  111,
+                                        "text":  "PRESIPENTE",
+                                        "x":  578
+                                    },
+                                    {
+                                        "y":  322,
+                                        "height":  16,
+                                        "width":  24,
+                                        "text":  "DE",
+                                        "x":  696
+                                    },
+                                    {
+                                        "y":  322,
+                                        "height":  14,
+                                        "width":  70,
+                                        "text":  "HONRA",
+                                        "x":  726
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ELEMARANTÔNIO LENZ VICE-PRES[PENTE",
+                      "words":  [
+                                    {
+                                        "y":  344,
+                                        "height":  21,
+                                        "width":  172,
+                                        "text":  "ELEMARANTÔNIO",
+                                        "x":  341
+                                    },
+                                    {
+                                        "y":  348,
+                                        "height":  17,
+                                        "width":  47,
+                                        "text":  "LENZ",
+                                        "x":  518
+                                    },
+                                    {
+                                        "y":  348,
+                                        "height":  20,
+                                        "width":  161,
+                                        "text":  "VICE-PRES[PENTE",
+                                        "x":  577
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "AEMIRZMMERMANN",
+                      "words":  [
+                                    {
+                                        "y":  376,
+                                        "height":  19,
+                                        "width":  221,
+                                        "text":  "AEMIRZMMERMANN",
+                                        "x":  345
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "4AIMELUiSPATIAS. 26-TESOVRF!RO",
+                      "words":  [
+                                    {
+                                        "y":  402,
+                                        "height":  24,
+                                        "width":  179,
+                                        "text":  "4AIMELUiSPATIAS.",
+                                        "x":  388
+                                    },
+                                    {
+                                        "y":  403,
+                                        "height":  25,
+                                        "width":  141,
+                                        "text":  "26-TESOVRF!RO",
+                                        "x":  577
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CLÉO ANTÓNIOROCKENBACH, COORDENADOR GERAL",
+                      "words":  [
+                                    {
+                                        "y":  430,
+                                        "height":  19,
+                                        "width":  47,
+                                        "text":  "CLÉO",
+                                        "x":  284
+                                    },
+                                    {
+                                        "y":  431,
+                                        "height":  21,
+                                        "width":  229,
+                                        "text":  "ANTÓNIOROCKENBACH,",
+                                        "x":  338
+                                    },
+                                    {
+                                        "y":  436,
+                                        "height":  19,
+                                        "width":  147,
+                                        "text":  "COORDENADOR",
+                                        "x":  577
+                                    },
+                                    {
+                                        "y":  437,
+                                        "height":  20,
+                                        "width":  63,
+                                        "text":  "GERAL",
+                                        "x":  728
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "BATISTA (KIKA)J SECRETÁRIA",
+                      "words":  [
+                                    {
+                                        "y":  464,
+                                        "height":  16,
+                                        "width":  77,
+                                        "text":  "BATISTA",
+                                        "x":  424
+                                    },
+                                    {
+                                        "y":  466,
+                                        "height":  18,
+                                        "width":  62,
+                                        "text":  "(KIKA)J",
+                                        "x":  504
+                                    },
+                                    {
+                                        "y":  463,
+                                        "height":  19,
+                                        "width":  111,
+                                        "text":  "SECRETÁRIA",
+                                        "x":  577
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ÉVERTONAPEREIRA DEOLIVEIRA\\ AUXILIAÑADMINISTRATIVO",
+                      "words":  [
+                                    {
+                                        "y":  489,
+                                        "height":  24,
+                                        "width":  169,
+                                        "text":  "ÉVERTONAPEREIRA",
+                                        "x":  272
+                                    },
+                                    {
+                                        "y":  494,
+                                        "height":  15,
+                                        "width":  122,
+                                        "text":  "DEOLIVEIRA\\",
+                                        "x":  445
+                                    },
+                                    {
+                                        "y":  491,
+                                        "height":  24,
+                                        "width":  260,
+                                        "text":  "AUXILIAÑADMINISTRATIVO",
+                                        "x":  577
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRESIDENTES DE",
+                      "words":  [
+                                    {
+                                        "y":  550,
+                                        "height":  22,
+                                        "width":  175,
+                                        "text":  "PRESIDENTES",
+                                        "x":  389
+                                    },
+                                    {
+                                        "y":  550,
+                                        "height":  22,
+                                        "width":  33,
+                                        "text":  "DE",
+                                        "x":  572
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "8",
+                      "words":  [
+                                    {
+                                        "y":  1085,
+                                        "height":  12,
+                                        "width":  12,
+                                        "text":  "8",
+                                        "x":  1
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EDUiNO WILKOMM",
+                      "words":  [
+                                    {
+                                        "y":  589,
+                                        "height":  19,
+                                        "width":  74,
+                                        "text":  "EDUiNO",
+                                        "x":  383
+                                    },
+                                    {
+                                        "y":  593,
+                                        "height":  15,
+                                        "width":  97,
+                                        "text":  "WILKOMM",
+                                        "x":  463
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "VÂNIO HEIMERDINGER",
+                      "words":  [
+                                    {
+                                        "y":  615,
+                                        "height":  21,
+                                        "width":  65,
+                                        "text":  "VÂNIO",
+                                        "x":  345
+                                    },
+                                    {
+                                        "y":  622,
+                                        "height":  16,
+                                        "width":  145,
+                                        "text":  "HEIMERDINGER",
+                                        "x":  418
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ÀNGÊLÂ DC FARIA MARASCHIN",
+                      "words":  [
+                                    {
+                                        "y":  647,
+                                        "height":  18,
+                                        "width":  76,
+                                        "text":  "ÀNGÊLÂ",
+                                        "x":  269
+                                    },
+                                    {
+                                        "y":  649,
+                                        "height":  16,
+                                        "width":  22,
+                                        "text":  "DC",
+                                        "x":  354
+                                    },
+                                    {
+                                        "y":  651,
+                                        "height":  15,
+                                        "width":  53,
+                                        "text":  "FARIA",
+                                        "x":  384
+                                    },
+                                    {
+                                        "y":  651,
+                                        "height":  17,
+                                        "width":  116,
+                                        "text":  "MARASCHIN",
+                                        "x":  445
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ren, Cíl.(S€kGIO FLORES DÉ CAMPOS",
+                      "words":  [
+                                    {
+                                        "y":  681,
+                                        "height":  17,
+                                        "width":  36,
+                                        "text":  "ren,",
+                                        "x":  218
+                                    },
+                                    {
+                                        "y":  677,
+                                        "height":  22,
+                                        "width":  108,
+                                        "text":  "Cíl.(S€kGIO",
+                                        "x":  261
+                                    },
+                                    {
+                                        "y":  684,
+                                        "height":  16,
+                                        "width":  66,
+                                        "text":  "FLORES",
+                                        "x":  377
+                                    },
+                                    {
+                                        "y":  680,
+                                        "height":  21,
+                                        "width":  23,
+                                        "text":  "DÉ",
+                                        "x":  451
+                                    },
+                                    {
+                                        "y":  685,
+                                        "height":  16,
+                                        "width":  80,
+                                        "text":  "CAMPOS",
+                                        "x":  481
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ELÊÂNDRO RODRIGUES GEHM",
+                      "words":  [
+                                    {
+                                        "y":  707,
+                                        "height":  19,
+                                        "width":  96,
+                                        "text":  "ELÊÂNDRO",
+                                        "x":  286
+                                    },
+                                    {
+                                        "y":  710,
+                                        "height":  16,
+                                        "width":  108,
+                                        "text":  "RODRIGUES",
+                                        "x":  390
+                                    },
+                                    {
+                                        "y":  711,
+                                        "height":  16,
+                                        "width":  55,
+                                        "text":  "GEHM",
+                                        "x":  505
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "IVO CARLOS STEFFAN",
+                      "words":  [
+                                    {
+                                        "y":  741,
+                                        "height":  15,
+                                        "width":  34,
+                                        "text":  "IVO",
+                                        "x":  361
+                                    },
+                                    {
+                                        "y":  741,
+                                        "height":  16,
+                                        "width":  72,
+                                        "text":  "CARLOS",
+                                        "x":  402
+                                    },
+                                    {
+                                        "y":  741,
+                                        "height":  16,
+                                        "width":  78,
+                                        "text":  "STEFFAN",
+                                        "x":  482
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ROMEU UHLMANN",
+                      "words":  [
+                                    {
+                                        "y":  771,
+                                        "height":  16,
+                                        "width":  68,
+                                        "text":  "ROMEU",
+                                        "x":  384
+                                    },
+                                    {
+                                        "y":  772,
+                                        "height":  16,
+                                        "width":  99,
+                                        "text":  "UHLMANN",
+                                        "x":  461
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CLÓVIS EDEMAR MATHEIS",
+                      "words":  [
+                                    {
+                                        "y":  797,
+                                        "height":  20,
+                                        "width":  66,
+                                        "text":  "CLÓVIS",
+                                        "x":  317
+                                    },
+                                    {
+                                        "y":  802,
+                                        "height":  15,
+                                        "width":  78,
+                                        "text":  "EDEMAR",
+                                        "x":  392
+                                    },
+                                    {
+                                        "y":  802,
+                                        "height":  16,
+                                        "width":  83,
+                                        "text":  "MATHEIS",
+                                        "x":  478
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "VILSON DA ROSA MEIO",
+                      "words":  [
+                                    {
+                                        "y":  832,
+                                        "height":  16,
+                                        "width":  69,
+                                        "text":  "VILSON",
+                                        "x":  340
+                                    },
+                                    {
+                                        "y":  832,
+                                        "height":  16,
+                                        "width":  26,
+                                        "text":  "DA",
+                                        "x":  418
+                                    },
+                                    {
+                                        "y":  832,
+                                        "height":  16,
+                                        "width":  50,
+                                        "text":  "ROSA",
+                                        "x":  452
+                                    },
+                                    {
+                                        "y":  833,
+                                        "height":  16,
+                                        "width":  53,
+                                        "text":  "MEIO",
+                                        "x":  508
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "AMAURI DE SOUZA RIBEIRO",
+                      "words":  [
+                                    {
+                                        "y":  861,
+                                        "height":  17,
+                                        "width":  79,
+                                        "text":  "AMAURI",
+                                        "x":  298
+                                    },
+                                    {
+                                        "y":  862,
+                                        "height":  16,
+                                        "width":  24,
+                                        "text":  "DE",
+                                        "x":  384
+                                    },
+                                    {
+                                        "y":  862,
+                                        "height":  16,
+                                        "width":  64,
+                                        "text":  "SOUZA",
+                                        "x":  415
+                                    },
+                                    {
+                                        "y":  863,
+                                        "height":  16,
+                                        "width":  74,
+                                        "text":  "RIBEIRO",
+                                        "x":  487
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HELMUTH GROSSMANN JUNIOR",
+                      "words":  [
+                                    {
+                                        "y":  890,
+                                        "height":  17,
+                                        "width":  93,
+                                        "text":  "HELMUTH",
+                                        "x":  255
+                                    },
+                                    {
+                                        "y":  891,
+                                        "height":  17,
+                                        "width":  126,
+                                        "text":  "GROSSMANN",
+                                        "x":  356
+                                    },
+                                    {
+                                        "y":  893,
+                                        "height":  16,
+                                        "width":  71,
+                                        "text":  "JUNIOR",
+                                        "x":  490
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "GILBERTO DELL VALLE",
+                      "words":  [
+                                    {
+                                        "y":  921,
+                                        "height":  17,
+                                        "width":  91,
+                                        "text":  "GILBERTO",
+                                        "x":  357
+                                    },
+                                    {
+                                        "y":  922,
+                                        "height":  16,
+                                        "width":  43,
+                                        "text":  "DELL",
+                                        "x":  456
+                                    },
+                                    {
+                                        "y":  922,
+                                        "height":  17,
+                                        "width":  55,
+                                        "text":  "VALLE",
+                                        "x":  506
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JOSÉLIO VENDRUSCULO",
+                      "words":  [
+                                    {
+                                        "y":  947,
+                                        "height":  21,
+                                        "width":  75,
+                                        "text":  "JOSÉLIO",
+                                        "x":  337
+                                    },
+                                    {
+                                        "y":  950,
+                                        "height":  18,
+                                        "width":  141,
+                                        "text":  "VENDRUSCULO",
+                                        "x":  420
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ROGÉRIO Lutz WIEST STEFFEN",
+                      "words":  [
+                                    {
+                                        "y":  975,
+                                        "height":  21,
+                                        "width":  85,
+                                        "text":  "ROGÉRIO",
+                                        "x":  278
+                                    },
+                                    {
+                                        "y":  980,
+                                        "height":  17,
+                                        "width":  40,
+                                        "text":  "Lutz",
+                                        "x":  370
+                                    },
+                                    {
+                                        "y":  981,
+                                        "height":  16,
+                                        "width":  57,
+                                        "text":  "WIEST",
+                                        "x":  418
+                                    },
+                                    {
+                                        "y":  981,
+                                        "height":  17,
+                                        "width":  77,
+                                        "text":  "STEFFEN",
+                                        "x":  483
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MARIA VANICE ESCHER SEGER",
+                      "words":  [
+                                    {
+                                        "y":  1008,
+                                        "height":  16,
+                                        "width":  64,
+                                        "text":  "MARIA",
+                                        "x":  278
+                                    },
+                                    {
+                                        "y":  1009,
+                                        "height":  17,
+                                        "width":  69,
+                                        "text":  "VANICE",
+                                        "x":  349
+                                    },
+                                    {
+                                        "y":  1010,
+                                        "height":  16,
+                                        "width":  70,
+                                        "text":  "ESCHER",
+                                        "x":  426
+                                    },
+                                    {
+                                        "y":  1010,
+                                        "height":  17,
+                                        "width":  56,
+                                        "text":  "SEGER",
+                                        "x":  504
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ADEMIR MEINERZ",
+                      "words":  [
+                                    {
+                                        "y":  1039,
+                                        "height":  16,
+                                        "width":  75,
+                                        "text":  "ADEMIR",
+                                        "x":  345
+                                    },
+                                    {
+                                        "y":  1040,
+                                        "height":  16,
+                                        "width":  84,
+                                        "text":  "MEINERZ",
+                                        "x":  476
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "LOTARIO WALLAUER",
+                      "words":  [
+                                    {
+                                        "y":  1068,
+                                        "height":  16,
+                                        "width":  80,
+                                        "text":  "LOTARIO",
+                                        "x":  370
+                                    },
+                                    {
+                                        "y":  1068,
+                                        "height":  16,
+                                        "width":  102,
+                                        "text":  "WALLAUER",
+                                        "x":  458
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JORGE JOÃO LUNARDI",
+                      "words":  [
+                                    {
+                                        "y":  1096,
+                                        "height":  16,
+                                        "width":  58,
+                                        "text":  "JORGE",
+                                        "x":  351
+                                    },
+                                    {
+                                        "y":  1093,
+                                        "height":  19,
+                                        "width":  50,
+                                        "text":  "JOÃO",
+                                        "x":  418
+                                    },
+                                    {
+                                        "y":  1097,
+                                        "height":  16,
+                                        "width":  84,
+                                        "text":  "LUNARDI",
+                                        "x":  476
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JOSE MAURO BARBIERI",
+                      "words":  [
+                                    {
+                                        "y":  1125,
+                                        "height":  15,
+                                        "width":  44,
+                                        "text":  "JOSE",
+                                        "x":  343
+                                    },
+                                    {
+                                        "y":  1125,
+                                        "height":  15,
+                                        "width":  72,
+                                        "text":  "MAURO",
+                                        "x":  395
+                                    },
+                                    {
+                                        "y":  1126,
+                                        "height":  15,
+                                        "width":  85,
+                                        "text":  "BARBIERI",
+                                        "x":  475
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "FELIPE RIGON DORNELES",
+                      "words":  [
+                                    {
+                                        "y":  1153,
+                                        "height":  15,
+                                        "width":  57,
+                                        "text":  "FELIPE",
+                                        "x":  328
+                                    },
+                                    {
+                                        "y":  1153,
+                                        "height":  15,
+                                        "width":  60,
+                                        "text":  "RIGON",
+                                        "x":  394
+                                    },
+                                    {
+                                        "y":  1154,
+                                        "height":  15,
+                                        "width":  97,
+                                        "text":  "DORNELES",
+                                        "x":  463
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "AGRICÚltÜRÀ",
+                      "words":  [
+                                    {
+                                        "y":  592,
+                                        "height":  18,
+                                        "width":  132,
+                                        "text":  "AGRICÚltÜRÀ",
+                                        "x":  574
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EXPORURÂLA",
+                      "words":  [
+                                    {
+                                        "y":  622,
+                                        "height":  18,
+                                        "width":  114,
+                                        "text":  "EXPORURÂLA",
+                                        "x":  576
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PECUÁRIA",
+                      "words":  [
+                                    {
+                                        "y":  648,
+                                        "height":  20,
+                                        "width":  94,
+                                        "text":  "PECUÁRIA",
+                                        "x":  576
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SEGURAN\u003cÂ",
+                      "words":  [
+                                    {
+                                        "y":  680,
+                                        "height":  22,
+                                        "width":  116,
+                                        "text":  "SEGURAN\u003cÂ",
+                                        "x":  575
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SUPRIMENTOS",
+                      "words":  [
+                                    {
+                                        "y":  710,
+                                        "height":  19,
+                                        "width":  136,
+                                        "text":  "SUPRIMENTOS",
+                                        "x":  575
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ETNIAS",
+                      "words":  [
+                                    {
+                                        "y":  742,
+                                        "height":  17,
+                                        "width":  66,
+                                        "text":  "ETNIAS",
+                                        "x":  576
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DIVULGAÇÃO",
+                      "words":  [
+                                    {
+                                        "y":  769,
+                                        "height":  24,
+                                        "width":  124,
+                                        "text":  "DIVULGAÇÃO",
+                                        "x":  576
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "BILHETERIA",
+                      "words":  [
+                                    {
+                                        "y":  803,
+                                        "height":  17,
+                                        "width":  108,
+                                        "text":  "BILHETERIA",
+                                        "x":  576
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CULTURA e TUkISMO",
+                      "words":  [
+                                    {
+                                        "y":  833,
+                                        "height":  17,
+                                        "width":  86,
+                                        "text":  "CULTURA",
+                                        "x":  575
+                                    },
+                                    {
+                                        "y":  838,
+                                        "height":  12,
+                                        "width":  9,
+                                        "text":  "e",
+                                        "x":  668
+                                    },
+                                    {
+                                        "y":  830,
+                                        "height":  22,
+                                        "width":  88,
+                                        "text":  "TUkISMO",
+                                        "x":  684
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PROMOÇÓES",
+                      "words":  [
+                                    {
+                                        "y":  863,
+                                        "height":  24,
+                                        "width":  120,
+                                        "text":  "PROMOÇÓES",
+                                        "x":  576
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CREDENCIAMENTO",
+                      "words":  [
+                                    {
+                                        "y":  893,
+                                        "height":  17,
+                                        "width":  177,
+                                        "text":  "CREDENCIAMENTO",
+                                        "x":  575
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SERVIÇOS",
+                      "words":  [
+                                    {
+                                        "y":  922,
+                                        "height":  20,
+                                        "width":  90,
+                                        "text":  "SERVIÇOS",
+                                        "x":  575
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "LOGiSTlCA",
+                      "words":  [
+                                    {
+                                        "y":  948,
+                                        "height":  20,
+                                        "width":  97,
+                                        "text":  "LOGiSTlCA",
+                                        "x":  576
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "INDUSTRIA e COMÉRCIO",
+                      "words":  [
+                                    {
+                                        "y":  978,
+                                        "height":  20,
+                                        "width":  104,
+                                        "text":  "INDUSTRIA",
+                                        "x":  575
+                                    },
+                                    {
+                                        "y":  985,
+                                        "height":  12,
+                                        "width":  10,
+                                        "text":  "e",
+                                        "x":  685
+                                    },
+                                    {
+                                        "y":  976,
+                                        "height":  21,
+                                        "width":  99,
+                                        "text":  "COMÉRCIO",
+                                        "x":  702
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RECEPÇÃO",
+                      "words":  [
+                                    {
+                                        "y":  1007,
+                                        "height":  22,
+                                        "width":  97,
+                                        "text":  "RECEPÇÃO",
+                                        "x":  575
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "INFRA-ESTRUTURA",
+                      "words":  [
+                                    {
+                                        "y":  1039,
+                                        "height":  17,
+                                        "width":  177,
+                                        "text":  "INFRA-ESTRUTURA",
+                                        "x":  574
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CONESUL",
+                      "words":  [
+                                    {
+                                        "y":  1068,
+                                        "height":  16,
+                                        "width":  87,
+                                        "text":  "CONESUL",
+                                        "x":  574
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOJA e DERIVADOS",
+                      "words":  [
+                                    {
+                                        "y":  1097,
+                                        "height":  16,
+                                        "width":  46,
+                                        "text":  "SOJA",
+                                        "x":  574
+                                    },
+                                    {
+                                        "y":  1101,
+                                        "height":  11,
+                                        "width":  9,
+                                        "text":  "e",
+                                        "x":  627
+                                    },
+                                    {
+                                        "y":  1096,
+                                        "height":  16,
+                                        "width":  107,
+                                        "text":  "DERIVADOS",
+                                        "x":  644
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSESSORIA JURiDICA",
+                      "words":  [
+                                    {
+                                        "y":  1126,
+                                        "height":  15,
+                                        "width":  114,
+                                        "text":  "ASSESSORIA",
+                                        "x":  574
+                                    },
+                                    {
+                                        "y":  1121,
+                                        "height":  19,
+                                        "width":  87,
+                                        "text":  "JURiDICA",
+                                        "x":  694
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSESSORIA delMPRENSA",
+                      "words":  [
+                                    {
+                                        "y":  1154,
+                                        "height":  15,
+                                        "width":  113,
+                                        "text":  "ASSESSORIA",
+                                        "x":  574
+                                    },
+                                    {
+                                        "y":  1152,
+                                        "height":  16,
+                                        "width":  126,
+                                        "text":  "delMPRENSA",
+                                        "x":  694
+                                    }
+                                ]
+                  }
+              ]
+}

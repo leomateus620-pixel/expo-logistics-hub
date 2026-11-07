@@ -1,0 +1,23 @@
+{
+  "desktopEnd": {
+    "columns": "3",
+    "endY": 200.48656511306763,
+    "endsBeforeFace": true,
+    "epilogueFaceTop": 230.48245239257812,
+    "segmentLength": 50,
+    "startY": 150.48656511306763,
+    "viewport": [
+      1263,
+      789
+    ]
+  },
+  "narrow": {
+    "allMarkersOutside": true,
+    "columns": "1",
+    "overflow": false,
+    "viewport": [
+      680,
+      789
+    ]
+  }
+}

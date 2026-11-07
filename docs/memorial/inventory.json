@@ -1,0 +1,757 @@
+[
+  {
+    "id": "fenasoja-1966",
+    "edition": 1,
+    "year": 1966,
+    "kind": "edition",
+    "sourceFile": "IMG_1147.jpeg",
+    "engravedPeriod": "DE 04 A 11 DE DEZEMBRO DE 1966",
+    "status": "partial",
+    "verifiedRecords": 34,
+    "unreadableNames": 1,
+    "pending": [
+      {
+        "section": "COMISSÃO CENTRAL",
+        "role": "VICE-PRESIDENTES",
+        "name": "Trecho ilegível na fotografia",
+        "note": "O prenome ANTENOR está legível depois de PEDRO CARPENEDO E, na mesma linha. O sobrenome após ANTENOR não pôde ser confirmado visualmente; não foi completado por inferência.",
+        "sourceRegion": [
+          0.265,
+          0.26,
+          0.683,
+          0.017
+        ]
+      },
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "Trecho ilegível na fotografia",
+        "name": "GERT MÜLLER",
+        "note": "O cargo começa fora da borda esquerda da fotografia. Fragmento visível: POSIÇÃO DE ANIMAIS DE PEQUENO PORTE. A primeira palavra não está completa; o nome GERT MÜLLER está legível.",
+        "sourceRegion": [
+          0,
+          0.813,
+          0.68,
+          0.018
+        ]
+      },
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "Trecho ilegível na fotografia",
+        "name": "CAMILO BELTRAME",
+        "note": "O cargo começa fora da borda esquerda da fotografia. Final legível: TELEFONES AUTOMÁTICOS (CITEL). A primeira palavra está truncada e não foi completada; o nome CAMILO BELTRAME está legível.",
+        "sourceRegion": [
+          0,
+          0.83,
+          0.735,
+          0.018
+        ]
+      },
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "Trecho ilegível na fotografia",
+        "name": "ELÍBIO FREDRICH",
+        "note": "O cargo começa cortado na borda esquerda da fotografia. Fragmento visível: RNAMENTAÇÃO PARQUE DE EXPOSIÇÕES. O início da primeira palavra não foi confirmado; o nome ELÍBIO FREDRICH está legível.",
+        "sourceRegion": [
+          0,
+          0.846,
+          0.715,
+          0.018
+        ]
+      }
+    ],
+    "notes": [
+      "Título original: 1ª FENASOJA.",
+      "DE 04 A 11 DE DEZEMBRO DE 1966",
+      "Transcrição visual da fotografia IMG_1147.jpeg e da face retificada fenasoja-1966.webp. O rascunho automático de OCR não foi tratado como fonte verificada.",
+      "Os dois vice-presidentes compartilham uma única linha e um único cargo na placa. Foram representados separadamente para preservar PEDRO CARPENEDO sem declarar confirmado o sobrenome incerto de ANTENOR.",
+      "O status de cada linha confirma o nome. Nos três cargos cortados, roleStatus indica a ilegibilidade do cargo sem ocultar o nome confirmado.",
+      "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+      "Grafias, abreviações e ordem foram mantidas a partir da imagem, sem pesquisa externa nem correção histórica inferida.",
+      "Status global parcial: há um sobrenome não confirmado e três cargos com início fora do enquadramento."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1966.jpg"
+  },
+  {
+    "id": "fenasoja-1974",
+    "edition": 2,
+    "year": 1974,
+    "kind": "edition",
+    "sourceFile": "IMG_1148.jpeg",
+    "engravedPeriod": "DE 02 A 10 DE MARÇO DE 1974",
+    "status": "partial",
+    "verifiedRecords": 32,
+    "unreadableNames": 3,
+    "pending": [
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "TENDAS E BEBIDAS",
+        "name": "Trecho ilegível na fotografia",
+        "note": "O prenome EUGÊNIO está legível. O sobrenome à direita está encoberto pelo reflexo e não foi confirmado visualmente.",
+        "sourceRegion": [
+          0.31,
+          0.495,
+          0.425,
+          0.019
+        ]
+      },
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "ORNAMENTAÇÃO DA CIDADE",
+        "name": "Trecho ilegível na fotografia",
+        "note": "O prenome ARNO está legível. O sobrenome depois de ARNO está sob o reflexo e não pôde ser confirmado; não foi completado por inferência.",
+        "sourceRegion": [
+          0.215,
+          0.56,
+          0.555,
+          0.019
+        ]
+      },
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "ASSUNTOS CIENTÍFICOS DA SOJA",
+        "name": "Trecho ilegível na fotografia",
+        "note": "O trecho LUIZ CARLOS PINTO está legível. O último sobrenome depois de PINTO está sob reflexo e não pôde ser confirmado com segurança.",
+        "sourceRegion": [
+          0.178,
+          0.673,
+          0.665,
+          0.019
+        ]
+      }
+    ],
+    "notes": [
+      "Título original: 2ª FENASOJA.",
+      "DE 02 A 10 DE MARÇO DE 1974",
+      "Transcrição visual da fotografia IMG_1148.jpeg e da face retificada fenasoja-1974.webp. O rascunho automático de OCR não foi tratado como fonte verificada.",
+      "Os três vice-presidentes estão sob um único cargo impresso. O cargo foi repetido nas entradas para preservar a associação e a ordem dos nomes.",
+      "O status de cada linha confirma o nome. Todos os cargos desta placa estão integralmente visíveis; não há cargo completado a partir de trecho cortado.",
+      "O reflexo sobre a primeira parte da coluna de nomes de PRESIDENTES DE ÁREA impede confirmar três nomes completos: o sobrenome de EUGÊNIO, o sobrenome de ARNO e o último sobrenome depois de LUIZ CARLOS PINTO.",
+      "Os prenomes e fragmentos confirmados dos nomes ilegíveis foram preservados nas notas das respectivas linhas; nenhum sobrenome foi completado por outra placa ou por fonte externa.",
+      "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+      "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida.",
+      "Status global parcial devido aos três nomes completos não confirmados na região do reflexo."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1974.jpg"
+  },
+  {
+    "id": "fenasoja-1976",
+    "edition": 3,
+    "year": 1976,
+    "kind": "edition",
+    "sourceFile": "IMG_1149.jpeg",
+    "engravedPeriod": "DE 27 DE MARÇO A 01 DE ABRIL DE 1976",
+    "status": "verified",
+    "verifiedRecords": 21,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Título original: 3ª FENASOJA.",
+      "DE 27 DE MARÇO A 01 DE ABRIL DE 1976",
+      "Transcrição visual da fotografia IMG_1149.jpeg e da face retificada fenasoja-1976.webp, com conferência ampliada da Comissão Central e de todas as nove linhas de PRESIDENTES DE ÁREA.",
+      "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+      "Os quatro vice-presidentes estão sob um único cargo impresso. O cargo foi repetido nas entradas para preservar a associação e a ordem dos nomes.",
+      "Todos os nomes e cargos foram confirmados visualmente nesta fotografia; não houve preenchimento de letras ocultas por inferência.",
+      "As grafias GUTERRES e DALTRY foram mantidas conforme impressas nesta placa, mesmo quando outras inscrições possam usar grafias distintas.",
+      "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+      "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1976.jpg"
+  },
+  {
+    "id": "fenasoja-1979",
+    "edition": 4,
+    "year": 1979,
+    "kind": "edition",
+    "sourceFile": "IMG_1150.jpeg",
+    "engravedPeriod": "DE 21 A 29 DE ABRIL DE 1979",
+    "status": "partial",
+    "verifiedRecords": 20,
+    "unreadableNames": 2,
+    "pending": [
+      {
+        "section": "COMISSÃO CENTRAL",
+        "role": "VICE-PRESIDENTES",
+        "name": "Trecho ilegível na fotografia",
+        "note": "Primeiro nome sob o cargo compartilhado VICE-PRESIDENTES. O prenome NORBERTO está legível; o sobrenome à direita não pôde ser confirmado com segurança na fotografia.",
+        "sourceRegion": [
+          0.333,
+          0.269,
+          0.52,
+          0.02
+        ]
+      },
+      {
+        "section": "COMISSÃO CENTRAL",
+        "role": "VICE-PRESIDENTES",
+        "name": "Trecho ilegível na fotografia",
+        "note": "Segundo nome sob o cargo compartilhado VICE-PRESIDENTES, que aparece apenas na primeira linha. O trecho ANACLETO LUZ está legível; o sobrenome seguinte permanece sem confirmação visual segura.",
+        "sourceRegion": [
+          0.6,
+          0.285,
+          0.29,
+          0.02
+        ]
+      },
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "Trecho ilegível na fotografia",
+        "name": "CLÁUDIO CAMARGO",
+        "note": "O cargo à esquerda está sob reflexo. O final ÇÃO é visível, mas as letras anteriores não puderam ser confirmadas integralmente. O nome CLÁUDIO CAMARGO está legível.",
+        "sourceRegion": [
+          0.405,
+          0.598,
+          0.395,
+          0.021
+        ]
+      }
+    ],
+    "notes": [
+      "Título original: 4ª FENASOJA.",
+      "DE 21 A 29 DE ABRIL DE 1979",
+      "Transcrição visual da fotografia IMG_1150.jpeg e da face retificada fenasoja-1979.webp, com conferência ampliada de todas as linhas da Comissão Central e de PRESIDENTES DE ÁREA.",
+      "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+      "Os cargos compartilhados VICE-PRESIDENTES, CONSELHO CONSULTIVO, SECRETÁRIOS e TESOUREIROS foram repetidos nas entradas para preservar a associação e a ordem dos nomes.",
+      "O status de cada linha confirma o nome. roleStatus indica separadamente a ilegibilidade do cargo da linha de CLÁUDIO CAMARGO, cujo nome está confirmado.",
+      "Permanecem sem confirmação visual segura os sobrenomes de NORBERTO e ANACLETO LUZ; os fragmentos legíveis foram preservados nas notas das respectivas linhas.",
+      "O amplo campo inferior da placa não contém outras inscrições visíveis e foi mantido livre, sem criação de linhas ou conteúdo para preenchê-lo.",
+      "namesFirst é false porque os cargos aparecem à esquerda e os nomes à direita na fotografia.",
+      "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+      "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida.",
+      "Status global parcial devido a dois nomes completos e um cargo não confirmados."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1979.jpg"
+  },
+  {
+    "id": "fenasoja-1981",
+    "edition": 5,
+    "year": 1981,
+    "kind": "edition",
+    "sourceFile": "IMG_1151.jpeg",
+    "engravedPeriod": "DE 01 A 13 DE AGOSTO DE 1981",
+    "status": "verified",
+    "verifiedRecords": 17,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Título original: 5ª FENASOJA.",
+      "DE 01 A 13 DE AGOSTO DE 1981",
+      "Transcrição visual da fotografia IMG_1151.jpeg e da face retificada fenasoja-1981.webp, com conferência ampliada de todas as linhas da Comissão Central e das cinco linhas de PRESIDENTES DE ÁREA.",
+      "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+      "Os cargos compartilhados VICE-PRESIDENTES, SECRETÁRIAS e SECRETÁRIOS EXECUTIVOS foram repetidos nas entradas para preservar a associação e a ordem dos nomes.",
+      "Todos os nomes e cargos foram confirmados visualmente nesta fotografia; não houve preenchimento de lacunas por inferência de outras edições.",
+      "O amplo campo inferior da placa não contém outras inscrições visíveis e foi mantido vazio, sem criação de linhas ou conteúdo para preenchê-lo.",
+      "namesFirst é false porque os cargos aparecem à esquerda e os nomes à direita na fotografia.",
+      "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+      "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1981.jpg"
+  },
+  {
+    "id": "fenasoja-1984",
+    "edition": 6,
+    "year": 1984,
+    "kind": "edition",
+    "sourceFile": "IMG_1152.jpeg",
+    "engravedPeriod": "DE 07 A 15 DE ABRIL DE 1984",
+    "status": "partial",
+    "verifiedRecords": 13,
+    "unreadableNames": 1,
+    "pending": [
+      {
+        "section": "COMISSÃO CENTRAL",
+        "role": "TESOUREIRO GERAL",
+        "name": "Trecho ilegível na fotografia",
+        "note": "O final ZIO L. BRUM está legível. As primeiras letras e a acentuação do prenome estão sob reflexo e não puderam ser confirmadas integralmente; não foram completadas por inferência.",
+        "sourceRegion": [
+          0.25906,
+          0.51157,
+          0.44519,
+          0.02174
+        ]
+      }
+    ],
+    "notes": [
+      "Título original: 6ª FENASOJA.",
+      "DE 07 A 15 DE ABRIL DE 1984",
+      "Transcrição visual da fotografia IMG_1152.jpeg e da face retificada fenasoja-1984.webp, com conferência ampliada das quatorze linhas de nomes da Comissão Central.",
+      "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+      "Os nove vice-presidentes estão sob um único cargo impresso. O cargo foi repetido nas entradas para preservar a associação e a ordem dos nomes.",
+      "A fotografia desta placa mostra somente a seção COMISSÃO CENTRAL. Não foi criada uma seção de áreas nem foram inferidos cargos adicionais.",
+      "O amplo campo inferior da placa não contém outras inscrições visíveis e foi mantido vazio, sem criação de linhas ou conteúdo para preenchê-lo.",
+      "O período foi transcrito diretamente da gravação: o mês indicado é ABRIL.",
+      "O prenome da linha TESOUREIRO GERAL não foi confirmado integralmente por causa do reflexo. O final legível foi mantido na nota da respectiva linha.",
+      "namesFirst é false porque os cargos aparecem à esquerda e os nomes à direita na fotografia.",
+      "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+      "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida.",
+      "Status global parcial devido a um nome completo não confirmado; todos os cargos estão legíveis."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1984.jpg"
+  },
+  {
+    "id": "fenasoja-1987",
+    "edition": 7,
+    "year": 1987,
+    "kind": "edition",
+    "sourceFile": "IMG_1153.jpeg",
+    "engravedPeriod": "DE 01 A 10 DE MAIO DE 1987",
+    "status": "verified",
+    "verifiedRecords": 16,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Título original: 7ª FENASOJA.",
+      "DE 01 A 10 DE MAIO DE 1987",
+      "Transcrição visual da fotografia IMG_1153.jpeg e da face retificada fenasoja-1987.webp, com conferência ampliada das quatro linhas da Comissão Central e das doze linhas de PRESIDENTES DE ÁREA.",
+      "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+      "Todos os cargos e nomes foram confirmados visualmente nesta fotografia, sem completar lacunas por inferência de outras edições.",
+      "Os cargos desta placa têm uma associação direta com cada nome na mesma linha; não há cargo compartilhado entre nomes em linhas subsequentes.",
+      "O cargo longo APROVEITAMENTO DA SOJA E ALIMENTAÇÃO HUMANA foi conferido também na fotografia original, cuja margem esquerda o mostra integralmente.",
+      "O amplo campo inferior da placa não contém outras inscrições visíveis e foi mantido livre, sem criação de linhas ou conteúdo para preenchê-lo.",
+      "namesFirst é false porque os cargos aparecem à esquerda e os nomes à direita na fotografia.",
+      "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+      "Grafias, acentos, trema, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1987.jpg"
+  },
+  {
+    "id": "fenasoja-1990",
+    "edition": 8,
+    "year": 1990,
+    "kind": "edition",
+    "sourceFile": "IMG_1154.jpeg",
+    "engravedPeriod": "DE 31 DE MARÇO A\n08 DE ABRIL DE 1990",
+    "status": "verified",
+    "verifiedRecords": 19,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "DE 31 DE MARÇO A\n08 DE ABRIL DE 1990",
+      "Cabeçalho impresso: 8ª FENASOJA.",
+      "Os cargos estão na coluna esquerda e os nomes na coluna direita, nas duas seções; namesFirst é false.",
+      "Conferência visual integral da fotografia original IMG_1154.jpeg e da face retificada fenasoja-1990.webp, incluindo ampliações locais das duas tabelas. O OCR foi tratado apenas como rascunho.",
+      "As regiões são localizadores aproximados normalizados na face retificada, em ordem [x, y, largura, altura]; não constituem garantia de recorte OCR.",
+      "A capitalização, as grafias, a pontuação visível e a ordem foram preservadas sem consulta a fontes externas. Os cargos desta peça não incluem dois-pontos.",
+      "Há 19 registros verificados: 5 na COMISSÃO CENTRAL e 14 em PRESIDENTES DE ÁREA. Nenhum cargo ou nome foi marcado ilegível.",
+      "O campo inferior após SAÚDE e PAULO TADEU T. DE LIMA está vazio. Aproximadamente de y=0.64 até a borda inferior da face retificada não há inscrição visível; esse espaço deve permanecer vazio."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1990.jpg"
+  },
+  {
+    "id": "fenasoja-1992",
+    "edition": 9,
+    "year": 1992,
+    "kind": "edition",
+    "sourceFile": "IMG_1155.jpeg",
+    "engravedPeriod": "DE 01 A 10 DE AGOSTO DE 1992",
+    "status": "partial",
+    "verifiedRecords": 22,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Transcrição visual conferida na fotografia original IMG_1155.jpeg e na face retificada fenasoja-1992.webp; o OCR foi consultado apenas como rascunho não confiável.",
+      "Período gravado: 'DE 01 A 10 DE AGOSTO DE 1992', exibido em duas linhas na fotografia. A edição aparece como '9ª FENASOJA'.",
+      "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita; namesFirst é false. A ordem de cima para baixo foi preservada.",
+      "Foram confirmados 10 nomes em COMISSÃO CENTRAL e 12 nomes em PRESIDENTES DE ÁREA. ASSESSORIA JURÍDICA e SECRETÁRIO EXECUTIVO são compartilhados por duas linhas de nomes cada, com um único rótulo por cargo na fotografia.",
+      "Reflexos e diferenças de contraste atravessam a coluna de cargos e o início de alguns nomes em PRESIDENTES DE ÁREA. As linhas foram conferidas em ampliações da fotografia original, sem pesquisa externa ou reconstrução por outras edições.",
+      "A extremidade inferior física da placa está fora do enquadramento original, e a face retificada conserva esse limite. Há uma grande faixa sem inscrições visíveis abaixo de SOCIAL / LEOPOLDO JUSTINO GIRARDI, mas não é possível confirmar o contorno completo nem excluir inscrições fora da área fotografada. Nenhum conteúdo hipotético foi criado.",
+      "Grafias e acentos seguem a inscrição visível. Foram preservados HERBERTO WERNER, PEDRO PRIMO PAULO BARILI, ÊNIO GEHM, INGRIDE MUNDSTOCK BOZZETTO e JAIME ADEMAR MATTIAZZI, sem uniformização com outras placas.",
+      "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+      "O estado geral permanece parcial pelo limite inferior não fotografado, embora todos os 22 nomes e respectivos cargos visíveis tenham sido confirmados."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1992.jpg"
+  },
+  {
+    "id": "fenasoja-1994",
+    "edition": 10,
+    "year": 1994,
+    "kind": "edition",
+    "sourceFile": "IMG_1156.jpeg",
+    "engravedPeriod": "DE 30 DE ABRIL A 08 DE MAIO DE 1994",
+    "status": "partial",
+    "verifiedRecords": 21,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Transcrição visual conferida na fotografia original IMG_1156.jpeg e na face retificada fenasoja-1994.webp; o OCR foi consultado apenas como rascunho não confiável.",
+      "Período gravado: 'DE 30 DE ABRIL A 08 DE MAIO DE 1994', exibido em duas linhas na fotografia. A edição aparece como '10ª FENASOJA'.",
+      "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita; namesFirst é false. A ordem de cima para baixo foi preservada.",
+      "Foram confirmados 8 nomes em COMISSÃO CENTRAL e 13 nomes em PRESIDENTES DE ÁREA. JURÍDICO é compartilhado por duas linhas de nomes, com um único rótulo na fotografia.",
+      "Reflexos e diferenças de contraste atravessam alguns cargos e a região direita de COMISSÃO CENTRAL. As linhas foram conferidas em ampliações da fotografia original, sem correção de grafia por dados externos ou outras edições.",
+      "A extremidade inferior física da placa está fora do enquadramento original, e a face retificada conserva esse limite. Há uma grande faixa sem inscrições visíveis abaixo de SUPRIMENTOS / AURI O. COPETTI JUNIOR, mas não é possível confirmar o contorno completo nem excluir inscrições fora da área fotografada. Nenhum conteúdo hipotético foi criado.",
+      "Grafias, acentos e trema seguem a inscrição visível. Foram preservados IRME SCHMIDT, PEDRO PAULO PRIMO BARIL, BENALDO LIBERALI e JUNIOR sem acrescentar letras ou acentos de variantes atuais.",
+      "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+      "O estado geral permanece parcial pelo limite inferior não fotografado, embora todos os 21 nomes e respectivos cargos visíveis tenham sido confirmados."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1994.jpg"
+  },
+  {
+    "id": "fenasoja-1996",
+    "edition": 11,
+    "year": 1996,
+    "kind": "edition",
+    "sourceFile": "11a_Fenasoja_1996.jpeg",
+    "engravedPeriod": "DE 27 DE ABRIL A 05 DE MAIO DE 1996",
+    "status": "partial",
+    "verifiedRecords": 19,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Transcrição visual conferida na fotografia original 11a_Fenasoja_1996.jpeg e na face retificada fenasoja-1996.webp; o OCR foi consultado apenas como rascunho não confiável.",
+      "Período gravado: 'DE 27 DE ABRIL A 05 DE MAIO DE 1996', exibido em duas linhas na fotografia. A edição aparece como '11ª FENASOJA'.",
+      "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita; namesFirst é false. A ordem de cima para baixo foi preservada.",
+      "Foram confirmados 8 nomes em COMISSÃO CENTRAL e 11 nomes em PRESIDENTES DE ÁREA. Não há cargo compartilhado por mais de uma linha visível.",
+      "O reflexo e o baixo contraste afetam principalmente os primeiros nomes da COMISSÃO CENTRAL. A leitura dessas linhas foi conferida em ampliações da fotografia original; nenhum nome foi completado com dados externos.",
+      "A extremidade inferior física da placa está fora do enquadramento original, e a face retificada conserva esse limite. Há uma grande faixa sem inscrições visíveis abaixo de PROMOÇÕES / ROZANE LUNARDI, mas não é possível confirmar o contorno completo nem excluir inscrições fora da área fotografada. Não foram criadas linhas para conteúdo hipotético.",
+      "Grafias e acentos seguem a inscrição visível, sem pesquisa externa ou correção por cadastros. VITOR DE CONTI está gravado sem acento em VITOR, e INFRAESTRUTURA não tem hífen.",
+      "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+      "O estado geral permanece parcial pelo limite inferior não fotografado, embora todos os 19 nomes e respectivos cargos visíveis tenham sido confirmados."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1996.jpg"
+  },
+  {
+    "id": "fenasoja-1998",
+    "edition": 12,
+    "year": 1998,
+    "kind": "edition",
+    "sourceFile": "12a_Fenasoja_1998.jpeg",
+    "engravedPeriod": "25 de Abril a 03 de Maio de 1998",
+    "status": "partial",
+    "verifiedRecords": 22,
+    "unreadableNames": 1,
+    "pending": [
+      {
+        "section": "VICE-PRESIDENTES DAS COMISSÕES:",
+        "role": "ASSESSOR CONTÁBIL",
+        "name": "Trecho ilegível na fotografia",
+        "note": "O primeiro caractere do prenome está desgastado e não foi confirmado de forma inequívoca entre R e B. O trecho restante 'ENALDO LIBERALI' é legível; o prenome não foi completado por inferência.",
+        "sourceRegion": [
+          0.0984,
+          0.93198,
+          0.82325,
+          0.01187
+        ]
+      }
+    ],
+    "notes": [
+      "Transcrição visual conferida na fotografia original 12a_Fenasoja_1998.jpeg e na face retificada fenasoja-1998.webp; o OCR foi consultado somente como rascunho não confiável.",
+      "Período gravado: '25 de Abril a 03 de Maio de 1998'. A localização gravada é 'SANTA ROSA - RS'.",
+      "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita. A ordem de cima para baixo foi preservada.",
+      "A seção COMISSÃO CENTRAL contém 7 nomes; VICE-PRESIDENTES DAS COMISSÕES contém 16 nomes, com ASSESSORIA JURÍDICA compartilhada por duas linhas.",
+      "Grafias, acentos, abreviações e o hífen de INFRA-ESTRUTURA seguem a inscrição visível, sem pesquisa externa ou correção por cadastros.",
+      "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+      "O estado geral permanece parcial devido ao primeiro caractere não confirmado no prenome do ASSESSOR CONTÁBIL. Todos os cargos estão legíveis."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-1998.jpg"
+  },
+  {
+    "id": "fenasoja-2000",
+    "edition": 13,
+    "year": 2000,
+    "kind": "edition",
+    "sourceFile": "13a_Fenasoja_2000.jpeg",
+    "engravedPeriod": "01 A 09 DE ABRIL DE 2000",
+    "status": "verified",
+    "verifiedRecords": 21,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Transcrição visual conferida na fotografia original 13a_Fenasoja_2000.jpeg e na face retificada fenasoja-2000.webp; o OCR foi consultado apenas como rascunho não confiável.",
+      "Período gravado: '01 A 09 DE ABRIL DE 2000'. A localização gravada é 'SANTA ROSA-RS BRASIL'.",
+      "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita. A ordem de cima para baixo foi preservada.",
+      "A seção COMISSÃO CENTRAL contém 6 nomes; VICE-PRESIDENTES DAS COMISSÕES contém 15 nomes, com ASSESSORIA JURÍDICA compartilhada por duas linhas.",
+      "Grafias, acentos, o prefixo 'Dr.' e o hífen de INFRA-ESTRUTURA seguem a inscrição visível, sem pesquisa externa ou correção por cadastros. VITOR DE CONTI está gravado sem acento em VITOR.",
+      "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+      "Todos os nomes e cargos desta placa foram confirmados visualmente; não há trecho editorial pendente."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2000.jpg"
+  },
+  {
+    "id": "fenasoja-2002",
+    "edition": 14,
+    "year": 2002,
+    "kind": "edition",
+    "sourceFile": "14a_Fenasoja_2002.jpeg",
+    "engravedPeriod": "6 a 14 de Abril de 2002",
+    "status": "verified",
+    "verifiedRecords": 27,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Transcrição visual conferida na fotografia original 14a_Fenasoja_2002.jpeg e na face retificada fenasoja-2002.webp; o OCR foi consultado apenas como rascunho não confiável.",
+      "Período gravado: '6 a 14 de Abril de 2002'. A linha completa inclui a localização 'Santa Rosa - RS - Brasil'.",
+      "Campanha/slogan gravado: 'antecipando o futuro'. A edição aparece como '14ª FENASOJA'.",
+      "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita; namesFirst é false. A ordem de cima para baixo foi preservada.",
+      "A seção COMISSÃO CENTRAL contém 7 nomes; PRESIDENTES DE ÁREA contém 20 nomes, com Segurança compartilhada por duas linhas.",
+      "Grafias, acentos, tremas, prefixos e o hífen de Infra-Estrutura seguem a inscrição visível, sem pesquisa externa ou correção por cadastros. ENIO GEHM está gravado sem acento em ENIO.",
+      "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+      "Todos os nomes e cargos desta placa foram confirmados visualmente; não há trecho editorial pendente."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2002.jpg"
+  },
+  {
+    "id": "fenasoja-2004",
+    "edition": 15,
+    "year": 2004,
+    "kind": "edition",
+    "sourceFile": "15a_Fenasoja_2004.jpeg",
+    "engravedPeriod": "01 a 09 de maio de 2004",
+    "status": "partial",
+    "verifiedRecords": 26,
+    "unreadableNames": 2,
+    "pending": [
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "Credenciamento:",
+        "name": "Trecho ilegível na fotografia",
+        "note": "O prenome Rafael está legível. Um reflexo sobre o sobrenome impede confirmar a grafia integral; nenhuma sugestão do OCR foi adotada para esse trecho.",
+        "sourceRegion": [
+          0.23,
+          0.744,
+          0.47,
+          0.022
+        ]
+      },
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "Infra-estrutura:",
+        "name": "Trecho ilegível na fotografia",
+        "note": "Os sobrenomes Liberali Paes estão legíveis. A grafia e a acentuação exatas do prenome não foram confirmadas na fotografia; a leitura sugerida pelo OCR não foi promovida a conteúdo verificado.",
+        "sourceRegion": [
+          0.23,
+          0.832,
+          0.58,
+          0.023
+        ]
+      }
+    ],
+    "notes": [
+      "01 a 09 de maio de 2004",
+      "Cabeçalho impresso: FENASOJA; Alimentando a economia.",
+      "Conferência visual da fotografia original 15a_Fenasoja_2004.jpeg e da face retificada fenasoja-2004.webp, incluindo ampliações locais sem geração de letras.",
+      "As regiões são localizadores aproximados normalizados na face retificada, em ordem [x, y, largura, altura]; não constituem garantia de recorte OCR.",
+      "Os dois-pontos fazem parte dos cargos transcritos. A ordem, a capitalização e as grafias legíveis foram preservadas, sem correções por fontes externas.",
+      "Há 27 linhas de cargos e nomes: 25 verificadas e 2 com trecho não confirmado. O crédito lateral constitui uma linha verificada adicional.",
+      "O título Crédito da peça organiza o rodapé e não integra a inscrição original."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2004.jpg"
+  },
+  {
+    "id": "fenasoja-2006",
+    "edition": 16,
+    "year": 2006,
+    "kind": "edition",
+    "sourceFile": "16a_Fenasoja_2006.jpeg",
+    "engravedPeriod": "29 de abril a 07 de maio de 2006",
+    "status": "verified",
+    "verifiedRecords": 27,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados.",
+      "As marcas, os slogans e as artes de campanha são preservados como recortes da fotografia. A face limpa não utiliza o reflexo do fotógrafo."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2006.jpg"
+  },
+  {
+    "id": "fenasoja-2008",
+    "edition": 17,
+    "year": 2008,
+    "kind": "edition",
+    "sourceFile": "17a_Fenasoja_2008.jpeg",
+    "engravedPeriod": "26 de abril a 04 maio de 2008",
+    "status": "verified",
+    "verifiedRecords": 28,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados.",
+      "As marcas e os cartazes são recortes da fotografia; títulos e slogans do cabeçalho foram recompostos após conferência visual. A face limpa não utiliza o reflexo do fotógrafo."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2008.jpg"
+  },
+  {
+    "id": "fenasoja-2010",
+    "edition": 18,
+    "year": 2010,
+    "kind": "edition",
+    "sourceFile": "18a_Fenasoja_2010.jpeg",
+    "engravedPeriod": "30 de abril a 9 de maio de 2010 (no cartaz)",
+    "status": "verified",
+    "verifiedRecords": 28,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados.",
+      "As marcas e os cartazes são recortes da fotografia; títulos e slogans do cabeçalho foram recompostos após conferência visual. A face limpa não utiliza o reflexo do fotógrafo."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2010.jpg"
+  },
+  {
+    "id": "fenasoja-2012",
+    "edition": 19,
+    "year": 2012,
+    "kind": "edition",
+    "sourceFile": "20a_Fenasoja_2014.jpeg",
+    "engravedPeriod": "27 DE ABRIL A 6 DE MAIO (no cartaz de 2012)",
+    "status": "verified",
+    "verifiedRecords": 29,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados, em coordenadas normalizadas. A arte limpa mantém as inscrições; cartazes e marcas vêm dos pixels originais."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2012.jpg"
+  },
+  {
+    "id": "fenasoja-2014",
+    "edition": 20,
+    "year": 2014,
+    "kind": "edition",
+    "sourceFile": "19a_Fenasoja_2012.jpeg",
+    "engravedPeriod": "25 DE ABRIL A 4 DE MAIO DE 2014 (no cartaz)",
+    "status": "verified",
+    "verifiedRecords": 30,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados, em coordenadas normalizadas. A arte limpa mantém as inscrições; cartazes e marcas vêm dos pixels originais."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2014.jpg"
+  },
+  {
+    "id": "fenasoja-2016",
+    "edition": 21,
+    "year": 2016,
+    "kind": "edition",
+    "sourceFile": "21a_Fenasoja_2016.jpeg",
+    "engravedPeriod": "DE 29 DE ABRIL A 08 DE MAIO DE 2016 (no cartaz)",
+    "status": "verified",
+    "verifiedRecords": 31,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados.",
+      "As marcas e os cartazes são recortes da fotografia; títulos e slogans do cabeçalho foram recompostos após conferência visual. A face limpa não utiliza o reflexo do fotógrafo."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2016.jpg"
+  },
+  {
+    "id": "fenasoja-2018",
+    "edition": 22,
+    "year": 2018,
+    "kind": "edition",
+    "sourceFile": "22a_Fenasoja_2018.jpeg",
+    "engravedPeriod": "2018 (marca da edição; sem intervalo gravado)",
+    "status": "partial",
+    "verifiedRecords": 29,
+    "unreadableNames": 1,
+    "pending": [
+      {
+        "section": "PRESIDENTES DE ÁREA",
+        "role": "SUPRIMENTOS",
+        "name": "Trecho ilegível na fotografia",
+        "note": "O nome inicial 'CASSIO ROBERTO' é legível; a fotografia não permite distinguir com segurança todas as letras do sobrenome final, iniciado por 'SCHUAS'. Nenhum sobrenome foi completado por inferência.",
+        "sourceRegion": [
+          0.03,
+          0.916,
+          0.89,
+          0.021
+        ]
+      }
+    ],
+    "notes": [
+      "Transcrição visual conferida na fotografia original 22a_Fenasoja_2018.jpeg e na face retificada fenasoja-2018.webp; o OCR foi consultado apenas como rascunho não confiável.",
+      "A fotografia imprime apenas o ano '2018' junto à marca FENASOJA; não é visível um intervalo de datas ou período completo de gestão.",
+      "Foram preservados a ordem das linhas, as duas ocorrências do cargo AUXILIAR ADMINISTRATIVA e a repetição de GERSON MIGUEL LAUERMANN em seções distintas.",
+      "Grafias e acentos foram transcritos conforme a leitura visível da placa, sem pesquisa externa ou correção de nomes por cadastros.",
+      "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+      "O estado geral permanece parcial por uma linha com sobrenome não resolvido na seção PRESIDENTES DE ÁREA."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2018.jpg"
+  },
+  {
+    "id": "fenasoja-2022",
+    "edition": 23,
+    "year": 2022,
+    "kind": "edition",
+    "sourceFile": "23a_Fenasoja_2022.jpeg",
+    "engravedPeriod": "DE 28 DE ABRIL A 08 DE MAIO DE 2022",
+    "status": "verified",
+    "verifiedRecords": 35,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "DE 28 DE ABRIL A\n08 DE MAIO DE 2022",
+      "Cabeçalho impresso: 23ª FENASOJA.",
+      "Os cargos estão na coluna esquerda e os nomes na coluna direita, nas duas seções.",
+      "Conferência visual integral da fotografia original 23a_Fenasoja_2022.jpeg e da face retificada fenasoja-2022.webp, incluindo ampliações locais para os trechos menores e finais. O OCR foi tratado apenas como rascunho.",
+      "As regiões são localizadores aproximados normalizados na face retificada, em ordem [x, y, largura, altura]; não constituem garantia de recorte OCR.",
+      "A capitalização, as grafias, a pontuação visível e a ordem foram preservadas sem consulta a fontes externas. Os cargos desta peça não incluem dois-pontos.",
+      "Há 35 registros verificados e nenhum registro ilegível. JOVEM contém duas linhas de nomes no mesmo registro, e COOPERATIVISMO contém dois nomes separados pela barra impressa."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2022.jpg"
+  },
+  {
+    "id": "fenasoja-2024",
+    "edition": 24,
+    "year": 2024,
+    "kind": "edition",
+    "sourceFile": "24a_Fenasoja_2024.jpeg",
+    "engravedPeriod": "DE 29 DE NOVEMBRO A\n08 DE DEZEMBRO DE 2024",
+    "status": "verified",
+    "verifiedRecords": 40,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "DE 29 DE NOVEMBRO A\n08 DE DEZEMBRO DE 2024",
+      "Cabeçalho impresso: 24ª FENASOJA.",
+      "Os cargos estão na coluna esquerda e os nomes na coluna direita, nas duas seções; namesFirst é false.",
+      "Conferência visual integral da fotografia original 24a_Fenasoja_2024.jpeg e da face retificada fenasoja-2024.webp, incluindo ampliações locais e aumento de contraste apenas para inspeção dos trechos menores. O OCR foi tratado apenas como rascunho.",
+      "As regiões são localizadores aproximados normalizados na face retificada, em ordem [x, y, largura, altura]; não constituem garantia de recorte OCR.",
+      "A capitalização, as grafias, a pontuação visível e a ordem foram preservadas sem consulta a fontes externas. Os cargos desta peça não incluem dois-pontos.",
+      "Há 40 registros verificados e nenhum registro ilegível. SECRETÁRIA e ASSESSORIA JURÍDICA abrangem duas linhas de nomes cada; CULTURA E TURISMO preserva a barra impressa entre dois nomes."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2024.jpg"
+  },
+  {
+    "id": "fenasoja-2026",
+    "edition": 25,
+    "year": 2026,
+    "kind": "edition",
+    "sourceFile": "25a_Fenasoja_2026.jpeg",
+    "engravedPeriod": "DE 01 A 10 DE MAIO DE 2026",
+    "status": "verified",
+    "verifiedRecords": 42,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados, em coordenadas normalizadas. A arte limpa mantém as inscrições; cartazes e marcas vêm dos pixels originais."
+    ],
+    "faceComparison": "evidence/pieces/fenasoja-2026.jpg"
+  },
+  {
+    "id": "documento-2020",
+    "edition": 23,
+    "year": 2020,
+    "kind": "document",
+    "sourceFile": "23a_Fenasoja_2020_Placa_Historica.jpeg",
+    "engravedPeriod": "DE 28 DE ABRIL A\n08 DE MAIO 2020",
+    "status": "verified",
+    "verifiedRecords": 37,
+    "unreadableNames": 0,
+    "pending": [],
+    "notes": [
+      "DE 28 DE ABRIL A\n08 DE MAIO 2020",
+      "FEIRA ADIADA EM RAZÃO DA PANDEMIA",
+      "Cabeçalho impresso: 23ª FENASOJA.",
+      "Os cargos estão na coluna esquerda e os nomes na coluna direita, nas duas seções de nomes; namesFirst é false.",
+      "Conferência visual integral da fotografia original 23a_Fenasoja_2020_Placa_Historica.jpeg e da face retificada documento-2020.webp, incluindo ampliações locais e aumento de contraste apenas para inspeção. O OCR foi tratado apenas como rascunho.",
+      "As regiões são localizadores aproximados normalizados na face retificada, em ordem [x, y, largura, altura]; não constituem garantia de recorte OCR.",
+      "A capitalização, as grafias, a pontuação visível e a ordem foram preservadas sem consulta a fontes externas nem correções por cronologia. Os cargos desta peça não incluem dois-pontos.",
+      "O período gravado termina em 08 DE MAIO 2020, sem a palavra DE entre MAIO e 2020.",
+      "Há 36 registros de cargos e nomes verificados, contendo 39 linhas impressas de nomes, mais um registro verificado de rodapé. Nenhum registro foi marcado ilegível.",
+      "ASSESSORIA JURÍDICA, JOVEM e PROMOÇÕES abrangem duas linhas de nomes cada. A duplicação de ROGÉRIO DOS SANTOS FERREIRA em dois cargos centrais reproduz a inscrição desta peça."
+    ],
+    "faceComparison": "evidence/pieces/documento-2020.jpg"
+  }
+]

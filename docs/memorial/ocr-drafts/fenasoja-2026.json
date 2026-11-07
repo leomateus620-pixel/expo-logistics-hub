@@ -1,0 +1,1882 @@
+﻿{
+    "status":  "UNREVIEWED_DRAFT",
+    "engine":  "Windows.Media.Ocr pt-BR",
+    "lines":  [
+                  {
+                      "text":  "DE 01 A 10 DE",
+                      "words":  [
+                                    {
+                                        "y":  37,
+                                        "height":  16,
+                                        "width":  33,
+                                        "text":  "DE",
+                                        "x":  485
+                                    },
+                                    {
+                                        "y":  36,
+                                        "height":  17,
+                                        "width":  22,
+                                        "text":  "01",
+                                        "x":  525
+                                    },
+                                    {
+                                        "y":  36,
+                                        "height":  17,
+                                        "width":  17,
+                                        "text":  "A",
+                                        "x":  555
+                                    },
+                                    {
+                                        "y":  36,
+                                        "height":  17,
+                                        "width":  24,
+                                        "text":  "10",
+                                        "x":  578
+                                    },
+                                    {
+                                        "y":  36,
+                                        "height":  17,
+                                        "width":  32,
+                                        "text":  "DE",
+                                        "x":  611
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "25a FENASOJA",
+                      "words":  [
+                                    {
+                                        "y":  43,
+                                        "height":  29,
+                                        "width":  61,
+                                        "text":  "25a",
+                                        "x":  141
+                                    },
+                                    {
+                                        "y":  45,
+                                        "height":  28,
+                                        "width":  217,
+                                        "text":  "FENASOJA",
+                                        "x":  216
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MAIO DE 2026",
+                      "words":  [
+                                    {
+                                        "y":  64,
+                                        "height":  17,
+                                        "width":  64,
+                                        "text":  "MAIO",
+                                        "x":  486
+                                    },
+                                    {
+                                        "y":  64,
+                                        "height":  17,
+                                        "width":  32,
+                                        "text":  "DE",
+                                        "x":  558
+                                    },
+                                    {
+                                        "y":  63,
+                                        "height":  18,
+                                        "width":  56,
+                                        "text":  "2026",
+                                        "x":  597
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "COMISSÃO CENTRAL",
+                      "words":  [
+                                    {
+                                        "y":  113,
+                                        "height":  14,
+                                        "width":  83,
+                                        "text":  "COMISSÃO",
+                                        "x":  376
+                                    },
+                                    {
+                                        "y":  116,
+                                        "height":  11,
+                                        "width":  72,
+                                        "text":  "CENTRAL",
+                                        "x":  464
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRESIDENTE DE HONRA",
+                      "words":  [
+                                    {
+                                        "y":  161,
+                                        "height":  12,
+                                        "width":  99,
+                                        "text":  "PRESIDENTE",
+                                        "x":  247
+                                    },
+                                    {
+                                        "y":  162,
+                                        "height":  11,
+                                        "width":  21,
+                                        "text":  "DE",
+                                        "x":  351
+                                    },
+                                    {
+                                        "y":  162,
+                                        "height":  11,
+                                        "width":  58,
+                                        "text":  "HONRA",
+                                        "x":  377
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRESIDENTE CCPF-CESTÁO 2024/2026",
+                      "words":  [
+                                    {
+                                        "y":  183,
+                                        "height":  12,
+                                        "width":  99,
+                                        "text":  "PRESIDENTE",
+                                        "x":  137
+                                    },
+                                    {
+                                        "y":  182,
+                                        "height":  14,
+                                        "width":  111,
+                                        "text":  "CCPF-CESTÁO",
+                                        "x":  241
+                                    },
+                                    {
+                                        "y":  183,
+                                        "height":  14,
+                                        "width":  80,
+                                        "text":  "2024/2026",
+                                        "x":  356
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRESIDENTE",
+                      "words":  [
+                                    {
+                                        "y":  207,
+                                        "height":  11,
+                                        "width":  98,
+                                        "text":  "PRESIDENTE",
+                                        "x":  338
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "VICE-PRESIDENTE",
+                      "words":  [
+                                    {
+                                        "y":  229,
+                                        "height":  12,
+                                        "width":  141,
+                                        "text":  "VICE-PRESIDENTE",
+                                        "x":  295
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DIRETOR COMERCIAL",
+                      "words":  [
+                                    {
+                                        "y":  251,
+                                        "height":  12,
+                                        "width":  69,
+                                        "text":  "DIRETOR",
+                                        "x":  270
+                                    },
+                                    {
+                                        "y":  252,
+                                        "height":  11,
+                                        "width":  93,
+                                        "text":  "COMERCIAL",
+                                        "x":  344
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DIRETORA DE MARKETING/COMUNICAÇÁO",
+                      "words":  [
+                                    {
+                                        "y":  272,
+                                        "height":  14,
+                                        "width":  82,
+                                        "text":  "DIRETORA",
+                                        "x":  103
+                                    },
+                                    {
+                                        "y":  273,
+                                        "height":  11,
+                                        "width":  22,
+                                        "text":  "DE",
+                                        "x":  190
+                                    },
+                                    {
+                                        "y":  272,
+                                        "height":  16,
+                                        "width":  220,
+                                        "text":  "MARKETING/COMUNICAÇÁO",
+                                        "x":  217
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "COORDENADOR FINANCEIRO",
+                      "words":  [
+                                    {
+                                        "y":  296,
+                                        "height":  11,
+                                        "width":  128,
+                                        "text":  "COORDENADOR",
+                                        "x":  208
+                                    },
+                                    {
+                                        "y":  296,
+                                        "height":  11,
+                                        "width":  97,
+                                        "text":  "FINANCEIRO",
+                                        "x":  341
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "FINANCEIRO",
+                      "words":  [
+                                    {
+                                        "y":  318,
+                                        "height":  11,
+                                        "width":  97,
+                                        "text":  "FINANCEIRO",
+                                        "x":  341
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SECRETÁRIA EXECUTIVA",
+                      "words":  [
+                                    {
+                                        "y":  338,
+                                        "height":  13,
+                                        "width":  97,
+                                        "text":  "SECRETÁRIA",
+                                        "x":  251
+                                    },
+                                    {
+                                        "y":  340,
+                                        "height":  11,
+                                        "width":  86,
+                                        "text":  "EXECUTIVA",
+                                        "x":  353
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MILTON RACHO",
+                      "words":  [
+                                    {
+                                        "y":  160,
+                                        "height":  11,
+                                        "width":  58,
+                                        "text":  "MILTON",
+                                        "x":  483
+                                    },
+                                    {
+                                        "y":  160,
+                                        "height":  11,
+                                        "width":  56,
+                                        "text":  "RACHO",
+                                        "x":  547
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DARIO JÚNIOR DA MOTTA GERMANO",
+                      "words":  [
+                                    {
+                                        "y":  183,
+                                        "height":  11,
+                                        "width":  50,
+                                        "text":  "DARIO",
+                                        "x":  483
+                                    },
+                                    {
+                                        "y":  180,
+                                        "height":  14,
+                                        "width":  60,
+                                        "text":  "JÚNIOR",
+                                        "x":  537
+                                    },
+                                    {
+                                        "y":  182,
+                                        "height":  11,
+                                        "width":  22,
+                                        "text":  "DA",
+                                        "x":  602
+                                    },
+                                    {
+                                        "y":  182,
+                                        "height":  11,
+                                        "width":  54,
+                                        "text":  "MOTTA",
+                                        "x":  629
+                                    },
+                                    {
+                                        "y":  181,
+                                        "height":  12,
+                                        "width":  82,
+                                        "text":  "GERMANO",
+                                        "x":  687
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MARCOS EDUARDO SERVAT",
+                      "words":  [
+                                    {
+                                        "y":  205,
+                                        "height":  11,
+                                        "width":  67,
+                                        "text":  "MARCOS",
+                                        "x":  484
+                                    },
+                                    {
+                                        "y":  204,
+                                        "height":  12,
+                                        "width":  79,
+                                        "text":  "EDUARDO",
+                                        "x":  556
+                                    },
+                                    {
+                                        "y":  204,
+                                        "height":  11,
+                                        "width":  60,
+                                        "text":  "SERVAT",
+                                        "x":  639
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "FABIANO SOLTIS",
+                      "words":  [
+                                    {
+                                        "y":  227,
+                                        "height":  11,
+                                        "width":  70,
+                                        "text":  "FABIANO",
+                                        "x":  484
+                                    },
+                                    {
+                                        "y":  227,
+                                        "height":  11,
+                                        "width":  52,
+                                        "text":  "SOLTIS",
+                                        "x":  559
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CLÉO ANTONIO ROCKENBACH",
+                      "words":  [
+                                    {
+                                        "y":  247,
+                                        "height":  14,
+                                        "width":  41,
+                                        "text":  "CLÉO",
+                                        "x":  484
+                                    },
+                                    {
+                                        "y":  249,
+                                        "height":  12,
+                                        "width":  73,
+                                        "text":  "ANTONIO",
+                                        "x":  529
+                                    },
+                                    {
+                                        "y":  248,
+                                        "height":  12,
+                                        "width":  110,
+                                        "text":  "ROCKENBACH",
+                                        "x":  607
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ZÉLIA SAVOLDI",
+                      "words":  [
+                                    {
+                                        "y":  269,
+                                        "height":  14,
+                                        "width":  44,
+                                        "text":  "ZÉLIA",
+                                        "x":  484
+                                    },
+                                    {
+                                        "y":  272,
+                                        "height":  11,
+                                        "width":  67,
+                                        "text":  "SAVOLDI",
+                                        "x":  532
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ROQUE VANDERLEI LUGOCH",
+                      "words":  [
+                                    {
+                                        "y":  294,
+                                        "height":  13,
+                                        "width":  56,
+                                        "text":  "ROQUE",
+                                        "x":  485
+                                    },
+                                    {
+                                        "y":  293,
+                                        "height":  12,
+                                        "width":  89,
+                                        "text":  "VANDERLEI",
+                                        "x":  545
+                                    },
+                                    {
+                                        "y":  293,
+                                        "height":  11,
+                                        "width":  65,
+                                        "text":  "LUGOCH",
+                                        "x":  639
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "FERNANDA SECKLER EICH",
+                      "words":  [
+                                    {
+                                        "y":  316,
+                                        "height":  11,
+                                        "width":  87,
+                                        "text":  "FERNANDA",
+                                        "x":  485
+                                    },
+                                    {
+                                        "y":  315,
+                                        "height":  12,
+                                        "width":  70,
+                                        "text":  "SECKLER",
+                                        "x":  576
+                                    },
+                                    {
+                                        "y":  315,
+                                        "height":  11,
+                                        "width":  35,
+                                        "text":  "EICH",
+                                        "x":  651
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DÉBORA LETÍCIA BAMBERG",
+                      "words":  [
+                                    {
+                                        "y":  336,
+                                        "height":  13,
+                                        "width":  66,
+                                        "text":  "DÉBORA",
+                                        "x":  486
+                                    },
+                                    {
+                                        "y":  335,
+                                        "height":  13,
+                                        "width":  58,
+                                        "text":  "LETÍCIA",
+                                        "x":  557
+                                    },
+                                    {
+                                        "y":  337,
+                                        "height":  11,
+                                        "width":  78,
+                                        "text":  "BAMBERG",
+                                        "x":  619
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRESIDENTES DE ÁREA",
+                      "words":  [
+                                    {
+                                        "y":  372,
+                                        "height":  11,
+                                        "width":  105,
+                                        "text":  "PRESIDENTES",
+                                        "x":  372
+                                    },
+                                    {
+                                        "y":  372,
+                                        "height":  10,
+                                        "width":  20,
+                                        "text":  "DE",
+                                        "x":  482
+                                    },
+                                    {
+                                        "y":  369,
+                                        "height":  13,
+                                        "width":  42,
+                                        "text":  "ÁREA",
+                                        "x":  507
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSESSORIA FINANCEIRA",
+                      "words":  [
+                                    {
+                                        "y":  406,
+                                        "height":  11,
+                                        "width":  98,
+                                        "text":  "ASSESSORIA",
+                                        "x":  242
+                                    },
+                                    {
+                                        "y":  406,
+                                        "height":  11,
+                                        "width":  96,
+                                        "text":  "FINANCEIRA",
+                                        "x":  344
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSESSORIA DE SUSTENTABILIDADE",
+                      "words":  [
+                                    {
+                                        "y":  428,
+                                        "height":  11,
+                                        "width":  99,
+                                        "text":  "ASSESSORIA",
+                                        "x":  156
+                                    },
+                                    {
+                                        "y":  428,
+                                        "height":  11,
+                                        "width":  22,
+                                        "text":  "DE",
+                                        "x":  259
+                                    },
+                                    {
+                                        "y":  428,
+                                        "height":  11,
+                                        "width":  155,
+                                        "text":  "SUSTENTABILIDADE",
+                                        "x":  285
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSESSORIA DE IMPRENSA",
+                      "words":  [
+                                    {
+                                        "y":  450,
+                                        "height":  11,
+                                        "width":  98,
+                                        "text":  "ASSESSORIA",
+                                        "x":  230
+                                    },
+                                    {
+                                        "y":  450,
+                                        "height":  11,
+                                        "width":  21,
+                                        "text":  "DE",
+                                        "x":  333
+                                    },
+                                    {
+                                        "y":  450,
+                                        "height":  11,
+                                        "width":  81,
+                                        "text":  "IMPRENSA",
+                                        "x":  359
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSESSORIA PROJETOS E CAPTAÇÓES INSTITUCIONAIS",
+                      "words":  [
+                                    {
+                                        "y":  472,
+                                        "height":  11,
+                                        "width":  100,
+                                        "text":  "ASSESSORIA",
+                                        "x":  12
+                                    },
+                                    {
+                                        "y":  472,
+                                        "height":  11,
+                                        "width":  83,
+                                        "text":  "PROJETOS",
+                                        "x":  117
+                                    },
+                                    {
+                                        "y":  472,
+                                        "height":  11,
+                                        "width":  9,
+                                        "text":  "E",
+                                        "x":  205
+                                    },
+                                    {
+                                        "y":  469,
+                                        "height":  17,
+                                        "width":  94,
+                                        "text":  "CAPTAÇÓES",
+                                        "x":  218
+                                    },
+                                    {
+                                        "y":  471,
+                                        "height":  12,
+                                        "width":  124,
+                                        "text":  "INSTITUCIONAIS",
+                                        "x":  317
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSESSORIA JURÍDICA",
+                      "words":  [
+                                    {
+                                        "y":  494,
+                                        "height":  11,
+                                        "width":  98,
+                                        "text":  "ASSESSORIA",
+                                        "x":  266
+                                    },
+                                    {
+                                        "y":  491,
+                                        "height":  13,
+                                        "width":  73,
+                                        "text":  "JURÍDICA",
+                                        "x":  368
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSESSORIA DE RELAÇOES INTERNACIONAIS",
+                      "words":  [
+                                    {
+                                        "y":  538,
+                                        "height":  11,
+                                        "width":  99,
+                                        "text":  "ASSESSORIA",
+                                        "x":  91
+                                    },
+                                    {
+                                        "y":  538,
+                                        "height":  11,
+                                        "width":  21,
+                                        "text":  "DE",
+                                        "x":  195
+                                    },
+                                    {
+                                        "y":  535,
+                                        "height":  16,
+                                        "width":  83,
+                                        "text":  "RELAÇOES",
+                                        "x":  221
+                                    },
+                                    {
+                                        "y":  537,
+                                        "height":  11,
+                                        "width":  133,
+                                        "text":  "INTERNACIONAIS",
+                                        "x":  308
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSESSORIA DE PROTOCOLO",
+                      "words":  [
+                                    {
+                                        "y":  581,
+                                        "height":  11,
+                                        "width":  98,
+                                        "text":  "ASSESSORIA",
+                                        "x":  216
+                                    },
+                                    {
+                                        "y":  581,
+                                        "height":  11,
+                                        "width":  22,
+                                        "text":  "DE",
+                                        "x":  318
+                                    },
+                                    {
+                                        "y":  580,
+                                        "height":  11,
+                                        "width":  97,
+                                        "text":  "PROTOCOLO",
+                                        "x":  345
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "AGRICULTURA, SOJA E DERIVADOS",
+                      "words":  [
+                                    {
+                                        "y":  603,
+                                        "height":  12,
+                                        "width":  116,
+                                        "text":  "AGRICULTURA,",
+                                        "x":  172
+                                    },
+                                    {
+                                        "y":  603,
+                                        "height":  10,
+                                        "width":  40,
+                                        "text":  "SOJA",
+                                        "x":  292
+                                    },
+                                    {
+                                        "y":  602,
+                                        "height":  11,
+                                        "width":  9,
+                                        "text":  "E",
+                                        "x":  337
+                                    },
+                                    {
+                                        "y":  602,
+                                        "height":  11,
+                                        "width":  92,
+                                        "text":  "DERIVADOS",
+                                        "x":  351
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "INOVAÇÃO E EXPERIÊNCIA",
+                      "words":  [
+                                    {
+                                        "y":  622,
+                                        "height":  17,
+                                        "width":  83,
+                                        "text":  "INOVAÇÃO",
+                                        "x":  238
+                                    },
+                                    {
+                                        "y":  624,
+                                        "height":  11,
+                                        "width":  9,
+                                        "text":  "E",
+                                        "x":  326
+                                    },
+                                    {
+                                        "y":  621,
+                                        "height":  14,
+                                        "width":  103,
+                                        "text":  "EXPERIÊNCIA",
+                                        "x":  340
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ARTE E CULTURA",
+                      "words":  [
+                                    {
+                                        "y":  646,
+                                        "height":  11,
+                                        "width":  40,
+                                        "text":  "ARTE",
+                                        "x":  313
+                                    },
+                                    {
+                                        "y":  646,
+                                        "height":  10,
+                                        "width":  9,
+                                        "text":  "E",
+                                        "x":  358
+                                    },
+                                    {
+                                        "y":  645,
+                                        "height":  12,
+                                        "width":  72,
+                                        "text":  "CULTURA",
+                                        "x":  371
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "BILHETERIA",
+                      "words":  [
+                                    {
+                                        "y":  667,
+                                        "height":  11,
+                                        "width":  91,
+                                        "text":  "BILHETERIA",
+                                        "x":  353
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CREDENCIAMENTO",
+                      "words":  [
+                                    {
+                                        "y":  689,
+                                        "height":  12,
+                                        "width":  149,
+                                        "text":  "CREDENCIAMENTO",
+                                        "x":  295
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "COOPERATIVISMO",
+                      "words":  [
+                                    {
+                                        "y":  710,
+                                        "height":  13,
+                                        "width":  141,
+                                        "text":  "COOPERATIVISMO",
+                                        "x":  303
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ESPAÇO DO AUTOMOVEL",
+                      "words":  [
+                                    {
+                                        "y":  734,
+                                        "height":  14,
+                                        "width":  63,
+                                        "text":  "ESPAÇO",
+                                        "x":  250
+                                    },
+                                    {
+                                        "y":  733,
+                                        "height":  12,
+                                        "width":  24,
+                                        "text":  "DO",
+                                        "x":  318
+                                    },
+                                    {
+                                        "y":  730,
+                                        "height":  14,
+                                        "width":  100,
+                                        "text":  "AUTOMOVEL",
+                                        "x":  345
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EXPORURAL",
+                      "words":  [
+                                    {
+                                        "y":  754,
+                                        "height":  12,
+                                        "width":  96,
+                                        "text":  "EXPORURAL",
+                                        "x":  349
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "INDÚSTRIA, COMÉRCIO E SERVICOS",
+                      "words":  [
+                                    {
+                                        "y":  777,
+                                        "height":  14,
+                                        "width":  89,
+                                        "text":  "INDÚSTRIA,",
+                                        "x":  170
+                                    },
+                                    {
+                                        "y":  775,
+                                        "height":  14,
+                                        "width":  86,
+                                        "text":  "COMÉRCIO",
+                                        "x":  264
+                                    },
+                                    {
+                                        "y":  777,
+                                        "height":  11,
+                                        "width":  9,
+                                        "text":  "E",
+                                        "x":  354
+                                    },
+                                    {
+                                        "y":  773,
+                                        "height":  17,
+                                        "width":  77,
+                                        "text":  "SERVICOS",
+                                        "x":  368
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "INFRAESTRUTURA E SEGURANÇA DO TRABALHO",
+                      "words":  [
+                                    {
+                                        "y":  801,
+                                        "height":  12,
+                                        "width":  142,
+                                        "text":  "INFRAESTRUTURA",
+                                        "x":  68
+                                    },
+                                    {
+                                        "y":  801,
+                                        "height":  11,
+                                        "width":  10,
+                                        "text":  "E",
+                                        "x":  214
+                                    },
+                                    {
+                                        "y":  800,
+                                        "height":  14,
+                                        "width":  99,
+                                        "text":  "SEGURANÇA",
+                                        "x":  228
+                                    },
+                                    {
+                                        "y":  799,
+                                        "height":  12,
+                                        "width":  24,
+                                        "text":  "DO",
+                                        "x":  331
+                                    },
+                                    {
+                                        "y":  798,
+                                        "height":  12,
+                                        "width":  86,
+                                        "text":  "TRABALHO",
+                                        "x":  359
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "LOGÍSTICA, HOTELARIA E TURISMO",
+                      "words":  [
+                                    {
+                                        "y":  821,
+                                        "height":  15,
+                                        "width":  86,
+                                        "text":  "LOGÍSTICA,",
+                                        "x":  176
+                                    },
+                                    {
+                                        "y":  821,
+                                        "height":  13,
+                                        "width":  89,
+                                        "text":  "HOTELARIA",
+                                        "x":  267
+                                    },
+                                    {
+                                        "y":  821,
+                                        "height":  12,
+                                        "width":  9,
+                                        "text":  "E",
+                                        "x":  361
+                                    },
+                                    {
+                                        "y":  820,
+                                        "height":  12,
+                                        "width":  71,
+                                        "text":  "TURISMO",
+                                        "x":  374
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "NOVAS GERAÇOES",
+                      "words":  [
+                                    {
+                                        "y":  843,
+                                        "height":  13,
+                                        "width":  55,
+                                        "text":  "NOVAS",
+                                        "x":  302
+                                    },
+                                    {
+                                        "y":  840,
+                                        "height":  16,
+                                        "width":  85,
+                                        "text":  "GERAÇOES",
+                                        "x":  361
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PECUÁRIA",
+                      "words":  [
+                                    {
+                                        "y":  862,
+                                        "height":  15,
+                                        "width":  79,
+                                        "text":  "PECUÁRIA",
+                                        "x":  367
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PREVENÇÃO E COMBATE A INCÊNDIO",
+                      "words":  [
+                                    {
+                                        "y":  886,
+                                        "height":  18,
+                                        "width":  98,
+                                        "text":  "PREVENÇÃO",
+                                        "x":  154
+                                    },
+                                    {
+                                        "y":  889,
+                                        "height":  12,
+                                        "width":  9,
+                                        "text":  "E",
+                                        "x":  257
+                                    },
+                                    {
+                                        "y":  887,
+                                        "height":  13,
+                                        "width":  77,
+                                        "text":  "COMBATE",
+                                        "x":  271
+                                    },
+                                    {
+                                        "y":  887,
+                                        "height":  12,
+                                        "width":  11,
+                                        "text":  "A",
+                                        "x":  353
+                                    },
+                                    {
+                                        "y":  884,
+                                        "height":  15,
+                                        "width":  77,
+                                        "text":  "INCÊNDIO",
+                                        "x":  369
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RECEPÇÃO E CERIMONIAL",
+                      "words":  [
+                                    {
+                                        "y":  908,
+                                        "height":  16,
+                                        "width":  86,
+                                        "text":  "RECEPÇÃO",
+                                        "x":  243
+                                    },
+                                    {
+                                        "y":  910,
+                                        "height":  12,
+                                        "width":  9,
+                                        "text":  "E",
+                                        "x":  334
+                                    },
+                                    {
+                                        "y":  908,
+                                        "height":  13,
+                                        "width":  100,
+                                        "text":  "CERIMONIAL",
+                                        "x":  347
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RELAÇOES INSTITUCIONAIS",
+                      "words":  [
+                                    {
+                                        "y":  932,
+                                        "height":  16,
+                                        "width":  83,
+                                        "text":  "RELAÇOES",
+                                        "x":  235
+                                    },
+                                    {
+                                        "y":  930,
+                                        "height":  14,
+                                        "width":  124,
+                                        "text":  "INSTITUCIONAIS",
+                                        "x":  323
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SAUDE, BEM ESTAR E ACESSIBILIDADE",
+                      "words":  [
+                                    {
+                                        "y":  975,
+                                        "height":  15,
+                                        "width":  58,
+                                        "text":  "SAUDE,",
+                                        "x":  149
+                                    },
+                                    {
+                                        "y":  977,
+                                        "height":  12,
+                                        "width":  35,
+                                        "text":  "BEM",
+                                        "x":  211
+                                    },
+                                    {
+                                        "y":  976,
+                                        "height":  13,
+                                        "width":  49,
+                                        "text":  "ESTAR",
+                                        "x":  251
+                                    },
+                                    {
+                                        "y":  976,
+                                        "height":  13,
+                                        "width":  9,
+                                        "text":  "E",
+                                        "x":  304
+                                    },
+                                    {
+                                        "y":  974,
+                                        "height":  14,
+                                        "width":  129,
+                                        "text":  "ACESSIBILIDADE",
+                                        "x":  318
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SEGURANÇA",
+                      "words":  [
+                                    {
+                                        "y":  997,
+                                        "height":  14,
+                                        "width":  98,
+                                        "text":  "SEGURANÇA",
+                                        "x":  350
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MERCOSUL",
+                      "words":  [
+                                    {
+                                        "y":  1019,
+                                        "height":  13,
+                                        "width":  87,
+                                        "text":  "MERCOSUL",
+                                        "x":  361
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "senwços",
+                      "words":  [
+                                    {
+                                        "y":  1040,
+                                        "height":  14,
+                                        "width":  76,
+                                        "text":  "senwços",
+                                        "x":  372
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "sc:na STORE",
+                      "words":  [
+                                    {
+                                        "y":  1063,
+                                        "height":  11,
+                                        "width":  39,
+                                        "text":  "sc:na",
+                                        "x":  354
+                                    },
+                                    {
+                                        "y":  1062,
+                                        "height":  12,
+                                        "width":  49,
+                                        "text":  "STORE",
+                                        "x":  399
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SHOWS",
+                      "words":  [
+                                    {
+                                        "y":  1084,
+                                        "height":  12,
+                                        "width":  58,
+                                        "text":  "SHOWS",
+                                        "x":  391
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "GASTRONOMIA",
+                      "words":  [
+                                    {
+                                        "y":  1105,
+                                        "height":  14,
+                                        "width":  118,
+                                        "text":  "GASTRONOMIA",
+                                        "x":  332
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JEFFERSON ARAÚJO",
+                      "words":  [
+                                    {
+                                        "y":  404,
+                                        "height":  11,
+                                        "width":  89,
+                                        "text":  "JEFFERSON",
+                                        "x":  486
+                                    },
+                                    {
+                                        "y":  401,
+                                        "height":  13,
+                                        "width":  64,
+                                        "text":  "ARAÚJO",
+                                        "x":  580
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ESTELA ZAMBERLAN SCHWERZ",
+                      "words":  [
+                                    {
+                                        "y":  425,
+                                        "height":  11,
+                                        "width":  56,
+                                        "text":  "ESTELA",
+                                        "x":  487
+                                    },
+                                    {
+                                        "y":  425,
+                                        "height":  11,
+                                        "width":  96,
+                                        "text":  "ZAMBERLAN",
+                                        "x":  548
+                                    },
+                                    {
+                                        "y":  424,
+                                        "height":  11,
+                                        "width":  78,
+                                        "text":  "SCHWERZ",
+                                        "x":  649
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DEISE ANELISE FROEUCH",
+                      "words":  [
+                                    {
+                                        "y":  447,
+                                        "height":  11,
+                                        "width":  45,
+                                        "text":  "DEISE",
+                                        "x":  487
+                                    },
+                                    {
+                                        "y":  447,
+                                        "height":  11,
+                                        "width":  65,
+                                        "text":  "ANELISE",
+                                        "x":  536
+                                    },
+                                    {
+                                        "y":  446,
+                                        "height":  11,
+                                        "width":  76,
+                                        "text":  "FROEUCH",
+                                        "x":  606
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JARDEL HILLESHEIM",
+                      "words":  [
+                                    {
+                                        "y":  469,
+                                        "height":  11,
+                                        "width":  61,
+                                        "text":  "JARDEL",
+                                        "x":  486
+                                    },
+                                    {
+                                        "y":  468,
+                                        "height":  11,
+                                        "width":  92,
+                                        "text":  "HILLESHEIM",
+                                        "x":  551
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JOSÉ MAURO BARBIERI",
+                      "words":  [
+                                    {
+                                        "y":  488,
+                                        "height":  14,
+                                        "width":  39,
+                                        "text":  "JOSÉ",
+                                        "x":  487
+                                    },
+                                    {
+                                        "y":  490,
+                                        "height":  11,
+                                        "width":  58,
+                                        "text":  "MAURO",
+                                        "x":  531
+                                    },
+                                    {
+                                        "y":  490,
+                                        "height":  11,
+                                        "width":  72,
+                                        "text":  "BARBIERI",
+                                        "x":  594
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SANDRA LAMEIRA",
+                      "words":  [
+                                    {
+                                        "y":  512,
+                                        "height":  11,
+                                        "width":  65,
+                                        "text":  "SANDRA",
+                                        "x":  488
+                                    },
+                                    {
+                                        "y":  512,
+                                        "height":  11,
+                                        "width":  69,
+                                        "text":  "LAMEIRA",
+                                        "x":  558
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EVERTON DOS SANTOS",
+                      "words":  [
+                                    {
+                                        "y":  534,
+                                        "height":  11,
+                                        "width":  72,
+                                        "text":  "EVERTON",
+                                        "x":  488
+                                    },
+                                    {
+                                        "y":  533,
+                                        "height":  11,
+                                        "width":  33,
+                                        "text":  "DOS",
+                                        "x":  565
+                                    },
+                                    {
+                                        "y":  533,
+                                        "height":  11,
+                                        "width":  62,
+                                        "text":  "SANTOS",
+                                        "x":  602
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "FABRíCIO CÉSAR MÜLLER",
+                      "words":  [
+                                    {
+                                        "y":  553,
+                                        "height":  14,
+                                        "width":  73,
+                                        "text":  "FABRíCIO",
+                                        "x":  489
+                                    },
+                                    {
+                                        "y":  553,
+                                        "height":  13,
+                                        "width":  50,
+                                        "text":  "CÉSAR",
+                                        "x":  566
+                                    },
+                                    {
+                                        "y":  552,
+                                        "height":  14,
+                                        "width":  63,
+                                        "text":  "MÜLLER",
+                                        "x":  621
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JORGE LUIZ VIANA",
+                      "words":  [
+                                    {
+                                        "y":  577,
+                                        "height":  11,
+                                        "width":  52,
+                                        "text":  "JORGE",
+                                        "x":  488
+                                    },
+                                    {
+                                        "y":  577,
+                                        "height":  11,
+                                        "width":  34,
+                                        "text":  "LUIZ",
+                                        "x":  545
+                                    },
+                                    {
+                                        "y":  577,
+                                        "height":  10,
+                                        "width":  49,
+                                        "text":  "VIANA",
+                                        "x":  582
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "VANESSA MATRASZEK GhOATTO",
+                      "words":  [
+                                    {
+                                        "y":  599,
+                                        "height":  11,
+                                        "width":  73,
+                                        "text":  "VANESSA",
+                                        "x":  488
+                                    },
+                                    {
+                                        "y":  598,
+                                        "height":  11,
+                                        "width":  93,
+                                        "text":  "MATRASZEK",
+                                        "x":  565
+                                    },
+                                    {
+                                        "y":  594,
+                                        "height":  15,
+                                        "width":  75,
+                                        "text":  "GhOATTO",
+                                        "x":  662
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DOUGLAS RAFAEL MARQUES",
+                      "words":  [
+                                    {
+                                        "y":  620,
+                                        "height":  12,
+                                        "width":  76,
+                                        "text":  "DOUGLAS",
+                                        "x":  489
+                                    },
+                                    {
+                                        "y":  620,
+                                        "height":  11,
+                                        "width":  60,
+                                        "text":  "RAFAEL",
+                                        "x":  569
+                                    },
+                                    {
+                                        "y":  619,
+                                        "height":  13,
+                                        "width":  78,
+                                        "text":  "MARQUES",
+                                        "x":  633
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "LEONARDO CHITOUNA",
+                      "words":  [
+                                    {
+                                        "y":  642,
+                                        "height":  12,
+                                        "width":  88,
+                                        "text":  "LEONARDO",
+                                        "x":  490
+                                    },
+                                    {
+                                        "y":  641,
+                                        "height":  12,
+                                        "width":  84,
+                                        "text":  "CHITOUNA",
+                                        "x":  582
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "GUSTAVO REIS",
+                      "words":  [
+                                    {
+                                        "y":  664,
+                                        "height":  11,
+                                        "width":  72,
+                                        "text":  "GUSTAVO",
+                                        "x":  490
+                                    },
+                                    {
+                                        "y":  663,
+                                        "height":  11,
+                                        "width":  34,
+                                        "text":  "REIS",
+                                        "x":  567
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DANIEL DALLALBA",
+                      "words":  [
+                                    {
+                                        "y":  686,
+                                        "height":  11,
+                                        "width":  58,
+                                        "text":  "DANIEL",
+                                        "x":  490
+                                    },
+                                    {
+                                        "y":  685,
+                                        "height":  11,
+                                        "width":  82,
+                                        "text":  "DALLALBA",
+                                        "x":  552
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ALEXANDRE DALL\u0027AGNESE",
+                      "words":  [
+                                    {
+                                        "y":  707,
+                                        "height":  12,
+                                        "width":  94,
+                                        "text":  "ALEXANDRE",
+                                        "x":  490
+                                    },
+                                    {
+                                        "y":  706,
+                                        "height":  12,
+                                        "width":  104,
+                                        "text":  "DALL\u0027AGNESE",
+                                        "x":  589
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ELTON LUIS WALKER",
+                      "words":  [
+                                    {
+                                        "y":  729,
+                                        "height":  12,
+                                        "width":  49,
+                                        "text":  "ELTON",
+                                        "x":  491
+                                    },
+                                    {
+                                        "y":  729,
+                                        "height":  11,
+                                        "width":  34,
+                                        "text":  "LUIS",
+                                        "x":  545
+                                    },
+                                    {
+                                        "y":  728,
+                                        "height":  12,
+                                        "width":  66,
+                                        "text":  "WALKER",
+                                        "x":  583
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "GERMANO TESSMER BOTTOW",
+                      "words":  [
+                                    {
+                                        "y":  751,
+                                        "height":  12,
+                                        "width":  80,
+                                        "text":  "GERMANO",
+                                        "x":  491
+                                    },
+                                    {
+                                        "y":  750,
+                                        "height":  12,
+                                        "width":  71,
+                                        "text":  "TESSMER",
+                                        "x":  575
+                                    },
+                                    {
+                                        "y":  747,
+                                        "height":  14,
+                                        "width":  68,
+                                        "text":  "BOTTOW",
+                                        "x":  651
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JORGE VINICIUS FEIX",
+                      "words":  [
+                                    {
+                                        "y":  773,
+                                        "height":  12,
+                                        "width":  51,
+                                        "text":  "JORGE",
+                                        "x":  491
+                                    },
+                                    {
+                                        "y":  772,
+                                        "height":  12,
+                                        "width":  68,
+                                        "text":  "VINICIUS",
+                                        "x":  546
+                                    },
+                                    {
+                                        "y":  772,
+                                        "height":  11,
+                                        "width":  34,
+                                        "text":  "FEIX",
+                                        "x":  618
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DOEISON FERNANDO DREY",
+                      "words":  [
+                                    {
+                                        "y":  795,
+                                        "height":  12,
+                                        "width":  66,
+                                        "text":  "DOEISON",
+                                        "x":  492
+                                    },
+                                    {
+                                        "y":  793,
+                                        "height":  13,
+                                        "width":  88,
+                                        "text":  "FERNANDO",
+                                        "x":  563
+                                    },
+                                    {
+                                        "y":  793,
+                                        "height":  12,
+                                        "width":  42,
+                                        "text":  "DREY",
+                                        "x":  655
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EDUARDO SANTOS",
+                      "words":  [
+                                    {
+                                        "y":  816,
+                                        "height":  13,
+                                        "width":  79,
+                                        "text":  "EDUARDO",
+                                        "x":  492
+                                    },
+                                    {
+                                        "y":  815,
+                                        "height":  13,
+                                        "width":  62,
+                                        "text":  "SANTOS",
+                                        "x":  575
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JOSYANE CRISTINA",
+                      "words":  [
+                                    {
+                                        "y":  839,
+                                        "height":  12,
+                                        "width":  70,
+                                        "text":  "JOSYANE",
+                                        "x":  492
+                                    },
+                                    {
+                                        "y":  837,
+                                        "height":  13,
+                                        "width":  72,
+                                        "text":  "CRISTINA",
+                                        "x":  566
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ELISANDRA SIMAO",
+                      "words":  [
+                                    {
+                                        "y":  860,
+                                        "height":  13,
+                                        "width":  89,
+                                        "text":  "ELISANDRA",
+                                        "x":  493
+                                    },
+                                    {
+                                        "y":  860,
+                                        "height":  12,
+                                        "width":  51,
+                                        "text":  "SIMAO",
+                                        "x":  585
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CAP. LEONARDO nuv OAMOROZ",
+                      "words":  [
+                                    {
+                                        "y":  883,
+                                        "height":  12,
+                                        "width":  35,
+                                        "text":  "CAP.",
+                                        "x":  493
+                                    },
+                                    {
+                                        "y":  882,
+                                        "height":  13,
+                                        "width":  89,
+                                        "text":  "LEONARDO",
+                                        "x":  532
+                                    },
+                                    {
+                                        "y":  881,
+                                        "height":  12,
+                                        "width":  31,
+                                        "text":  "nuv",
+                                        "x":  625
+                                    },
+                                    {
+                                        "y":  880,
+                                        "height":  14,
+                                        "width":  80,
+                                        "text":  "OAMOROZ",
+                                        "x":  660
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SIMONE CASAGRANDE",
+                      "words":  [
+                                    {
+                                        "y":  905,
+                                        "height":  12,
+                                        "width":  61,
+                                        "text":  "SIMONE",
+                                        "x":  493
+                                    },
+                                    {
+                                        "y":  903,
+                                        "height":  13,
+                                        "width":  107,
+                                        "text":  "CASAGRANDE",
+                                        "x":  559
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MIGUU NEOEV",
+                      "words":  [
+                                    {
+                                        "y":  926,
+                                        "height":  13,
+                                        "width":  59,
+                                        "text":  "MIGUU",
+                                        "x":  551
+                                    },
+                                    {
+                                        "y":  925,
+                                        "height":  13,
+                                        "width":  52,
+                                        "text":  "NEOEV",
+                                        "x":  615
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DIANA SCHMIDT",
+                      "words":  [
+                                    {
+                                        "y":  949,
+                                        "height":  13,
+                                        "width":  50,
+                                        "text":  "DIANA",
+                                        "x":  494
+                                    },
+                                    {
+                                        "y":  948,
+                                        "height":  13,
+                                        "width":  71,
+                                        "text":  "SCHMIDT",
+                                        "x":  548
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ROSA CORZAN",
+                      "words":  [
+                                    {
+                                        "y":  971,
+                                        "height":  13,
+                                        "width":  43,
+                                        "text":  "ROSA",
+                                        "x":  494
+                                    },
+                                    {
+                                        "y":  970,
+                                        "height":  14,
+                                        "width":  64,
+                                        "text":  "CORZAN",
+                                        "x":  542
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "VANESSA",
+                      "words":  [
+                                    {
+                                        "y":  992,
+                                        "height":  13,
+                                        "width":  73,
+                                        "text":  "VANESSA",
+                                        "x":  562
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CARLA",
+                      "words":  [
+                                    {
+                                        "y":  1059,
+                                        "height":  11,
+                                        "width":  51,
+                                        "text":  "CARLA",
+                                        "x":  496
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "«oco",
+                      "words":  [
+                                    {
+                                        "y":  1080,
+                                        "height":  12,
+                                        "width":  47,
+                                        "text":  "«oco",
+                                        "x":  547
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CAOSIO",
+                      "words":  [
+                                    {
+                                        "y":  1100,
+                                        "height":  13,
+                                        "width":  66,
+                                        "text":  "CAOSIO",
+                                        "x":  574
+                                    }
+                                ]
+                  }
+              ]
+}

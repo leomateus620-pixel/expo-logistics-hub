@@ -1,0 +1,472 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 29 DE NOVEMBRO A\n08 DE DEZEMBRO DE 2024",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE DE HONRA",
+          "name": "MARLON LUÍS SALING",
+          "status": "verified",
+          "sourceRegion": [
+            0.19196,
+            0.1261,
+            0.56555,
+            0.02796
+          ]
+        },
+        {
+          "role": "PRESIDENTE CCPF-GESTÃO 2022/2024",
+          "name": "ELIAS DALLALBA",
+          "status": "verified",
+          "sourceRegion": [
+            0.06081,
+            0.1467,
+            0.72588,
+            0.0292
+          ]
+        },
+        {
+          "role": "PRESIDENTE",
+          "name": "DÁRIO JUNIOR DA MOTTA GERMANO",
+          "status": "verified",
+          "sourceRegion": [
+            0.30722,
+            0.17155,
+            0.55247,
+            0.02625
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "MARCOS EDUARDO SERVAT",
+          "status": "verified",
+          "sourceRegion": [
+            0.25211,
+            0.19339,
+            0.54401,
+            0.02597
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "RICARDO EMILIO ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.28212,
+            0.21344,
+            0.54312,
+            0.0247
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "DIEGO LEONARDO WIETHOLTER",
+          "status": "verified",
+          "sourceRegion": [
+            0.28008,
+            0.23142,
+            0.54304,
+            0.02742
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CLÉO ANTONIO ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.20188,
+            0.2523,
+            0.61329,
+            0.02623
+          ]
+        },
+        {
+          "role": "EXECUTIVA",
+          "name": "ZÉLIA SAVOLDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.32196,
+            0.27435,
+            0.37575,
+            0.02388
+          ]
+        },
+        {
+          "role": "SECRETÁRIA",
+          "name": "CAROLINA DE CONTI\nDÉBORA LETÍCIA BAMBERG",
+          "status": "verified",
+          "sourceRegion": [
+            0.30994,
+            0.29428,
+            0.49307,
+            0.04234
+          ],
+          "note": "Cargo impresso uma única vez à esquerda de duas linhas consecutivas de nomes. A quebra de linha preserva o cargo compartilhado e a ordem impressa."
+        },
+        {
+          "role": "SECRETÁRIO",
+          "name": "RAFAEL WOHLENBERG FERRO",
+          "status": "verified",
+          "sourceRegion": [
+            0.30985,
+            0.33312,
+            0.52222,
+            0.02313
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "IMPRENSA",
+          "name": "JARDEL HILLESHEIM",
+          "status": "verified",
+          "sourceRegion": [
+            0.32765,
+            0.39376,
+            0.42404,
+            0.01869
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JOSÉ MAURO BARBIERI\nJEFERSON FREY CARVALHO",
+          "status": "verified",
+          "sourceRegion": [
+            0.21574,
+            0.41195,
+            0.61169,
+            0.03561
+          ],
+          "note": "Cargo impresso uma única vez à esquerda de duas linhas consecutivas de nomes. Não há barra impressa entre esses nomes."
+        },
+        {
+          "role": "PROTOCOLO",
+          "name": "JORGE LUIZ VIANA",
+          "status": "verified",
+          "sourceRegion": [
+            0.30957,
+            0.4534,
+            0.44363,
+            0.01898
+          ]
+        },
+        {
+          "role": "AGRICULTURA, SOJA E DERIVADOS",
+          "name": "VANESSA MATRÁSZEK GNOATTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.10128,
+            0.47313,
+            0.74134,
+            0.01749
+          ]
+        },
+        {
+          "role": "BERÇO NACIONAL DA SOJA",
+          "name": "MARCEL LENZ STRAGLIOTTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.17358,
+            0.49373,
+            0.63193,
+            0.01765
+          ]
+        },
+        {
+          "role": "BILHETERIA E CREDENCIAMENTO",
+          "name": "IVAN LUIZ SQUINZANI",
+          "status": "verified",
+          "sourceRegion": [
+            0.11334,
+            0.51393,
+            0.61405,
+            0.01845
+          ]
+        },
+        {
+          "role": "COMUNICAÇÃO",
+          "name": "MARISTANI WEIAND NEUMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.28349,
+            0.53091,
+            0.54115,
+            0.01854
+          ]
+        },
+        {
+          "role": "PLANEJAMENTO ESTRATÉGICO",
+          "name": "ADEMIR ROSA",
+          "status": "verified",
+          "sourceRegion": [
+            0.13844,
+            0.55161,
+            0.53495,
+            0.01839
+          ]
+        },
+        {
+          "role": "COOPERATIVISMO",
+          "name": "ALEXANDRE DALL'AGNESE",
+          "status": "verified",
+          "sourceRegion": [
+            0.25749,
+            0.57171,
+            0.55129,
+            0.01795
+          ]
+        },
+        {
+          "role": "CULTURA E TURISMO",
+          "name": "RAFAEL RUFINO / LEONARDO CHITOLINA",
+          "status": "verified",
+          "sourceRegion": [
+            0.23151,
+            0.59171,
+            0.67791,
+            0.01675
+          ],
+          "note": "Os dois nomes compartilham o cargo na mesma linha, separados pela barra impressa."
+        },
+        {
+          "role": "INOVAÇÃO E TECNOLOGIA",
+          "name": "LÍDIA LINCK LAGEMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.1815,
+            0.61092,
+            0.59197,
+            0.01715
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO E MARKETING",
+          "name": "CAROLINE NEILA MOLINARI KOSLOWSKI",
+          "status": "verified",
+          "sourceRegion": [
+            0.16947,
+            0.63184,
+            0.73765,
+            0.01563
+          ]
+        },
+        {
+          "role": "ETNIAS",
+          "name": "RAFAEL ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.35481,
+            0.65013,
+            0.42224,
+            0.01798
+          ]
+        },
+        {
+          "role": "EXPORURAL",
+          "name": "FABIANO SOLTIS",
+          "status": "verified",
+          "sourceRegion": [
+            0.31504,
+            0.67022,
+            0.38395,
+            0.01815
+          ]
+        },
+        {
+          "role": "INDÚSTRIA, COMÉRCIO E SERVIÇOS",
+          "name": "JORGE VINICIUS FEIX",
+          "status": "verified",
+          "sourceRegion": [
+            0.09527,
+            0.692,
+            0.63283,
+            0.01564
+          ]
+        },
+        {
+          "role": "INFRAESTRUTURA",
+          "name": "DANIEL DALLALBA",
+          "status": "verified",
+          "sourceRegion": [
+            0.25626,
+            0.71028,
+            0.47268,
+            0.01689
+          ]
+        },
+        {
+          "role": "JOVEM",
+          "name": "LEONARDO DALLALBA",
+          "status": "verified",
+          "sourceRegion": [
+            0.3417,
+            0.72916,
+            0.43184,
+            0.01706
+          ],
+          "note": "As letras do cargo aparecem espaçadas na placa."
+        },
+        {
+          "role": "LOGÍSTICA",
+          "name": "JOÃO CARLOS DE CASTRO DORNELES",
+          "status": "verified",
+          "sourceRegion": [
+            0.32975,
+            0.74801,
+            0.5483,
+            0.01654
+          ]
+        },
+        {
+          "role": "MERCOSUL",
+          "name": "DANIEL ZIMMERMANN FUHR",
+          "status": "verified",
+          "sourceRegion": [
+            0.32176,
+            0.76781,
+            0.4806,
+            0.01804
+          ]
+        },
+        {
+          "role": "MUSICANTO",
+          "name": "GERSON MIGUEL LAUERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.31377,
+            0.78859,
+            0.50006,
+            0.01659
+          ]
+        },
+        {
+          "role": "CAPTAÇÃO DE RECURSOS",
+          "name": "CASSIO RICARDO FELTES",
+          "status": "verified",
+          "sourceRegion": [
+            0.19132,
+            0.80976,
+            0.61945,
+            0.01491
+          ]
+        },
+        {
+          "role": "ORÇAMENTOS E CONTROLADORIA",
+          "name": "GUSTAVO REIS",
+          "status": "verified",
+          "sourceRegion": [
+            0.11133,
+            0.8305,
+            0.5827,
+            0.01514
+          ]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "VITOR HUGO NOGUEIRA DUTRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.31363,
+            0.84666,
+            0.50942,
+            0.01575
+          ]
+        },
+        {
+          "role": "RECEPÇÃO E EVENTOS",
+          "name": "DAIANE L. E. C. NOGUEIRA DUTRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.21917,
+            0.8676,
+            0.63756,
+            0.01377
+          ]
+        },
+        {
+          "role": "RELAÇÕES EXTERIORES",
+          "name": "PAULO MIGUEL NEDEL",
+          "status": "verified",
+          "sourceRegion": [
+            0.21218,
+            0.8874,
+            0.54077,
+            0.01487
+          ]
+        },
+        {
+          "role": "SAÚDE E BEM ESTAR",
+          "name": "RODRIGO CALIXTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.24698,
+            0.9066,
+            0.48154,
+            0.01547
+          ]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "TEN. CEL. VALTAIR DORNELES",
+          "status": "verified",
+          "sourceRegion": [
+            0.28569,
+            0.92275,
+            0.53867,
+            0.01632
+          ]
+        },
+        {
+          "role": "SEGURANÇA DO TRABALHO",
+          "name": "DIEGO JOSÉ REGINALDO",
+          "status": "verified",
+          "sourceRegion": [
+            0.17125,
+            0.94512,
+            0.5997,
+            0.01321
+          ]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "ALEXANDRE BARBOSA",
+          "status": "verified",
+          "sourceRegion": [
+            0.31237,
+            0.96162,
+            0.45069,
+            0.01527
+          ]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "ROQUE VANDERLEI LUGOCH",
+          "status": "verified",
+          "sourceRegion": [
+            0.29053,
+            0.98061,
+            0.53827,
+            0.00587
+          ],
+          "note": "Cargo e nome completos foram confirmados na fotografia original. O refinamento do recorte retificado preserva agora a última linha e a borda inferior da placa."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "DE 29 DE NOVEMBRO A\n08 DE DEZEMBRO DE 2024",
+    "Cabeçalho impresso: 24ª FENASOJA.",
+    "Os cargos estão na coluna esquerda e os nomes na coluna direita, nas duas seções; namesFirst é false.",
+    "Conferência visual integral da fotografia original 24a_Fenasoja_2024.jpeg e da face retificada fenasoja-2024.webp, incluindo ampliações locais e aumento de contraste apenas para inspeção dos trechos menores. O OCR foi tratado apenas como rascunho.",
+    "As regiões são localizadores aproximados normalizados na face retificada, em ordem [x, y, largura, altura]; não constituem garantia de recorte OCR.",
+    "A capitalização, as grafias, a pontuação visível e a ordem foram preservadas sem consulta a fontes externas. Os cargos desta peça não incluem dois-pontos.",
+    "Há 40 registros verificados e nenhum registro ilegível. SECRETÁRIA e ASSESSORIA JURÍDICA abrangem duas linhas de nomes cada; CULTURA E TURISMO preserva a barra impressa entre dois nomes."
+  ]
+}

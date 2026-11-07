@@ -1,0 +1,288 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 21 A 29 DE ABRIL DE 1979",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "ADELKI CAMILO BELTRAME",
+          "status": "verified",
+          "sourceRegion": [
+            0.395,
+            0.253,
+            0.49,
+            0.02
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [
+            0.333,
+            0.269,
+            0.52,
+            0.02
+          ],
+          "note": "Primeiro nome sob o cargo compartilhado VICE-PRESIDENTES. O prenome NORBERTO está legível; o sobrenome à direita não pôde ser confirmado com segurança na fotografia."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [
+            0.6,
+            0.285,
+            0.29,
+            0.02
+          ],
+          "note": "Segundo nome sob o cargo compartilhado VICE-PRESIDENTES, que aparece apenas na primeira linha. O trecho ANACLETO LUZ está legível; o sobrenome seguinte permanece sem confirmação visual segura."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "ANTENOR GRISOTTI",
+          "status": "verified",
+          "sourceRegion": [
+            0.6,
+            0.301,
+            0.23,
+            0.02
+          ],
+          "note": "Terceiro nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "EUGÊNIO PILZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.6,
+            0.317,
+            0.175,
+            0.02
+          ],
+          "note": "Quarto nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "ALCYR PETERS HARTUNG",
+          "status": "verified",
+          "sourceRegion": [
+            0.292,
+            0.333,
+            0.57,
+            0.02
+          ]
+        },
+        {
+          "role": "CONSELHO CONSULTIVO",
+          "name": "PEDRO CARPENEDO",
+          "status": "verified",
+          "sourceRegion": [
+            0.28,
+            0.349,
+            0.55,
+            0.02
+          ],
+          "note": "Primeiro dos três nomes do CONSELHO CONSULTIVO."
+        },
+        {
+          "role": "CONSELHO CONSULTIVO",
+          "name": "WILLY KLAUS",
+          "status": "verified",
+          "sourceRegion": [
+            0.6,
+            0.364,
+            0.155,
+            0.02
+          ],
+          "note": "Segundo nome do CONSELHO CONSULTIVO; o cargo aparece apenas na primeira linha."
+        },
+        {
+          "role": "CONSELHO CONSULTIVO",
+          "name": "ARTHUR SCHMIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.6,
+            0.38,
+            0.2,
+            0.02
+          ],
+          "note": "Terceiro nome do CONSELHO CONSULTIVO; o cargo aparece apenas na primeira linha."
+        },
+        {
+          "role": "SECRETÁRIOS",
+          "name": "ERNI FRIDERICHS",
+          "status": "verified",
+          "sourceRegion": [
+            0.38,
+            0.396,
+            0.425,
+            0.02
+          ],
+          "note": "Primeiro dos dois nomes sob o cargo compartilhado SECRETÁRIOS."
+        },
+        {
+          "role": "SECRETÁRIOS",
+          "name": "PAULO MADEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.6,
+            0.412,
+            0.195,
+            0.02
+          ],
+          "note": "Segundo nome sob o cargo compartilhado SECRETÁRIOS."
+        },
+        {
+          "role": "TESOUREIROS",
+          "name": "EUGÊNIO EIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.375,
+            0.427,
+            0.39,
+            0.02
+          ],
+          "note": "Primeiro dos três nomes sob o cargo compartilhado TESOUREIROS."
+        },
+        {
+          "role": "TESOUREIROS",
+          "name": "LUIZ PILOTTI",
+          "status": "verified",
+          "sourceRegion": [
+            0.6,
+            0.443,
+            0.16,
+            0.02
+          ],
+          "note": "Segundo nome sob o cargo compartilhado TESOUREIROS."
+        },
+        {
+          "role": "TESOUREIROS",
+          "name": "JAIME MONTEIRO",
+          "status": "verified",
+          "sourceRegion": [
+            0.6,
+            0.459,
+            0.2,
+            0.02
+          ],
+          "note": "Terceiro nome sob o cargo compartilhado TESOUREIROS."
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "PARQUE DE EXPOSIÇÕES",
+          "name": "NILSO GUIDOLIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.265,
+            0.566,
+            0.505,
+            0.021
+          ]
+        },
+        {
+          "role": "RECEPÇÃO, HOSPEDAGEM E ALIMENTAÇÃO",
+          "name": "TELMO ANNES",
+          "status": "verified",
+          "sourceRegion": [
+            0.088,
+            0.582,
+            0.665,
+            0.021
+          ]
+        },
+        {
+          "role": "Trecho ilegível na fotografia",
+          "roleStatus": "unreadable",
+          "name": "CLÁUDIO CAMARGO",
+          "status": "verified",
+          "sourceRegion": [
+            0.405,
+            0.598,
+            0.395,
+            0.021
+          ],
+          "note": "O cargo à esquerda está sob reflexo. O final ÇÃO é visível, mas as letras anteriores não puderam ser confirmadas integralmente. O nome CLÁUDIO CAMARGO está legível."
+        },
+        {
+          "role": "PROMOÇÕES E DIVERSÕES",
+          "name": "LIDO HEIMERDINGER",
+          "status": "verified",
+          "sourceRegion": [
+            0.245,
+            0.614,
+            0.575,
+            0.021
+          ]
+        },
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "LOURIVAL ANDRADE",
+          "status": "verified",
+          "sourceRegion": [
+            0.273,
+            0.63,
+            0.545,
+            0.021
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "DOMINGOS FRANCISCO PASA",
+          "status": "verified",
+          "sourceRegion": [
+            0.405,
+            0.646,
+            0.485,
+            0.021
+          ]
+        },
+        {
+          "role": "AGRICULTURA E ASSUNTOS DA SOJA",
+          "name": "HÉRCULES BEATI",
+          "status": "verified",
+          "sourceRegion": [
+            0.153,
+            0.662,
+            0.625,
+            0.021
+          ]
+        },
+        {
+          "role": "INGRESSOS",
+          "name": "SAUL DANTE LIBERALI",
+          "status": "verified",
+          "sourceRegion": [
+            0.393,
+            0.678,
+            0.435,
+            0.021
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Título original: 4ª FENASOJA.",
+    "DE 21 A 29 DE ABRIL DE 1979",
+    "Transcrição visual da fotografia IMG_1150.jpeg e da face retificada fenasoja-1979.webp, com conferência ampliada de todas as linhas da Comissão Central e de PRESIDENTES DE ÁREA.",
+    "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+    "Os cargos compartilhados VICE-PRESIDENTES, CONSELHO CONSULTIVO, SECRETÁRIOS e TESOUREIROS foram repetidos nas entradas para preservar a associação e a ordem dos nomes.",
+    "O status de cada linha confirma o nome. roleStatus indica separadamente a ilegibilidade do cargo da linha de CLÁUDIO CAMARGO, cujo nome está confirmado.",
+    "Permanecem sem confirmação visual segura os sobrenomes de NORBERTO e ANACLETO LUZ; os fragmentos legíveis foram preservados nas notas das respectivas linhas.",
+    "O amplo campo inferior da placa não contém outras inscrições visíveis e foi mantido livre, sem criação de linhas ou conteúdo para preenchê-lo.",
+    "namesFirst é false porque os cargos aparecem à esquerda e os nomes à direita na fotografia.",
+    "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+    "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida.",
+    "Status global parcial devido a dois nomes completos e um cargo não confirmados."
+  ]
+}

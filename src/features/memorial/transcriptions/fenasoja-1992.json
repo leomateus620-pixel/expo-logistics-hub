@@ -1,0 +1,166 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 01 A 10 DE AGOSTO DE 1992",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "HERBERTO WERNER",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.275, 0.66, 0.024]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "ROGÉRIO JACOB KERBER",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.292, 0.66, 0.024]
+        },
+        {
+          "role": "TESOUREIRO",
+          "name": "DERQUI GNATTA",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.307, 0.66, 0.024]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "PEDRO PRIMO PAULO BARILI",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.323, 0.66, 0.024],
+          "note": "Cargo compartilhado com a linha seguinte. A ordem PRIMO PAULO foi preservada exatamente como aparece nesta placa."
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JORGE QUERUZ",
+          "status": "verified",
+          "sourceRegion": [0.51, 0.338, 0.31, 0.023],
+          "note": "Segunda linha do cargo compartilhado ASSESSORIA JURÍDICA; o rótulo não é repetido na fotografia."
+        },
+        {
+          "role": "ASSESSORIA CONTÁBIL",
+          "name": "BENALDO LIBERALI",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.353, 0.66, 0.024]
+        },
+        {
+          "role": "COORDENADOR",
+          "name": "CLÁUDIO TADEU KLEIN",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.37, 0.66, 0.024]
+        },
+        {
+          "role": "SECRETÁRIO",
+          "name": "ÊNIO GEHM",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.386, 0.66, 0.024]
+        },
+        {
+          "role": "SECRETÁRIO EXECUTIVO",
+          "name": "DANIEL FROSI",
+          "status": "verified",
+          "sourceRegion": [0.2, 0.402, 0.66, 0.024],
+          "note": "Cargo compartilhado com a linha seguinte: a placa mostra um único rótulo SECRETÁRIO EXECUTIVO para os dois nomes."
+        },
+        {
+          "role": "SECRETÁRIO EXECUTIVO",
+          "name": "ROQUE BIEGER",
+          "status": "verified",
+          "sourceRegion": [0.51, 0.419, 0.31, 0.024],
+          "note": "Segunda linha do cargo compartilhado SECRETÁRIO EXECUTIVO; o rótulo não é repetido na fotografia."
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "AGRICULTURA",
+          "name": "ALDO WALMOR SCHMIDT",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.53, 0.69, 0.023]
+        },
+        {
+          "role": "APROVEITAMENTO DA SOJA",
+          "name": "LOURIVAL DE ANDRADE",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.544, 0.69, 0.023]
+        },
+        {
+          "role": "CONESUL",
+          "name": "SÉRGIO AMBROS MALLMANN",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.56, 0.69, 0.024]
+        },
+        {
+          "role": "CULTURA",
+          "name": "INGRIDE MUNDSTOCK BOZZETTO",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.573, 0.69, 0.025]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "ARTUR LORENTZ",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.592, 0.69, 0.023]
+        },
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "RUDI STRELOW",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.608, 0.69, 0.023]
+        },
+        {
+          "role": "INFRAESTRUTURA",
+          "name": "JAIME ADEMAR MATTIAZZI",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.623, 0.69, 0.025],
+          "note": "MATTIAZZI está gravado com dois T nesta placa; a grafia não foi uniformizada com outras edições."
+        },
+        {
+          "role": "INTEGRAÇÃO REGIONAL",
+          "name": "OLAVO CUNEGATTI",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.641, 0.69, 0.024]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "ROGÉRIO KERBER",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.655, 0.69, 0.025]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "JOÃO CARLOS LOUREIRO",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.672, 0.69, 0.026]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "DOMINGOS FRANCISCO PASA",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.691, 0.69, 0.024]
+        },
+        {
+          "role": "SOCIAL",
+          "name": "LEOPOLDO JUSTINO GIRARDI",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.708, 0.69, 0.025]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Transcrição visual conferida na fotografia original IMG_1155.jpeg e na face retificada fenasoja-1992.webp; o OCR foi consultado apenas como rascunho não confiável.",
+    "Período gravado: 'DE 01 A 10 DE AGOSTO DE 1992', exibido em duas linhas na fotografia. A edição aparece como '9ª FENASOJA'.",
+    "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita; namesFirst é false. A ordem de cima para baixo foi preservada.",
+    "Foram confirmados 10 nomes em COMISSÃO CENTRAL e 12 nomes em PRESIDENTES DE ÁREA. ASSESSORIA JURÍDICA e SECRETÁRIO EXECUTIVO são compartilhados por duas linhas de nomes cada, com um único rótulo por cargo na fotografia.",
+    "Reflexos e diferenças de contraste atravessam a coluna de cargos e o início de alguns nomes em PRESIDENTES DE ÁREA. As linhas foram conferidas em ampliações da fotografia original, sem pesquisa externa ou reconstrução por outras edições.",
+    "A extremidade inferior física da placa está fora do enquadramento original, e a face retificada conserva esse limite. Há uma grande faixa sem inscrições visíveis abaixo de SOCIAL / LEOPOLDO JUSTINO GIRARDI, mas não é possível confirmar o contorno completo nem excluir inscrições fora da área fotografada. Nenhum conteúdo hipotético foi criado.",
+    "Grafias e acentos seguem a inscrição visível. Foram preservados HERBERTO WERNER, PEDRO PRIMO PAULO BARILI, ÊNIO GEHM, INGRIDE MUNDSTOCK BOZZETTO e JAIME ADEMAR MATTIAZZI, sem uniformização com outras placas.",
+    "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+    "O estado geral permanece parcial pelo limite inferior não fotografado, embora todos os 22 nomes e respectivos cargos visíveis tenham sido confirmados."
+  ]
+}

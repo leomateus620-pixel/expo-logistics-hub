@@ -1,0 +1,1143 @@
+﻿{
+    "status":  "UNREVIEWED_DRAFT",
+    "engine":  "Windows.Media.Ocr pt-BR",
+    "lines":  [
+                  {
+                      "text":  "14g FENASOJA}",
+                      "words":  [
+                                    {
+                                        "y":  39,
+                                        "height":  41,
+                                        "width":  77,
+                                        "text":  "14g",
+                                        "x":  317
+                                    },
+                                    {
+                                        "y":  36,
+                                        "height":  50,
+                                        "width":  308,
+                                        "text":  "FENASOJA}",
+                                        "x":  434
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "antecipando o fUtUfO",
+                      "words":  [
+                                    {
+                                        "y":  102,
+                                        "height":  31,
+                                        "width":  209,
+                                        "text":  "antecipando",
+                                        "x":  338
+                                    },
+                                    {
+                                        "y":  110,
+                                        "height":  20,
+                                        "width":  14,
+                                        "text":  "o",
+                                        "x":  570
+                                    },
+                                    {
+                                        "y":  106,
+                                        "height":  26,
+                                        "width":  96,
+                                        "text":  "fUtUfO",
+                                        "x":  607
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "6a 2002. santa Rosa • RS • Brasil",
+                      "words":  [
+                                    {
+                                        "y":  140,
+                                        "height":  15,
+                                        "width":  25,
+                                        "text":  "6a",
+                                        "x":  314
+                                    },
+                                    {
+                                        "y":  143,
+                                        "height":  16,
+                                        "width":  54,
+                                        "text":  "2002.",
+                                        "x":  466
+                                    },
+                                    {
+                                        "y":  144,
+                                        "height":  16,
+                                        "width":  47,
+                                        "text":  "santa",
+                                        "x":  526
+                                    },
+                                    {
+                                        "y":  145,
+                                        "height":  15,
+                                        "width":  39,
+                                        "text":  "Rosa",
+                                        "x":  580
+                                    },
+                                    {
+                                        "y":  152,
+                                        "height":  4,
+                                        "width":  6,
+                                        "text":  "•",
+                                        "x":  626
+                                    },
+                                    {
+                                        "y":  146,
+                                        "height":  15,
+                                        "width":  22,
+                                        "text":  "RS",
+                                        "x":  638
+                                    },
+                                    {
+                                        "y":  152,
+                                        "height":  5,
+                                        "width":  5,
+                                        "text":  "•",
+                                        "x":  666
+                                    },
+                                    {
+                                        "y":  147,
+                                        "height":  15,
+                                        "width":  47,
+                                        "text":  "Brasil",
+                                        "x":  678
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "COMISSÃO CENTRAL",
+                      "words":  [
+                                    {
+                                        "y":  213,
+                                        "height":  29,
+                                        "width":  194,
+                                        "text":  "COMISSÃO",
+                                        "x":  237
+                                    },
+                                    {
+                                        "y":  221,
+                                        "height":  24,
+                                        "width":  161,
+                                        "text":  "CENTRAL",
+                                        "x":  442
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Presidente: ÁLVARO EIDT",
+                      "words":  [
+                                    {
+                                        "y":  255,
+                                        "height":  22,
+                                        "width":  132,
+                                        "text":  "Presidente:",
+                                        "x":  237
+                                    },
+                                    {
+                                        "y":  249,
+                                        "height":  30,
+                                        "width":  104,
+                                        "text":  "ÁLVARO",
+                                        "x":  376
+                                    },
+                                    {
+                                        "y":  260,
+                                        "height":  20,
+                                        "width":  62,
+                                        "text":  "EIDT",
+                                        "x":  488
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Vice-Presidente: ALEXANDRE MORONI",
+                      "words":  [
+                                    {
+                                        "y":  283,
+                                        "height":  24,
+                                        "width":  192,
+                                        "text":  "Vice-Presidente:",
+                                        "x":  176
+                                    },
+                                    {
+                                        "y":  288,
+                                        "height":  21,
+                                        "width":  154,
+                                        "text":  "ALEXANDRE",
+                                        "x":  375
+                                    },
+                                    {
+                                        "y":  290,
+                                        "height":  21,
+                                        "width":  108,
+                                        "text":  "MORONI",
+                                        "x":  538
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "10 Tesoureiro: ATEMIR ZIMMERMANN",
+                      "words":  [
+                                    {
+                                        "y":  315,
+                                        "height":  19,
+                                        "width":  25,
+                                        "text":  "10",
+                                        "x":  203
+                                    },
+                                    {
+                                        "y":  315,
+                                        "height":  22,
+                                        "width":  132,
+                                        "text":  "Tesoureiro:",
+                                        "x":  235
+                                    },
+                                    {
+                                        "y":  318,
+                                        "height":  21,
+                                        "width":  102,
+                                        "text":  "ATEMIR",
+                                        "x":  375
+                                    },
+                                    {
+                                        "y":  319,
+                                        "height":  22,
+                                        "width":  183,
+                                        "text":  "ZIMMERMANN",
+                                        "x":  483
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "20 Tesoureiro: ZIMMERMANN",
+                      "words":  [
+                                    {
+                                        "y":  345,
+                                        "height":  19,
+                                        "width":  26,
+                                        "text":  "20",
+                                        "x":  201
+                                    },
+                                    {
+                                        "y":  345,
+                                        "height":  22,
+                                        "width":  132,
+                                        "text":  "Tesoureiro:",
+                                        "x":  235
+                                    },
+                                    {
+                                        "y":  349,
+                                        "height":  22,
+                                        "width":  183,
+                                        "text":  "ZIMMERMANN",
+                                        "x":  485
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Coordenador Gera: CLÉO ANTÔNIO ROCKENBACH",
+                      "words":  [
+                                    {
+                                        "y":  373,
+                                        "height":  23,
+                                        "width":  153,
+                                        "text":  "Coordenador",
+                                        "x":  138
+                                    },
+                                    {
+                                        "y":  376,
+                                        "height":  21,
+                                        "width":  69,
+                                        "text":  "Gera:",
+                                        "x":  297
+                                    },
+                                    {
+                                        "y":  371,
+                                        "height":  27,
+                                        "width":  66,
+                                        "text":  "CLÉO",
+                                        "x":  374
+                                    },
+                                    {
+                                        "y":  373,
+                                        "height":  27,
+                                        "width":  121,
+                                        "text":  "ANTÔNIO",
+                                        "x":  447
+                                    },
+                                    {
+                                        "y":  380,
+                                        "height":  22,
+                                        "width":  173,
+                                        "text":  "ROCKENBACH",
+                                        "x":  578
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Secretária Coordenação: ELENIR BATISTA",
+                      "words":  [
+                                    {
+                                        "y":  402,
+                                        "height":  22,
+                                        "width":  120,
+                                        "text":  "Secretária",
+                                        "x":  77
+                                    },
+                                    {
+                                        "y":  405,
+                                        "height":  26,
+                                        "width":  159,
+                                        "text":  "Coordenação:",
+                                        "x":  206
+                                    },
+                                    {
+                                        "y":  407,
+                                        "height":  21,
+                                        "width":  94,
+                                        "text":  "ELENIR",
+                                        "x":  375
+                                    },
+                                    {
+                                        "y":  409,
+                                        "height":  20,
+                                        "width":  108,
+                                        "text":  "BATISTA",
+                                        "x":  477
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Assessor, Coordenação: ANDRÉ WIEDERGRÜN",
+                      "words":  [
+                                    {
+                                        "y":  434,
+                                        "height":  22,
+                                        "width":  105,
+                                        "text":  "Assessor,",
+                                        "x":  93
+                                    },
+                                    {
+                                        "y":  435,
+                                        "height":  27,
+                                        "width":  159,
+                                        "text":  "Coordenação:",
+                                        "x":  205
+                                    },
+                                    {
+                                        "y":  432,
+                                        "height":  26,
+                                        "width":  90,
+                                        "text":  "ANDRÉ",
+                                        "x":  372
+                                    },
+                                    {
+                                        "y":  435,
+                                        "height":  25,
+                                        "width":  178,
+                                        "text":  "WIEDERGRÜN",
+                                        "x":  470
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRESIDENTES DE ÁREA",
+                      "words":  [
+                                    {
+                                        "y":  487,
+                                        "height":  24,
+                                        "width":  249,
+                                        "text":  "PRESIDENTES",
+                                        "x":  208
+                                    },
+                                    {
+                                        "y":  489,
+                                        "height":  22,
+                                        "width":  46,
+                                        "text":  "DE",
+                                        "x":  469
+                                    },
+                                    {
+                                        "y":  482,
+                                        "height":  30,
+                                        "width":  95,
+                                        "text":  "ÁREA",
+                                        "x":  525
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Agricultura.",
+                      "words":  [
+                                    {
+                                        "y":  524,
+                                        "height":  21,
+                                        "width":  120,
+                                        "text":  "Agricultura.",
+                                        "x":  178
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• DENIR FROSI",
+                      "words":  [
+                                    {
+                                        "y":  529,
+                                        "height":  5,
+                                        "width":  4,
+                                        "text":  "•",
+                                        "x":  294
+                                    },
+                                    {
+                                        "y":  525,
+                                        "height":  18,
+                                        "width":  75,
+                                        "text":  "DENIR",
+                                        "x":  307
+                                    },
+                                    {
+                                        "y":  526,
+                                        "height":  18,
+                                        "width":  71,
+                                        "text":  "FROSI",
+                                        "x":  390
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Exporural:",
+                      "words":  [
+                                    {
+                                        "y":  551,
+                                        "height":  22,
+                                        "width":  104,
+                                        "text":  "Exporural:",
+                                        "x":  194
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "JAIRTON DEZORDI",
+                      "words":  [
+                                    {
+                                        "y":  552,
+                                        "height":  19,
+                                        "width":  103,
+                                        "text":  "JAIRTON",
+                                        "x":  305
+                                    },
+                                    {
+                                        "y":  553,
+                                        "height":  19,
+                                        "width":  107,
+                                        "text":  "DEZORDI",
+                                        "x":  416
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "\u0027 AUGUSTO MORONI",
+                      "words":  [
+                                    {
+                                        "y":  576,
+                                        "height":  6,
+                                        "width":  6,
+                                        "text":  "\u0027",
+                                        "x":  255
+                                    },
+                                    {
+                                        "y":  579,
+                                        "height":  19,
+                                        "width":  112,
+                                        "text":  "AUGUSTO",
+                                        "x":  304
+                                    },
+                                    {
+                                        "y":  580,
+                                        "height":  19,
+                                        "width":  98,
+                                        "text":  "MORONI",
+                                        "x":  425
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Pecuaria:",
+                      "words":  [
+                                    {
+                                        "y":  578,
+                                        "height":  18,
+                                        "width":  93,
+                                        "text":  "Pecuaria:",
+                                        "x":  204
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Segurança.",
+                      "words":  [
+                                    {
+                                        "y":  606,
+                                        "height":  22,
+                                        "width":  113,
+                                        "text":  "Segurança.",
+                                        "x":  183
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• TEN CEL ERLO DOS SANTOS PttROSK1",
+                      "words":  [
+                                    {
+                                        "y":  610,
+                                        "height":  6,
+                                        "width":  5,
+                                        "text":  "•",
+                                        "x":  291
+                                    },
+                                    {
+                                        "y":  606,
+                                        "height":  18,
+                                        "width":  46,
+                                        "text":  "TEN",
+                                        "x":  303
+                                    },
+                                    {
+                                        "y":  607,
+                                        "height":  18,
+                                        "width":  41,
+                                        "text":  "CEL",
+                                        "x":  357
+                                    },
+                                    {
+                                        "y":  607,
+                                        "height":  19,
+                                        "width":  59,
+                                        "text":  "ERLO",
+                                        "x":  406
+                                    },
+                                    {
+                                        "y":  608,
+                                        "height":  19,
+                                        "width":  47,
+                                        "text":  "DOS",
+                                        "x":  474
+                                    },
+                                    {
+                                        "y":  609,
+                                        "height":  19,
+                                        "width":  91,
+                                        "text":  "SANTOS",
+                                        "x":  529
+                                    },
+                                    {
+                                        "y":  608,
+                                        "height":  22,
+                                        "width":  113,
+                                        "text":  "PttROSK1",
+                                        "x":  628
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MAJOR SÉRGIO FLORES DE CAMPOS",
+                      "words":  [
+                                    {
+                                        "y":  634,
+                                        "height":  18,
+                                        "width":  80,
+                                        "text":  "MAJOR",
+                                        "x":  304
+                                    },
+                                    {
+                                        "y":  628,
+                                        "height":  25,
+                                        "width":  89,
+                                        "text":  "SÉRGIO",
+                                        "x":  392
+                                    },
+                                    {
+                                        "y":  635,
+                                        "height":  20,
+                                        "width":  86,
+                                        "text":  "FLORES",
+                                        "x":  490
+                                    },
+                                    {
+                                        "y":  637,
+                                        "height":  18,
+                                        "width":  29,
+                                        "text":  "DE",
+                                        "x":  584
+                                    },
+                                    {
+                                        "y":  637,
+                                        "height":  20,
+                                        "width":  96,
+                                        "text":  "CAMPOS",
+                                        "x":  621
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ANTÔNIO CARLOS SIMÕES BALTAR",
+                      "words":  [
+                                    {
+                                        "y":  655,
+                                        "height":  25,
+                                        "width":  110,
+                                        "text":  "ANTÔNIO",
+                                        "x":  302
+                                    },
+                                    {
+                                        "y":  662,
+                                        "height":  19,
+                                        "width":  92,
+                                        "text":  "CARLOS",
+                                        "x":  420
+                                    },
+                                    {
+                                        "y":  659,
+                                        "height":  24,
+                                        "width":  90,
+                                        "text":  "SIMÕES",
+                                        "x":  519
+                                    },
+                                    {
+                                        "y":  664,
+                                        "height":  20,
+                                        "width":  89,
+                                        "text":  "BALTAR",
+                                        "x":  617
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SUprimentos:",
+                      "words":  [
+                                    {
+                                        "y":  660,
+                                        "height":  23,
+                                        "width":  135,
+                                        "text":  "SUprimentos:",
+                                        "x":  159
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Etnias:",
+                      "words":  [
+                                    {
+                                        "y":  688,
+                                        "height":  19,
+                                        "width":  68,
+                                        "text":  "Etnias:",
+                                        "x":  225
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ABDUL NASSER EL HAMOUI",
+                      "words":  [
+                                    {
+                                        "y":  689,
+                                        "height":  18,
+                                        "width":  79,
+                                        "text":  "ABDUL",
+                                        "x":  301
+                                    },
+                                    {
+                                        "y":  690,
+                                        "height":  18,
+                                        "width":  91,
+                                        "text":  "NASSER",
+                                        "x":  388
+                                    },
+                                    {
+                                        "y":  690,
+                                        "height":  19,
+                                        "width":  26,
+                                        "text":  "EL",
+                                        "x":  487
+                                    },
+                                    {
+                                        "y":  691,
+                                        "height":  20,
+                                        "width":  96,
+                                        "text":  "HAMOUI",
+                                        "x":  521
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "LUÍS EDUARDO RAMOS MARIATH",
+                      "words":  [
+                                    {
+                                        "y":  711,
+                                        "height":  24,
+                                        "width":  54,
+                                        "text":  "LUÍS",
+                                        "x":  302
+                                    },
+                                    {
+                                        "y":  717,
+                                        "height":  19,
+                                        "width":  113,
+                                        "text":  "EDUARDO",
+                                        "x":  364
+                                    },
+                                    {
+                                        "y":  718,
+                                        "height":  19,
+                                        "width":  83,
+                                        "text":  "RAMOS",
+                                        "x":  486
+                                    },
+                                    {
+                                        "y":  719,
+                                        "height":  20,
+                                        "width":  107,
+                                        "text":  "MARIATH",
+                                        "x":  577
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Divulgação:",
+                      "words":  [
+                                    {
+                                        "y":  714,
+                                        "height":  25,
+                                        "width":  119,
+                                        "text":  "Divulgação:",
+                                        "x":  173
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ELEMAR ANTÔNIO LENZ",
+                      "words":  [
+                                    {
+                                        "y":  744,
+                                        "height":  19,
+                                        "width":  92,
+                                        "text":  "ELEMAR",
+                                        "x":  301
+                                    },
+                                    {
+                                        "y":  739,
+                                        "height":  25,
+                                        "width":  111,
+                                        "text":  "ANTÔNIO",
+                                        "x":  400
+                                    },
+                                    {
+                                        "y":  746,
+                                        "height":  19,
+                                        "width":  56,
+                                        "text":  "LENZ",
+                                        "x":  520
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Bilheteria:",
+                      "words":  [
+                                    {
+                                        "y":  743,
+                                        "height":  19,
+                                        "width":  105,
+                                        "text":  "Bilheteria:",
+                                        "x":  187
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PEDRO LUÍS BÜTTENBENDER",
+                      "words":  [
+                                    {
+                                        "y":  772,
+                                        "height":  19,
+                                        "width":  79,
+                                        "text":  "PEDRO",
+                                        "x":  300
+                                    },
+                                    {
+                                        "y":  766,
+                                        "height":  25,
+                                        "width":  54,
+                                        "text":  "LUÍS",
+                                        "x":  387
+                                    },
+                                    {
+                                        "y":  768,
+                                        "height":  25,
+                                        "width":  185,
+                                        "text":  "BÜTTENBENDER",
+                                        "x":  450
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Cultura:",
+                      "words":  [
+                                    {
+                                        "y":  770,
+                                        "height":  20,
+                                        "width":  82,
+                                        "text":  "Cultura:",
+                                        "x":  209
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Promoções:",
+                      "words":  [
+                                    {
+                                        "y":  797,
+                                        "height":  23,
+                                        "width":  118,
+                                        "text":  "Promoções:",
+                                        "x":  172
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "IARA PILZ",
+                      "words":  [
+                                    {
+                                        "y":  799,
+                                        "height":  19,
+                                        "width":  59,
+                                        "text":  "IARA",
+                                        "x":  298
+                                    },
+                                    {
+                                        "y":  800,
+                                        "height":  19,
+                                        "width":  52,
+                                        "text":  "PILZ",
+                                        "x":  365
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Credenciamento:",
+                      "words":  [
+                                    {
+                                        "y":  823,
+                                        "height":  22,
+                                        "width":  171,
+                                        "text":  "Credenciamento:",
+                                        "x":  118
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RAFAEL MORONI",
+                      "words":  [
+                                    {
+                                        "y":  827,
+                                        "height":  19,
+                                        "width":  88,
+                                        "text":  "RAFAEL",
+                                        "x":  298
+                                    },
+                                    {
+                                        "y":  828,
+                                        "height":  19,
+                                        "width":  99,
+                                        "text":  "MORONI",
+                                        "x":  394
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Serviços:",
+                      "words":  [
+                                    {
+                                        "y":  852,
+                                        "height":  24,
+                                        "width":  91,
+                                        "text":  "Serviços:",
+                                        "x":  197
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ENIO GEHM",
+                      "words":  [
+                                    {
+                                        "y":  854,
+                                        "height":  19,
+                                        "width":  59,
+                                        "text":  "ENIO",
+                                        "x":  298
+                                    },
+                                    {
+                                        "y":  855,
+                                        "height":  19,
+                                        "width":  67,
+                                        "text":  "GEHM",
+                                        "x":  364
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Indústria e Comércio: JOSÉ LUÍS EIDT",
+                      "words":  [
+                                    {
+                                        "y":  875,
+                                        "height":  22,
+                                        "width":  92,
+                                        "text":  "Indústria",
+                                        "x":  70
+                                    },
+                                    {
+                                        "y":  883,
+                                        "height":  14,
+                                        "width":  11,
+                                        "text":  "e",
+                                        "x":  169
+                                    },
+                                    {
+                                        "y":  878,
+                                        "height":  22,
+                                        "width":  102,
+                                        "text":  "Comércio:",
+                                        "x":  186
+                                    },
+                                    {
+                                        "y":  876,
+                                        "height":  24,
+                                        "width":  58,
+                                        "text":  "JOSÉ",
+                                        "x":  295
+                                    },
+                                    {
+                                        "y":  877,
+                                        "height":  24,
+                                        "width":  54,
+                                        "text":  "LUÍS",
+                                        "x":  361
+                                    },
+                                    {
+                                        "y":  883,
+                                        "height":  19,
+                                        "width":  56,
+                                        "text":  "EIDT",
+                                        "x":  424
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "social: LUis ANTÓNIO KERBER",
+                      "words":  [
+                                    {
+                                        "y":  907,
+                                        "height":  19,
+                                        "width":  66,
+                                        "text":  "social:",
+                                        "x":  221
+                                    },
+                                    {
+                                        "y":  903,
+                                        "height":  24,
+                                        "width":  55,
+                                        "text":  "LUis",
+                                        "x":  296
+                                    },
+                                    {
+                                        "y":  904,
+                                        "height":  24,
+                                        "width":  110,
+                                        "text":  "ANTÓNIO",
+                                        "x":  358
+                                    },
+                                    {
+                                        "y":  910,
+                                        "height":  19,
+                                        "width":  90,
+                                        "text":  "KERBER",
+                                        "x":  477
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Infra-Estrutura: HEINZ LORENTZ",
+                      "words":  [
+                                    {
+                                        "y":  931,
+                                        "height":  22,
+                                        "width":  159,
+                                        "text":  "Infra-Estrutura:",
+                                        "x":  127
+                                    },
+                                    {
+                                        "y":  935,
+                                        "height":  19,
+                                        "width":  73,
+                                        "text":  "HEINZ",
+                                        "x":  296
+                                    },
+                                    {
+                                        "y":  936,
+                                        "height":  19,
+                                        "width":  106,
+                                        "text":  "LORENTZ",
+                                        "x":  377
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Conesul: FREDI ORLANDO ACOSTA",
+                      "words":  [
+                                    {
+                                        "y":  960,
+                                        "height":  20,
+                                        "width":  87,
+                                        "text":  "Conesul:",
+                                        "x":  199
+                                    },
+                                    {
+                                        "y":  962,
+                                        "height":  19,
+                                        "width":  71,
+                                        "text":  "FREDI",
+                                        "x":  295
+                                    },
+                                    {
+                                        "y":  963,
+                                        "height":  19,
+                                        "width":  114,
+                                        "text":  "ORLANDO",
+                                        "x":  374
+                                    },
+                                    {
+                                        "y":  963,
+                                        "height":  19,
+                                        "width":  91,
+                                        "text":  "ACOSTA",
+                                        "x":  496
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Assessor Jurídico: JOSÉ MAURO BARBIERI",
+                      "words":  [
+                                    {
+                                        "y":  985,
+                                        "height":  20,
+                                        "width":  88,
+                                        "text":  "Assessor",
+                                        "x":  106
+                                    },
+                                    {
+                                        "y":  986,
+                                        "height":  21,
+                                        "width":  86,
+                                        "text":  "Jurídico:",
+                                        "x":  199
+                                    },
+                                    {
+                                        "y":  984,
+                                        "height":  23,
+                                        "width":  57,
+                                        "text":  "JOSÉ",
+                                        "x":  293
+                                    },
+                                    {
+                                        "y":  990,
+                                        "height":  18,
+                                        "width":  85,
+                                        "text":  "MAURO",
+                                        "x":  359
+                                    },
+                                    {
+                                        "y":  990,
+                                        "height":  19,
+                                        "width":  113,
+                                        "text":  "BARBIERI",
+                                        "x":  453
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Assessor Contábil: ALDAIR JOSÉ HOLZ",
+                      "words":  [
+                                    {
+                                        "y":  1012,
+                                        "height":  19,
+                                        "width":  88,
+                                        "text":  "Assessor",
+                                        "x":  101
+                                    },
+                                    {
+                                        "y":  1013,
+                                        "height":  20,
+                                        "width":  89,
+                                        "text":  "Contábil:",
+                                        "x":  195
+                                    },
+                                    {
+                                        "y":  1016,
+                                        "height":  18,
+                                        "width":  88,
+                                        "text":  "ALDAIR",
+                                        "x":  293
+                                    },
+                                    {
+                                        "y":  1011,
+                                        "height":  24,
+                                        "width":  56,
+                                        "text":  "JOSÉ",
+                                        "x":  389
+                                    },
+                                    {
+                                        "y":  1017,
+                                        "height":  18,
+                                        "width":  61,
+                                        "text":  "HOLZ",
+                                        "x":  454
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Assessor Imprensa: ELIZEU FERRO",
+                      "words":  [
+                                    {
+                                        "y":  1039,
+                                        "height":  19,
+                                        "width":  88,
+                                        "text":  "Assessor",
+                                        "x":  87
+                                    },
+                                    {
+                                        "y":  1040,
+                                        "height":  22,
+                                        "width":  103,
+                                        "text":  "Imprensa:",
+                                        "x":  181
+                                    },
+                                    {
+                                        "y":  1042,
+                                        "height":  19,
+                                        "width":  80,
+                                        "text":  "ELIZEU",
+                                        "x":  294
+                                    },
+                                    {
+                                        "y":  1043,
+                                        "height":  19,
+                                        "width":  76,
+                                        "text":  "FERRO",
+                                        "x":  383
+                                    }
+                                ]
+                  }
+              ]
+}

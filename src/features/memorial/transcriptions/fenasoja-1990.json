@@ -1,0 +1,239 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 31 DE MARÇO A\n08 DE ABRIL DE 1990",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "PEDRO CAPPENEDO",
+          "status": "verified",
+          "sourceRegion": [
+            0.32288,
+            0.24428,
+            0.48287,
+            0.02741
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "VALDIR TUPPA CAPPENEDO",
+          "status": "verified",
+          "sourceRegion": [
+            0.28022,
+            0.26082,
+            0.5357,
+            0.02776
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "ANTENOR IRINEU PUNTEL",
+          "status": "verified",
+          "sourceRegion": [
+            0.22698,
+            0.27722,
+            0.57772,
+            0.02803
+          ]
+        },
+        {
+          "role": "SECRETÁRIO EXECUTIVO",
+          "name": "CLÁUDIO KLEIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.22102,
+            0.29397,
+            0.53414,
+            0.02756
+          ]
+        },
+        {
+          "role": "TESOUREIRO GERAL",
+          "name": "BENALDO LIBERALI",
+          "status": "verified",
+          "sourceRegion": [
+            0.25998,
+            0.31105,
+            0.50113,
+            0.02718
+          ],
+          "note": "Grafia conferida visualmente: BENALDO LIBERALI."
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "HERBERTO WERNER",
+          "status": "verified",
+          "sourceRegion": [
+            0.22034,
+            0.41817,
+            0.51685,
+            0.02669
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "ÁLVARO ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.35164,
+            0.43558,
+            0.46287,
+            0.02615
+          ]
+        },
+        {
+          "role": "AGRICULTURA",
+          "name": "FERNADO DALL'AGNESE",
+          "status": "verified",
+          "sourceRegion": [
+            0.31608,
+            0.45154,
+            0.52515,
+            0.02657
+          ],
+          "note": "Grafia conferida visualmente: FERNADO DALL'AGNESE."
+        },
+        {
+          "role": "APROVEITAMENTO DA SOJA",
+          "name": "BERNARDO KERKHOF",
+          "status": "verified",
+          "sourceRegion": [
+            0.18915,
+            0.46671,
+            0.58766,
+            0.02699
+          ]
+        },
+        {
+          "role": "ASSUNTOS INTERNACIONAIS",
+          "name": "ANTONIO CARLOS SILVEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.18337,
+            0.48282,
+            0.63895,
+            0.02731
+          ]
+        },
+        {
+          "role": "CULTURA",
+          "name": "HOMERO CELSO JUNGES",
+          "status": "verified",
+          "sourceRegion": [
+            0.36206,
+            0.50038,
+            0.44929,
+            0.02567
+          ]
+        },
+        {
+          "role": "SOCIAL",
+          "name": "JOÃO MOYSES DOS SANTOS HUDSON",
+          "status": "verified",
+          "sourceRegion": [
+            0.38007,
+            0.51657,
+            0.55257,
+            0.02641
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "PEDRO JOÃO STEFFEN",
+          "status": "verified",
+          "sourceRegion": [
+            0.32075,
+            0.53208,
+            0.47916,
+            0.02573
+          ]
+        },
+        {
+          "role": "INFRAESTRUTURA",
+          "name": "PEDRO IGNÁCIO BÜTTENBENDER",
+          "status": "verified",
+          "sourceRegion": [
+            0.27935,
+            0.54769,
+            0.61346,
+            0.02672
+          ]
+        },
+        {
+          "role": "SEGURANÇA E TRÂNSITO",
+          "name": "FLÁVIO VIEIRA HAIGERT",
+          "status": "verified",
+          "sourceRegion": [
+            0.21413,
+            0.56305,
+            0.59204,
+            0.02646
+          ]
+        },
+        {
+          "role": "PROMOÇÕES E DIVERSÕES",
+          "name": "SÉRGIO AMBROS MALLMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.19693,
+            0.57875,
+            0.66354,
+            0.02693
+          ]
+        },
+        {
+          "role": "HORTIGRANJEIROS",
+          "name": "CLETO BORTOLI",
+          "status": "verified",
+          "sourceRegion": [
+            0.27008,
+            0.59511,
+            0.45554,
+            0.02519
+          ]
+        },
+        {
+          "role": "TRANSPORTES",
+          "name": "OLAVO CUNEGATTI",
+          "status": "verified",
+          "sourceRegion": [
+            0.31189,
+            0.61117,
+            0.4546,
+            0.0251
+          ]
+        },
+        {
+          "role": "SAÚDE",
+          "name": "PAULO TADEU T. DE LIMA",
+          "status": "verified",
+          "sourceRegion": [
+            0.38146,
+            0.62739,
+            0.42268,
+            0.02476
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "DE 31 DE MARÇO A\n08 DE ABRIL DE 1990",
+    "Cabeçalho impresso: 8ª FENASOJA.",
+    "Os cargos estão na coluna esquerda e os nomes na coluna direita, nas duas seções; namesFirst é false.",
+    "Conferência visual integral da fotografia original IMG_1154.jpeg e da face retificada fenasoja-1990.webp, incluindo ampliações locais das duas tabelas. O OCR foi tratado apenas como rascunho.",
+    "As regiões são localizadores aproximados normalizados na face retificada, em ordem [x, y, largura, altura]; não constituem garantia de recorte OCR.",
+    "A capitalização, as grafias, a pontuação visível e a ordem foram preservadas sem consulta a fontes externas. Os cargos desta peça não incluem dois-pontos.",
+    "Há 19 registros verificados: 5 na COMISSÃO CENTRAL e 14 em PRESIDENTES DE ÁREA. Nenhum cargo ou nome foi marcado ilegível.",
+    "O campo inferior após SAÚDE e PAULO TADEU T. DE LIMA está vazio. Aproximadamente de y=0.64 até a borda inferior da face retificada não há inscrição visível; esse espaço deve permanecer vazio."
+  ]
+}

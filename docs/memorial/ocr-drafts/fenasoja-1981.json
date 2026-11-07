@@ -1,0 +1,99 @@
+﻿{
+    "status":  "UNREVIEWED_DRAFT",
+    "engine":  "Windows.Media.Ocr pt-BR",
+    "lines":  [
+                  {
+                      "text":  "PRE3DFN7E-s",
+                      "words":  [
+                                    {
+                                        "y":  683,
+                                        "height":  13,
+                                        "width":  130,
+                                        "text":  "PRE3DFN7E-s",
+                                        "x":  427
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DIVULGAÇÃO\u0027",
+                      "words":  [
+                                    {
+                                        "y":  740,
+                                        "height":  26,
+                                        "width":  131,
+                                        "text":  "DIVULGAÇÃO\u0027",
+                                        "x":  361
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "-PROMOÇÕES",
+                      "words":  [
+                                    {
+                                        "y":  766,
+                                        "height":  22,
+                                        "width":  135,
+                                        "text":  "-PROMOÇÕES",
+                                        "x":  353
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ÉNERCjAS ALTERNATIVAS",
+                      "words":  [
+                                    {
+                                        "y":  788,
+                                        "height":  22,
+                                        "width":  96,
+                                        "text":  "ÉNERCjAS",
+                                        "x":  245
+                                    },
+                                    {
+                                        "y":  788,
+                                        "height":  20,
+                                        "width":  145,
+                                        "text":  "ALTERNATIVAS",
+                                        "x":  346
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DE •fiEODOPO",
+                      "words":  [
+                                    {
+                                        "y":  814,
+                                        "height":  15,
+                                        "width":  27,
+                                        "text":  "DE",
+                                        "x":  290
+                                    },
+                                    {
+                                        "y":  811,
+                                        "height":  20,
+                                        "width":  112,
+                                        "text":  "•fiEODOPO",
+                                        "x":  565
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• \u0027BILHEtFR14$:",
+                      "words":  [
+                                    {
+                                        "y":  841,
+                                        "height":  2,
+                                        "width":  3,
+                                        "text":  "•",
+                                        "x":  366
+                                    },
+                                    {
+                                        "y":  829,
+                                        "height":  29,
+                                        "width":  134,
+                                        "text":  "\u0027BILHEtFR14$:",
+                                        "x":  372
+                                    }
+                                ]
+                  }
+              ]
+}

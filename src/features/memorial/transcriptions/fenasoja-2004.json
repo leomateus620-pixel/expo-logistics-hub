@@ -1,0 +1,202 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "Presidente:",
+          "name": "Alexandre Moroni",
+          "status": "verified",
+          "sourceRegion": [0.29, 0.294, 0.44, 0.021]
+        },
+        {
+          "role": "Vice-Presidente:",
+          "name": "Heinz Lorentz",
+          "status": "verified",
+          "sourceRegion": [0.23, 0.316, 0.47, 0.021]
+        },
+        {
+          "role": "1º Tesoureiro:",
+          "name": "Atemir Zimmermann",
+          "status": "verified",
+          "sourceRegion": [0.26, 0.338, 0.49, 0.021]
+        },
+        {
+          "role": "2º Tesoureiro:",
+          "name": "Leomar Tesche",
+          "status": "verified",
+          "sourceRegion": [0.26, 0.36, 0.43, 0.021]
+        },
+        {
+          "role": "Coordenador Geral:",
+          "name": "Cléo Antonio Rockenbach",
+          "status": "verified",
+          "sourceRegion": [0.21, 0.382, 0.62, 0.021]
+        },
+        {
+          "role": "Secretária:",
+          "name": "Elenir Batista Junges (KIKA)",
+          "status": "verified",
+          "sourceRegion": [0.3, 0.403, 0.59, 0.021]
+        },
+        {
+          "role": "Auxiliar Administrativo:",
+          "name": "Francis Becker",
+          "status": "verified",
+          "sourceRegion": [0.12, 0.425, 0.59, 0.021]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "Agricultura:",
+          "name": "Fábio Scalco",
+          "status": "verified",
+          "sourceRegion": [0.285, 0.524, 0.4, 0.021]
+        },
+        {
+          "role": "Exporural:",
+          "name": "Jairton Dezordi",
+          "status": "verified",
+          "sourceRegion": [0.31, 0.546, 0.42, 0.021]
+        },
+        {
+          "role": "Pecuária:",
+          "name": "Milton Racho",
+          "status": "verified",
+          "sourceRegion": [0.33, 0.568, 0.36, 0.021]
+        },
+        {
+          "role": "Segurança:",
+          "name": "Major Abel Monteiro de Souza",
+          "status": "verified",
+          "sourceRegion": [0.31, 0.59, 0.58, 0.021]
+        },
+        {
+          "role": "Suprimentos:",
+          "name": "Alexandre Massotti da Silva",
+          "status": "verified",
+          "sourceRegion": [0.28, 0.612, 0.6, 0.021]
+        },
+        {
+          "role": "Etnias:",
+          "name": "Osmar Zamin",
+          "status": "verified",
+          "sourceRegion": [0.35, 0.634, 0.34, 0.021]
+        },
+        {
+          "role": "Divulgação:",
+          "name": "Antonio Carlos Simões Baltar",
+          "status": "verified",
+          "sourceRegion": [0.3, 0.656, 0.59, 0.021]
+        },
+        {
+          "role": "Bilheteria:",
+          "name": "Elemar Antonio Lenz",
+          "status": "verified",
+          "sourceRegion": [0.3, 0.678, 0.48, 0.021]
+        },
+        {
+          "role": "Cultura:",
+          "name": "Luis Artur Hoffmann",
+          "status": "verified",
+          "sourceRegion": [0.33, 0.7, 0.45, 0.021]
+        },
+        {
+          "role": "Promoções:",
+          "name": "Amauri de Souza Ribeiro",
+          "status": "verified",
+          "sourceRegion": [0.31, 0.722, 0.53, 0.021]
+        },
+        {
+          "role": "Credenciamento:",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [0.23, 0.744, 0.47, 0.022],
+          "note": "O prenome Rafael está legível. Um reflexo sobre o sobrenome impede confirmar a grafia integral; nenhuma sugestão do OCR foi adotada para esse trecho."
+        },
+        {
+          "role": "Serviços:",
+          "name": "Carlos Augusto Lozekam",
+          "status": "verified",
+          "sourceRegion": [0.34, 0.766, 0.49, 0.024],
+          "note": "Há reflexo sobre parte de Augusto, mas as letras permanecem distinguíveis na fotografia original ampliada."
+        },
+        {
+          "role": "Indústria e Comércio:",
+          "name": "Luiz Carlos Netz",
+          "status": "verified",
+          "sourceRegion": [0.16, 0.788, 0.58, 0.023]
+        },
+        {
+          "role": "Social:",
+          "name": "Geraldo Eidt",
+          "status": "verified",
+          "sourceRegion": [0.35, 0.81, 0.34, 0.021]
+        },
+        {
+          "role": "Infra-estrutura:",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [0.23, 0.832, 0.58, 0.023],
+          "note": "Os sobrenomes Liberali Paes estão legíveis. A grafia e a acentuação exatas do prenome não foram confirmadas na fotografia; a leitura sugerida pelo OCR não foi promovida a conteúdo verificado."
+        },
+        {
+          "role": "Conesul:",
+          "name": "Fredi Orlando Acosta",
+          "status": "verified",
+          "sourceRegion": [0.34, 0.854, 0.45, 0.021]
+        },
+        {
+          "role": "Da Soja e Derivados:",
+          "name": "Denise Lorentz",
+          "status": "verified",
+          "sourceRegion": [0.18, 0.876, 0.55, 0.022]
+        },
+        {
+          "role": "Assessoria Jurídica:",
+          "name": "José Mauro Barbieri",
+          "status": "verified",
+          "sourceRegion": [0.18, 0.898, 0.62, 0.022]
+        },
+        {
+          "role": "Assessoria Contábil:",
+          "name": "Aldair José Holz",
+          "status": "verified",
+          "sourceRegion": [0.18, 0.92, 0.56, 0.022]
+        },
+        {
+          "role": "Assessoria Imprensa:",
+          "name": "Elizeu Ferro",
+          "status": "verified",
+          "sourceRegion": [0.18, 0.942, 0.5, 0.022]
+        }
+      ]
+    },
+    {
+      "title": "Crédito da peça",
+      "lines": [
+        {
+          "role": "",
+          "name": "PREMIER TROFÉUS 3512 4095",
+          "status": "verified",
+          "sourceRegion": [0.972, 0.78, 0.025, 0.174],
+          "note": "Crédito impresso verticalmente junto à borda direita, lido após rotação apenas para inspeção."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "01 a 09 de maio de 2004",
+    "Cabeçalho impresso: FENASOJA; Alimentando a economia.",
+    "Conferência visual da fotografia original 15a_Fenasoja_2004.jpeg e da face retificada fenasoja-2004.webp, incluindo ampliações locais sem geração de letras.",
+    "As regiões são localizadores aproximados normalizados na face retificada, em ordem [x, y, largura, altura]; não constituem garantia de recorte OCR.",
+    "Os dois-pontos fazem parte dos cargos transcritos. A ordem, a capitalização e as grafias legíveis foram preservadas, sem correções por fontes externas.",
+    "Há 27 linhas de cargos e nomes: 25 verificadas e 2 com trecho não confirmado. O crédito lateral constitui uma linha verificada adicional.",
+    "O título Crédito da peça organiza o rodapé e não integra a inscrição original."
+  ]
+}

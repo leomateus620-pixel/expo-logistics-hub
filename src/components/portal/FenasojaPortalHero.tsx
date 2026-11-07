@@ -39,12 +39,13 @@ const INTRO_VISIBILITY_THRESHOLD = 0.35;
 
 interface FenasojaPortalHeroProps {
   onIntroReleased?: () => void;
+  introSuppressed?: boolean;
 }
 
-export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroReleased }: FenasojaPortalHeroProps) {
+export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroReleased, introSuppressed = false }: FenasojaPortalHeroProps) {
   const heroRef = useRef<HTMLElement>(null);
   const [presentation, setPresentation] = useState<IntroPresentation>(() => (
-    shouldAutoplayAlvoradaIntro() ? 'waiting' : 'done'
+    !introSuppressed && shouldAutoplayAlvoradaIntro() ? 'waiting' : 'done'
   ));
   const [introStage, setIntroStage] = useState<AlvoradaIntroStage>('preparing');
   const presentationRef = useRef<IntroPresentation>(presentation);
@@ -71,6 +72,8 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroRele
     telemetry.mark('engine-selected', { engine: 'unavailable', reason: 'chunk-failed' });
     finishIntro();
   }, [finishIntro]);
+
+  useEffect(() => { if (introSuppressed) finishIntro(); }, [introSuppressed, finishIntro]);
 
   useEffect(() => () => {
     if (leaveTimer.current !== null) window.clearTimeout(leaveTimer.current);

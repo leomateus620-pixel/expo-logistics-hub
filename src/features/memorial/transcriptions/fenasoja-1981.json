@@ -1,0 +1,227 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 01 A 13 DE AGOSTO DE 1981",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "NILSO FORTUNATO GUIDOLIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.35,
+            0.26,
+            0.5,
+            0.02
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "ANACLETO LUIZ GIOVELLI",
+          "status": "verified",
+          "sourceRegion": [
+            0.29,
+            0.276,
+            0.535,
+            0.02
+          ],
+          "note": "Primeiro dos cinco nomes sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "WILLY KLAUS",
+          "status": "verified",
+          "sourceRegion": [
+            0.555,
+            0.292,
+            0.15,
+            0.02
+          ],
+          "note": "Segundo nome sob o cargo compartilhado VICE-PRESIDENTES; o cargo aparece apenas na primeira linha."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "EUGÊNIO PILZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.555,
+            0.308,
+            0.15,
+            0.02
+          ],
+          "note": "Terceiro nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "ADELKI CAMILO BELTRAME",
+          "status": "verified",
+          "sourceRegion": [
+            0.555,
+            0.324,
+            0.27,
+            0.02
+          ],
+          "note": "Quarto nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "IRINEU BIGOLIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.555,
+            0.34,
+            0.18,
+            0.02
+          ],
+          "note": "Quinto nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "OSVALDO COSTA FILHO",
+          "status": "verified",
+          "sourceRegion": [
+            0.25,
+            0.356,
+            0.545,
+            0.02
+          ]
+        },
+        {
+          "role": "SECRETÁRIAS",
+          "name": "CLECI MENECHEL",
+          "status": "verified",
+          "sourceRegion": [
+            0.34,
+            0.372,
+            0.395,
+            0.02
+          ],
+          "note": "Primeiro dos três nomes sob o cargo compartilhado SECRETÁRIAS."
+        },
+        {
+          "role": "SECRETÁRIAS",
+          "name": "DEISI RABUSKE",
+          "status": "verified",
+          "sourceRegion": [
+            0.555,
+            0.388,
+            0.16,
+            0.02
+          ],
+          "note": "Segundo nome sob o cargo compartilhado SECRETÁRIAS."
+        },
+        {
+          "role": "SECRETÁRIAS",
+          "name": "TAIS BELTRAME",
+          "status": "verified",
+          "sourceRegion": [
+            0.555,
+            0.404,
+            0.18,
+            0.02
+          ],
+          "note": "Terceiro nome sob o cargo compartilhado SECRETÁRIAS. A grafia TAIS foi preservada como está visível na placa."
+        },
+        {
+          "role": "SECRETÁRIOS EXECUTIVOS",
+          "name": "ECLAIR MORAGINSKI",
+          "status": "verified",
+          "sourceRegion": [
+            0.22,
+            0.42,
+            0.555,
+            0.02
+          ],
+          "note": "Primeiro dos dois nomes sob o cargo compartilhado SECRETÁRIOS EXECUTIVOS."
+        },
+        {
+          "role": "SECRETÁRIOS EXECUTIVOS",
+          "name": "BILMAR STEFFEN",
+          "status": "verified",
+          "sourceRegion": [
+            0.555,
+            0.436,
+            0.18,
+            0.02
+          ],
+          "note": "Segundo nome sob o cargo compartilhado SECRETÁRIOS EXECUTIVOS."
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "ALCIDES VICINI",
+          "status": "verified",
+          "sourceRegion": [
+            0.342,
+            0.53,
+            0.405,
+            0.021
+          ]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "PAULO MADEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.342,
+            0.546,
+            0.42,
+            0.021
+          ]
+        },
+        {
+          "role": "ENERGIAS ALTERNATIVAS",
+          "name": "MOISÉS TEIXEIRA PAZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.23,
+            0.562,
+            0.56,
+            0.021
+          ]
+        },
+        {
+          "role": "ANIMAIS DE PEQUENO PORTE",
+          "name": "TEODORO DUTRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.187,
+            0.578,
+            0.56,
+            0.021
+          ]
+        },
+        {
+          "role": "BILHETERIA",
+          "name": "SAUL DANTE LIBERALI",
+          "status": "verified",
+          "sourceRegion": [
+            0.355,
+            0.594,
+            0.435,
+            0.021
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Título original: 5ª FENASOJA.",
+    "DE 01 A 13 DE AGOSTO DE 1981",
+    "Transcrição visual da fotografia IMG_1151.jpeg e da face retificada fenasoja-1981.webp, com conferência ampliada de todas as linhas da Comissão Central e das cinco linhas de PRESIDENTES DE ÁREA.",
+    "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+    "Os cargos compartilhados VICE-PRESIDENTES, SECRETÁRIAS e SECRETÁRIOS EXECUTIVOS foram repetidos nas entradas para preservar a associação e a ordem dos nomes.",
+    "Todos os nomes e cargos foram confirmados visualmente nesta fotografia; não houve preenchimento de lacunas por inferência de outras edições.",
+    "O amplo campo inferior da placa não contém outras inscrições visíveis e foi mantido vazio, sem criação de linhas ou conteúdo para preenchê-lo.",
+    "namesFirst é false porque os cargos aparecem à esquerda e os nomes à direita na fotografia.",
+    "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+    "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida."
+  ]
+}
