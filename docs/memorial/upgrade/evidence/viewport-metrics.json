@@ -1,0 +1,121 @@
+[
+  {
+    "requested": [
+      1366,
+      768
+    ],
+    "columns": "7",
+    "header": 78.34429931640625,
+    "height": 768,
+    "layoutHeight": 776,
+    "pageOverflow": false,
+    "scale": "0.7847938144329897",
+    "scrollHeight": 776,
+    "svgHeight": "776",
+    "total": 26,
+    "visible": 26,
+    "width": 1366
+  },
+  {
+    "requested": [
+      1440,
+      900
+    ],
+    "columns": "7",
+    "header": 78.34429931640625,
+    "height": 900,
+    "layoutHeight": 776,
+    "pageOverflow": false,
+    "scale": "0.9548969072164949",
+    "scrollHeight": 776,
+    "svgHeight": "776",
+    "total": 26,
+    "visible": 26,
+    "width": 1440
+  },
+  {
+    "requested": [
+      1920,
+      1080
+    ],
+    "columns": "7",
+    "header": 78.34429931640625,
+    "height": 1080,
+    "layoutHeight": 776,
+    "pageOverflow": false,
+    "scale": "1.1868556701030928",
+    "scrollHeight": 776,
+    "svgHeight": "776",
+    "total": 26,
+    "visible": 26,
+    "width": 1920
+  },
+  {
+    "requested": [
+      360,
+      800
+    ],
+    "columns": "2",
+    "header": 91.65296173095705,
+    "height": 800,
+    "layoutHeight": 2414,
+    "pageOverflow": false,
+    "scale": "0.9148936170212766",
+    "scrollHeight": 2414,
+    "svgHeight": "2414",
+    "total": 26,
+    "visible": 6,
+    "width": 360
+  },
+  {
+    "requested": [
+      390,
+      844
+    ],
+    "columns": "3",
+    "header": 91.65296173095705,
+    "height": 844,
+    "layoutHeight": 1686,
+    "pageOverflow": false,
+    "scale": "0.6925925925925925",
+    "scrollHeight": 1686,
+    "svgHeight": "1686",
+    "total": 26,
+    "visible": 15,
+    "width": 390
+  },
+  {
+    "requested": [
+      430,
+      932
+    ],
+    "columns": "3",
+    "header": 91.65296173095705,
+    "height": 932,
+    "layoutHeight": 1686,
+    "pageOverflow": false,
+    "scale": "0.7666666666666667",
+    "scrollHeight": 1686,
+    "svgHeight": "1686",
+    "total": 26,
+    "visible": 15,
+    "width": 430
+  },
+  {
+    "requested": [
+      844,
+      390
+    ],
+    "columns": "5",
+    "header": 67.54386138916016,
+    "height": 390,
+    "layoutHeight": 1140,
+    "pageOverflow": false,
+    "scale": "0.9124423963133641",
+    "scrollHeight": 1140,
+    "svgHeight": "1140",
+    "total": 26,
+    "visible": 5,
+    "width": 844
+  }
+]

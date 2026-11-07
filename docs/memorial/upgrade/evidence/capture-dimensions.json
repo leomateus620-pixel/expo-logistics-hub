@@ -1,0 +1,98 @@
+{
+  "after-accessible-reading.jpg": [
+    390,
+    844
+  ],
+  "after-desktop-inspection.jpg": [
+    1366,
+    768
+  ],
+  "after-desktop-reading-zoom.jpg": [
+    1440,
+    900
+  ],
+  "after-gallery-1366x768.jpg": [
+    1366,
+    768
+  ],
+  "after-gallery-1440x900.jpg": [
+    1440,
+    900
+  ],
+  "after-gallery-1920x1080.jpg": [
+    1920,
+    1080
+  ],
+  "after-gallery-360x800.jpg": [
+    360,
+    800
+  ],
+  "after-gallery-390x844.jpg": [
+    390,
+    844
+  ],
+  "after-gallery-430x932.jpg": [
+    430,
+    932
+  ],
+  "after-gallery-844x390.jpg": [
+    844,
+    390
+  ],
+  "after-mobile-2012.jpg": [
+    390,
+    843
+  ],
+  "after-mobile-2014.jpg": [
+    390,
+    843
+  ],
+  "after-mobile-2026.jpg": [
+    390,
+    843
+  ],
+  "after-mobile-390-inspection.jpg": [
+    390,
+    844
+  ],
+  "after-mobile-document-2020.jpg": [
+    390,
+    843
+  ],
+  "after-mobile-epilogue.jpg": [
+    390,
+    843
+  ],
+  "before-desktop-detail.jpg": [
+    1366,
+    768
+  ],
+  "before-desktop-gallery.jpg": [
+    1366,
+    768
+  ],
+  "fallback-context-loss.jpg": [
+    1123,
+    632
+  ],
+  "fallback-no-webgl.jpg": [
+    1123,
+    632
+  ],
+  "interaction-1-gallery.jpg": [
+    390,
+    844
+  ],
+  "interaction-2-inspection.jpg": [
+    390,
+    844
+  ],
+  "interaction-3-manipulation.jpg": [
+    390,
+    844
+  ],
+  "interaction-4-return.jpg": [
+    390,
+    844
+  ]
+}

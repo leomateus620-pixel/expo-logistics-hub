@@ -46,6 +46,7 @@ if (qa.get('media')==='slow' || qa.get('media')==='fail') {
 export function Diagnostic() {
   const [params,setParams]=useSearchParams();
   const [surface,setSurface]=useState<Element>();
+  const [gestureResult,setGestureResult]=useState('');
   const state=readEcosystemLocation(params) ?? {view:'organization' as const};
   useLayoutEffect(()=> {setSurface(document.querySelector('[data-testid="ecosystem-experience"]') ?? undefined);},[]);
   return <>
@@ -58,6 +59,28 @@ export function Diagnostic() {
         const canvas=document.querySelector<HTMLCanvasElement>('.memorial canvas');
         const context=canvas?.getContext('webgl2'); context?.getExtension('WEBGL_lose_context')?.loseContext();
       }}>Simular perda de contexto</button>
+      <button type="button" style={{minHeight:44,padding:8,border:'1px solid #a38852'}} onClick={()=> {
+        const target=document.querySelector<HTMLElement>('.memorial-viewer__stage') ?? document.querySelector<HTMLElement>('.memorial-viewport');
+        if (!target) return;
+        const rect=target.getBoundingClientRect();
+        const read=()=>document.querySelector('.memorial-viewer__stage')?.getAttribute('data-pose') ?? document.querySelector('.memorial-timeline')?.getAttribute('style');
+        const samples:Record<string,unknown>={kind:'synthetic PointerEvents; capture stubbed; not physical multitouch',before:read()};
+        // Synthetic pointer IDs cannot own native capture. Only this isolated fixture
+        // stubs capture; production controls and browser gestures remain unchanged.
+        const capture=target.setPointerCapture, has=target.hasPointerCapture, release=target.releasePointerCapture;
+        target.setPointerCapture=()=>undefined;target.hasPointerCapture=()=>false;target.releasePointerCapture=()=>undefined;
+        const event=(type:string,id:number,x:number,y:number)=>target.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',button:0,buttons:type==='pointerup'?0:1,isPrimary:id===9001,clientX:rect.left+x,clientY:rect.top+y,bubbles:true,cancelable:true}));
+        try {
+          event('pointerdown',9001,100,140);event('pointermove',9001,120,150);samples.rotate=read();
+          event('pointerdown',9002,220,150);event('pointermove',9002,270,175);samples.pinch=read();
+          event('pointerup',9002,270,175);event('pointermove',9001,122,152);samples.resume=read();
+          event('pointercancel',9001,122,152);const cancelled=read();event('pointermove',9001,350,350);samples.cancelStable=read()===cancelled;
+          event('pointerdown',9001,100,140);event('pointerdown',9002,220,150);event('lostpointercapture',9002,220,150);event('pointermove',9001,102,142);samples.lostCapture=read();
+          window.dispatchEvent(new Event('blur'));const blurred=read();event('pointermove',9001,360,360);samples.blurStable=read()===blurred;
+        } finally {target.setPointerCapture=capture;target.hasPointerCapture=has;target.releasePointerCapture=release;}
+        setGestureResult(JSON.stringify(samples));
+      }}>Testar transições de toque</button>
+      <output data-gesture-result style={{display:'block',maxHeight:120,overflow:'auto',overflowWrap:'anywhere'}}>{gestureResult}</output>
     </details>,surface)}
   </>;
 }

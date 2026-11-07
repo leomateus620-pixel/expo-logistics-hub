@@ -1,0 +1,18 @@
+{
+  "viewport": [
+    390,
+    844
+  ],
+  "galleryBefore": "width: 540px; height: 1686px; transform: translate3d(2.84217e-14px, -494.711px, 0px) scale(0.692593);",
+  "inspectionPose": {
+    "scale": 1.953125,
+    "x": 0,
+    "y": -24.9765625,
+    "yaw": 0.12,
+    "pitch": 0
+  },
+  "galleryAfter": "width: 540px; height: 1686px; transform: translate3d(2.84217e-14px, -494.711px, 0px) scale(0.692593);",
+  "unchanged": true,
+  "focus": "fenasoja-2014",
+  "recording": "Screenshots of gallery, inspection, manipulation and return; not continuous video"
+}

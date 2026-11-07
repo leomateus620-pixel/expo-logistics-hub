@@ -5,6 +5,8 @@ import { readFile } from 'node:fs/promises';
 
 const mediaRoot=path.resolve(__dirname,'../../public/memorial-voluntariado/art');
 export default defineConfig({
+  cacheDir: 'node_modules/.vite-memorial-qa',
+  optimizeDeps: { entries: ['scripts/memorial/qa.html'] },
   plugins:[react(),{name:'memorial-isolated-media-test',configureServer(server){
     server.middlewares.use(async(req,res,next)=>{
       const url=new URL(req.url ?? '/', 'http://localhost');

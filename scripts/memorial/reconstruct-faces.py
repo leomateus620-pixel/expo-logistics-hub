@@ -1,7 +1,7 @@
 """Clean museum faces: deterministic typesetting plus ORIGINAL historical graphics.
 
 Never asks an image model to reconstruct lettering. Reviewed inscription data is the
-only source of names. Incomplete characters stay explicitly marked. Original JPEGs
+only source of names. Uncertainty stays in the accessible transcript/records, not on the exhibition face. Original JPEGs
 and perspective-corrected photographic faces remain available for comparison.
 """
 from pathlib import Path
@@ -177,10 +177,11 @@ def clean_plate(record, transcript, source):
         lines=[]
         for item in section['lines']:
             line=dict(item)
-            line['name']=line['name'] if line['status']=='verified' else 'Trecho ilegível na fotografia'
+            line['name']=line['name'] if line['status']=='verified' else ''
+            if line.get('roleStatus')=='unreadable' or line['role']=='Trecho ilegível na fotografia':line['role']=''
             line['status']='verified'
             if lines and abs(lines[-1]['sourceRegion'][1]-line['sourceRegion'][1]) < .002 and lines[-1]['role']==line['role']:
-                lines[-1]['name'] += ' E '+line['name']
+                lines[-1]['name'] = ' E '.join(name for name in [lines[-1]['name'],line['name']] if name)
             else: lines.append(line)
         if not lines:continue
         first_y=lines[0]['sourceRegion'][1]
@@ -262,6 +263,9 @@ def main():
             thumb=face.copy();thumb.thumbnail((bound,round(bound*4/3)))
             thumb.save(MEDIA/'thumbnails'/f"{record['id']}{suffix}.webp",quality=quality,method=6)
         assets[record['id']].update({'art':True,'artWidth':face.width,'artHeight':face.height,'artBytes':target.stat().st_size,'artSha256':hashlib.sha256(target.read_bytes()).hexdigest(),'editorialStatus':transcript['status'],'thumbnailBytes':(MEDIA/'thumbnails'/f"{record['id']}.webp").stat().st_size})
+        for suffix,field in [('', 'thumbnailSha256'),('-240','thumbnailSmallSha256')]:
+            assets[record['id']][field]=hashlib.sha256((MEDIA/'thumbnails'/f"{record['id']}{suffix}.webp").read_bytes()).hexdigest()
+        assets[record['id']]['exhibitionRevision']='2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset'
         print(f"{record['id']}: {sum(len(s['lines']) for s in transcript['sections'])} reviewed rows, {target.stat().st_size} bytes")
     (DATA/'assets.json').write_text(json.dumps(assets,indent=2)+'\n',encoding='utf-8')
 
