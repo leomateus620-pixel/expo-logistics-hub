@@ -1,0 +1,88 @@
+{
+  "base": "70a4e58b4dd0c07828032d6305e3f8c062d9677a",
+  "candidateFullSuite": {
+    "files": 507,
+    "failedFiles": 55,
+    "passedTests": 4281,
+    "failedTests": 94
+  },
+  "baselineRerun": {
+    "selectedFiles": 55,
+    "failedFiles": 53,
+    "passedTests": 387,
+    "failedTests": 92
+  },
+  "exactMatchingFailedCases": 92,
+  "failuresByFile": {
+    "src/test/agendaMeetingWorkspace.test.tsx": 4,
+    "src/test/commercialDashboardSpaces.test.tsx": 1,
+    "src/test/commercialMap2026Reference.test.ts": 2,
+    "src/test/commercialMapArenaCanonical.test.ts": 1,
+    "src/test/commercialMapAtmospherePersistence.test.tsx": 1,
+    "src/test/commercialMapBootLoader.test.tsx": 2,
+    "src/test/commercialMapControlIcons.test.tsx": 1,
+    "src/test/commercialMapElectricalInfrastructure.test.ts": 2,
+    "src/test/commercialMapExplorer.test.ts": 3,
+    "src/test/commercialMapExporuralArchitecture.test.ts": 1,
+    "src/test/commercialMapExporuralCartographicFidelity.test.ts": 1,
+    "src/test/commercialMapFenasojaReferenceStructures.test.ts": 1,
+    "src/test/commercialMapLoadingPipeline.test.ts": 3,
+    "src/test/commercialMapMobileExperience.test.ts": 1,
+    "src/test/commercialMapNonPermanentCleanup.test.ts": 1,
+    "src/test/commercialMapPavilion12PlanPresentation.test.ts": 1,
+    "src/test/commercialMapPavilion3PlanPresentation.test.ts": 1,
+    "src/test/commercialMapPavilion5PlanPresentation.test.ts": 1,
+    "src/test/commercialMapPavilion8PlanPresentation.test.ts": 1,
+    "src/test/commercialMapPavilionFourSoyKitchen.test.ts": 1,
+    "src/test/commercialMapPavilionModuleCard.test.tsx": 9,
+    "src/test/commercialMapPavilionRendering.test.ts": 1,
+    "src/test/commercialMapPavilions135Migration.contract.test.ts": 1,
+    "src/test/commercialMapPavilions813Migration.contract.test.ts": 1,
+    "src/test/commercialMapPresentation.test.ts": 2,
+    "src/test/commercialMapRearParking.test.ts": 1,
+    "src/test/commercialMapRearRoadNetwork.test.ts": 1,
+    "src/test/commercialMapRearRoadTreeClearance.test.ts": 1,
+    "src/test/commercialMapRegionalHighways.test.ts": 1,
+    "src/test/commercialMapRoadPrecision.test.ts": 1,
+    "src/test/commercialMapRuntimeStability.test.ts": 1,
+    "src/test/commercialMapSiteEnvironment.test.ts": 2,
+    "src/test/commercialMapSoyGateInfrastructure.test.ts": 1,
+    "src/test/commercialMapSpatialBounds.test.ts": 1,
+    "src/test/commercialMapVisitInteraction.test.tsx": 1,
+    "src/test/commercialMapVisitWorld.test.ts": 1,
+    "src/test/commercialPavilionGroupingMigration.test.ts": 1,
+    "src/test/commissionMapMigration.contract.test.ts": 1,
+    "src/test/commissionMapPortals.test.ts": 1,
+    "src/test/commissionPortal.test.tsx": 2,
+    "src/test/cronogramaDashboardIntegration.test.tsx": 1,
+    "src/test/cronogramaDataIntegrity.test.ts": 2,
+    "src/test/cronogramaMobilePresentation.test.tsx": 3,
+    "src/test/cronogramaRegistrationInteractions.test.tsx": 2,
+    "src/test/cronogramaTimeline.test.tsx": 12,
+    "src/test/currentOrgRouteStability.test.tsx": 1,
+    "src/test/eventHarvestCompletion.test.tsx": 2,
+    "src/test/exporural2028Revision.test.ts": 1,
+    "src/test/lotPricing2028.test.ts": 1,
+    "src/test/memberIdentity.test.ts": 1,
+    "src/test/portalHistoryAssets.test.ts": 1,
+    "src/test/venueEventsPresentation.test.ts": 3,
+    "src/features/alvorada/AlvoradaBrandHero.test.tsx": 1
+  },
+  "candidateOnly": [
+    {
+      "file": "src/test/commercialMapNeCloverleaf.test.ts",
+      "test": "NE cloverleaf BR-344 × BR-472 builds a gap-free overpass mesh that never enters the park and never z-fights",
+      "failure": "Timeout 5000 ms"
+    },
+    {
+      "file": "src/test/cronogramaPlanEditor.test.tsx",
+      "test": "workspace de planejamento em tela inteira protege Escape, permite continuar, mantém/restaura e descarta rascunhos com confirmação",
+      "failure": "Timeout 5000 ms"
+    }
+  ],
+  "candidateTimeoutRerun": {
+    "command": "npm test -- --maxWorkers=1 src/test/commercialMapNeCloverleaf.test.ts src/test/cronogramaPlanEditor.test.tsx",
+    "passedTests": 15,
+    "failedTests": 0
+  }
+}

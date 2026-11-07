@@ -81,9 +81,9 @@ export function FenasojaEcosystemExperienceView({
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const focusFrame = window.requestAnimationFrame(() => closeButton.current?.focus({
-      preventScroll: true,
-    }));
+    const focusFrame = window.requestAnimationFrame(() => {
+      if (navigationRef.current.view === 'organization') closeButton.current?.focus({ preventScroll: true });
+    });
 
     const containKeyboard = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
@@ -94,6 +94,8 @@ export function FenasojaEcosystemExperienceView({
         ).filter((element) => (
           element.getAttribute('aria-hidden') !== 'true'
           && !element.closest('[aria-hidden="true"]')
+          && !element.closest('[inert]')
+          && element.tabIndex >= 0
           && element.getClientRects().length > 0
         ));
         const first = focusable[0];
@@ -166,7 +168,7 @@ export function FenasojaEcosystemExperienceView({
         <Suspense fallback={<div className="ecosystem-memorial-preparing" role="status"><p>Preparando o Memorial do Voluntariado…</p><button type="button" onClick={() => navigate({ view: 'organization' })}>Voltar ao Ecossistema</button></div>}><MemorialExperience navigation={navigation} onNavigate={navigate} /></Suspense>
       </AlvoradaErrorBoundary>}
 
-      <button
+      {navigation.view === 'organization' && <button
         ref={closeButton}
         type="button"
         className="alvorada-overlay__close"
@@ -174,7 +176,7 @@ export function FenasojaEcosystemExperienceView({
         onClick={finish}
       >
         <X aria-hidden="true" />
-      </button>
+      </button>}
     </section>,
     document.body,
   );

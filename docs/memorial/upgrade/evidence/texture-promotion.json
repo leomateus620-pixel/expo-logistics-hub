@@ -1,0 +1,14 @@
+{
+  "initialTexture": "732×1024",
+  "after": {
+    "bytes": "15979862",
+    "drawCalls": "2",
+    "frames": "12",
+    "geometries": "3",
+    "height": 900,
+    "pose": "{\"scale\":2.44140625,\"x\":0,\"y\":0,\"yaw\":0,\"pitch\":0}",
+    "texture": "1463×2048",
+    "textures": "3",
+    "width": 1440
+  }
+}

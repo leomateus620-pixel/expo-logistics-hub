@@ -1,0 +1,22 @@
+{
+  "threeD": {
+    "kind": "synthetic PointerEvents; capture stubbed; not physical multitouch",
+    "before": "{\"scale\":1,\"x\":0,\"y\":0,\"yaw\":0,\"pitch\":0}",
+    "rotate": "{\"scale\":1,\"x\":0,\"y\":0,\"yaw\":0.12,\"pitch\":0.05}",
+    "pinch": "{\"scale\":1.5206906325745546,\"x\":0,\"y\":60.92422882943359,\"yaw\":0.12,\"pitch\":0.05}",
+    "resume": "{\"scale\":1.5206906325745546,\"x\":0,\"y\":60.92422882943359,\"yaw\":0.132,\"pitch\":0.060000000000000005}",
+    "cancelStable": true,
+    "lostCapture": "{\"scale\":1.5206906325745546,\"x\":0,\"y\":60.92422882943359,\"yaw\":0.14400000000000002,\"pitch\":0.07}",
+    "blurStable": true
+  },
+  "fallback2D": {
+    "kind": "synthetic PointerEvents; capture stubbed; not physical multitouch",
+    "before": "{\"scale\":1.5206906325745546,\"x\":0,\"y\":60.92422882943359,\"yaw\":0.14400000000000002,\"pitch\":0.07}",
+    "rotate": "{\"scale\":1.5206906325745546,\"x\":0,\"y\":70.92422882943359,\"yaw\":0.14400000000000002,\"pitch\":0.07}",
+    "pinch": "{\"scale\":2.312499999999999,\"x\":0,\"y\":159.4056078465854,\"yaw\":0.14400000000000002,\"pitch\":0.07}",
+    "resume": "{\"scale\":2.312499999999999,\"x\":0,\"y\":161.4056078465854,\"yaw\":0.14400000000000002,\"pitch\":0.07}",
+    "cancelStable": true,
+    "lostCapture": "{\"scale\":2.312499999999999,\"x\":0,\"y\":163.4056078465854,\"yaw\":0.14400000000000002,\"pitch\":0.07}",
+    "blurStable": true
+  }
+}

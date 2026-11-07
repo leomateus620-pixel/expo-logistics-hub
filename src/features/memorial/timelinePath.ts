@@ -1,5 +1,5 @@
 export interface TimelinePoint { x: number; y: number }
-/** Markers are measured from the actual rendered layout; faces and labels stay outside the path. */
+/** Markers and viewBox share stable content coordinates, independent of pan/zoom. */
 export function timelinePath(points: TimelinePoint[], width: number, columns: number, shortFinalSegment = false) {
   if (!points.length) return '';
   let path = `M ${points[0].x} ${points[0].y}`;

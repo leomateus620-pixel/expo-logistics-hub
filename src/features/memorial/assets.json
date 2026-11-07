@@ -21,16 +21,17 @@
       ]
     ],
     "faceBytes": 678574,
-    "thumbnailBytes": 39144,
+    "thumbnailBytes": 37342,
     "art": true,
     "artWidth": 1506,
     "artHeight": 2200,
-    "artBytes": 348506,
-    "artSha256": "05c7828105be931e08d2b276ef093a9669f89a398627bf2b25083e9b496a7d9c",
+    "artBytes": 329594,
+    "artSha256": "fcbda45beeee10de5e815b0b59314270fd7ec9a0e9f5e868b890ddf5e074fbd0",
     "editorialStatus": "partial",
     "faceSha256": "4fbf6ab360bc489dbbc5481c28cdf1be8f779e528471af6d622ea8e6c2168f88",
-    "thumbnailSha256": "15ca44eaf7d553addeeb337d5f8cf7601aaa6a6595b345d204421bba5e277f7e",
-    "thumbnailSmallSha256": "15e21f5a8d03f22d282c056d366abd7f3735ee20d9d1eb804db1e59736337ec3"
+    "thumbnailSha256": "dd2c0d6f070f2614da774eb0642dc58736713a628f44b66e0bf67ea6fef11cff",
+    "thumbnailSmallSha256": "1f1c6de5eb257d4e216b904cfac1fc534cdfa83a9b3012c01ce1c853a2d3390b",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1974": {
     "width": 980,
@@ -54,16 +55,17 @@
       ]
     ],
     "faceBytes": 626110,
-    "thumbnailBytes": 46938,
+    "thumbnailBytes": 45136,
     "art": true,
     "artWidth": 1589,
     "artHeight": 2200,
-    "artBytes": 396462,
-    "artSha256": "bdb7274a6fff9cd36cf122ab7dc3a8f712a4214af795e8717f2037a3cfb230c6",
+    "artBytes": 382166,
+    "artSha256": "08a2314d6951dd7045d221ae307241563e1e25b1e5c5f6c4be7d23d46901fd40",
     "editorialStatus": "partial",
     "faceSha256": "a65bb0128a469d1a2c08b84235c700e92dda098691a379f08caa4c5fa379e018",
-    "thumbnailSha256": "06c2d3530ccfe15daf1b0f3a59ddf399d7c002a2b17aac7a061787e0e6061282",
-    "thumbnailSmallSha256": "69f957da9cc2b9bc9d0f632bc0ecd4c90fc30c94cb7d9dd708b84e2b35b9603b"
+    "thumbnailSha256": "c093dc55ad4f7e693af938830c1867ee0f1d1348c3a0955125c4cdab1cb2b0c3",
+    "thumbnailSmallSha256": "9c9ad853d3501f6e6d0d121937bcaf5d149559159a141e8023e1a66710d0a470",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1976": {
     "width": 1028,
@@ -96,7 +98,8 @@
     "editorialStatus": "verified",
     "faceSha256": "7e97c312b0f0cd90de4403d5d30e61e2008a5c9b377cd914895e779e97a42b15",
     "thumbnailSha256": "26d0ec2db5e84b2d906b2b6288f49787ce2976eb36e4cd2babe1a27de82c9cf4",
-    "thumbnailSmallSha256": "5ad8160303709e58ab7afe46f0b629e90d7a536b6e32d8eb814515368cb8e0d1"
+    "thumbnailSmallSha256": "5ad8160303709e58ab7afe46f0b629e90d7a536b6e32d8eb814515368cb8e0d1",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1979": {
     "width": 1022,
@@ -120,16 +123,17 @@
       ]
     ],
     "faceBytes": 545554,
-    "thumbnailBytes": 29464,
+    "thumbnailBytes": 27392,
     "art": true,
     "artWidth": 1583,
     "artHeight": 2200,
-    "artBytes": 251634,
-    "artSha256": "21a3967699045db8c2c60bb91b640c2411e7956865e1be0b156eafb5b2b6dd13",
+    "artBytes": 230654,
+    "artSha256": "1063cdcb5828502cb0bac88d11e6d5d61c07a6f33df6ed25ff744b3ab3383b80",
     "editorialStatus": "partial",
     "faceSha256": "898b5c9ae80b54b93c6f925949eed84d005e4cf4c20fcf07d436e8e40789bce4",
-    "thumbnailSha256": "9f6f0c4341801e069ad6b46ef5fa3928d6a72e3345cf3df01baded6bc861cce8",
-    "thumbnailSmallSha256": "5c102868d638f04656a1a0be737601b2aa540f0fb88da1f52359cac6008cda98"
+    "thumbnailSha256": "bdb97f33bbe60a111b66a2b9a874e59e048ed4f11ff593f2bc969942f88659d8",
+    "thumbnailSmallSha256": "12de9162c2019bfd6e643e85693aaf8d18656170f4b572162335834811d1c605",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1981": {
     "width": 1038,
@@ -162,7 +166,8 @@
     "editorialStatus": "verified",
     "faceSha256": "4749647e57e3004cb888a9e2eef85d2f3e48f45066b97dfa22b521be1b0a00d9",
     "thumbnailSha256": "15945c2c81f84d9c9aa78ec788f26d9619054a6ee30ad1f2f719b9b10795e148",
-    "thumbnailSmallSha256": "c910f2c68f844aa78e894f9b45fa0feab6874715bebfded3dc2da28ce6332315"
+    "thumbnailSmallSha256": "c910f2c68f844aa78e894f9b45fa0feab6874715bebfded3dc2da28ce6332315",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1984": {
     "width": 1068,
@@ -186,16 +191,17 @@
       ]
     ],
     "faceBytes": 517410,
-    "thumbnailBytes": 18362,
+    "thumbnailBytes": 17560,
     "art": true,
     "artWidth": 1834,
     "artHeight": 2200,
-    "artBytes": 191820,
-    "artSha256": "e9112de078f6e36394c56d8d8551a4a6b0e0bd3e0326d288f601c853829f43b8",
+    "artBytes": 183518,
+    "artSha256": "5fd2b0c4f5a9d172b68fadffe93e1b3dc5b2cfb8a833aa3a9e9eff38c95329df",
     "editorialStatus": "partial",
     "faceSha256": "efc870cbcacf03583c14c280aa8b0fc01c3ddbc1d6c3dd17224699de5578e0fc",
-    "thumbnailSha256": "12d5e6a7925401999405bbc7999837ebb40ff5598c8f5289d8e5434ed6aebe5f",
-    "thumbnailSmallSha256": "0b9ee44de1c0802e0dea4be3dc3df6fef9880a33321ed021a7753d021abb095f"
+    "thumbnailSha256": "452718fb94c0ad29a14d18645763f12506e0d42bfd60881f7b0efeb67177a30b",
+    "thumbnailSmallSha256": "eaac5174bc0556bd6ed9a8024cb79c5cd755811a9086dfc574bb7c26c31563f6",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1987": {
     "width": 1015,
@@ -228,7 +234,8 @@
     "editorialStatus": "verified",
     "faceSha256": "f5c590da2a285e2cdc5628bb316712050835f7f07f9acbf166ff17eef3804010",
     "thumbnailSha256": "9bcb05e63543480c05901a9dddce82a6d19cf0010b7da9bb773779971ffb49ad",
-    "thumbnailSmallSha256": "141eb1c51a470f900a49b807ee8d14e51160cc54800b3256c6957f46f17f7f8e"
+    "thumbnailSmallSha256": "141eb1c51a470f900a49b807ee8d14e51160cc54800b3256c6957f46f17f7f8e",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1990": {
     "width": 955,
@@ -261,7 +268,8 @@
     "editorialStatus": "verified",
     "faceSha256": "924ed938d436991f0fba4a90a12fba1a07f6e3e453e21ff5a00c36c07e5fffa1",
     "thumbnailSha256": "6a5ec338c0ccaa6f69203c9dc9a7549ae8e805c6e0e7b661bd25706a8da6aff6",
-    "thumbnailSmallSha256": "7cefcc2264dc58471eb7a1ae0b8daceea40e234252dfd0d0290c151fa260a7fd"
+    "thumbnailSmallSha256": "7cefcc2264dc58471eb7a1ae0b8daceea40e234252dfd0d0290c151fa260a7fd",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1992": {
     "width": 1015,
@@ -294,7 +302,8 @@
     "editorialStatus": "partial",
     "faceSha256": "5f5afdb2cef277a71550b87ebab22df21632cc14a840ca133f5f46b0cad88790",
     "thumbnailSha256": "081b971722426aa6f547e9cc1617288808bdfd2e0ceb659f9590eccc8c181ee6",
-    "thumbnailSmallSha256": "8fca4c07ce079e5ce7c5bd3e235707c793cb1545e27d83f2813fd84000a515f9"
+    "thumbnailSmallSha256": "8fca4c07ce079e5ce7c5bd3e235707c793cb1545e27d83f2813fd84000a515f9",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1994": {
     "width": 1047,
@@ -327,7 +336,8 @@
     "editorialStatus": "partial",
     "faceSha256": "cd02953ca4ffec7278554d6621f4b1e3ab9bc0e297f806f3b1892901c84c5a1a",
     "thumbnailSha256": "b356fc82d7afca78741bd77c289d24bd9f7856546c5110c89b983bb0ff59e892",
-    "thumbnailSmallSha256": "bc6f33bc9659b51e66698554455eda03d63d220b11f83254a141e726354ff549"
+    "thumbnailSmallSha256": "bc6f33bc9659b51e66698554455eda03d63d220b11f83254a141e726354ff549",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1996": {
     "width": 987,
@@ -360,7 +370,8 @@
     "editorialStatus": "partial",
     "faceSha256": "cb12bf6889f04c839b1cfc7eae46d8502226e65281a6f1e5387da798327c25d0",
     "thumbnailSha256": "1917512a1033266ebf516c47f73ef8fb3c111461f54ab86344f8a9b974291f87",
-    "thumbnailSmallSha256": "9b597e4507aea5e313f3173b1aa68afd190c1d9562337e66304692bd5cf870a8"
+    "thumbnailSmallSha256": "9b597e4507aea5e313f3173b1aa68afd190c1d9562337e66304692bd5cf870a8",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-1998": {
     "width": 895,
@@ -384,16 +395,17 @@
       ]
     ],
     "faceBytes": 313652,
-    "thumbnailBytes": 37028,
+    "thumbnailBytes": 36494,
     "art": true,
     "artWidth": 1598,
     "artHeight": 2200,
-    "artBytes": 271138,
-    "artSha256": "5d9a752c4f2763cdae5d3f4478df90a5cc03599846ae3cb227f39e9eb8263769",
+    "artBytes": 266068,
+    "artSha256": "0c029fa88196e8a01f7b1d9bc2820c4a6d8d380f12d5beab50d764be2523eb90",
     "editorialStatus": "partial",
     "faceSha256": "550d7104e00e0c23f71bc794450ecc9d5c265ec0cac360e6e7f69a870da64713",
-    "thumbnailSha256": "3bbd3cf7cf0ef68c9b86812554c3911bcea8f720be9076c05a3cd889eed7de84",
-    "thumbnailSmallSha256": "2e57d46b017a3de0d7cc45baf0ab49a6b90d40db456a1283aea1f59281bcce07"
+    "thumbnailSha256": "65cb508bf1bc8842a7b65a95115ac0e5366a8af0076b4359a2537d14d7f5b741",
+    "thumbnailSmallSha256": "89caf3b73acfb2de4ae8cb0c110d04be4150db7dc434371e9990242fb5e4bdcd",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2000": {
     "width": 851,
@@ -426,7 +438,8 @@
     "editorialStatus": "verified",
     "faceSha256": "88818e63476588bb8183756a90acb612c05d230cf4c240541f2bbded4500cf9d",
     "thumbnailSha256": "991b8feec6eb611e3849d20364379f9c5d2343ae590a302a3ed5f0a734dc1967",
-    "thumbnailSmallSha256": "d707565558fbf4de0a5740c689a089bccfca9042e4cb65f0556787a3c848da61"
+    "thumbnailSmallSha256": "d707565558fbf4de0a5740c689a089bccfca9042e4cb65f0556787a3c848da61",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2002": {
     "width": 829,
@@ -459,7 +472,8 @@
     "editorialStatus": "verified",
     "faceSha256": "677b6acd8dae6fcdfd9c0cc7b40418421f1c77514bfe3e8affe3be452d49c2d3",
     "thumbnailSha256": "845ee1998b88d5ce8afac4379e8635fdd69652e3b44289d8f5466949f08c90f8",
-    "thumbnailSmallSha256": "609a8a59acd92871359297683c12bb66f34a5cb284d062e2478952e0cbf6efa8"
+    "thumbnailSmallSha256": "609a8a59acd92871359297683c12bb66f34a5cb284d062e2478952e0cbf6efa8",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2004": {
     "width": 933,
@@ -483,16 +497,17 @@
       ]
     ],
     "faceBytes": 322188,
-    "thumbnailBytes": 46342,
+    "thumbnailBytes": 44326,
     "art": true,
     "artWidth": 1602,
     "artHeight": 2200,
-    "artBytes": 361844,
-    "artSha256": "5834e0ef7101282ff7ca3885563667ba45ec131c12e6cd1262279d4beeec3ecd",
+    "artBytes": 351306,
+    "artSha256": "195a5165a4d20ef4fac8e00e04d43f4829b0da54c3b94ee3723716aa28710a3f",
     "editorialStatus": "partial",
     "faceSha256": "c8f414429888cfb8f627067bc7c8403627a20dee35871b66aff7cc3ac225c919",
-    "thumbnailSha256": "c81d3fd42cc3f1019125079e9084b5c01f4f179dedf3354f424481e7ef241774",
-    "thumbnailSmallSha256": "542a33d9b1de5899a3103922a5b6eecca79e75529c8e522ae572447d167a2265"
+    "thumbnailSha256": "a1e5ffb9b1bdee55d7aa316c04545679ce71eedf53232c48e808843600e8081d",
+    "thumbnailSmallSha256": "20d6d17d185b5e9643e397b60c767119ac3c8e1bf38b19c99552568964a187b7",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2006": {
     "width": 874,
@@ -525,7 +540,8 @@
     "editorialStatus": "verified",
     "faceSha256": "5ade03010324d937d49453d019e5791afc4abc42d4afbd9c3b86913d3bc0356f",
     "thumbnailSha256": "00fdb5db04c93e790c78e3a76f00117eb8846a370488d07aacebaa0e8abff1d8",
-    "thumbnailSmallSha256": "b75604754785c49738927b4d654a7efd69e29c9dd30c308af99bc8b164ea6ec0"
+    "thumbnailSmallSha256": "b75604754785c49738927b4d654a7efd69e29c9dd30c308af99bc8b164ea6ec0",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2008": {
     "width": 908,
@@ -558,7 +574,8 @@
     "editorialStatus": "verified",
     "faceSha256": "114ee49196c23a745b6776c467c2bf035d296b61449f0f7357fd8be112acbeb4",
     "thumbnailSha256": "bbd7ed57969ef2f8d9142e8bb597190546612155b03dca8a15c89b2307974c6a",
-    "thumbnailSmallSha256": "96f60b2018d4be9836ccda2f8e5aa612609ff47e6bcffa4e74dfad309f679d95"
+    "thumbnailSmallSha256": "96f60b2018d4be9836ccda2f8e5aa612609ff47e6bcffa4e74dfad309f679d95",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2010": {
     "width": 914,
@@ -591,7 +608,8 @@
     "editorialStatus": "verified",
     "faceSha256": "e8be09f1912cc0b2fe64cbc53950a85b59f70a63bbae0d1bed5ae8875e2dcd53",
     "thumbnailSha256": "c577c6655ea9752aa50361a4e6c297ddda019ffdd190de948e2223bcb41854f3",
-    "thumbnailSmallSha256": "26e648ee40a431766f46ac1fcdc9226c587cb43bb7e4a72036e5fda33bbef92f"
+    "thumbnailSmallSha256": "26e648ee40a431766f46ac1fcdc9226c587cb43bb7e4a72036e5fda33bbef92f",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2012": {
     "width": 872,
@@ -624,7 +642,8 @@
     "editorialStatus": "verified",
     "faceSha256": "7321abefb9b74cc93af36889fff6def3419023180fc7ddc3493e11d45b854552",
     "thumbnailSha256": "8d695d0a920afbc1d652f24f453c5459f7d4b088ec0e44902595accefef8caa8",
-    "thumbnailSmallSha256": "a985e1eb36fb3ac8557fc5583f41566509924ddfd478d03ed2aac0c2f8ab67cd"
+    "thumbnailSmallSha256": "a985e1eb36fb3ac8557fc5583f41566509924ddfd478d03ed2aac0c2f8ab67cd",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2014": {
     "width": 888,
@@ -657,7 +676,8 @@
     "editorialStatus": "verified",
     "faceSha256": "eb644f89ea99084676fe7da0b9328f44bfd75c9c29cf6b527f243a5302c4f7b5",
     "thumbnailSha256": "229f4926e22714ef2d9c80bad4cb139d7bf36bfa673bb1ca8ac9e576327c772d",
-    "thumbnailSmallSha256": "773de14989f4771b3ff79e936cc31d705274b493ca28af8f80edbb36444ba210"
+    "thumbnailSmallSha256": "773de14989f4771b3ff79e936cc31d705274b493ca28af8f80edbb36444ba210",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2016": {
     "width": 936,
@@ -690,7 +710,8 @@
     "editorialStatus": "verified",
     "faceSha256": "0d4049edc4a12cbba8da8613d183b3b5ca9d3ed28d4c71685290f4d33a89821e",
     "thumbnailSha256": "c8b991d7d045ecf2ffdd447dfe5f32078f2549b5e21704a0cce918393cd0e609",
-    "thumbnailSmallSha256": "00fc2a36cbd818a17ad01a8b375418dfea79a1f826f73a183f0ba7dd962c1401"
+    "thumbnailSmallSha256": "00fc2a36cbd818a17ad01a8b375418dfea79a1f826f73a183f0ba7dd962c1401",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2018": {
     "width": 720,
@@ -714,16 +735,17 @@
       ]
     ],
     "faceBytes": 203342,
-    "thumbnailBytes": 51040,
+    "thumbnailBytes": 50738,
     "art": true,
     "artWidth": 1714,
     "artHeight": 2200,
-    "artBytes": 426330,
-    "artSha256": "df737906c610e8d44b1a7a870c885c43a0d31d40cbbf96174f62bf33e32fd895",
+    "artBytes": 422134,
+    "artSha256": "1aaf6449bed553ac9f3c1cbab2843c010a1f742e3c4b966c1fbefaaf587afb98",
     "editorialStatus": "partial",
     "faceSha256": "79b532faa071860bbb215d7ce0393b434d062d3b63aac1a33a4a4432f0bcaa40",
-    "thumbnailSha256": "8c6a8297422b16eee0c02dc2e848c176769cb6791eba6f9806c873480c4fb1c8",
-    "thumbnailSmallSha256": "72c62afed6f2ef34954e09239101aa5c1b4b6bff8134f56e6f127ab732c23e90"
+    "thumbnailSha256": "27fb435643fbb75cc91ab546a0e61d943996eed5d9dd8db1da3acd0504fba21e",
+    "thumbnailSmallSha256": "4926f42206819f04b9e9cbd781891de7dce201f306bb4672c54f10bbcae8d562",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2022": {
     "width": 907,
@@ -756,7 +778,8 @@
     "editorialStatus": "verified",
     "faceSha256": "311082a4ae7012dee3d7c514a7db128a086dafd8867de3ac1e3229a3b6ef5bb6",
     "thumbnailSha256": "9352f0f556e8c743c2ad435e26a1e4945e7200346a049823539acc78a9595d02",
-    "thumbnailSmallSha256": "055e0c0b39e6035b9f62498f5f9f9fa4c351bf78a6a934dd054c7b5a2a5a3c04"
+    "thumbnailSmallSha256": "055e0c0b39e6035b9f62498f5f9f9fa4c351bf78a6a934dd054c7b5a2a5a3c04",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2024": {
     "width": 963,
@@ -789,7 +812,8 @@
     "editorialStatus": "verified",
     "faceSha256": "6aa474424ce79d9f617aecc782730e6f211ca55cd3ccbb02b9ba048dcbb1c95e",
     "thumbnailSha256": "82a61f2cad3237418bd787b112ca04ece3ceca6db950110c42823963b1a9d7e1",
-    "thumbnailSmallSha256": "6aadf31fec111954cec783db003f6fd24875148ca18f38e24a2929b182c54567"
+    "thumbnailSmallSha256": "6aadf31fec111954cec783db003f6fd24875148ca18f38e24a2929b182c54567",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2026": {
     "width": 837,
@@ -822,7 +846,8 @@
     "editorialStatus": "verified",
     "faceSha256": "a7e4a8e931b208f310e49a20dd4e3260185e312d1ffad8dbd832dd109432dbb1",
     "thumbnailSha256": "a47f4b4a3d479f2124f08b73a803388a177f0cb733c3bb43913e923a79887d7a",
-    "thumbnailSmallSha256": "dc261d7c801bcaa6c9eff6ce9dc61b9812399de55f932be95a31f7057d6dd281"
+    "thumbnailSmallSha256": "dc261d7c801bcaa6c9eff6ce9dc61b9812399de55f932be95a31f7057d6dd281",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "documento-2020": {
     "width": 947,
@@ -855,7 +880,8 @@
     "editorialStatus": "verified",
     "faceSha256": "58db1981d099e0f074ce808c6f3897c4426b082981aba92ee937b700fdc7022e",
     "thumbnailSha256": "93bf99ed96744b6501af554fb88fbf75c722b6ee72d68202143ebfcf23c2bce9",
-    "thumbnailSmallSha256": "9a99635dc1d17e93f44add9bda20bc4f02fd285f3ecd756df09332765e053679"
+    "thumbnailSmallSha256": "9a99635dc1d17e93f44add9bda20bc4f02fd285f3ecd756df09332765e053679",
+    "exhibitionRevision": "2026-11-07: editorial uncertainty retained in transcript; only verified inscriptions typeset"
   },
   "fenasoja-2028": {
     "width": 900,
