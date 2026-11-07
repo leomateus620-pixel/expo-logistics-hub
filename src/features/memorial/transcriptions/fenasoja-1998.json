@@ -1,0 +1,282 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "SÉRGIO LUNARDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.08606,
+            0.3358,
+            0.82265,
+            0.01338
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "ARTUR LORENTZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.08616,
+            0.35956,
+            0.82307,
+            0.01327
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "DERQUI GNATTA",
+          "status": "verified",
+          "sourceRegion": [
+            0.08626,
+            0.38236,
+            0.82347,
+            0.01317
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "LUIZ ALBERTO PILOTTI",
+          "status": "verified",
+          "sourceRegion": [
+            0.08635,
+            0.40617,
+            0.82388,
+            0.01306
+          ]
+        },
+        {
+          "role": "SECRETÁRIA EXECUTIVA",
+          "name": "ROSEMARI LACERDA",
+          "status": "verified",
+          "sourceRegion": [
+            0.08645,
+            0.42901,
+            0.82428,
+            0.01296
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CLÉO A. ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.08655,
+            0.45287,
+            0.8247,
+            0.01285
+          ]
+        },
+        {
+          "role": "SECRETÁRIA COORDENAÇÃO",
+          "name": "ELENIR BATISTA",
+          "status": "verified",
+          "sourceRegion": [
+            0.08665,
+            0.47576,
+            0.8251,
+            0.01275
+          ]
+        }
+      ]
+    },
+    {
+      "title": "VICE-PRESIDENTES DAS COMISSÕES:",
+      "lines": [
+        {
+          "role": "AGRICULTURA",
+          "name": "JORGE JOÃO LUNARDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.09683,
+            0.57437,
+            0.81708,
+            0.01346
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "NOLI BRUN",
+          "status": "verified",
+          "sourceRegion": [
+            0.09694,
+            0.59838,
+            0.81749,
+            0.01335
+          ]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "MJ. ANTÔNIO R. FRANCISCO FERREIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.09704,
+            0.62241,
+            0.81797,
+            0.01624
+          ],
+          "note": "O prefixo abreviado 'MJ.' foi preservado sem expansão."
+        },
+        {
+          "role": "CONE SUL",
+          "name": "SÉRGIO AMBROS MALLMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.09715,
+            0.64646,
+            0.81832,
+            0.01314
+          ]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "ÁLVARO EIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.09725,
+            0.66954,
+            0.81872,
+            0.01304
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "SÉRGIO LUÍS DONINI BUENO",
+          "status": "verified",
+          "sourceRegion": [
+            0.09735,
+            0.69364,
+            0.81914,
+            0.01293
+          ]
+        },
+        {
+          "role": "CREDENCIAMENTO",
+          "name": "ELISEU HOLZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.09746,
+            0.71777,
+            0.81955,
+            0.01283
+          ]
+        },
+        {
+          "role": "CULTURA",
+          "name": "HAMILTON MUNHOZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.09756,
+            0.74092,
+            0.81995,
+            0.01272
+          ]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "NAMIR STREJEVITCH",
+          "status": "verified",
+          "sourceRegion": [
+            0.09767,
+            0.76509,
+            0.82037,
+            0.01262
+          ]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "NELSON KLAESENER",
+          "status": "verified",
+          "sourceRegion": [
+            0.09777,
+            0.78929,
+            0.82079,
+            0.01251
+          ]
+        },
+        {
+          "role": "SOCIAL",
+          "name": "BEATRIZ BASTIAN OLIVEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.09787,
+            0.81251,
+            0.82119,
+            0.0124
+          ]
+        },
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "SÉRGIO OLIVEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.09798,
+            0.83676,
+            0.82161,
+            0.0123
+          ]
+        },
+        {
+          "role": "INFRA-ESTRUTURA",
+          "name": "ISMAEL OLIVEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.09808,
+            0.86002,
+            0.82201,
+            0.01219
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JORGE QUERUZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.09819,
+            0.88432,
+            0.82243,
+            0.01208
+          ],
+          "note": "Cargo compartilhado com a linha seguinte: a placa mostra um único rótulo ASSESSORIA JURÍDICA para os dois nomes."
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "SÍLVIO SEBALHOS SILVA",
+          "status": "verified",
+          "sourceRegion": [
+            0.37334,
+            0.90252,
+            0.39175,
+            0.02001
+          ],
+          "note": "Segunda linha do cargo compartilhado ASSESSORIA JURÍDICA; o rótulo não é repetido na fotografia."
+        },
+        {
+          "role": "ASSESSOR CONTÁBIL",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [
+            0.0984,
+            0.93198,
+            0.82325,
+            0.01187
+          ],
+          "note": "O primeiro caractere do prenome está desgastado e não foi confirmado de forma inequívoca entre R e B. O trecho restante 'ENALDO LIBERALI' é legível; o prenome não foi completado por inferência."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Transcrição visual conferida na fotografia original 12a_Fenasoja_1998.jpeg e na face retificada fenasoja-1998.webp; o OCR foi consultado somente como rascunho não confiável.",
+    "Período gravado: '25 de Abril a 03 de Maio de 1998'. A localização gravada é 'SANTA ROSA - RS'.",
+    "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita. A ordem de cima para baixo foi preservada.",
+    "A seção COMISSÃO CENTRAL contém 7 nomes; VICE-PRESIDENTES DAS COMISSÕES contém 16 nomes, com ASSESSORIA JURÍDICA compartilhada por duas linhas.",
+    "Grafias, acentos, abreviações e o hífen de INFRA-ESTRUTURA seguem a inscrição visível, sem pesquisa externa ou correção por cadastros.",
+    "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+    "O estado geral permanece parcial devido ao primeiro caractere não confirmado no prenome do ASSESSOR CONTÁBIL. Todos os cargos estão legíveis."
+  ]
+}

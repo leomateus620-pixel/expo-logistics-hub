@@ -1,0 +1,208 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 01 A 10 DE MAIO DE 1987",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "JOÃO ALBERTO PULCINELLI",
+          "status": "verified",
+          "sourceRegion": [
+            0.39,
+            0.255,
+            0.49,
+            0.021
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "ECLAIR KRÜGER MORAGINSKI",
+          "status": "verified",
+          "sourceRegion": [
+            0.29,
+            0.271,
+            0.6,
+            0.021
+          ]
+        },
+        {
+          "role": "TESOUREIRO GERAL",
+          "name": "BENALDO LIBERALI",
+          "status": "verified",
+          "sourceRegion": [
+            0.32,
+            0.287,
+            0.47,
+            0.021
+          ],
+          "note": "Grafia BENALDO preservada conforme está visível na fotografia."
+        },
+        {
+          "role": "SECRETÁRIO EXECUTIVO",
+          "name": "CLÁUDIO TADEU KLEIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.282,
+            0.303,
+            0.56,
+            0.021
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "PECUÁRIA",
+          "name": "PEDRO CARPENEDO",
+          "status": "verified",
+          "sourceRegion": [
+            0.41,
+            0.414,
+            0.39,
+            0.022
+          ]
+        },
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "HERBERTO WERNER",
+          "status": "verified",
+          "sourceRegion": [
+            0.275,
+            0.43,
+            0.525,
+            0.022
+          ]
+        },
+        {
+          "role": "AGRICULTURA",
+          "name": "LOURIVAL BUBLITZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.37,
+            0.446,
+            0.42,
+            0.022
+          ]
+        },
+        {
+          "role": "APROVEITAMENTO DA SOJA E ALIMENTAÇÃO HUMANA",
+          "name": "BERNARDO KERKHOFF",
+          "status": "verified",
+          "sourceRegion": [
+            0,
+            0.462,
+            0.83,
+            0.022
+          ]
+        },
+        {
+          "role": "PROMOÇÕES E DIVERSÕES",
+          "name": "BRUNO SALA",
+          "status": "verified",
+          "sourceRegion": [
+            0.25,
+            0.478,
+            0.485,
+            0.022
+          ]
+        },
+        {
+          "role": "INFRAESTRUTURA",
+          "name": "OSCAR IGNÁCIO BÜTTENBENDER",
+          "status": "verified",
+          "sourceRegion": [
+            0.33,
+            0.494,
+            0.595,
+            0.022
+          ]
+        },
+        {
+          "role": "SOCIAL E RECEPÇÃO",
+          "name": "KUNIO INAMOTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.31,
+            0.51,
+            0.45,
+            0.022
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO E INFORMAÇÕES",
+          "name": "HILÁRIO FREISLEBEN",
+          "status": "verified",
+          "sourceRegion": [
+            0.21,
+            0.526,
+            0.61,
+            0.022
+          ]
+        },
+        {
+          "role": "INGRESSOS E ALIMENTAÇÃO",
+          "name": "ANTÔNIO CARLOS S. SILVEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.232,
+            0.542,
+            0.66,
+            0.022
+          ]
+        },
+        {
+          "role": "ASSUNTOS INTERNACIONAIS",
+          "name": "ANTENOR PUNTEL",
+          "status": "verified",
+          "sourceRegion": [
+            0.225,
+            0.558,
+            0.555,
+            0.022
+          ]
+        },
+        {
+          "role": "CULTURA E RECEPÇÃO",
+          "name": "HOMERO CELSO JUNGES",
+          "status": "verified",
+          "sourceRegion": [
+            0.28,
+            0.574,
+            0.565,
+            0.022
+          ]
+        },
+        {
+          "role": "SEGURANÇA, ESTACIONAMENTO E SINALIZAÇÃO",
+          "name": "FLÁVIO HERALDO HAIGERT",
+          "status": "verified",
+          "sourceRegion": [
+            0.045,
+            0.59,
+            0.82,
+            0.022
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Título original: 7ª FENASOJA.",
+    "DE 01 A 10 DE MAIO DE 1987",
+    "Transcrição visual da fotografia IMG_1153.jpeg e da face retificada fenasoja-1987.webp, com conferência ampliada das quatro linhas da Comissão Central e das doze linhas de PRESIDENTES DE ÁREA.",
+    "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+    "Todos os cargos e nomes foram confirmados visualmente nesta fotografia, sem completar lacunas por inferência de outras edições.",
+    "Os cargos desta placa têm uma associação direta com cada nome na mesma linha; não há cargo compartilhado entre nomes em linhas subsequentes.",
+    "O cargo longo APROVEITAMENTO DA SOJA E ALIMENTAÇÃO HUMANA foi conferido também na fotografia original, cuja margem esquerda o mostra integralmente.",
+    "O amplo campo inferior da placa não contém outras inscrições visíveis e foi mantido livre, sem criação de linhas ou conteúdo para preenchê-lo.",
+    "namesFirst é false porque os cargos aparecem à esquerda e os nomes à direita na fotografia.",
+    "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+    "Grafias, acentos, trema, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida."
+  ]
+}

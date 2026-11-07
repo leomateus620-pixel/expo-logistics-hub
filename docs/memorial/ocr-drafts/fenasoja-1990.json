@@ -1,0 +1,340 @@
+﻿{
+    "status":  "UNREVIEWED_DRAFT",
+    "engine":  "Windows.Media.Ocr pt-BR",
+    "lines":  [
+                  {
+                      "text":  "PRESIDENTES DE AREA",
+                      "words":  [
+                                    {
+                                        "y":  457,
+                                        "height":  11,
+                                        "width":  116,
+                                        "text":  "PRESIDENTES",
+                                        "x":  400
+                                    },
+                                    {
+                                        "y":  457,
+                                        "height":  11,
+                                        "width":  23,
+                                        "text":  "DE",
+                                        "x":  522
+                                    },
+                                    {
+                                        "y":  456,
+                                        "height":  12,
+                                        "width":  46,
+                                        "text":  "AREA",
+                                        "x":  550
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "kERKHOF,",
+                      "words":  [
+                                    {
+                                        "y":  580,
+                                        "height":  16,
+                                        "width":  88,
+                                        "text":  "kERKHOF,",
+                                        "x":  643
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ": ÂNtoÑIO CAkLOS SILVEIRAü",
+                      "words":  [
+                                    {
+                                        "y":  607,
+                                        "height":  7,
+                                        "width":  3,
+                                        "text":  ":",
+                                        "x":  528
+                                    },
+                                    {
+                                        "y":  598,
+                                        "height":  19,
+                                        "width":  84,
+                                        "text":  "ÂNtoÑIO",
+                                        "x":  536
+                                    },
+                                    {
+                                        "y":  597,
+                                        "height":  19,
+                                        "width":  72,
+                                        "text":  "CAkLOS",
+                                        "x":  624
+                                    },
+                                    {
+                                        "y":  601,
+                                        "height":  14,
+                                        "width":  85,
+                                        "text":  "SILVEIRAü",
+                                        "x":  699
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HOMERO CELSO JUNÇÉS",
+                      "words":  [
+                                    {
+                                        "y":  620,
+                                        "height":  19,
+                                        "width":  79,
+                                        "text":  "HOMERO",
+                                        "x":  538
+                                    },
+                                    {
+                                        "y":  618,
+                                        "height":  17,
+                                        "width":  57,
+                                        "text":  "CELSO",
+                                        "x":  622
+                                    },
+                                    {
+                                        "y":  619,
+                                        "height":  19,
+                                        "width":  73,
+                                        "text":  "JUNÇÉS",
+                                        "x":  683
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ".joÃ0 MOYSES DOS SANTOSHUDSON",
+                      "words":  [
+                                    {
+                                        "y":  638,
+                                        "height":  18,
+                                        "width":  52,
+                                        "text":  ".joÃ0",
+                                        "x":  534
+                                    },
+                                    {
+                                        "y":  642,
+                                        "height":  13,
+                                        "width":  72,
+                                        "text":  "MOYSES",
+                                        "x":  590
+                                    },
+                                    {
+                                        "y":  642,
+                                        "height":  13,
+                                        "width":  37,
+                                        "text":  "DOS",
+                                        "x":  668
+                                    },
+                                    {
+                                        "y":  639,
+                                        "height":  16,
+                                        "width":  155,
+                                        "text":  "SANTOSHUDSON",
+                                        "x":  710
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PEDROJOÂOSTEFFEN",
+                      "words":  [
+                                    {
+                                        "y":  659,
+                                        "height":  18,
+                                        "width":  197,
+                                        "text":  "PEDROJOÂOSTEFFEN",
+                                        "x":  538
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "\u0027PEDRO IGNÁCIO BÜTTENBENDER",
+                      "words":  [
+                                    {
+                                        "y":  683,
+                                        "height":  16,
+                                        "width":  71,
+                                        "text":  "\u0027PEDRO",
+                                        "x":  529
+                                    },
+                                    {
+                                        "y":  679,
+                                        "height":  18,
+                                        "width":  75,
+                                        "text":  "IGNÁCIO",
+                                        "x":  605
+                                    },
+                                    {
+                                        "y":  680,
+                                        "height":  16,
+                                        "width":  146,
+                                        "text":  "BÜTTENBENDER",
+                                        "x":  684
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• •Ñ#RAESTãLfrtJRA",
+                      "words":  [
+                                    {
+                                        "y":  687,
+                                        "height":  2,
+                                        "width":  2,
+                                        "text":  "•",
+                                        "x":  267
+                                    },
+                                    {
+                                        "y":  682,
+                                        "height":  21,
+                                        "width":  171,
+                                        "text":  "•Ñ#RAESTãLfrtJRA",
+                                        "x":  284
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Çü3íÊvÁVtO\\VIÉlRA HAIGERT",
+                      "words":  [
+                                    {
+                                        "y":  701,
+                                        "height":  18,
+                                        "width":  182,
+                                        "text":  "Çü3íÊvÁVtO\\VIÉlRA",
+                                        "x":  482
+                                    },
+                                    {
+                                        "y":  703,
+                                        "height":  13,
+                                        "width":  80,
+                                        "text":  "HAIGERT",
+                                        "x":  669
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "sÉcuRANÇAE TRÂNSITO",
+                      "words":  [
+                                    {
+                                        "y":  704,
+                                        "height":  20,
+                                        "width":  130,
+                                        "text":  "sÉcuRANÇAE",
+                                        "x":  233
+                                    },
+                                    {
+                                        "y":  703,
+                                        "height":  17,
+                                        "width":  89,
+                                        "text":  "TRÂNSITO",
+                                        "x":  366
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRPMOÇOÉS SÉRGIO AMBROS MALLMANN",
+                      "words":  [
+                                    {
+                                        "y":  725,
+                                        "height":  23,
+                                        "width":  116,
+                                        "text":  "PRPMOÇOÉS",
+                                        "x":  216
+                                    },
+                                    {
+                                        "y":  720,
+                                        "height":  19,
+                                        "width":  69,
+                                        "text":  "SÉRGIO",
+                                        "x":  535
+                                    },
+                                    {
+                                        "y":  721,
+                                        "height":  16,
+                                        "width":  78,
+                                        "text":  "AMBROS",
+                                        "x":  608
+                                    },
+                                    {
+                                        "y":  721,
+                                        "height":  17,
+                                        "width":  103,
+                                        "text":  "MALLMANN",
+                                        "x":  692
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HORTIGRÀNJEIROS:Q..",
+                      "words":  [
+                                    {
+                                        "y":  745,
+                                        "height":  20,
+                                        "width":  202,
+                                        "text":  "HORTIGRÀNJEIROS:Q..",
+                                        "x":  283
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ": CUNEGATI",
+                      "words":  [
+                                    {
+                                        "y":  763,
+                                        "height":  4,
+                                        "width":  2,
+                                        "text":  ":",
+                                        "x":  429
+                                    },
+                                    {
+                                        "y":  765,
+                                        "height":  13,
+                                        "width":  100,
+                                        "text":  "CUNEGATI",
+                                        "x":  604
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "TRANSPQRTES",
+                      "words":  [
+                                    {
+                                        "y":  768,
+                                        "height":  17,
+                                        "width":  135,
+                                        "text":  "TRANSPQRTES",
+                                        "x":  319
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "TADEU T. DE LIMA",
+                      "words":  [
+                                    {
+                                        "y":  786,
+                                        "height":  16,
+                                        "width":  63,
+                                        "text":  "TADEU",
+                                        "x":  602
+                                    },
+                                    {
+                                        "y":  786,
+                                        "height":  13,
+                                        "width":  14,
+                                        "text":  "T.",
+                                        "x":  668
+                                    },
+                                    {
+                                        "y":  786,
+                                        "height":  13,
+                                        "width":  25,
+                                        "text":  "DE",
+                                        "x":  687
+                                    },
+                                    {
+                                        "y":  785,
+                                        "height":  15,
+                                        "width":  43,
+                                        "text":  "LIMA",
+                                        "x":  718
+                                    }
+                                ]
+                  }
+              ]
+}

@@ -1,0 +1,258 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "LOURIVAL BUBLITZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.11321,
+            0.30213,
+            0.84735,
+            0.04775
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "ÁLVARO EIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.11246,
+            0.32631,
+            0.84675,
+            0.0481
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "ATEMIR ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.1116,
+            0.35433,
+            0.84605,
+            0.0485
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "ALMIRO ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.1108,
+            0.38037,
+            0.84539,
+            0.04888
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CLÉO A. ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.11008,
+            0.40349,
+            0.84481,
+            0.04921
+          ]
+        },
+        {
+          "role": "SECRETÁRIA COORDENAÇÃO",
+          "name": "ELENIR BATISTA",
+          "status": "verified",
+          "sourceRegion": [
+            0.10937,
+            0.42657,
+            0.84402,
+            0.05345
+          ]
+        }
+      ]
+    },
+    {
+      "title": "VICE-PRESIDENTES DAS COMISSÕES",
+      "lines": [
+        {
+          "role": "AGRICULTURA",
+          "name": "VITOR DE CONTI",
+          "status": "verified",
+          "sourceRegion": [
+            0.0959,
+            0.5269,
+            0.84132,
+            0.05194
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "AUGUSTO MORONI",
+          "status": "verified",
+          "sourceRegion": [
+            0.09526,
+            0.54791,
+            0.8408,
+            0.05224
+          ]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "SÉRGIO FLORES DE CAMPOS",
+          "status": "verified",
+          "sourceRegion": [
+            0.09442,
+            0.57557,
+            0.84,
+            0.05457
+          ]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "ALEXANDRE MORONI",
+          "status": "verified",
+          "sourceRegion": [
+            0.09348,
+            0.60603,
+            0.83939,
+            0.0521
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "LUCIANO MALLMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.09282,
+            0.62789,
+            0.83864,
+            0.05627
+          ]
+        },
+        {
+          "role": "CULTURA",
+          "name": "PEDRO LUÍS BUTTENBENDER",
+          "status": "verified",
+          "sourceRegion": [
+            0.092,
+            0.65447,
+            0.83808,
+            0.05472
+          ]
+        },
+        {
+          "role": "CREDENCIAMENTO",
+          "name": "WERNER PILZ NETO",
+          "status": "verified",
+          "sourceRegion": [
+            0.09108,
+            0.6848,
+            0.83742,
+            0.05322
+          ]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "NAMIR STREJEVITCH",
+          "status": "verified",
+          "sourceRegion": [
+            0.09041,
+            0.70657,
+            0.83661,
+            0.05832
+          ]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "NERINO SÁVIO DA ROSA",
+          "status": "verified",
+          "sourceRegion": [
+            0.08958,
+            0.73397,
+            0.83598,
+            0.05775
+          ]
+        },
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "LUÍS MARIATH",
+          "status": "verified",
+          "sourceRegion": [
+            0.08883,
+            0.7585,
+            0.83537,
+            0.05809
+          ]
+        },
+        {
+          "role": "SOCIAL",
+          "name": "HEINZ LORENTZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.08791,
+            0.78865,
+            0.83482,
+            0.05469
+          ]
+        },
+        {
+          "role": "INFRA-ESTRUTURA",
+          "name": "JOÃO GUSTAVO GAMBIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.08719,
+            0.81216,
+            0.83408,
+            0.05788
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "Dr. PEDRO BARILI",
+          "status": "verified",
+          "sourceRegion": [
+            0.0865,
+            0.83471,
+            0.83351,
+            0.05819
+          ],
+          "note": "Cargo compartilhado com a linha seguinte: a placa mostra um único rótulo ASSESSORIA JURÍDICA para os dois nomes."
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "Dr. JUSTINO GIRARDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.42644,
+            0.8774,
+            0.40742,
+            0.04084
+          ],
+          "note": "Segunda linha do cargo compartilhado ASSESSORIA JURÍDICA; o rótulo não é repetido na fotografia."
+        },
+        {
+          "role": "ASSESSORIA CONTÁBIL",
+          "name": "BENALDO LIBERALI",
+          "status": "verified",
+          "sourceRegion": [
+            0.08481,
+            0.89,
+            0.83229,
+            0.05611
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Transcrição visual conferida na fotografia original 13a_Fenasoja_2000.jpeg e na face retificada fenasoja-2000.webp; o OCR foi consultado apenas como rascunho não confiável.",
+    "Período gravado: '01 A 09 DE ABRIL DE 2000'. A localização gravada é 'SANTA ROSA-RS BRASIL'.",
+    "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita. A ordem de cima para baixo foi preservada.",
+    "A seção COMISSÃO CENTRAL contém 6 nomes; VICE-PRESIDENTES DAS COMISSÕES contém 15 nomes, com ASSESSORIA JURÍDICA compartilhada por duas linhas.",
+    "Grafias, acentos, o prefixo 'Dr.' e o hífen de INFRA-ESTRUTURA seguem a inscrição visível, sem pesquisa externa ou correção por cadastros. VITOR DE CONTI está gravado sem acento em VITOR.",
+    "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+    "Todos os nomes e cargos desta placa foram confirmados visualmente; não há trecho editorial pendente."
+  ]
+}

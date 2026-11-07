@@ -1,0 +1,363 @@
+{
+  "status": "verified",
+  "engravedPeriod": "DE 29 DE ABRIL A 08 DE MAIO DE 2016 (no cartaz)",
+  "namesFirst": true,
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE DE HONRA",
+          "name": "ÁLVARO EIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.20325,
+            0.23858,
+            0.76533,
+            0.02364
+          ]
+        },
+        {
+          "role": "PRESIDENTE CCPF",
+          "name": "ÂNGELA DE FARIA MARASCHIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.20288,
+            0.26093,
+            0.76598,
+            0.02315
+          ]
+        },
+        {
+          "role": "PRESIDENTE",
+          "name": "GERSON MIGUEL LAUERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.20252,
+            0.28341,
+            0.76663,
+            0.02265
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "ALEXANDRE RODRIGO MARONEZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.20215,
+            0.30582,
+            0.76728,
+            0.02216
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "JAIME LUÍS PATIAS",
+          "status": "verified",
+          "sourceRegion": [
+            0.20178,
+            0.32828,
+            0.76794,
+            0.02167
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "RICARDO EMÍLIO ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.20141,
+            0.35088,
+            0.76859,
+            0.02117
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CLÉO ANTÔNIO ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.20104,
+            0.37341,
+            0.76925,
+            0.02067
+          ]
+        },
+        {
+          "role": "AUXILIAR ADMINISTRATIVO",
+          "name": "LUCIANA SAWCZUK MALEICO",
+          "status": "verified",
+          "sourceRegion": [
+            0.20067,
+            0.39599,
+            0.7699,
+            0.02017
+          ]
+        },
+        {
+          "role": "AUXILIAR ADMINISTRATIVO",
+          "name": "ADRIANO CLEOMAR BERGMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.2003,
+            0.4187,
+            0.77056,
+            0.01966
+          ]
+        },
+        {
+          "role": "PROTOCOLO",
+          "name": "JORGE LUIZ VIANA",
+          "status": "verified",
+          "sourceRegion": [
+            0.19993,
+            0.44135,
+            0.77122,
+            0.01916
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "ASSESSORIA de IMPRENSA",
+          "name": "EUNICE MARIA BIER KERKHOFF",
+          "status": "verified",
+          "sourceRegion": [
+            0.19874,
+            0.51373,
+            0.77333,
+            0.01754
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JOSÉ MAURO BARBIERI",
+          "status": "verified",
+          "sourceRegion": [
+            0.19838,
+            0.53614,
+            0.77398,
+            0.01704
+          ]
+        },
+        {
+          "role": "AGRICULTURA",
+          "name": "GILMAR FRANCISCO VIONE",
+          "status": "verified",
+          "sourceRegion": [
+            0.19801,
+            0.55858,
+            0.77463,
+            0.01654
+          ]
+        },
+        {
+          "role": "BILHETERIA",
+          "name": "SÉRGIO IVAN DE SOUZA GRIZA",
+          "status": "verified",
+          "sourceRegion": [
+            0.19764,
+            0.58106,
+            0.77528,
+            0.01603
+          ]
+        },
+        {
+          "role": "PROJETOS E CAPTAÇÃO",
+          "name": "ARTUR LORENTZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.19727,
+            0.60358,
+            0.77594,
+            0.01552
+          ]
+        },
+        {
+          "role": "CREDENCIAMENTO",
+          "name": "ROGÉRIO DOS SANTOS FERREIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.1969,
+            0.62614,
+            0.77659,
+            0.01502
+          ]
+        },
+        {
+          "role": "CULTURA e TURISMO",
+          "name": "BERNARDETE ALVES CARVALHO",
+          "status": "verified",
+          "sourceRegion": [
+            0.19653,
+            0.64874,
+            0.77725,
+            0.0145
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "BIANCA LETZOW JUNGES",
+          "status": "verified",
+          "sourceRegion": [
+            0.19616,
+            0.67138,
+            0.7779,
+            0.01399
+          ]
+        },
+        {
+          "role": "ETNIAS",
+          "name": "JOSÉ CARLOS DA SILVA ELIAS",
+          "status": "verified",
+          "sourceRegion": [
+            0.19579,
+            0.69405,
+            0.77856,
+            0.01348
+          ]
+        },
+        {
+          "role": "EXPORURAL",
+          "name": "ROBERTO ADRIANO RACHO",
+          "status": "verified",
+          "sourceRegion": [
+            0.19542,
+            0.71677,
+            0.77922,
+            0.01296
+          ]
+        },
+        {
+          "role": "INDÚSTRIA, COMÉRCIO E SERVIÇOS",
+          "name": "ODAYLSON EDER",
+          "status": "verified",
+          "sourceRegion": [
+            0.19504,
+            0.73952,
+            0.77988,
+            0.01244
+          ]
+        },
+        {
+          "role": "INFRAESTRUTURA",
+          "name": "ELIAS DALLALBA",
+          "status": "verified",
+          "sourceRegion": [
+            0.19467,
+            0.76231,
+            0.78055,
+            0.01192
+          ]
+        },
+        {
+          "role": "LOGÍSTICA",
+          "name": "JOSÉLIO VENDRÚSCULO",
+          "status": "verified",
+          "sourceRegion": [
+            0.1943,
+            0.78514,
+            0.78121,
+            0.0114
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "GUSTAVO EDUARDO SAUTER GROFF",
+          "status": "verified",
+          "sourceRegion": [
+            0.19392,
+            0.80801,
+            0.78187,
+            0.01088
+          ]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "VITOR HUGO NOGUEIRA DUTRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.19355,
+            0.83092,
+            0.78254,
+            0.01036
+          ]
+        },
+        {
+          "role": "RECEPÇÃO",
+          "name": "MARIA VANICE ESCHER SEGER",
+          "status": "verified",
+          "sourceRegion": [
+            0.19317,
+            0.85387,
+            0.78321,
+            0.00983
+          ]
+        },
+        {
+          "role": "RELAÇÕES INTERNACIONAIS",
+          "name": "DANIEL ZIMMERMANN FÜHR",
+          "status": "verified",
+          "sourceRegion": [
+            0.19279,
+            0.87686,
+            0.78387,
+            0.0093
+          ]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "Ten.Cel. VLADIMIR F. DALLA COSTA RIBAS",
+          "status": "verified",
+          "sourceRegion": [
+            0.19242,
+            0.89989,
+            0.78454,
+            0.00877
+          ]
+        },
+        {
+          "role": "SERVIÇOS DE MANUTENÇÃO",
+          "name": "JOSÉ MIGUEL DAS CHAGAS",
+          "status": "verified",
+          "sourceRegion": [
+            0.19204,
+            0.92296,
+            0.78521,
+            0.00824
+          ]
+        },
+        {
+          "role": "SOJA e DERIVADOS",
+          "name": "VANESSA MATRASZEK GNOATTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.19166,
+            0.94606,
+            0.78588,
+            0.0077
+          ]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "JOÃO LUIS MADALOZZO DA ROSA",
+          "status": "verified",
+          "sourceRegion": [
+            0.19128,
+            0.96921,
+            0.78656,
+            0.00717
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados.",
+    "As marcas e os cartazes são recortes da fotografia; títulos e slogans do cabeçalho foram recompostos após conferência visual. A face limpa não utiliza o reflexo do fotógrafo."
+  ]
+}

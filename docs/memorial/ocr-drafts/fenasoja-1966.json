@@ -1,0 +1,909 @@
+﻿{
+    "status":  "UNREVIEWED_DRAFT",
+    "engine":  "Windows.Media.Ocr pt-BR",
+    "lines":  [
+                  {
+                      "text":  "Ia",
+                      "words":  [
+                                    {
+                                        "y":  162,
+                                        "height":  38,
+                                        "width":  36,
+                                        "text":  "Ia",
+                                        "x":  135
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRESIDENTES DF. ÁREA",
+                      "words":  [
+                                    {
+                                        "y":  561,
+                                        "height":  13,
+                                        "width":  130,
+                                        "text":  "PRESIDENTES",
+                                        "x":  377
+                                    },
+                                    {
+                                        "y":  561,
+                                        "height":  13,
+                                        "width":  25,
+                                        "text":  "DF.",
+                                        "x":  514
+                                    },
+                                    {
+                                        "y":  558,
+                                        "height":  16,
+                                        "width":  52,
+                                        "text":  "ÁREA",
+                                        "x":  545
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PROMOÇÃO vAçpkyzÀçÂp",
+                      "words":  [
+                                    {
+                                        "y":  631,
+                                        "height":  22,
+                                        "width":  117,
+                                        "text":  "PROMOÇÃO",
+                                        "x":  72
+                                    },
+                                    {
+                                        "y":  632,
+                                        "height":  23,
+                                        "width":  139,
+                                        "text":  "vAçpkyzÀçÂp",
+                                        "x":  212
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "râCADO ERTO M",
+                      "words":  [
+                                    {
+                                        "y":  672,
+                                        "height":  22,
+                                        "width":  76,
+                                        "text":  "râCADO",
+                                        "x":  270
+                                    },
+                                    {
+                                        "y":  678,
+                                        "height":  18,
+                                        "width":  50,
+                                        "text":  "ERTO",
+                                        "x":  570
+                                    },
+                                    {
+                                        "y":  680,
+                                        "height":  14,
+                                        "width":  15,
+                                        "text":  "M",
+                                        "x":  626
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "-r\u0027 INDÚSTRIA ÇUNARDI)?",
+                      "words":  [
+                                    {
+                                        "y":  726,
+                                        "height":  8,
+                                        "width":  11,
+                                        "text":  "-r\u0027",
+                                        "x":  185
+                                    },
+                                    {
+                                        "y":  718,
+                                        "height":  24,
+                                        "width":  109,
+                                        "text":  "INDÚSTRIA",
+                                        "x":  201
+                                    },
+                                    {
+                                        "y":  719,
+                                        "height":  22,
+                                        "width":  101,
+                                        "text":  "ÇUNARDI)?",
+                                        "x":  585
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EPWINO\u0027FEHLAUEÊ",
+                      "words":  [
+                                    {
+                                        "y":  763,
+                                        "height":  22,
+                                        "width":  193,
+                                        "text":  "EPWINO\u0027FEHLAUEÊ",
+                                        "x":  529
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ": SCHMIDT",
+                      "words":  [
+                                    {
+                                        "y":  797,
+                                        "height":  8,
+                                        "width":  4,
+                                        "text":  ":",
+                                        "x":  422
+                                    },
+                                    {
+                                        "y":  788,
+                                        "height":  18,
+                                        "width":  90,
+                                        "text":  "SCHMIDT",
+                                        "x":  623
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PÚBLICA",
+                      "words":  [
+                                    {
+                                        "y":  808,
+                                        "height":  21,
+                                        "width":  85,
+                                        "text":  "PÚBLICA",
+                                        "x":  351
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HOSPEDAdEMEÁúMENTAÇÃo",
+                      "words":  [
+                                    {
+                                        "y":  847,
+                                        "height":  26,
+                                        "width":  306,
+                                        "text":  "HOSPEDAdEMEÁúMENTAÇÃo",
+                                        "x":  129
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• TRAÑSPOÊtEETRÂNSlfO",
+                      "words":  [
+                                    {
+                                        "y":  885,
+                                        "height":  3,
+                                        "width":  2,
+                                        "text":  "•",
+                                        "x":  169
+                                    },
+                                    {
+                                        "y":  873,
+                                        "height":  22,
+                                        "width":  254,
+                                        "text":  "TRAÑSPOÊtEETRÂNSlfO",
+                                        "x":  180
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "INFORMAÇÕES E RECLAMAÇÕES»",
+                      "words":  [
+                                    {
+                                        "y":  896,
+                                        "height":  23,
+                                        "width":  150,
+                                        "text":  "INFORMAÇÕES",
+                                        "x":  114
+                                    },
+                                    {
+                                        "y":  900,
+                                        "height":  14,
+                                        "width":  12,
+                                        "text":  "E",
+                                        "x":  267
+                                    },
+                                    {
+                                        "y":  894,
+                                        "height":  24,
+                                        "width":  159,
+                                        "text":  "RECLAMAÇÕES»",
+                                        "x":  284
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PROMOÇÃO ÉJMPRENSAW",
+                      "words":  [
+                                    {
+                                        "y":  918,
+                                        "height":  22,
+                                        "width":  117,
+                                        "text":  "PROMOÇÃO",
+                                        "x":  189
+                                    },
+                                    {
+                                        "y":  917,
+                                        "height":  21,
+                                        "width":  128,
+                                        "text":  "ÉJMPRENSAW",
+                                        "x":  310
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RAINHÀ DÂ FENASOJA",
+                      "words":  [
+                                    {
+                                        "y":  961,
+                                        "height":  20,
+                                        "width":  77,
+                                        "text":  "RAINHÀ",
+                                        "x":  212
+                                    },
+                                    {
+                                        "y":  962,
+                                        "height":  20,
+                                        "width":  30,
+                                        "text":  "DÂ",
+                                        "x":  294
+                                    },
+                                    {
+                                        "y":  965,
+                                        "height":  16,
+                                        "width":  105,
+                                        "text":  "FENASOJA",
+                                        "x":  329
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ORNAMENTAÇÃO DACIDADE",
+                      "words":  [
+                                    {
+                                        "y":  986,
+                                        "height":  22,
+                                        "width":  173,
+                                        "text":  "ORNAMENTAÇÃO",
+                                        "x":  144
+                                    },
+                                    {
+                                        "y":  989,
+                                        "height":  17,
+                                        "width":  110,
+                                        "text":  "DACIDADE",
+                                        "x":  321
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ORNAMENTAÇÂQVITRINÉS",
+                      "words":  [
+                                    {
+                                        "y":  1009,
+                                        "height":  22,
+                                        "width":  265,
+                                        "text":  "ORNAMENTAÇÂQVITRINÉS",
+                                        "x":  165
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RÁDiO AMADORISMO",
+                      "words":  [
+                                    {
+                                        "y":  1031,
+                                        "height":  18,
+                                        "width":  63,
+                                        "text":  "RÁDiO",
+                                        "x":  219
+                                    },
+                                    {
+                                        "y":  1034,
+                                        "height":  18,
+                                        "width":  144,
+                                        "text":  "AMADORISMO",
+                                        "x":  287
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ESPORTES",
+                      "words":  [
+                                    {
+                                        "y":  1056,
+                                        "height":  17,
+                                        "width":  102,
+                                        "text":  "ESPORTES",
+                                        "x":  327
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PROMOÇÕES. CULTURAIS",
+                      "words":  [
+                                    {
+                                        "y":  1077,
+                                        "height":  23,
+                                        "width":  129,
+                                        "text":  "PROMOÇÕES.",
+                                        "x":  184
+                                    },
+                                    {
+                                        "y":  1076,
+                                        "height":  19,
+                                        "width":  110,
+                                        "text":  "CULTURAIS",
+                                        "x":  320
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ESPETÁCULOS E bESFlLES",
+                      "words":  [
+                                    {
+                                        "y":  1099,
+                                        "height":  19,
+                                        "width":  141,
+                                        "text":  "ESPETÁCULOS",
+                                        "x":  170
+                                    },
+                                    {
+                                        "y":  1103,
+                                        "height":  15,
+                                        "width":  11,
+                                        "text":  "E",
+                                        "x":  318
+                                    },
+                                    {
+                                        "y":  1100,
+                                        "height":  20,
+                                        "width":  94,
+                                        "text":  "bESFlLES",
+                                        "x":  334
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DEFESA SANITÁRIAÁÑIMAL",
+                      "words":  [
+                                    {
+                                        "y":  1126,
+                                        "height":  17,
+                                        "width":  78,
+                                        "text":  "DEFESA",
+                                        "x":  154
+                                    },
+                                    {
+                                        "y":  1122,
+                                        "height":  20,
+                                        "width":  191,
+                                        "text":  "SANITÁRIAÁÑIMAL",
+                                        "x":  237
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PROJEÇÃO CINEMATOGRÁFICA",
+                      "words":  [
+                                    {
+                                        "y":  1146,
+                                        "height":  23,
+                                        "width":  109,
+                                        "text":  "PROJEÇÃO",
+                                        "x":  118
+                                    },
+                                    {
+                                        "y":  1146,
+                                        "height":  19,
+                                        "width":  194,
+                                        "text":  "CINEMATOGRÁFICA",
+                                        "x":  233
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "POSIÇÃO DE ANIMAIS DE PEQUENO PORTE",
+                      "words":  [
+                                    {
+                                        "y":  1170,
+                                        "height":  23,
+                                        "width":  89,
+                                        "text":  "POSIÇÃO",
+                                        "x":  0
+                                    },
+                                    {
+                                        "y":  1174,
+                                        "height":  14,
+                                        "width":  26,
+                                        "text":  "DE",
+                                        "x":  96
+                                    },
+                                    {
+                                        "y":  1173,
+                                        "height":  15,
+                                        "width":  86,
+                                        "text":  "ANIMAIS",
+                                        "x":  128
+                                    },
+                                    {
+                                        "y":  1173,
+                                        "height":  15,
+                                        "width":  26,
+                                        "text":  "DE",
+                                        "x":  221
+                                    },
+                                    {
+                                        "y":  1173,
+                                        "height":  18,
+                                        "width":  99,
+                                        "text":  "PEQUENO",
+                                        "x":  254
+                                    },
+                                    {
+                                        "y":  1172,
+                                        "height":  15,
+                                        "width":  67,
+                                        "text":  "PORTE",
+                                        "x":  358
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "\u0027RAÇÃO TELEFONES AUTOMÁTICOS (CITEL)",
+                      "words":  [
+                                    {
+                                        "y":  1194,
+                                        "height":  22,
+                                        "width":  78,
+                                        "text":  "\u0027RAÇÃO",
+                                        "x":  0
+                                    },
+                                    {
+                                        "y":  1196,
+                                        "height":  16,
+                                        "width":  116,
+                                        "text":  "TELEFONES",
+                                        "x":  84
+                                    },
+                                    {
+                                        "y":  1192,
+                                        "height":  19,
+                                        "width":  146,
+                                        "text":  "AUTOMÁTICOS",
+                                        "x":  205
+                                    },
+                                    {
+                                        "y":  1193,
+                                        "height":  20,
+                                        "width":  66,
+                                        "text":  "(CITEL)",
+                                        "x":  358
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ")RNAMENTAÇÃO PARQUE DE EXPOSIÇÕES",
+                      "words":  [
+                                    {
+                                        "y":  1217,
+                                        "height":  22,
+                                        "width":  169,
+                                        "text":  ")RNAMENTAÇÃO",
+                                        "x":  0
+                                    },
+                                    {
+                                        "y":  1220,
+                                        "height":  17,
+                                        "width":  83,
+                                        "text":  "PARQUE",
+                                        "x":  176
+                                    },
+                                    {
+                                        "y":  1219,
+                                        "height":  15,
+                                        "width":  26,
+                                        "text":  "DE",
+                                        "x":  266
+                                    },
+                                    {
+                                        "y":  1215,
+                                        "height":  23,
+                                        "width":  127,
+                                        "text":  "EXPOSIÇÕES",
+                                        "x":  297
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "FLORIANO",
+                      "words":  [
+                                    {
+                                        "y":  808,
+                                        "height":  20,
+                                        "width":  101,
+                                        "text":  "FLORIANO",
+                                        "x":  629
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RECÉPÇÃ03E,SE.ü- HÉLIO CHAVES LOPES",
+                      "words":  [
+                                    {
+                                        "y":  827,
+                                        "height":  26,
+                                        "width":  197,
+                                        "text":  "RECÉPÇÃ03E,SE.ü-",
+                                        "x":  328
+                                    },
+                                    {
+                                        "y":  831,
+                                        "height":  19,
+                                        "width":  59,
+                                        "text":  "HÉLIO",
+                                        "x":  528
+                                    },
+                                    {
+                                        "y":  831,
+                                        "height":  18,
+                                        "width":  79,
+                                        "text":  "CHAVES",
+                                        "x":  591
+                                    },
+                                    {
+                                        "y":  829,
+                                        "height":  22,
+                                        "width":  66,
+                                        "text":  "LOPES",
+                                        "x":  672
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ÉÚCÊNIO piLZ",
+                      "words":  [
+                                    {
+                                        "y":  852,
+                                        "height":  19,
+                                        "width":  89,
+                                        "text":  "ÉÚCÊNIO",
+                                        "x":  527
+                                    },
+                                    {
+                                        "y":  851,
+                                        "height":  20,
+                                        "width":  50,
+                                        "text":  "piLZ",
+                                        "x":  622
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EGON KUNDE",
+                      "words":  [
+                                    {
+                                        "y":  878,
+                                        "height":  15,
+                                        "width":  59,
+                                        "text":  "EGON",
+                                        "x":  523
+                                    },
+                                    {
+                                        "y":  875,
+                                        "height":  18,
+                                        "width":  71,
+                                        "text":  "KUNDE",
+                                        "x":  587
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "VÁLÉERTO BELTRAME.",
+                      "words":  [
+                                    {
+                                        "y":  893,
+                                        "height":  23,
+                                        "width":  118,
+                                        "text":  "VÁLÉERTO",
+                                        "x":  499
+                                    },
+                                    {
+                                        "y":  899,
+                                        "height":  16,
+                                        "width":  108,
+                                        "text":  "BELTRAME.",
+                                        "x":  623
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOCIAL ZENAPOLEÂO",
+                      "words":  [
+                                    {
+                                        "y":  941,
+                                        "height":  18,
+                                        "width":  80,
+                                        "text":  "SOCIAL",
+                                        "x":  352
+                                    },
+                                    {
+                                        "y":  942,
+                                        "height":  23,
+                                        "width":  128,
+                                        "text":  "ZENAPOLEÂO",
+                                        "x":  507
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EL4TON LANES•PILAU",
+                      "words":  [
+                                    {
+                                        "y":  964,
+                                        "height":  18,
+                                        "width":  69,
+                                        "text":  "EL4TON",
+                                        "x":  514
+                                    },
+                                    {
+                                        "y":  968,
+                                        "height":  16,
+                                        "width":  127,
+                                        "text":  "LANES•PILAU",
+                                        "x":  588
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ". RENATO STADUTO",
+                      "words":  [
+                                    {
+                                        "y":  1004,
+                                        "height":  3,
+                                        "width":  4,
+                                        "text":  ".",
+                                        "x":  512
+                                    },
+                                    {
+                                        "y":  990,
+                                        "height":  18,
+                                        "width":  81,
+                                        "text":  "RENATO",
+                                        "x":  524
+                                    },
+                                    {
+                                        "y":  990,
+                                        "height":  16,
+                                        "width":  91,
+                                        "text":  "STADUTO",
+                                        "x":  611
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "- CÂÇOSTINHO ZENNI",
+                      "words":  [
+                                    {
+                                        "y":  1012,
+                                        "height":  1,
+                                        "width":  4,
+                                        "text":  "-",
+                                        "x":  479
+                                    },
+                                    {
+                                        "y":  1008,
+                                        "height":  22,
+                                        "width":  131,
+                                        "text":  "CÂÇOSTINHO",
+                                        "x":  510
+                                    },
+                                    {
+                                        "y":  1013,
+                                        "height":  17,
+                                        "width":  59,
+                                        "text":  "ZENNI",
+                                        "x":  647
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CLARO LOPES DE LOS SANTOS",
+                      "words":  [
+                                    {
+                                        "y":  1032,
+                                        "height":  23,
+                                        "width":  75,
+                                        "text":  "CLARO",
+                                        "x":  516
+                                    },
+                                    {
+                                        "y":  1036,
+                                        "height":  16,
+                                        "width":  62,
+                                        "text":  "LOPES",
+                                        "x":  598
+                                    },
+                                    {
+                                        "y":  1036,
+                                        "height":  15,
+                                        "width":  30,
+                                        "text":  "DE",
+                                        "x":  663
+                                    },
+                                    {
+                                        "y":  1033,
+                                        "height":  18,
+                                        "width":  37,
+                                        "text":  "LOS",
+                                        "x":  699
+                                    },
+                                    {
+                                        "y":  1036,
+                                        "height":  19,
+                                        "width":  81,
+                                        "text":  "SANTOS",
+                                        "x":  741
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "\u0027PE. -MARCELO FABIANO",
+                      "words":  [
+                                    {
+                                        "y":  1058,
+                                        "height":  15,
+                                        "width":  37,
+                                        "text":  "\u0027PE.",
+                                        "x":  516
+                                    },
+                                    {
+                                        "y":  1058,
+                                        "height":  15,
+                                        "width":  99,
+                                        "text":  "-MARCELO",
+                                        "x":  557
+                                    },
+                                    {
+                                        "y":  1059,
+                                        "height":  17,
+                                        "width":  92,
+                                        "text":  "FABIANO",
+                                        "x":  663
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ÂÉLSONCRÀBIN",
+                      "words":  [
+                                    {
+                                        "y":  1077,
+                                        "height":  20,
+                                        "width":  175,
+                                        "text":  "ÂÉLSONCRÀBIN",
+                                        "x":  512
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ANSELMO SCHULER",
+                      "words":  [
+                                    {
+                                        "y":  1104,
+                                        "height":  15,
+                                        "width":  99,
+                                        "text":  "ANSELMO",
+                                        "x":  521
+                                    },
+                                    {
+                                        "y":  1102,
+                                        "height":  18,
+                                        "width":  91,
+                                        "text":  "SCHULER",
+                                        "x":  626
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ".WALTER WARTH",
+                      "words":  [
+                                    {
+                                        "y":  1127,
+                                        "height":  16,
+                                        "width":  87,
+                                        "text":  ".WALTER",
+                                        "x":  516
+                                    },
+                                    {
+                                        "y":  1127,
+                                        "height":  16,
+                                        "width":  73,
+                                        "text":  "WARTH",
+                                        "x":  609
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ". AÑTHUR SCHMIDT",
+                      "words":  [
+                                    {
+                                        "y":  1159,
+                                        "height":  2,
+                                        "width":  3,
+                                        "text":  ".",
+                                        "x":  514
+                                    },
+                                    {
+                                        "y":  1148,
+                                        "height":  17,
+                                        "width":  82,
+                                        "text":  "AÑTHUR",
+                                        "x":  521
+                                    },
+                                    {
+                                        "y":  1150,
+                                        "height":  17,
+                                        "width":  91,
+                                        "text":  "SCHMIDT",
+                                        "x":  609
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CERT MÜLLER",
+                      "words":  [
+                                    {
+                                        "y":  1173,
+                                        "height":  15,
+                                        "width":  55,
+                                        "text":  "CERT",
+                                        "x":  518
+                                    },
+                                    {
+                                        "y":  1170,
+                                        "height":  20,
+                                        "width":  80,
+                                        "text":  "MÜLLER",
+                                        "x":  578
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CAMILO BELTRAME",
+                      "words":  [
+                                    {
+                                        "y":  1197,
+                                        "height":  16,
+                                        "width":  78,
+                                        "text":  "CAMILO",
+                                        "x":  520
+                                    },
+                                    {
+                                        "y":  1196,
+                                        "height":  17,
+                                        "width":  106,
+                                        "text":  "BELTRAME",
+                                        "x":  605
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ELíBlO FREDRICH",
+                      "words":  [
+                                    {
+                                        "y":  1216,
+                                        "height":  20,
+                                        "width":  64,
+                                        "text":  "ELíBlO",
+                                        "x":  521
+                                    },
+                                    {
+                                        "y":  1220,
+                                        "height":  18,
+                                        "width":  100,
+                                        "text":  "FREDRICH",
+                                        "x":  592
+                                    }
+                                ]
+                  }
+              ]
+}

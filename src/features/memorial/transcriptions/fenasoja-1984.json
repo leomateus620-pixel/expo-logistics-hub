@@ -1,0 +1,192 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 07 A 15 DE ABRIL DE 1984",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "ADIL MANJABOSCO",
+          "status": "verified",
+          "sourceRegion": [
+            0.33267,
+            0.28022,
+            0.4007,
+            0.02163
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "PEDRO CARPENEDO",
+          "status": "verified",
+          "sourceRegion": [
+            0.27403,
+            0.29899,
+            0.46425,
+            0.02161
+          ],
+          "note": "Primeiro dos nove nomes sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "WILLY KLAUS",
+          "status": "verified",
+          "sourceRegion": [
+            0.53297,
+            0.31654,
+            0.14176,
+            0.02179
+          ],
+          "note": "Segundo nome sob o cargo compartilhado VICE-PRESIDENTES; o cargo aparece apenas na primeira linha."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "ELIAS SCALCO",
+          "status": "verified",
+          "sourceRegion": [
+            0.53297,
+            0.33424,
+            0.15156,
+            0.0218
+          ],
+          "note": "Terceiro nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "EDGAR DESSUY",
+          "status": "verified",
+          "sourceRegion": [
+            0.53297,
+            0.35195,
+            0.16135,
+            0.0218
+          ],
+          "note": "Quarto nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "SÉRGIO AMBROS MALLMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.53297,
+            0.36966,
+            0.28364,
+            0.02174
+          ],
+          "note": "Quinto nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "JOÃO ALBERTO PULCINELLI",
+          "status": "verified",
+          "sourceRegion": [
+            0.53297,
+            0.38737,
+            0.26899,
+            0.02176
+          ],
+          "note": "Sexto nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "EDGAR MASSOTI",
+          "status": "verified",
+          "sourceRegion": [
+            0.53297,
+            0.40509,
+            0.17118,
+            0.02181
+          ],
+          "note": "Sétimo nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "PEDRO STEFFEN",
+          "status": "verified",
+          "sourceRegion": [
+            0.53297,
+            0.42281,
+            0.17119,
+            0.02182
+          ],
+          "note": "Oitavo nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "NAIRO RIBEIRO",
+          "status": "verified",
+          "sourceRegion": [
+            0.53297,
+            0.44053,
+            0.16143,
+            0.02183
+          ],
+          "note": "Nono nome sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "ECLAIR MORAGINSKI",
+          "status": "verified",
+          "sourceRegion": [
+            0.2298,
+            0.45839,
+            0.52822,
+            0.02168
+          ]
+        },
+        {
+          "role": "SECRETÁRIO EXECUTIVO",
+          "name": "NOLAR CAETANO",
+          "status": "verified",
+          "sourceRegion": [
+            0.22,
+            0.47612,
+            0.4989,
+            0.0217
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "CLÁUDIO CAMARGO",
+          "status": "verified",
+          "sourceRegion": [
+            0.23952,
+            0.49384,
+            0.51854,
+            0.0217
+          ]
+        },
+        {
+          "role": "TESOUREIRO GERAL",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [
+            0.25906,
+            0.51157,
+            0.44519,
+            0.02174
+          ],
+          "note": "O final ZIO L. BRUM está legível. As primeiras letras e a acentuação do prenome estão sob reflexo e não puderam ser confirmadas integralmente; não foram completadas por inferência."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Título original: 6ª FENASOJA.",
+    "DE 07 A 15 DE ABRIL DE 1984",
+    "Transcrição visual da fotografia IMG_1152.jpeg e da face retificada fenasoja-1984.webp, com conferência ampliada das quatorze linhas de nomes da Comissão Central.",
+    "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+    "Os nove vice-presidentes estão sob um único cargo impresso. O cargo foi repetido nas entradas para preservar a associação e a ordem dos nomes.",
+    "A fotografia desta placa mostra somente a seção COMISSÃO CENTRAL. Não foi criada uma seção de áreas nem foram inferidos cargos adicionais.",
+    "O amplo campo inferior da placa não contém outras inscrições visíveis e foi mantido vazio, sem criação de linhas ou conteúdo para preenchê-lo.",
+    "O período foi transcrito diretamente da gravação: o mês indicado é ABRIL.",
+    "O prenome da linha TESOUREIRO GERAL não foi confirmado integralmente por causa do reflexo. O final legível foi mantido na nota da respectiva linha.",
+    "namesFirst é false porque os cargos aparecem à esquerda e os nomes à direita na fotografia.",
+    "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+    "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem, sem correção histórica inferida.",
+    "Status global parcial devido a um nome completo não confirmado; todos os cargos estão legíveis."
+  ]
+}

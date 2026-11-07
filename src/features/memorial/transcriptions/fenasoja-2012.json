@@ -1,0 +1,338 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL | 19ª FENASOJA",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "ELEMAR ANTONIO LENZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.02535,
+            0.25091,
+            0.9476,
+            0.0226
+          ]
+        },
+        {
+          "role": "PRESIDENTE DE HONRA",
+          "name": "SÉRGIO AMBROS MALLMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.02529,
+            0.27399,
+            0.94783,
+            0.02281
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "ÂNGELA DE FARIA MARASCHIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.02523,
+            0.29717,
+            0.94805,
+            0.02302
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "ATEMIR ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.02517,
+            0.32027,
+            0.94828,
+            0.02322
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "JAIME LUIS PATIAS",
+          "status": "verified",
+          "sourceRegion": [
+            0.02511,
+            0.34338,
+            0.9485,
+            0.02343
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CLÉO ANTONIO ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.02505,
+            0.36651,
+            0.94873,
+            0.02364
+          ]
+        },
+        {
+          "role": "SECRETÁRIO",
+          "name": "ÉVERTON PEREIRA DE OLIVEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.02499,
+            0.38974,
+            0.94895,
+            0.02385
+          ]
+        },
+        {
+          "role": "AUXILIAR ADMINISTRATIVO",
+          "name": "VINÍCIUS RIGON DORNELES",
+          "status": "verified",
+          "sourceRegion": [
+            0.02493,
+            0.41288,
+            0.94918,
+            0.02406
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "AGRICULTURA",
+          "name": "VÂNIO HEIMERDINGER",
+          "status": "verified",
+          "sourceRegion": [
+            0.02472,
+            0.4901,
+            0.94993,
+            0.02475
+          ]
+        },
+        {
+          "role": "EXPORURAL",
+          "name": "GABRIEL AUGUSTO WEBER",
+          "status": "verified",
+          "sourceRegion": [
+            0.02466,
+            0.5129,
+            0.95015,
+            0.02496
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "GUSTAVO EDUARDO SAUTER GROFF",
+          "status": "verified",
+          "sourceRegion": [
+            0.0246,
+            0.5357,
+            0.95037,
+            0.02517
+          ]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "TEN CEL SÉRGIO FLORES DE CAMPOS",
+          "status": "verified",
+          "sourceRegion": [
+            0.02454,
+            0.55852,
+            0.9506,
+            0.02537
+          ]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "ALEXANDRE RODRIGO MARONEZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.02448,
+            0.58134,
+            0.95082,
+            0.02558
+          ]
+        },
+        {
+          "role": "ETNIAS",
+          "name": "ELISABETE ESTELA MYSKO",
+          "status": "verified",
+          "sourceRegion": [
+            0.02442,
+            0.60418,
+            0.95104,
+            0.02578
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "TIAGO NARDIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.02436,
+            0.62703,
+            0.95126,
+            0.02599
+          ]
+        },
+        {
+          "role": "BILHETERIA",
+          "name": "SÉRGIO IVAN DE SOUZA GRIZA",
+          "status": "verified",
+          "sourceRegion": [
+            0.0243,
+            0.64989,
+            0.95149,
+            0.0262
+          ]
+        },
+        {
+          "role": "CULTURA E TURISMO",
+          "name": "ÂNGELO ELOCIR ZENI",
+          "status": "verified",
+          "sourceRegion": [
+            0.02424,
+            0.67275,
+            0.95171,
+            0.0264
+          ]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "AMAURI DE SOUZA RIBEIRO",
+          "status": "verified",
+          "sourceRegion": [
+            0.02418,
+            0.69563,
+            0.95193,
+            0.02661
+          ]
+        },
+        {
+          "role": "CREDENCIAMENTO",
+          "name": "FABIANE VOLKMER GROSSMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.02412,
+            0.71852,
+            0.95216,
+            0.02682
+          ]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "GILBERTO DELL VALLE",
+          "status": "verified",
+          "sourceRegion": [
+            0.02406,
+            0.74142,
+            0.95238,
+            0.02703
+          ]
+        },
+        {
+          "role": "LOGÍSTICA",
+          "name": "JOSÉLIO VENDRÚSCULO",
+          "status": "verified",
+          "sourceRegion": [
+            0.024,
+            0.76434,
+            0.9526,
+            0.02723
+          ]
+        },
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "HELMUTH GROSSMANN JÚNIOR",
+          "status": "verified",
+          "sourceRegion": [
+            0.02394,
+            0.78726,
+            0.95283,
+            0.02744
+          ]
+        },
+        {
+          "role": "RECEPÇÃO",
+          "name": "MARIA VANICE ESCHER SEGER",
+          "status": "verified",
+          "sourceRegion": [
+            0.02388,
+            0.81019,
+            0.95305,
+            0.02765
+          ]
+        },
+        {
+          "role": "INFRA-ESTRUTURA",
+          "name": "ADEMIR LUÍS MEINERZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.02382,
+            0.83313,
+            0.95327,
+            0.02786
+          ]
+        },
+        {
+          "role": "CONESUL",
+          "name": "GERSON MIGUEL LAUERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.02376,
+            0.85609,
+            0.9535,
+            0.02807
+          ]
+        },
+        {
+          "role": "SOJA E DERIVADOS",
+          "name": "JORGE JOÃO LUNARDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.0237,
+            0.87905,
+            0.95372,
+            0.02828
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JOSÉ MAURO BARBIERI",
+          "status": "verified",
+          "sourceRegion": [
+            0.02364,
+            0.90203,
+            0.95394,
+            0.02849
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE IMPRENSA",
+          "name": "FELIPE RIGON DORNELES",
+          "status": "verified",
+          "sourceRegion": [
+            0.02358,
+            0.92501,
+            0.95417,
+            0.02869
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE PROJETOS",
+          "name": "CLÁUDIO FRANKE",
+          "status": "verified",
+          "sourceRegion": [
+            0.02352,
+            0.94801,
+            0.95439,
+            0.0289
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados, em coordenadas normalizadas. A arte limpa mantém as inscrições; cartazes e marcas vêm dos pixels originais."
+  ]
+}

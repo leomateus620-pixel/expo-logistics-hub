@@ -1,0 +1,871 @@
+{
+  "fenasoja-1966": {
+    "width": 981,
+    "height": 1433,
+    "originalSha256": "aed7b71864d16da619f757efee70e20640e1d222695aedb54db09bf6b6bcb4dd",
+    "homography": [
+      [
+        1.0199390868582072,
+        0.0,
+        0.0
+      ],
+      [
+        0.004224917707165925,
+        1.025598773414444,
+        -63.58712395169553
+      ],
+      [
+        1.0032951721947199e-05,
+        1.431557247974351e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 678574,
+    "thumbnailBytes": 39144,
+    "art": true,
+    "artWidth": 1506,
+    "artHeight": 2200,
+    "artBytes": 348506,
+    "artSha256": "05c7828105be931e08d2b276ef093a9669f89a398627bf2b25083e9b496a7d9c",
+    "editorialStatus": "partial",
+    "faceSha256": "4fbf6ab360bc489dbbc5481c28cdf1be8f779e528471af6d622ea8e6c2168f88",
+    "thumbnailSha256": "15ca44eaf7d553addeeb337d5f8cf7601aaa6a6595b345d204421bba5e277f7e",
+    "thumbnailSmallSha256": "15e21f5a8d03f22d282c056d366abd7f3735ee20d9d1eb804db1e59736337ec3"
+  },
+  "fenasoja-1974": {
+    "width": 980,
+    "height": 1357,
+    "originalSha256": "a28d12384e2cd58ad2bd866375dbf2290d0cb8fd4c24038a27e3525442f0d0a6",
+    "homography": [
+      [
+        1.0418122334626845,
+        0.0,
+        0.0
+      ],
+      [
+        0.024911128691757038,
+        1.045184312501978,
+        -146.32580375027692
+      ],
+      [
+        2.5137612416732293e-05,
+        2.2702592257659203e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 626110,
+    "thumbnailBytes": 46938,
+    "art": true,
+    "artWidth": 1589,
+    "artHeight": 2200,
+    "artBytes": 396462,
+    "artSha256": "bdb7274a6fff9cd36cf122ab7dc3a8f712a4214af795e8717f2037a3cfb230c6",
+    "editorialStatus": "partial",
+    "faceSha256": "a65bb0128a469d1a2c08b84235c700e92dda098691a379f08caa4c5fa379e018",
+    "thumbnailSha256": "06c2d3530ccfe15daf1b0f3a59ddf399d7c002a2b17aac7a061787e0e6061282",
+    "thumbnailSmallSha256": "69f957da9cc2b9bc9d0f632bc0ecd4c90fc30c94cb7d9dd708b84e2b35b9603b"
+  },
+  "fenasoja-1976": {
+    "width": 1028,
+    "height": 1427,
+    "originalSha256": "cac794b8f9134df0715cd2a40b6323a8429d4dccfc2833ee78822e6f9683c134",
+    "homography": [
+      [
+        1.023881282199273,
+        0.0035976151869264675,
+        -25.8920365003098
+      ],
+      [
+        0.0020572014433461517,
+        1.0388867288897012,
+        -85.24014180503916
+      ],
+      [
+        4.812085959612153e-06,
+        2.4317393872346987e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 577894,
+    "thumbnailBytes": 31410,
+    "art": true,
+    "artWidth": 1585,
+    "artHeight": 2200,
+    "artBytes": 274248,
+    "artSha256": "7a64cfd8859b145c52c1fa8ecf8c4c2504f50c74e7b5c83f583777a116f5506c",
+    "editorialStatus": "verified",
+    "faceSha256": "7e97c312b0f0cd90de4403d5d30e61e2008a5c9b377cd914895e779e97a42b15",
+    "thumbnailSha256": "26d0ec2db5e84b2d906b2b6288f49787ce2976eb36e4cd2babe1a27de82c9cf4",
+    "thumbnailSmallSha256": "5ad8160303709e58ab7afe46f0b629e90d7a536b6e32d8eb814515368cb8e0d1"
+  },
+  "fenasoja-1979": {
+    "width": 1022,
+    "height": 1420,
+    "originalSha256": "158bd198e0ec2b3fe0aa363dc34e9f0ae5ed1bcc13aedd99b7db5c2821345973",
+    "homography": [
+      [
+        1.0057875001810197,
+        0.011293052633611448,
+        -29.121959478925522
+      ],
+      [
+        -0.016200480738663488,
+        1.0216428165819766,
+        -86.38602594878544
+      ],
+      [
+        -7.339842741310021e-06,
+        1.7373117046018983e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 545554,
+    "thumbnailBytes": 29464,
+    "art": true,
+    "artWidth": 1583,
+    "artHeight": 2200,
+    "artBytes": 251634,
+    "artSha256": "21a3967699045db8c2c60bb91b640c2411e7956865e1be0b156eafb5b2b6dd13",
+    "editorialStatus": "partial",
+    "faceSha256": "898b5c9ae80b54b93c6f925949eed84d005e4cf4c20fcf07d436e8e40789bce4",
+    "thumbnailSha256": "9f6f0c4341801e069ad6b46ef5fa3928d6a72e3345cf3df01baded6bc861cce8",
+    "thumbnailSmallSha256": "5c102868d638f04656a1a0be737601b2aa540f0fb88da1f52359cac6008cda98"
+  },
+  "fenasoja-1981": {
+    "width": 1038,
+    "height": 1401,
+    "originalSha256": "ac7cebd5ae33276ffd54d889bf534cd888a2eb2f4fd85133bec7ce6c2473d009",
+    "homography": [
+      [
+        1.0537353755268475,
+        0.033070154438788364,
+        -71.8373945740771
+      ],
+      [
+        -0.004461616332817463,
+        1.1042500423723345,
+        -146.5797121902202
+      ],
+      [
+        -3.1868688091553558e-06,
+        6.907589709228166e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 596274,
+    "thumbnailBytes": 24928,
+    "art": true,
+    "artWidth": 1630,
+    "artHeight": 2200,
+    "artBytes": 204728,
+    "artSha256": "75cab10babb28083f6301e500f9dc688598eff1a061b0595a25bff46c35f57c3",
+    "editorialStatus": "verified",
+    "faceSha256": "4749647e57e3004cb888a9e2eef85d2f3e48f45066b97dfa22b521be1b0a00d9",
+    "thumbnailSha256": "15945c2c81f84d9c9aa78ec788f26d9619054a6ee30ad1f2f719b9b10795e148",
+    "thumbnailSmallSha256": "c910f2c68f844aa78e894f9b45fa0feab6874715bebfded3dc2da28ce6332315"
+  },
+  "fenasoja-1984": {
+    "width": 1068,
+    "height": 1281,
+    "originalSha256": "f18c1d1eacff6a84134411bc5e2c9f760e6acc490b1486482383e37913a57b63",
+    "homography": [
+      [
+        1.0500359817718505,
+        0.02871192137657405,
+        -44.072799313041166
+      ],
+      [
+        0.002100215615530995,
+        1.0837112576139274,
+        -276.41987823809507
+      ],
+      [
+        1.6407934496335255e-06,
+        5.449760901836496e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 517410,
+    "thumbnailBytes": 18362,
+    "art": true,
+    "artWidth": 1834,
+    "artHeight": 2200,
+    "artBytes": 191820,
+    "artSha256": "e9112de078f6e36394c56d8d8551a4a6b0e0bd3e0326d288f601c853829f43b8",
+    "editorialStatus": "partial",
+    "faceSha256": "efc870cbcacf03583c14c280aa8b0fc01c3ddbc1d6c3dd17224699de5578e0fc",
+    "thumbnailSha256": "12d5e6a7925401999405bbc7999837ebb40ff5598c8f5289d8e5434ed6aebe5f",
+    "thumbnailSmallSha256": "0b9ee44de1c0802e0dea4be3dc3df6fef9880a33321ed021a7753d021abb095f"
+  },
+  "fenasoja-1987": {
+    "width": 1015,
+    "height": 1378,
+    "originalSha256": "7b2fd4c1c878d85690cc5baa1e40973f0956e4f6ac588fa6547586fe8d32ccd9",
+    "homography": [
+      [
+        1.0183447400254126,
+        0.017633675151955193,
+        -49.471275638810305
+      ],
+      [
+        -0.017005456076811674,
+        1.0511497537479237,
+        -155.8390623289073
+      ],
+      [
+        -1.234964130487419e-05,
+        3.816814141782789e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 487206,
+    "thumbnailBytes": 25382,
+    "art": true,
+    "artWidth": 1620,
+    "artHeight": 2200,
+    "artBytes": 227740,
+    "artSha256": "6f31e3655c99d13571e8a7cbbeeb25ffc8d7dafd666178efdcba89c4c8dc8a84",
+    "editorialStatus": "verified",
+    "faceSha256": "f5c590da2a285e2cdc5628bb316712050835f7f07f9acbf166ff17eef3804010",
+    "thumbnailSha256": "9bcb05e63543480c05901a9dddce82a6d19cf0010b7da9bb773779971ffb49ad",
+    "thumbnailSmallSha256": "141eb1c51a470f900a49b807ee8d14e51160cc54800b3256c6957f46f17f7f8e"
+  },
+  "fenasoja-1990": {
+    "width": 955,
+    "height": 1288,
+    "originalSha256": "267c9cc176900ef9408a07e0312b4f9938e51cde10a3c124321151f7078df7ca",
+    "homography": [
+      [
+        1.094208858940251,
+        0.0691888505653086,
+        -135.76646265928204
+      ],
+      [
+        -0.006466069728182556,
+        1.1587196952903351,
+        -220.5912619908976
+      ],
+      [
+        7.549245605052243e-06,
+        0.00010427355128574485,
+        1.0
+      ]
+    ],
+    "faceBytes": 448222,
+    "thumbnailBytes": 31324,
+    "art": true,
+    "artWidth": 1631,
+    "artHeight": 2200,
+    "artBytes": 268656,
+    "artSha256": "5b83c6bd02eb913ccc4e45a7f896a173199ec2c315f1202ca07a9c4c1c789f85",
+    "editorialStatus": "verified",
+    "faceSha256": "924ed938d436991f0fba4a90a12fba1a07f6e3e453e21ff5a00c36c07e5fffa1",
+    "thumbnailSha256": "6a5ec338c0ccaa6f69203c9dc9a7549ae8e805c6e0e7b661bd25706a8da6aff6",
+    "thumbnailSmallSha256": "7cefcc2264dc58471eb7a1ae0b8daceea40e234252dfd0d0290c151fa260a7fd"
+  },
+  "fenasoja-1992": {
+    "width": 1015,
+    "height": 1358,
+    "originalSha256": "95b59a203a5d657e36e92a69f35587a2a6c4e28e59904f7267e63cd59a59f90c",
+    "homography": [
+      [
+        1.0567938831384855,
+        0.038881305487067176,
+        -90.32982653366419
+      ],
+      [
+        -0.0034263127580648283,
+        1.1066990208549479,
+        -194.50834896258368
+      ],
+      [
+        -2.5249172867095464e-06,
+        7.070331328196246e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 465064,
+    "thumbnailBytes": 33672,
+    "art": true,
+    "artWidth": 1644,
+    "artHeight": 2200,
+    "artBytes": 284792,
+    "artSha256": "3424c8dc791117770e7c73aaf389f31efc86c6b65cef2b7c2113e6d72c2c72f4",
+    "editorialStatus": "partial",
+    "faceSha256": "5f5afdb2cef277a71550b87ebab22df21632cc14a840ca133f5f46b0cad88790",
+    "thumbnailSha256": "081b971722426aa6f547e9cc1617288808bdfd2e0ceb659f9590eccc8c181ee6",
+    "thumbnailSmallSha256": "8fca4c07ce079e5ce7c5bd3e235707c793cb1545e27d83f2813fd84000a515f9"
+  },
+  "fenasoja-1994": {
+    "width": 1047,
+    "height": 1417,
+    "originalSha256": "d419edc91a71ef1091e188f7f04e6b949cb3f2204ec927fa466cd8281c60b055",
+    "homography": [
+      [
+        1.0586236310781758,
+        0.03419711167808716,
+        -68.37192089203641
+      ],
+      [
+        -0.02071764954534956,
+        1.1325648418124648,
+        -124.45092081891727
+      ],
+      [
+        -1.4631108435981422e-05,
+        9.111140771969315e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 467892,
+    "thumbnailBytes": 32334,
+    "art": true,
+    "artWidth": 1626,
+    "artHeight": 2200,
+    "artBytes": 273082,
+    "artSha256": "7156f9180d707b99307ce532511e91aae470deaa77fcc580f101c3a88a802ba4",
+    "editorialStatus": "partial",
+    "faceSha256": "cd02953ca4ffec7278554d6621f4b1e3ab9bc0e297f806f3b1892901c84c5a1a",
+    "thumbnailSha256": "b356fc82d7afca78741bd77c289d24bd9f7856546c5110c89b983bb0ff59e892",
+    "thumbnailSmallSha256": "bc6f33bc9659b51e66698554455eda03d63d220b11f83254a141e726354ff549"
+  },
+  "fenasoja-1996": {
+    "width": 987,
+    "height": 1269,
+    "originalSha256": "d6eca69e8980737434236c0833619980e4009b0f8e543344b6a25047a990e4dd",
+    "homography": [
+      [
+        1.0236533122109084,
+        0.0284348142280808,
+        -59.00223952326765
+      ],
+      [
+        0.018774162062233875,
+        1.0231918323917437,
+        -282.31646201084124
+      ],
+      [
+        1.4806121500184363e-05,
+        1.0420884262315294e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 380808,
+    "thumbnailBytes": 28260,
+    "art": true,
+    "artWidth": 1711,
+    "artHeight": 2200,
+    "artBytes": 252946,
+    "artSha256": "ef9ae3877b4d8c081a67b5c9907c2b701d10a19b607e23a59656852a67610837",
+    "editorialStatus": "partial",
+    "faceSha256": "cb12bf6889f04c839b1cfc7eae46d8502226e65281a6f1e5387da798327c25d0",
+    "thumbnailSha256": "1917512a1033266ebf516c47f73ef8fb3c111461f54ab86344f8a9b974291f87",
+    "thumbnailSmallSha256": "9b597e4507aea5e313f3173b1aa68afd190c1d9562337e66304692bd5cf870a8"
+  },
+  "fenasoja-1998": {
+    "width": 895,
+    "height": 1232,
+    "originalSha256": "25ccb1a84a7537bae6ea4f11bdf9740f57587793db07dfa8aaed915462f1b93c",
+    "homography": [
+      [
+        0.9628456295411758,
+        -0.03651351933956643,
+        -23.535344530829242
+      ],
+      [
+        0.005728307302014464,
+        0.8983895285325973,
+        -226.58892363848304
+      ],
+      [
+        3.42589219329856e-05,
+        -8.005024821576123e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 313652,
+    "thumbnailBytes": 37028,
+    "art": true,
+    "artWidth": 1598,
+    "artHeight": 2200,
+    "artBytes": 271138,
+    "artSha256": "5d9a752c4f2763cdae5d3f4478df90a5cc03599846ae3cb227f39e9eb8263769",
+    "editorialStatus": "partial",
+    "faceSha256": "550d7104e00e0c23f71bc794450ecc9d5c265ec0cac360e6e7f69a870da64713",
+    "thumbnailSha256": "3bbd3cf7cf0ef68c9b86812554c3911bcea8f720be9076c05a3cd889eed7de84",
+    "thumbnailSmallSha256": "2e57d46b017a3de0d7cc45baf0ab49a6b90d40db456a1283aea1f59281bcce07"
+  },
+  "fenasoja-2000": {
+    "width": 851,
+    "height": 1226,
+    "originalSha256": "7c278870345a5ea2e23743629fc5980df5cee1431623e93f3f448c242a6b0634",
+    "homography": [
+      [
+        0.915361008692657,
+        -0.029695409852154325,
+        -63.5585704770585
+      ],
+      [
+        -0.01070936385466241,
+        0.8723263648888697,
+        -229.45882994999798
+      ],
+      [
+        -1.3666190995708721e-05,
+        -8.06372029707199e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 297162,
+    "thumbnailBytes": 32760,
+    "art": true,
+    "artWidth": 1527,
+    "artHeight": 2200,
+    "artBytes": 246316,
+    "artSha256": "75679ea45ac6e67670100f686f4c32d29205ea7f2a64b8b6bc28d21911ef3216",
+    "editorialStatus": "verified",
+    "faceSha256": "88818e63476588bb8183756a90acb612c05d230cf4c240541f2bbded4500cf9d",
+    "thumbnailSha256": "991b8feec6eb611e3849d20364379f9c5d2343ae590a302a3ed5f0a734dc1967",
+    "thumbnailSmallSha256": "d707565558fbf4de0a5740c689a089bccfca9042e4cb65f0556787a3c848da61"
+  },
+  "fenasoja-2002": {
+    "width": 829,
+    "height": 1156,
+    "originalSha256": "32b62e3090bb7ca1d2f8c27c1d651a7798072b92d82b26399a595ae91073ef5c",
+    "homography": [
+      [
+        0.9474002518330659,
+        -0.0322413698267797,
+        -72.13882493473402
+      ],
+      [
+        0.0,
+        0.8931593045370175,
+        -284.9178181473086
+      ],
+      [
+        2.056113297707418e-05,
+        -7.944783693555644e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 293636,
+    "thumbnailBytes": 34344,
+    "art": true,
+    "artWidth": 1578,
+    "artHeight": 2200,
+    "artBytes": 269606,
+    "artSha256": "ef151931933158fd3dfdfd9054551443348f46971faff0ce41349aa1aea8487c",
+    "editorialStatus": "verified",
+    "faceSha256": "677b6acd8dae6fcdfd9c0cc7b40418421f1c77514bfe3e8affe3be452d49c2d3",
+    "thumbnailSha256": "845ee1998b88d5ce8afac4379e8635fdd69652e3b44289d8f5466949f08c90f8",
+    "thumbnailSmallSha256": "609a8a59acd92871359297683c12bb66f34a5cb284d062e2478952e0cbf6efa8"
+  },
+  "fenasoja-2004": {
+    "width": 933,
+    "height": 1281,
+    "originalSha256": "2dd5b635c4e922e8aa944f3d6b4e1134924939c1347d53c411c506f2f676c80e",
+    "homography": [
+      [
+        0.9279546632527975,
+        -0.020299008258654945,
+        -64.8263328031759
+      ],
+      [
+        -0.015079117872767984,
+        0.8745888366205443,
+        -204.39744276537033
+      ],
+      [
+        2.17015484467207e-06,
+        -8.314491421249092e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 322188,
+    "thumbnailBytes": 46342,
+    "art": true,
+    "artWidth": 1602,
+    "artHeight": 2200,
+    "artBytes": 361844,
+    "artSha256": "5834e0ef7101282ff7ca3885563667ba45ec131c12e6cd1262279d4beeec3ecd",
+    "editorialStatus": "partial",
+    "faceSha256": "c8f414429888cfb8f627067bc7c8403627a20dee35871b66aff7cc3ac225c919",
+    "thumbnailSha256": "c81d3fd42cc3f1019125079e9084b5c01f4f179dedf3354f424481e7ef241774",
+    "thumbnailSmallSha256": "542a33d9b1de5899a3103922a5b6eecca79e75529c8e522ae572447d167a2265"
+  },
+  "fenasoja-2006": {
+    "width": 874,
+    "height": 1214,
+    "originalSha256": "c49055c2f67db914d9a5612f8ae97f445508d10fadbcb866120b503846b72d0b",
+    "homography": [
+      [
+        0.9411502026487635,
+        -0.03664793664000985,
+        -40.22929776740484
+      ],
+      [
+        -0.0028807671815897153,
+        0.8853557804752404,
+        -187.5485063344899
+      ],
+      [
+        1.2419960102447914e-05,
+        -8.481489255239825e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 290462,
+    "thumbnailBytes": 34420,
+    "art": true,
+    "artWidth": 1584,
+    "artHeight": 2200,
+    "artBytes": 288902,
+    "artSha256": "f5434988265f48b68ec2b5121c7a2dbf18f018c5bc225ad126ced936d99d9733",
+    "editorialStatus": "verified",
+    "faceSha256": "5ade03010324d937d49453d019e5791afc4abc42d4afbd9c3b86913d3bc0356f",
+    "thumbnailSha256": "00fdb5db04c93e790c78e3a76f00117eb8846a370488d07aacebaa0e8abff1d8",
+    "thumbnailSmallSha256": "b75604754785c49738927b4d654a7efd69e29c9dd30c308af99bc8b164ea6ec0"
+  },
+  "fenasoja-2008": {
+    "width": 908,
+    "height": 1253,
+    "originalSha256": "71fe1796205a1a2a5dd28607b4132af2947a1a4251f717e17f476c54a939f860",
+    "homography": [
+      [
+        0.9280600643269735,
+        -0.0385148630047906,
+        8.550299587063513
+      ],
+      [
+        -0.008245838522163538,
+        0.8777237004702924,
+        -194.85466150440487
+      ],
+      [
+        -1.0994964425529546e-06,
+        -8.261732024556254e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 348774,
+    "thumbnailBytes": 43142,
+    "art": true,
+    "artWidth": 1594,
+    "artHeight": 2200,
+    "artBytes": 362098,
+    "artSha256": "a8054ff20f6f321c472989751be79e2a04dd4b473804980b227385acdd1e4d07",
+    "editorialStatus": "verified",
+    "faceSha256": "114ee49196c23a745b6776c467c2bf035d296b61449f0f7357fd8be112acbeb4",
+    "thumbnailSha256": "bbd7ed57969ef2f8d9142e8bb597190546612155b03dca8a15c89b2307974c6a",
+    "thumbnailSmallSha256": "96f60b2018d4be9836ccda2f8e5aa612609ff47e6bcffa4e74dfad309f679d95"
+  },
+  "fenasoja-2010": {
+    "width": 914,
+    "height": 1272,
+    "originalSha256": "0038bd90c3ec8c5ca91886e1058d1bb213778e71a04dd07bdc616fb21c3778c2",
+    "homography": [
+      [
+        0.944423389442451,
+        -0.022450635248235762,
+        -38.82014176223272
+      ],
+      [
+        -0.006429678743442388,
+        0.8854586155254918,
+        -219.29154174938014
+      ],
+      [
+        1.7469105802841767e-05,
+        -8.099883105378743e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 337612,
+    "thumbnailBytes": 42144,
+    "art": true,
+    "artWidth": 1581,
+    "artHeight": 2200,
+    "artBytes": 355766,
+    "artSha256": "1c7fabc01dc2001b29d5ee465f62c5bf788c511f800b81189ae59a8897ce5ae6",
+    "editorialStatus": "verified",
+    "faceSha256": "e8be09f1912cc0b2fe64cbc53950a85b59f70a63bbae0d1bed5ae8875e2dcd53",
+    "thumbnailSha256": "c577c6655ea9752aa50361a4e6c297ddda019ffdd190de948e2223bcb41854f3",
+    "thumbnailSmallSha256": "26e648ee40a431766f46ac1fcdc9226c587cb43bb7e4a72036e5fda33bbef92f"
+  },
+  "fenasoja-2012": {
+    "width": 872,
+    "height": 1209,
+    "originalSha256": "8eb5c8362c43bffc53137d778d346ce9e6402b952ca644ade6e586882cf2c679",
+    "homography": [
+      [
+        0.948118713533184,
+        -0.013431681775053439,
+        -68.3901731039324
+      ],
+      [
+        -0.018597647434207706,
+        0.895623547489476,
+        -243.0918072596272
+      ],
+      [
+        1.8137845221350825e-05,
+        -7.620928428184019e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 304876,
+    "thumbnailBytes": 44350,
+    "art": true,
+    "artWidth": 1587,
+    "artHeight": 2200,
+    "artBytes": 368360,
+    "artSha256": "0e512d5925402a38f5a17a64902d7525234867c8fdfba81fe0d89444f24a4bb1",
+    "editorialStatus": "verified",
+    "faceSha256": "7321abefb9b74cc93af36889fff6def3419023180fc7ddc3493e11d45b854552",
+    "thumbnailSha256": "8d695d0a920afbc1d652f24f453c5459f7d4b088ec0e44902595accefef8caa8",
+    "thumbnailSmallSha256": "a985e1eb36fb3ac8557fc5583f41566509924ddfd478d03ed2aac0c2f8ab67cd"
+  },
+  "fenasoja-2014": {
+    "width": 888,
+    "height": 1243,
+    "originalSha256": "b6536e2cb459575a835d1ff8c07ce4db1a61f51ef18e767436a957c064423870",
+    "homography": [
+      [
+        0.9352481117368071,
+        -0.021784895775395503,
+        -36.14039088807855
+      ],
+      [
+        -0.002884973834348298,
+        0.8933802307031924,
+        -205.35051421302293
+      ],
+      [
+        -4.19038103581542e-06,
+        -7.065987168248486e-05,
+        1.0
+      ]
+    ],
+    "faceBytes": 328572,
+    "thumbnailBytes": 47178,
+    "art": true,
+    "artWidth": 1572,
+    "artHeight": 2200,
+    "artBytes": 378366,
+    "artSha256": "6b43acc5eee21dbda3adb296d81f673940b9db74b55045d5dd2490809f8f8c5e",
+    "editorialStatus": "verified",
+    "faceSha256": "eb644f89ea99084676fe7da0b9328f44bfd75c9c29cf6b527f243a5302c4f7b5",
+    "thumbnailSha256": "229f4926e22714ef2d9c80bad4cb139d7bf36bfa673bb1ca8ac9e576327c772d",
+    "thumbnailSmallSha256": "773de14989f4771b3ff79e936cc31d705274b493ca28af8f80edbb36444ba210"
+  },
+  "fenasoja-2016": {
+    "width": 936,
+    "height": 1247,
+    "originalSha256": "5062e18c45b0fba965bec69291ab57f208f05b33a33fcfefbeac6104f7f7fa07",
+    "homography": [
+      [
+        0.8542283694603588,
+        -0.11431279883289476,
+        -9.24478780379483
+      ],
+      [
+        0.0080353504637054,
+        0.7238511542721298,
+        -66.05526809942901
+      ],
+      [
+        5.442353915093563e-06,
+        -0.00021424483087623938,
+        1.0
+      ]
+    ],
+    "faceBytes": 306410,
+    "thumbnailBytes": 43066,
+    "art": true,
+    "artWidth": 1651,
+    "artHeight": 2200,
+    "artBytes": 370274,
+    "artSha256": "f46f5ad65544763002f88d667ce232dd295c50f84bd5345bea06f2d0df6e2a54",
+    "editorialStatus": "verified",
+    "faceSha256": "0d4049edc4a12cbba8da8613d183b3b5ca9d3ed28d4c71685290f4d33a89821e",
+    "thumbnailSha256": "c8b991d7d045ecf2ffdd447dfe5f32078f2549b5e21704a0cce918393cd0e609",
+    "thumbnailSmallSha256": "00fc2a36cbd818a17ad01a8b375418dfea79a1f826f73a183f0ba7dd962c1401"
+  },
+  "fenasoja-2018": {
+    "width": 720,
+    "height": 924,
+    "originalSha256": "4c3900343a2d56901abf94d3c3f3d446578cf0b436fb1c8f5b589cdf640d9e21",
+    "homography": [
+      [
+        0.826554388525407,
+        -0.09818680641230539,
+        -46.29418661607094
+      ],
+      [
+        0.014388974407749059,
+        0.757819318808113,
+        -307.6554581368836
+      ],
+      [
+        -2.4254094649600842e-05,
+        -0.00017504688561771972,
+        1.0
+      ]
+    ],
+    "faceBytes": 203342,
+    "thumbnailBytes": 51040,
+    "art": true,
+    "artWidth": 1714,
+    "artHeight": 2200,
+    "artBytes": 426330,
+    "artSha256": "df737906c610e8d44b1a7a870c885c43a0d31d40cbbf96174f62bf33e32fd895",
+    "editorialStatus": "partial",
+    "faceSha256": "79b532faa071860bbb215d7ce0393b434d062d3b63aac1a33a4a4432f0bcaa40",
+    "thumbnailSha256": "8c6a8297422b16eee0c02dc2e848c176769cb6791eba6f9806c873480c4fb1c8",
+    "thumbnailSmallSha256": "72c62afed6f2ef34954e09239101aa5c1b4b6bff8134f56e6f127ab732c23e90"
+  },
+  "fenasoja-2022": {
+    "width": 907,
+    "height": 1197,
+    "originalSha256": "b094505bef82b7232fb44c7123a7e1b45666bf3d3968a0b150dde1f5923ebf65",
+    "homography": [
+      [
+        0.792731043676633,
+        -0.053528462756299994,
+        -12.818792342925361
+      ],
+      [
+        -0.03589883445325235,
+        0.7370250502035085,
+        -138.99369333952234
+      ],
+      [
+        -8.2020630353807e-05,
+        -0.00015805323619984583,
+        1.0
+      ]
+    ],
+    "faceBytes": 305640,
+    "thumbnailBytes": 47376,
+    "art": true,
+    "artWidth": 1667,
+    "artHeight": 2200,
+    "artBytes": 383170,
+    "artSha256": "aa5a02ad81d85f544d67c1dbc109deb3ead24a372dbbcc87ae27d0668711db64",
+    "editorialStatus": "verified",
+    "faceSha256": "311082a4ae7012dee3d7c514a7db128a086dafd8867de3ac1e3229a3b6ef5bb6",
+    "thumbnailSha256": "9352f0f556e8c743c2ad435e26a1e4945e7200346a049823539acc78a9595d02",
+    "thumbnailSmallSha256": "055e0c0b39e6035b9f62498f5f9f9fa4c351bf78a6a934dd054c7b5a2a5a3c04"
+  },
+  "fenasoja-2024": {
+    "width": 963,
+    "height": 1264,
+    "originalSha256": "117099be4eef8d146b1c7dce151f05220dcdc64b0e6c4492f4c53a4f6489197f",
+    "homography": [
+      [
+        0.8185051165934698,
+        -0.07711013453621876,
+        18.5064322886925
+      ],
+      [
+        -0.0014371476525846044,
+        0.7624068296961161,
+        -182.97763912706782
+      ],
+      [
+        -6.046284281384268e-05,
+        -0.00013748456312813521,
+        1.0
+      ]
+    ],
+    "faceBytes": 377314,
+    "thumbnailBytes": 64950,
+    "art": true,
+    "artWidth": 1676,
+    "artHeight": 2200,
+    "artBytes": 480936,
+    "artSha256": "9fad8fb213582a205159980400157af4604cc711fa568cdd39c49b33bde46470",
+    "editorialStatus": "verified",
+    "faceSha256": "6aa474424ce79d9f617aecc782730e6f211ca55cd3ccbb02b9ba048dcbb1c95e",
+    "thumbnailSha256": "82a61f2cad3237418bd787b112ca04ece3ceca6db950110c42823963b1a9d7e1",
+    "thumbnailSmallSha256": "6aadf31fec111954cec783db003f6fd24875148ca18f38e24a2929b182c54567"
+  },
+  "fenasoja-2026": {
+    "width": 837,
+    "height": 1126,
+    "originalSha256": "35b3530636b135ba7d6928983ac45c0e1663f0d6914e4f49faa0763ec17f68c6",
+    "homography": [
+      [
+        0.7709474461133168,
+        -0.07559586115734974,
+        19.428136317438884
+      ],
+      [
+        6.205613412751966e-17,
+        0.7423057093058149,
+        -190.77256729159447
+      ],
+      [
+        -0.0001296960741267124,
+        -0.00014193025198622523,
+        1.0
+      ]
+    ],
+    "faceBytes": 247996,
+    "thumbnailBytes": 56922,
+    "art": true,
+    "artWidth": 1635,
+    "artHeight": 2200,
+    "artBytes": 455522,
+    "artSha256": "0bf748f35241f9e5d2daa611b5461a2f5d565812f4fa758c5192838cabb86cec",
+    "editorialStatus": "verified",
+    "faceSha256": "a7e4a8e931b208f310e49a20dd4e3260185e312d1ffad8dbd832dd109432dbb1",
+    "thumbnailSha256": "a47f4b4a3d479f2124f08b73a803388a177f0cb733c3bb43913e923a79887d7a",
+    "thumbnailSmallSha256": "dc261d7c801bcaa6c9eff6ce9dc61b9812399de55f932be95a31f7057d6dd281"
+  },
+  "documento-2020": {
+    "width": 947,
+    "height": 1256,
+    "originalSha256": "ccf256c36043432a7ce48dee0fe7d2954453d20316557dd807645dc536c3a106",
+    "homography": [
+      [
+        0.8242815975416321,
+        -0.0670926881719933,
+        9.996810537627002
+      ],
+      [
+        -0.017485738515807113,
+        0.7635439151902428,
+        -113.76804336334615
+      ],
+      [
+        -6.036580397122408e-05,
+        -0.00014613382363828283,
+        1.0
+      ]
+    ],
+    "faceBytes": 313416,
+    "thumbnailBytes": 50688,
+    "art": true,
+    "artWidth": 1659,
+    "artHeight": 2200,
+    "artBytes": 403500,
+    "artSha256": "bdabd86384882793c0605051fbc736e2fbbc9b5ed9661487aa3a94828a18e5f2",
+    "editorialStatus": "verified",
+    "faceSha256": "58db1981d099e0f074ce808c6f3897c4426b082981aba92ee937b700fdc7022e",
+    "thumbnailSha256": "93bf99ed96744b6501af554fb88fbf75c722b6ee72d68202143ebfcf23c2bce9",
+    "thumbnailSmallSha256": "9a99635dc1d17e93f44add9bda20bc4f02fd285f3ecd756df09332765e053679"
+  },
+  "fenasoja-2028": {
+    "width": 900,
+    "height": 1200,
+    "originalSha256": null,
+    "homography": null,
+    "faceBytes": 22572,
+    "thumbnailBytes": 7516,
+    "faceSha256": "6b9f3dbbfe3b70d212c305b09ce56646bcf639af3902076ae2c05704f657e577",
+    "thumbnailSha256": "800c8d9856b9137a7802b988ca87e63cf52f3f444cac444b8a0290d7da35d829",
+    "thumbnailSmallSha256": "1f9d56cc04fd4b8624101bcb433e516dfd1b9f0f521d6ec9de871bc184aa5fac"
+  }
+}

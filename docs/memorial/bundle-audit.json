@@ -1,0 +1,74 @@
+{
+  "portalStaticGraph": [
+    "CommissionPortalPage-0BiOgg3Q.js",
+    "module-runtime-CEDABylm.js",
+    "react-vendor-DTjdp-YJ.js",
+    "index-Ct873EQc.js",
+    "log-in-DifuPe95.js",
+    "fenasoja-symbol-144-BrliEKTf.js",
+    "SoySummitCountdown-6ylRVbkB.js",
+    "fenasoja-countdown-navigation-DeqNFomk.js",
+    "arrow-up-right-DgsjbTbd.js",
+    "skip-forward-DYIcFqDZ.js",
+    "data-vendor-C_SDnT5D.js",
+    "commercialMapQueryKey-blkUQKRg.js",
+    "play-Jreh3ZEd.js",
+    "pause-NunxCNvy.js",
+    "ui-radix-DHM1y7Sk.js",
+    "soy-summit-Bm3fAcfA.js"
+  ],
+  "galleryStaticGraph": [
+    "MemorialExperience-Cisiw9cT.js",
+    "react-vendor-DTjdp-YJ.js",
+    "CommissionPortalPage-0BiOgg3Q.js",
+    "module-runtime-CEDABylm.js",
+    "arrow-up-right-DgsjbTbd.js",
+    "arrow-down-D3VsEAhB.js",
+    "tabs-C1gYFCfy.js",
+    "index-Ct873EQc.js",
+    "file-image-DOKh3fxh.js",
+    "minimize-2-CXMGiUkw.js",
+    "maximize-2-CPwnLjLL.js",
+    "log-in-DifuPe95.js",
+    "fenasoja-symbol-144-BrliEKTf.js",
+    "SoySummitCountdown-6ylRVbkB.js",
+    "fenasoja-countdown-navigation-DeqNFomk.js",
+    "skip-forward-DYIcFqDZ.js",
+    "data-vendor-C_SDnT5D.js",
+    "commercialMapQueryKey-blkUQKRg.js",
+    "play-Jreh3ZEd.js",
+    "pause-NunxCNvy.js",
+    "ui-radix-DHM1y7Sk.js",
+    "soy-summit-Bm3fAcfA.js"
+  ],
+  "forbiddenPortal": [],
+  "forbiddenGallery": [],
+  "chunks": [
+    {
+      "file": "CommissionPortalPage-0BiOgg3Q.js",
+      "bytes": 70823,
+      "gzipBytes": 24219
+    },
+    {
+      "file": "MemorialExperience-Cisiw9cT.js",
+      "bytes": 69505,
+      "gzipBytes": 20993
+    },
+    {
+      "file": "MemorialViewer-C5AvU-0T.js",
+      "bytes": 5163,
+      "gzipBytes": 1891
+    },
+    {
+      "file": "PlateRenderer-DFOarFU0.js",
+      "bytes": 8917,
+      "gzipBytes": 3463
+    },
+    {
+      "file": "maps-three-CqmvnFd9.js",
+      "bytes": 1211280,
+      "gzipBytes": 362788
+    }
+  ],
+  "note": "Static compressed sizes are not observed network traffic. Browser requests are recorded separately; pre-existing portal resources belong to their own baseline."
+}

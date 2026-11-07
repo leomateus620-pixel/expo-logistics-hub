@@ -273,3 +273,5 @@
 }
 
 .alvorada-overlay--ecosystem { height: 100dvh; }
+.ecosystem-memorial-preparing { position: absolute; z-index: 5; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 30px; background: #151715; color: #f2ead9; }
+.ecosystem-memorial-preparing button { min-height: 44px; padding: 10px 16px; border: 1px solid #b99c5b; border-radius: 4px; color: #e8d3a1; }

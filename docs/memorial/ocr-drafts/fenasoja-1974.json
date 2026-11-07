@@ -1,0 +1,895 @@
+﻿{
+    "status":  "UNREVIEWED_DRAFT",
+    "engine":  "Windows.Media.Ocr pt-BR",
+    "lines":  [
+                  {
+                      "text":  "AQUILES CIOVEtyLiü.",
+                      "words":  [
+                                    {
+                                        "y":  423,
+                                        "height":  17,
+                                        "width":  81,
+                                        "text":  "AQUILES",
+                                        "x":  574
+                                    },
+                                    {
+                                        "y":  419,
+                                        "height":  23,
+                                        "width":  88,
+                                        "text":  "CIOVEtyLiü.",
+                                        "x":  660
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HÉLIO VETTõÀA*O",
+                      "words":  [
+                                    {
+                                        "y":  463,
+                                        "height":  18,
+                                        "width":  57,
+                                        "text":  "HÉLIO",
+                                        "x":  574
+                                    },
+                                    {
+                                        "y":  459,
+                                        "height":  20,
+                                        "width":  110,
+                                        "text":  "VETTõÀA*O",
+                                        "x":  636
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "VANDERLEY GIACOMINÚ",
+                      "words":  [
+                                    {
+                                        "y":  444,
+                                        "height":  16,
+                                        "width":  111,
+                                        "text":  "VANDERLEY",
+                                        "x":  576
+                                    },
+                                    {
+                                        "y":  442,
+                                        "height":  19,
+                                        "width":  111,
+                                        "text":  "GIACOMINÚ",
+                                        "x":  691
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ". CLÉLIO",
+                      "words":  [
+                                    {
+                                        "y":  495,
+                                        "height":  2,
+                                        "width":  3,
+                                        "text":  ".",
+                                        "x":  569
+                                    },
+                                    {
+                                        "y":  483,
+                                        "height":  17,
+                                        "width":  67,
+                                        "text":  "CLÉLIO",
+                                        "x":  576
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• \u0027CASQUEIRQDASILVB",
+                      "words":  [
+                                    {
+                                        "y":  526,
+                                        "height":  2,
+                                        "width":  2,
+                                        "text":  "•",
+                                        "x":  127
+                                    },
+                                    {
+                                        "y":  508,
+                                        "height":  18,
+                                        "width":  198,
+                                        "text":  "\u0027CASQUEIRQDASILVB",
+                                        "x":  648
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PQESIDENTES DE ÁREA",
+                      "words":  [
+                                    {
+                                        "y":  593,
+                                        "height":  13,
+                                        "width":  123,
+                                        "text":  "PQESIDENTES",
+                                        "x":  412
+                                    },
+                                    {
+                                        "y":  593,
+                                        "height":  12,
+                                        "width":  24,
+                                        "text":  "DE",
+                                        "x":  541
+                                    },
+                                    {
+                                        "y":  590,
+                                        "height":  15,
+                                        "width":  49,
+                                        "text":  "ÁREA",
+                                        "x":  571
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "-FEIRA DOAÑTESANATO",
+                      "words":  [
+                                    {
+                                        "y":  805,
+                                        "height":  18,
+                                        "width":  64,
+                                        "text":  "-FEIRA",
+                                        "x":  259
+                                    },
+                                    {
+                                        "y":  801,
+                                        "height":  19,
+                                        "width":  157,
+                                        "text":  "DOAÑTESANATO",
+                                        "x":  328
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "u,JLUü1NAÇÃOESOM",
+                      "words":  [
+                                    {
+                                        "y":  822,
+                                        "height":  22,
+                                        "width":  193,
+                                        "text":  "u,JLUü1NAÇÃOESOM",
+                                        "x":  290
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "*SUINOCULTURA\u0027",
+                      "words":  [
+                                    {
+                                        "y":  844,
+                                        "height":  18,
+                                        "width":  158,
+                                        "text":  "*SUINOCULTURA\u0027",
+                                        "x":  333
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RAiN#1BE CORTE DE \u0027RÉcébçÃcj",
+                      "words":  [
+                                    {
+                                        "y":  866,
+                                        "height":  23,
+                                        "width":  88,
+                                        "text":  "RAiN#1BE",
+                                        "x":  191
+                                    },
+                                    {
+                                        "y":  866,
+                                        "height":  18,
+                                        "width":  61,
+                                        "text":  "CORTE",
+                                        "x":  285
+                                    },
+                                    {
+                                        "y":  869,
+                                        "height":  14,
+                                        "width":  25,
+                                        "text":  "DE",
+                                        "x":  352
+                                    },
+                                    {
+                                        "y":  862,
+                                        "height":  25,
+                                        "width":  107,
+                                        "text":  "\u0027RÉcébçÃcj",
+                                        "x":  381
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ": SOM NA ALIMENTAÇÃO",
+                      "words":  [
+                                    {
+                                        "y":  893,
+                                        "height":  6,
+                                        "width":  7,
+                                        "text":  ":",
+                                        "x":  252
+                                    },
+                                    {
+                                        "y":  891,
+                                        "height":  15,
+                                        "width":  51,
+                                        "text":  "SOM",
+                                        "x":  261
+                                    },
+                                    {
+                                        "y":  890,
+                                        "height":  17,
+                                        "width":  26,
+                                        "text":  "NA",
+                                        "x":  318
+                                    },
+                                    {
+                                        "y":  888,
+                                        "height":  21,
+                                        "width":  134,
+                                        "text":  "ALIMENTAÇÃO",
+                                        "x":  349
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSUNTOS CIENTÍFICOS",
+                      "words":  [
+                                    {
+                                        "y":  911,
+                                        "height":  19,
+                                        "width":  101,
+                                        "text":  "ASSUNTOS",
+                                        "x":  178
+                                    },
+                                    {
+                                        "y":  909,
+                                        "height":  20,
+                                        "width":  115,
+                                        "text":  "CIENTÍFICOS",
+                                        "x":  283
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "; LAVOURAS DEMONSTRATIVAS,",
+                      "words":  [
+                                    {
+                                        "y":  937,
+                                        "height":  9,
+                                        "width":  5,
+                                        "text":  ";",
+                                        "x":  191
+                                    },
+                                    {
+                                        "y":  933,
+                                        "height":  16,
+                                        "width":  109,
+                                        "text":  "LAVOURAS",
+                                        "x":  198
+                                    },
+                                    {
+                                        "y":  932,
+                                        "height":  19,
+                                        "width":  177,
+                                        "text":  "DEMONSTRATIVAS,",
+                                        "x":  312
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HOSPEDAGEM EALIMENTAÇÃO",
+                      "words":  [
+                                    {
+                                        "y":  954,
+                                        "height":  20,
+                                        "width":  138,
+                                        "text":  "HOSPEDAGEM",
+                                        "x":  187
+                                    },
+                                    {
+                                        "y":  953,
+                                        "height":  21,
+                                        "width":  155,
+                                        "text":  "EALIMENTAÇÃO",
+                                        "x":  331
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ANIMAIS DE PEQUENO",
+                      "words":  [
+                                    {
+                                        "y":  979,
+                                        "height":  15,
+                                        "width":  80,
+                                        "text":  "ANIMAIS",
+                                        "x":  205
+                                    },
+                                    {
+                                        "y":  978,
+                                        "height":  15,
+                                        "width":  28,
+                                        "text":  "DE",
+                                        "x":  289
+                                    },
+                                    {
+                                        "y":  975,
+                                        "height":  20,
+                                        "width":  96,
+                                        "text":  "PEQUENO",
+                                        "x":  322
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ORNAMENTAÇÃObE\u0027WtÀINÉS.",
+                      "words":  [
+                                    {
+                                        "y":  996,
+                                        "height":  23,
+                                        "width":  290,
+                                        "text":  "ORNAMENTAÇÃObE\u0027WtÀINÉS.",
+                                        "x":  197
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSUNTOS bA INDÚSTRIA EE.ÇOMÉRCIÓ",
+                      "words":  [
+                                    {
+                                        "y":  1022,
+                                        "height":  20,
+                                        "width":  105,
+                                        "text":  "ASSUNTOS",
+                                        "x":  14
+                                    },
+                                    {
+                                        "y":  1018,
+                                        "height":  19,
+                                        "width":  30,
+                                        "text":  "bA",
+                                        "x":  223
+                                    },
+                                    {
+                                        "y":  1019,
+                                        "height":  18,
+                                        "width":  101,
+                                        "text":  "INDÚSTRIA",
+                                        "x":  257
+                                    },
+                                    {
+                                        "y":  1016,
+                                        "height":  24,
+                                        "width":  122,
+                                        "text":  "EE.ÇOMÉRCIÓ",
+                                        "x":  361
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  ".AOD@YIAS",
+                      "words":  [
+                                    {
+                                        "y":  1043,
+                                        "height":  20,
+                                        "width":  109,
+                                        "text":  ".AOD@YIAS",
+                                        "x":  373
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRÊMIOS",
+                      "words":  [
+                                    {
+                                        "y":  1063,
+                                        "height":  18,
+                                        "width":  86,
+                                        "text":  "PRÊMIOS",
+                                        "x":  394
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "-VENDÀDE ESPAÇOS",
+                      "words":  [
+                                    {
+                                        "y":  1084,
+                                        "height":  20,
+                                        "width":  107,
+                                        "text":  "-VENDÀDE",
+                                        "x":  282
+                                    },
+                                    {
+                                        "y":  1087,
+                                        "height":  19,
+                                        "width":  87,
+                                        "text":  "ESPAÇOS",
+                                        "x":  393
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• INFORMAÇÕES E RECLAMAÇÕES",
+                      "words":  [
+                                    {
+                                        "y":  1116,
+                                        "height":  3,
+                                        "width":  4,
+                                        "text":  "•",
+                                        "x":  163
+                                    },
+                                    {
+                                        "y":  1108,
+                                        "height":  22,
+                                        "width":  139,
+                                        "text":  "INFORMAÇÕES",
+                                        "x":  177
+                                    },
+                                    {
+                                        "y":  1112,
+                                        "height":  14,
+                                        "width":  11,
+                                        "text":  "E",
+                                        "x":  322
+                                    },
+                                    {
+                                        "y":  1108,
+                                        "height":  21,
+                                        "width":  141,
+                                        "text":  "RECLAMAÇÕES",
+                                        "x":  339
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSUNTOS INTERNACIONAIS",
+                      "words":  [
+                                    {
+                                        "y":  1134,
+                                        "height":  16,
+                                        "width":  100,
+                                        "text":  "ASSUNTOS",
+                                        "x":  213
+                                    },
+                                    {
+                                        "y":  1131,
+                                        "height":  18,
+                                        "width":  160,
+                                        "text":  "INTERNACIONAIS",
+                                        "x":  319
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DESFILE DE CARROS ALEGÓRICOS",
+                      "words":  [
+                                    {
+                                        "y":  1157,
+                                        "height":  15,
+                                        "width":  76,
+                                        "text":  "DESFILE",
+                                        "x":  161
+                                    },
+                                    {
+                                        "y":  1156,
+                                        "height":  15,
+                                        "width":  25,
+                                        "text":  "DE",
+                                        "x":  244
+                                    },
+                                    {
+                                        "y":  1156,
+                                        "height":  15,
+                                        "width":  79,
+                                        "text":  "CARROS",
+                                        "x":  273
+                                    },
+                                    {
+                                        "y":  1152,
+                                        "height":  19,
+                                        "width":  123,
+                                        "text":  "ALEGÓRICOS",
+                                        "x":  356
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PROMOÇÃO CULTURAL E RECREAÇÃO",
+                      "words":  [
+                                    {
+                                        "y":  1176,
+                                        "height":  22,
+                                        "width":  112,
+                                        "text":  "PROMOÇÃO",
+                                        "x":  125
+                                    },
+                                    {
+                                        "y":  1179,
+                                        "height":  15,
+                                        "width":  98,
+                                        "text":  "CULTURAL",
+                                        "x":  242
+                                    },
+                                    {
+                                        "y":  1179,
+                                        "height":  16,
+                                        "width":  11,
+                                        "text":  "E",
+                                        "x":  346
+                                    },
+                                    {
+                                        "y":  1175,
+                                        "height":  22,
+                                        "width":  115,
+                                        "text":  "RECREAÇÃO",
+                                        "x":  363
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "TRÂNSITO E POLICIAMENTO PSTENSIVO",
+                      "words":  [
+                                    {
+                                        "y":  1198,
+                                        "height":  19,
+                                        "width":  94,
+                                        "text":  "TRÂNSITO",
+                                        "x":  105
+                                    },
+                                    {
+                                        "y":  1201,
+                                        "height":  16,
+                                        "width":  14,
+                                        "text":  "E",
+                                        "x":  205
+                                    },
+                                    {
+                                        "y":  1201,
+                                        "height":  17,
+                                        "width":  143,
+                                        "text":  "POLICIAMENTO",
+                                        "x":  222
+                                    },
+                                    {
+                                        "y":  1201,
+                                        "height":  17,
+                                        "width":  107,
+                                        "text":  "PSTENSIVO",
+                                        "x":  371
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ESPORTES",
+                      "words":  [
+                                    {
+                                        "y":  1223,
+                                        "height":  16,
+                                        "width":  96,
+                                        "text":  "ESPORTES",
+                                        "x":  381
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RUY.",
+                      "words":  [
+                                    {
+                                        "y":  782,
+                                        "height":  15,
+                                        "width":  40,
+                                        "text":  "RUY.",
+                                        "x":  573
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ARMíNlOVÉü1S5Ú",
+                      "words":  [
+                                    {
+                                        "y":  802,
+                                        "height":  18,
+                                        "width":  155,
+                                        "text":  "ARMíNlOVÉü1S5Ú",
+                                        "x":  571
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ESPOSA",
+                      "words":  [
+                                    {
+                                        "y":  870,
+                                        "height":  14,
+                                        "width":  73,
+                                        "text":  "ESPOSA",
+                                        "x":  805
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "30SÉ",
+                      "words":  [
+                                    {
+                                        "y":  953,
+                                        "height":  17,
+                                        "width":  46,
+                                        "text":  "30SÉ",
+                                        "x":  639
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "OLÍVIO S: MACHADO",
+                      "words":  [
+                                    {
+                                        "y":  975,
+                                        "height":  17,
+                                        "width":  62,
+                                        "text":  "OLÍVIO",
+                                        "x":  571
+                                    },
+                                    {
+                                        "y":  978,
+                                        "height":  14,
+                                        "width":  17,
+                                        "text":  "S:",
+                                        "x":  639
+                                    },
+                                    {
+                                        "y":  979,
+                                        "height":  14,
+                                        "width":  99,
+                                        "text":  "MACHADO",
+                                        "x":  659
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "AGOSTINHO ZENNI",
+                      "words":  [
+                                    {
+                                        "y":  998,
+                                        "height":  17,
+                                        "width":  113,
+                                        "text":  "AGOSTINHO",
+                                        "x":  568
+                                    },
+                                    {
+                                        "y":  999,
+                                        "height":  15,
+                                        "width":  57,
+                                        "text":  "ZENNI",
+                                        "x":  687
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ANTENOR GRISOTTI\u0027",
+                      "words":  [
+                                    {
+                                        "y":  1022,
+                                        "height":  14,
+                                        "width":  92,
+                                        "text":  "ANTENOR",
+                                        "x":  569
+                                    },
+                                    {
+                                        "y":  1019,
+                                        "height":  17,
+                                        "width":  88,
+                                        "text":  "GRISOTTI\u0027",
+                                        "x":  667
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "DESUS OOSSANTOS RODRIGUES",
+                      "words":  [
+                                    {
+                                        "y":  1044,
+                                        "height":  16,
+                                        "width":  61,
+                                        "text":  "DESUS",
+                                        "x":  565
+                                    },
+                                    {
+                                        "y":  1042,
+                                        "height":  19,
+                                        "width":  120,
+                                        "text":  "OOSSANTOS",
+                                        "x":  632
+                                    },
+                                    {
+                                        "y":  1045,
+                                        "height":  14,
+                                        "width":  109,
+                                        "text":  "RODRIGUES",
+                                        "x":  758
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "UBIRAJARA MENDES SERRÃO",
+                      "words":  [
+                                    {
+                                        "y":  1065,
+                                        "height":  16,
+                                        "width":  107,
+                                        "text":  "UBIRAJARA",
+                                        "x":  570
+                                    },
+                                    {
+                                        "y":  1067,
+                                        "height":  16,
+                                        "width":  78,
+                                        "text":  "MENDES",
+                                        "x":  683
+                                    },
+                                    {
+                                        "y":  1064,
+                                        "height":  17,
+                                        "width":  76,
+                                        "text":  "SERRÃO",
+                                        "x":  767
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "NORBERTO SUDBÑACK",
+                      "words":  [
+                                    {
+                                        "y":  1089,
+                                        "height":  14,
+                                        "width":  104,
+                                        "text":  "NORBERTO",
+                                        "x":  570
+                                    },
+                                    {
+                                        "y":  1088,
+                                        "height":  15,
+                                        "width":  106,
+                                        "text":  "SUDBÑACK",
+                                        "x":  678
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ELIAS SCALCO",
+                      "words":  [
+                                    {
+                                        "y":  1109,
+                                        "height":  17,
+                                        "width":  51,
+                                        "text":  "ELIAS",
+                                        "x":  570
+                                    },
+                                    {
+                                        "y":  1111,
+                                        "height":  15,
+                                        "width":  74,
+                                        "text":  "SCALCO",
+                                        "x":  626
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CLÁUDIOCAMARGQ",
+                      "words":  [
+                                    {
+                                        "y":  1129,
+                                        "height":  23,
+                                        "width":  188,
+                                        "text":  "CLÁUDIOCAMARGQ",
+                                        "x":  569
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SIMÕES RANGEL",
+                      "words":  [
+                                    {
+                                        "y":  1153,
+                                        "height":  18,
+                                        "width":  72,
+                                        "text":  "SIMÕES",
+                                        "x":  568
+                                    },
+                                    {
+                                        "y":  1156,
+                                        "height":  14,
+                                        "width":  78,
+                                        "text":  "RANGEL",
+                                        "x":  644
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RÉGIS ANTÔNIO AGUADO DE ARAÚJO",
+                      "words":  [
+                                    {
+                                        "y":  1176,
+                                        "height":  17,
+                                        "width":  54,
+                                        "text":  "RÉGIS",
+                                        "x":  569
+                                    },
+                                    {
+                                        "y":  1175,
+                                        "height":  18,
+                                        "width":  88,
+                                        "text":  "ANTÔNIO",
+                                        "x":  628
+                                    },
+                                    {
+                                        "y":  1179,
+                                        "height":  14,
+                                        "width":  83,
+                                        "text":  "AGUADO",
+                                        "x":  721
+                                    },
+                                    {
+                                        "y":  1179,
+                                        "height":  15,
+                                        "width":  25,
+                                        "text":  "DE",
+                                        "x":  810
+                                    },
+                                    {
+                                        "y":  1175,
+                                        "height":  19,
+                                        "width":  77,
+                                        "text":  "ARAÚJO",
+                                        "x":  841
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EDSON PADILHA",
+                      "words":  [
+                                    {
+                                        "y":  1200,
+                                        "height":  16,
+                                        "width":  66,
+                                        "text":  "EDSON",
+                                        "x":  568
+                                    },
+                                    {
+                                        "y":  1200,
+                                        "height":  16,
+                                        "width":  84,
+                                        "text":  "PADILHA",
+                                        "x":  640
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• PLÍNIO MUNDSTOCK",
+                      "words":  [
+                                    {
+                                        "y":  1229,
+                                        "height":  2,
+                                        "width":  4,
+                                        "text":  "•",
+                                        "x":  558
+                                    },
+                                    {
+                                        "y":  1221,
+                                        "height":  18,
+                                        "width":  63,
+                                        "text":  "PLÍNIO",
+                                        "x":  568
+                                    },
+                                    {
+                                        "y":  1224,
+                                        "height":  14,
+                                        "width":  122,
+                                        "text":  "MUNDSTOCK",
+                                        "x":  637
+                                    }
+                                ]
+                  }
+              ]
+}

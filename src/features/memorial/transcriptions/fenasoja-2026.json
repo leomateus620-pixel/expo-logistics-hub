@@ -1,0 +1,486 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE DE HONRA",
+          "name": "MILTON RACHO",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.138,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "PRESIDENTE CCPF-GESTÃO 2024/2026",
+          "name": "DARIO JÚNIOR DA MOTTA GERMANO",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.158,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "PRESIDENTE",
+          "name": "MARCOS EDUARDO SERVAT",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.178,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "FABIANO SOLTIS",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.198,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "DIRETOR COMERCIAL",
+          "name": "CLÉO ANTONIO ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.218,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "DIRETORA DE MARKETING/COMUNICAÇÃO",
+          "name": "ZÉLIA SAVOLDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.238,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "COORDENADOR FINANCEIRO",
+          "name": "ROQUE VANDERLEI LUGOCH",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.258,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "FINANCEIRO",
+          "name": "FERNANDA SECKLER EICH",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.278,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "SECRETÁRIA EXECUTIVA",
+          "name": "DÉBORA LETÍCIA BAMBERG",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.298,
+            0.96,
+            0.022
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "ASSESSORIA FINANCEIRA",
+          "name": "JEFFERSON ARAÚJO",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.357,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE SUSTENTABILIDADE",
+          "name": "ESTELA ZAMBERLAN SCHWERZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.3764,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE IMPRENSA",
+          "name": "DEISE ANELISE FROELICH",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.3958,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ASSESSORIA PROJETOS E CAPTAÇÕES INSTITUCIONAIS",
+          "name": "JARDEL HILLESHEIM",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.4152,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JOSÉ MAURO BARBIERI",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.4346,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE RELAÇÕES INTERNACIONAIS",
+          "name": "SANDRA LAMEIRA",
+          "status": "verified",
+          "note": "Cargo compartilhado com Everton dos Santos e Fabrício César Müller.",
+          "sourceRegion": [
+            0.02,
+            0.454,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE RELAÇÕES INTERNACIONAIS",
+          "name": "EVERTON DOS SANTOS",
+          "status": "verified",
+          "note": "Cargo compartilhado.",
+          "sourceRegion": [
+            0.02,
+            0.4734,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE RELAÇÕES INTERNACIONAIS",
+          "name": "FABRÍCIO CÉSAR MÜLLER",
+          "status": "verified",
+          "note": "Cargo compartilhado.",
+          "sourceRegion": [
+            0.02,
+            0.4928,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ASSESSORIA DE PROTOCOLO",
+          "name": "JORGE LUIZ VIANA",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.5122,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "AGRICULTURA, SOJA E DERIVADOS",
+          "name": "VANESSA MATRASZEK GNOATTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.5317,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "INOVAÇÃO E EXPERIÊNCIA",
+          "name": "DOUGLAS RAFAEL MARQUES",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.5511,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ARTE E CULTURA",
+          "name": "LEONARDO CHITOLINA",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.5705,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "BILHETERIA",
+          "name": "GUSTAVO REIS",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.5899,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "CREDENCIAMENTO",
+          "name": "DANIEL DALLALBA",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.6093,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "COOPERATIVISMO",
+          "name": "ALEXANDRE DALL'AGNESE",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.6287,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "ESPAÇO DO AUTOMÓVEL",
+          "name": "ELTON LUIS WALKER",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.6481,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "EXPORURAL",
+          "name": "GERMANO TESSMER BÜTTOW",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.6675,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "INDÚSTRIA, COMÉRCIO E SERVIÇOS",
+          "name": "JORGE VINICIUS FEIX",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.6869,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "INFRAESTRUTURA E SEGURANÇA DO TRABALHO",
+          "name": "DJEISON FERNANDO DREY",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.7063,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "LOGÍSTICA, HOTELARIA E TURISMO",
+          "name": "EDUARDO SANTOS",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.7257,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "NOVAS GERAÇÕES",
+          "name": "JOSYANE CRISTINA HECK",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.7451,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "ELISANDRA SIMÃO REIS",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.7645,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "PREVENÇÃO E COMBATE A INCÊNDIO",
+          "name": "CAP. LEONARDO RUY DAMBROZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.7839,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "RECEPÇÃO E CERIMONIAL",
+          "name": "SIMONE CASAGRANDE",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.8033,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "RELAÇÕES INSTITUCIONAIS",
+          "name": "PAULO MIGUEL NEDEL",
+          "status": "verified",
+          "note": "Cargo compartilhado com Diana Schmidt Nedel.",
+          "sourceRegion": [
+            0.02,
+            0.8227,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "RELAÇÕES INSTITUCIONAIS",
+          "name": "DIANA SCHMIDT NEDEL",
+          "status": "verified",
+          "note": "Cargo compartilhado.",
+          "sourceRegion": [
+            0.02,
+            0.8422,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "SAÚDE, BEM ESTAR E ACESSIBILIDADE",
+          "name": "ROSA ZORZAN DE PAULA",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.8616,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "TEN CEL VANESSA PERIPOLLI",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.881,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "MERCOSUL",
+          "name": "DANIEL ZIMMERMANN FUHR",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.9004,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "VALTAIR DORNELES",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.9198,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "SOJA STORE",
+          "name": "CARLA FREISLEBEN SERVAT",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.9392,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "SHOWS",
+          "name": "VÍTOR HUGO NOGUEIRA DUTRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.9586,
+            0.96,
+            0.022
+          ]
+        },
+        {
+          "role": "GASTRONOMIA",
+          "name": "RODRIGO CALIXTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.02,
+            0.978,
+            0.96,
+            0.022
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados, em coordenadas normalizadas. A arte limpa mantém as inscrições; cartazes e marcas vêm dos pixels originais."
+  ]
+}

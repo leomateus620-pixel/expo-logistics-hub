@@ -1,0 +1,419 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "WILLY KLAUS",
+          "status": "verified",
+          "sourceRegion": [
+            0.265,
+            0.244,
+            0.415,
+            0.017
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "PEDRO CARPENEDO",
+          "status": "verified",
+          "sourceRegion": [
+            0.265,
+            0.26,
+            0.683,
+            0.017
+          ],
+          "note": "Cargo compartilhado na mesma linha impressa com o segundo vice-presidente; a fotografia usa a conjunção E entre os nomes."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "Trecho ilegível na fotografia",
+          "status": "unreadable",
+          "sourceRegion": [
+            0.265,
+            0.26,
+            0.683,
+            0.017
+          ],
+          "note": "O prenome ANTENOR está legível depois de PEDRO CARPENEDO E, na mesma linha. O sobrenome após ANTENOR não pôde ser confirmado visualmente; não foi completado por inferência."
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "IRNEU BIGOLIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.3,
+            0.275,
+            0.405,
+            0.017
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "MILTON SCHUBERT",
+          "status": "verified",
+          "sourceRegion": [
+            0.3,
+            0.29,
+            0.435,
+            0.017
+          ]
+        },
+        {
+          "role": "1º DIRETOR",
+          "name": "RUY MAGALHÃES",
+          "status": "verified",
+          "sourceRegion": [
+            0.337,
+            0.305,
+            0.382,
+            0.017
+          ]
+        },
+        {
+          "role": "2º DIRETOR",
+          "name": "PAULO SÉRGIO KAPPEL",
+          "status": "verified",
+          "sourceRegion": [
+            0.337,
+            0.321,
+            0.44,
+            0.017
+          ]
+        },
+        {
+          "role": "3º DIRETOR",
+          "name": "ARNALDO PEDRO GASSEN",
+          "status": "verified",
+          "sourceRegion": [
+            0.337,
+            0.336,
+            0.47,
+            0.017
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "PROMOÇÃO E VALORIZAÇÃO DA SOJA",
+          "name": "CLÁUDIO MAGALHÃES",
+          "status": "verified",
+          "sourceRegion": [
+            0.07,
+            0.439,
+            0.695,
+            0.018
+          ]
+        },
+        {
+          "role": "SUINOCULTURA",
+          "name": "ONÓRIO CANTOS",
+          "status": "verified",
+          "sourceRegion": [
+            0.287,
+            0.455,
+            0.425,
+            0.018
+          ]
+        },
+        {
+          "role": "GADO LEITEIRO",
+          "name": "ALBERTO MEIXNER",
+          "status": "verified",
+          "sourceRegion": [
+            0.288,
+            0.47,
+            0.445,
+            0.018
+          ]
+        },
+        {
+          "role": "CUNICULTURA",
+          "name": "ERNESTO JANJAR",
+          "status": "verified",
+          "sourceRegion": [
+            0.302,
+            0.486,
+            0.41,
+            0.018
+          ]
+        },
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "RAUL LUNARDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.202,
+            0.501,
+            0.5,
+            0.018
+          ]
+        },
+        {
+          "role": "INGRESSOS",
+          "name": "EGÍDIO LAVARDA",
+          "status": "verified",
+          "sourceRegion": [
+            0.33,
+            0.516,
+            0.39,
+            0.018
+          ]
+        },
+        {
+          "role": "DIPLOMAS E PRÊMIOS",
+          "name": "EDWINO FEHLAUER",
+          "status": "verified",
+          "sourceRegion": [
+            0.22,
+            0.532,
+            0.525,
+            0.018
+          ]
+        },
+        {
+          "role": "TENDAS",
+          "name": "RICARDO SCHMIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.368,
+            0.547,
+            0.365,
+            0.018
+          ]
+        },
+        {
+          "role": "SEGURANÇA PÚBLICA",
+          "name": "AMARÍLIO FLORIANO",
+          "status": "verified",
+          "sourceRegion": [
+            0.223,
+            0.563,
+            0.535,
+            0.018
+          ]
+        },
+        {
+          "role": "RECEPÇÃO",
+          "name": "HÉLIO CHAVES LOPES",
+          "status": "verified",
+          "sourceRegion": [
+            0.33,
+            0.578,
+            0.428,
+            0.018
+          ]
+        },
+        {
+          "role": "HOSPEDAGEM E ALIMENTAÇÃO",
+          "name": "EUGÊNIO PILZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.126,
+            0.594,
+            0.57,
+            0.018
+          ]
+        },
+        {
+          "role": "TRANSPORTE E TRÂNSITO",
+          "name": "EGON KUNDE",
+          "status": "verified",
+          "sourceRegion": [
+            0.18,
+            0.609,
+            0.505,
+            0.018
+          ]
+        },
+        {
+          "role": "INFORMAÇÕES E RECLAMAÇÕES",
+          "name": "ALBERTO BELTRAME",
+          "status": "verified",
+          "sourceRegion": [
+            0.112,
+            0.625,
+            0.638,
+            0.018
+          ]
+        },
+        {
+          "role": "PROMOÇÃO E IMPRENSA",
+          "name": "DALTRI TEIXEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.186,
+            0.64,
+            0.53,
+            0.018
+          ]
+        },
+        {
+          "role": "SOCIAL",
+          "name": "NAPOLEÃO SILVA",
+          "status": "verified",
+          "sourceRegion": [
+            0.363,
+            0.656,
+            0.35,
+            0.018
+          ]
+        },
+        {
+          "role": "RAINHA DA FENASOJA",
+          "name": "LITON LANES PILAU",
+          "status": "verified",
+          "sourceRegion": [
+            0.211,
+            0.672,
+            0.522,
+            0.018
+          ]
+        },
+        {
+          "role": "ORNAMENTAÇÃO DA CIDADE",
+          "name": "RENATO STADUTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.141,
+            0.687,
+            0.58,
+            0.018
+          ]
+        },
+        {
+          "role": "ORNAMENTAÇÃO VITRINES",
+          "name": "AGOSTINHO ZENNI",
+          "status": "verified",
+          "sourceRegion": [
+            0.161,
+            0.703,
+            0.57,
+            0.018
+          ]
+        },
+        {
+          "role": "RÁDIO AMADORISMO",
+          "name": "CLARO LOPES DE LOS SANTOS",
+          "status": "verified",
+          "sourceRegion": [
+            0.214,
+            0.719,
+            0.63,
+            0.018
+          ]
+        },
+        {
+          "role": "ESPORTES",
+          "name": "PE. MARCELO FABIANO",
+          "status": "verified",
+          "sourceRegion": [
+            0.328,
+            0.734,
+            0.45,
+            0.018
+          ]
+        },
+        {
+          "role": "PROMOÇÕES CULTURAIS",
+          "name": "NELSON GRÁBIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.181,
+            0.75,
+            0.535,
+            0.018
+          ]
+        },
+        {
+          "role": "ESPETÁCULOS E DESFILES",
+          "name": "ANSELMO SCHÜLER",
+          "status": "verified",
+          "sourceRegion": [
+            0.167,
+            0.766,
+            0.57,
+            0.018
+          ]
+        },
+        {
+          "role": "DEFESA SANITÁRIA ANIMAL",
+          "name": "WALTER WARTH",
+          "status": "verified",
+          "sourceRegion": [
+            0.152,
+            0.782,
+            0.555,
+            0.018
+          ]
+        },
+        {
+          "role": "PROJEÇÃO CINEMATOGRÁFICA",
+          "name": "ARTHUR SCHMIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.115,
+            0.798,
+            0.61,
+            0.018
+          ]
+        },
+        {
+          "role": "Trecho ilegível na fotografia",
+          "roleStatus": "unreadable",
+          "name": "GERT MÜLLER",
+          "status": "verified",
+          "sourceRegion": [
+            0,
+            0.813,
+            0.68,
+            0.018
+          ],
+          "note": "O cargo começa fora da borda esquerda da fotografia. Fragmento visível: POSIÇÃO DE ANIMAIS DE PEQUENO PORTE. A primeira palavra não está completa; o nome GERT MÜLLER está legível."
+        },
+        {
+          "role": "Trecho ilegível na fotografia",
+          "roleStatus": "unreadable",
+          "name": "CAMILO BELTRAME",
+          "status": "verified",
+          "sourceRegion": [
+            0,
+            0.83,
+            0.735,
+            0.018
+          ],
+          "note": "O cargo começa fora da borda esquerda da fotografia. Final legível: TELEFONES AUTOMÁTICOS (CITEL). A primeira palavra está truncada e não foi completada; o nome CAMILO BELTRAME está legível."
+        },
+        {
+          "role": "Trecho ilegível na fotografia",
+          "roleStatus": "unreadable",
+          "name": "ELÍBIO FREDRICH",
+          "status": "verified",
+          "sourceRegion": [
+            0,
+            0.846,
+            0.715,
+            0.018
+          ],
+          "note": "O cargo começa cortado na borda esquerda da fotografia. Fragmento visível: RNAMENTAÇÃO PARQUE DE EXPOSIÇÕES. O início da primeira palavra não foi confirmado; o nome ELÍBIO FREDRICH está legível."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Título original: 1ª FENASOJA.",
+    "DE 04 A 11 DE DEZEMBRO DE 1966",
+    "Transcrição visual da fotografia IMG_1147.jpeg e da face retificada fenasoja-1966.webp. O rascunho automático de OCR não foi tratado como fonte verificada.",
+    "Os dois vice-presidentes compartilham uma única linha e um único cargo na placa. Foram representados separadamente para preservar PEDRO CARPENEDO sem declarar confirmado o sobrenome incerto de ANTENOR.",
+    "O status de cada linha confirma o nome. Nos três cargos cortados, roleStatus indica a ilegibilidade do cargo sem ocultar o nome confirmado.",
+    "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+    "Grafias, abreviações e ordem foram mantidas a partir da imagem, sem pesquisa externa nem correção histórica inferida.",
+    "Status global parcial: há um sobrenome não confirmado e três cargos com início fora do enquadramento."
+  ]
+}

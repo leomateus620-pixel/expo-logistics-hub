@@ -4,6 +4,7 @@ import {
   Crown,
   Landmark,
   Layers3,
+  GalleryVerticalEnd,
   LocateFixed,
   Minus,
   PanelsTopLeft,
@@ -18,6 +19,7 @@ interface OrgFilterBarProps {
   filter: OrgGraphFilter;
   compact?: boolean;
   onFilterChange: (filter: OrgGraphFilter) => void;
+  onOpenMemorial?: () => void;
 }
 
 interface OrgViewportControlsProps {
@@ -50,7 +52,14 @@ const FILTERS = [
   icon: typeof Layers3;
 }>;
 
-export function OrgFilterBar({ filter, compact = false, onFilterChange }: OrgFilterBarProps) {
+export function OrgMemorialShortcut({ onOpen }: { onOpen: () => void }) {
+  return <button type="button" className="org-memorial-shortcut" onClick={onOpen}>
+    <GalleryVerticalEnd aria-hidden="true" data-org-filter-icon />
+    <span>Memorial do Voluntariado</span>
+  </button>;
+}
+
+export function OrgFilterBar({ filter, compact = false, onFilterChange, onOpenMemorial }: OrgFilterBarProps) {
   return (
     <nav className="org-filters" data-compact={compact || undefined} aria-label="Filtrar níveis organizacionais" data-org-interactive>
       {FILTERS.map((item) => {
@@ -69,6 +78,7 @@ export function OrgFilterBar({ filter, compact = false, onFilterChange }: OrgFil
           </button>
         );
       })}
+      {onOpenMemorial && <OrgMemorialShortcut onOpen={onOpenMemorial} />}
     </nav>
   );
 }

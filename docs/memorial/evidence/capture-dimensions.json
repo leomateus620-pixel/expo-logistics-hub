@@ -1,0 +1,187 @@
+{
+  "clean-faces-contact-1.jpg": {
+    "width": 1500,
+    "height": 1890,
+    "bytes": 527737
+  },
+  "clean-faces-contact-2.jpg": {
+    "width": 1500,
+    "height": 1890,
+    "bytes": 638110
+  },
+  "clean-faces-contact-3.jpg": {
+    "width": 1500,
+    "height": 1890,
+    "bytes": 739288
+  },
+  "delivery-preview.jpg": {
+    "width": 1712,
+    "height": 887,
+    "bytes": 204951
+  },
+  "desktop-background-before.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 72131
+  },
+  "desktop-closed-focus-2004.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 85062
+  },
+  "desktop-detail-2004-inspection.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 80473
+  },
+  "desktop-detail-2004-oblique.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 75120
+  },
+  "desktop-detail-2004.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 74840
+  },
+  "desktop-ecosystem-entry.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 26484
+  },
+  "desktop-ecosystem-ready-fixture.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 86285
+  },
+  "desktop-ecosystem-return.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 25128
+  },
+  "desktop-gallery.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 72249
+  },
+  "desktop-timeline-epilogue.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 39892
+  },
+  "desktop-timeline-turn.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 62859
+  },
+  "desktop-transcription-2004.jpg": {
+    "width": 1262,
+    "height": 789,
+    "bytes": 52650
+  },
+  "environment-comparison-desktop.jpg": {
+    "width": 2526,
+    "height": 859,
+    "bytes": 256721
+  },
+  "environment-comparison-mobile.jpg": {
+    "width": 780,
+    "height": 914,
+    "bytes": 79952
+  },
+  "mobile-closed-2018.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 37807
+  },
+  "mobile-detail-2012.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 40728
+  },
+  "mobile-detail-2014.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 39477
+  },
+  "mobile-detail-2018.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 42544
+  },
+  "mobile-detail-2026.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 40839
+  },
+  "mobile-detail-document-2020.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 40525
+  },
+  "mobile-ecosystem-ready-fixture.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 32459
+  },
+  "mobile-epilogue-2028.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 30052
+  },
+  "mobile-fallback-context-loss.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 36886
+  },
+  "mobile-fallback-no-webgl.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 37886
+  },
+  "mobile-gallery-keyboard-focus.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 33261
+  },
+  "mobile-gallery.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 32000
+  },
+  "mobile-reduced-motion.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 36569
+  },
+  "mobile-slow-loading.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 33436
+  },
+  "mobile-timeline-ending.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 32170
+  },
+  "mobile-transcription-2018.jpg": {
+    "width": 390,
+    "height": 822,
+    "bytes": 35819
+  },
+  "narrow-680-timeline.jpg": {
+    "width": 679,
+    "height": 789,
+    "bytes": 39945
+  },
+  "source-contact-sheet.jpg": {
+    "width": 1500,
+    "height": 2100,
+    "bytes": 647260
+  },
+  "tablet-return-after-orientation.jpg": {
+    "width": 768,
+    "height": 822,
+    "bytes": 60454
+  }
+}

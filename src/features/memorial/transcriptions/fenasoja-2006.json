@@ -1,0 +1,319 @@
+{
+  "status": "verified",
+  "engravedPeriod": "29 de abril a 07 de maio de 2006",
+  "namesFirst": true,
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "Engº Agrº JAIRTON LUIS DEZORDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.22418,
+            0.1593,
+            0.753,
+            0.02626
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "Engº Agrº MILTON RACHO",
+          "status": "verified",
+          "sourceRegion": [
+            0.22404,
+            0.18734,
+            0.75348,
+            0.02608
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "ATEMIR ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.22389,
+            0.21543,
+            0.75396,
+            0.02589
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "LEOMAR TESCHE",
+          "status": "verified",
+          "sourceRegion": [
+            0.22375,
+            0.24355,
+            0.75443,
+            0.0257
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CLÉO A. ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.22361,
+            0.2717,
+            0.75491,
+            0.02551
+          ]
+        },
+        {
+          "role": "SECRETÁRIA DA COORDENAÇÃO",
+          "name": "ELENIR JUNGES (KIKA)",
+          "status": "verified",
+          "sourceRegion": [
+            0.22346,
+            0.2999,
+            0.75539,
+            0.02532
+          ]
+        },
+        {
+          "role": "AUX. ADMINISTRATIVA",
+          "name": "ANA PAULA H. SILVEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.22332,
+            0.32812,
+            0.75587,
+            0.02513
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "AGRICULTURA",
+          "name": "CARLOS CÉSAR HERMANNS",
+          "status": "verified",
+          "sourceRegion": [
+            0.22278,
+            0.43531,
+            0.75769,
+            0.0244
+          ]
+        },
+        {
+          "role": "EXPORURAL",
+          "name": "SÉRGIO SCHNEIDER",
+          "status": "verified",
+          "sourceRegion": [
+            0.22264,
+            0.46138,
+            0.75813,
+            0.02422
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "AUGUSTO MORONI",
+          "status": "verified",
+          "sourceRegion": [
+            0.22251,
+            0.48758,
+            0.75858,
+            0.02404
+          ]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "Major ABEL M. DE SOUZA",
+          "status": "verified",
+          "sourceRegion": [
+            0.22238,
+            0.51371,
+            0.75902,
+            0.02387
+          ]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "MARLON LUIS SALING",
+          "status": "verified",
+          "sourceRegion": [
+            0.22225,
+            0.53987,
+            0.75947,
+            0.02369
+          ]
+        },
+        {
+          "role": "ETNIAS",
+          "name": "LUIS ALBERTO GIOVELLI",
+          "status": "verified",
+          "sourceRegion": [
+            0.22211,
+            0.56616,
+            0.75991,
+            0.02351
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "ROMEU UHLMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.22198,
+            0.59238,
+            0.76036,
+            0.02333
+          ]
+        },
+        {
+          "role": "BILHETERIA",
+          "name": "ELEMAR ANTÔNIO LENZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.22184,
+            0.61873,
+            0.76081,
+            0.02315
+          ]
+        },
+        {
+          "role": "CULTURA",
+          "name": "LUIS ARTUR HOFFMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.22171,
+            0.64501,
+            0.76125,
+            0.02297
+          ]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "HEITOR HENRIQUE CARDOSO",
+          "status": "verified",
+          "sourceRegion": [
+            0.22158,
+            0.67133,
+            0.7617,
+            0.02279
+          ]
+        },
+        {
+          "role": "CREDENCIAMENTO",
+          "name": "RAFAEL MORONI",
+          "status": "verified",
+          "sourceRegion": [
+            0.22144,
+            0.69777,
+            0.76215,
+            0.0226
+          ]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "CARLOS AUGUSTO LOZEKAM",
+          "status": "verified",
+          "sourceRegion": [
+            0.22131,
+            0.72415,
+            0.7626,
+            0.02242
+          ]
+        },
+        {
+          "role": "LOGÍSTICA",
+          "name": "CELSO DA ROSA",
+          "status": "verified",
+          "sourceRegion": [
+            0.22118,
+            0.75056,
+            0.76305,
+            0.02224
+          ]
+        },
+        {
+          "role": "INDÚSTRIA e COMÉRCIO",
+          "name": "IRÁLCIO JOSÉ MOTTA AMORIM",
+          "status": "verified",
+          "sourceRegion": [
+            0.22104,
+            0.7771,
+            0.7635,
+            0.02206
+          ]
+        },
+        {
+          "role": "SOCIAL",
+          "name": "DULCE KERBER",
+          "status": "verified",
+          "sourceRegion": [
+            0.22091,
+            0.80357,
+            0.76395,
+            0.02187
+          ]
+        },
+        {
+          "role": "INFRA-ESTRUTURA",
+          "name": "CICILIA LIBERALI PAES",
+          "status": "verified",
+          "sourceRegion": [
+            0.22077,
+            0.83017,
+            0.7644,
+            0.02169
+          ]
+        },
+        {
+          "role": "CONESUL",
+          "name": "AIRTON BERTOL DA SILVA",
+          "status": "verified",
+          "sourceRegion": [
+            0.22064,
+            0.85671,
+            0.76485,
+            0.02151
+          ]
+        },
+        {
+          "role": "SOJA e DERIVADOS",
+          "name": "ZÉLIA SAVOLDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.2205,
+            0.88327,
+            0.7653,
+            0.02132
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JOSÉ MAURO BARBIERI",
+          "status": "verified",
+          "sourceRegion": [
+            0.22037,
+            0.90997,
+            0.76575,
+            0.02114
+          ]
+        },
+        {
+          "role": "ASSESSORIA IMPRENSA",
+          "name": "VITOR HUGO NOGUEIRA DUTRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.22023,
+            0.9366,
+            0.76621,
+            0.02095
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Conferência visual linha a linha na fotografia original e na cópia retificada. Regiões são localizadores aproximados.",
+    "As marcas, os slogans e as artes de campanha são preservados como recortes da fotografia. A face limpa não utiliza o reflexo do fotógrafo."
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "EUGÊNIO PILZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.34,
+            0.261,
+            0.35,
+            0.019
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "WILLY KLAUS",
+          "status": "verified",
+          "sourceRegion": [
+            0.28,
+            0.276,
+            0.4,
+            0.019
+          ],
+          "note": "Primeiro dos quatro nomes sob o cargo compartilhado VICE-PRESIDENTES."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "ADELKI CAMILO BELTRAME",
+          "status": "verified",
+          "sourceRegion": [
+            0.54,
+            0.291,
+            0.27,
+            0.019
+          ],
+          "note": "Segundo nome sob o cargo compartilhado VICE-PRESIDENTES, que aparece apenas na primeira linha."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "ELIAS SCALCO",
+          "status": "verified",
+          "sourceRegion": [
+            0.54,
+            0.306,
+            0.155,
+            0.019
+          ],
+          "note": "Terceiro nome sob o cargo compartilhado VICE-PRESIDENTES, que aparece apenas na primeira linha."
+        },
+        {
+          "role": "VICE-PRESIDENTES",
+          "name": "PEDRO CARPENEDO",
+          "status": "verified",
+          "sourceRegion": [
+            0.54,
+            0.321,
+            0.205,
+            0.019
+          ],
+          "note": "Quarto nome sob o cargo compartilhado VICE-PRESIDENTES, que aparece apenas na primeira linha."
+        },
+        {
+          "role": "SECRETÁRIO EXECUTIVO",
+          "name": "ERNANI DENARDIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.23,
+            0.336,
+            0.51,
+            0.019
+          ]
+        },
+        {
+          "role": "SECRETÁRIO GERAL",
+          "name": "GUILHERME SOARES GARCIA",
+          "status": "verified",
+          "sourceRegion": [
+            0.27,
+            0.352,
+            0.555,
+            0.019
+          ]
+        },
+        {
+          "role": "1º SECRETÁRIO",
+          "name": "HÉLIO VETTORATO",
+          "status": "verified",
+          "sourceRegion": [
+            0.32,
+            0.367,
+            0.41,
+            0.019
+          ]
+        },
+        {
+          "role": "2º SECRETÁRIO",
+          "name": "DANILO GRAFFUNDER",
+          "status": "verified",
+          "sourceRegion": [
+            0.315,
+            0.382,
+            0.445,
+            0.019
+          ]
+        },
+        {
+          "role": "TESOUREIRO GERAL",
+          "name": "JAIME ALBERTO MONTEIRO",
+          "status": "verified",
+          "sourceRegion": [
+            0.27,
+            0.398,
+            0.54,
+            0.019
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "FRANCISCO HAAS",
+          "status": "verified",
+          "sourceRegion": [
+            0.315,
+            0.413,
+            0.41,
+            0.019
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "DÉLCIO WEIZENMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.315,
+            0.428,
+            0.445,
+            0.019
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "ASSUNTOS CIENTÍFICOS DA SOJA",
+          "name": "EDGAR DESSUY",
+          "status": "verified",
+          "sourceRegion": [
+            0.145,
+            0.552,
+            0.555,
+            0.02
+          ]
+        },
+        {
+          "role": "LAVOURAS",
+          "name": "JUAREZ PINTO GUTERRES",
+          "status": "verified",
+          "sourceRegion": [
+            0.35,
+            0.568,
+            0.45,
+            0.02
+          ],
+          "note": "A grafia visível nesta placa é GUTERRES, preservada sem normalização a outras inscrições."
+        },
+        {
+          "role": "ESPORTES E PROMOÇÕES",
+          "name": "ROBERTO BOHRER",
+          "status": "verified",
+          "sourceRegion": [
+            0.21,
+            0.583,
+            0.52,
+            0.02
+          ]
+        },
+        {
+          "role": "PRÊMIOS E DIPLOMAS",
+          "name": "JUAREZ STRAZZULAS",
+          "status": "verified",
+          "sourceRegion": [
+            0.242,
+            0.599,
+            0.51,
+            0.02
+          ]
+        },
+        {
+          "role": "PROMOÇÃO CULTURAL E RECREAÇÃO",
+          "name": "IVO LEOPOLDO DA SILVEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.098,
+            0.614,
+            0.725,
+            0.02
+          ]
+        },
+        {
+          "role": "RODOVIAS",
+          "name": "HILÁRIO CORDEBELLA",
+          "status": "verified",
+          "sourceRegion": [
+            0.35,
+            0.63,
+            0.415,
+            0.02
+          ]
+        },
+        {
+          "role": "TENDAS",
+          "name": "CELSO RITTER",
+          "status": "verified",
+          "sourceRegion": [
+            0.375,
+            0.646,
+            0.31,
+            0.02
+          ]
+        },
+        {
+          "role": "VENDA DE ESPAÇOS",
+          "name": "RICARDO NORBERTO SCHMIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.26,
+            0.661,
+            0.59,
+            0.02
+          ]
+        },
+        {
+          "role": "TRÂNSITO",
+          "name": "DALTRY TEIXEIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.35,
+            0.677,
+            0.365,
+            0.02
+          ],
+          "note": "A grafia visível nesta placa é DALTRY, preservada sem normalização a outras inscrições."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Título original: 3ª FENASOJA.",
+    "DE 27 DE MARÇO A 01 DE ABRIL DE 1976",
+    "Transcrição visual da fotografia IMG_1149.jpeg e da face retificada fenasoja-1976.webp, com conferência ampliada da Comissão Central e de todas as nove linhas de PRESIDENTES DE ÁREA.",
+    "O rascunho automático de OCR não foi tratado como fonte verificada; não foram consultadas fontes externas.",
+    "Os quatro vice-presidentes estão sob um único cargo impresso. O cargo foi repetido nas entradas para preservar a associação e a ordem dos nomes.",
+    "Todos os nomes e cargos foram confirmados visualmente nesta fotografia; não houve preenchimento de letras ocultas por inferência.",
+    "As grafias GUTERRES e DALTRY foram mantidas conforme impressas nesta placa, mesmo quando outras inscrições possam usar grafias distintas.",
+    "As regiões sourceRegion são localizadores aproximados normalizados sobre a face retificada; não são uma garantia de detecção por OCR nem coordenadas de precisão.",
+    "Grafias, acentos, abreviações e ordem foram mantidos a partir da imagem."
+  ]
+}

@@ -1,0 +1,447 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 28 DE ABRIL A\n08 DE MAIO 2020",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE DE HONRA",
+          "name": "NILSON FORTUNATO GUIDOLIN",
+          "status": "verified",
+          "sourceRegion": [
+            0.2116,
+            0.13632,
+            0.60045,
+            0.0245
+          ]
+        },
+        {
+          "role": "PRESIDENTE DO CCPF GESTÃO 2018/2022",
+          "name": "ALEXANDRE RODRIGO MARONEZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.05944,
+            0.15403,
+            0.77106,
+            0.02491
+          ]
+        },
+        {
+          "role": "PRESIDENTE",
+          "name": "ELIAS DALLALBA",
+          "status": "verified",
+          "sourceRegion": [
+            0.31936,
+            0.17861,
+            0.46026,
+            0.02212
+          ]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "ROGÉRIO DOS SANTOS FERREIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.27049,
+            0.19571,
+            0.56414,
+            0.02422
+          ]
+        },
+        {
+          "role": "1º TESOUREIRO",
+          "name": "RICARDO EMÍLIO ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.29616,
+            0.2159,
+            0.55508,
+            0.02414
+          ]
+        },
+        {
+          "role": "2º TESOUREIRO",
+          "name": "DIEGO LEONARDO WIETHOLTER",
+          "status": "verified",
+          "sourceRegion": [
+            0.29536,
+            0.23607,
+            0.55563,
+            0.02409
+          ]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CLÉO ANTONIO ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.22251,
+            0.25519,
+            0.59441,
+            0.02411
+          ]
+        },
+        {
+          "role": "EXECUTIVO",
+          "name": "ROGÉRIO DOS SANTOS FERREIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.33553,
+            0.27563,
+            0.51873,
+            0.02391
+          ],
+          "note": "O nome aparece também em VICE-PRESIDENTE nesta própria peça; ambas as inscrições foram preservadas."
+        },
+        {
+          "role": "AUXILIAR ADMINISTRATIVA",
+          "name": "CAROLINA DE CONTI",
+          "status": "verified",
+          "sourceRegion": [
+            0.19027,
+            0.29667,
+            0.52049,
+            0.02293
+          ]
+        },
+        {
+          "role": "PROTOCOLO",
+          "name": "JORGE LUIZ VIANA",
+          "status": "verified",
+          "sourceRegion": [
+            0.3245,
+            0.31622,
+            0.39722,
+            0.02272
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "ASSESSORIA DE IMPRENSA",
+          "name": "JARDEL HILLESHEIM",
+          "status": "verified",
+          "sourceRegion": [
+            0.1907,
+            0.39394,
+            0.5419,
+            0.02171
+          ]
+        },
+        {
+          "role": "ASSESSORIA JURÍDICA",
+          "name": "JOSÉ MAURO BARBIERI\nDÁRIO JÚNIOR DA MOTTA GERMANO",
+          "status": "verified",
+          "sourceRegion": [
+            0.22818,
+            0.41156,
+            0.62709,
+            0.0363
+          ],
+          "note": "Cargo impresso uma única vez à esquerda de duas linhas consecutivas de nomes, preservadas com quebra de linha e sem barra acrescentada."
+        },
+        {
+          "role": "AGRICULTURA, SOJA E DERIVADOS",
+          "name": "MARCOS EDUARDO SERVAT",
+          "status": "verified",
+          "sourceRegion": [
+            0.12097,
+            0.45175,
+            0.68655,
+            0.02251
+          ]
+        },
+        {
+          "role": "BILHETERIA",
+          "name": "IVAN LUIZ SQUINZANI",
+          "status": "verified",
+          "sourceRegion": [
+            0.33103,
+            0.4714,
+            0.40018,
+            0.02151
+          ]
+        },
+        {
+          "role": "COMUNICAÇÃO",
+          "name": "MARISTANI WEIAND NEUMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.29966,
+            0.49011,
+            0.53394,
+            0.02142
+          ]
+        },
+        {
+          "role": "CREDENCIAMENTO",
+          "name": "CARINE GOMES LUNARDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.26241,
+            0.50986,
+            0.51572,
+            0.02138
+          ]
+        },
+        {
+          "role": "CULTURA E TURISMO",
+          "name": "RAFAEL RUFINO DA COSTA",
+          "status": "verified",
+          "sourceRegion": [
+            0.24723,
+            0.52865,
+            0.53536,
+            0.02231
+          ]
+        },
+        {
+          "role": "DESENVOLVIMENTO E TECNOLOGIA",
+          "name": "MARCOS PAULO SCHERER",
+          "status": "verified",
+          "sourceRegion": [
+            0.11346,
+            0.54857,
+            0.67073,
+            0.02213
+          ]
+        },
+        {
+          "role": "DESENVOLVIMENTO DE PRODUTOS",
+          "name": "PATRÍCIA KUHN",
+          "status": "verified",
+          "sourceRegion": [
+            0.1126,
+            0.56645,
+            0.57574,
+            0.02317
+          ]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "DANIEL U. RIBEIRO DA SILVA",
+          "status": "verified",
+          "sourceRegion": [
+            0.31999,
+            0.5861,
+            0.51711,
+            0.02216
+          ]
+        },
+        {
+          "role": "ETNIAS",
+          "name": "SÉRGIO OSTAPIUK",
+          "status": "verified",
+          "sourceRegion": [
+            0.37613,
+            0.60394,
+            0.3737,
+            0.02332
+          ]
+        },
+        {
+          "role": "EXPORURAL",
+          "name": "ROBERTO ADRIANO RACHO",
+          "status": "verified",
+          "sourceRegion": [
+            0.32719,
+            0.62494,
+            0.4606,
+            0.02216
+          ]
+        },
+        {
+          "role": "INDÚSTRIA, COMÉRCIO E SERVIÇOS",
+          "name": "JORGE VINICIUS FEIX",
+          "status": "verified",
+          "sourceRegion": [
+            0.11561,
+            0.64528,
+            0.64504,
+            0.0218
+          ]
+        },
+        {
+          "role": "JOVEM",
+          "name": "LAISA GABRIELA DALLALBA\nJOÃO PEDRO DA ROCHA FERREIRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.37785,
+            0.66483,
+            0.48008,
+            0.03702
+          ],
+          "note": "Cargo impresso uma única vez à esquerda de duas linhas consecutivas de nomes, preservadas na ordem impressa."
+        },
+        {
+          "role": "INFRAESTRUTURA",
+          "name": "DANIEL DALLALBA",
+          "status": "verified",
+          "sourceRegion": [
+            0.27682,
+            0.70318,
+            0.42421,
+            0.0211
+          ]
+        },
+        {
+          "role": "LOGÍSTICA",
+          "name": "JOÃO CARLOS DE CASTRO DORNELES",
+          "status": "verified",
+          "sourceRegion": [
+            0.34393,
+            0.72113,
+            0.53944,
+            0.02175
+          ]
+        },
+        {
+          "role": "MUSICANTO",
+          "name": "VÍTOR DANIEL DE CONTI",
+          "status": "verified",
+          "sourceRegion": [
+            0.3306,
+            0.74132,
+            0.43424,
+            0.022
+          ]
+        },
+        {
+          "role": "ORÇAMENTO",
+          "name": "MARCEL LENZ STRAGLIOTTO",
+          "status": "verified",
+          "sourceRegion": [
+            0.32014,
+            0.76155,
+            0.47327,
+            0.02185
+          ]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "VALÉRIO AVELLAR",
+          "status": "verified",
+          "sourceRegion": [
+            0.34173,
+            0.78172,
+            0.38673,
+            0.02208
+          ]
+        },
+        {
+          "role": "PROJETOS E CAPTAÇÃO",
+          "name": "RODINEI GERARDON",
+          "status": "verified",
+          "sourceRegion": [
+            0.22326,
+            0.80136,
+            0.52321,
+            0.02162
+          ]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "PAULO MIGUEL NEDEL\nDIANA SCHMIDT NEDEL",
+          "status": "verified",
+          "sourceRegion": [
+            0.32085,
+            0.82035,
+            0.42599,
+            0.03713
+          ],
+          "note": "Cargo impresso uma única vez à esquerda de duas linhas consecutivas de nomes, preservadas com quebra de linha."
+        },
+        {
+          "role": "RECEPÇÃO",
+          "name": "DAIANE L. ENGLEITNER CERUTTI NOGUEIRA DUTRA",
+          "status": "verified",
+          "sourceRegion": [
+            0.34093,
+            0.85693,
+            0.62981,
+            0.02205
+          ]
+        },
+        {
+          "role": "RELAÇÕES INTERNACIONAIS",
+          "name": "DANIEL ZIMMERMANN FUHR",
+          "status": "verified",
+          "sourceRegion": [
+            0.18381,
+            0.87898,
+            0.6224,
+            0.02102
+          ]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "MAJOR VALTAIR DORNELES",
+          "status": "verified",
+          "sourceRegion": [
+            0.31893,
+            0.8979,
+            0.48601,
+            0.02253
+          ]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "RODRIGO VALMOR BÜRKLE",
+          "status": "verified",
+          "sourceRegion": [
+            0.33385,
+            0.91731,
+            0.42812,
+            0.02172
+          ]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "ROQUE VANDERLEI LUGOCH",
+          "status": "verified",
+          "sourceRegion": [
+            0.31356,
+            0.93691,
+            0.47726,
+            0.02044
+          ]
+        }
+      ]
+    },
+    {
+      "title": "",
+      "lines": [
+        {
+          "role": "",
+          "name": "FEIRA ADIADA EM RAZÃO DA PANDEMIA",
+          "status": "verified",
+          "sourceRegion": [
+            0.31903,
+            0.97395,
+            0.39059,
+            0.01049
+          ],
+          "note": "Rodapé da própria peça, confirmado na fotografia original e preservado integralmente após o refinamento do recorte retificado. A seção fica sem título porque não há um título adicional impresso."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "DE 28 DE ABRIL A\n08 DE MAIO 2020",
+    "FEIRA ADIADA EM RAZÃO DA PANDEMIA",
+    "Cabeçalho impresso: 23ª FENASOJA.",
+    "Os cargos estão na coluna esquerda e os nomes na coluna direita, nas duas seções de nomes; namesFirst é false.",
+    "Conferência visual integral da fotografia original 23a_Fenasoja_2020_Placa_Historica.jpeg e da face retificada documento-2020.webp, incluindo ampliações locais e aumento de contraste apenas para inspeção. O OCR foi tratado apenas como rascunho.",
+    "As regiões são localizadores aproximados normalizados na face retificada, em ordem [x, y, largura, altura]; não constituem garantia de recorte OCR.",
+    "A capitalização, as grafias, a pontuação visível e a ordem foram preservadas sem consulta a fontes externas nem correções por cronologia. Os cargos desta peça não incluem dois-pontos.",
+    "O período gravado termina em 08 DE MAIO 2020, sem a palavra DE entre MAIO e 2020.",
+    "Há 36 registros de cargos e nomes verificados, contendo 39 linhas impressas de nomes, mais um registro verificado de rodapé. Nenhum registro foi marcado ilegível.",
+    "ASSESSORIA JURÍDICA, JOVEM e PROMOÇÕES abrangem duas linhas de nomes cada. A duplicação de ROGÉRIO DOS SANTOS FERREIRA em dois cargos centrais reproduz a inscrição desta peça."
+  ]
+}

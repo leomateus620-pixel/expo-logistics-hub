@@ -24,7 +24,7 @@ import { useOrgPerformanceTelemetry } from '../hooks/useOrgPerformanceTelemetry'
 import { useOrgPresentation } from '../hooks/useOrgPresentation';
 import { useOrgViewport, type OrgViewportCamera, type ViewportSize } from '../hooks/useOrgViewport';
 import { OrganizationalNode } from './OrganizationalNode';
-import { OrgFilterBar, OrgViewportControls } from './OrgControls';
+import { OrgFilterBar, OrgMemorialShortcut, OrgViewportControls } from './OrgControls';
 import { PersonDetailPanel } from './PersonDetailPanel';
 import { RelationshipLayer } from './RelationshipLayer';
 import { SoybeanAtmosphere } from './SoybeanAtmosphere';
@@ -40,6 +40,7 @@ export interface OrganizationalEcosystemProps {
   onReady?: () => void;
   onRetry?: () => void;
   onSelectedNodeChange?: (node: OrgNode | null) => void;
+  onOpenMemorial?: () => void;
 }
 
 interface GraphReadyProps extends Omit<OrganizationalEcosystemProps, 'error' | 'graph' | 'loading'> {
@@ -73,6 +74,7 @@ function GraphReady({
   initialSelectedNodeId,
   onReady,
   onSelectedNodeChange,
+  onOpenMemorial,
 }: GraphReadyProps) {
   const performanceTelemetryRef = useOrgPerformanceTelemetry(active);
   const renderableNodeIds = useMemo(() => new Set(graph.renderableNodeIds), [graph.renderableNodeIds]);
@@ -309,7 +311,7 @@ function GraphReady({
             <h1>Ecossistema</h1>
           </div>
         </header>
-        <OrgFilterBar compact={viewportSize.width < 1150} filter={interaction.filter} onFilterChange={handleFilterChange} />
+        <OrgFilterBar compact={viewportSize.width < 1150} filter={interaction.filter} onFilterChange={handleFilterChange} onOpenMemorial={onOpenMemorial} />
       </div>
 
       <div
@@ -470,6 +472,7 @@ export function OrganizationalEcosystem({
   onReady,
   onRetry,
   onSelectedNodeChange,
+  onOpenMemorial,
 }: OrganizationalEcosystemProps) {
   const hasContent = hasRenderableOrganization(graph);
   const state = loading ? 'loading' : error ? 'error' : hasContent ? 'ready' : 'empty';
@@ -483,6 +486,7 @@ export function OrganizationalEcosystem({
       aria-label="Ecossistema organizacional FENASOJA 2028"
     >
       <SoybeanAtmosphere active={active} />
+      {state !== 'ready' && onOpenMemorial && <nav className="org-filters org-entry-shortcuts" aria-label="Acervo do Ecossistema"><OrgMemorialShortcut onOpen={onOpenMemorial} /></nav>}
       {loading ? (
         <LoadingState />
       ) : error ? (
@@ -494,6 +498,7 @@ export function OrganizationalEcosystem({
           initialSelectedNodeId={initialSelectedNodeId}
           onReady={onReady}
           onSelectedNodeChange={onSelectedNodeChange}
+          onOpenMemorial={onOpenMemorial}
         />
       ) : (
         <EmptyState />

@@ -1,0 +1,327 @@
+{
+  "status": "verified",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "6 a 14 de Abril de 2002",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "Presidente",
+          "name": "ÁLVARO EIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.0839,
+            0.22824,
+            0.86048,
+            0.04398
+          ]
+        },
+        {
+          "role": "Vice-Presidente",
+          "name": "ALEXANDRE MORONI",
+          "status": "verified",
+          "sourceRegion": [
+            0.08319,
+            0.25657,
+            0.86059,
+            0.04417
+          ]
+        },
+        {
+          "role": "1º Tesoureiro",
+          "name": "ATEMIR ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.08251,
+            0.28395,
+            0.86074,
+            0.04245
+          ]
+        },
+        {
+          "role": "2º Tesoureiro",
+          "name": "ALMIRO ZIMMERMANN",
+          "status": "verified",
+          "sourceRegion": [
+            0.08185,
+            0.3104,
+            0.86084,
+            0.04263
+          ]
+        },
+        {
+          "role": "Coordenador Geral",
+          "name": "CLÉO ANTÔNIO ROCKENBACH",
+          "status": "verified",
+          "sourceRegion": [
+            0.08128,
+            0.33308,
+            0.86087,
+            0.04563
+          ]
+        },
+        {
+          "role": "Secretária Coordenação",
+          "name": "ELENIR BATISTA",
+          "status": "verified",
+          "sourceRegion": [
+            0.08062,
+            0.35954,
+            0.86099,
+            0.04486
+          ]
+        },
+        {
+          "role": "Assessor Coordenação",
+          "name": "ANDRÉ WIEDERGRÜN",
+          "status": "verified",
+          "sourceRegion": [
+            0.07998,
+            0.38506,
+            0.8611,
+            0.04503
+          ]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "Agricultura",
+          "name": "DENIR FROSI",
+          "status": "verified",
+          "sourceRegion": [
+            0.0882,
+            0.46468,
+            0.841,
+            0.03948
+          ]
+        },
+        {
+          "role": "Exporural",
+          "name": "JAIRTON DEZORDI",
+          "status": "verified",
+          "sourceRegion": [
+            0.08761,
+            0.48834,
+            0.84109,
+            0.03963
+          ]
+        },
+        {
+          "role": "Pecuária",
+          "name": "AUGUSTO MORONI",
+          "status": "verified",
+          "sourceRegion": [
+            0.08709,
+            0.50916,
+            0.84115,
+            0.04072
+          ]
+        },
+        {
+          "role": "Segurança",
+          "name": "TEN CEL ERLO DOS SANTOS PITROSKI",
+          "status": "verified",
+          "sourceRegion": [
+            0.08645,
+            0.53472,
+            0.84123,
+            0.04184
+          ],
+          "note": "O prefixo 'TEN CEL' foi preservado sem expansão. Cargo compartilhado com a linha seguinte: a placa mostra um único rótulo Segurança para os dois nomes."
+        },
+        {
+          "role": "Segurança",
+          "name": "MAJOR SÉRGIO FLORES DE CAMPOS",
+          "status": "verified",
+          "sourceRegion": [
+            0.36202,
+            0.55962,
+            0.54453,
+            0.03944
+          ],
+          "note": "Segunda linha do cargo compartilhado Segurança; o rótulo não é repetido na fotografia."
+        },
+        {
+          "role": "Suprimentos",
+          "name": "ANTÔNIO CARLOS SIMÕES BALTAR",
+          "status": "verified",
+          "sourceRegion": [
+            0.08539,
+            0.57733,
+            0.84134,
+            0.04498
+          ]
+        },
+        {
+          "role": "Etnias",
+          "name": "ABDUL NASSER EL HAMOUI",
+          "status": "verified",
+          "sourceRegion": [
+            0.08468,
+            0.60575,
+            0.84153,
+            0.04135
+          ]
+        },
+        {
+          "role": "Divulgação",
+          "name": "LUÍS EDUARDO RAMOS MARIATH",
+          "status": "verified",
+          "sourceRegion": [
+            0.08419,
+            0.62565,
+            0.84154,
+            0.04434
+          ]
+        },
+        {
+          "role": "Bilheteria",
+          "name": "ELEMAR ANTÔNIO LENZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.08357,
+            0.65029,
+            0.84164,
+            0.0445
+          ]
+        },
+        {
+          "role": "Cultura",
+          "name": "PEDRO LUÍS BÜTTENBENDER",
+          "status": "verified",
+          "sourceRegion": [
+            0.08301,
+            0.67304,
+            0.84173,
+            0.04465
+          ]
+        },
+        {
+          "role": "Promoções",
+          "name": "IARA PILZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.08235,
+            0.69959,
+            0.84189,
+            0.04196
+          ]
+        },
+        {
+          "role": "Credenciamento",
+          "name": "RAFAEL MORONI",
+          "status": "verified",
+          "sourceRegion": [
+            0.08178,
+            0.72235,
+            0.84196,
+            0.04306
+          ]
+        },
+        {
+          "role": "Serviços",
+          "name": "ENIO GEHM",
+          "status": "verified",
+          "sourceRegion": [
+            0.08117,
+            0.74701,
+            0.84205,
+            0.04322
+          ]
+        },
+        {
+          "role": "Indústria e Comércio",
+          "name": "JOSÉ LUÍS EIDT",
+          "status": "verified",
+          "sourceRegion": [
+            0.08067,
+            0.76694,
+            0.84209,
+            0.04526
+          ]
+        },
+        {
+          "role": "Social",
+          "name": "LUÍS ANTÔNIO KERBER",
+          "status": "verified",
+          "sourceRegion": [
+            0.08005,
+            0.79161,
+            0.84218,
+            0.04542
+          ]
+        },
+        {
+          "role": "Infra-Estrutura",
+          "name": "HEINZ LORENTZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.07944,
+            0.81629,
+            0.84232,
+            0.04367
+          ]
+        },
+        {
+          "role": "Conesul",
+          "name": "FREDI ORLANDO ACOSTA",
+          "status": "verified",
+          "sourceRegion": [
+            0.07882,
+            0.84098,
+            0.84243,
+            0.04287
+          ]
+        },
+        {
+          "role": "Assessor Jurídico",
+          "name": "JOSÉ MAURO BARBIERI",
+          "status": "verified",
+          "sourceRegion": [
+            0.0783,
+            0.86187,
+            0.84247,
+            0.04492
+          ]
+        },
+        {
+          "role": "Assessor Contábil",
+          "name": "ALDAIR JOSÉ HOLZ",
+          "status": "verified",
+          "sourceRegion": [
+            0.07771,
+            0.88561,
+            0.84258,
+            0.04412
+          ]
+        },
+        {
+          "role": "Assessor Imprensa",
+          "name": "ELIZEU FERRO",
+          "status": "verified",
+          "sourceRegion": [
+            0.07712,
+            0.90937,
+            0.8427,
+            0.04332
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Transcrição visual conferida na fotografia original 14a_Fenasoja_2002.jpeg e na face retificada fenasoja-2002.webp; o OCR foi consultado apenas como rascunho não confiável.",
+    "Período gravado: '6 a 14 de Abril de 2002'. A linha completa inclui a localização 'Santa Rosa - RS - Brasil'.",
+    "Campanha/slogan gravado: 'antecipando o futuro'. A edição aparece como '14ª FENASOJA'.",
+    "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita; namesFirst é false. A ordem de cima para baixo foi preservada.",
+    "A seção COMISSÃO CENTRAL contém 7 nomes; PRESIDENTES DE ÁREA contém 20 nomes, com Segurança compartilhada por duas linhas.",
+    "Grafias, acentos, tremas, prefixos e o hífen de Infra-Estrutura seguem a inscrição visível, sem pesquisa externa ou correção por cadastros. ENIO GEHM está gravado sem acento em ENIO.",
+    "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+    "Todos os nomes e cargos desta placa foram confirmados visualmente; não há trecho editorial pendente."
+  ]
+}

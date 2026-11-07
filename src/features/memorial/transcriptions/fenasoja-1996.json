@@ -1,0 +1,143 @@
+{
+  "status": "partial",
+  "sourceSpace": "rectified-normalized-approximate",
+  "engravedPeriod": "DE 27 DE ABRIL A 05 DE MAIO DE 1996",
+  "namesFirst": false,
+  "sections": [
+    {
+      "title": "COMISSÃO CENTRAL",
+      "lines": [
+        {
+          "role": "PRESIDENTE",
+          "name": "SÉRGIO AMBROS MALLMANN",
+          "status": "verified",
+          "sourceRegion": [0.23, 0.294, 0.64, 0.024]
+        },
+        {
+          "role": "VICE-PRESIDENTE",
+          "name": "SÉRGIO LUNARDI",
+          "status": "verified",
+          "sourceRegion": [0.23, 0.316, 0.64, 0.022]
+        },
+        {
+          "role": "COORDENADOR GERAL",
+          "name": "CARLOS ROBERTO NASI",
+          "status": "verified",
+          "sourceRegion": [0.23, 0.333, 0.64, 0.022]
+        },
+        {
+          "role": "SECRETÁRIA 1",
+          "name": "ELENIR BATISTA",
+          "status": "verified",
+          "sourceRegion": [0.23, 0.349, 0.64, 0.022]
+        },
+        {
+          "role": "SECRETÁRIA 2",
+          "name": "MARIA MORAES",
+          "status": "verified",
+          "sourceRegion": [0.23, 0.365, 0.64, 0.022]
+        },
+        {
+          "role": "TESOUREIRO",
+          "name": "LUIZ PILOTTI",
+          "status": "verified",
+          "sourceRegion": [0.23, 0.383, 0.64, 0.022]
+        },
+        {
+          "role": "SERVIÇOS",
+          "name": "FERNANDO SEGER",
+          "status": "verified",
+          "sourceRegion": [0.23, 0.399, 0.64, 0.022]
+        },
+        {
+          "role": "INFRAESTRUTURA",
+          "name": "CLÁUDIO FRANKE",
+          "status": "verified",
+          "sourceRegion": [0.23, 0.415, 0.64, 0.022]
+        }
+      ]
+    },
+    {
+      "title": "PRESIDENTES DE ÁREA",
+      "lines": [
+        {
+          "role": "AGRICULTURA",
+          "name": "VITOR DE CONTI",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.531, 0.6, 0.022]
+        },
+        {
+          "role": "INDÚSTRIA E COMÉRCIO",
+          "name": "ISMAEL OLIVEIRA",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.545, 0.6, 0.023]
+        },
+        {
+          "role": "DIVULGAÇÃO",
+          "name": "CARLOS CASAGRANDE",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.562, 0.6, 0.023]
+        },
+        {
+          "role": "SOCIAL",
+          "name": "CLAIRTON RIBAS",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.58, 0.6, 0.022]
+        },
+        {
+          "role": "CONESUL",
+          "name": "CLÁUDIO CAMARGO",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.594, 0.6, 0.025]
+        },
+        {
+          "role": "SUPRIMENTOS",
+          "name": "ÁLVARO EIDT",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.61, 0.6, 0.025]
+        },
+        {
+          "role": "SEGURANÇA",
+          "name": "ANTÔNIO VALMOR GOES",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.627, 0.6, 0.025]
+        },
+        {
+          "role": "PECUÁRIA",
+          "name": "NOLI BRUN",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.643, 0.6, 0.023]
+        },
+        {
+          "role": "RELAÇÕES PÚBLICAS",
+          "name": "CARMEM BRAUN",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.657, 0.6, 0.026]
+        },
+        {
+          "role": "CULTURA",
+          "name": "CLAUDETE MALLMANN",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.676, 0.6, 0.026]
+        },
+        {
+          "role": "PROMOÇÕES",
+          "name": "ROZANE LUNARDI",
+          "status": "verified",
+          "sourceRegion": [0.24, 0.691, 0.6, 0.026]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Transcrição visual conferida na fotografia original 11a_Fenasoja_1996.jpeg e na face retificada fenasoja-1996.webp; o OCR foi consultado apenas como rascunho não confiável.",
+    "Período gravado: 'DE 27 DE ABRIL A 05 DE MAIO DE 1996', exibido em duas linhas na fotografia. A edição aparece como '11ª FENASOJA'.",
+    "Em ambas as seções, os cargos aparecem na coluna esquerda e os nomes na coluna direita; namesFirst é false. A ordem de cima para baixo foi preservada.",
+    "Foram confirmados 8 nomes em COMISSÃO CENTRAL e 11 nomes em PRESIDENTES DE ÁREA. Não há cargo compartilhado por mais de uma linha visível.",
+    "O reflexo e o baixo contraste afetam principalmente os primeiros nomes da COMISSÃO CENTRAL. A leitura dessas linhas foi conferida em ampliações da fotografia original; nenhum nome foi completado com dados externos.",
+    "A extremidade inferior física da placa está fora do enquadramento original, e a face retificada conserva esse limite. Há uma grande faixa sem inscrições visíveis abaixo de PROMOÇÕES / ROZANE LUNARDI, mas não é possível confirmar o contorno completo nem excluir inscrições fora da área fotografada. Não foram criadas linhas para conteúdo hipotético.",
+    "Grafias e acentos seguem a inscrição visível, sem pesquisa externa ou correção por cadastros. VITOR DE CONTI está gravado sem acento em VITOR, e INFRAESTRUTURA não tem hífen.",
+    "As regiões são aproximações normalizadas [x, y, largura, altura] no espaço da face retificada; não representam limites tipográficos exatos.",
+    "O estado geral permanece parcial pelo limite inferior não fotografado, embora todos os 19 nomes e respectivos cargos visíveis tenham sido confirmados."
+  ]
+}

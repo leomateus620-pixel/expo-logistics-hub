@@ -74,7 +74,8 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
 
   it('não cria rota, deep link, menu, atalho ou registry paralelo', () => {
     for (const sourceText of [app, portalRegistry, sidebar, logisticsLayout, brand]) {
-      expect(sourceText).not.toMatch(/\/alvorada|o-nascer-da-alvorada/i);
+      // The existing BOT icon uses /alvorada/*.png; an asset URL is not a public route.
+      expect(sourceText).not.toMatch(/(?:to|href|path)\s*[:=]\s*["']\/(?:alvorada|o-nascer-da-alvorada)(?:[\/"'])/i);
       expect(sourceText).not.toContain('FenasojaEcosystemExperience');
     }
     expect(app).not.toMatch(/path=["'].*alvorada/i);
@@ -92,7 +93,8 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
 
   it('embute a introdução no card da contagem oficial sem substituir a contagem', () => {
     expect(app).toContain('path="/cronograma-eventos/contagem-oficial"');
-    expect(portalPage).toContain('<FenasojaPortalHero onIntroReleased={releaseHistory} />');
+    expect(portalPage).toMatch(/<FenasojaPortalHero\b[^>]*onIntroReleased=\{releaseHistory\}/);
+    expect(portalPage).toContain('introSuppressed={ecosystemOpen}');
     expect(portalHero).toMatch(/presentation !== 'done'[\s\S]*?onIntroReleased\(\)/);
     expect(portalHero).toContain('<OfficialCountdownCompact concealed={introActive} />');
     expect(portalHero).toContain("const loadAlvoradaIntro = () => import('@/features/alvorada/AlvoradaIntro')");
@@ -122,7 +124,7 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
       "const loadEcosystemExperience = () => import('@/features/alvorada/FenasojaEcosystemExperience')",
     );
     expect(portalPage).toContain('const FenasojaEcosystemExperience = lazy(loadEcosystemExperience)');
-    expect(portalPage).toContain('<FenasojaEcosystemExperience onComplete={closeEcosystem} />');
+    expect(portalPage).toMatch(/<FenasojaEcosystemExperience\b[^>]*onComplete=\{closeEcosystem\}/);
     expect(portalPage).not.toMatch(/from '@\/features\/alvorada\/AlvoradaIntro'/);
 
     const shippedAssets = readdirSync(resolve('public/alvorada'));

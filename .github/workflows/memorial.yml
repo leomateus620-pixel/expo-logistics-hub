@@ -1,0 +1,40 @@
+name: Memorial do Voluntariado
+on:
+  pull_request:
+    paths:
+      - 'src/features/memorial/**'
+      - 'public/memorial-voluntariado/**'
+      - 'src/features/alvorada/**'
+      - 'src/pages/commissions/CommissionPortalPage.tsx'
+      - 'src/components/portal/FenasojaPortalHero.tsx'
+      - 'src/test/alvoradaAccessContract.test.ts'
+      - 'scripts/memorial/**'
+      - '.github/workflows/memorial.yml'
+permissions:
+  contents: read
+jobs:
+  memorial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: oven-sh/setup-bun@v2
+        with: {bun-version: '1.3.0'}
+      - run: bun install --frozen-lockfile
+      - name: Historical archive and ecosystem journey
+        run: npx vitest run --maxWorkers=2 src/features/memorial src/features/alvorada/ecosystemNavigation.test.ts src/features/alvorada/organizational/components/OrganizationalEcosystem.test.tsx src/features/alvorada/organizational/components/OrgControls.test.tsx src/test/alvoradaAccessContract.test.ts
+      - run: npm run typecheck
+      - name: Scoped lint
+        run: npx eslint src/features/memorial src/features/alvorada/ecosystemNavigation.ts src/features/alvorada/ecosystemNavigation.test.ts src/features/alvorada/FenasojaEcosystemExperience.tsx src/features/alvorada/organizational/components/OrgControls.tsx src/features/alvorada/organizational/components/OrganizationalEcosystem.tsx src/pages/commissions/CommissionPortalPage.tsx src/components/portal/FenasojaPortalHero.tsx
+      - run: npm run build
+      - run: node scripts/memorial/bundle-audit.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: memorial-validation-${{ github.sha }}
+          path: docs/memorial/bundle-audit.json

@@ -1,0 +1,561 @@
+﻿{
+    "status":  "UNREVIEWED_DRAFT",
+    "engine":  "Windows.Media.Ocr pt-BR",
+    "lines":  [
+                  {
+                      "text":  "7a FENASOJA",
+                      "words":  [
+                                    {
+                                        "y":  181,
+                                        "height":  36,
+                                        "width":  46,
+                                        "text":  "7a",
+                                        "x":  214
+                                    },
+                                    {
+                                        "y":  180,
+                                        "height":  35,
+                                        "width":  251,
+                                        "text":  "FENASOJA",
+                                        "x":  277
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "COMISSÃO",
+                      "words":  [
+                                    {
+                                        "y":  284,
+                                        "height":  16,
+                                        "width":  98,
+                                        "text":  "COMISSÃO",
+                                        "x":  475
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "TESOUREIRO",
+                      "words":  [
+                                    {
+                                        "y":  399,
+                                        "height":  18,
+                                        "width":  126,
+                                        "text":  "TESOUREIRO",
+                                        "x":  328
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PRESIDENTES DE ÁREA",
+                      "words":  [
+                                    {
+                                        "y":  500,
+                                        "height":  13,
+                                        "width":  128,
+                                        "text":  "PRESIDENTES",
+                                        "x":  458
+                                    },
+                                    {
+                                        "y":  500,
+                                        "height":  13,
+                                        "width":  26,
+                                        "text":  "DE",
+                                        "x":  591
+                                    },
+                                    {
+                                        "y":  497,
+                                        "height":  16,
+                                        "width":  52,
+                                        "text":  "ÁREA",
+                                        "x":  622
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "-\u0027PEDRO\"éÀÀpENEDO\u0027u",
+                      "words":  [
+                                    {
+                                        "y":  569,
+                                        "height":  21,
+                                        "width":  211,
+                                        "text":  "-\u0027PEDRO\"éÀÀpENEDO\u0027u",
+                                        "x":  599
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PÉCUÁRIA",
+                      "words":  [
+                                    {
+                                        "y":  570,
+                                        "height":  20,
+                                        "width":  95,
+                                        "text":  "PÉCUÁRIA",
+                                        "x":  422
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "\u0027FERBSÀTO WERNER",
+                      "words":  [
+                                    {
+                                        "y":  593,
+                                        "height":  21,
+                                        "width":  113,
+                                        "text":  "\u0027FERBSÀTO",
+                                        "x":  598
+                                    },
+                                    {
+                                        "y":  596,
+                                        "height":  16,
+                                        "width":  86,
+                                        "text":  "WERNER",
+                                        "x":  717
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "E COMÉRCIO",
+                      "words":  [
+                                    {
+                                        "y":  597,
+                                        "height":  14,
+                                        "width":  10,
+                                        "text":  "E",
+                                        "x":  398
+                                    },
+                                    {
+                                        "y":  594,
+                                        "height":  18,
+                                        "width":  105,
+                                        "text":  "COMÉRCIO",
+                                        "x":  413
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "_ lLCíVR!VÀVPÚBLlTZ",
+                      "words":  [
+                                    {
+                                        "y":  635,
+                                        "height":  1,
+                                        "width":  2,
+                                        "text":  "_",
+                                        "x":  503
+                                    },
+                                    {
+                                        "y":  613,
+                                        "height":  24,
+                                        "width":  191,
+                                        "text":  "lLCíVR!VÀVPÚBLlTZ",
+                                        "x":  599
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ÁGR$CÜLTÚRA",
+                      "words":  [
+                                    {
+                                        "y":  615,
+                                        "height":  20,
+                                        "width":  140,
+                                        "text":  "ÁGR$CÜLTÚRA",
+                                        "x":  381
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "; BkRÑARÓo",
+                      "words":  [
+                                    {
+                                        "y":  644,
+                                        "height":  9,
+                                        "width":  3,
+                                        "text":  ";",
+                                        "x":  601
+                                    },
+                                    {
+                                        "y":  633,
+                                        "height":  22,
+                                        "width":  111,
+                                        "text":  "BkRÑARÓo",
+                                        "x":  607
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "\u0027 \u0027}3UJNOSAL4A",
+                      "words":  [
+                                    {
+                                        "y":  661,
+                                        "height":  3,
+                                        "width":  2,
+                                        "text":  "\u0027",
+                                        "x":  569
+                                    },
+                                    {
+                                        "y":  656,
+                                        "height":  24,
+                                        "width":  146,
+                                        "text":  "\u0027}3UJNOSAL4A",
+                                        "x":  586
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "PROMOÇÕES e DIVEASÓÉS",
+                      "words":  [
+                                    {
+                                        "y":  660,
+                                        "height":  20,
+                                        "width":  125,
+                                        "text":  "PROMOÇÕES",
+                                        "x":  263
+                                    },
+                                    {
+                                        "y":  659,
+                                        "height":  17,
+                                        "width":  13,
+                                        "text":  "e",
+                                        "x":  391
+                                    },
+                                    {
+                                        "y":  658,
+                                        "height":  20,
+                                        "width":  108,
+                                        "text":  "DIVEASÓÉS",
+                                        "x":  408
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "•INÉRAESTRUTURA-",
+                      "words":  [
+                                    {
+                                        "y":  681,
+                                        "height":  20,
+                                        "width":  177,
+                                        "text":  "•INÉRAESTRUTURA-",
+                                        "x":  343
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "OSCAR IGNÁCIO BÜfiENBENbER",
+                      "words":  [
+                                    {
+                                        "y":  682,
+                                        "height":  20,
+                                        "width":  71,
+                                        "text":  "OSCAR",
+                                        "x":  600
+                                    },
+                                    {
+                                        "y":  682,
+                                        "height":  19,
+                                        "width":  86,
+                                        "text":  "IGNÁCIO",
+                                        "x":  674
+                                    },
+                                    {
+                                        "y":  682,
+                                        "height":  20,
+                                        "width":  165,
+                                        "text":  "BÜfiENBENbER",
+                                        "x":  766
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOCIAL E RECEPÇÃO",
+                      "words":  [
+                                    {
+                                        "y":  706,
+                                        "height":  17,
+                                        "width":  71,
+                                        "text":  "SOCIAL",
+                                        "x":  319
+                                    },
+                                    {
+                                        "y":  707,
+                                        "height":  13,
+                                        "width":  11,
+                                        "text":  "E",
+                                        "x":  394
+                                    },
+                                    {
+                                        "y":  705,
+                                        "height":  20,
+                                        "width":  104,
+                                        "text":  "RECEPÇÃO",
+                                        "x":  410
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "KUNiO INAMOTO",
+                      "words":  [
+                                    {
+                                        "y":  706,
+                                        "height":  16,
+                                        "width":  63,
+                                        "text":  "KUNiO",
+                                        "x":  605
+                                    },
+                                    {
+                                        "y":  707,
+                                        "height":  15,
+                                        "width":  92,
+                                        "text":  "INAMOTO",
+                                        "x":  674
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "b\u0027V\u0027JLGAÇÃO E.",
+                      "words":  [
+                                    {
+                                        "y":  723,
+                                        "height":  23,
+                                        "width":  127,
+                                        "text":  "b\u0027V\u0027JLGAÇÃO",
+                                        "x":  223
+                                    },
+                                    {
+                                        "y":  729,
+                                        "height":  14,
+                                        "width":  14,
+                                        "text":  "E.",
+                                        "x":  356
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "\u0027HILÁRIO FREISLEBEN",
+                      "words":  [
+                                    {
+                                        "y":  726,
+                                        "height":  18,
+                                        "width":  83,
+                                        "text":  "\u0027HILÁRIO",
+                                        "x":  601
+                                    },
+                                    {
+                                        "y":  730,
+                                        "height":  15,
+                                        "width":  118,
+                                        "text":  "FREISLEBEN",
+                                        "x":  690
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ANTÔNio CARLOS S. SILVEIRÀ",
+                      "words":  [
+                                    {
+                                        "y":  746,
+                                        "height":  22,
+                                        "width":  90,
+                                        "text":  "ANTÔNio",
+                                        "x":  604
+                                    },
+                                    {
+                                        "y":  752,
+                                        "height":  16,
+                                        "width":  78,
+                                        "text":  "CARLOS",
+                                        "x":  700
+                                    },
+                                    {
+                                        "y":  753,
+                                        "height":  15,
+                                        "width":  16,
+                                        "text":  "S.",
+                                        "x":  784
+                                    },
+                                    {
+                                        "y":  750,
+                                        "height":  19,
+                                        "width":  88,
+                                        "text":  "SILVEIRÀ",
+                                        "x":  805
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "INGRESSOS E ALIMENTAÇÃO",
+                      "words":  [
+                                    {
+                                        "y":  751,
+                                        "height":  14,
+                                        "width":  109,
+                                        "text":  "INGRESSOS",
+                                        "x":  243
+                                    },
+                                    {
+                                        "y":  751,
+                                        "height":  14,
+                                        "width":  10,
+                                        "text":  "E",
+                                        "x":  359
+                                    },
+                                    {
+                                        "y":  750,
+                                        "height":  20,
+                                        "width":  139,
+                                        "text":  "ALIMENTAÇÃO",
+                                        "x":  375
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ASSUNTOS INTERNACIONAIS",
+                      "words":  [
+                                    {
+                                        "y":  773,
+                                        "height":  14,
+                                        "width":  106,
+                                        "text":  "ASSUNTOS",
+                                        "x":  238
+                                    },
+                                    {
+                                        "y":  772,
+                                        "height":  17,
+                                        "width":  163,
+                                        "text":  "INTERNACIONAIS",
+                                        "x":  349
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ANTENOR PUNTEL",
+                      "words":  [
+                                    {
+                                        "y":  773,
+                                        "height":  16,
+                                        "width":  95,
+                                        "text":  "ANTENOR",
+                                        "x":  604
+                                    },
+                                    {
+                                        "y":  775,
+                                        "height":  15,
+                                        "width":  77,
+                                        "text":  "PUNTEL",
+                                        "x":  705
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "CULTURA E RECEPÇÃO",
+                      "words":  [
+                                    {
+                                        "y":  795,
+                                        "height":  15,
+                                        "width":  92,
+                                        "text":  "CULTURA",
+                                        "x":  293
+                                    },
+                                    {
+                                        "y":  796,
+                                        "height":  14,
+                                        "width":  12,
+                                        "text":  "E",
+                                        "x":  389
+                                    },
+                                    {
+                                        "y":  794,
+                                        "height":  21,
+                                        "width":  105,
+                                        "text":  "RECEPÇÃO",
+                                        "x":  408
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HOMERO CELSO JUNGES",
+                      "words":  [
+                                    {
+                                        "y":  796,
+                                        "height":  16,
+                                        "width":  89,
+                                        "text":  "HOMERO",
+                                        "x":  603
+                                    },
+                                    {
+                                        "y":  797,
+                                        "height":  15,
+                                        "width":  64,
+                                        "text":  "CELSO",
+                                        "x":  697
+                                    },
+                                    {
+                                        "y":  798,
+                                        "height":  16,
+                                        "width":  80,
+                                        "text":  "JUNGES",
+                                        "x":  765
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SECURANÇA, EStAClONAMENTO E SINALIZAÇÃO",
+                      "words":  [
+                                    {
+                                        "y":  815,
+                                        "height":  20,
+                                        "width":  121,
+                                        "text":  "SECURANÇA,",
+                                        "x":  55
+                                    },
+                                    {
+                                        "y":  814,
+                                        "height":  18,
+                                        "width":  181,
+                                        "text":  "EStAClONAMENTO",
+                                        "x":  180
+                                    },
+                                    {
+                                        "y":  818,
+                                        "height":  14,
+                                        "width":  10,
+                                        "text":  "E",
+                                        "x":  367
+                                    },
+                                    {
+                                        "y":  817,
+                                        "height":  20,
+                                        "width":  128,
+                                        "text":  "SINALIZAÇÃO",
+                                        "x":  383
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "FLÁVIO HERALDO HA\u0027GERT",
+                      "words":  [
+                                    {
+                                        "y":  816,
+                                        "height":  18,
+                                        "width":  69,
+                                        "text":  "FLÁVIO",
+                                        "x":  604
+                                    },
+                                    {
+                                        "y":  820,
+                                        "height":  18,
+                                        "width":  96,
+                                        "text":  "HERALDO",
+                                        "x":  679
+                                    },
+                                    {
+                                        "y":  822,
+                                        "height":  17,
+                                        "width":  89,
+                                        "text":  "HA\u0027GERT",
+                                        "x":  781
+                                    }
+                                ]
+                  }
+              ]
+}
