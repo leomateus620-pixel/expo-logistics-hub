@@ -40,7 +40,7 @@ Product Design orientou o percurso Ecossistema → linha → peça → nome → 
 
 Só a inspeção utiliza Three.js, seguindo o padrão direto de `VenueRenderer` do Soy Summit, com `RoomEnvironment`, sem importar a cena do evento ou o Mapa Comercial. O módulo e a textura são carregados na abertura. Há um contexto, uma textura de face e ambiente por inspeção, com descarte de malhas, materiais, texturas, bitmap, observadores, eventos e renderizador. O portal suprime a introdução 3D ao abrir diretamente uma visão do Ecossistema, evitando um renderizador atrás do Memorial.
 
-A entrada tem suspensão breve e estabiliza frontalmente. Não há animação contínua durante a leitura. Arraste horizontal, setas, botões de giro, aproximação e Vista frontal oferecem inspeção limitada. O visualizador não captura roda nem zoom nativo da página. A política de resolução reduz DPR em telas estreitas e em renderização lenta. Falha de textura, WebGL ausente ou perda de contexto mantém a face frontal, a fotografia, a transcrição e a navegação.
+A entrada tem suspensão breve e estabiliza frontalmente. Ao voltar a uma aba que estava em segundo plano, o renderizador recompõe o frame sem manter animação contínua. Não há animação contínua durante a leitura. Arraste horizontal, setas, botões de giro, aproximação e Vista frontal oferecem inspeção limitada. O visualizador não captura roda nem zoom nativo da página. A política de resolução reduz DPR em telas estreitas e em renderização lenta. Falha de textura, WebGL ausente ou perda de contexto mantém a face frontal, a fotografia, a transcrição e a navegação.
 
 ## Reprodução
 

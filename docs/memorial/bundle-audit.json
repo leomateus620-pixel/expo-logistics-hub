@@ -1,43 +1,43 @@
 {
   "portalStaticGraph": [
-    "CommissionPortalPage-0BiOgg3Q.js",
+    "CommissionPortalPage-CA4MEoFe.js",
     "module-runtime-CEDABylm.js",
     "react-vendor-DTjdp-YJ.js",
-    "index-Ct873EQc.js",
-    "log-in-DifuPe95.js",
+    "index-CAkXZ4vv.js",
+    "log-in-C7mnJKzO.js",
     "fenasoja-symbol-144-BrliEKTf.js",
     "SoySummitCountdown-6ylRVbkB.js",
     "fenasoja-countdown-navigation-DeqNFomk.js",
-    "arrow-up-right-DgsjbTbd.js",
-    "skip-forward-DYIcFqDZ.js",
+    "arrow-up-right-k8wuXJ3o.js",
+    "skip-forward-CZnY_Azc.js",
     "data-vendor-C_SDnT5D.js",
     "commercialMapQueryKey-blkUQKRg.js",
-    "play-Jreh3ZEd.js",
-    "pause-NunxCNvy.js",
+    "play-D3TwrFpn.js",
+    "pause-CXlYJzId.js",
     "ui-radix-DHM1y7Sk.js",
     "soy-summit-Bm3fAcfA.js"
   ],
   "galleryStaticGraph": [
-    "MemorialExperience-Cisiw9cT.js",
+    "MemorialExperience-DCy8woOW.js",
     "react-vendor-DTjdp-YJ.js",
-    "CommissionPortalPage-0BiOgg3Q.js",
+    "CommissionPortalPage-CA4MEoFe.js",
     "module-runtime-CEDABylm.js",
-    "arrow-up-right-DgsjbTbd.js",
-    "arrow-down-D3VsEAhB.js",
-    "tabs-C1gYFCfy.js",
-    "index-Ct873EQc.js",
-    "file-image-DOKh3fxh.js",
-    "minimize-2-CXMGiUkw.js",
-    "maximize-2-CPwnLjLL.js",
-    "log-in-DifuPe95.js",
+    "arrow-up-right-k8wuXJ3o.js",
+    "arrow-down-CTmhBg0o.js",
+    "tabs-Dng-tgQq.js",
+    "index-CAkXZ4vv.js",
+    "file-image--zCAdSzV.js",
+    "minimize-2-BlyS_-b3.js",
+    "maximize-2-D9_sNBrq.js",
+    "log-in-C7mnJKzO.js",
     "fenasoja-symbol-144-BrliEKTf.js",
     "SoySummitCountdown-6ylRVbkB.js",
     "fenasoja-countdown-navigation-DeqNFomk.js",
-    "skip-forward-DYIcFqDZ.js",
+    "skip-forward-CZnY_Azc.js",
     "data-vendor-C_SDnT5D.js",
     "commercialMapQueryKey-blkUQKRg.js",
-    "play-Jreh3ZEd.js",
-    "pause-NunxCNvy.js",
+    "play-D3TwrFpn.js",
+    "pause-CXlYJzId.js",
     "ui-radix-DHM1y7Sk.js",
     "soy-summit-Bm3fAcfA.js"
   ],
@@ -45,24 +45,24 @@
   "forbiddenGallery": [],
   "chunks": [
     {
-      "file": "CommissionPortalPage-0BiOgg3Q.js",
+      "file": "CommissionPortalPage-CA4MEoFe.js",
       "bytes": 70823,
       "gzipBytes": 24219
     },
     {
-      "file": "MemorialExperience-Cisiw9cT.js",
+      "file": "MemorialExperience-DCy8woOW.js",
       "bytes": 69505,
-      "gzipBytes": 20993
+      "gzipBytes": 20995
     },
     {
-      "file": "MemorialViewer-C5AvU-0T.js",
+      "file": "MemorialViewer-CcH6KckX.js",
       "bytes": 5163,
-      "gzipBytes": 1891
+      "gzipBytes": 1892
     },
     {
-      "file": "PlateRenderer-DFOarFU0.js",
-      "bytes": 8917,
-      "gzipBytes": 3463
+      "file": "PlateRenderer-B3qjUBLf.js",
+      "bytes": 9123,
+      "gzipBytes": 3504
     },
     {
       "file": "maps-three-CqmvnFd9.js",

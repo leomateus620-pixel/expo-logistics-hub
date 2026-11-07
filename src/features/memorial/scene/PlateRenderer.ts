@@ -65,6 +65,7 @@ export class PlateRenderer {
     canvas.addEventListener('lostpointercapture', this.pointerEnd);
     canvas.addEventListener('keydown', this.keyDown);
     this.reduced.addEventListener('change', this.motionChanged);
+    document.addEventListener('visibilitychange', this.visibilityChanged);
   }
 
   private own<T extends THREE.BufferGeometry | THREE.Material | THREE.Texture>(resource: T): T { this.resources.add(resource); return resource; }
@@ -194,12 +195,14 @@ export class PlateRenderer {
     if (handlers[event.key]) { event.preventDefault(); handlers[event.key](); }
   };
   private motionChanged = () => { if (this.reduced.matches) this.frontal(); };
+  private visibilityChanged = () => { if (!document.hidden) this.resize(); };
   private contextLost = (event: Event) => { event.preventDefault(); if (!this.disposed) this.onError(); };
 
   dispose() {
     if (this.disposed) return;
     this.disposed = true; this.abort.abort(); cancelAnimationFrame(this.frame);
     this.resizeObserver.disconnect(); this.reduced.removeEventListener('change', this.motionChanged);
+    document.removeEventListener('visibilitychange', this.visibilityChanged);
     this.canvas.removeEventListener('webglcontextlost', this.contextLost);
     this.canvas.removeEventListener('pointerdown', this.pointerDown);
     this.canvas.removeEventListener('pointermove', this.pointerMove);

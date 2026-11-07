@@ -1,15 +1,15 @@
 {
   "note": "Recursos proprios observados do Memorial, excluindo a base preexistente do portal. Pesos nominais dos arquivos; gzip calculado para JS/CSS. Nao sao bytes transferidos nem um teste de cache frio. O incremento do detalhe exclui miniaturas adicionais solicitadas pela rolagem da galeria.",
   "gallery": {
-    "fileCount": 31,
-    "fileBytes": 442724,
-    "compressedPayloadBytes": 381101,
+    "fileCount": 17,
+    "fileBytes": 236964,
+    "compressedPayloadBytes": 175343,
     "files": [
       {
-        "url": "http://127.0.0.1:8080/assets/MemorialExperience-Cisiw9cT.js",
+        "url": "http://127.0.0.1:8080/assets/MemorialExperience-DCy8woOW.js",
         "kind": "script",
         "bytes": 69505,
-        "compressedBytes": 20993
+        "compressedBytes": 20995
       },
       {
         "url": "http://127.0.0.1:8080/assets/MemorialExperience-C_bhFADk.css",
@@ -22,156 +22,6 @@
         "kind": "image",
         "bytes": 12060,
         "compressedBytes": 12060
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1974-240.webp?v=69f957da9cc2",
-        "kind": "image",
-        "bytes": 14596,
-        "compressedBytes": 14596
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1976-240.webp?v=5ad816030370",
-        "kind": "image",
-        "bytes": 10458,
-        "compressedBytes": 10458
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1979-240.webp?v=5c102868d638",
-        "kind": "image",
-        "bytes": 9646,
-        "compressedBytes": 9646
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1981-240.webp?v=c910f2c68f84",
-        "kind": "image",
-        "bytes": 8276,
-        "compressedBytes": 8276
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1984-240.webp?v=0b9ee44de1c0",
-        "kind": "image",
-        "bytes": 6360,
-        "compressedBytes": 6360
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1987-240.webp?v=141eb1c51a47",
-        "kind": "image",
-        "bytes": 8360,
-        "compressedBytes": 8360
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1990-240.webp?v=7cefcc2264dc",
-        "kind": "image",
-        "bytes": 9862,
-        "compressedBytes": 9862
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1992-240.webp?v=8fca4c07ce07",
-        "kind": "image",
-        "bytes": 11200,
-        "compressedBytes": 11200
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1994-240.webp?v=bc6f33bc9659",
-        "kind": "image",
-        "bytes": 10582,
-        "compressedBytes": 10582
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1996-240.webp?v=9b597e4507ae",
-        "kind": "image",
-        "bytes": 9580,
-        "compressedBytes": 9580
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1998-240.webp?v=2e57d46b017a",
-        "kind": "image",
-        "bytes": 13158,
-        "compressedBytes": 13158
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2000-240.webp?v=d707565558fb",
-        "kind": "image",
-        "bytes": 11980,
-        "compressedBytes": 11980
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2002-240.webp?v=609a8a59acd9",
-        "kind": "image",
-        "bytes": 12480,
-        "compressedBytes": 12480
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2004-240.webp?v=542a33d9b1de",
-        "kind": "image",
-        "bytes": 17152,
-        "compressedBytes": 17152
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2006-240.webp?v=b75604754785",
-        "kind": "image",
-        "bytes": 12162,
-        "compressedBytes": 12162
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2008-240.webp?v=96f60b2018d4",
-        "kind": "image",
-        "bytes": 14996,
-        "compressedBytes": 14996
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2010-240.webp?v=26e648ee40a4",
-        "kind": "image",
-        "bytes": 14344,
-        "compressedBytes": 14344
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2012-240.webp?v=a985e1eb36fb",
-        "kind": "image",
-        "bytes": 15614,
-        "compressedBytes": 15614
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2014-240.webp?v=773de14989f4",
-        "kind": "image",
-        "bytes": 15894,
-        "compressedBytes": 15894
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2016-240.webp?v=00fc2a36cbd8",
-        "kind": "image",
-        "bytes": 15248,
-        "compressedBytes": 15248
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2018-240.webp?v=72c62afed6f2",
-        "kind": "image",
-        "bytes": 18410,
-        "compressedBytes": 18410
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2022-240.webp?v=055e0c0b39e6",
-        "kind": "image",
-        "bytes": 15572,
-        "compressedBytes": 15572
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2024-240.webp?v=6aadf31fec11",
-        "kind": "image",
-        "bytes": 20546,
-        "compressedBytes": 20546
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2026-240.webp?v=dc261d7c801b",
-        "kind": "image",
-        "bytes": 18046,
-        "compressedBytes": 18046
-      },
-      {
-        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-2028-240.webp?v=1f9d56cc04fd",
-        "kind": "image",
-        "bytes": 3316,
-        "compressedBytes": 3316
       },
       {
         "url": "http://127.0.0.1:8080/memorial-voluntariado/environment/graphite.webp",
@@ -190,19 +40,85 @@
         "kind": "image",
         "bytes": 5090,
         "compressedBytes": 5090
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1974-240.webp?v=69f957da9cc2",
+        "kind": "image",
+        "bytes": 14596,
+        "compressedBytes": 14596
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1979-240.webp?v=5c102868d638",
+        "kind": "image",
+        "bytes": 9646,
+        "compressedBytes": 9646
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1976-240.webp?v=5ad816030370",
+        "kind": "image",
+        "bytes": 10458,
+        "compressedBytes": 10458
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1981-240.webp?v=c910f2c68f84",
+        "kind": "image",
+        "bytes": 8276,
+        "compressedBytes": 8276
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1984-240.webp?v=0b9ee44de1c0",
+        "kind": "image",
+        "bytes": 6360,
+        "compressedBytes": 6360
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1990-240.webp?v=7cefcc2264dc",
+        "kind": "image",
+        "bytes": 9862,
+        "compressedBytes": 9862
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1987-240.webp?v=141eb1c51a47",
+        "kind": "image",
+        "bytes": 8360,
+        "compressedBytes": 8360
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1994-240.webp?v=bc6f33bc9659",
+        "kind": "image",
+        "bytes": 10582,
+        "compressedBytes": 10582
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1992-240.webp?v=8fca4c07ce07",
+        "kind": "image",
+        "bytes": 11200,
+        "compressedBytes": 11200
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1996-240.webp?v=9b597e4507ae",
+        "kind": "image",
+        "bytes": 9580,
+        "compressedBytes": 9580
+      },
+      {
+        "url": "http://127.0.0.1:8080/memorial-voluntariado/thumbnails/fenasoja-1998-240.webp?v=2e57d46b017a",
+        "kind": "image",
+        "bytes": 13158,
+        "compressedBytes": 13158
       }
     ]
   },
   "opened2004Increment": {
     "fileCount": 5,
-    "fileBytes": 1591724,
-    "compressedPayloadBytes": 731822,
+    "fileBytes": 1591930,
+    "compressedPayloadBytes": 731864,
     "files": [
       {
-        "url": "http://127.0.0.1:8080/assets/MemorialViewer-C5AvU-0T.js",
+        "url": "http://127.0.0.1:8080/assets/MemorialViewer-CcH6KckX.js",
         "kind": "script",
         "bytes": 5163,
-        "compressedBytes": 1891
+        "compressedBytes": 1892
       },
       {
         "url": "http://127.0.0.1:8080/memorial-voluntariado/art/fenasoja-2004.webp?v=5834e0ef7101",
@@ -217,10 +133,10 @@
         "compressedBytes": 1836
       },
       {
-        "url": "http://127.0.0.1:8080/assets/PlateRenderer-DFOarFU0.js",
+        "url": "http://127.0.0.1:8080/assets/PlateRenderer-B3qjUBLf.js",
         "kind": "script",
-        "bytes": 8917,
-        "compressedBytes": 3463
+        "bytes": 9123,
+        "compressedBytes": 3504
       },
       {
         "url": "http://127.0.0.1:8080/assets/maps-three-CqmvnFd9.js",
