@@ -30,6 +30,7 @@ export const ROAD_SURFACE_PROFILE = {
 } as const;
 
 export const CLASSIFICATION_LABELS: Record<MapClassification, string> = {
+  FOOD_POINT: 'Ponto de alimentação',
   SELLABLE_LOT: 'Lote comercial',
   INTERNAL_STAND: 'Estande interno',
   QUADRA: 'Quadra',
@@ -109,6 +110,7 @@ export const STATUS_CONFIG: Record<CommercialStatus, {
 export const COMMERCIAL_PHASES: readonly CommercialPhase[] = ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'BLOCKED'];
 
 export const CLASSIFICATION_COLORS: Record<MapClassification, string> = {
+  FOOD_POINT: '#916226',
   SELLABLE_LOT: '#3cab57',
   INTERNAL_STAND: '#62bd72',
   QUADRA: '#24543a',

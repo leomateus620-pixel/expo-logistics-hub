@@ -67,7 +67,6 @@
 .sales-cart__close:hover { background: oklch(var(--muted)); color: oklch(var(--foreground)); }
 .sales-cart__close svg { width: 15px; height: 15px; }
 
-/* Segmented control real: trilho + indicador deslizante. */
 .sales-segmented {
   position: relative;
   display: grid;
@@ -77,19 +76,6 @@
   border: 1px solid oklch(var(--border));
   background: oklch(var(--muted));
   isolation: isolate;
-}
-
-.sales-segmented__thumb {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: calc(50% - 4px);
-  height: calc(100% - 8px);
-  border-radius: 10px;
-  background: oklch(var(--primary));
-  box-shadow: 0 6px 16px -10px oklch(var(--primary) / 0.9);
-  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 0;
 }
 
 .sales-segmented button {
@@ -236,8 +222,24 @@
 
 .sales-sheet-body { display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
 
-.sales-checkout-dialog {
-  background: oklch(var(--card));
+.sales-cart-drawer[role="dialog"] {
+  background: oklch(var(--card, 98.46% 0.0017 247.84));
+  color: oklch(var(--card-foreground, 27% 0.037 157));
+  border-color: oklch(var(--border, 88% 0.018 157));
+  backdrop-filter: none;
+}
+.sales-cart-drawer .sales-cart-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 5px 8px;
+  text-align: left;
+}
+.sales-cart-drawer__header button { min-width: 44px; min-height: 44px; }
+
+.sales-checkout-dialog[role="dialog"] {
+  background: oklch(var(--card, 98.46% 0.0017 247.84));
   border-color: oklch(var(--border));
   color: oklch(var(--card-foreground));
   backdrop-filter: none;
@@ -286,10 +288,25 @@
 @media (max-width: 950px) {
   .sales-cart { display: none; }
   .sales-mobile-bar { display: flex; }
+  .commercial-map-shell:has(.sales-mobile-bar) .commercial-map-dock.is-mobile {
+    bottom: max(72px, calc(env(safe-area-inset-bottom) + 64px));
+    max-height: calc(100% - 136px);
+  }
   .sales-grid { grid-template-columns: 1fr; }
   .sales-checkout-dialog { max-height: calc(100dvh - 16px); padding: 16px; }
   .sales-installment-row { grid-template-columns: 22px minmax(128px, 1fr) auto 40px; gap: 5px; }
   .sales-installment-row > strong { font-size: .72rem; }
+}
+
+.sales-segmented.sales-segmented--stage {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: oklch(var(--muted, 94% 0.012 157));
+  border-color: oklch(var(--border, 88% 0.018 157));
+}
+.sales-segmented--stage button { min-height: 44px; color: oklch(var(--muted-foreground, 37% 0.035 157)); }
+.sales-segmented--stage button.is-active {
+  background: oklch(var(--primary, 39% 0.09 157));
+  color: oklch(var(--primary-foreground, 99% 0 0));
 }
 
 @media (max-width: 364px) {

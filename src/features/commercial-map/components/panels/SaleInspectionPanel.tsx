@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { ArrowLeft, ArrowUpRight, Building2, Crosshair, MapPinned, X } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Building2, Crosshair, MapPinned, Utensils, X } from 'lucide-react';
 import { useSaleInspectionStore } from '../../state/useSaleInspectionStore';
 import type { SaleInspectionGroup, SaleInspectionResolution, SaleInspectionSpace } from '../../utils/saleInspectionGroups';
+import { foodPointQuantityLabel } from '../../utils/lotPricing2028';
 import './sale-inspection.css';
 
 export function SaleInspectionPanel({ resolution, interiorEntityId, onOverview, onEnterGroup, onSpace, onBack, onClose }: {
@@ -41,12 +42,16 @@ export function SaleInspectionPanel({ resolution, interiorEntityId, onOverview, 
       <ul className="sale-inspection-groups">
       {resolution.groups.map((group) => {
         const active = group.kind === 'pavilion' ? interiorEntityId === group.pavilionEntityId : !interiorEntityId;
+        const count = group.spaces.length;
+        const label = group.kind === 'gastronomy' ? foodPointQuantityLabel(count)
+          : `${count} ${group.kind === 'pavilion' ? (count === 1 ? 'módulo' : 'módulos') : (count === 1 ? 'lote' : 'lotes')}`;
+        const Icon = group.kind === 'gastronomy' ? Utensils : group.kind === 'pavilion' ? Building2 : MapPinned;
         return <li key={group.key} className={active ? 'is-active' : ''}>
           <div className="sale-inspection-group-head">
-            <div>{group.kind === 'pavilion' ? <Building2 aria-hidden="true" /> : <MapPinned aria-hidden="true" />}<strong>{group.title}</strong></div>
+            <div><Icon aria-hidden="true" /><strong>{group.title}</strong></div>
             <button type="button" aria-label={`Enquadrar ${group.title}`} onClick={() => onEnterGroup(group)}>{active ? 'Enquadrar' : 'Ver grupo'}<ArrowUpRight aria-hidden="true" /></button>
           </div>
-          <p className="sale-inspection-group-meta">{group.spaces.length} {group.kind === 'pavilion' ? (group.spaces.length === 1 ? 'módulo' : 'módulos') : (group.spaces.length === 1 ? 'lote' : 'lotes')}{active && <span>Em exibição</span>}</p>
+          <p className="sale-inspection-group-meta">{label}{active && <span>Em exibição</span>}</p>
           <div className="sale-inspection-spaces">
             {group.spaces.map((space) => <button key={space.lotId} type="button" aria-label={`Localizar ${space.label} em ${group.title}`} onClick={() => onSpace(group, space)}>{space.label}</button>)}
           </div>

@@ -8,6 +8,7 @@ import {
 import type { CommercialLot, CommercialMapData, MapEntity } from '../types';
 import {
   buildCommercialMapSegmentIndex,
+  foodPointsByStructure,
   getCommercialMapSegment,
   type CommercialMapSegmentId,
 } from '../data/commercialMapSegments';
@@ -66,11 +67,12 @@ export function scopeCommercialMapData(
   }
 
   const segmentIndex = buildCommercialMapSegmentIndex(data.entities, data.lots);
-  const entities = data.entities.filter((entity) => segmentIndex.get(entity.id)?.id === scope);
+  const anchors = scope === 'gastronomia' ? foodPointsByStructure(data.entities, data.lots) : null;
+  const entities = data.entities.filter((entity) => segmentIndex.get(entity.id)?.id === scope || anchors?.has(entity.id));
   const entityIds = new Set(entities.map((entity) => entity.id));
   return {
     entities,
-    lots: data.lots.filter((lot) => entityIds.has(lot.entityId)),
+    lots: data.lots.filter((lot) => segmentIndex.get(lot.entityId)?.id === scope),
     entityIds,
   };
 }

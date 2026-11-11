@@ -24,7 +24,7 @@ export interface CommercialSalesOrdersSectionProps {
 }
 
 export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSectionProps) {
-  const { projectId, canManageSales, scrollContainer, onBack } = props;
+  const { projectId, canManageSales, canManageContracts, scrollContainer, onBack } = props;
   const { scopeProjectId, filters: storedFilters, page: storedPage, expandedRecordId: storedExpanded,
     selectedRecordIdentity, ensureProjectScope, setSelectedRecordIdentity, setPage, setExpanded, resetFilters } = useSalesOrdersUiStore(useShallow((state) => ({
       scopeProjectId: state.scopeProjectId, filters: state.filters, page: state.page,
@@ -35,7 +35,8 @@ export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSection
   // Bloqueia a identidade anterior durante o próprio render, antes que qualquer RPC de detalhe monte.
   const sameProject = scopeProjectId === null || scopeProjectId === projectId;
   const expandedRecordId = sameProject ? storedExpanded : null;
-  const filters = sameProject ? storedFilters : EMPTY_SALE_FILTERS;
+  const projectFilters = sameProject ? storedFilters : EMPTY_SALE_FILTERS;
+  const filters = !canManageContracts && projectFilters.hasDocument ? { ...projectFilters, hasDocument: '' as const } : projectFilters;
   const page = sameProject ? storedPage : 0;
   const [exportOpen, setExportOpen] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
@@ -126,7 +127,7 @@ export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSection
     </header>
     {!canManageSales ? <p className="cso-state"><ShieldAlert aria-hidden="true" />Acesso restrito: consultar vendas exige a permissão de gestão de vendas.</p>
       : <>
-        {!expandedRecordId && <><SalesOrdersFilters onExport={() => setExportOpen(true)} exportBusy={exportBusy} /><div className="cso-list-caption"><span>Pedidos individuais e registros legados</span><span>Valores negociados · não representam recebimentos</span></div></>}
+        {!expandedRecordId && <><SalesOrdersFilters onExport={() => setExportOpen(true)} exportBusy={exportBusy} canManageContracts={canManageContracts} /><div className="cso-list-caption"><span>Pedidos individuais e registros legados</span><span>Valores negociados · não representam recebimentos</span></div></>}
         {query.isLoading && <p className="cso-state" role="status"><Loader2 className="is-spinning" aria-hidden="true" />Carregando vendas…</p>}
         {errorText && <p className="cso-state is-error" role="alert"><ShieldAlert aria-hidden="true" />{restricted ? 'Acesso restrito às vendas desta organização.' : errorText}{!restricted && <button type="button" className="cso-link" onClick={() => query.refetch()}>Tentar novamente</button>}</p>}
         {!errorText && expandedRecordId && selectedRecord && <SaleOrderDetail key={selectedRecord.recordId} record={selectedRecord} {...props} onReady={detailReady} />}

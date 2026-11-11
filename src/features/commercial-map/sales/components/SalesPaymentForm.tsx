@@ -69,7 +69,8 @@ export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCe
   };
 
   const updateItem = (index: number, patch: Partial<{ dueDate: string; amountCents: number }>) => {
-    const installments = value.installments.map((item, position) => (position === index ? { ...item, ...patch } : item));
+    const installments = value.installments.map((item, position) => position === index
+      ? { ...item, ...patch, manualAmount: item.manualAmount || patch.amountCents !== undefined } : item);
     set({ installments, manualAmounts: value.manualAmounts || patch.amountCents !== undefined });
   };
 

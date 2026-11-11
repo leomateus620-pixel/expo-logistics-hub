@@ -6,6 +6,7 @@ import { paymentMethodLabel, SALES_PAYMENT_METHODS, SALES_PAYMENT_METHOD_LABELS 
 import type { SaleOrdersFilters } from './salesOrdersService';
 import { useSalesOrdersUiStore } from './useSalesOrdersUiStore';
 import { fmtSaleDate } from './salesOrdersPresentation';
+import { COMMERCIAL_MAP_SEGMENTS } from '../../data/commercialMapSegments';
 
 const STATUS_FILTER_LABELS = {
   PENDING: 'Aguardando assinatura', PARTIAL: 'Parcialmente assinada', SIGNED: 'Assinatura confirmada',
@@ -14,17 +15,21 @@ const STATUS_FILTER_LABELS = {
 const FILTER_REMOVE_LABELS: Record<keyof SaleOrdersFilters, string> = {
   search: 'Remover busca', status: 'Remover filtro de situação', hasDocument: 'Remover filtro de documento',
   paymentMethod: 'Remover filtro de pagamento', from: 'Remover data inicial', to: 'Remover data final',
+  segment: 'Remover filtro de segmento',
 };
 
 function saleFilterLabel(key: keyof SaleOrdersFilters, value: string) {
   if (key === 'status') return STATUS_FILTER_LABELS[value as keyof typeof STATUS_FILTER_LABELS];
   if (key === 'hasDocument') return value === 'yes' ? 'Com arquivo anexado' : 'Sem arquivo anexado';
   if (key === 'paymentMethod') return paymentMethodLabel(value);
+  if (key === 'segment') return COMMERCIAL_MAP_SEGMENTS.find((segment) => segment.id === value)?.name ?? value;
   if (key === 'from' || key === 'to') return `${key === 'from' ? 'De' : 'Até'} ${fmtSaleDate(value)}`;
   return `Busca: ${value}`;
 }
 
-export function SalesOrdersFilters({ onExport, exportBusy = false }: { onExport?: () => void; exportBusy?: boolean }) {
+export function SalesOrdersFilters({ onExport, exportBusy = false, canManageContracts }: {
+  onExport?: () => void; exportBusy?: boolean; canManageContracts: boolean;
+}) {
   const { filters, filtersOpen, searchOpen, setFiltersOpen, setSearchOpen, setFilters, resetFilters } = useSalesOrdersUiStore(useShallow((state) => ({
     filters: state.filters, filtersOpen: state.filtersOpen, searchOpen: state.searchOpen,
     setFiltersOpen: state.setFiltersOpen, setSearchOpen: state.setSearchOpen,
@@ -35,7 +40,8 @@ export function SalesOrdersFilters({ onExport, exportBusy = false }: { onExport?
   const searchRef = useRef<HTMLInputElement>(null);
   const searchTriggerRef = useRef<HTMLButtonElement>(null);
   useEffect(() => { setSearchDraft(filters.search); }, [filters.search]);
-  const activeFilters = (Object.entries(filters) as [keyof SaleOrdersFilters, string][]).filter(([, value]) => value);
+  const activeFilters = (Object.entries(filters) as [keyof SaleOrdersFilters, string][])
+    .filter(([key, value]) => value && (key !== 'hasDocument' || canManageContracts));
   const advancedCount = activeFilters.filter(([key]) => key !== 'search').length;
   const submitSearch = (event: FormEvent) => { event.preventDefault(); setFilters({ search: searchDraft }); };
   const clear = () => { setSearchDraft(''); resetFilters(); };
@@ -56,12 +62,16 @@ export function SalesOrdersFilters({ onExport, exportBusy = false }: { onExport?
                 <option value="">Todas as situações</option>
                 {Object.entries(STATUS_FILTER_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </select></label>
-              <label>Documentos<select aria-label="Documento" value={filters.hasDocument} onChange={(e) => setFilters({ hasDocument: e.target.value as typeof filters.hasDocument })}>
+              {canManageContracts && <label>Documentos<select aria-label="Documento" value={filters.hasDocument} onChange={(e) => setFilters({ hasDocument: e.target.value as typeof filters.hasDocument })}>
                 <option value="">Com ou sem documento</option><option value="yes">Com arquivo anexado</option><option value="no">Sem arquivo anexado</option>
-              </select></label>
+              </select></label>}
               <label>Pagamento<select aria-label="Forma de pagamento" value={filters.paymentMethod} onChange={(e) => setFilters({ paymentMethod: e.target.value })}>
                 <option value="">Todas as formas</option>
                 {SALES_PAYMENT_METHODS.map((m) => <option key={m} value={m}>{SALES_PAYMENT_METHOD_LABELS[m]}</option>)}
+              </select></label>
+              <label>Segmento<select aria-label="Segmento" value={filters.segment ?? ''} onChange={(e) => setFilters({ segment: e.target.value })}>
+                <option value="">Todos os segmentos</option>
+                {COMMERCIAL_MAP_SEGMENTS.map((segment) => <option key={segment.id} value={segment.id}>{segment.name}</option>)}
               </select></label>
               <div className="cso-dates">
                 <label>De<input type="date" value={filters.from} onChange={(e) => setFilters({ from: e.target.value })} /></label>
@@ -78,7 +88,7 @@ export function SalesOrdersFilters({ onExport, exportBusy = false }: { onExport?
     {searchOpen && <form id="cso-search-form" className="cso-search" onSubmit={submitSearch} role="search" onKeyDown={(e) => {
       if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setSearchOpen(false); searchTriggerRef.current?.focus(); }
     }}>
-      <input ref={searchRef} value={searchDraft} onChange={(e) => setSearchDraft(e.target.value)} placeholder="Expositor, referência, contrato ou espaço" aria-label="Pesquisar vendas" />
+      <input ref={searchRef} value={searchDraft} onChange={(e) => setSearchDraft(e.target.value)} placeholder={canManageContracts ? 'Expositor, referência, contrato ou espaço' : 'Expositor, referência ou espaço'} aria-label="Pesquisar vendas" />
       <button type="submit" aria-label="Pesquisar"><Search aria-hidden="true" /></button>
     </form>}
     {activeFilters.length > 0 && <div className="cso-active-filters" aria-label="Filtros ativos">

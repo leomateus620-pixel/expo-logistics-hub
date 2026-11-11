@@ -48,11 +48,21 @@ describe('Dashboard sales workspace composition', () => {
   it('remounts the sales area directly with preserved filters/page after the map handoff', async () => {
     useSalesOrdersUiStore.setState({ area: 'sales', page: 2,
       filters: { ...EMPTY_SALE_FILTERS, search: 'registro', hasDocument: 'yes' } });
-    mount();
+    mount({ canManageContracts: true });
     await waitFor(() => expect(fetchSaleOrdersPage).toHaveBeenCalledWith('ui-test-only',
       { ...EMPTY_SALE_FILTERS, search: 'registro', hasDocument: 'yes' }, 2));
     expect(screen.queryByRole('button', { name: 'Acessar vendas e contratos' })).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Indicadores comerciais principais' })).not.toBeInTheDocument();
+  });
+
+  it('omite filtros de documentos quando o perfil só pode consultar vendas', async () => {
+    useSalesOrdersUiStore.setState({ area: 'sales', filters: { ...EMPTY_SALE_FILTERS, search: 'registro', hasDocument: 'yes' } });
+    mount();
+    await waitFor(() => expect(fetchSaleOrdersPage).toHaveBeenCalledWith('ui-test-only',
+      { ...EMPTY_SALE_FILTERS, search: 'registro' }, 0));
+    fireEvent.click(screen.getByRole('button', { name: 'Filtrar' }));
+    expect(screen.getByRole('combobox', { name: 'Segmento' })).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Documento' })).not.toBeInTheDocument();
   });
 
   it('returns from dedicated sales with the selected scope, metric, focus and overview scroll intact', async () => {

@@ -1895,6 +1895,11 @@ export type Database = {
       }
       commercial_lots: {
         Row: {
+          commercial_unit: string
+          display_order: number | null
+          food_type: string | null
+          price_source: Json | null
+          unit_quantity: number | null
           accessibility_notes: string | null
           archived_at: string | null
           area_validation_status: string
@@ -1927,6 +1932,11 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          commercial_unit?: string
+          display_order?: number | null
+          food_type?: string | null
+          price_source?: Json | null
+          unit_quantity?: number | null
           accessibility_notes?: string | null
           archived_at?: string | null
           area_validation_status?: string
@@ -1959,6 +1969,11 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          commercial_unit?: string
+          display_order?: number | null
+          food_type?: string | null
+          price_source?: Json | null
+          unit_quantity?: number | null
           accessibility_notes?: string | null
           archived_at?: string | null
           area_validation_status?: string
@@ -6063,18 +6078,21 @@ export type Database = {
       }
       lot_contract_lots: {
         Row: {
+          removed_at: string | null
           contract_id: string
           created_at: string
           created_by: string | null
           lot_id: string
         }
         Insert: {
+          removed_at?: string | null
           contract_id: string
           created_at?: string
           created_by?: string | null
           lot_id: string
         }
         Update: {
+          removed_at?: string | null
           contract_id?: string
           created_at?: string
           created_by?: string | null
@@ -6092,6 +6110,7 @@ export type Database = {
       }
       lot_contract_versions: {
         Row: {
+          covered_lot_ids: string[] | null
           contract_id: string
           file_size: number
           id: string
@@ -6104,6 +6123,7 @@ export type Database = {
           version: number
         }
         Insert: {
+          covered_lot_ids?: string[] | null
           contract_id: string
           file_size: number
           id?: string
@@ -6116,6 +6136,7 @@ export type Database = {
           version: number
         }
         Update: {
+          covered_lot_ids?: string[] | null
           contract_id?: string
           file_size?: number
           id?: string
@@ -6139,6 +6160,7 @@ export type Database = {
       }
       lot_contracts: {
         Row: {
+          sale_id: string | null
           active_version: number
           contract_number: string | null
           created_at: string
@@ -6151,6 +6173,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          sale_id?: string | null
           active_version?: number
           contract_number?: string | null
           created_at?: string
@@ -6163,6 +6186,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          sale_id?: string | null
           active_version?: number
           contract_number?: string | null
           created_at?: string
@@ -6175,6 +6199,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lot_contracts_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "lot_sales"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lot_contracts_lot_id_fkey"
             columns: ["lot_id"]
@@ -6500,6 +6531,12 @@ export type Database = {
       }
       lot_sale_order_items: {
         Row: {
+          commercial_unit: string
+          display_name_snapshot: string | null
+          structure_id_snapshot: string | null
+          structure_identifier_snapshot: string | null
+          structure_name_snapshot: string | null
+          unit_quantity_snapshot: number | null
           cancelled_at: string | null
           cancelled_by: string | null
           contract_state: string
@@ -6507,10 +6544,10 @@ export type Database = {
           id: string
           item_total: number
           lot_id: string
-          official_area_snapshot: number
+          official_area_snapshot: number | null
           order_id: string
           original_status: string
-          price_per_sqm_snapshot: number
+          price_per_sqm_snapshot: number | null
           pricing_rule_id: string | null
           pricing_rule_label: string | null
           pricing_stage: string
@@ -6520,6 +6557,12 @@ export type Database = {
           signed_by: string | null
         }
         Insert: {
+          commercial_unit?: string
+          display_name_snapshot?: string | null
+          structure_id_snapshot?: string | null
+          structure_identifier_snapshot?: string | null
+          structure_name_snapshot?: string | null
+          unit_quantity_snapshot?: number | null
           cancelled_at?: string | null
           cancelled_by?: string | null
           contract_state?: string
@@ -6527,10 +6570,10 @@ export type Database = {
           id?: string
           item_total: number
           lot_id: string
-          official_area_snapshot: number
+          official_area_snapshot?: number | null
           order_id: string
           original_status: string
-          price_per_sqm_snapshot: number
+          price_per_sqm_snapshot?: number | null
           pricing_rule_id?: string | null
           pricing_rule_label?: string | null
           pricing_stage: string
@@ -6540,6 +6583,12 @@ export type Database = {
           signed_by?: string | null
         }
         Update: {
+          commercial_unit?: string
+          display_name_snapshot?: string | null
+          structure_id_snapshot?: string | null
+          structure_identifier_snapshot?: string | null
+          structure_name_snapshot?: string | null
+          unit_quantity_snapshot?: number | null
           cancelled_at?: string | null
           cancelled_by?: string | null
           contract_state?: string
@@ -6547,10 +6596,10 @@ export type Database = {
           id?: string
           item_total?: number
           lot_id?: string
-          official_area_snapshot?: number
+          official_area_snapshot?: number | null
           order_id?: string
           original_status?: string
-          price_per_sqm_snapshot?: number
+          price_per_sqm_snapshot?: number | null
           pricing_rule_id?: string | null
           pricing_rule_label?: string | null
           pricing_stage?: string
@@ -11421,6 +11470,8 @@ export type Database = {
     Views: {
       commercial_lot_pricing_2028: {
         Row: {
+          commercial_unit: string | null
+          unit_quantity: number | null
           area_validation_status: string | null
           block: string | null
           corner_confirmed: boolean | null
@@ -11473,6 +11524,7 @@ export type Database = {
       }
       commercial_sale_eligibility: {
         Row: {
+          commercial_unit: string | null
           block: string | null
           has_active_contract: boolean | null
           has_active_negotiation: boolean | null
@@ -12889,6 +12941,7 @@ export type Database = {
       }
       export_commercial_sale_orders: {
         Args: {
+          p_segment_slug?: string
           p_from?: string
           p_has_document?: boolean
           p_payment_method?: string
@@ -13444,6 +13497,7 @@ export type Database = {
       }
       list_commercial_sale_orders: {
         Args: {
+          p_segment_slug?: string
           p_from?: string
           p_has_document?: boolean
           p_limit?: number
@@ -13510,6 +13564,7 @@ export type Database = {
           project_id: string
         }[]
       }
+      map_gastronomy_anchor_ids: { Args: never; Returns: string[] }
       map_segment_is_complete: {
         Args: { _segment_id: string }
         Returns: boolean
@@ -13780,6 +13835,7 @@ export type Database = {
       register_lot_contract_version: {
         Args: {
           p_contract_number: string
+          p_expected_sale_id?: string
           p_file_size: number
           p_lot_id: string
           p_mime_type: string

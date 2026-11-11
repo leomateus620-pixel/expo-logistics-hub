@@ -1,4 +1,5 @@
 import type { LotPricingStage } from '../utils/lotPricing2028';
+import type { CommercialUnit } from '../types';
 
 export type SalesStage = LotPricingStage;
 
@@ -44,6 +45,7 @@ export interface SalesSelectionEntry {
   title?: string;
   location?: string | null;
   area?: string | null;
+  commercialUnit?: CommercialUnit;
 }
 
 export interface SalesBuyerDraft {
@@ -65,6 +67,7 @@ export interface SalesFeesDraft {
 export interface SalesInstallmentDraft {
   dueDate: string;
   amountCents: number;
+  manualAmount?: boolean;
 }
 
 export interface SalesPaymentDraft {

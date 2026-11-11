@@ -28,5 +28,6 @@ export function toSalesEntry(lot: CommercialLot, context?: string | null, entity
     title: identity.title,
     location: identity.location,
     area: identity.area,
+    commercialUnit: lot.commercialUnit,
   };
 }

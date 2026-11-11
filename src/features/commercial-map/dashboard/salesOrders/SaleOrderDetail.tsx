@@ -13,6 +13,7 @@ import { describeSalesError, fetchSaleOrderDetail, uniqueContracts, type SaleCon
 import { documentSummary, fmtSaleArea, fmtSaleDate, receiptSummary, saleDetailSummary, saleName, saleStateLabel, signatureSummary } from './salesOrdersPresentation';
 import { useSalesOrdersUiStore, type SalesOrdersDetailTab, type SalesOrdersRecordIdentity } from './useSalesOrdersUiStore';
 import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
+import { foodPointQuantityLabel } from '../../utils/lotPricing2028';
 
 const ITEM_STATE_LABEL: Record<string, string> = {
   PENDING_SIGNATURE: 'Aguardando assinatura', SIGNED: 'Assinatura confirmada',
@@ -53,26 +54,29 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
     return lot.block ? `Quadra ${lot.block}` : 'Área externa';
   }, [lotIndex, entityIndex]);
   const itemRows = detail.data?.items;
+  const itemLocation = useCallback((item: NonNullable<typeof itemRows>[number]) => item.commercialUnit === 'FOOD_POINT'
+    ? ['Gastronomia', item.structureName, item.structureIdentifier].filter(Boolean).join(' · ')
+    : locationOf(item.lotId), [locationOf]);
   const itemPresentation = useMemo(() => {
     if (!itemRows) return null;
     const activeItems = itemRows.filter((item) => item.contractState !== 'CANCELLED');
     const groupedItems = new Map<string, typeof itemRows>();
     const itemIndex = new Map<string, (typeof itemRows)[number]>();
     itemRows.forEach((item) => {
-      const location = locationOf(item.lotId);
+      const location = itemLocation(item);
       const group = groupedItems.get(location) ?? [];
       group.push(item);
       groupedItems.set(location, group);
-      // Conserva a primeira ocorrência, como a busca por identidade usada anteriormente.
-      if (!itemIndex.has(item.lotId)) itemIndex.set(item.lotId, item);
+      if (!itemIndex.has(item.lotId) || item.contractState !== 'CANCELLED') itemIndex.set(item.lotId, item);
     });
     return {
       activeItems, groupedItems, itemIndex,
       activeSubtotal: activeItems.some((item) => item.itemTotal === null) ? null : activeItems.reduce((sum, item) => sum + (item.itemTotal ?? 0), 0),
       hasCancelled: activeItems.length !== itemRows.length,
-      attachmentItems: activeItems.map((item) => ({ lotId: item.lotId, label: `${item.displayName || item.publicIdentifier} · ${locationOf(item.lotId)}` })),
+      attachmentItems: activeItems.map((item) => ({ lotId: item.lotId, saleId: item.saleId, commercialUnit: item.commercialUnit,
+        label: `${item.displayName || item.publicIdentifier} · ${itemLocation(item)}` })),
     };
-  }, [itemRows, locationOf]);
+  }, [itemRows, itemLocation]);
   const contractRows = detail.data?.contracts;
   const contracts = useMemo(() => contractRows ? uniqueContracts(contractRows) : null, [contractRows]);
   const installmentRows = detail.data?.installments;
@@ -86,8 +90,8 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
   const labelOf = useCallback((lotId: string) => {
     const item = itemPresentation?.itemIndex.get(lotId);
     const label = item ? (item.displayName || item.publicIdentifier) : (lotIndex.get(lotId)?.displayName ?? 'Espaço');
-    return `${label} · ${locationOf(lotId)}`;
-  }, [itemPresentation, lotIndex, locationOf]);
+    return `${label} · ${item ? itemLocation(item) : locationOf(lotId)}`;
+  }, [itemPresentation, itemLocation, lotIndex, locationOf]);
 
   if (detail.isLoading) return <p className="cso-state" role="status"><Loader2 className="is-spinning" aria-hidden="true" />Carregando detalhes…</p>;
   if (detail.error) return <p className="cso-state is-error" role="alert">{describeSalesError(detail.error)}
@@ -96,6 +100,8 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
   const d = detail.data;
   const h = d.header;
   const { activeItems, activeSubtotal, hasCancelled, groupedItems, attachmentItems } = itemPresentation;
+  const hasFood = d.items.some((item) => item.commercialUnit === 'FOOD_POINT');
+  const onlyFood = activeItems.length > 0 && activeItems.every((item) => item.commercialUnit === 'FOOD_POINT');
   const installmentPages = Math.max(1, Math.ceil(d.installments.length / INSTALLMENTS_PER_PAGE));
   const currentInstallmentPage = Math.min(installmentPage, installmentPages - 1);
   const installments = d.installments.slice(currentInstallmentPage * INSTALLMENTS_PER_PAGE, (currentInstallmentPage + 1) * INSTALLMENTS_PER_PAGE);
@@ -105,7 +111,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
       <div className="cso-detail-identity"><h3 tabIndex={-1}>{saleName(currentRecord)}</h3><div className="cso-reference"><strong>{currentRecord.reference}</strong><span>{fmtSaleDate(currentRecord.createdAt)}</span><span>{saleStateLabel(currentRecord)}</span></div>
         <p className={`cso-summary-signature ${currentRecord.pendingCount > 0 ? 'is-wait' : ''}`}>{signatureSummary(currentRecord)}</p>
       </div>
-      <div className="cso-detail-summary-numbers"><div><span>Espaços ativos</span><strong>{activeItems.length}</strong></div><div className="cso-value"><span>Valor negociado</span><strong>{formatDashboardCurrency(moneyValue(h.negotiatedTotal))}</strong></div></div>
+      <div className="cso-detail-summary-numbers"><div><span>{onlyFood ? 'Pontos ativos' : 'Espaços ativos'}</span><strong>{activeItems.length}</strong></div><div className="cso-value"><span>Valor negociado</span><strong>{formatDashboardCurrency(moneyValue(h.negotiatedTotal))}</strong></div></div>
     </header>
     <SaleOrderDetailTabs onReady={onReady} readyData={d}>
       <TabsList className="cso-tabs-list" aria-label="Assuntos da venda">
@@ -137,14 +143,17 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
             <button type="button" className="cso-secondary" data-view-sale={record.recordId} disabled={currentRecord.lotIds.length === 0} onClick={() => {
               useSalesOrdersUiStore.getState().rememberOrigin(record.recordId, scrollContainer()?.scrollTop ?? 0);
               onViewSale(currentRecord, currentRecord.lotIds);
-            }}><MapPinned aria-hidden="true" />Ver lotes no mapa</button>
-            {canManageSales && h.kind === 'ORDER' && h.orderId && activeItems.length > 0 && <button type="button" className="cso-view cso-edit-lots" onClick={() => setReviseOpen(true)}><Pencil aria-hidden="true" />Editar lotes</button>}
+            }}><MapPinned aria-hidden="true" />{hasFood ? 'Ver espaços no mapa' : 'Ver lotes no mapa'}</button>
+            {canManageSales && h.kind === 'ORDER' && h.orderId && activeItems.length > 0 && <button type="button" className="cso-view cso-edit-lots" onClick={() => setReviseOpen(true)}><Pencil aria-hidden="true" />{hasFood ? 'Editar espaços' : 'Editar lotes'}</button>}
           </div></div>
           {Array.from(groupedItems, ([location, items]) => <div className="cso-space-group" key={location}>
-            <h4>{location}<span>{items.length} {items.length === 1 ? 'espaço' : 'espaços'}</span></h4>
+            <h4>{location}<span>{items.every((item) => item.commercialUnit === 'FOOD_POINT')
+              ? foodPointQuantityLabel(items.length) : `${items.length} ${items.length === 1 ? 'espaço' : 'espaços'}`}</span></h4>
             <ul className="cso-items">{items.map((item) => <li key={item.itemId ?? item.lotId} className={item.contractState === 'CANCELLED' ? 'is-cancelled' : ''}>
               <span className="cso-strong">{item.displayName || item.publicIdentifier}</span>
-              <span className="cso-item-area" aria-label={`Área: ${fmtSaleArea(item.areaSnapshot)}`}>{fmtSaleArea(item.areaSnapshot)}</span>
+              {item.commercialUnit === 'FOOD_POINT'
+                ? <span className="cso-item-area">{foodPointQuantityLabel(item.unitQuantity ?? 1)}</span>
+                : <span className="cso-item-area" aria-label={`Área: ${fmtSaleArea(item.areaSnapshot)}`}>{fmtSaleArea(item.areaSnapshot)}</span>}
               <span className="cso-item-value" aria-label={`Valor registrado: ${formatDashboardCurrency(item.itemTotal)}`}>{formatDashboardCurrency(item.itemTotal)}</span>
               <span className={`cso-item-state ${item.contractState === 'PENDING_SIGNATURE' ? 'is-wait' : ''}`}>{ITEM_STATE_LABEL[item.contractState] ?? item.contractState}</span>
             </li>)}</ul>
@@ -185,12 +194,14 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
       </TabsContent>
       <TabsContent value="contracts" className="cso-tab-content">
         <section className="cso-block"><div className="cso-block-head"><h3>Contratos {contracts && <span className="cso-count">{contracts.length}</span>}</h3>
-          {canManageContracts && h.kind === 'ORDER' && orgId && <button type="button" className="cso-view" onClick={() => setAttachOpen({ contract: null })}><Paperclip aria-hidden="true" />Anexar contrato</button>}
+          {canManageContracts && h.kind === 'ORDER' && orgId && activeItems.length > 0 && <button type="button" className="cso-view" onClick={() => setAttachOpen({ contract: null })}><Paperclip aria-hidden="true" />Anexar contrato</button>}
         </div>
           <p className="cso-contract-signature"><span>Assinatura dos espaços</span><strong>{signatureSummary(currentRecord)}</strong></p>
           {contracts === null ? <p className="cso-state"><ShieldAlert aria-hidden="true" />Consulta de documentos restrita ao seu perfil.</p>
             : contracts.length === 0 ? <p className="cso-state">Sem arquivo anexado.</p>
-              : <ul className="cso-docs">{contracts.map((contract) => <SaleOrderContract key={contract.contractId} contract={contract} labelOf={labelOf} canReplace={canManageContracts && contract.scope === 'ORDER_ITEMS'} onReplace={() => setAttachOpen({ contract })} />)}</ul>}
+              : <ul className="cso-docs">{contracts.map((contract) => <SaleOrderContract key={contract.contractId} contract={contract}
+                labelOf={labelOf} canReplace={canManageContracts && activeItems.length > 0 && (contract.scope === 'ORDER_ITEMS'
+                  || activeItems.some((item) => item.commercialUnit === 'FOOD_POINT' && contract.lotIds.includes(item.lotId)))} onReplace={() => setAttachOpen({ contract })} />)}</ul>}
           <p className="cso-note">Arquivo anexado não comprova assinatura ou recebimento.</p>
         </section>
       </TabsContent>
@@ -210,6 +221,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail', record.recordId] }),
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }),
         queryClient.invalidateQueries({ queryKey: ['lot-contract-versions'] }),
+        scheduleCommercialMapRefresh(queryClient),
       ]);
     }} />}
   </div>;

@@ -1,12 +1,13 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowLeft, CarFront, Check, ChevronDown, ChevronUp, Factory, FilterX, Layers3, PanelLeftClose, PanelLeftOpen, RotateCcw, Tractor } from 'lucide-react';
+import { ArrowLeft, CarFront, Check, ChevronDown, ChevronRight, ChevronUp, Factory, FilterX, Layers3, PanelLeftClose, PanelLeftOpen, RotateCcw, Tractor, Utensils } from 'lucide-react';
 import { STATUS_CONFIG } from '../../constants';
 import { toCommercialPhase } from '../../types';
-import { commercialMapSegmentInventory, type CommercialMapSegmentId } from '../../data/commercialMapSegments';
+import { commercialMapSegmentInventory, foodPointsByStructure, type CommercialMapSegmentId } from '../../data/commercialMapSegments';
 import { TERRITORY_SYMBOLS } from '../../utils/territorialOrientation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CommercialLot, MapEntity } from '../../types';
 import { ContextualMapLegend } from '../panels/ContextualMapLegend';
+import { FENASOJA_RESTAURANT_PRESENTATION_NAME } from '../../utils/fenasojaRestaurant';
 import './commercial-map-dock.css';
 
 interface CommercialMapDockProps {
@@ -35,6 +36,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
   const selectedModuleId = useCommercialMapStore((s) => s.selectedModuleId);
   const selectedEntityId = useCommercialMapStore((s) => s.selectedEntityId);
   const activePanel = useCommercialMapStore((s) => s.activePanel);
+  const selectStructure = useCommercialMapStore((s) => s.selectEntityFromExplorer);
   const mode = useCommercialMapStore((s) => s.workspaceMode);
   const exitInterior = useCommercialMapStore((s) => s.exitInterior);
   const statusFilters = useCommercialMapStore((s) => s.statusFilters);
@@ -49,8 +51,10 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
   const restoreToggleFocus = useRef(false);
   const dragStart = useRef<number | null>(null);
   const expanded = interiorEntity ? interiorExpanded : dockExpanded;
-  const inventory = useMemo(() => commercialMapSegmentInventory(entities, lots).filter(({ segment }) =>
-    segment.behavior.visibleByDefault || segment.behavior.interaction !== 'informational'), [entities, lots]);
+  const inventory = useMemo(() => commercialMapSegmentInventory(entities, lots).filter(({ segment, lotCount }) =>
+    segment.id === 'gastronomia' ? lotCount > 0 : segment.behavior.visibleByDefault || segment.behavior.interaction !== 'informational'), [entities, lots]);
+  const structures = useMemo(() => activeSegmentId === 'gastronomia' ? foodPointsByStructure(entities, lots) : null,
+    [activeSegmentId, entities, lots]);
   const activeSegment = inventory.find(({ segment }) => segment.id === activeSegmentId)?.segment;
   const interiorId = interiorEntity?.id;
 
@@ -155,12 +159,13 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
           <div className="commercial-map-dock__segment-heading"><strong>Segmentos</strong><small>Selecione para explorar</small></div>
         <div className="commercial-map-dock__segments" role="group" aria-label="Filtrar mapa por segmento">
           {inventory.map(({ segment, lotCount }) => {
-            const Icon = segment.id === 'exporural' ? Tractor : segment.id === 'industria-comercio-servicos' ? Factory : CarFront;
+            const Icon = segment.id === 'gastronomia' ? Utensils
+              : segment.id === 'exporural' ? Tractor : segment.id === 'industria-comercio-servicos' ? Factory : CarFront;
             return <button key={segment.id} type="button" aria-pressed={activeSegmentId === segment.id}
               className={activeSegmentId === segment.id ? 'is-active' : ''} onClick={() => onSegmentSelect(segment.id)}
               disabled={segment.behavior.interaction !== 'filter-and-focus'} aria-controls="commercial-map-viewport">
               <span className={`commercial-map-dock__territory-symbol commercial-map-dock__territory-symbol--${segment.id}`} aria-hidden="true"><Icon />{TERRITORY_SYMBOLS[segment.id].glyph}</span>
-              <span><strong>{segment.name}</strong><small>{lotCount} lotes</small></span>
+              <span><strong>{segment.name}</strong><small>{lotCount} {segment.id === 'gastronomia' ? (lotCount === 1 ? 'ponto' : 'pontos') : (lotCount === 1 ? 'lote' : 'lotes')}</small></span>
               {activeSegmentId === segment.id && <Check aria-hidden="true" />}
             </button>;
           })}
@@ -169,6 +174,20 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
           <RotateCcw aria-hidden="true" />Limpar segmento
         </button>
         {statusFilters.length > 0 && <p className="commercial-map-dock__filter-note">{statusFilters.length} filtro(s) de situação ativo(s)</p>}
+      </section>}
+      {!interiorEntity && structures && <section className="commercial-map-dock__gastronomy" aria-label="Estruturas de Gastronomia">
+        <h3>{structures.size} estruturas</h3>
+        {entities.filter((entity) => structures.has(entity.id)).sort((a, b) => a.publicIdentifier.localeCompare(b.publicIdentifier)).map((entity) => {
+          const points = structures.get(entity.id)!;
+          const available = points.filter(({ lot }) => lot.status === 'AVAILABLE').length;
+          return <button key={entity.id} type="button" aria-current={selectedEntityId === entity.id || undefined}
+            onClick={() => selectStructure(entity.id)}>
+            <span>{entity.publicIdentifier}</span>
+            <span><strong>{entity.publicIdentifier === 'C2' ? FENASOJA_RESTAURANT_PRESENTATION_NAME : entity.name}</strong>
+              <small>{points.length} {points.length === 1 ? 'ponto' : 'pontos'} · {available} {available === 1 ? 'disponível' : 'disponíveis'}</small></span>
+            <ChevronRight aria-hidden="true" />
+          </button>;
+        })}
       </section>}
       {isModule ? <div className="commercial-map-dock__module">
         {moduleCard}

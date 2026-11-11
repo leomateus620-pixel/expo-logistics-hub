@@ -63,26 +63,27 @@ function OverviewAmount({ text }: { text: string }) {
   </>;
 }
 
-function financeCoverage(lots: number, priced: number): string {
-  if (lots === 0) return 'Nenhum lote';
+function financeCoverage(lots: number, priced: number, unitLabel: string): string {
+  if (lots === 0) return `Nenhum ${unitLabel}`;
   return priced < lots
     ? `Subtotal · ${formatDashboardInteger(priced)} de ${formatDashboardInteger(lots)} com valor`
     : `${formatDashboardInteger(lots)} de ${formatDashboardInteger(lots)} com valor`;
 }
 
 /** Absence and partial coverage stay visible; the detail lives in the info control. */
-function financeQualifier(lots: number, priced: number): string | null {
-  if (lots === 0) return 'Nenhum lote';
+function financeQualifier(lots: number, priced: number, unitLabel: string): string | null {
+  if (lots === 0) return `Nenhum ${unitLabel}`;
   if (priced === 0) return 'Sem valor';
   return priced < lots ? 'Parcial' : null;
 }
 
-function FinanceCard({ tone, label, icon, value, lots, priced, info, action, footer }: {
+function FinanceCard({ tone, label, icon, value, lots, priced, info, action, footer, unitLabel }: {
   action?: ReactNode; footer?: ReactNode; tone: FinanceTone; label: string; icon: ReactNode; value: number; lots: number; priced: number;
+  unitLabel: string;
   info: Omit<OverviewInfoContent, 'facts'> & { facts?: readonly OverviewInfoFact[] };
 }) {
   const exact = priced > 0 ? formatDashboardCurrency(value) : '—';
-  const qualifier = financeQualifier(lots, priced);
+  const qualifier = financeQualifier(lots, priced, unitLabel);
   return <article className={`commercial-dashboard-overview-finance commercial-dashboard-overview-finance--${tone}`}>
     {tone === 'inventory' && <svg className="commercial-dashboard-overview-finance__contours" viewBox="0 0 260 150"
       preserveAspectRatio="xMaxYMid slice" aria-hidden="true" focusable="false">
@@ -96,7 +97,7 @@ function FinanceCard({ tone, label, icon, value, lots, priced, info, action, foo
       <span className="commercial-dashboard-overview-finance__badge" aria-hidden="true">{icon}</span>
       <span className="commercial-dashboard-overview-finance__title">{label}</span>
       {qualifier && <span className="commercial-dashboard-overview-qualifier">{qualifier}</span>}
-      <div className="commercial-dashboard-overview-finance__actions">{action}<OverviewInfo {...info} facts={[['Valor exato', exact], ['Cobertura', financeCoverage(lots, priced)], ...(info.facts ?? [])]} /></div>
+      <div className="commercial-dashboard-overview-finance__actions">{action}<OverviewInfo {...info} facts={[['Valor exato', exact], ['Cobertura', financeCoverage(lots, priced, unitLabel)], ...(info.facts ?? [])]} /></div>
     </header>
     <strong className="commercial-dashboard-overview-finance__value">
       {priced > 0 ? <span className="commercial-dashboard-overview-amount" title={exact}>
@@ -122,8 +123,8 @@ function OverviewKpi({ tone, label, icon, value, qualifier, info }: {
 }
 
 function statusAreaFact(summary: DashboardStatusSummary, inventoryLots: number): string {
-  const area = formatDashboardAreaWithCoverage(summary.areaSqm, summary.lotCount, summary.areaPendingCount, inventoryLots);
-  const partial = summary.areaPendingCount > 0 && summary.areaPendingCount < summary.lotCount;
+  const area = formatDashboardAreaWithCoverage(summary.areaSqm, summary.areaLotCount, summary.areaPendingCount, inventoryLots);
+  const partial = summary.areaPendingCount > 0 && summary.areaPendingCount < summary.areaLotCount;
   return partial ? `${area} · ${formatDashboardInteger(summary.areaPendingCount)} sem área oficial` : area;
 }
 
@@ -179,6 +180,8 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
   const progressFillRef = useRef<SalesProgressFill | null>(null);
   const snapshot = useMemo(() => buildCommercialDashboardSnapshot({ entities: data.entities, lots: data.lots }, pricingStage), [data.entities, data.lots, pricingStage]);
   const { overall } = snapshot;
+  const spaceLabel = overall.commercialFoodPoints > 0 ? 'Espaços' : 'Lotes';
+  const unitLabel = overall.commercialFoodPoints > 0 ? 'espaço' : 'lote';
   const lotShare = (value: number) => overall.commercialLots ? `${formatDashboardPercentage(value)} dos espaços comerciais` : '—';
   const updatedAtLabel = dataUpdatedAt > 0 && Number.isFinite(dataUpdatedAt)
     ? `Atualizado às ${new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(dataUpdatedAt)}`
@@ -267,49 +270,53 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
               aria-label="Ver fluxo de caixa" onClick={() => openAnalytics('cashflow')}><CashflowGlyph /></button>
           </TooltipTrigger><TooltipContent>Ver fluxo de caixa</TooltipContent></Tooltip></TooltipProvider> : undefined}
           footer={projectId && canManageSales ? <CommercialCashflowPreview scope={presentation.scope} onOpen={month => openAnalytics('cashflow', month)} /> : undefined}
-          value={overall.soldValue} lots={overall.soldLots} priced={overall.byStatus.SOLD.pricedLotCount}
+          value={overall.soldValue} lots={overall.soldLots} priced={overall.byStatus.SOLD.pricedLotCount} unitLabel={unitLabel}
           info={{ label: 'Informações sobre vendas confirmadas', title: 'Vendas confirmadas',
             lead: 'Soma do valor negociado das vendas confirmadas no fluxo comercial (situação Vendido).',
             note: 'Valor negociado confirmado. A confirmação comercial não equivale a recebimento financeiro.' }} />
         <FinanceCard tone="open" label="Valor das vendas em andamento" icon={<PendingSignatureGlyph />}
-          value={overall.saleOpenValue} lots={overall.saleOpenLots} priced={overall.byStatus.SALE_OPEN.pricedLotCount}
+          value={overall.saleOpenValue} lots={overall.saleOpenLots} priced={overall.byStatus.SALE_OPEN.pricedLotCount} unitLabel={unitLabel}
           info={{ label: 'Informações sobre vendas em andamento', title: 'Vendas em andamento',
             lead: 'Soma do valor negociado das vendas registradas que ainda aguardam assinatura do contrato.',
             facts: [['Situação', 'Aguardando assinatura']],
             note: 'Venda em andamento não é receita realizada.' }} />
-        <FinanceCard tone="inventory" label="Valor total comercial dos lotes" icon={<InventoryBaseGlyph />}
-          value={overall.totalKnownValue} lots={overall.commercialLots} priced={overall.knownValueLots}
+        <FinanceCard tone="inventory" label={overall.commercialFoodPoints > 0 ? 'Valor total comercial dos espaços' : 'Valor total comercial dos lotes'} icon={<InventoryBaseGlyph />}
+          value={overall.totalKnownValue} lots={overall.commercialLots} priced={overall.knownValueLots} unitLabel={unitLabel}
           info={{ label: 'Informações sobre o valor total comercial', title: 'Valor total comercial',
-            lead: 'Base comercial conhecida do inventário: valor negociado das vendas somado à tabela oficial dos lotes sem venda.',
+            lead: 'Soma do valor negociado das vendas e dos valores oficiais dos espaços sem venda.',
             facts: [['Composição', `Vendas + tabela oficial (${pricingStage === 'RENOVACAO' ? 'Renovação' : '2ª Etapa'})`]],
-            note: 'Não é meta nem receita. Lotes sem valor registrado não são estimados.' }} />
+            note: 'A cobertura indica quantos espaços têm valor registrado.' }} />
       </section>
       <CommercialSalesProgress aggregate={overall} fillMemory={progressFillRef} />
       <section className="commercial-dashboard-overview__kpis" aria-label="Indicadores comerciais principais">
-        <OverviewKpi tone="spaces" label="Espaços comerciais" icon={<ModulesGlyph />} value={formatDashboardInteger(overall.commercialLots)}
+        <OverviewKpi tone="spaces" label={overall.commercialFoodPoints > 0 ? 'Espaços comercializáveis' : 'Espaços comerciais'} icon={<ModulesGlyph />} value={formatDashboardInteger(overall.commercialLots)}
           info={{ label: 'Informações sobre espaços comerciais', title: 'Espaços comerciais',
-            lead: 'Inventário ativo: lotes vendidos, em andamento, disponíveis, reservados, em negociação e bloqueados.',
+            lead: 'Inventário ativo de espaços vendidos, em andamento, disponíveis, reservados, em negociação e bloqueados.',
             facts: [
+              ...(overall.commercialFoodPoints > 0 ? [
+                ['Espaços por metragem', formatDashboardInteger(overall.commercialAreaLots)] as const,
+                ['Pontos de alimentação', formatDashboardInteger(overall.commercialFoodPoints)] as const,
+              ] : []),
               ['Reservados', formatDashboardInteger(overall.reservedLots)],
               ['Em negociação', formatDashboardInteger(overall.negotiationLots)],
               ['Bloqueados', formatDashboardInteger(overall.blockedLots)],
               ['Indisponíveis', `${formatDashboardInteger(overall.unavailableLots)} fora do inventário`],
             ] }} />
-        <OverviewKpi tone="open" label="Lotes com venda em andamento" icon={<ProcessGlyph />} value={formatDashboardInteger(overall.saleOpenLots)}
-          info={{ label: 'Informações sobre lotes com venda em andamento', title: 'Lotes com venda em andamento',
-            lead: 'Lotes com venda registrada aguardando a confirmação da assinatura do contrato.',
+        <OverviewKpi tone="open" label={`${spaceLabel} com venda em andamento`} icon={<ProcessGlyph />} value={formatDashboardInteger(overall.saleOpenLots)}
+          info={{ label: `Informações sobre ${spaceLabel.toLowerCase()} com venda em andamento`, title: `${spaceLabel} com venda em andamento`,
+            lead: 'Vendas registradas aguardando a confirmação da assinatura do contrato.',
             facts: [['Participação', lotShare(overall.byStatus.SALE_OPEN.lotPercentage)],
-              ['Área oficial', statusAreaFact(overall.byStatus.SALE_OPEN, overall.commercialLots)]] }} />
-        <OverviewKpi tone="sold" label="Lotes vendidos" icon={<ConfirmedGlyph />} value={formatDashboardInteger(overall.soldLots)}
-          info={{ label: 'Informações sobre lotes vendidos', title: 'Lotes vendidos',
-            lead: 'Lotes na situação Vendido, com venda confirmada no fluxo comercial.',
+              ['Área oficial', statusAreaFact(overall.byStatus.SALE_OPEN, overall.commercialAreaLots)]] }} />
+        <OverviewKpi tone="sold" label={`${spaceLabel} vendidos`} icon={<ConfirmedGlyph />} value={formatDashboardInteger(overall.soldLots)}
+          info={{ label: `Informações sobre ${spaceLabel.toLowerCase()} vendidos`, title: `${spaceLabel} vendidos`,
+            lead: 'Espaços com venda confirmada no fluxo comercial.',
             facts: [['Participação', lotShare(overall.soldLotPercentage)],
-              ['Área oficial', statusAreaFact(overall.byStatus.SOLD, overall.commercialLots)]] }} />
-        <OverviewKpi tone="available" label="Lotes disponíveis" icon={<AvailableLotGlyph />} value={formatDashboardInteger(overall.availableLots)}
-          info={{ label: 'Informações sobre lotes disponíveis', title: 'Lotes disponíveis',
-            lead: 'Lotes liberados para proposta comercial.',
+              ['Área oficial', statusAreaFact(overall.byStatus.SOLD, overall.commercialAreaLots)]] }} />
+        <OverviewKpi tone="available" label={`${spaceLabel} disponíveis`} icon={<AvailableLotGlyph />} value={formatDashboardInteger(overall.availableLots)}
+          info={{ label: `Informações sobre ${spaceLabel.toLowerCase()} disponíveis`, title: `${spaceLabel} disponíveis`,
+            lead: 'Espaços liberados para proposta comercial.',
             facts: [['Participação', lotShare(overall.byStatus.AVAILABLE.lotPercentage)],
-              ['Área oficial', statusAreaFact(overall.byStatus.AVAILABLE, overall.commercialLots)]] }} />
+              ['Área oficial', statusAreaFact(overall.byStatus.AVAILABLE, overall.commercialAreaLots)]] }} />
         <div className="commercial-dashboard-region-summary" aria-label="Área comercial e vendas">
           <CommercialDashboardAreaCard aggregate={overall} />
           {salesAvailable && projectId && <CommercialDashboardSalesSummary projectId={projectId}
@@ -326,6 +333,17 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
       </div>
       <CommercialDashboardSpaces key={presentation.scope} snapshot={snapshot} data={data} onViewLot={onViewLot}
         presentationMemory={spacesMemory} stateMemory={spacesMemory} projectId={projectId} dataUpdatedAt={dataUpdatedAt} canManageSales={canManageSales}
+        onOpenGastronomySales={salesAvailable && canManageSales ? () => {
+          overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
+          salesOrigin.current = 'overview';
+          const store = useSalesOrdersUiStore.getState();
+          if (projectId) store.ensureProjectScope(projectId);
+          store.resetFilters();
+          store.setFilters({ segment: 'gastronomia' });
+          store.setExpanded(null);
+          store.setArea('sales');
+          scrollContainer?.()?.scrollTo?.({ top: 0 });
+        } : undefined}
         onOpenOrder={salesAvailable && canManageSales ? (order) => {
           overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
           salesOrigin.current = 'overview';

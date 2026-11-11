@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
 import CommercialMapWorkspace from '@/features/commercial-map/CommercialMapPage';
 import type { CommercialMapQueryScope } from '@/features/commercial-map/types';
-import type { CommissionMapPortalConfig } from '@/modules/commissions/commissionMapPortalRegistry';
 
 interface CommissionCommercialMapPageProps {
-  portal: CommissionMapPortalConfig;
+  portal: { id: string; segmentId: string };
 }
 
 export default function CommissionCommercialMapPage({ portal }: CommissionCommercialMapPageProps) {

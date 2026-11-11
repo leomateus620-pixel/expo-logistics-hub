@@ -8,8 +8,9 @@ interface Props {
 }
 
 export function SalesCartItem({ line, onRemove }: Props) {
-  const areaLabel = formatAreaSqmLabel(line.areaSqm) ?? 'Área não informada';
-  const priceLabel = formatPricePerSqm(line.pricePerSqm);
+  const foodPoint = line.entry.commercialUnit === 'FOOD_POINT';
+  const areaLabel = foodPoint ? '1 ponto de alimentação' : formatAreaSqmLabel(line.areaSqm) ?? 'Área não informada';
+  const priceLabel = foodPoint ? null : formatPricePerSqm(line.pricePerSqm);
 
   return (
     <article className={`sales-cart__item${line.unpriced ? ' is-pending' : ''}${line.pending ? ' is-loading' : ''}`}>

@@ -37,6 +37,7 @@ export function describeExportScope(filters: SaleOrdersFilters, scope: Scope, si
   if (effective.status) parts.push(`Situação da tela: ${statusLabels[effective.status]}`);
   if (effective.hasDocument) parts.push(effective.hasDocument === 'yes' ? 'Com arquivo anexado' : 'Sem arquivo anexado');
   if (effective.paymentMethod) parts.push(`Pagamento: ${paymentMethodLabel(effective.paymentMethod)}`);
+  if (effective.segment) parts.push(effective.segment === 'gastronomia' ? 'Gastronomia' : effective.segment);
   if (effective.from) parts.push(`De ${fmtSaleDate(effective.from)}`);
   if (effective.to) parts.push(`Até ${fmtSaleDate(effective.to)}`);
   if (scope === 'filtered' && signature !== 'ALL' && signatureFilters.includes(filters.status)) {
@@ -53,6 +54,7 @@ async function fetchExportSnapshot(projectId: string, filters: SaleOrdersFilters
     p_has_document: filters.hasDocument === '' ? null : filters.hasDocument === 'yes',
     p_payment_method: filters.paymentMethod || null, p_from: filters.from || null, p_to: filters.to || null,
     p_signature_selection: signature,
+    ...(filters.segment ? { p_segment_slug: filters.segment } : {}),
   });
   if (error) throw error;
   if (!data || !Array.isArray(data.rows) || typeof data.generatedAt !== 'string' || !Number.isFinite(Date.parse(data.generatedAt))) {

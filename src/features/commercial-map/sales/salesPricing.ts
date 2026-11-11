@@ -1,6 +1,7 @@
 import type { LotPricing2028 } from '../utils/lotPricing2028';
 import { stageTotal } from '../utils/lotPricing2028';
 import type { SalesSelectionEntry, SalesStage } from './salesTypes';
+import { toCents } from './salesMoney';
 
 export interface SalesCartLine {
   entry: SalesSelectionEntry;
@@ -18,14 +19,11 @@ export interface SalesCartLine {
 export interface SalesCartSummary {
   lines: SalesCartLine[];
   areaTotal: number;
+  foodPointCount: number;
   valueTotal: number;
   blockingCount: number;
   pendingCount: number;
   ready: boolean;
-}
-
-function toCents(value: number): number {
-  return Math.round((value + Number.EPSILON) * 100);
 }
 
 export function buildCartLine(
@@ -37,6 +35,14 @@ export function buildCartLine(
     return {
       entry, pricing: null, areaSqm: null, pricePerSqm: null, total: null,
       unpriced: true, pendingReason: 'Sem correspondência na tabela oficial 2028',
+    };
+  }
+  if (pricing.commercialUnit === 'FOOD_POINT') {
+    const total = stageTotal(pricing, stage);
+    const priced = total != null && total > 0 && pricing.resolutionStatus === 'OK' && pricing.unitQuantity === 1;
+    return {
+      entry: { ...entry, commercialUnit: 'FOOD_POINT' }, pricing, areaSqm: null, pricePerSqm: null,
+      total: priced ? total : null, unpriced: !priced, pendingReason: priced ? null : 'Valor ainda não definido',
     };
   }
   if (pricing.resolutionStatus === 'EXCLUIDO') {
@@ -85,6 +91,7 @@ export function summarizeCart(
   return {
     lines,
     areaTotal: areaCents / 100,
+    foodPointCount: lines.filter(({ entry }) => entry.commercialUnit === 'FOOD_POINT').length,
     valueTotal: valueCents / 100,
     blockingCount,
     pendingCount,

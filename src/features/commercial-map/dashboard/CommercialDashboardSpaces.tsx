@@ -11,6 +11,7 @@ import { CommercialDashboardLotChart } from './CommercialDashboardCharts';
 import { useDashboardStatusHighlight } from './useDashboardStatusHighlight';
 import { CommercialDashboardComparison } from './CommercialDashboardComparison';
 import { CommercialDashboardScopeCard } from './CommercialDashboardScopeCard';
+import { CommercialGastronomyDashboard } from './CommercialGastronomyDashboard';
 import { OverviewInfo } from './CommercialDashboardOverviewInfo';
 import { formatDashboardCommercialProgress } from './commercialDashboardProgress';
 import './commercial-dashboard-scope-cards.css';
@@ -65,7 +66,7 @@ function Verification({ aggregate }: { aggregate: DashboardAggregate }) {
   </details>;
 }
 
-export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentationMemory, stateMemory, projectId, dataUpdatedAt, canManageSales, onOpenOrder }: {
+export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentationMemory, stateMemory, projectId, dataUpdatedAt, canManageSales, onOpenOrder, onOpenGastronomySales }: {
   snapshot: CommercialDashboardSnapshot;
   data: Pick<CommercialMapData, 'entities' | 'lots'>;
   onViewLot: (id: string) => void;
@@ -75,6 +76,7 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
   dataUpdatedAt?: number;
   canManageSales?: boolean;
   onOpenOrder?: (order: OccupancyOrder) => void;
+  onOpenGastronomySales?: () => void;
 }) {
   // Presentation scope only; every element below shares one existing snapshot aggregate.
   const [requestedScopeId, setScopeId] = useState(() => presentationMemory?.scopeId ?? stateMemory?.current?.requestedScopeId ?? 'external:all');
@@ -105,9 +107,11 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
   const aggregate = pavilion ?? (isInternal ? snapshot.internal : isPending ? snapshot.unclassified : area ?? snapshot.external);
   const title = pavilion?.definition.officialName ?? (isInternal ? 'Todos os pavilhões' : isPending ? 'Classificação pendente' : area?.segment.name ?? 'Todas as áreas externas');
   const segment = area?.segment;
-  const showExternalBoundary = !pavilion && !isInternal && !isPending;
+  const isGastronomy = segment?.id === 'gastronomia';
+  const showExternalBoundary = !pavilion && !isInternal && !isPending && !isGastronomy;
+  const externalSegments = COMMERCIAL_MAP_SEGMENTS.filter((segment) => segment.id !== 'gastronomia');
   const boundary = useMemo(() => showExternalBoundary ? getDashboardExternalBoundaries(data.entities, data.lots,
-    segment ? [segment] : COMMERCIAL_MAP_SEGMENTS) : EMPTY_BOUNDARY,
+    segment ? [segment] : externalSegments) : EMPTY_BOUNDARY,
   [data.entities, data.lots, segment, showExternalBoundary]);
   const items = useMemo(() => aggregate.records.map((record) => ({
     ...record, areaName: snapshot.segments.find((item) => item.segmentId === record.segmentId)?.segment.name,
@@ -128,7 +132,7 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
         <div className="commercial-dashboard-scope-grid commercial-dashboard-scope-grid--external" role="group" aria-label="Selecionar área externa">
           <CommercialDashboardScopeCard scopeId="external:all" title="Área Externa" aggregate={snapshot.external}
             selected={scopeId === 'external:all'} onSelect={() => setScopeId('external:all')} />
-          {snapshot.segments.map((item) => <CommercialDashboardScopeCard key={item.segmentId} scopeId={`external:${item.segmentId}`}
+          {snapshot.segments.filter((item) => item.segmentId !== 'gastronomia' || item.totalLots > 0).map((item) => <CommercialDashboardScopeCard key={item.segmentId} scopeId={`external:${item.segmentId}`}
             title={item.segment.name} aggregate={item} segmentId={item.segmentId}
             selected={scopeId === `external:${item.segmentId}`} onSelect={() => setScopeId(`external:${item.segmentId}`)} />)}
         </div>
@@ -150,6 +154,8 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
         </button>}
       </div>
     </div>
+    {isGastronomy ? <CommercialGastronomyDashboard aggregate={aggregate} structures={snapshot.gastronomyStructures}
+      onViewStructure={onViewLot} onOpenSales={onOpenGastronomySales} /> : <>
     <div className="commercial-dashboard-selected-summary"><div className="commercial-dashboard-scope-heading">
       <div><span className="commercial-dashboard-eyebrow">Recorte selecionado</span>
         <div className="commercial-dashboard-workspace-analysis__scope-title"><h2>{title}</h2>
@@ -193,15 +199,16 @@ export function CommercialDashboardSpaces({ snapshot, data, onViewLot, presentat
       <Verification aggregate={aggregate} />
       <details className="commercial-dashboard-scope-analysis" open={comparisonOpen} onToggle={(event) => setComparisonOpen(event.currentTarget.open)}>
         <summary>Comparar segmentos externos</summary>
-        {comparisonOpen && <CommercialDashboardComparison segments={snapshot.segments} includeValue={false} />}
+        {comparisonOpen && <CommercialDashboardComparison segments={snapshot.segments.filter((item) => item.segmentId !== 'gastronomia')} includeValue={false} />}
       </details>
     </div>
     {isPending && <p className="commercial-dashboard-pending">Estes espaços permanecem nos totais globais, sem atribuição de área ou pavilhão por suposição.
       {[...new Set(snapshot.unclassified.records.map((record) => record.classificationIssue))].filter(Boolean).map((reason) => <span key={reason}> {reason}.</span>)}
     </p>}
     {!pavilion && !isInternal && !isPending && boundary.pending.map((message) => <p className="commercial-dashboard-pending" key={message}>{message}</p>)}
+    </>}
     <div className="commercial-dashboard-reconciliation" role="note" aria-label="Reconciliação do inventário ativo">
-      <span>{formatDashboardInteger(snapshot.overall.totalLots)} registros ativos = {formatDashboardInteger(snapshot.external.totalLots)} externos + {formatDashboardInteger(snapshot.internal.totalLots)} internos + {formatDashboardInteger(snapshot.unclassified.totalLots)} pendentes</span>
+      <span>{formatDashboardInteger(snapshot.overall.totalLots)} registros ativos = {formatDashboardInteger(snapshot.external.totalLots)} externos + {formatDashboardInteger(snapshot.internal.totalLots)} internos{snapshot.gastronomyStructures.length > 0 && ` + ${formatDashboardInteger(snapshot.segments.find((item) => item.segmentId === 'gastronomia')?.totalLots ?? 0)} pontos de alimentação`} + {formatDashboardInteger(snapshot.unclassified.totalLots)} pendentes</span>
       <small>Indisponíveis aparecem na planta e na legenda, fora dos percentuais comerciais.</small>
     </div>
   </section>;

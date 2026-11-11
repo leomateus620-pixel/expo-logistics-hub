@@ -54,6 +54,7 @@ import {
 } from 'react';
 import { Canvas, type RootState, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, useTexture } from '@react-three/drei';
+import { Utensils } from 'lucide-react';
 import { CommercialMapSceneShaderWarmup } from './CommercialMapSceneShaderWarmup';
 import { CommercialMapPresentation } from './CommercialMapPresentation';
 import { COMMERCIAL_MAP_PRESENTATION_EVENT, isCommercialMapPresentationVisible } from '../../utils/frameActivity';
@@ -251,6 +252,7 @@ import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
 import {
   COMMERCIAL_MAP_SEGMENT_IDS,
   buildCommercialMapSegmentIndex,
+  foodPointsByStructure,
   getCommercialMapSegment,
   isSegmentTintClassification,
   type CommercialMapSegmentDefinition,
@@ -2088,6 +2090,7 @@ function CameraRig({
   isolatedArea,
   exteriorRenderedEntities,
   resolvedSegmentByEntity,
+  gastronomyStructureIds,
   segmentOverride,
   publicFocusEntityIds,
   initialPublicView,
@@ -2101,6 +2104,7 @@ function CameraRig({
   isolatedArea?: CommercialMapSegmentId | null;
   exteriorRenderedEntities: MapEntity[];
   resolvedSegmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
+  gastronomyStructureIds: ReadonlySet<string>;
   segmentOverride?: CommercialMapSegmentDefinition | null;
   publicFocusEntityIds?: ReadonlySet<string> | null;
   initialPublicView?: PublicNavigation | null;
@@ -2149,8 +2153,9 @@ function CameraRig({
   const requestedSegment = segmentOverride?.id === activeSegmentId ? segmentOverride : getCommercialMapSegment(activeSegmentId);
   const activeSegment = requestedSegment?.behavior.interaction === 'filter-and-focus' ? requestedSegment : null;
   const activeSegmentEntities = useMemo(
-    () => activeSegment ? exteriorRenderedEntities.filter((entity) => resolvedSegmentByEntity.get(entity.id)?.id === activeSegment.id) : [],
-    [activeSegment, exteriorRenderedEntities, resolvedSegmentByEntity],
+    () => activeSegment ? exteriorRenderedEntities.filter((entity) => activeSegment.id === 'gastronomia'
+      ? gastronomyStructureIds.has(entity.id) : resolvedSegmentByEntity.get(entity.id)?.id === activeSegment.id) : [],
+    [activeSegment, exteriorRenderedEntities, gastronomyStructureIds, resolvedSegmentByEntity],
   );
   // Consulta pública: o enquadramento inicial e o "Reenquadrar área" usam os
   // lotes do link, não o parque inteiro. Os limites de segurança da câmera
@@ -4875,6 +4880,7 @@ const Scene = memo(function Scene({
       ? new Set(entities.map((entity) => entity.publicIdentifier))
       : null
   ), [entities, isolatedArea]);
+  const gastronomyStructureIds = useMemo(() => new Set(foodPointsByStructure(entities, lots).keys()), [entities, lots]);
   // Consulta pública: o entorno é apenas contexto cartográfico. A verificação
   // acontece aqui, no único ponto por onde passam clique, toque e hover.
   const canInspectEntity = useCallback(
@@ -4889,9 +4895,10 @@ const Scene = memo(function Scene({
     if (!canInspectEntity(entityId)) return;
     // Em modo Vendas o clique pertence ao carrinho: não seleciona a entidade
     // nem abre o painel de detalhes padrão.
-    if (!interactiveEntityIds && dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId), null, entities.find(entity => entity.id === entityId))) return;
+    if (!gastronomyStructureIds.has(entityId) && !interactiveEntityIds
+      && dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId), null, entities.find(entity => entity.id === entityId))) return;
     setSelectedEntityId(entityId);
-  }, [canInspectEntity, entities, hydrologicalModeActive, interactiveEntityIds, lots, setSelectedEntityId]);
+  }, [canInspectEntity, entities, gastronomyStructureIds, hydrologicalModeActive, interactiveEntityIds, lots, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
     if (isSoyHarvestCameraOwned()) return;
     if (useVisitStore.getState().enabled) return;
@@ -4972,6 +4979,7 @@ const Scene = memo(function Scene({
     };
   }, [entities]);
   const exteriorRenderedEntities = useMemo(() => renderedEntities.filter((entity) => {
+    if (entity.classification === 'FOOD_POINT') return false;
     if (entity.classification !== 'INTERNAL_STAND') return true;
     if (entity.parentEntityId && commercialPavilionIdentity.ids.has(entity.parentEntityId)) {
       return false;
@@ -5647,6 +5655,16 @@ const Scene = memo(function Scene({
       )}
         </group></PublicContextGroup>}
       </InteriorCameraRequestContext.Provider>
+      {!publicPolicy && activeSegmentId === 'gastronomia' && !interiorEntity && !visitEnabled
+        && !hydrologicalModeActive && !lunarCinematicActive && exteriorRenderedEntities.map((entity) => {
+          if (!gastronomyStructureIds.has(entity.id) || entity.id === selectedEntityId
+            || (entityFiltersActive && !presentedMatchingEntityIds.has(entity.id))) return null;
+          const [x, z] = geometryCentroid(entity.geometry);
+          return <Html key={entity.id} center position={[x, entity.geometry.elevation + entityLabelHeight(entity), z]}
+            style={{ pointerEvents: 'none' }} zIndexRange={[20, 2]}>
+            <span className="commercial-map-food-marker" aria-hidden="true"><Utensils />{entity.publicIdentifier}</span>
+          </Html>;
+        })}
       <CameraRig
         selectedEntity={selectedEntity}
         interiorEntity={interiorEntity}
@@ -5656,6 +5674,7 @@ const Scene = memo(function Scene({
         isolatedArea={isolatedArea}
         exteriorRenderedEntities={exteriorRenderedEntities}
         resolvedSegmentByEntity={resolvedSegmentByEntity}
+        gastronomyStructureIds={gastronomyStructureIds}
         segmentOverride={segmentOverride}
         publicFocusEntityIds={publicFocusEntityIds}
         initialPublicView={initialPublicView}

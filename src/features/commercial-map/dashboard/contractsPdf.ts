@@ -7,6 +7,7 @@ export interface ContractPdfRecord {
   createdAt: string | null;
   value: number | null;
   locations: { location: string | null; lots: string[] }[];
+  documents?: { name: string; spaces: string[] }[] | null;
   signatureStatus: string;
   signatureCompletedAt?: string | null;
   signaturesCompleted?: number | null;
@@ -70,7 +71,7 @@ export async function generateContractsPdf({ records, scopeDescription, eventNam
   const width = doc.internal.pageSize.getWidth(), height = doc.internal.pageSize.getHeight();
   const left = 12, right = width - 12, bottom = height - 14;
   const columns = [68, 31, 24, 68, 34, 48];
-  const heads = ['Contrato / Empresa', 'CNPJ', 'Cadastro', 'Pavilhão e lotes', 'Valor negociado', 'Assinatura'];
+  const heads = ['Contrato / Empresa', 'CNPJ', 'Cadastro', 'Locais e espaços', 'Valor negociado', 'Assinatura'];
   const lineHeight = 3.8;
   const summary = summarizeContracts(records);
   const generated = generatedAt.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -123,13 +124,19 @@ export async function generateContractsPdf({ records, scopeDescription, eventNam
   y += 3;
   tableHeader();
   for (const record of records) {
+    const documents = record.documents ?? [];
+    const contractPrefix = documents.length === 1 ? `Contrato ${clean(documents[0].name)} · ` : '';
+    const identification = contractPrefix && record.identification.startsWith(contractPrefix)
+      ? record.identification.slice(contractPrefix.length) : record.identification;
     const signature = [clean(record.signatureStatus)];
     if (record.signatureCompletedAt) signature.push(`Conclusão: ${displayDate(record.signatureCompletedAt)}`);
     if (record.signaturesCompleted != null && record.signaturesPending != null) signature.push(`Concluídas: ${record.signaturesCompleted} · pendentes: ${record.signaturesPending}`);
     if (record.excludedFromCurrentTotal) signature.push('Cancelado/substituído');
+    const spaces = [locationsText(record.locations), ...documents.map(({ name, spaces: covered }) =>
+      `${clean(name)} · ${covered.map(clean).join(', ')}`)].join('\n');
     const cellValues = [
-      `${clean(record.identification)}\nRazão social: ${clean(record.legalName)}\nNome fantasia: ${clean(record.tradeName)}`,
-      displayDocument(record.document), displayDate(record.createdAt), locationsText(record.locations),
+      `${clean(identification)}\nRazão social: ${clean(record.legalName)}\nNome fantasia: ${clean(record.tradeName)}`,
+      displayDocument(record.document), displayDate(record.createdAt), spaces,
       validValue(record.value) ? money(cents(record.value!)) : NOT_INFORMED, signature.join('\n'),
     ];
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);

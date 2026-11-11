@@ -21,7 +21,7 @@ export function scopeForLot(lot: CommercialLot, entities: readonly MapEntity[]):
     : null;
   if (parent) {
     return {
-      key: `parent:${parent.id}`,
+      key: `${lot.commercialUnit === 'FOOD_POINT' ? 'food' : 'parent'}:${parent.id}`,
       label: parent.name || parent.publicIdentifier,
       projectId: entity.projectId,
     };

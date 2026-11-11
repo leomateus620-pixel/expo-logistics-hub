@@ -35,6 +35,7 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, entities, locatio
   const h = detail.header;
   const stage = String(h.stage ?? 'RENOVACAO');
   const active = detail.items.filter((i) => ['PENDING_SIGNATURE', 'SIGNED', 'LEGACY_UNVERIFIED'].includes(i.contractState));
+  const hasFood = active.some((item) => item.commercialUnit === 'FOOD_POINT');
   const [removed, setRemoved] = useState<Set<string>>(new Set());
   const [added, setAdded] = useState<string[]>([]);
   const [search, setSearch] = useState('');
@@ -160,7 +161,7 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, entities, locatio
           <header className="cso-attach-header">
             <div>
               <span className="cso-attach-eyebrow">{h.buyerTradeName?.trim() || h.buyerName}</span>
-              <Dialog.Title className="cso-attach-title">Editar lotes da venda</Dialog.Title>
+              <Dialog.Title className="cso-attach-title">{hasFood ? 'Editar espaços da venda' : 'Editar lotes da venda'}</Dialog.Title>
               <Dialog.Description className="cso-attach-description">Adicione, retire ou troque espaços. Valores e parcelas em aberto são recalculados.</Dialog.Description>
             </div>
             <Dialog.Close asChild><Button className="cso-attach-close" type="button" variant="outline" size="icon" aria-label="Fechar edição" disabled={busy}><X aria-hidden="true" /></Button></Dialog.Close>
@@ -195,14 +196,15 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, entities, locatio
                 </div>}
                 <div className="rso-add-area">
                   <div className="rso-add-heading">
-                    <div><h4>Adicionar lotes</h4><p>Pesquisa restrita a <strong>{selectedScope?.label ?? 'local não identificado'}</strong>.</p></div>
+                    <div><h4>{hasFood ? 'Adicionar espaços' : 'Adicionar lotes'}</h4><p>Pesquisa restrita a <strong>{selectedScope?.label ?? 'local não identificado'}</strong>.</p></div>
                     {scopes.length > 1 && <label><span>Local da venda</span><select value={selectedScope?.key ?? ''} onChange={(event) => { setScopeKey(event.target.value); setSearch(''); }} disabled={busy}>{scopes.map((scope) => <option key={scope.key} value={scope.key}>{scope.label}</option>)}</select></label>}
                   </div>
                 <label className="rso-search"><Search aria-hidden="true" />
-                  <input value={search} disabled={busy || !selectedScope} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por número, código ou nome" aria-label="Buscar lote para adicionar" />
+                  <input value={search} disabled={busy || !selectedScope} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por número, código ou nome"
+                    aria-label={hasFood ? 'Buscar espaço para adicionar' : 'Buscar lote para adicionar'} />
                 </label>
                 {search.trim() && <ul className="rso-candidates">
-                  {candidates.length === 0 && <li className="rso-empty">Nenhum lote encontrado neste local.</li>}
+                  {candidates.length === 0 && <li className="rso-empty">{hasFood ? 'Nenhum espaço encontrado neste local.' : 'Nenhum lote encontrado neste local.'}</li>}
                   {candidates.map((lot) => {
                     const disabledReason = candidateDisabledReason(lot, priceOf(lot));
                     const phase = lot.status === 'AVAILABLE' ? 'available' : lot.status === 'SALE_OPEN' ? 'open' : lot.status === 'SOLD' ? 'sold' : 'blocked';
@@ -257,7 +259,9 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, entities, locatio
                 <span>Total {formatDashboardCurrency(Number(h.negotiatedTotal ?? 0))} → <strong>{formatDashboardCurrency(preview.total)}</strong>
                   {preview.schedule.length > 0 ? ` · ${preview.schedule.length} parcela(s)` : ''}</span>
                 {lotContractWarnings.length > 0 && <span className="rso-warn">Contrato individual em {lotContractWarnings.join(', ')}: o arquivo continua no histórico do lote.</span>}
-                {hasOrderContract && <span className="rso-warn">Esta venda tem contrato da venda inteira: anexe uma nova versão após salvar.</span>}
+                {hasOrderContract && <span className="rso-warn">{hasFood
+                  ? 'Para abranger espaços adicionados, anexe uma nova versão após salvar.'
+                  : 'Esta venda tem contrato da venda inteira. Anexe uma nova versão após salvar.'}</span>}
                 {paidCount > 0 && <span>Valores já recebidos ficam preservados.</span>}
               </div>}
               {error && <p className="cso-attach-state is-error" role="alert">{error}</p>}
