@@ -3,18 +3,22 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { FileText, Loader2, Upload, X } from 'lucide-react';
 import { validateContractFile } from '../../utils/contracts';
 import { attachOrderContract, describeSalesError, type SaleContract } from './salesOrdersService';
+import { uploadLotContract } from '../../services/commercialMapService';
+import type { CommercialUnit } from '../../types';
 import './attach-order-contract.css';
 
 export function AttachOrderContractDialog({ orgId, orderId, items, contract, onClose, onAttached }: {
   orgId: string;
   orderId: string;
-  items: { lotId: string; label: string }[];
+  items: { lotId: string; saleId?: string | null; label: string; commercialUnit?: CommercialUnit }[];
   contract: SaleContract | null;
   onClose: () => void;
   onAttached: () => Promise<void>;
 }) {
   const initial = contract ? contract.lotIds.filter((id) => items.some((i) => i.lotId === id)) : items.map((i) => i.lotId);
-  const [scope, setScope] = useState<'all' | 'selected'>(contract && initial.length !== items.length ? 'selected' : 'all');
+  const [scope, setScope] = useState<'all' | 'selected' | 'lot'>(contract?.scope === 'LOT' ? 'lot' : contract && initial.length !== items.length ? 'selected' : 'all');
+  const foodItems = items.filter((item) => item.commercialUnit === 'FOOD_POINT' && item.saleId);
+  const [pointId, setPointId] = useState(contract?.scope === 'LOT' ? initial[0] : foodItems[0]?.lotId);
   const [selected, setSelected] = useState<Set<string>>(new Set(initial));
   const [file, setFile] = useState<File | null>(null);
   const [number, setNumber] = useState(contract?.contractNumber ?? '');
@@ -25,7 +29,9 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
   const fileInput = useRef<HTMLInputElement>(null);
   const previousFocus = useRef<HTMLElement | null>(typeof document !== 'undefined' && document.activeElement instanceof HTMLElement ? document.activeElement : null);
   const scopeName = useId();
-  const lotIds = scope === 'all' ? items.map((i) => i.lotId) : items.filter((i) => selected.has(i.lotId)).map((i) => i.lotId);
+  const point = foodItems.find((item) => item.lotId === pointId);
+  const lotIds = scope === 'lot' ? (point ? [point.lotId] : [])
+    : scope === 'all' ? items.map((i) => i.lotId) : items.filter((i) => selected.has(i.lotId)).map((i) => i.lotId);
   const currentVersion = contract?.versions.find((version) => version.version === contract.activeVersion);
   const phaseLabel = phase === 'upload' ? 'Enviando arquivo…' : phase === 'register' ? 'Registrando vínculo…' : 'Atualizando venda…';
   const fileSize = file ? new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(file.size / (file.size < 1048576 ? 1024 : 1048576)) : '';
@@ -39,8 +45,13 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
     if (lotIds.length === 0) { setError('Selecione ao menos um espaço.'); return; }
     submitting.current = true; setError(null);
     try {
-      await attachOrderContract({ orgId, orderId, lotIds, file, contractNumber: number, contractId: contract?.contractId ?? null,
-        onProgress: (p) => { if (p !== 'done') setPhase(p); } });
+      if (scope === 'lot') {
+        setPhase('upload');
+        await uploadLotContract({ orgId, lotId: lotIds[0], file, contractNumber: number, expectedSaleId: point?.saleId ?? undefined });
+      } else {
+        await attachOrderContract({ orgId, orderId, lotIds, file, contractNumber: number, contractId: contract?.contractId ?? null,
+          onProgress: (p) => { if (p !== 'done') setPhase(p); } });
+      }
       // Vínculo já persistido: fecha na hora e atualiza as listas em segundo plano.
       onClose();
       void Promise.resolve(onAttached()).catch(() => undefined);
@@ -93,7 +104,7 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
               </section>
               <fieldset className="cso-attach-section" disabled={busy}>
                 <legend><span aria-hidden="true">02</span> Abrangência do documento</legend>
-                <div className="cso-attach-scope-options">
+                {contract?.scope !== 'LOT' && <div className="cso-attach-scope-options">
                   <label className={scope === 'all' ? 'is-selected' : ''}>
                     <input name={scopeName} type="radio" checked={scope === 'all'} onChange={() => setScope('all')} />
                     <span><strong>Toda a venda</strong><small>{items.length} {items.length === 1 ? 'espaço da venda' : 'espaços da venda'}</small></span>
@@ -102,7 +113,15 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
                     <input name={scopeName} type="radio" checked={scope === 'selected'} onChange={() => setScope('selected')} />
                     <span><strong>Escolher espaços</strong><small>Definir a abrangência</small></span>
                   </label>
-                </div>
+                  {!contract && foodItems.length > 0 && <label className={scope === 'lot' ? 'is-selected' : ''}>
+                    <input name={scopeName} type="radio" checked={scope === 'lot'} onChange={() => setScope('lot')} />
+                    <span><strong>Um ponto</strong><small>Contrato do ponto de alimentação</small></span>
+                  </label>}
+                </div>}
+                {scope === 'lot' ? <label className="cso-attach-field"><span>Ponto de alimentação</span>
+                  <select value={pointId ?? ''} disabled={contract?.scope === 'LOT' || busy} onChange={(event) => setPointId(event.target.value)}>
+                    {foodItems.map((item) => <option key={item.lotId} value={item.lotId}>{item.label}</option>)}
+                  </select></label> : <>
                 <div className="cso-attach-coverage-heading">
                   <span>{scope === 'all' ? 'Espaços abrangidos' : 'Selecione os espaços abrangidos'}</span>
                   <strong>{lotIds.length} de {items.length}</strong>
@@ -112,6 +131,7 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
                     const next = new Set(prev); if (event.target.checked) next.add(item.lotId); else next.delete(item.lotId); return next;
                   })} /><span>{item.label}</span></label></li>)}</ul> :
                   <ul className="cso-attach-covered-spaces">{items.map((item) => <li key={item.lotId}>{item.label}</li>)}</ul>}
+                </>}
               </fieldset>
               <p className="cso-attach-note">Anexar o documento não confirma assinatura nem pagamento.</p>
             </div>

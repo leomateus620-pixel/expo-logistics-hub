@@ -11,7 +11,8 @@ export interface DashboardLotRecord {
   readonly value: number | null;
   /** Invalid or absent official area stays pending instead of becoming zero. */
   readonly officialAreaSqm: number | null;
-  readonly category: 'external' | 'internal' | 'unclassified';
+  readonly category: 'external' | 'internal' | 'food' | 'unclassified';
+  readonly foodStructure?: MapEntity;
   readonly pavilion: MapEntity | null;
   readonly blockCode: string | null;
   readonly classificationIssue: string | null;
@@ -19,6 +20,7 @@ export interface DashboardLotRecord {
 
 export interface DashboardStatusSummary {
   readonly lotCount: number;
+  readonly areaLotCount: number;
   /** Sum of valid official areas for this status. */
   readonly areaSqm: number;
   /** Sum of registered commercial values for priced lots only. */
@@ -41,6 +43,8 @@ export interface DashboardAggregate {
   readonly totalLots: number;
   /** SOLD + SALE_OPEN + AVAILABLE + RESERVED + IN_NEGOTIATION + BLOCKED. */
   readonly commercialLots: number;
+  readonly commercialAreaLots: number;
+  readonly commercialFoodPoints: number;
   readonly soldLots: number;
   /** Vendas em aberto: carteira registrada aguardando assinatura, nunca receita realizada. */
   readonly saleOpenLots: number;
@@ -92,8 +96,9 @@ export interface CommercialDashboardSnapshot {
   readonly pavilions: readonly CommercialPavilionDashboardSnapshot[];
   /** Existing contract excludes lots whose cadastral entity is missing. Report them explicitly. */
   readonly orphanLots: number;
-  /** These segment aggregates contain external inventory only. */
+  /** External segments and points of alimentação, grouped by exclusive membership. */
   readonly segments: readonly CommercialSegmentDashboardSnapshot[];
+  readonly gastronomyStructures: readonly (DashboardAggregate & { readonly structure: MapEntity })[];
   /** Active lots with no single official segment remain in overall totals. */
   readonly unclassifiedLots: number;
 }

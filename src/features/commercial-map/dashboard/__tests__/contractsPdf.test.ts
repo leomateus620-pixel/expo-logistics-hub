@@ -1,3 +1,4 @@
+import { inflateSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
 import { generateContractsPdf, summarizeContracts, type ContractPdfRecord } from '../contractsPdf';
 
@@ -27,5 +28,23 @@ describe('relatório de contratos', () => {
     const pdf = await generateContractsPdf({ records: [long, ...Array.from({ length: 35 }, () => contract())], scopeDescription: 'Todos os contratos', generatedAt: new Date('2026-10-28T14:42:00Z') });
     expect(pdf.getNumberOfPages()).toBeGreaterThan(3);
     expect(pdf.output('arraybuffer').byteLength).toBeGreaterThan(1000);
+  });
+
+  it('exporta o ponto como unidade e apresenta uma única referência do arquivo compartilhado', async () => {
+    const records = [contract({
+      identification: 'Contrato COBERTURA-C2 · Pedido PV-123',
+      value: 82464,
+      locations: [{ location: 'Gastronomia · Restaurante · C2', lots: ['Pizzaria (1 ponto de alimentação)', 'Restaurante Central (1 ponto de alimentação)'] }],
+      documents: [{ name: 'COBERTURA-C2', spaces: ['Pizzaria', 'Restaurante Central'] }],
+    })];
+    const pdf = await generateContractsPdf({ records, scopeDescription: 'Gastronomia' });
+    const bytes = Buffer.from(pdf.output('arraybuffer')).toString('latin1');
+    const content = [...bytes.matchAll(/stream\r?\n([\s\S]*?)\r?\nendstream/g)]
+      .map(([, stream]) => inflateSync(Buffer.from(stream, 'latin1')).toString('latin1')).join('\n');
+    const text = [...content.matchAll(/^\((.*)\) Tj$/gm)].map(([, line]) => line.replace(/\\([()\\])/g, '$1')).join(' ');
+    expect(text).toContain('Gastronomia · Restaurante · C2');
+    expect(text).toContain('1 ponto de alimentação');
+    expect(text.match(/COBERTURA-C2/g)).toHaveLength(1);
+    expect(summarizeContracts(records)).toMatchObject({ count: 1, currentCents: 8246400 });
   });
 });

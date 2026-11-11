@@ -1,10 +1,12 @@
 /**
  * Motor oficial de precificação 2028 — utilidades puras.
  *
- * Regra fundamental: TOTAL = ÁREA OFICIAL × PREÇO/m².
+ * Lotes usam área oficial × preço/m². Pontos de alimentação usam o total fixo.
  * A multiplicação é feita em centavos inteiros para eliminar erro de ponto
  * flutuante (5,00 × 50,00 deve ser exatamente 250,00).
  */
+
+import type { CommercialUnit } from '../types';
 
 export type LotPricingStage = 'RENOVACAO' | 'SEGUNDA_ETAPA';
 
@@ -32,11 +34,17 @@ export interface LotPricing2028 {
   segundaTotal: number | null;
   segundaRuleLabel: string | null;
   resolutionStatus: LotPricingResolution;
+  commercialUnit?: CommercialUnit;
+  unitQuantity?: number | null;
   /** Valor calculado pela regra oficial (referência quando há override). */
   renovacaoDefaultTotal?: number | null;
   segundaDefaultTotal?: number | null;
   renovacaoIsManual?: boolean;
   segundaIsManual?: boolean;
+}
+
+export function foodPointQuantityLabel(quantity: number): string {
+  return `${quantity} ${quantity === 1 ? 'ponto' : 'pontos'} de alimentação`;
 }
 
 /** A detail request can finish on either side of an inventory refresh. Never

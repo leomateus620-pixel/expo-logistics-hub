@@ -78,6 +78,10 @@ interface LotRow {
   infrastructure: string[] | null; has_electricity: boolean; has_water: boolean; has_internet: boolean; is_corner: boolean; is_covered: boolean;
   accessibility_notes: string | null; commercial_notes: string | null; internal_notes: string | null; archived_at: string | null;
   created_by: string | null; updated_by: string | null; created_at: string | null; updated_at: string | null;
+  commercial_unit?: CommercialLot['commercialUnit'];
+  unit_quantity?: number | null;
+  display_order?: number | null;
+  food_type?: string | null;
 }
 /** Every relation column consumed by mapLot; no history/blob payloads. */
 const OFFICIAL_PRICING_EMBED = `financial_entity:map_entities!commercial_lots_entity_id_fkey(id,
@@ -326,10 +330,9 @@ function mapCalibration(row: CalibrationRow): MapCalibration {
 
 function mapEntity(
   row: EntityRow,
-  geometryRow: GeometryRow,
+  geometryRow: GeometryRow | undefined,
   forcedSegmentId?: CommercialMapSegmentId,
 ): MapEntity {
-  const storedGeometry = geometryRow.geometry;
   const segment = getCommercialMapSegment(forcedSegmentId);
   return {
     id: row.id,
@@ -346,14 +349,14 @@ function mapEntity(
     isSellable: row.is_sellable,
     isArchived: row.is_archived,
     geometry: {
-      id: geometryRow.id,
+      id: geometryRow?.id ?? null,
       type: 'Polygon',
-      coordinates: storedGeometry.coordinates,
-      elevation: Number(geometryRow.elevation),
-      extrusionHeight: Number(geometryRow.extrusion_height),
-      rotation: Number(geometryRow.rotation),
-      geometryVersion: geometryRow.version,
-      calibrationVersion: geometryRow.calibration_version,
+      coordinates: geometryRow?.geometry.coordinates ?? [],
+      elevation: Number(geometryRow?.elevation ?? 0),
+      extrusionHeight: Number(geometryRow?.extrusion_height ?? 0),
+      rotation: Number(geometryRow?.rotation ?? 0),
+      geometryVersion: geometryRow?.version ?? 0,
+      calibrationVersion: geometryRow?.calibration_version ?? null,
     },
     metadata: segment
       ? {
@@ -404,6 +407,10 @@ function mapLot(row: LotRow): CommercialLot {
     frontageMeters: row.frontage_meters === null ? null : Number(row.frontage_meters),
     depthMeters: row.depth_meters === null ? null : Number(row.depth_meters),
     pricingMode: price?.pricing_mode ?? 'NEGOTIABLE',
+    commercialUnit: row.commercial_unit ?? 'SQUARE_METER',
+    unitQuantity: row.unit_quantity ?? null,
+    displayOrder: row.display_order ?? null,
+    foodType: row.food_type ?? null,
     basePrice: price?.base_price === null || price?.base_price === undefined ? null : Number(price.base_price),
     pricePerSqm: price?.price_per_sqm === null || price?.price_per_sqm === undefined ? null : Number(price.price_per_sqm),
     askingPrice: price?.asking_price === null || price?.asking_price === undefined ? null : Number(price.asking_price),
@@ -582,8 +589,8 @@ async function fetchCommissionCommercialMap(
     (geometriesResult.data ?? []).map((row: GeometryRow) => [row.entity_id, row]),
   );
   const entities = entityRows
-    .filter((row) => geometryByEntity.has(row.id))
-    .map((row) => mapEntity(row, geometryByEntity.get(row.id)!, localSegment.id));
+    .filter((row) => geometryByEntity.has(row.id) || row.classification === 'FOOD_POINT')
+    .map((row) => mapEntity(row, geometryByEntity.get(row.id), localSegment.id));
 
   if (entities.length !== entityRows.length) {
     throw commissionMapError('MAP_SEGMENT_GEOMETRY_INCOMPLETE');
@@ -605,6 +612,13 @@ async function fetchCommissionCommercialMap(
     segmentId: null,
     metadata: entity.metadata ?? {},
   })) as MapEntity[];
+  if (localSegment.id === 'gastronomia') {
+    const anchors = new Set(entities.map((entity) => entity.parentEntityId));
+    entities.push(...parkContextEntities.filter((entity) => anchors.has(entity.id)));
+    if ([...anchors].some((id) => !id || !entities.some((entity) => entity.id === id && entity.geometry.coordinates.length))) {
+      throw commissionMapError('MAP_SEGMENT_GEOMETRY_INCOMPLETE');
+    }
+  }
   return {
     parkContextEntities,
     source: 'database',
@@ -734,10 +748,10 @@ export async function fetchCommercialMap(
   );
   const geometryByEntity = new Map<string, GeometryRow>((geometriesResult.data ?? []).map((row: GeometryRow) => [row.entity_id, row]));
   const entities = (entitiesResult.data ?? [])
-    .filter((row: EntityRow) => geometryByEntity.has(row.id))
+    .filter((row: EntityRow) => geometryByEntity.has(row.id) || row.classification === 'FOOD_POINT')
     .map((row: EntityRow) => mapEntity(
       row,
-      geometryByEntity.get(row.id)!,
+      geometryByEntity.get(row.id),
       row.segment_id ? segmentSlugById.get(row.segment_id) : undefined,
     ));
   const entityRows = (entitiesResult.data ?? []) as EntityRow[];
@@ -1245,7 +1259,7 @@ export async function registerLotSale(params: {
   return data;
 }
 
-export async function uploadLotContract(params: { orgId: string; lotId: string; file: File; contractNumber?: string }) {
+export async function uploadLotContract(params: { orgId: string; lotId: string; file: File; contractNumber?: string; expectedSaleId?: string }) {
   const validationError = validateContractFile(params.file);
   if (validationError) throw new Error(validationError);
   const extension = params.file.name.split('.').pop()?.toLowerCase() || 'pdf';
@@ -1264,6 +1278,7 @@ export async function uploadLotContract(params: { orgId: string; lotId: string; 
     p_mime_type: params.file.type,
     p_file_size: params.file.size,
     p_contract_number: params.contractNumber || null,
+    ...(params.expectedSaleId ? { p_expected_sale_id: params.expectedSaleId } : {}),
   });
   if (error) {
     await supabase.storage.from('map-contracts').remove([objectPath]);

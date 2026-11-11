@@ -1,7 +1,8 @@
 import type { CommercialLot, MapEntity } from '../types';
 import { resolveCommercialPavilionDefinition } from './commercialPavilions';
+import { FENASOJA_RESTAURANT_PRESENTATION_NAME } from './fenasojaRestaurant';
 
-type LotFields = Pick<CommercialLot, 'publicIdentifier' | 'lotNumber' | 'block' | 'displayName'>;
+type LotFields = Pick<CommercialLot, 'publicIdentifier' | 'lotNumber' | 'block' | 'displayName' | 'commercialUnit'>;
 
 export interface LotIdentity {
   title: string;
@@ -15,9 +16,16 @@ export interface LotIdentity {
 export function resolveLotIdentity(
   lot: LotFields,
   entity?: Pick<MapEntity, 'metadata' | 'parentEntityId' | 'segmentId'> | null,
-  pavilion?: Pick<MapEntity, 'publicIdentifier' | 'id'> | null,
+  pavilion?: (Pick<MapEntity, 'publicIdentifier' | 'id'> & Partial<Pick<MapEntity, 'name'>>) | null,
   scopedArea?: string | null,
 ): LotIdentity {
+  if (lot.commercialUnit === 'FOOD_POINT') {
+    const title = lot.displayName.trim() || lot.publicIdentifier;
+    const structureName = pavilion?.publicIdentifier === 'C2' ? FENASOJA_RESTAURANT_PRESENTATION_NAME : pavilion?.name;
+    const location = pavilion && entity?.parentEntityId === pavilion.id
+      ? [structureName, pavilion.publicIdentifier].filter(Boolean).join(' · ') : null;
+    return { title, location, area: 'Gastronomia', number: null, full: [title, location, 'Gastronomia'].filter(Boolean).join(' · ') };
+  }
   const number = lot.lotNumber == null ? null : String(lot.lotNumber).trim() || null;
   const isModule = Boolean(entity?.parentEntityId && pavilion && entity.parentEntityId === pavilion.id
     && resolveCommercialPavilionDefinition(pavilion));

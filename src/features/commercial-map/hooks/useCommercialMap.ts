@@ -52,7 +52,7 @@ import {
 } from '../utils/entityExplorer';
 import { resolveMapPermissions } from '../utils/permissions';
 import { resolveContextualMapScope } from '../utils/contextualMapSummary';
-import { getCommercialMapSegment } from '../data/commercialMapSegments';
+import { foodPointsByStructure, getCommercialMapSegment } from '../data/commercialMapSegments';
 import { scheduleCommercialMapRefresh } from '../queries/commercialMapRefresh';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
@@ -246,6 +246,8 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
   const activeSegment = getCommercialMapSegment(activeSegmentId);
   const debouncedSearch = useDebouncedValue(search, 140);
   const indexedItems = useMemo(() => buildEntityExplorerIndex(entities, lots), [entities, lots]);
+  const itemsById = useMemo(() => new Map(indexedItems.map((item) => [item.entity.id, item])), [indexedItems]);
+  const foodStructures = useMemo(() => foodPointsByStructure(entities, lots), [entities, lots]);
   const visibleItems = useMemo(
     () => indexedItems.filter((item) => layerVisibility[item.entity.layerId] !== false),
     [indexedItems, layerVisibility],
@@ -258,14 +260,15 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
     () => interiorScope
       ? visibleItems.filter((item) => interiorScope.entityIds.has(item.entity.id))
       : activeSegment?.behavior.interaction === 'filter-and-focus'
-        ? visibleItems.filter((item) => item.segment?.id === activeSegmentId)
+        ? visibleItems.filter((item) => item.segment?.id === activeSegmentId
+          || (activeSegmentId === 'gastronomia' && foodStructures.has(item.entity.id)))
         : visibleItems,
-    [activeSegment?.behavior.interaction, activeSegmentId, interiorScope, visibleItems],
+    [activeSegment?.behavior.interaction, activeSegmentId, foodStructures, interiorScope, visibleItems],
   );
   const facets = useMemo(() => buildEntityExplorerFacets(segmentItems), [segmentItems]);
 
   const stableResult = useMemo(() => {
-    const filteredItems = filterAndSortEntityExplorerItems(segmentItems, {
+    const matches = filterAndSortEntityExplorerItems(segmentItems, {
       query: debouncedSearch,
       statusFilters,
       classificationFilters,
@@ -273,12 +276,20 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
       verificationFilters,
       sortOrder,
     });
+    // The explorer opens the same structure as the scene, including when the
+    // query matched a point's own name or individual commercial status.
+    const filteredItems = [...new Map(matches.flatMap((item) => {
+      if (item.entity.classification !== 'FOOD_POINT') return [[item.entity.id, item] as const];
+      const parentId = item.entity.parentEntityId;
+      const parent = parentId && foodStructures.has(parentId) ? itemsById.get(parentId) : null;
+      return parent ? [[parent.entity.id, parent] as const] : [];
+    })).values()];
     const filteredEntities = filteredItems.map((item) => item.entity);
 
     return {
       entities: filteredEntities,
       items: filteredItems,
-      matchingEntityIds: new Set(filteredEntities.map((entity) => entity.id)),
+      matchingEntityIds: new Set([...filteredEntities, ...matches.map((item) => item.entity)].map((entity) => entity.id)),
       hasActiveCriteria: Boolean(
         normalizeExplorerText(debouncedSearch)
         || statusFilters.length
@@ -291,7 +302,7 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
       filteredCount: filteredItems.length,
       facets,
     };
-  }, [activeSegmentId, classificationFilters, debouncedSearch, facets, interiorScope, locationFilter, segmentItems, sortOrder, statusFilters, verificationFilters, visibleItems.length]);
+  }, [activeSegmentId, classificationFilters, debouncedSearch, facets, foodStructures, interiorScope, itemsById, locationFilter, segmentItems, sortOrder, statusFilters, verificationFilters, visibleItems.length]);
 
   return stableResult;
 }

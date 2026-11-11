@@ -24,8 +24,9 @@ export function documentSummary(record: SaleOrderSummary): string {
   return record.documentCount === 1 ? '1 documento' : `${record.documentCount} documentos`;
 }
 
-export function saleStateLabel(record: SaleOrderSummary): string {
+export function saleStateLabel(record: Pick<SaleOrderSummary, 'kind' | 'status' | 'pendingCount'>): string {
   if (record.kind === 'LEGACY') return 'Legado';
+  if (record.status !== 'CANCELLED' && record.pendingCount > 0) return 'Venda em aberto';
   const labels: Record<string, string> = { OPEN: 'Venda em aberto', CONFIRMED: 'Venda confirmada', CANCELLED: 'Venda cancelada' };
   return labels[record.status] ?? record.status;
 }

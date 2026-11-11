@@ -232,6 +232,7 @@ const baseCommissionModules: CommissionModule[] = [
     publicPortal: true,
     menus: [
       dashboardMenu,
+      { label: 'Mapa Comercial', path: 'mapa-comercial', description: 'Consultar os pontos de alimentação no parque.', icon: MapPin },
       { label: 'Fichas', path: 'fichas', description: 'Fichas operacionais e controles previstos.', icon: ClipboardList },
       { label: 'Refeições', path: 'refeicoes', description: 'Planejamento e acompanhamento de refeições.', icon: UtensilsCrossed },
       { label: 'Consumo por Comissão', path: 'consumo', description: 'Consumo por comissão e período.', icon: ChartColumn },

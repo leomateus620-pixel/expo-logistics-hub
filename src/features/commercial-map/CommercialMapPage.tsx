@@ -384,6 +384,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   }), [activeSegmentId, interiorEntityId, mapFilter.matchingEntityIds, mapFilter.hasActiveCriteria]);
   const scenePresentation = useDeferredValue(presentation);
   const selectedEntity = scopedData.entities.find((entity) => entity.id === selectedEntityId) ?? null;
+  const inspectingGastronomy = saleResolution?.groups.some((group) => group.kind === 'gastronomy'
+    && group.spaces.some((space) => space.entityId === selectedEntityId || space.entityId === selectedEntity?.parentEntityId));
   const selectedLot = scopedData.lots.find((lot) => lot.entityId === selectedEntityId);
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
   const interiorEntity = data?.entities.find((entity) => entity.id === interiorEntityId) ?? null;
@@ -698,6 +700,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
       return;
     }
     if (store.interiorEntityId) store.exitInterior();
+    useSaleInspectionStore.getState().focusFoodPoint(group.kind === 'gastronomy' ? space.lotId : null);
     store.selectEntityFromExplorer(space.entityId);
   };
 
@@ -985,7 +988,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           </span></div>
         )}
         </div>
-        {saleResolution && !dashboardOpen && (
+        {saleResolution && !dashboardOpen && !inspectingGastronomy && (
           <SaleInspectionPanel
             resolution={saleResolution}
             interiorEntityId={interiorEntityId}

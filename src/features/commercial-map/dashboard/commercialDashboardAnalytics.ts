@@ -1,5 +1,5 @@
 import { COMMERCIAL_MAP_SEGMENTS, buildCommercialMapSegmentIndex, type CommercialMapSegmentId } from '../data/commercialMapSegments';
-import type { CommercialLot, CommercialMapData, CommercialStatus } from '../types';
+import type { CommercialLot, CommercialMapData, CommercialStatus, MapEntity } from '../types';
 import type { LotPricingStage } from '../utils/lotPricing2028';
 import { COMMERCIAL_PAVILION_DEFINITIONS, type CommercialPavilionPublicIdentifier } from '../utils/commercialPavilions';
 import { classifyDashboardLot } from './commercialDashboardClassification';
@@ -21,6 +21,7 @@ const AREA_UNITS_PER_SQM = 10_000;
 
 interface MutableStatusSummary {
   lotCount: number;
+  areaLotCount: number;
   areaUnits: number;
   valueCents: number;
   areaPendingCount: number;
@@ -61,7 +62,7 @@ export function resolveDashboardLotValue(lot: CommercialLot, stage: LotPricingSt
 }
 
 function makeMutableStatusSummary(): MutableStatusSummary {
-  return { lotCount: 0, areaUnits: 0, valueCents: 0, areaPendingCount: 0, pricePendingCount: 0, pricedLotCount: 0 };
+  return { lotCount: 0, areaLotCount: 0, areaUnits: 0, valueCents: 0, areaPendingCount: 0, pricePendingCount: 0, pricedLotCount: 0 };
 }
 
 function makeAccumulator(): MutableAggregate {
@@ -83,8 +84,11 @@ function addRecord(accumulator: MutableAggregate, record: DashboardLotRecord): v
   accumulator.records.push(record);
   const bucket = accumulator.byStatus[record.lot.status];
   bucket.lotCount += 1;
-  if (record.officialAreaSqm === null) bucket.areaPendingCount += 1;
-  else bucket.areaUnits += Math.round(record.officialAreaSqm * AREA_UNITS_PER_SQM);
+  if (record.lot.commercialUnit !== 'FOOD_POINT') {
+    bucket.areaLotCount += 1;
+    if (record.officialAreaSqm === null) bucket.areaPendingCount += 1;
+    else bucket.areaUnits += Math.round(record.officialAreaSqm * AREA_UNITS_PER_SQM);
+  }
   if (record.value === null) bucket.pricePendingCount += 1;
   else {
     bucket.pricedLotCount += 1;
@@ -95,6 +99,7 @@ function addRecord(accumulator: MutableAggregate, record: DashboardLotRecord): v
 function finishAccumulator(accumulator: MutableAggregate): DashboardAggregate {
   const buckets = accumulator.byStatus;
   const commercialLots = COMMERCIAL_STATUSES.reduce((sum, status) => sum + buckets[status].lotCount, 0);
+  const commercialAreaLots = COMMERCIAL_STATUSES.reduce((sum, status) => sum + buckets[status].areaLotCount, 0);
   const totalAreaUnits = COMMERCIAL_STATUSES.reduce((sum, status) => sum + buckets[status].areaUnits, 0);
   const totalAreaSqm = totalAreaUnits / AREA_UNITS_PER_SQM;
   const lotsWithoutOfficialArea = COMMERCIAL_STATUSES.reduce((sum, status) => sum + buckets[status].areaPendingCount, 0);
@@ -108,6 +113,7 @@ function finishAccumulator(accumulator: MutableAggregate): DashboardAggregate {
     const participates = status !== 'UNAVAILABLE';
     byStatus[status] = Object.freeze({
       lotCount: bucket.lotCount,
+      areaLotCount: bucket.areaLotCount,
       areaSqm: bucket.areaUnits / AREA_UNITS_PER_SQM,
       value: bucket.valueCents / 100,
       areaPendingCount: bucket.areaPendingCount,
@@ -123,6 +129,8 @@ function finishAccumulator(accumulator: MutableAggregate): DashboardAggregate {
     byStatus: statusSummary,
     totalLots: accumulator.records.length,
     commercialLots,
+    commercialAreaLots,
+    commercialFoodPoints: commercialLots - commercialAreaLots,
     soldLots: buckets.SOLD.lotCount,
     saleOpenLots: buckets.SALE_OPEN.lotCount,
     availableLots: buckets.AVAILABLE.lotCount,
@@ -175,6 +183,7 @@ export function buildCommercialDashboardSnapshot(
   const segmentAccumulators = new Map<CommercialMapSegmentId, MutableAggregate>(
     COMMERCIAL_MAP_SEGMENTS.map((segment) => [segment.id, makeAccumulator()]),
   );
+  const foodStructures = new Map<string, { structure: MapEntity; aggregate: MutableAggregate }>();
   let orphanLots = 0;
   const seenLotIds = new Set<string>();
 
@@ -190,20 +199,26 @@ export function buildCommercialDashboardSnapshot(
       entity,
       segmentId,
       value: resolveDashboardLotValue(lot, pricingStage),
-      officialAreaSqm: validOfficialArea(lot.officialAreaSqm),
+      officialAreaSqm: lot.commercialUnit === 'FOOD_POINT' ? null : validOfficialArea(lot.officialAreaSqm),
       ...classifyDashboardLot(entity, lot, entityById, segmentId),
     });
     addRecord(overall, record);
     if (record.category === 'internal' && record.pavilion) {
       addRecord(internal, record);
       addRecord(pavilionAccumulators.get(record.pavilion.publicIdentifier.trim().toUpperCase() as CommercialPavilionPublicIdentifier)!, record);
+    } else if (record.category === 'food' && record.foodStructure) {
+      const structure = record.foodStructure;
+      if (!foodStructures.has(structure.id)) foodStructures.set(structure.id, { structure, aggregate: makeAccumulator() });
+      addRecord(foodStructures.get(structure.id)!.aggregate, record);
+      addRecord(segmentAccumulators.get('gastronomia')!, record);
     } else if (record.category === 'external' && segmentId) {
       addRecord(external, record);
       addRecord(segmentAccumulators.get(segmentId)!, record);
     } else addRecord(unclassified, record);
   }
 
-  const segments = COMMERCIAL_MAP_SEGMENTS.map((segment): CommercialSegmentDashboardSnapshot => Object.freeze({
+  const segments = COMMERCIAL_MAP_SEGMENTS.filter((segment) => segment.id !== 'gastronomia' || segmentAccumulators.get(segment.id)!.records.length)
+    .map((segment): CommercialSegmentDashboardSnapshot => Object.freeze({
     ...finishAccumulator(segmentAccumulators.get(segment.id)!),
     segment,
     segmentId: segment.id,
@@ -220,6 +235,9 @@ export function buildCommercialDashboardSnapshot(
     }))),
     orphanLots,
     segments: Object.freeze(segments),
+    gastronomyStructures: Object.freeze([...foodStructures.values()]
+      .sort((a, b) => a.structure.publicIdentifier.localeCompare(b.structure.publicIdentifier))
+      .map(({ structure, aggregate }) => Object.freeze({ ...finishAccumulator(aggregate), structure }))),
     unclassifiedLots: unclassified.records.length,
   });
 }

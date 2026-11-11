@@ -3,6 +3,7 @@ import type { LotPricingResolution } from './utils/lotPricing2028';
 export type MapClassification =
   | 'SELLABLE_LOT'
   | 'INTERNAL_STAND'
+  | 'FOOD_POINT'
   | 'QUADRA'
   | 'PAVILION'
   | 'BUILDING'
@@ -57,6 +58,7 @@ export function toCommercialPhase(status: CommercialStatus): CommercialPhase {
 export type VerificationStatus = 'DRAFT' | 'NEEDS_REVIEW' | 'VERIFIED' | 'ARCHIVED';
 export type AreaValidationStatus = 'UNVALIDATED' | 'CALCULATED' | 'VALIDATED' | 'REJECTED';
 export type PricingMode = 'FIXED_TOTAL' | 'PRICE_PER_SQUARE_METER' | 'NEGOTIABLE' | 'NOT_FOR_SALE';
+export type CommercialUnit = 'SQUARE_METER' | 'FOOD_POINT';
 export type MapSource = 'database' | 'official-reference';
 export type MapPanel = 'layers' | 'results' | 'details' | 'calibration' | null;
 export type MapWorkspaceMode = '3d' | 'list' | 'edit' | 'create';
@@ -190,6 +192,11 @@ export interface CommercialLot {
   frontageMeters: number | null;
   depthMeters: number | null;
   pricingMode: PricingMode;
+  /** Older area records use the default SQUARE_METER unit. */
+  commercialUnit?: CommercialUnit;
+  unitQuantity?: number | null;
+  displayOrder?: number | null;
+  foodType?: string | null;
   basePrice: number | null;
   pricePerSqm: number | null;
   askingPrice: number | null;

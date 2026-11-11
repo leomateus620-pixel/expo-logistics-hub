@@ -11,6 +11,7 @@ export const COMMERCIAL_MAP_SEGMENT_IDS = {
   exporural: 'exporural',
   industry: 'industria-comercio-servicos',
   automotive: 'espaco-automovel',
+  gastronomy: 'gastronomia',
 } as const;
 
 export type CommercialMapSegmentId = typeof COMMERCIAL_MAP_SEGMENT_IDS[keyof typeof COMMERCIAL_MAP_SEGMENT_IDS];
@@ -33,7 +34,7 @@ export interface CommercialMapSegmentDefinition {
   description: string;
   palette: CommercialMapSegmentPalette;
   boundary: {
-    source: 'annex-2026' | 'official-cadastral-2026';
+    source: 'annex-2026' | 'official-cadastral-2026' | 'commercial-inventory-2028';
     reference: string;
     /** The visual footprint is the exact union of declared members, never a centroid approximation. */
     resolution: 'explicit-entity-union';
@@ -209,6 +210,24 @@ export const COMMERCIAL_MAP_SEGMENTS: readonly CommercialMapSegmentDefinition[] 
     },
     behavior: { visibleByDefault: true, interaction: 'filter-and-focus' },
   },
+  {
+    id: COMMERCIAL_MAP_SEGMENT_IDS.gastronomy,
+    code: 'GASTRONOMIA',
+    name: 'Gastronomia',
+    description: 'Pontos de alimentação vinculados às estruturas do parque.',
+    palette: { surface: '#916226', edge: '#674216', accent: '#f2d49c', foreground: '#452e17' },
+    boundary: {
+      source: 'commercial-inventory-2028',
+      reference: 'Estruturas vinculadas ao inventário comercial de Gastronomia',
+      resolution: 'explicit-entity-union',
+      blockIdentifiers: [],
+      perimeter: [],
+      excludedIdentifiers: [],
+    },
+    membership: { blockCodes: [], entityIdentifiers: [], excludedIdentifiers: [] },
+    camera: { direction: [0.48, 0.84, 0.38], padding: 1.22, minDistanceRatio: 0.10, maxDistanceRatio: 2.2 },
+    behavior: { visibleByDefault: false, interaction: 'filter-and-focus' },
+  },
 ] as const;
 
 const SEGMENT_BY_ID = new Map(COMMERCIAL_MAP_SEGMENTS.map((segment) => [segment.id, segment]));
@@ -266,6 +285,8 @@ export function findCommercialMapSegmentsForEntity(
   ) {
     return [SEGMENT_BY_ID.get(canonicalSegmentId)!];
   }
+  // Food points have no cartographic fallback or inherited commercial segment.
+  if (entity.classification === 'FOOD_POINT') return [];
   const block = entityBlockCode(entity, lot);
   const metadataSegments = new Set(segmentsFromMetadata(entity).map((segment) => segment.id));
   return COMMERCIAL_MAP_SEGMENTS.filter((segment) => {
@@ -305,7 +326,7 @@ export function buildCommercialMapSegmentIndex(
   while (changed) {
     changed = false;
     entities.forEach((entity) => {
-      if (index.has(entity.id) || directCandidates.has(entity.id) || !entity.parentEntityId) return;
+      if (entity.classification === 'FOOD_POINT' || index.has(entity.id) || directCandidates.has(entity.id) || !entity.parentEntityId) return;
       const parentSegment = index.get(entity.parentEntityId);
       if (!parentSegment || EXCLUSIONS_BY_SEGMENT.get(parentSegment.id)?.has(entity.publicIdentifier)) return;
       index.set(entity.id, parentSegment);
@@ -314,6 +335,27 @@ export function buildCommercialMapSegmentIndex(
   }
 
   return index;
+}
+
+export function foodPointsByStructure(entities: readonly MapEntity[], lots: readonly CommercialLot[]) {
+  const byId = new Map(entities.map((entity) => [entity.id, entity]));
+  const groups = new Map<string, { entity: MapEntity; lot: CommercialLot }[]>();
+  for (const lot of lots) {
+    if (lot.commercialUnit !== 'FOOD_POINT' || lot.archivedAt) continue;
+    const entity = byId.get(lot.entityId);
+    if (!entity?.parentEntityId || entity.isArchived || entity.segmentSource !== 'database'
+      || entity.segmentId !== COMMERCIAL_MAP_SEGMENT_IDS.gastronomy) continue;
+    const structure = byId.get(entity.parentEntityId);
+    if (!structure || structure.projectId !== entity.projectId || structure.isArchived
+      || structure.isSellable || !structure.geometry.coordinates.length) continue;
+    if (!groups.has(structure.id)) groups.set(structure.id, []);
+    groups.get(structure.id)!.push({ entity, lot });
+  }
+  for (const points of groups.values()) {
+    points.sort((a, b) => (a.lot.displayOrder ?? 0) - (b.lot.displayOrder ?? 0)
+      || a.lot.publicIdentifier.localeCompare(b.lot.publicIdentifier));
+  }
+  return groups;
 }
 
 export function withCommercialMapSegmentMetadata(entity: MapEntity): MapEntity {

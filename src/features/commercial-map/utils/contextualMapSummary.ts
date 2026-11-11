@@ -31,7 +31,7 @@ export interface ContextualMapScope {
   lots: readonly CommercialLot[];
   plan: CommercialPavilionModulePlan | null;
   totalCount: number;
-  unit: 'lotes' | 'módulos';
+  unit: 'lotes' | 'módulos' | 'pontos' | 'espaços';
   nonCommercialCount: number;
   unregisteredModuleCount: number;
 }
@@ -103,7 +103,8 @@ export function resolveContextualMapScope({
     lots: scopeLots,
     plan: null,
     totalCount: scopeLots.length,
-    unit: 'lotes',
+    unit: activeSegmentId === 'gastronomia' ? 'pontos'
+      : scopeLots.some((lot) => lot.commercialUnit === 'FOOD_POINT') ? 'espaços' : 'lotes',
     nonCommercialCount: scopeEntities.filter((entity) => !lotEntityIds.has(entity.id) && !entity.isSellable).length,
     unregisteredModuleCount: 0,
   };
@@ -117,15 +118,16 @@ export interface ContextualAreaTotal {
 }
 
 function officialAreaTotal(lots: readonly CommercialLot[]): ContextualAreaTotal {
+  const areaLots = lots.filter((lot) => lot.commercialUnit !== 'FOOD_POINT');
   let total = 0;
   let informedCount = 0;
-  lots.forEach((lot) => {
+  areaLots.forEach((lot) => {
     if (lot.officialAreaSqm !== null && Number.isFinite(lot.officialAreaSqm) && lot.officialAreaSqm > 0) {
       total += lot.officialAreaSqm;
       informedCount += 1;
     }
   });
-  return { squareMeters: informedCount > 0 ? total : null, informedCount, missingCount: lots.length - informedCount };
+  return { squareMeters: informedCount > 0 ? total : null, informedCount, missingCount: areaLots.length - informedCount };
 }
 
 /** Status totals describe the whole scope; the filtered count describes its visible subset. */

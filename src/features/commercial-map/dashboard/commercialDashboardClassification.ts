@@ -3,7 +3,7 @@ import type { CommercialMapSegmentId } from '../data/commercialMapSegments';
 import { resolveCommercialPavilionDefinition } from '../utils/commercialPavilions';
 import type { DashboardLotRecord } from './commercialDashboardTypes';
 
-type Classification = Pick<DashboardLotRecord, 'category' | 'pavilion' | 'blockCode' | 'classificationIssue'>;
+type Classification = Pick<DashboardLotRecord, 'category' | 'pavilion' | 'blockCode' | 'classificationIssue' | 'foodStructure'>;
 const pending = (classificationIssue: string): Classification => ({
   category: 'unclassified', pavilion: null, blockCode: null, classificationIssue,
 });
@@ -17,6 +17,13 @@ export function classifyDashboardLot(
   entityById: ReadonlyMap<string, MapEntity>,
   segmentId: CommercialMapSegmentId | null,
 ): Classification {
+  if (lot.commercialUnit === 'FOOD_POINT') {
+    const structure = entity.parentEntityId ? entityById.get(entity.parentEntityId) : null;
+    if (segmentId !== 'gastronomia' || entity.segmentSource !== 'database'
+      || !structure || structure.isArchived || structure.isSellable || structure.projectId !== entity.projectId
+      || !structure.geometry.coordinates.length) return pending('Vínculo com estrutura de Gastronomia inválido');
+    return { category: 'food', foodStructure: structure, pavilion: null, blockCode: null, classificationIssue: null };
+  }
   const visited = new Set([entity.id]);
   let parentId = entity.parentEntityId;
   let parentBlock: string | null = null;

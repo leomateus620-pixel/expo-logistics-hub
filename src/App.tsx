@@ -378,6 +378,13 @@ function CommissionModuleRoutes() {
             <Suspended>
               {module.slug === 'financeiro-gerencial' ? (
                 <FinancialManagementPage module={module} />
+              ) : module.slug === 'gastronomia' ? (
+                <Routes>
+                  <Route path="mapa-comercial" element={<FullMapViewerRedirect>
+                    <CommissionCommercialMapPage portal={{ id: 'gastronomia', segmentId: 'gastronomia' }} />
+                  </FullMapViewerRedirect>} />
+                  <Route path="*" element={<CommissionDashboardPlaceholder module={module} />} />
+                </Routes>
               ) : (
                 <CommissionDashboardPlaceholder module={module} />
               )}

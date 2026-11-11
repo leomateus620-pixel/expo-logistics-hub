@@ -38,6 +38,19 @@ export function redistribute(totalCents: number, drafts: SalesInstallmentDraft[]
   return buildDraftSchedule(totalCents, drafts.map((item) => item.dueDate));
 }
 
+/** Preserve values entered by the seller when the subtotal or fees change. */
+export function redistributeAutomatic(totalCents: number, payment: SalesPaymentDraft): SalesInstallmentDraft[] {
+  const { installments } = payment;
+  if (!payment.manualAmounts) return redistribute(totalCents, installments);
+  const manual = installments.filter((item) => item.manualAmount);
+  const automaticCount = installments.length - manual.length;
+  if (!manual.length || !automaticCount) return installments;
+  const remainder = Math.max(0, totalCents - draftsSumCents(manual));
+  const amounts = splitCents(remainder, automaticCount);
+  let index = 0;
+  return installments.map((item) => item.manualAmount ? item : { ...item, amountCents: amounts[index++] });
+}
+
 export function draftsToInstallments(drafts: SalesInstallmentDraft[]): SalesInstallment[] {
   return drafts.map((item, index) => ({ number: index + 1, dueDate: item.dueDate, amount: item.amountCents / 100 }));
 }

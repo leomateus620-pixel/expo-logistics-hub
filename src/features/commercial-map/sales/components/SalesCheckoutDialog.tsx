@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { draftsToInstallments, initialSalesPayment, monthlyDueDates, redistribute } from '../salesInstallments';
+import { draftsToInstallments, initialSalesPayment, monthlyDueDates, redistributeAutomatic } from '../salesInstallments';
 import { formatCents, toCents } from '../salesMoney';
 import type { SalesCartSummary } from '../salesPricing';
 import { useSalesCheckout } from '../useSalesCheckout';
@@ -80,7 +80,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
       if (current.paymentMethod !== 'BOLETO_PARCELADO') {
         return { ...current, installments: [{ dueDate: current.installments[0]?.dueDate ?? monthlyDueDates(1)[0], amountCents: totalCents }] };
       }
-      return current.manualAmounts ? current : { ...current, installments: redistribute(totalCents, current.installments) };
+      return { ...current, installments: redistributeAutomatic(totalCents, current) };
     });
   }, [totalCents]);
 
@@ -144,7 +144,7 @@ export function SalesCheckoutDialog({ summary }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(next) => !checkout.isPending && !logoUploading && setOpen(next)}>
-      <DialogContent className="sales-checkout-dialog sm:max-w-2xl">
+      <DialogContent className="sales-checkout-dialog bg-card backdrop-blur-none sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Finalizar venda</DialogTitle>
           <DialogDescription>

@@ -61,6 +61,8 @@ import { HistoryExperience } from '../../history/HistoryExperience';
 import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
 import { SaleExhibitorIdentity } from '../../sales/components/SaleExhibitorEditDialog';
 import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
+import { foodPointsByStructure } from '../../data/commercialMapSegments';
+import { GastronomyStructurePanel } from './GastronomyStructurePanel';
 
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const areaNumber = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -325,7 +327,31 @@ function DetailMetric({ icon: Icon, label, value, warning }: { icon: typeof Tag;
   );
 }
 
-export function EntityDetailsPanel({ entity, lot, entities, lots, permissions, sceneAvailable = true }: { entity: MapEntity; lot?: CommercialLot; entities: MapEntity[]; lots: CommercialLot[]; permissions: MapPermissions; sceneAvailable?: boolean }) {
+interface EntityDetailsPanelProps {
+  entity: MapEntity;
+  lot?: CommercialLot;
+  entities: MapEntity[];
+  lots: CommercialLot[];
+  permissions: MapPermissions;
+  sceneAvailable?: boolean;
+}
+
+export function EntityDetailsPanel(props: EntityDetailsPanelProps) {
+  const { entity, entities, lots, permissions, sceneAvailable = true } = props;
+  const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
+  const enterInterior = useCommercialMapStore((state) => state.enterInterior);
+  const groups = useMemo(() => foodPointsByStructure(entities, lots), [entities, lots]);
+  const structure = entity.classification === 'FOOD_POINT'
+    ? entities.find((item) => item.id === entity.parentEntityId) : entity;
+  const points = structure && groups.get(structure.id);
+  if (structure && points?.length) return <GastronomyStructurePanel key={structure.id} structure={structure} points={points}
+    mapData={{ entities, lots }} onEnterInterior={sceneAvailable && strategicLandmarkSupportsInterior(structure)
+      ? () => enterInterior(structure.id) : undefined}
+    canSell={permissions.canManageSales && sceneAvailable} onClose={() => setSelectedEntityId(null)} />;
+  return <DefaultEntityDetailsPanel {...props} />;
+}
+
+function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, sceneAvailable = true }: EntityDetailsPanelProps) {
   const salesModeActive = useSalesStore((state) => state.salesModeActive) && sceneAvailable;
   const salesSelection = useSalesStore((state) => state.selection);
   const toggleSalesLot = useSalesStore((state) => state.toggleLot);

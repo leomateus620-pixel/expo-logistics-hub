@@ -21,6 +21,7 @@ export const TERRITORY_SYMBOLS: Record<CommercialMapSegmentId, { glyph: string; 
   exporural: { glyph: '◇', short: 'Exporural', pattern: 'none' },
   'industria-comercio-servicos': { glyph: '▤', short: 'ICS', pattern: '8 4' },
   'espaco-automovel': { glyph: '○', short: 'Automóvel', pattern: '2 4' },
+  gastronomia: { glyph: '', short: 'Gastronomia', pattern: 'none' },
 };
 
 const finiteRing = (ring: readonly Coordinate[]) => ring.length >= 3 && ring.every(p => p.length === 2 && p.every(Number.isFinite));

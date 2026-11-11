@@ -10,7 +10,7 @@ export interface SaleInspectionSpace {
 
 export interface SaleInspectionGroup {
   key: string;
-  kind: 'external' | 'pavilion';
+  kind: 'external' | 'pavilion' | 'gastronomy';
   /** Pavilhão proprietário (para grupos internos). */
   pavilionEntityId: string | null;
   title: string;
@@ -40,6 +40,7 @@ export function resolveSaleInspection(
   const lotById = new Map(lots.map((lot) => [lot.id, lot]));
   const entityById = new Map(entities.map((entity) => [entity.id, entity]));
   const external: SaleInspectionSpace[] = [];
+  const foodStructures = new Map<string, SaleInspectionGroup>();
   const pavilions = new Map<string, SaleInspectionGroup>();
   const missing: string[] = [];
   const unique = Array.from(new Set(lotIds));
@@ -47,6 +48,17 @@ export function resolveSaleInspection(
     const lot = lotById.get(lotId);
     const entity = lot ? entityById.get(lot.entityId) : undefined;
     if (!lot || !entity) { missing.push(lot?.publicIdentifier ?? lotId); return; }
+    if (lot.commercialUnit === 'FOOD_POINT') {
+      const structure = entity.parentEntityId ? entityById.get(entity.parentEntityId) : null;
+      if (!structure || structure.isArchived) { missing.push(lot.publicIdentifier); return; }
+      const group = foodStructures.get(structure.id) ?? {
+        key: `food:${structure.id}`, kind: 'gastronomy' as const, pavilionEntityId: null,
+        title: `Gastronomia · ${structure.name} (${structure.publicIdentifier})`, spaces: [],
+      };
+      group.spaces.push({ lotId, entityId: structure.id, label: labelFor(lot, entity), moduleId: null });
+      foodStructures.set(structure.id, group);
+      return;
+    }
     const target = resolveCommercialPavilionModuleNavigationTarget(entity);
     const space: SaleInspectionSpace = { lotId, entityId: entity.id, label: labelFor(lot, entity), moduleId: target?.moduleId ?? null };
     if (!target) { external.push(space); return; }
@@ -61,14 +73,16 @@ export function resolveSaleInspection(
   });
   const groups: SaleInspectionGroup[] = [];
   if (external.length) groups.push({ key: 'external', kind: 'external', pavilionEntityId: null, title: 'Área externa', spaces: external });
+  groups.push(...foodStructures.values());
   groups.push(...Array.from(pavilions.values()));
+  const hasExterior = external.length > 0 || foodStructures.size > 0;
   const mode = groups.length === 0 ? 'empty'
-    : external.length && pavilions.size === 0 ? 'external'
-      : !external.length && pavilions.size === 1 ? 'single-pavilion' : 'mixed';
+    : hasExterior && pavilions.size === 0 ? 'external'
+      : !hasExterior && pavilions.size === 1 ? 'single-pavilion' : 'mixed';
   return {
     groups,
-    overviewEntityIds: [...external.map((space) => space.entityId), ...pavilions.keys()],
-    externalLotIds: external.map((space) => space.lotId),
+    overviewEntityIds: [...external.map((space) => space.entityId), ...foodStructures.keys(), ...pavilions.keys()],
+    externalLotIds: [...external.map((space) => space.lotId), ...[...foodStructures.values()].flatMap(({ spaces }) => spaces.map((space) => space.lotId))],
     allLotIds: groups.flatMap((group) => group.spaces.map((space) => space.lotId)),
     missing,
     mode,

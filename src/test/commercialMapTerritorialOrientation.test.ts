@@ -9,7 +9,9 @@ import clipping from 'polygon-clipping';
 const data = prepareTerritorialOrientation(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);
 describe('orientação territorial cadastral', () => {
   it('usa quadras externas confirmadas, nomes de vias oficiais e somente três referências territoriais', () => {
-    expect(data.filter(item => item.kind === 'segment').map(item => item.segmentId).sort()).toEqual(Object.values(COMMERCIAL_MAP_SEGMENT_IDS).sort());
+    expect(data.filter(item => item.kind === 'segment').map(item => item.segmentId).sort()).toEqual([
+      COMMERCIAL_MAP_SEGMENT_IDS.automotive, COMMERCIAL_MAP_SEGMENT_IDS.exporural, COMMERCIAL_MAP_SEGMENT_IDS.industry,
+    ]);
     expect(data.filter(item => item.kind === 'block').map(item => item.name)).toContain('Quadra R');
     expect(data.filter(item => item.kind === 'road').map(item => item.name)).toContain('Rua Bolívia');
     expect(data.some(item => item.name.includes('M001'))).toBe(false);
@@ -20,7 +22,7 @@ describe('orientação territorial cadastral', () => {
       expect(data.find(item => item.kind === 'block' && item.name === `Quadra ${block}`))
         .toMatchObject({ segmentId: COMMERCIAL_MAP_SEGMENT_IDS.industry });
     }
-    expect(Object.values(TERRITORY_SYMBOLS).map(value => value.pattern)).toEqual(['none', '8 4', '2 4']);
+    expect(Object.values(TERRITORY_SYMBOLS).map(value => value.pattern)).toEqual(['none', '8 4', '2 4', 'none']);
   });
   it('mantém todas as âncoras de quadra dentro da área real, inclusive com recortes', () => {
     for (const item of data.filter(item => item.kind === 'block')) {

@@ -137,8 +137,8 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
     </div>
      {statusFilters.length > 0 && <p className="commercial-context-filter-note">Filtro: {[...new Set(statusFilters.map(toCommercialPhase))].map((status) => STATUS_CONFIG[status].label).join(', ')}</p>}
     {compact ? <details className="commercial-context-expand"><summary>Situações e legenda<ChevronDown aria-hidden="true" /></summary>{statuses}</details> : statuses}
-    {!compact && <dl className="commercial-context-primary-area"><OfficialArea label="Área oficial dos lotes no escopo" value={summary.officialArea} /></dl>}
-    <details className="commercial-context-expand" key={`${scope.kind}:${interiorEntity?.id ?? activeSegmentId ?? 'park'}`}>
+    {scope.unit !== 'pontos' && !compact && <dl className="commercial-context-primary-area"><OfficialArea label="Área oficial dos lotes no escopo" value={summary.officialArea} /></dl>}
+    {scope.unit !== 'pontos' && <details className="commercial-context-expand" key={`${scope.kind}:${interiorEntity?.id ?? activeSegmentId ?? 'park'}`}>
       <summary>Áreas e informações<ChevronDown aria-hidden="true" /></summary>
       {compact && scope.plan && <PavilionPlanThumbnail plan={scope.plan} />}
       <dl className="commercial-context-areas">
@@ -159,6 +159,6 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
         {scope.plan.supportSpaces.map((space) => <p className="commercial-context-note" key={space.id}>{space.label} · apoio não comercial</p>)}
         {scope.plan.documentDiscrepancies.map((note) => <p className="commercial-context-note" key={note}>Divergência documental: {note}</p>)}
       </>}
-    </details>
+    </details>}
   </section>;
 });

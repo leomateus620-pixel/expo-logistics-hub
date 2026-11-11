@@ -1,11 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CommercialLot, MapEntity } from '../../types';
 import { toSalesEntry } from '../salesEntry';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
-import { formatAreaSqmLabel, formatBrl } from '../../utils/lotPricing2028';
+import { foodPointQuantityLabel, formatAreaSqmLabel, formatBrl } from '../../utils/lotPricing2028';
 import { useSalesEligibility } from '../salesEligibility';
 import { useSalesCart } from '../useSalesCheckout';
 import { useSalesStore } from '../useSalesSelection';
@@ -77,8 +77,8 @@ export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: 
   }, [active, setNightModeActive, setSalesPresentationActive, setTreesVisible]);
 
   useEffect(() => {
-    if (!active) setSheetOpen(false);
-  }, [active]);
+    if (!active || checkoutOpen) setSheetOpen(false);
+  }, [active, checkoutOpen]);
 
   if (!active) return null;
 
@@ -93,16 +93,24 @@ export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: 
           <small>
             {loading
               ? 'Calculando…'
-              : `${formatAreaSqmLabel(summary.areaTotal)} · ${formatBrl(summary.valueTotal) ?? 'R$ 0,00'}`}
+              : [
+                summary.foodPointCount > 0 ? foodPointQuantityLabel(summary.foodPointCount) : null,
+                summary.areaTotal > 0 ? formatAreaSqmLabel(summary.areaTotal) : null,
+                formatBrl(summary.valueTotal),
+              ].filter(Boolean).join(' · ')}
           </small>
         </span>
         <span className="sales-mobile-bar__cta">Ver venda</span>
       </button>
 
-      <Drawer open={sheetOpen} onOpenChange={setSheetOpen}>
-        <DrawerContent className="max-h-[80dvh]">
-          <DrawerHeader className="pb-2">
+      <Drawer open={sheetOpen} onOpenChange={setSheetOpen} shouldScaleBackground={false}>
+        <DrawerContent className="sales-cart-drawer max-h-[80dvh] bg-card backdrop-blur-none">
+          <DrawerHeader className="sales-cart-drawer__header">
             <DrawerTitle>Venda de espaços</DrawerTitle>
+            <DrawerDescription className="sr-only">Etapa de valores, espaços selecionados e total da venda.</DrawerDescription>
+            <DrawerClose asChild>
+              <Button type="button" variant="ghost" size="icon" aria-label="Fechar carrinho"><X aria-hidden="true" /></Button>
+            </DrawerClose>
           </DrawerHeader>
           <div className="sales-sheet-body px-4 pb-6">
             <SalesStageSwitch />

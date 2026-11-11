@@ -1,5 +1,7 @@
 # AGENTS.md — Mapa Comercial (frontend)
 
+- Os pontos de alimentação são filhos comerciais com vínculo pelo UUID da estrutura e sem geometria própria. A ficha abre no mapa padrão para consulta por ponto e, no modo Vendas, usa seleção explícita separada da consulta. O filtro enquadra apenas as estruturas com pontos cadastrados.
+
 - A cena externa e o corte dos pavilhões não montam atlas numéricos permanentes; a identificação contextual usa a seleção, enquanto a planta interna detalhada conserva sua numeração — por quê: manter o mapa navegável sem poluição e preservar a leitura da planta interna.
 - Navegação e damping, por si só, não reduzem o DPR do mapa. O controlador adaptativo existente conserva a resolução vigente durante a atividade e aplica a base mais recente após estabilização; mudanças de orçamento precisam de evidência de capacidade ou de viewport/modo — por quê: evitar perda de definição e realocação de buffers em cada gesto, preservando a adaptação sustentada e a recuperação de contexto.
 - A ficha interna de módulos mantém o destaque comercial fora dos detalhes recolhíveis e dimensiona seus elementos pela largura real da lateral, com estilos próprios do painel — por quê: o estado e as ações de venda não podem ficar ocultos nem cortados em telas estreitas.

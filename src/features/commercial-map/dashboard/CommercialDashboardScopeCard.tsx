@@ -1,21 +1,22 @@
 import { useId, type ReactNode } from 'react';
-import { Building2, CarFront, Factory, MapPinned, Sprout } from 'lucide-react';
+import { Building2, CarFront, Factory, MapPinned, Sprout, Utensils } from 'lucide-react';
 import { COMMERCIAL_MAP_SEGMENT_IDS, type CommercialMapSegmentId } from '../data/commercialMapSegments';
 import { OverviewInfo } from './CommercialDashboardOverviewInfo';
 import { formatDashboardInteger } from './commercialDashboardFormatters';
 import { buildDashboardCommercialProgress, formatDashboardCommercialProgress } from './commercialDashboardProgress';
 import type { DashboardAggregate } from './commercialDashboardTypes';
 
-type ScopeIdentity = 'all' | 'rural' | 'industry' | 'automotive' | 'pavilion';
+type ScopeIdentity = 'all' | 'rural' | 'industry' | 'automotive' | 'gastronomy' | 'pavilion';
 
 /** Visual identities follow canonical IDs; membership remains in the snapshot. */
 const segmentIdentities: Record<CommercialMapSegmentId, ScopeIdentity> = {
   [COMMERCIAL_MAP_SEGMENT_IDS.exporural]: 'rural',
   [COMMERCIAL_MAP_SEGMENT_IDS.industry]: 'industry',
   [COMMERCIAL_MAP_SEGMENT_IDS.automotive]: 'automotive',
+  [COMMERCIAL_MAP_SEGMENT_IDS.gastronomy]: 'gastronomy',
 };
 const icons: Record<ScopeIdentity, typeof MapPinned> = {
-  all: MapPinned, rural: Sprout, industry: Factory, automotive: CarFront, pavilion: Building2,
+  all: MapPinned, rural: Sprout, industry: Factory, automotive: CarFront, gastronomy: Utensils, pavilion: Building2,
 };
 
 export function CommercialDashboardScopeCard({ scopeId, title, aggregate, selected, onSelect, segmentId, pavilionNumber }: {
@@ -33,7 +34,7 @@ export function CommercialDashboardScopeCard({ scopeId, title, aggregate, select
   const progress = buildDashboardCommercialProgress({ total: aggregate.commercialLots,
     saleOpen: aggregate.saleOpenLots, sold: aggregate.soldLots });
   const formatted = formatDashboardCommercialProgress(progress.percentage);
-  const context = pavilionNumber !== undefined ? 'lotes' : 'espaços';
+  const context = identity === 'gastronomy' ? 'pontos' : pavilionNumber !== undefined ? 'lotes' : 'espaços';
   const progressText = progress.percentage === null ? 'Sem base de cálculo' : `${formatted} comercializados`;
   const note: ReactNode = <>
     {aggregate.unavailableLots > 0

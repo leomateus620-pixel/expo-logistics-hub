@@ -41,6 +41,10 @@
 .commercial-dashboard-scope-card--industry::before { background: linear-gradient(90deg, #5a718007 1px, transparent 1px), linear-gradient(#5a718007 1px, transparent 1px); background-size: 22px 22px; }
 .commercial-dashboard-scope-card--automotive { --scope-accent: #6c706b; --scope-surface: #f5f5f0; --scope-line: #e0e3d9; }
 .commercial-dashboard-scope-card--automotive::before { background: repeating-linear-gradient(154deg, transparent 0 45px, #858f7010 46px 47px, transparent 48px 64px); }
+.commercial-dashboard-scope-card--gastronomy { --scope-accent: #916226; --scope-surface: #faf3e6; --scope-line: #eadcc4; }
+@container dashboard-scopes (min-width: 1050px) {
+  .commercial-dashboard-scope-grid--external:has(.commercial-dashboard-scope-card--gastronomy) { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
 .commercial-dashboard-scope-card--pavilion { --scope-accent: #64716c; --scope-surface: #f8faf7; --scope-line: #dce3dc; border-radius: 8px; }
 .commercial-dashboard-scope-card--pavilion::before { background: linear-gradient(90deg, transparent 0 80%, #58746608 80% 80.6%, transparent 80.6% 90%, #58746608 90% 90.6%, transparent 90.6%); }
 .commercial-dashboard-scope-card:hover { border-color: #9bae9c; }

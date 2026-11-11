@@ -42,22 +42,28 @@ function publicIdentifiersForSegment(segmentId: string) {
 }
 
 describe('registro de segmentos do Mapa Comercial 3D', () => {
-  it('mantém três contratos únicos, completos e visualmente válidos', () => {
+  it('mantém os quatro segmentos com identidades e paletas distintas', () => {
     expect(COMMERCIAL_MAP_SEGMENTS.map((segment) => segment.id)).toEqual([
       COMMERCIAL_MAP_SEGMENT_IDS.exporural,
       COMMERCIAL_MAP_SEGMENT_IDS.industry,
       COMMERCIAL_MAP_SEGMENT_IDS.automotive,
+      COMMERCIAL_MAP_SEGMENT_IDS.gastronomy,
     ]);
-    expect(new Set(COMMERCIAL_MAP_SEGMENTS.map((segment) => segment.id)).size).toBe(3);
-    expect(new Set(COMMERCIAL_MAP_SEGMENTS.map((segment) => segment.code)).size).toBe(3);
+    expect(new Set(COMMERCIAL_MAP_SEGMENTS.map((segment) => segment.id)).size).toBe(4);
+    expect(new Set(COMMERCIAL_MAP_SEGMENTS.map((segment) => segment.code)).size).toBe(4);
 
     COMMERCIAL_MAP_SEGMENTS.forEach((segment) => {
       expect(segment.name.trim()).not.toBe('');
       expect(segment.description.trim()).not.toBe('');
       expect(segment.boundary.reference.trim()).not.toBe('');
       expect(segment.boundary.resolution).toBe('explicit-entity-union');
-      expect(segment.boundary.perimeter.length).toBeGreaterThanOrEqual(4);
-      expect(segment.behavior).toEqual({ visibleByDefault: true, interaction: 'filter-and-focus' });
+      if (segment.id === 'gastronomia') {
+        expect(segment.boundary.perimeter).toEqual([]);
+        expect(segment.membership.entityIdentifiers).toEqual([]);
+      } else {
+        expect(segment.boundary.perimeter.length).toBeGreaterThanOrEqual(4);
+      }
+      expect(segment.behavior).toEqual({ visibleByDefault: segment.id !== 'gastronomia', interaction: 'filter-and-focus' });
       expect(segment.palette.surface).toMatch(/^#[0-9A-F]{6}$/i);
       expect(segment.palette.edge).toMatch(/^#[0-9A-F]{6}$/i);
       expect(segment.palette.accent).toMatch(/^#[0-9A-F]{6}$/i);

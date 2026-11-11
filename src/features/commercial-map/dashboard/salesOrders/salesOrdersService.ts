@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { validateContractFile } from '../../utils/contracts';
+import type { CommercialUnit } from '../../types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
@@ -34,6 +35,7 @@ export interface SaleOrderSummary {
   /** null quando o usuário não pode consultar contratos. */
   documentCount: number | null;
   paidInstallments: number;
+  foodPoints?: { name: string; structure: string }[];
 }
 
 export interface SaleOrdersFilters {
@@ -43,9 +45,10 @@ export interface SaleOrdersFilters {
   paymentMethod: string;
   from: string;
   to: string;
+  segment?: string;
 }
 
-export const EMPTY_SALE_FILTERS: SaleOrdersFilters = { search: '', status: '', hasDocument: '', paymentMethod: '', from: '', to: '' };
+export const EMPTY_SALE_FILTERS: SaleOrdersFilters = { search: '', status: '', hasDocument: '', paymentMethod: '', from: '', to: '', segment: '' };
 export const SALE_ORDERS_PAGE_SIZE = 20;
 
 export interface SaleOrdersPage {
@@ -82,8 +85,9 @@ export function mapSummaryRow(row: any, documentsAccessible: boolean): SaleOrder
     legacyCount: Number(row.legacy_count ?? 0),
     activeItemsTotal: num(row.active_items_total),
     lotIds: (row.lot_ids ?? []).filter(Boolean),
-    documentCount: documentsAccessible ? Number(row.document_count ?? 0) : null,
+    documentCount: documentsAccessible ? Number(row.documents_visible ?? row.document_count ?? 0) : null,
     paidInstallments: Number(row.paid_installments ?? 0),
+    foodPoints: row.food_points ?? [],
   };
 }
 
@@ -98,6 +102,7 @@ export async function fetchSaleOrdersPage(projectId: string, filters: SaleOrders
     p_to: filters.to || null,
     p_limit: SALE_ORDERS_PAGE_SIZE,
     p_offset: page * SALE_ORDERS_PAGE_SIZE,
+    ...(filters.segment ? { p_segment_slug: filters.segment } : {}),
   });
   if (error) throw error;
   const rawTotal: unknown = data?.total;
@@ -118,6 +123,7 @@ export async function fetchSaleOrdersPage(projectId: string, filters: SaleOrders
 
 export interface SaleOrderItemDetail {
   itemId: string | null;
+  saleId?: string | null;
   lotId: string;
   entityId: string | null;
   publicIdentifier: string;
@@ -125,6 +131,10 @@ export interface SaleOrderItemDetail {
   displayName: string | null;
   areaSnapshot: number | null;
   itemTotal: number | null;
+  commercialUnit?: CommercialUnit;
+  unitQuantity?: number | null;
+  structureIdentifier?: string | null;
+  structureName?: string | null;
   pricingStage?: string | null;
   contractState: SaleItemContractState;
   signedAt?: string | null;
@@ -135,6 +145,7 @@ export interface SaleOrderItemDetail {
 export interface SaleContractVersion {
   id: string; version: number; storagePath: string; originalName: string; mimeType: string;
   fileSize: number; uploadedAt: string; supersededAt: string | null;
+  coveredLotIds?: string[] | null;
 }
 
 export interface SaleContract {
@@ -144,6 +155,7 @@ export interface SaleContract {
   activeVersion: number;
   createdAt: string;
   lotIds: string[];
+  historicalLotIds?: string[];
   versions: SaleContractVersion[];
 }
 
@@ -223,6 +235,7 @@ export function describeSalesError(error: unknown): string {
   const message = error instanceof Error ? error.message : String((error as { message?: string })?.message ?? error);
   if (message.includes('MAP_PERMISSION_DENIED') || message.includes('row-level security')) return 'Você não tem permissão para esta ação.';
   if (message.includes('ITEM_NOT_IN_ORDER')) return 'Algum espaço selecionado não pertence a esta venda.';
+  if (message.includes('SALE_CHANGED')) return 'A venda deste ponto foi alterada. Atualize os dados antes de anexar o contrato.';
   if (message.includes('CONTRACT_OBJECT_NOT_FOUND')) return 'O arquivo não foi confirmado no armazenamento. Tente novamente.';
   if (message.includes('INVALID_CONTRACT_FILE')) return 'Envie um PDF ou DOCX de até 15 MB.';
   if (message.includes('ORDER_NOT_FOUND')) return 'Venda não encontrada.';
@@ -268,6 +281,7 @@ export function describeReviseError(error: unknown): string {
   if (message.includes('ORDER_WOULD_BE_EMPTY')) return 'A venda precisa manter ao menos um espaço. Para encerrar, cancele a venda.';
   if (message.includes('TOTAL_BELOW_PAID')) return 'O novo total ficaria abaixo do valor já recebido.';
   if (message.includes('INVALID_INSTALLMENT_COUNT')) return 'Quantidade de parcelas inválida para os valores já recebidos.';
+  if (message.includes('LOT_OUTSIDE_ORDER_SCOPE')) return 'Escolha um espaço na mesma estrutura ou no mesmo recorte comercial da venda.';
   if (message.includes('ORDER_CHANGED')) return 'A venda foi alterada por outra pessoa. Reabra e tente novamente.';
   if (message.includes('ORDER_NOT_ACTIVE')) return 'Esta venda não está ativa.';
   if (message.includes('NOTHING_TO_CHANGE')) return 'Nenhuma alteração para salvar.';

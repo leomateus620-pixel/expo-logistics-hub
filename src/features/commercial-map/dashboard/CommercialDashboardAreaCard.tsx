@@ -7,7 +7,7 @@ import { buildDashboardCommercialProgress, formatDashboardCommercialProgress } f
 
 /** Presentation of the existing official-area snapshot; never estimates missing areas. */
 export function CommercialDashboardAreaCard({ aggregate }: { aggregate: DashboardAggregate }) {
-  const transactedLots = aggregate.saleOpenLots + aggregate.soldLots;
+  const transactedLots = aggregate.byStatus.SALE_OPEN.areaLotCount + aggregate.byStatus.SOLD.areaLotCount;
   const transactedPending = aggregate.byStatus.SALE_OPEN.areaPendingCount + aggregate.byStatus.SOLD.areaPendingCount;
   const numeratorAbsent = transactedLots > 0 && transactedPending === transactedLots;
   const progress = buildDashboardCommercialProgress({
@@ -15,14 +15,14 @@ export function CommercialDashboardAreaCard({ aggregate }: { aggregate: Dashboar
     saleOpen: aggregate.saleOpenAreaSqm,
     sold: aggregate.soldAreaSqm,
   });
-  const areaLabel = formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialLots,
-    aggregate.lotsWithoutOfficialArea, aggregate.commercialLots);
+  const areaLabel = formatDashboardAreaWithCoverage(aggregate.totalAreaSqm, aggregate.commercialAreaLots,
+    aggregate.lotsWithoutOfficialArea, aggregate.commercialAreaLots);
   const area = /^(\S+)\s+m²$/u.exec(areaLabel);
-  const partial = aggregate.lotsWithoutOfficialArea > 0 && aggregate.lotsWithoutOfficialArea < aggregate.commercialLots;
+  const partial = aggregate.lotsWithoutOfficialArea > 0 && aggregate.lotsWithoutOfficialArea < aggregate.commercialAreaLots;
   const percentageLabel = formatDashboardCommercialProgress(progress.percentage);
   const statusArea = (status: 'SALE_OPEN' | 'SOLD') => {
     const row = aggregate.byStatus[status];
-    return formatDashboardAreaWithCoverage(row.areaSqm, row.lotCount, row.areaPendingCount, aggregate.commercialLots);
+    return formatDashboardAreaWithCoverage(row.areaSqm, row.areaLotCount, row.areaPendingCount, aggregate.commercialAreaLots);
   };
   return <article className="commercial-dashboard-area-card" aria-label="Área comercial oficial">
     <header className="commercial-dashboard-area-card__heading">

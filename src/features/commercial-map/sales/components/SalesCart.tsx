@@ -1,6 +1,6 @@
 import { MousePointerClick, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { formatAreaSqmLabel, formatBrl } from '../../utils/lotPricing2028';
+import { foodPointQuantityLabel, formatAreaSqmLabel, formatBrl } from '../../utils/lotPricing2028';
 import type { SalesCartSummary } from '../salesPricing';
 import { SALES_STAGE_LABELS, type SalesStage } from '../salesTypes';
 import { useSalesStore } from '../useSalesSelection';
@@ -11,10 +11,8 @@ const STAGES: SalesStage[] = ['RENOVACAO', 'SEGUNDA_ETAPA'];
 export function SalesStageSwitch() {
   const stage = useSalesStore((state) => state.stage);
   const setStage = useSalesStore((state) => state.setStage);
-  const activeIndex = STAGES.indexOf(stage);
   return (
-    <div className="sales-segmented" role="group" aria-label="Etapa de valores">
-      <span className="sales-segmented__thumb" style={{ transform: `translateX(${activeIndex * 100}%)` }} aria-hidden="true" />
+    <div className="sales-segmented sales-segmented--stage" role="group" aria-label="Etapa de valores">
       {STAGES.map((item) => (
         <button
           key={item}
@@ -40,7 +38,7 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
       <div className="sales-cart__empty">
         <MousePointerClick aria-hidden="true" />
         <strong>Selecione os espaços diretamente no mapa.</strong>
-        <span>Clique em um lote para adicionar à venda.</span>
+        <span>Clique em um lote ou abra uma estrutura de Gastronomia para escolher os pontos.</span>
       </div>
     );
   }
@@ -54,10 +52,13 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
       </div>
 
       <div className="sales-cart__totals">
-        <div className="sales-cart__totals-row">
+        {summary.foodPointCount > 0 && <div className="sales-cart__totals-row">
+          <span>{foodPointQuantityLabel(summary.foodPointCount)}</span>
+        </div>}
+        {summary.lines.length > summary.foodPointCount && <div className="sales-cart__totals-row">
           <span>Área total</span>
           <span>{formatAreaSqmLabel(summary.areaTotal)}</span>
-        </div>
+        </div>}
         <div className="sales-cart__totals-row is-primary">
           <span>Total</span>
           <strong>{loading ? '—' : formatBrl(summary.valueTotal)}</strong>

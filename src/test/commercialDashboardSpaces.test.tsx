@@ -75,7 +75,7 @@ describe('managerial scopes in the existing dashboard', () => {
     const onViewLot = vi.fn();
     render(<CommercialDashboard {...props} onViewLot={onViewLot} />);
     const selectors = screen.getByRole('group', { name: 'Selecionar área externa' });
-    for (const segment of COMMERCIAL_MAP_SEGMENTS) {
+    for (const segment of COMMERCIAL_MAP_SEGMENTS.filter(({ id }) => id !== 'gastronomia')) {
       fireEvent.click(within(selectors).getByRole('button', { name: segment.name }));
       const map = screen.getByRole('region', { name: `Mini mapa comercial: ${segment.name}` });
       const expected = sampleRecords.find((record) => record.category === 'external' && record.segmentId === segment.id)!;
