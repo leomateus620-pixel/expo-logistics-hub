@@ -36,6 +36,8 @@ export interface CommissionMenuItem {
   path: string;
   description: string;
   icon: LucideIcon;
+  group?: string;
+  quickLabel?: string;
   objective?: string;
   activities?: string[];
   tasks?: string[];

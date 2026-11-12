@@ -17,6 +17,9 @@ vi.mock("@/hooks/useOrgCommissions", () => ({
 vi.mock("@/hooks/useModuleAccess", () => ({
   useModuleAccess: () => ({ canAccess: false }),
 }));
+vi.mock("@/features/soja-store/hooks/useSojaStoreAccess", () => ({
+  useSojaStoreAccess: () => ({ data: { enabled: false, capabilities: [] } }),
+}));
 vi.mock("./useTeamManagement", () => ({
   useTeamManagement: () => ({
     canManage: false,
@@ -85,6 +88,7 @@ it.each([
   "industria-comercio-servicos",
   "logistica",
   "infraestrutura",
+  "sojastore",
 ])("does not send the %s team alias to a map/placeholder", (alias) => {
   state.units = cases;
   render(

@@ -1,7 +1,8 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useOrgCommissions } from "@/hooks/useOrgCommissions";
 import { useModuleAccess } from "@/hooks/useModuleAccess";
+import { useUnitIdentity } from "@/hooks/useUnitAgenda";
 import { VolunteerTeam } from "@/features/volunteers/VolunteerTeam";
 import {
   teamModule,
@@ -12,12 +13,29 @@ import CommissionLayout from "@/components/commissions/CommissionLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import type { OrgUnit } from "@/lib/org-units";
+import type { CommissionModule } from "@/modules/commissions/commissionRegistry";
+import { useSojaStoreAccess } from "@/features/soja-store/hooks/useSojaStoreAccess";
+import { buildSojaStoreMenu, SOJA_STORE_UNIT } from "@/features/soja-store/navigation";
+
 const OperationsTeam = lazy(() => import("@/pages/TeamPage"));
+
+function SojaStoreTeamLayout({ unit, module, children }: { unit: OrgUnit; module: CommissionModule; children: ReactNode }) {
+  const { commissionIdBySlug } = useUnitIdentity(SOJA_STORE_UNIT);
+  const access = useSojaStoreAccess(commissionIdBySlug === unit.id ? commissionIdBySlug : null);
+  const menus = buildSojaStoreMenu(module.menus, access.isError ? undefined : access.data);
+  const grouped = menus.some((item) => item.quickLabel);
+  return (
+    <CommissionLayout module={module} variant={grouped ? "workspace" : "standard"} menuItems={withTeamMenu(menus)}>
+      {children}
+    </CommissionLayout>
+  );
+}
+
 function ActiveTeam({ unit }: { unit: OrgUnit }) {
   const module = teamModule(unit);
   const { canAccess } = useModuleAccess(module);
-  return (
-    <CommissionLayout module={module} menuItems={withTeamMenu(module.menus)}>
+  const content = (
+    <>
       <Link
         className="mb-5 inline-flex text-sm underline underline-offset-4"
         to="/equipes"
@@ -42,8 +60,12 @@ function ActiveTeam({ unit }: { unit: OrgUnit }) {
       ) : (
         <VolunteerTeam unit={unit} />
       )}
-    </CommissionLayout>
+    </>
   );
+  if (module.slug === SOJA_STORE_UNIT) {
+    return <SojaStoreTeamLayout unit={unit} module={module}>{content}</SojaStoreTeamLayout>;
+  }
+  return <CommissionLayout module={module} menuItems={withTeamMenu(module.menus)}>{content}</CommissionLayout>;
 }
 export default function CommissionVolunteerTeamPage() {
   const { moduleSlug = "" } = useParams();

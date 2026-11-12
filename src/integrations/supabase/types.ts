@@ -13959,6 +13959,185 @@ export type Database = {
         }
         Returns: string
       }
+      soja_store_access: {
+        Args: { _commission_id: string; _org_id: string }
+        Returns: Json
+      }
+      soja_store_catalog: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+          _search?: string | null
+          _status?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_create_purchase: {
+        Args: { _commission_id: string; _org_id: string; _payload: Json; _request_id: string }
+        Returns: Json
+      }
+      soja_store_dashboard: {
+        Args: { _commission_id: string; _org_id: string }
+        Returns: Json
+      }
+      soja_store_import_batches: {
+        Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string }
+        Returns: Json
+      }
+      soja_store_import_preview: {
+        Args: {
+          _batch_id: string
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+        }
+        Returns: Json
+      }
+      soja_store_locations: {
+        Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string }
+        Returns: Json
+      }
+      soja_store_product: {
+        Args: { _commission_id: string; _org_id: string; _product_id: string }
+        Returns: Json
+      }
+      soja_store_purchase: {
+        Args: { _commission_id: string; _org_id: string; _purchase_id: string }
+        Returns: Json
+      }
+      soja_store_purchase_options: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _location_id?: string | null
+          _org_id: string
+          _search?: string | null
+          _supplier_id?: string | null
+          _variant_id?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_purchases: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _location_id?: string | null
+          _offset?: number
+          _org_id: string
+          _status?: string | null
+          _supplier_id?: string | null
+          _variant_id?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_receive_purchase: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_request_status: {
+        Args: { _commission_id: string; _org_id: string; _request_id: string }
+        Returns: Json
+      }
+      soja_store_review_import_batch: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_review_import_line: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_save_location: {
+        Args: {
+          _commission_id: string
+          _expected_version: number | null
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_save_product: {
+        Args: {
+          _commission_id: string
+          _expected_version: number | null
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_save_supplier: {
+        Args: {
+          _commission_id: string
+          _expected_version: number | null
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_stock: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _location_id?: string | null
+          _offset?: number
+          _org_id: string
+          _variant_id?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_stock_movements: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _location_id?: string | null
+          _offset?: number
+          _org_id: string
+          _variant_id?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_stock_options: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _location_id?: string | null
+          _org_id: string
+          _search?: string | null
+          _variant_id?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_stage_import: {
+        Args: { _commission_id: string; _org_id: string; _payload: Json; _request_id: string }
+        Returns: Json
+      }
+      soja_store_suppliers: {
+        Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string }
+        Returns: Json
+      }
       submit_public_mobility_form: {
         Args: {
           _members?: Json

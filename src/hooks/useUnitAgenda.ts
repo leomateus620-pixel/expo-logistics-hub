@@ -50,10 +50,12 @@ export function useUnitIdentity(entryId: string | null | undefined) {
     const bySlug = new Map<string, UnitSummary>();
     const byCanonicalId = new Map<string, { commissionId: string; slug: string; name: string }>();
     let commissionId: string | null = null;
+    let commissionIdBySlug: string | null = null;
     let commissionSlug: string | null = null;
 
     for (const unit of units) {
-      const official = resolveOfficialUnit(unit.slug) ?? resolveOfficialUnit(unit.name);
+      const officialSlug = resolveOfficialUnit(unit.slug);
+      const official = officialSlug ?? resolveOfficialUnit(unit.name);
       const canonicalId = official?.entry.id ?? unit.slug;
       bySlug.set(unit.slug, {
         id: canonicalId,
@@ -66,10 +68,14 @@ export function useUnitIdentity(entryId: string | null | undefined) {
         commissionId = unit.id;
         commissionSlug = unit.slug;
       }
+      if (entryId && (officialSlug?.entry.id ?? unit.slug) === entryId && (!commissionIdBySlug || unit.slug === entryId)) {
+        commissionIdBySlug = unit.id;
+      }
     }
 
     return {
       commissionId,
+      commissionIdBySlug,
       commissionSlug,
       unitOptions: Array.from(bySlug.values()).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
       byCanonicalId,
@@ -88,6 +94,7 @@ export function useUnitAgenda(entryId: string | null | undefined) {
   const queryClient = useQueryClient();
   const {
     commissionId,
+    commissionIdBySlug,
     commissionSlug,
     resolveUnit,
     unitOptions,
@@ -142,12 +149,14 @@ export function useUnitAgenda(entryId: string | null | undefined) {
 
   return {
     commissionId,
+    commissionIdBySlug,
     commissionSlug,
     unitOptions,
     byCanonicalId,
     rows,
     events,
     metrics: metricsQuery.data ?? EMPTY_METRICS,
+    identityLoading,
     isLoading: identityLoading || agendaQuery.isLoading,
     isError: agendaQuery.isError,
     refetch: agendaQuery.refetch,
