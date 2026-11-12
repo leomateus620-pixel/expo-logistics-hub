@@ -212,6 +212,7 @@ import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment, SunrisePostProcessing } from './CommercialMapEnvironment';
 import { LateralResidentialDistrict } from './LateralResidentialDistrict';
+import { EtniasAdjacentSiteLayer } from './EtniasAdjacentSiteLayer';
 import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 import { applyParkGroundDetail } from './terrainMaterial';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
@@ -5414,6 +5415,7 @@ const Scene = memo(function Scene({
               vegetationVisible={treesVisible}
               nightMode={nightAtmosphereActive}
             />
+            <EtniasAdjacentSiteLayer vegetationVisible={treesVisible} />
             </EssentialSceneLayer>
           )}
           {/* Rear approaches and external roads share one polygon union. */}

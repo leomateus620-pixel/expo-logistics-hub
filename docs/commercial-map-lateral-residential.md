@@ -1,5 +1,7 @@
 # Fenasoja 2028 — bairro lateral do Mapa Comercial 3D
 
+A Q5 abaixo descreve a implantação original. A [revisão do trecho ao lado das Etnias](validation/entorno-etnias/README.md) substituiu suas duas aproximações institucionais e manteve as seis residências da Rua Fenasoja.
+
 Esta expansão interpreta a faixa urbana externa à Av. Benvenuto de Conti, desde a cunha próxima ao trevo até a transição institucional ao lado do Portão 3. As imagens fornecidas orientam a malha, a ocupação dos lotes, os volumes principais, as piscinas e as massas de vegetação. Não são levantamento cadastral nem permitem confirmar unidades habitacionais, altura de fachadas, limites legais ou espécies vegetais.
 
 ## Referências e método de leitura

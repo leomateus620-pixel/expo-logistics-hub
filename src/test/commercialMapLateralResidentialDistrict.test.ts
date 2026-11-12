@@ -15,11 +15,11 @@ function corners(center: readonly number[], size: readonly number[], rotation = 
   }));
 }
 describe('satellite-registered lateral residential district', () => {
-  it('retains five distinct urban units with sparse and institutional occupation', () => {
+  it('retains five distinct urban units and all residences and pools', () => {
     expect(LATERAL_DISTRICT_BLOCKS).toHaveLength(5);
-    expect(LATERAL_DISTRICT_REFERENCE_COUNTS.map((entry) => entry.occupiedParcels)).toEqual([2, 9, 11, 12, 8]);
+    expect(LATERAL_DISTRICT_REFERENCE_COUNTS.map((entry) => entry.occupiedParcels)).toEqual([2, 9, 11, 12, 6]);
     expect(parcels.filter((parcel) => parcel.use === 'vacant')).toHaveLength(3);
-    expect(parcels.filter((parcel) => parcel.use === 'institutional')).toHaveLength(2);
+    expect(parcels.filter((parcel) => parcel.use === 'residential')).toHaveLength(37);
     expect(parcels.filter((parcel) => parcel.pool)).toHaveLength(27);
     expect(LATERAL_DISTRICT_ROADS.map((road) => road.name)).toContain('Rua Fenasoja');
   });

@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { QUADRAS_AB_SPATIAL_REFERENCE } from '../../data/quadrasABEnvironment';
 import { createInteriorGroundReferenceAtlas } from './interiorGroundReference';
 import { groundNoiseForMaterial } from './groundNoiseTexture';
-import { INTERNAL_GROUND_OWNERSHIP_RINGS } from '../../data/internalGroundCoverage';
+import { INTERNAL_GROUND_COVERAGE } from '../../data/internalGroundCoverage';
 
 type Scope = 'all' | 'internal-base' | 'access-grass';
 type Atlas = ReturnType<typeof createInteriorGroundReferenceAtlas>;
@@ -38,11 +38,11 @@ const quadraA = bounds(QUADRAS_AB_SPATIAL_REFERENCE.quadraA.polygon);
 const quadraB = bounds(QUADRAS_AB_SPATIAL_REFERENCE.quadraB.polygon);
 
 const number = (value: number) => value.toFixed(8);
-const ownershipMask = INTERNAL_GROUND_OWNERSHIP_RINGS.map((ring, ringIndex) => {
-  const feather = ringIndex === 0 || ringIndex === INTERNAL_GROUND_OWNERSHIP_RINGS.length - 1;
+const ownershipMask = INTERNAL_GROUND_COVERAGE.map(({ ring, featherEdges }) => {
   const points = ring.slice(0, ring.length > 1 && ring[0][0] === ring.at(-1)![0] && ring[0][1] === ring.at(-1)![1] ? -1 : undefined);
   const box = bounds(points);
   const edges = points.map((a, i) => {
+    if (featherEdges !== 'all' && !featherEdges?.includes(i)) return '';
     const b = points[(i + 1) % points.length];
     return `edgeDistance=min(edgeDistance,interiorSegmentDistance(p,vec2(${number(a[0])},${number(a[1])}),vec2(${number(b[0])},${number(b[1])})));`;
   }).join('\n');
@@ -55,8 +55,8 @@ const ownershipMask = INTERNAL_GROUND_OWNERSHIP_RINGS.map((ring, ringIndex) => {
     return `if ((p.y > ${number(a[1])}) != (p.y > ${number(b[1])})) {
       if (p.x < ${number(a[0])} + (p.y - ${number(a[1])}) * ${number((b[0] - a[0]) / (b[1] - a[1]))}) inside = !inside;
     }`;
-  }).join('\n')} if (inside) { ${feather ? `float edgeDistance=1.e6; ${edges}` : ''}
-    weight = max(weight, ${feather ? 'smoothstep(0., 1.1, edgeDistance)' : '1.'}); } }`;
+  }).join('\n')} if (inside) { ${featherEdges ? `float edgeDistance=1.e6; ${edges}` : ''}
+    weight = max(weight, ${featherEdges ? 'smoothstep(0., 1.1, edgeDistance)' : '1.'}); } }`;
 }).join('\n');
 
 const sample = `
@@ -165,7 +165,7 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
         normal=normalize(mix(priorNormal,normal,interiorWeight));
       }`);
   };
-  material.customProgramCacheKey = () => `${upstreamKey}:park-interior-quadras-ab-v1:${scope}`;
+  material.customProgramCacheKey = () => `${upstreamKey}:park-interior-quadras-ab-v2:${scope}`;
   (material.onBeforeCompile as GroundHook)[HOOK_MARKER] = true;
   installed.add(material);
   material.needsUpdate = true;

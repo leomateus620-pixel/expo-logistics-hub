@@ -14,7 +14,7 @@ import * as district from "../features/commercial-map/data/lateralResidentialDis
 import { isProtectedCommercialMapRoad, spatialBoundsContain, COMMERCIAL_MAP_SPATIAL_BOUNDS } from '../features/commercial-map/data/commercialMapSpatialBounds';
 import { retainedTerritoryAccessRoad } from '../features/commercial-map/data/accessJunctionReconstruction';
 
-it("preserves retained building anchors, protected roads and the complete adjacent lateral district", () => {
+it("preserves retained building anchors, protected roads and the lateral residences", () => {
   const roadGeometry = buildTerritoryRoadGeometry();
   const geometryHashes: Record<string, string> = {};
   Object.entries(roadGeometry).forEach(([key, value]) => {
@@ -54,7 +54,24 @@ it("preserves retained building anchors, protected roads and the complete adjace
     roads: JSON.parse(JSON.stringify(value.roads.filter((r: {id:string})=>!correctedRoadIds.includes(r.id)),
       (_,v)=>typeof v==='number'?Math.round(v*1e8)/1e8:v)),
   });
-  expect(snapshot.district).toEqual(prior.district);
+  const {
+    LATERAL_DISTRICT_BLOCKS: oldBlocks,
+    LATERAL_DISTRICT_REFERENCE_COUNTS: oldCounts,
+    LATERAL_DISTRICT_VEGETATION: oldVegetation,
+    ...oldDistrict
+  } = prior.district;
+  const {
+    LATERAL_DISTRICT_BLOCKS: blocks,
+    LATERAL_DISTRICT_REFERENCE_COUNTS: counts,
+    LATERAL_DISTRICT_VEGETATION: vegetation,
+    ...unchangedDistrict
+  } = snapshot.district;
+  const replaced = ['Q5-rbs-estudio', 'Q5-rbs-administracao'];
+  expect(unchangedDistrict).toEqual(oldDistrict);
+  expect(blocks.slice(0, 4)).toEqual(oldBlocks.slice(0, 4));
+  expect(counts.slice(0, 4)).toEqual(oldCounts.slice(0, 4));
+  expect(blocks[4].parcels).toEqual(oldBlocks[4].parcels.filter(({ id }: { id: string }) => !replaced.includes(id)));
+  expect(vegetation).toEqual(oldVegetation.filter(({ id }: { id: string }) => !replaced.some((parcel) => id.startsWith(parcel + '-'))));
   snapshot.buildings.forEach((b: { id: string }) => expect(b).toEqual(prior.buildings.find((p: { id: string }) => p.id === b.id)));
   const oldRoads = preserved(prior).roads;
   const newRoads = preserved(snapshot).roads;
