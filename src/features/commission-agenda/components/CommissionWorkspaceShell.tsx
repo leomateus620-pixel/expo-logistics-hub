@@ -23,12 +23,13 @@ export interface WorkspacePrimaryAction {
 export interface CommissionHeaderProps {
   unit: CommissionUnitViewModel;
   action?: WorkspacePrimaryAction;
+  titleTag?: 'h1' | 'p';
   /** Rendered below the identity (usually the navigation). */
   children?: ReactNode;
   className?: string;
 }
 
-export function CommissionHeader({ unit, action, children, className }: CommissionHeaderProps) {
+export function CommissionHeader({ unit, action, titleTag: Title = 'h1', children, className }: CommissionHeaderProps) {
   const Icon = unit.icon;
   const ActionIcon = action?.icon;
   const leads = unit.leads.length > 0 ? unit.leads : unit.principal ? [unit.principal] : [];
@@ -43,7 +44,7 @@ export function CommissionHeader({ unit, action, children, className }: Commissi
         <span className="cw-header__icon" aria-hidden="true"><Icon /></span>
         <div className="min-w-0">
           <div className="cw-header__title-row">
-            <h1 className="cw-header__name ws-display">{unit.name}</h1>
+            <Title className="cw-header__name ws-display">{unit.name}</Title>
             <div className="cw-header__eyebrow">
               <span className="ws-label">{unitTypeLabel(unit.type)}</span>
               <span className="cw-unit-status" data-status={unit.status}>{UNIT_STATUS_LABELS[unit.status]}</span>
@@ -146,16 +147,17 @@ export function CommissionNavigation({ items, active, className }: CommissionNav
 export interface CommissionWorkspaceShellProps {
   unit: CommissionUnitViewModel;
   navigation: CommissionWorkspaceNavItem[];
-  section: CommissionWorkspaceSection;
+  section: string;
+  identityTitleTag?: 'h1' | 'p';
   action?: WorkspacePrimaryAction;
   children: ReactNode;
   className?: string;
 }
 
-export function CommissionWorkspaceShell({ unit, section, action, children, className }: CommissionWorkspaceShellProps) {
+export function CommissionWorkspaceShell({ unit, section, identityTitleTag, action, children, className }: CommissionWorkspaceShellProps) {
   return (
     <div className={cn('unit-workspace', className)} data-unit={unit.id} data-section={section}>
-      <CommissionHeader unit={unit} action={action} />
+      <CommissionHeader unit={unit} action={action} titleTag={identityTitleTag} />
       <div className="unit-workspace__content">{children}</div>
     </div>
   );

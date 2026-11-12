@@ -1,6 +1,6 @@
 import { VolunteerTeamById } from '@/features/volunteers/VolunteerTeam';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CalendarPlus, MapPinned, Building2, ArrowUpRight } from 'lucide-react';
 import { SOY_SUMMIT_ROUTE } from '@/config/soy-summit';
 import { useCapabilities } from '@/hooks/useCapabilities';
@@ -35,6 +35,12 @@ import {
 import { draftToSaveEventPayload, validateDraft } from '@/features/commission-agenda/lib/event-draft';
 import { canManageDocuments } from '@/features/commission-agenda/lib/visibility';
 import type { AgendaEventDraft } from '@/features/commission-agenda/components/EventFormShell';
+import { SojaStoreWorkspaceRoute } from '@/features/soja-store/components/SojaStoreWorkspaceRoute';
+import { useSojaStoreAccess } from '@/features/soja-store/hooks/useSojaStoreAccess';
+import { buildSojaStoreMenu, SOJA_STORE_SECTION_PATHS, SOJA_STORE_UNIT, type SojaStoreSection } from '@/features/soja-store/navigation';
+
+const SojaStoreSummary = lazy(() => import('@/features/soja-store/components/SojaStoreSummary')
+  .then(({ SojaStoreSummary }) => ({ default: SojaStoreSummary })));
 
 interface CommissionWorkspacePageProps {
   module: CommissionModule;
@@ -47,24 +53,31 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
   const { byUnit, isLoading: peopleLoading } = useCommissionPeople();
   const location = useLocation();
   const navigate = useNavigate();
+  const { moduleSlug } = useParams();
   const agendaRef = useRef<CommissionAgendaPageHandle>(null);
   const [pendingCreate, setPendingCreate] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const section = resolveWorkspaceSection(location.pathname, module.basePath);
+  const isSojaStore = entry.id === SOJA_STORE_UNIT;
+  const currentBasePath = moduleSlug ? `/comissoes/${moduleSlug}` : module.basePath;
+  const section = resolveWorkspaceSection(location.pathname, currentBasePath, isSojaStore ? SOJA_STORE_SECTION_PATHS : undefined);
+  const storeSection = isSojaStore && section in SOJA_STORE_SECTION_PATHS;
 
   const {
     commissionId,
+    commissionIdBySlug,
     commissionSlug,
     unitOptions,
     byCanonicalId,
     events,
     metrics,
+    identityLoading,
     isLoading: agendaLoading,
     isError,
     refetch,
     invalidate,
   } = useUnitAgenda(entry.id);
+  const storeAccess = useSojaStoreAccess(isSojaStore ? commissionIdBySlug : null);
 
   const unit = useMemo(
     () => toCommissionUnitViewModel({ module, entry, people: byUnit.get(entry.id) }),
@@ -120,8 +133,8 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
 
   const { hasCapability } = useCapabilities();
   const mapPortal = entry.mapPortalSlug ? getCommissionMapPortal(entry.mapPortalSlug) : undefined;
-  const sidebarItems = useMemo<CommissionMenuItem[]>(
-    () => navigation.map((item) => ({
+  const sidebarItems = useMemo<CommissionMenuItem[]>(() => {
+    const items: CommissionMenuItem[] = navigation.map((item) => ({
       label: item.label,
       path: WORKSPACE_SECTION_PATHS[item.id],
       description: `${item.label} da frente.`,
@@ -133,9 +146,9 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
       entry.id === 'soy-summit'
         ? [{ label: 'Centro Cívico 3D', path: SOY_SUMMIT_ROUTE, description: 'Visita ao Centro Cívico e contagem do Soy Summit 2027.', icon: Building2 }]
         : [],
-    ),
-    [navigation, mapPortal, hasCapability, entry.id],
-  );
+    );
+    return isSojaStore ? buildSojaStoreMenu(items, storeAccess.isError ? undefined : storeAccess.data) : items;
+  }, [navigation, mapPortal, hasCapability, entry.id, isSojaStore, storeAccess.data, storeAccess.isError]);
 
   const agendaPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.agenda}`;
   const overviewPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.overview}`;
@@ -281,6 +294,14 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
   );
 
   const documentsState: AgendaLoadState = documentsLoading ? 'loading' : 'ready';
+  const storeRoute = (routeSection: SojaStoreSection) => (
+    <SojaStoreWorkspaceRoute
+      section={routeSection}
+      commissionId={commissionIdBySlug}
+      identityLoading={identityLoading}
+      accessQuery={storeAccess}
+    />
+  );
 
   return (
     <CommissionLayout module={module} variant="workspace" menuItems={sidebarItems}>
@@ -288,7 +309,8 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         unit={unit}
         navigation={navigation}
         section={section}
-        action={section === 'team' ? undefined : { label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
+        identityTitleTag={storeSection ? 'p' : 'h1'}
+        action={section === 'team' || storeSection ? undefined : { label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
       >
         <PageTransition>
           {entry.id === 'soy-summit' && section === 'overview' && <Link to={SOY_SUMMIT_ROUTE}
@@ -302,18 +324,25 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
             <Route
               path={WORKSPACE_SECTION_PATHS.overview}
               element={
-                <CommissionOverviewPage
-                  unit={unit}
-                  events={events}
-                  documents={documents}
-                  state={state}
-                  onOpenEvent={openEventInAgenda}
-                  onCreateEvent={requestCreate}
-                  onOpenDocument={(doc) => void handleOpenDocument(doc)}
-                  onDownloadDocument={(doc) => void handleOpenDocument(doc, true)}
-                  onAddDocument={handleAddDocument}
-                  onRetry={retry}
-                />
+                <>
+                  {isSojaStore && commissionIdBySlug && !storeAccess.isError && storeAccess.data?.enabled && (
+                    <Suspense fallback={null}>
+                      <SojaStoreSummary commissionId={commissionIdBySlug} access={storeAccess.data} />
+                    </Suspense>
+                  )}
+                  <CommissionOverviewPage
+                    unit={unit}
+                    events={events}
+                    documents={documents}
+                    state={state}
+                    onOpenEvent={openEventInAgenda}
+                    onCreateEvent={requestCreate}
+                    onOpenDocument={(doc) => void handleOpenDocument(doc)}
+                    onDownloadDocument={(doc) => void handleOpenDocument(doc, true)}
+                    onAddDocument={handleAddDocument}
+                    onRetry={retry}
+                  />
+                </>
               }
             />
             <Route
@@ -352,6 +381,18 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
             />
             <Route path={WORKSPACE_SECTION_PATHS.team} element={<VolunteerTeamById commissionId={commissionId} />} />
             <Route path={WORKSPACE_SECTION_PATHS.tasks} element={<CommissionTasksPage unit={unit} />} />
+            {isSojaStore && (
+              <>
+                <Route path={SOJA_STORE_SECTION_PATHS.produtos} element={storeRoute('produtos')} />
+                <Route path={`${SOJA_STORE_SECTION_PATHS.produtos}/:detailId`} element={storeRoute('produtos')} />
+                <Route path={SOJA_STORE_SECTION_PATHS.estoque} element={storeRoute('estoque')} />
+                <Route path={SOJA_STORE_SECTION_PATHS.fornecedores} element={storeRoute('fornecedores')} />
+                <Route path={SOJA_STORE_SECTION_PATHS.compras} element={storeRoute('compras')} />
+                <Route path={`${SOJA_STORE_SECTION_PATHS.compras}/:detailId`} element={storeRoute('compras')} />
+                <Route path={SOJA_STORE_SECTION_PATHS.importacoes} element={storeRoute('importacoes')} />
+                <Route path={SOJA_STORE_SECTION_PATHS.configuracoes} element={storeRoute('configuracoes')} />
+              </>
+            )}
             <Route path="*" element={<Navigate to={overviewPath} replace />} />
           </Routes>
         </PageTransition>

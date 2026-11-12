@@ -1,0 +1,57 @@
+.ss-overview {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.ss-overview header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+
+.ss-overview > p,
+.ss-overview header p {
+  color: var(--ss-muted);
+  font-size: 0.875rem;
+}
+
+.ss-overview-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 0.65rem;
+}
+
+.ss-overview-metric {
+  display: flex;
+  height: 100%;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--ss-line);
+  border-radius: 0.6rem;
+  background: var(--ss-paper);
+  overflow-wrap: anywhere;
+}
+
+.ss-overview-metric:hover {
+  border-color: var(--ss-ink);
+}
+
+.ss-overview-metric > span {
+  display: grid;
+  align-content: start;
+  gap: 0.1rem;
+}
+
+.ss-overview-metric strong {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+
+.ss-overview-metric svg {
+  flex: none;
+}

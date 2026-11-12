@@ -23,11 +23,19 @@ export function buildWorkspaceNavigation(
   ];
 }
 
-export function resolveWorkspaceSection(pathname: string, basePath: string): CommissionWorkspaceSection {
-  const relative = pathname.replace(basePath, '').replace(/^\/+/, '').split('/')[0] ?? '';
+export function resolveWorkspaceSection<Extension extends string = never>(
+  pathname: string,
+  basePath: string,
+  extensionPaths?: Readonly<Record<Extension, string>>,
+): CommissionWorkspaceSection | Extension {
+  if (!pathname.startsWith(`${basePath}/`)) return 'overview';
+  const relative = pathname.slice(basePath.length).replace(/^\/+/, '').split('/')[0];
   const match = (Object.entries(WORKSPACE_SECTION_PATHS) as Array<[CommissionWorkspaceSection, string]>)
     .find(([, path]) => path === relative);
-  return match?.[0] ?? 'overview';
+  if (match) return match[0];
+  const extension = extensionPaths && (Object.keys(extensionPaths) as Extension[])
+    .find((id) => extensionPaths[id] === relative);
+  return extension ?? 'overview';
 }
 
 export function unitArticleLabel(type: 'comissao' | 'assessoria') {

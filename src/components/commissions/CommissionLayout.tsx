@@ -38,6 +38,7 @@ export default function CommissionLayout({ module, children, variant = 'standard
       )}
       data-commission={module.slug}
       data-layout-variant={variant}
+      data-grouped-navigation={isWorkspace && menuItems?.some((item) => item.quickLabel) ? '' : undefined}
       style={{ '--commission-accent': module.visual.accentColor } as CSSProperties}
     >
       <a href="#main-content" className="skip-to-content">
