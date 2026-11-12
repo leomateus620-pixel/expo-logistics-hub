@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { applyInteriorGroundMaterial, acquireInteriorGroundMaterial, releaseInteriorGroundMaterial } from '../features/commercial-map/components/canvas/interiorGroundMaterial';
 import { INTERNAL_NATURAL_PARKING_RINGS, INTERNAL_PARKING_GROUND_ENVELOPE, isInternalGroundPoint } from '../features/commercial-map/data/internalGroundCoverage';
 import { officialPdfPointToLocal } from '../features/commercial-map/data/officialReference2026';
+import { etniasAdjacentSitePointToWorld } from '../features/commercial-map/data/etniasAdjacentSite';
 import { parkingContainsPoint } from '../features/commercial-map/utils/parkingGeometry';
 import { applyTerrainMultiscaleDetail } from '../features/commercial-map/components/canvas/terrainMaterial';
 import { createParkingMaterialSet } from '../features/commercial-map/components/canvas/parkingMaterials';
@@ -26,6 +27,12 @@ describe('canonical interior ground ownership and resources', () => {
   it('protects the external east/west fields, highway margins and lateral district', () => {
     for (const source of [[80,2950],[6300,3200],[6600,1800],[3200,4650],[5450,4900],[4100,5300]] as const)
       expect(isInternalGroundPoint(officialPdfPointToLocal(source)), source.join(',')).toBe(false);
+  });
+  it('continues the Etnias grass atlas through the adjacent grounds and stops at the field edge', () => {
+    expect(isInternalGroundPoint(etniasAdjacentSitePointToWorld([74, 81]))).toBe(true);
+    expect(isInternalGroundPoint(etniasAdjacentSitePointToWorld([96.8, 57]))).toBe(true);
+    expect(isInternalGroundPoint(etniasAdjacentSitePointToWorld([48, 106]))).toBe(false);
+    expect(isInternalGroundPoint(etniasAdjacentSitePointToWorld([-2, 45]))).toBe(false);
   });
   it('shares A/B atlas and noise across distinct depth/opacity owners until the final release', () => {
     const a = acquireInteriorGroundMaterial(), b = acquireInteriorGroundMaterial();

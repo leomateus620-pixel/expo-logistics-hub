@@ -212,10 +212,6 @@ const Q5: readonly DistrictParcel[] = [
     { pool: pool([352, 82], [5, 7], 'rounded'), palms: [[332, 86]], frontage: 'south' }),
   lot('Q5', 'villa-faixa-campo', [329, 90, 357, 101], house([339, 95], [15, 7], 'flat-modern', SILVER, 2),
     { pool: pool([352, 95], [6, 7]), frontage: 'south' }),
-  lot('Q5', 'rbs-estudio', [358, 11, 386, 101], house([372, 47], [19, 31], 'long-shed', SILVER, 1, false),
-    { use: 'institutional', trees: [[362, 17], [378, 86], [370, 94]], palms: [[379, 70]], frontage: 'avenue' }),
-  lot('Q5', 'rbs-administracao', [387, 11, 409, 101], house([398, 47], [14, 20], 'hip-villa', GRAPHITE, 1, false),
-    { use: 'institutional', palms: [[403, 67], [391, 80]], trees: [[395, 17], [401, 93]], frontage: 'avenue' }),
 ];
 
 export const LATERAL_DISTRICT_BLOCKS: readonly DistrictBlock[] = [
@@ -227,8 +223,9 @@ export const LATERAL_DISTRICT_BLOCKS: readonly DistrictBlock[] = [
     referenceSummary: { occupiedEstimate: [11, 13], poolsVisible: 10, notes: 'Onze propriedades adotadas, grande villa com piscina orgânica no sudoeste e três villas orientais; uma cobertura cerâmica sem piscina identificável.' } },
   { id: 'Q4', name: 'Rua 10 de Agosto — Rua Fenasoja', polygon: rectangle([250, 11, 318, 101]), parcels: Q4,
     referenceSummary: { occupiedEstimate: [11, 13], poolsVisible: 6, notes: 'Doze conjuntos volumétricos adotados; grande jardim norte/leste preservado; a cobertura longa pode ser anexo da propriedade vizinha. Seis piscinas visíveis.' } },
-  { id: 'Q5', name: 'Faixa Fenasoja — transição institucional junto ao Portão 3', polygon: rectangle([329, 11, 409, 101]), parcels: Q5,
-    referenceSummary: { occupiedEstimate: [7, 8], poolsVisible: 5, notes: 'Cinco a seis residências na faixa estreita e dois edifícios do mesmo campus RBS. O campus conserva amplos gramados; não equivale a uma quadra residencial convencional.' } },
+  // The two former institutional placeholders are represented by etniasAdjacentSite.
+  { id: 'Q5', name: 'Faixa residencial da Rua Fenasoja', polygon: rectangle([329, 11, 357, 101]), parcels: Q5,
+    referenceSummary: { occupiedEstimate: [5, 6], poolsVisible: 5, notes: 'Cinco a seis residências na faixa estreita voltada para a Rua Fenasoja.' } },
 ];
 
 /** Avenue already belongs to ParkAccessInfrastructure; only new branch streets live here. */
