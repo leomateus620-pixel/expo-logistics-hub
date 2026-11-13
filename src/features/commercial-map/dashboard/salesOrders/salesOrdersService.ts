@@ -145,6 +145,8 @@ export interface SaleOrderItemDetail {
 export interface SaleContractVersion {
   id: string; version: number; storagePath: string; originalName: string; mimeType: string;
   fileSize: number; uploadedAt: string; supersededAt: string | null;
+  uploadedBy?: string | null;
+  uploadedByName?: string | null;
   coveredLotIds?: string[] | null;
 }
 

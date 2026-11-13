@@ -19,6 +19,7 @@ import type {
   PolygonGeometry,
 } from '../types';
 import { validateContractFile } from '../utils/contracts';
+import type { SaleContract } from '../dashboard/salesOrders/salesOrdersService';
 import {
   getCommercialMapSegment,
   type CommercialMapSegmentId,
@@ -1259,11 +1260,50 @@ export async function registerLotSale(params: {
   return data;
 }
 
-export async function uploadLotContract(params: { orgId: string; lotId: string; file: File; contractNumber?: string; expectedSaleId?: string }) {
+export interface LotContractHistoryDocument extends SaleContract {
+  saleId: string | null;
+  orderId: string | null;
+  isCurrent: boolean;
+  coverageCount?: number;
+}
+
+export interface LotContractHistory {
+  saleId: string | null;
+  orderId: string | null;
+  canUpload: boolean;
+  documentsAccessible: boolean;
+  canViewHistory: boolean;
+  contracts: LotContractHistoryDocument[];
+  history: MapActivity[];
+}
+
+export async function fetchLotContractHistory(lotId: string, signal?: AbortSignal): Promise<LotContractHistory> {
+  const query = db.rpc('get_lot_contract_history', { p_lot_id: lotId });
+  const { data, error } = await (signal ? query.abortSignal(signal) : query);
+  if (error) throw error;
+  if (!data) throw new Error('Não foi possível consultar os documentos e o histórico.');
+  return data;
+}
+
+export async function uploadLotContract(params: {
+  orgId: string;
+  lotId: string;
+  file: File;
+  contractNumber?: string;
+  expectedSaleId?: string;
+  document?: LotContractHistoryDocument;
+  onProgress?: (phase: 'upload' | 'register') => void;
+}) {
   const validationError = validateContractFile(params.file);
   if (validationError) throw new Error(validationError);
   const extension = params.file.name.split('.').pop()?.toLowerCase() || 'pdf';
-  const objectPath = `${params.orgId}/${params.lotId}/${crypto.randomUUID()}.${extension}`;
+  const sharedDocument = params.document?.scope === 'ORDER_ITEMS' ? params.document : null;
+  if (sharedDocument && (!sharedDocument.orderId || !params.expectedSaleId)) {
+    throw new Error('Não foi possível identificar a venda deste documento.');
+  }
+  const folder = sharedDocument ? `orders/${sharedDocument.orderId}` : params.lotId;
+  const objectPath = `${params.orgId}/${folder}/${crypto.randomUUID()}.${extension}`;
+  params.onProgress?.('upload');
   const { error: uploadError } = await supabase.storage.from('map-contracts').upload(objectPath, params.file, {
     cacheControl: '3600',
     contentType: params.file.type,
@@ -1271,7 +1311,8 @@ export async function uploadLotContract(params: { orgId: string; lotId: string; 
   });
   if (uploadError) throw uploadError;
 
-  const { data, error } = await db.rpc('register_lot_contract_version', {
+  params.onProgress?.('register');
+  const { data, error } = await db.rpc(sharedDocument ? 'replace_lot_order_contract' : 'register_lot_contract_version', {
     p_lot_id: params.lotId,
     p_storage_path: objectPath,
     p_original_name: params.file.name,
@@ -1279,16 +1320,38 @@ export async function uploadLotContract(params: { orgId: string; lotId: string; 
     p_file_size: params.file.size,
     p_contract_number: params.contractNumber || null,
     ...(params.expectedSaleId ? { p_expected_sale_id: params.expectedSaleId } : {}),
+    ...(params.document ? { p_contract_id: params.document.contractId, p_expected_version: params.document.activeVersion } : {}),
   });
   if (error) {
-    await supabase.storage.from('map-contracts').remove([objectPath]);
+    // An ambiguous transport error can follow a committed registration. Only
+    // remove objects after an explicit database rejection.
+    if (typeof error.code === 'string' && /^[0-9A-Z]{5}$/.test(error.code) && !error.code.startsWith('08')) {
+      await supabase.storage.from('map-contracts').remove([objectPath]).catch(() => undefined);
+    }
     throw error;
   }
   return data;
 }
 
-export async function getContractSignedUrl(storagePath: string) {
-  const { data, error } = await supabase.storage.from('map-contracts').createSignedUrl(storagePath, 300);
+export async function updateLotContractMetadata(params: {
+  lotId: string;
+  expectedSaleId: string;
+  document: LotContractHistoryDocument;
+  contractNumber: string;
+}) {
+  const { error } = await db.rpc('update_commercial_contract_metadata', {
+    p_contract_id: params.document.contractId,
+    p_contract_number: params.contractNumber.trim() || null,
+    p_expected_version: params.document.activeVersion,
+    p_lot_id: params.lotId,
+    p_expected_sale_id: params.expectedSaleId,
+  });
+  if (error) throw error;
+}
+
+export async function getContractSignedUrl(storagePath: string, download?: string) {
+  const { data, error } = await supabase.storage.from('map-contracts').createSignedUrl(storagePath, 300,
+    download ? { download } : undefined);
   if (error) throw error;
   return data.signedUrl;
 }

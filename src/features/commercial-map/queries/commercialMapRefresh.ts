@@ -2,6 +2,12 @@ import type { QueryClient } from '@tanstack/react-query';
 
 export const COMMERCIAL_MAP_REFRESH_DEBOUNCE_MS = 400;
 const MAP_KEY = ['commercial-map'] as const;
+export const LOT_CONTRACT_HISTORY_KEY = ['commercial-lot-contract-history'] as const;
+
+export function refreshLotContractHistory(queryClient: QueryClient) {
+  if (queryClient.getQueryCache().findAll({ queryKey: LOT_CONTRACT_HISTORY_KEY }).length === 0) return Promise.resolve();
+  return queryClient.invalidateQueries({ queryKey: LOT_CONTRACT_HISTORY_KEY });
+}
 
 /** Diagnóstico leve (sem dados pessoais) das decisões de sincronização. */
 export function recordCommercialMapSync(event: string, detail?: Record<string, unknown>) {
@@ -56,6 +62,7 @@ function flush(queryClient: QueryClient) {
   if (inFlight) recordCommercialMapSync('refresh-pending-after-inflight');
   void waitForIdle(queryClient)
     .then(() => queryClient.invalidateQueries({ queryKey: MAP_KEY }, { cancelRefetch: false }))
+    .then(() => refreshLotContractHistory(queryClient))
     .then(() => queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }, { cancelRefetch: false }))
     .then(() => queryClient.invalidateQueries({ queryKey: ['financial-operational', 'scenarios'] }, { cancelRefetch: false }))
     .catch(() => undefined)

@@ -5,7 +5,11 @@ import { describeLotActivity } from '../../utils/saleActivity';
 const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' });
 
 /** Lista do histórico auditável de um lote — compartilhada pela ficha de lote e pela de módulo. */
-export function LotActivityList({ items, loading }: { items: MapActivity[] | undefined; loading: boolean }) {
+export function LotActivityList({ items, loading, showActor = false }: {
+  items: MapActivity[] | undefined;
+  loading: boolean;
+  showActor?: boolean;
+}) {
   if (loading) return <p>Carregando histórico auditável…</p>;
   if (!items?.length) return <div className="commercial-map-empty compact"><History /><strong>Nenhuma alteração registrada</strong></div>;
   return <>
@@ -15,7 +19,8 @@ export function LotActivityList({ items, loading }: { items: MapActivity[] | und
         <i><CheckCircle2 /></i>
         <span><strong>{d.title}</strong>
           {d.details.map((line) => <small key={line}>{line}</small>)}
-          <small>{dateTime.format(new Date(item.createdAt))}</small>
+          {showActor && <small>{item.actorName || (item.actorUserId ? 'Nome do responsável indisponível' : 'Autoria não registrada')}</small>}
+          <small><time dateTime={item.createdAt}>{dateTime.format(new Date(item.createdAt))}</time></small>
         </span>
       </div>;
     })}

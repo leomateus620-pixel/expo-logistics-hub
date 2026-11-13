@@ -244,6 +244,7 @@ export interface MapActivity {
   action: string;
   reason: string | null;
   actorUserId: string | null;
+  actorName?: string | null;
   beforeState: Record<string, unknown> | null;
   afterState: Record<string, unknown> | null;
   createdAt: string;

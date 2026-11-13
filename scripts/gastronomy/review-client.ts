@@ -2,15 +2,17 @@ import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/official
 
 const project = '0538d132-34dd-4347-a33c-526edac7339c';
 const org = '00000000-0000-4000-a000-000000000001';
-const user = { id: '00000000-0000-4000-a000-000000000010', email: 'qa@fenasoja.invalid' };
+const restricted = new URLSearchParams(location.search).get('perfil') === 'sem-contratos';
+const user = { id: `00000000-0000-4000-a000-00000000001${restricted ? '4' : '0'}`, email: 'qa@fenasoja.invalid' };
 const session = { user, access_token: 'gastronomy-qa' };
 const ok = (data: unknown) => ({ data, error: null });
 const reference = OFFICIAL_REFERENCE_DATA;
+const qaIdentity = { 'x-gastronomy-qa-user': restricted ? 'sem-contratos' : 'vendas' };
 let pendingInventory: Promise<any> | null = null;
 
 function inventory() {
   if (!pendingInventory) {
-    pendingInventory = fetch('/__gastronomy/inventory').then((result) => result.json()).then((result) => {
+    pendingInventory = fetch('/__gastronomy/inventory', { headers: qaIdentity }).then((result) => result.json()).then((result) => {
       if (result.error) throw new Error(result.error.message);
       return result.data;
     }).finally(() => { pendingInventory = null; });
@@ -19,9 +21,11 @@ function inventory() {
 }
 
 async function tableRows(table: string): Promise<Record<string, any>[]> {
-  if (table === 'org_members') return [{ org_id: org, role: 'admin', organizations: { id: org, nome: 'Fenasoja QA' } }];
-  if (table === 'user_roles') return [{ role: 'admin' }];
-  if (table === 'user_capabilities') return ['map.view','map.manage_sales','map.manage_contracts'].map((capability) => ({ capability }));
+  if (table === 'org_members') return [{ org_id: org, role: restricted ? 'operador' : 'admin', organizations: { id: org, nome: 'Fenasoja QA' } }];
+  if (table === 'user_roles') return [{ role: restricted ? 'operador' : 'admin' }];
+  if (table === 'user_capabilities') return (restricted
+    ? ['restricted_scope', 'map.view', 'map.manage_sales']
+    : ['map.view', 'map.manage_sales', 'map.manage_contracts']).map((capability) => ({ capability }));
   if (table === 'map_projects') return [{
     id: project, org_id: org, name: 'Parque Fenasoja', description: null, coordinate_system: 'LOCAL_NORMALIZED',
     reference_width: reference.project.referenceWidth, reference_height: reference.project.referenceHeight,
@@ -61,6 +65,10 @@ async function tableRows(table: string): Promise<Record<string, any>[]> {
   if (table === 'commercial_lot_pricing_2028') return snapshot.pricing;
   if (table === 'commercial_sale_eligibility') return snapshot.eligibility;
   if (table === 'commercial_exhibitors') return snapshot.exhibitors;
+  if (table === 'lot_sales') return snapshot.lots.flatMap((lot: any) => lot.lot_sales ?? []);
+  if (table === 'lot_contracts') return snapshot.contracts;
+  if (table === 'lot_sale_installments') return snapshot.installments;
+  if (table === 'map_activity_logs') return snapshot.activity;
   if (table === 'lot_sale_orders') return snapshot.orders;
   if (table === 'lot_sale_order_items') return snapshot.items.map((item: any) => ({
     ...item, lot_sale_orders: snapshot.orders.find((order: any) => order.id === item.order_id),
@@ -103,9 +111,21 @@ function query(table: string) {
 }
 function rpc(name: string, args: unknown) {
   const request = (signal?: AbortSignal) => fetch('/__gastronomy/rpc', {
-    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name, args }), signal,
+    method: 'POST', headers: { ...qaIdentity, 'content-type': 'application/json' }, body: JSON.stringify({ name, args }), signal,
   }).then((response) => response.json());
   return { abortSignal: request, then: (resolve: any, reject: any) => request().then(resolve, reject) };
+}
+
+function storage(bucket: string) {
+  const send = (operation: string, headers: Record<string, string>, body: BodyInit) => bucket === 'map-contracts'
+    ? fetch(`/__gastronomy/storage/${operation}`, { method: 'POST', headers: { ...qaIdentity, ...headers }, body }).then(response => response.json())
+    : Promise.resolve(ok(null));
+  const byName = (operation: string, name: string, download?: string) => send(operation, { 'content-type': 'application/json' }, JSON.stringify({ name, download }));
+  return {
+    upload: (name: string, file: File) => send('upload', { 'content-type': file.type, 'x-gastronomy-qa-path': name }, file),
+    remove: (names: string[]) => Promise.all(names.map(name => byName('remove', name))),
+    createSignedUrl: (name: string, _ttl: number, options?: { download?: string }) => byName('sign', name, options?.download),
+  };
 }
 export const supabase = {
   auth: {
@@ -120,5 +140,5 @@ export const supabase = {
   from: query,
   rpc,
   functions: { invoke: async () => ok({}) },
-  storage: { from: () => ({ createSignedUrl: async () => ok(null) }) },
+  storage: { from: storage },
 };

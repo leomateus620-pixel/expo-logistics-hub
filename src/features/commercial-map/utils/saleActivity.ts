@@ -8,12 +8,15 @@ const money = (v: unknown) => (v === null || v === undefined ? null : formatBrl(
 const lotsText = (v: unknown) => (Array.isArray(v) && v.length ? v.map((x) => String(x).replace(/^B5-M0*/, '')).join(', ') : null);
 
 const STATUS: Record<string, string> = { AVAILABLE: 'Disponível', SALE_OPEN: 'Venda em aberto', SOLD: 'Vendido', BLOCKED: 'Bloqueado' };
+const contractNumber = (state: Record<string, unknown>) => typeof state.contract_number === 'string' && state.contract_number.trim()
+  ? state.contract_number : 'Sem número';
 
 /** Texto legível do histórico do lote (vendas, edições de venda e preços). */
 export function describeLotActivity(item: ActivityLike): { title: string; details: string[] } {
   const price = describePriceActivity(item);
   if (price) return { title: price.title, details: [price.detail, price.actor].filter(Boolean) as string[] };
   const a = read(item.afterState);
+  const b = read(item.beforeState);
   const buyer = typeof a.buyer === 'string' && a.buyer ? a.buyer : null;
   const of = buyer ? ` de ${buyer}` : '';
   const details: string[] = [];
@@ -26,6 +29,11 @@ export function describeLotActivity(item: ActivityLike): { title: string; detail
   }
   if (item.reason) details.push(`Motivo: ${item.reason}`);
   switch (item.action) {
+    case 'LOT_SALE_OPEN':
+    case 'LOT_SOLD':
+    case 'SALE_REGISTERED':
+    case 'LOT_SALE_REGISTERED':
+      return { title: 'Venda registrada', details };
     case 'LOT_SALE_ITEM_ADDED':
       return { title: `Adicionado à venda${of}`, details: [`Situação: ${STATUS[String(a.status)] ?? String(a.status ?? '—')}`, ...details] };
     case 'LOT_SALE_ITEM_REMOVED':
@@ -36,6 +44,20 @@ export function describeLotActivity(item: ActivityLike): { title: string; detail
       return { title: 'Contrato assinado confirmado', details: ['Situação: Vendido', ...(item.reason ? [] : [])] };
     case 'LOT_SALE_CANCELLED':
       return { title: 'Venda em aberto cancelada', details: ['Voltou a Disponível', ...(item.reason ? [`Motivo: ${item.reason}`] : [])] };
+    case 'CONTRACT_UPLOADED':
+    case 'ORDER_CONTRACT_UPLOADED':
+      return { title: 'Contrato anexado', details: typeof a.version === 'number' ? [`Versão ${a.version}`] : [] };
+    case 'CONTRACT_REPLACED':
+    case 'ORDER_CONTRACT_REPLACED':
+      return { title: 'Versão do contrato substituída', details: [
+        ...(typeof a.version === 'number' ? [`Versão ${a.version}`] : []),
+        ...('contract_number' in b && 'contract_number' in a && contractNumber(b) !== contractNumber(a)
+          ? [`Número do contrato: ${contractNumber(b)} → ${contractNumber(a)}`] : []),
+      ] };
+    case 'CONTRACT_METADATA_UPDATED':
+    case 'ORDER_CONTRACT_METADATA_UPDATED':
+      return { title: 'Dados do contrato alterados', details: 'contract_number' in b && 'contract_number' in a
+        ? [`Número do contrato: ${contractNumber(b)} → ${contractNumber(a)}`] : [] };
     default:
       return { title: item.action.replace(/_/g, ' ').toLowerCase().replace(/^./, (c) => c.toUpperCase()), details: item.reason ? [item.reason] : [] };
   }

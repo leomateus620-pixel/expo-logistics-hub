@@ -347,7 +347,7 @@ export function EntityDetailsPanel(props: EntityDetailsPanelProps) {
   if (structure && points?.length) return <GastronomyStructurePanel key={structure.id} structure={structure} points={points}
     mapData={{ entities, lots }} onEnterInterior={sceneAvailable && strategicLandmarkSupportsInterior(structure)
       ? () => enterInterior(structure.id) : undefined}
-    canSell={permissions.canManageSales && sceneAvailable} onClose={() => setSelectedEntityId(null)} />;
+    permissions={permissions} canSell={permissions.canManageSales && sceneAvailable} onClose={() => setSelectedEntityId(null)} />;
   return <DefaultEntityDetailsPanel {...props} />;
 }
 

@@ -12,7 +12,7 @@ import { SaleOrderHistory } from './SaleOrderHistory';
 import { describeSalesError, fetchSaleOrderDetail, uniqueContracts, type SaleContract, type SaleOrderSummary } from './salesOrdersService';
 import { documentSummary, fmtSaleArea, fmtSaleDate, receiptSummary, saleDetailSummary, saleName, saleStateLabel, signatureSummary } from './salesOrdersPresentation';
 import { useSalesOrdersUiStore, type SalesOrdersDetailTab, type SalesOrdersRecordIdentity } from './useSalesOrdersUiStore';
-import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
+import { refreshLotContractHistory, scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
 import { foodPointQuantityLabel } from '../../utils/lotPricing2028';
 
 const ITEM_STATE_LABEL: Record<string, string> = {
@@ -73,7 +73,8 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
       activeItems, groupedItems, itemIndex,
       activeSubtotal: activeItems.some((item) => item.itemTotal === null) ? null : activeItems.reduce((sum, item) => sum + (item.itemTotal ?? 0), 0),
       hasCancelled: activeItems.length !== itemRows.length,
-      attachmentItems: activeItems.map((item) => ({ lotId: item.lotId, saleId: item.saleId, commercialUnit: item.commercialUnit,
+      attachmentItems: activeItems.map((item) => ({ lotId: item.lotId,
+        saleId: item.contractState === 'SIGNED' ? item.saleId : null, commercialUnit: item.commercialUnit,
         label: `${item.displayName || item.publicIdentifier} · ${itemLocation(item)}` })),
     };
   }, [itemRows, itemLocation]);
@@ -201,7 +202,8 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
             : contracts.length === 0 ? <p className="cso-state">Sem arquivo anexado.</p>
               : <ul className="cso-docs">{contracts.map((contract) => <SaleOrderContract key={contract.contractId} contract={contract}
                 labelOf={labelOf} canReplace={canManageContracts && activeItems.length > 0 && (contract.scope === 'ORDER_ITEMS'
-                  || activeItems.some((item) => item.commercialUnit === 'FOOD_POINT' && contract.lotIds.includes(item.lotId)))} onReplace={() => setAttachOpen({ contract })} />)}</ul>}
+                  || activeItems.some((item) => item.commercialUnit === 'FOOD_POINT' && item.contractState === 'SIGNED'
+                    && contract.lotIds.includes(item.lotId)))} onReplace={() => setAttachOpen({ contract })} />)}</ul>}
           <p className="cso-note">Arquivo anexado não comprova assinatura ou recebimento.</p>
         </section>
       </TabsContent>
@@ -220,7 +222,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail', record.recordId] }),
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }),
-        queryClient.invalidateQueries({ queryKey: ['lot-contract-versions'] }),
+        refreshLotContractHistory(queryClient),
         scheduleCommercialMapRefresh(queryClient),
       ]);
     }} />}
