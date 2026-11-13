@@ -36,8 +36,9 @@ import { draftToSaveEventPayload, validateDraft } from '@/features/commission-ag
 import { canManageDocuments } from '@/features/commission-agenda/lib/visibility';
 import type { AgendaEventDraft } from '@/features/commission-agenda/components/EventFormShell';
 import { SojaStoreWorkspaceRoute } from '@/features/soja-store/components/SojaStoreWorkspaceRoute';
+import { SojaStoreRouteNotice } from '@/features/soja-store/components/SojaStoreRouteNotice';
 import { useSojaStoreAccess } from '@/features/soja-store/hooks/useSojaStoreAccess';
-import { buildSojaStoreMenu, SOJA_STORE_SECTION_PATHS, SOJA_STORE_UNIT, type SojaStoreSection } from '@/features/soja-store/navigation';
+import { buildSojaStoreMenu, SOJA_STORE_IMPORTS_PATH, SOJA_STORE_SECTION_PATHS, SOJA_STORE_UNIT, SOJA_STORE_WORKSPACE_PATHS, type SojaStoreSection } from '@/features/soja-store/navigation';
 
 const SojaStoreSummary = lazy(() => import('@/features/soja-store/components/SojaStoreSummary')
   .then(({ SojaStoreSummary }) => ({ default: SojaStoreSummary })));
@@ -60,8 +61,8 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
 
   const isSojaStore = entry.id === SOJA_STORE_UNIT;
   const currentBasePath = moduleSlug ? `/comissoes/${moduleSlug}` : module.basePath;
-  const section = resolveWorkspaceSection(location.pathname, currentBasePath, isSojaStore ? SOJA_STORE_SECTION_PATHS : undefined);
-  const storeSection = isSojaStore && section in SOJA_STORE_SECTION_PATHS;
+  const section = resolveWorkspaceSection(location.pathname, currentBasePath, isSojaStore ? SOJA_STORE_WORKSPACE_PATHS : undefined);
+  const storeSection = isSojaStore && Object.prototype.hasOwnProperty.call(SOJA_STORE_WORKSPACE_PATHS, section);
 
   const {
     commissionId,
@@ -310,7 +311,7 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         navigation={navigation}
         section={section}
         identityTitleTag={storeSection ? 'p' : 'h1'}
-        action={section === 'team' || storeSection ? undefined : { label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
+        action={section === 'team' || storeSection || (isSojaStore && section !== 'agenda') ? undefined : { label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
       >
         <PageTransition>
           {entry.id === 'soy-summit' && section === 'overview' && <Link to={SOY_SUMMIT_ROUTE}
@@ -386,14 +387,19 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
                 <Route path={SOJA_STORE_SECTION_PATHS.produtos} element={storeRoute('produtos')} />
                 <Route path={`${SOJA_STORE_SECTION_PATHS.produtos}/:detailId`} element={storeRoute('produtos')} />
                 <Route path={SOJA_STORE_SECTION_PATHS.estoque} element={storeRoute('estoque')} />
+                <Route path={SOJA_STORE_SECTION_PATHS.vendas} element={storeRoute('vendas')} />
+                <Route path={SOJA_STORE_SECTION_PATHS.caixa} element={storeRoute('caixa')} />
                 <Route path={SOJA_STORE_SECTION_PATHS.fornecedores} element={storeRoute('fornecedores')} />
                 <Route path={SOJA_STORE_SECTION_PATHS.compras} element={storeRoute('compras')} />
                 <Route path={`${SOJA_STORE_SECTION_PATHS.compras}/:detailId`} element={storeRoute('compras')} />
-                <Route path={SOJA_STORE_SECTION_PATHS.importacoes} element={storeRoute('importacoes')} />
+                <Route path={SOJA_STORE_SECTION_PATHS.clientes} element={storeRoute('clientes')} />
+                <Route path={`${SOJA_STORE_SECTION_PATHS.clientes}/:detailId`} element={storeRoute('clientes')} />
+                <Route path={SOJA_STORE_SECTION_PATHS.financeiro} element={storeRoute('financeiro')} />
+                <Route path={`${SOJA_STORE_IMPORTS_PATH}/*`} element={<SojaStoreRouteNotice imports />} />
                 <Route path={SOJA_STORE_SECTION_PATHS.configuracoes} element={storeRoute('configuracoes')} />
               </>
             )}
-            <Route path="*" element={<Navigate to={overviewPath} replace />} />
+            <Route path="*" element={isSojaStore ? <SojaStoreRouteNotice /> : <Navigate to={overviewPath} replace />} />
           </Routes>
         </PageTransition>
       </CommissionWorkspaceShell>

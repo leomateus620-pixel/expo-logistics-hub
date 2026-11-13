@@ -62,7 +62,7 @@ try {
     const person = randomUUID();
     await sql`INSERT INTO auth.users VALUES (${user})`;
     await sql`INSERT INTO public.org_members VALUES (${org}, ${user}, 'operador', true)`;
-    await sql`INSERT INTO public.commission_people VALUES (${person}, ${org}, ${user})`;
+    await sql`INSERT INTO public.commission_people (id, org_id, user_id) VALUES (${person}, ${org}, ${user})`;
     await sql`INSERT INTO public.commission_responsibles (commission_id, org_id, person_id) VALUES (${commission}, ${org}, ${person})`;
     await sql`
       INSERT INTO soja_store_private.access_grants (org_id, commission_id, person_id, user_id, capability, granted_by)

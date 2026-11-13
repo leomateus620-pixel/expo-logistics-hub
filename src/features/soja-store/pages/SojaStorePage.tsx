@@ -3,15 +3,20 @@ import { useCurrentOrg } from "@/hooks/useCurrentOrg";
 import type { SojaStoreAccess } from "../hooks/useSojaStoreAccess";
 import { CatalogPage } from "./CatalogPage";
 import { DirectoryPage } from "./DirectoryPage";
-import { ImportStagingPage } from "./ImportStagingPage";
 import { ProductDetailPage } from "./ProductDetailPage";
 import { PurchaseDetailPage } from "./PurchaseDetailPage";
 import { PurchasesPage } from "./PurchasesPage";
 import { StockPage } from "./StockPage";
+import { CustomersPage } from "./customers/CustomersPage";
+import { CashPage } from "./pos/CashPage";
+import { PosRulePanel } from "./pos/PosRulePanel";
+import { FinancePage } from "./finance/FinancePage";
+import { SalesPage } from "./sales/SalesPage";
+import type { SojaStoreSection } from "../navigation";
 import "../soja-store.css";
 
 export default function SojaStorePage({ section, commissionId, detailId, access }: {
-  section: "produtos" | "fornecedores" | "configuracoes" | "estoque" | "compras" | "importacoes";
+  section: SojaStoreSection;
   commissionId: string;
   detailId?: string;
   access: SojaStoreAccess;
@@ -34,6 +39,11 @@ export default function SojaStorePage({ section, commissionId, detailId, access 
         <CatalogPage scope={scope} queryKey={queryKey} canManage={canManage} />
       ) : section === "estoque" ? (
         <StockPage scope={scope} queryKey={queryKey} access={access} />
+      ) : section === "caixa" ? (
+        <CashPage scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("cash.manage")} />
+      ) : section === "vendas" ? (
+        <SalesPage scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("sales.manage")}
+          reservationFlow={access.capabilities.includes("sales.fulfillment")} />
       ) : section === "compras" ? detailId ? (
         <PurchaseDetailPage
           scope={scope}
@@ -44,12 +54,22 @@ export default function SojaStorePage({ section, commissionId, detailId, access 
           canViewStock={access.capabilities.includes("stock.view")}
         />
       ) : (
-        <PurchasesPage scope={scope} queryKey={queryKey} canManage={canManagePurchases} />
+        <PurchasesPage scope={scope} queryKey={queryKey} canManage={canManagePurchases}
+          canViewCosts={access.capabilities.includes("purchases.costs")} />
       ) : section === "fornecedores" ? (
         <DirectoryPage kind="suppliers" scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("suppliers.manage")} />
-      ) : section === "configuracoes" ? (
-        <DirectoryPage kind="locations" scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("settings.manage")} />
-      ) : <ImportStagingPage scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("imports.manage")} />}
+      ) : section === "clientes" ? (
+        <CustomersPage scope={scope} queryKey={queryKey} detailId={detailId} canManage={access.capabilities.includes("customers.manage")}
+          canReadCatalog={access.capabilities.includes("catalog.view")}
+          canReadSales={access.capabilities.includes("customers.history") && access.capabilities.includes("sales.view")} />
+      ) : section === "financeiro" ? (
+        <FinancePage scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("finance.manage")} />
+      ) : (
+        <>
+          <DirectoryPage kind="locations" scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("settings.manage")} />
+          {access.capabilities.includes("sales.manage") && <PosRulePanel scope={scope} queryKey={queryKey} canManage />}
+        </>
+      )}
     </div>
   );
 }

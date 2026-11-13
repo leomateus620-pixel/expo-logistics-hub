@@ -62,6 +62,7 @@
   }
 
   .cw-soja-quick-nav__item[aria-current='page'],
+  .cw-soja-quick-nav__item[data-current-section='true'],
   .cw-soja-quick-nav__item[aria-expanded='true'] {
     background: #e2e7d7;
   }

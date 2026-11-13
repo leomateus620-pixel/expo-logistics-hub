@@ -6,8 +6,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { storeRpc, type StoreScope } from "../api/store";
 import type { NamedOption, PurchaseOptions } from "../domain/purchases";
 
-export function PurchaseOption({ kind, label, value, onChange, scope, queryKey, error, disabled }: {
-  kind: keyof PurchaseOptions;
+export function PurchaseOption({ kind, label, value, onChange, scope, queryKey, error, disabled, source = "purchase" }: {
+  kind: keyof PurchaseOptions | "commissions" | "customers";
   label: string;
   value: NamedOption | null;
   onChange: (value: NamedOption) => void;
@@ -15,20 +15,30 @@ export function PurchaseOption({ kind, label, value, onChange, scope, queryKey, 
   queryKey: readonly unknown[];
   error?: string;
   disabled?: boolean;
+  source?: "purchase" | "inventory";
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [term, setTerm] = useState("");
   const id = useId();
   const options = useQuery({
-    queryKey: [...queryKey, "purchase-options", term],
-    queryFn: () => storeRpc<PurchaseOptions>("soja_store_purchase_options", {
-      ...scope, _search: term || null, _limit: 30,
-    }),
+    queryKey: [...queryKey, kind === "commissions" || kind === "customers" ? kind : source, "options", term],
+    queryFn: async () => {
+      const args = { ...scope, _search: term || null, _limit: 30 };
+      if (kind === "commissions") return { named: await storeRpc<NamedOption[]>("soja_store_issue_destinations", args) };
+      if (kind === "customers") {
+        const customers = await storeRpc<Array<NamedOption & { city: string | null }>>("soja_store_sale_customers", args);
+        return { named: customers.map(({ id, name, city }) => ({ id, name: city ? `${name} · ${city}` : name })) };
+      }
+      return storeRpc<PurchaseOptions>(source === "inventory" ? "soja_store_inventory_options" : "soja_store_purchase_options", args);
+    },
     enabled: open,
     meta: { persist: false },
   });
-  const rows = options.data?.[kind].map((row) => "product_name" in row ? {
+  const selectedRows = options.data && ("named" in options.data
+    ? options.data.named
+    : kind === "commissions" || kind === "customers" ? [] : options.data[kind]);
+  const rows = selectedRows?.map((row) => "product_name" in row && "sku" in row && "unit" in row && "label" in row ? {
     id: row.id,
     name: [row.product_name, row.label, row.sku, row.unit].filter(Boolean).join(" · "),
   } : row);

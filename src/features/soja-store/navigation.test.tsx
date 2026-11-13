@@ -1,15 +1,22 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import type { ComponentProps } from 'react';
+import { useState } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { buildWorkspaceNavigation, resolveWorkspaceSection, WORKSPACE_SECTION_PATHS } from '@/features/commission-agenda/lib/workspace-navigation';
-import { buildSojaStoreMenu, SOJA_STORE_SECTION_PATHS } from './navigation';
+import { buildSojaStoreMenu, SOJA_STORE_SECTION_PATHS, SOJA_STORE_WORKSPACE_PATHS } from './navigation';
 import { SojaStoreWorkspaceRoute } from './components/SojaStoreWorkspaceRoute';
+import { SojaStoreRouteNotice } from './components/SojaStoreRouteNotice';
+import CommissionWorkspaceSidebar from '@/features/commission-agenda/components/CommissionWorkspaceSidebar';
+import { resolveCommissionRouteModule } from '@/modules/commissions/officialCommissionCatalog';
 
 vi.mock('./pages/SojaStorePage', () => ({
   default: ({ commissionId, detailId }: { commissionId: string; detailId: string }) => (
     <p>{commissionId} / {detailId}</p>
   ),
+}));
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ signOut: vi.fn() }),
 }));
 
 afterEach(cleanup);
@@ -25,15 +32,20 @@ describe('navegação da Soja Store', () => {
   it('agrupa somente as áreas autorizadas e preserva os links institucionais', () => {
     expect(buildSojaStoreMenu(baseMenu, { enabled: false, capabilities: ['catalog.view'] })).toBe(baseMenu);
     expect(buildSojaStoreMenu(baseMenu, { enabled: true, capabilities: [] })).toBe(baseMenu);
-    const menu = buildSojaStoreMenu(baseMenu, { enabled: true, capabilities: ['catalog.view', 'settings.view', 'stock.view'] });
+    const menu = buildSojaStoreMenu(baseMenu, {
+      enabled: true,
+      capabilities: ['catalog.view', 'settings.view', 'stock.view', 'suppliers.view', 'purchases.view', 'imports.view'],
+    });
     expect(menu.map(({ path, group }) => [path, group])).toEqual([
       ['dashboard', undefined],
       ['produtos', 'Operação'],
       ['estoque', 'Operação'],
+      ['fornecedores', 'Gestão'],
+      ['compras', 'Gestão'],
+      ['equipe', 'Gestão'],
       ['configuracoes', 'Gestão'],
       ['agenda', 'Comissão'],
       ['documentos', 'Comissão'],
-      ['equipe', 'Comissão'],
       ['tarefas', 'Comissão'],
     ]);
   });
@@ -41,8 +53,31 @@ describe('navegação da Soja Store', () => {
   it('reconhece detalhes e o alias da Soja Store sem estender as outras comissões', () => {
     expect(resolveWorkspaceSection(`${basePath}/produtos/novo`, basePath, SOJA_STORE_SECTION_PATHS)).toBe('produtos');
     expect(resolveWorkspaceSection(`${basePath}/compras/42`, basePath, SOJA_STORE_SECTION_PATHS)).toBe('compras');
+    expect(resolveWorkspaceSection(`${basePath}/clientes/novo`, basePath, SOJA_STORE_SECTION_PATHS)).toBe('clientes');
     expect(resolveWorkspaceSection('/comissoes/sojastore/produtos/42', '/comissoes/sojastore', SOJA_STORE_SECTION_PATHS)).toBe('produtos');
     expect(resolveWorkspaceSection('/comissoes/mercosul/produtos/42', '/comissoes/mercosul')).toBe('overview');
+    expect(resolveWorkspaceSection(`${basePath}/importacoes/lote`, basePath, SOJA_STORE_WORKSPACE_PATHS)).toBe('importacoes');
+  });
+
+  it('explica o endereço legado de importações e oferece retorno à visão geral', () => {
+    render(<MemoryRouter><SojaStoreRouteNotice imports /></MemoryRouter>);
+    expect(screen.getByText('Importações não fazem parte da operação da Soja Store.')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Voltar à visão geral' })).toHaveAttribute('href', `${basePath}/dashboard`);
+  });
+
+  it('marca o detalhe no alias e indica a seção atual no menu Mais', () => {
+    const module = resolveCommissionRouteModule('soja-store')!;
+    const menu = buildSojaStoreMenu(baseMenu, { enabled: true, capabilities: ['purchases.view'] });
+    function Navigation() {
+      const [open, setOpen] = useState(false);
+      return <CommissionWorkspaceSidebar module={module} menuItems={menu} mobileOpen={open} onMobileOpen={() => setOpen(true)} onMobileClose={() => setOpen(false)} />;
+    }
+    render(<MemoryRouter initialEntries={['/comissoes/sojastore/compras/registro']}><Navigation /></MemoryRouter>);
+    expect(screen.getByRole('link', { name: 'Compras' })).toHaveAttribute('aria-current', 'page');
+    fireEvent.click(screen.getByRole('button', { name: 'Mais seções, inclui a página atual' }));
+    expect(screen.getByRole('dialog', { name: 'Navegação da frente' })).toBeInTheDocument();
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    expect(screen.queryByRole('dialog', { name: 'Navegação da frente' })).not.toBeInTheDocument();
   });
 });
 

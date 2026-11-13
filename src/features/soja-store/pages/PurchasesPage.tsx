@@ -5,30 +5,33 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { storeError, storeRpc, type StoreScope } from "../api/store";
 import { StoreFailure, StoreField, StoreHeading, StoreState } from "../components/StoreElements";
+import { readOperationalFilters } from "../domain/operationalFilters";
+import { PurchaseQuotes } from "./PurchaseQuotes";
 import { dateLabel, moneyLabel, purchaseStates, type PurchaseStatus, type PurchaseSummary } from "../domain/purchases";
 
 export const purchasesPath = "/comissoes/soja-store/compras";
 const pageSize = 30;
 
-export function PurchasesPage({ scope, queryKey, canManage }: {
+export function PurchasesPage({ scope, queryKey, canManage, canViewCosts = canManage }: {
   scope: StoreScope;
   queryKey: readonly unknown[];
   canManage: boolean;
+  canViewCosts?: boolean;
 }) {
   const [params, setParams] = useSearchParams();
   const inputStatus = params.get("situacao");
   const status = inputStatus && Object.prototype.hasOwnProperty.call(purchaseStates, inputStatus) ? inputStatus as PurchaseStatus : "";
   const uuid = z.string().uuid().nullable().catch(null);
   const filters = {
+    ...readOperationalFilters(params),
     _supplier_id: uuid.parse(params.get("fornecedor")),
-    _location_id: uuid.parse(params.get("local")),
     _variant_id: uuid.parse(params.get("variante")),
   };
-  const filtered = !!(filters._supplier_id || filters._location_id || filters._variant_id);
+  const filtered = Object.values(filters).some(Boolean);
   const page = Math.max(1, Math.min(333334, Number.parseInt(params.get("pagina") ?? "", 10) || 1));
   const purchases = useQuery({
     queryKey: [...queryKey, "purchases", status, filters, page],
-    queryFn: () => storeRpc<{ total: number; items: PurchaseSummary[] }>("soja_store_purchases", {
+    queryFn: () => storeRpc<{ total: number; items: PurchaseSummary[] }>("soja_store_purchases_filtered", {
       ...scope, ...filters, _status: status || null, _limit: pageSize, _offset: (page - 1) * pageSize,
     }),
     meta: { persist: false },
@@ -56,8 +59,12 @@ export function PurchasesPage({ scope, queryKey, canManage }: {
             {Object.entries(purchaseStates).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
           </select>
         </StoreField>
+        {(filters._start || filters._end || filters._location_id) && <p className="text-sm">
+          {filters._start ? `Desde ${dateLabel(filters._start)}` : ""}{filters._end ? ` até ${dateLabel(filters._end)}` : ""}{filters._location_id ? " · Local selecionado no painel" : ""}
+        </p>}
         {filtered && <Button type="button" variant="outline" onClick={() => setParams({})}>Limpar filtros</Button>}
       </div>
+      {canViewCosts && !filtered && <PurchaseQuotes scope={scope} queryKey={queryKey} canManage={canManage} />}
       {purchases.isPending ? <StoreState title="Carregando pedidos" busy /> :
         purchases.isError ? <StoreFailure message={storeError(purchases.error)} retry={() => void purchases.refetch()} /> :
           !purchases.data.items.length ? (

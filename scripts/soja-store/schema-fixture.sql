@@ -20,6 +20,7 @@ CREATE TABLE public.commissions (
   slug text NOT NULL,
   is_active boolean NOT NULL DEFAULT true,
   unit_type text NOT NULL DEFAULT 'comissao',
+  nome text NOT NULL DEFAULT 'Comissão de teste',
   UNIQUE (id, org_id),
   UNIQUE (org_id, slug)
 );
@@ -35,6 +36,7 @@ CREATE TABLE public.org_members (
 CREATE TABLE public.commission_people (
   id uuid PRIMARY KEY,
   org_id uuid NOT NULL REFERENCES public.organizations(id),
+  display_name text NOT NULL DEFAULT 'Pessoa de teste',
   user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   UNIQUE (id, org_id),
   UNIQUE (org_id, user_id)
