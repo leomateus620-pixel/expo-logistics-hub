@@ -54,9 +54,11 @@ import {
 } from 'react';
 import { Canvas, type RootState, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, useTexture } from '@react-three/drei';
-import { Utensils } from 'lucide-react';
 import { CommercialMapSceneShaderWarmup } from './CommercialMapSceneShaderWarmup';
 import { CommercialMapPresentation } from './CommercialMapPresentation';
+import { useCommercialMapPresentationVisible } from './CommercialMapPresentationContext';
+import { GastronomyStructureMarkers, type GastronomyMarkerAnchor } from './GastronomyStructureMarkers';
+import { resolveGastronomyMarkerAnchor } from './gastronomyMarkerAnchor';
 import { COMMERCIAL_MAP_PRESENTATION_EVENT, isCommercialMapPresentationVisible } from '../../utils/frameActivity';
 import { readPreparedHeadquartersGeometry } from './headquarters/headquartersPreparationResource';
 import { CommercialMapInteractiveBoot, DeferredSceneLayer } from './DeferredSceneLayer';
@@ -394,6 +396,16 @@ function calculateContextualLabelPosition(
     THREE.MathUtils.clamp(y, 46, size.height - 12),
   ];
 }
+
+function calculateGastronomyLabelPosition(
+  object: THREE.Object3D,
+  camera: THREE.Camera,
+  size: { width: number; height: number },
+): [number, number] {
+  const [x, y] = calculateContextualLabelPosition(object, camera, size);
+  return [x, Math.min(y, size.height - 60)];
+}
+
 const PRECISE_HOVER_CAPABLE = typeof window === 'undefined'
   || !window.matchMedia
   || window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
@@ -1858,6 +1870,7 @@ const EntityLabel = memo(function EntityLabel({
   filtersActive,
   isMatch,
   cinematicHidden,
+  gastronomyAnchor,
 }: {
   entity: MapEntity;
   lot?: CommercialLot;
@@ -1866,6 +1879,7 @@ const EntityLabel = memo(function EntityLabel({
   filtersActive: boolean;
   isMatch: boolean;
   cinematicHidden: boolean;
+  gastronomyAnchor?: GastronomyMarkerAnchor['position'];
 }) {
   const metadata = useMemo(() => normalizeMapEntityMetadata(entity, lot), [entity, lot]);
   const classification = entity.classification;
@@ -1887,7 +1901,7 @@ const EntityLabel = memo(function EntityLabel({
 
   return (
     <Html
-      position={[
+      position={gastronomyAnchor ?? [
         contextualRoadAnchor?.[0] ?? metadata.labelAnchor[0],
         entity.geometry.elevation + labelHeight,
         contextualRoadAnchor?.[1] ?? metadata.labelAnchor[1],
@@ -1895,10 +1909,11 @@ const EntityLabel = memo(function EntityLabel({
       transform={false}
       eps={0.001}
       zIndexRange={[22, 2]}
-      calculatePosition={calculateContextualLabelPosition}
+      calculatePosition={gastronomyAnchor ? calculateGastronomyLabelPosition : calculateContextualLabelPosition}
       style={{
         pointerEvents: 'none',
-        transform: isSoldLot(lot?.status) ? 'translate3d(-50%, calc(-100% - 24px), 0)' : 'translate3d(-50%, -100%, 0)',
+        transform: gastronomyAnchor ? 'translate3d(-50%, 18px, 0)'
+          : isSoldLot(lot?.status) ? 'translate3d(-50%, calc(-100% - 24px), 0)' : 'translate3d(-50%, -100%, 0)',
         visibility: cinematicHidden ? 'hidden' : 'visible',
       }}
     >
@@ -4700,6 +4715,39 @@ function NightAwareResidentialDistrict(props: ComponentProps<typeof LateralResid
   return <LateralResidentialDistrict {...props} nightMode={night || props.nightMode} />;
 }
 
+function ExteriorGastronomyMarkers({
+  night,
+  qualityTier,
+  ...props
+}: Omit<ComponentProps<typeof GastronomyStructureMarkers>, 'motionEnabled' | 'reducedGraphics' | 'limitedAnimation'> & {
+  qualityTier: CommercialMapQualityTier;
+}) {
+  const presentationVisible = useCommercialMapPresentationVisible();
+  const globalNight = useCommercialMapStore((state) => state.nightModeActive);
+  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const [motionAllowed, setMotionAllowed] = useState(false);
+
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setMotionAllowed(!preference.matches && document.visibilityState === 'visible');
+    update();
+    preference.addEventListener('change', update);
+    document.addEventListener('visibilitychange', update);
+    return () => {
+      preference.removeEventListener('change', update);
+      document.removeEventListener('visibilitychange', update);
+    };
+  }, []);
+
+  return <GastronomyStructureMarkers
+    {...props}
+    night={globalNight || night}
+    motionEnabled={presentationVisible && motionAllowed}
+    reducedGraphics={reducedGraphics || qualityTier === 'LOW'}
+    limitedAnimation={qualityTier === 'MEDIUM'}
+  />;
+}
+
 const EMPTY_PUBLIC_SALES: ReadonlySet<string> = new Set();
 
 const Scene = memo(function Scene({
@@ -4764,6 +4812,7 @@ const Scene = memo(function Scene({
   const lunarLaunchPhase = useCommercialMapStore((state) => state.lunarLaunchPhase);
   const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
   const lunarCinematicActive = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
+  const sunriseRunning = useCommercialMapStore((state) => state.sunrisePhase === 'running');
   const soyCinematicActive = useSoyHarvestStore(state => state.enabled || state.status === 'restoring');
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const fallbackSegmentId = useCommercialMapStore((state) => sceneSegmentId === undefined ? state.activeSegmentId : null);
@@ -5035,6 +5084,28 @@ const Scene = memo(function Scene({
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )).map((entity) => rearParkingEnabled ? rearParkingEntityForPresentation(entity) : entity), [nonLotEntities, rearParkingEnabled]);
+  const gastronomyFocused = activeSegmentId === COMMERCIAL_MAP_SEGMENT_IDS.gastronomy
+    || segmentOverride?.id === COMMERCIAL_MAP_SEGMENT_IDS.gastronomy;
+  const gastronomyMarkerAnchors = useMemo(() => {
+    const anchors: GastronomyMarkerAnchor[] = [];
+    for (const entity of structuralEntities) {
+      if (!gastronomyStructureIds.has(entity.id) || !canInspectEntity(entity.id)
+        || layerVisibility[entity.layerId] === false || (layerOpacity[entity.layerId] ?? 1) <= 0.015
+        || (entityFiltersActive && !presentedMatchingEntityIds.has(entity.id))) continue;
+      const position = resolveGastronomyMarkerAnchor(entity);
+      if (position) anchors.push({ id: entity.id, position });
+    }
+    return anchors;
+  }, [canInspectEntity, entityFiltersActive, gastronomyStructureIds, layerOpacity, layerVisibility,
+    presentedMatchingEntityIds, structuralEntities]);
+  const showGastronomyMarkers = !publicPolicy && !interiorEntity && !visitEnabled && !hydrologicalModeActive
+    && !lunarCinematicActive && !soyCinematicActive && !sunriseRunning && !parkingInspectionOpen
+    && (!activeSegmentId || activeSegmentId === COMMERCIAL_MAP_SEGMENT_IDS.gastronomy)
+    && (!segmentOverride || segmentOverride.id === COMMERCIAL_MAP_SEGMENT_IDS.gastronomy)
+    && gastronomyMarkerAnchors.length > 0;
+  const selectedGastronomyAnchor = showGastronomyMarkers
+    ? gastronomyMarkerAnchors.find(({ id }) => id === selectedEntityId)?.position
+    : undefined;
   const pavilionComplexEntities = useMemo(() => publicPolicy
     ? structuralEntities.filter(entity => publicPolicy.activeScope.has(entity.id))
     : structuralEntities, [publicPolicy, structuralEntities]);
@@ -5633,6 +5704,7 @@ const Scene = memo(function Scene({
           filtersActive={entityFiltersActive}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           cinematicHidden={lunarCinematicActive}
+          gastronomyAnchor={entity.id === selectedEntityId ? selectedGastronomyAnchor : undefined}
         />
       ))}
       {technicalValidationAllowed
@@ -5655,18 +5727,17 @@ const Scene = memo(function Scene({
           <QuadrasABValidationOverlay />
         </Suspense>
       )}
+      {showGastronomyMarkers && (
+          <ExteriorGastronomyMarkers
+            anchors={gastronomyMarkerAnchors}
+            focused={gastronomyFocused}
+            selectedId={selectedEntityId}
+            night={nightAtmosphereActive}
+            qualityTier={renderQualityTier}
+          />
+        )}
         </group></PublicContextGroup>}
       </InteriorCameraRequestContext.Provider>
-      {!publicPolicy && activeSegmentId === 'gastronomia' && !interiorEntity && !visitEnabled
-        && !hydrologicalModeActive && !lunarCinematicActive && exteriorRenderedEntities.map((entity) => {
-          if (!gastronomyStructureIds.has(entity.id) || entity.id === selectedEntityId
-            || (entityFiltersActive && !presentedMatchingEntityIds.has(entity.id))) return null;
-          const [x, z] = geometryCentroid(entity.geometry);
-          return <Html key={entity.id} center position={[x, entity.geometry.elevation + entityLabelHeight(entity), z]}
-            style={{ pointerEvents: 'none' }} zIndexRange={[20, 2]}>
-            <span className="commercial-map-food-marker" aria-hidden="true"><Utensils />{entity.publicIdentifier}</span>
-          </Html>;
-        })}
       <CameraRig
         selectedEntity={selectedEntity}
         interiorEntity={interiorEntity}
