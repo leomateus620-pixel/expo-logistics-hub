@@ -1,23 +1,32 @@
 import { useRef, useState } from 'react';
-import { ArrowLeft, ChevronDown, DoorOpen, ShoppingCart, Utensils, X } from 'lucide-react';
+import { ArrowLeft, ChevronDown, DoorOpen, FileLock2, Paperclip, Pencil, ShoppingCart, Utensils, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { STATUS_CONFIG } from '../../constants';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
+import { useLotContractHistory } from '../../hooks/useCommercialMap';
+import type { SaleContractVersion } from '../../dashboard/salesOrders/salesOrdersService';
 import { isSellableLot, toSalesEntry } from '../../sales/salesEntry';
 import { formatCents, toCents } from '../../sales/salesMoney';
 import { useSalesStore } from '../../sales/useSalesSelection';
 import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
+import type { LotContractHistoryDocument } from '../../services/commercialMapService';
 import { useSaleInspectionStore } from '../../state/useSaleInspectionStore';
-import { toCommercialPhase, type CommercialLot, type CommercialMapData, type MapEntity } from '../../types';
+import { toCommercialPhase, type CommercialLot, type CommercialMapData, type MapEntity, type MapPermissions } from '../../types';
 import { FENASOJA_RESTAURANT_PRESENTATION_NAME } from '../../utils/fenasojaRestaurant';
 import { formatBrl } from '../../utils/lotPricing2028';
+import { LotContractFileButton } from '../commercial/LotContractFileButton';
+import { LotWorkflowDialog } from '../commercial/LotWorkflowDialog';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
+import { LotActivityList } from './LotActivityList';
 import './gastronomy-structure-panel.css';
 
-export function GastronomyStructurePanel({ structure, points, canSell, mapData, onEnterInterior, onClose }: {
+type PointPermissions = Pick<MapPermissions, 'canManageSales' | 'canManageContracts'>;
+
+export function GastronomyStructurePanel({ structure, points, canSell, permissions, mapData, onEnterInterior, onClose }: {
   structure: MapEntity;
   points: readonly { entity: MapEntity; lot: CommercialLot }[];
   canSell: boolean;
+  permissions: PointPermissions;
   mapData: Pick<CommercialMapData, 'lots' | 'entities'>;
   onEnterInterior?: () => void;
   onClose: () => void;
@@ -135,6 +144,9 @@ export function GastronomyStructurePanel({ structure, points, canSell, mapData, 
                     {lot.currentBuyer && <div><dt>Expositor</dt><dd>{lot.currentBuyer}</dd></div>}
                   </dl>
                   {canSell && lot.status === 'SALE_OPEN' && <SaleOpenSection lotId={lot.id} canManageSales mapData={mapData} />}
+                  {(permissions.canManageContracts || permissions.canManageSales) && !lot.id.startsWith('reference:') && !lot.archivedAt && (
+                    <GastronomyPointContracts lot={lot} structureName={name} permissions={permissions} />
+                  )}
                 </>}
               </div>
             </li>;
@@ -148,4 +160,124 @@ export function GastronomyStructurePanel({ structure, points, canSell, mapData, 
       </footer>}
     </aside>
   );
+}
+
+const contractDateTime = new Intl.DateTimeFormat('pt-BR', {
+  dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo',
+});
+
+type ContractAction = { mode: 'upload' | 'metadata'; document?: LotContractHistoryDocument };
+type ContractTarget = ContractAction & { saleId: string; orderId: string | null };
+
+function contractSaleReference(document: LotContractHistoryDocument) {
+  if (document.orderId) return `PV-${document.orderId.slice(0, 8).toUpperCase()}`;
+  if (document.saleId) return `LG-${document.saleId.slice(0, 8).toUpperCase()}`;
+  return 'Venda de origem não identificada';
+}
+
+function versionAuthor(version: SaleContractVersion) {
+  return version.uploadedByName || (version.uploadedBy ? 'Nome do responsável indisponível' : 'Autoria não registrada');
+}
+
+function GastronomyPointContracts({ lot, structureName, permissions }: {
+  lot: CommercialLot;
+  structureName: string;
+  permissions: PointPermissions;
+}) {
+  const contractHistory = useLotContractHistory(lot.id);
+  const [action, setAction] = useState<ContractTarget | null>(null);
+  const actionTrigger = useRef<HTMLButtonElement | null>(null);
+  const data = contractHistory.data;
+  const accessible = permissions.canManageContracts && Boolean(data?.documentsAccessible);
+  const canUpload = accessible && Boolean(data?.canUpload && data.saleId);
+  const documents = accessible ? data?.contracts ?? [] : [];
+  const current = documents.filter((contract) => contract.isCurrent);
+  const history = documents.filter((contract) => !contract.isCurrent || contract.versions.some((version) => version.version !== contract.activeVersion));
+  const showActivity = Boolean(data?.canViewHistory);
+
+  function openAction(next: ContractAction, trigger: HTMLButtonElement) {
+    if (!canUpload || !data?.saleId) return;
+    actionTrigger.current = trigger;
+    setAction({ ...next, saleId: data.saleId, orderId: data.orderId });
+  }
+
+  function closeAction() {
+    setAction(null);
+    requestAnimationFrame(() => {
+      if (actionTrigger.current?.isConnected) actionTrigger.current.focus({ preventScroll: true });
+    });
+  }
+
+  if (contractHistory.isLoading) return <p className="gastronomy-panel__contract-status" role="status">
+    {permissions.canManageContracts ? 'Carregando documentos autorizados…' : 'Carregando histórico…'}
+  </p>;
+  if (contractHistory.isError) return <div className="gastronomy-panel__contract-status" role="alert">
+    <p>{permissions.canManageContracts ? 'Não foi possível carregar os contratos deste ponto.' : 'Não foi possível carregar o histórico deste ponto.'}</p>
+    <Button type="button" variant="outline" size="sm" onClick={() => { void contractHistory.refetch(); }} disabled={contractHistory.isFetching}>Tentar novamente</Button>
+  </div>;
+
+  return <>
+    {accessible && (data?.saleId || current.length > 0) && <section className="gastronomy-panel__contracts" aria-label="Contratos do ponto">
+      <h4><FileLock2 aria-hidden="true" />Contratos do ponto</h4>
+      {current.length === 0 && <p>Nenhum contrato vigente anexado.</p>}
+      {current.map((contract) => {
+        const version = contract.versions.find((version) => version.version === contract.activeVersion);
+        return <article className="gastronomy-panel__contract" key={contract.contractId}>
+          <div className="gastronomy-panel__contract-name">
+            <strong>{version?.originalName ?? 'Arquivo indisponível'}</strong>
+            <span>{contract.scope === 'LOT' ? 'Contrato individual' : 'Documento da venda'} · {contractSaleReference(contract)}</span>
+            {contract.contractNumber && <span>Contrato {contract.contractNumber}</span>}
+            {version && <>
+              <span>Versão {version.version} · {contractDateTime.format(new Date(version.uploadedAt))}</span>
+              <span>{versionAuthor(version)}</span>
+            </>}
+          </div>
+          <div className="gastronomy-panel__contract-actions">
+            {version && <LotContractFileButton version={version} className="gastronomy-panel__contract-open">Abrir contrato</LotContractFileButton>}
+            {canUpload && <>
+              <Button type="button" variant="outline" size="sm" onClick={(event) => openAction({ mode: 'upload', document: contract }, event.currentTarget)}>
+                Substituir contrato
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={(event) => openAction({ mode: 'metadata', document: contract }, event.currentTarget)}>
+                <Pencil aria-hidden="true" />Editar dados do contrato
+              </Button>
+            </>}
+          </div>
+        </article>;
+      })}
+      {canUpload && !current.some((contract) => contract.scope === 'LOT') && (
+        <Button type="button" size="sm" onClick={(event) => openAction({ mode: 'upload' }, event.currentTarget)}>
+          <Paperclip aria-hidden="true" />Anexar contrato
+        </Button>
+      )}
+    </section>}
+
+    {(showActivity || history.length > 0) && <details className="gastronomy-panel__contract-history">
+      <summary>Histórico de contratos</summary>
+      {history.map((contract) => {
+        const versions = contract.versions.filter((version) => !contract.isCurrent || version.version !== contract.activeVersion);
+        return <article className="gastronomy-panel__contract" key={contract.contractId}>
+          <div className="gastronomy-panel__contract-name">
+            <strong>{contractSaleReference(contract)}</strong>
+            <span>{contract.scope === 'LOT' ? 'Contrato individual' : 'Documento da venda'}</span>
+          </div>
+          {versions.map((version) => <div className="gastronomy-panel__contract-version" key={version.id}>
+            <strong>{version.originalName}</strong>
+            <span>Versão {version.version} · {contractDateTime.format(new Date(version.uploadedAt))}</span>
+            <span>{versionAuthor(version)}</span>
+            <LotContractFileButton version={version} className="gastronomy-panel__contract-open">Abrir contrato</LotContractFileButton>
+          </div>)}
+        </article>;
+      })}
+      {showActivity && <div className="commercial-map-activity"><LotActivityList items={data?.history} loading={false} showActor /></div>}
+    </details>}
+
+    {action && canUpload && action.saleId === data?.saleId && action.orderId === data.orderId && <LotWorkflowDialog
+      key={`${lot.id}:${action.saleId}:${action.document?.contractId ?? 'new'}:${action.mode}`}
+      lot={lot}
+      workflow="contract"
+      contractTarget={{ structureName, ...action }}
+      onClose={closeAction}
+    />}
+  </>;
 }

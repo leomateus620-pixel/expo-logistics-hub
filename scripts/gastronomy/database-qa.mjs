@@ -11,8 +11,10 @@ const gastronomyMember = '00000000-0000-4000-a000-000000000011';
 const mapViewer = '00000000-0000-4000-a000-000000000012';
 const ruralMember = '00000000-0000-4000-a000-000000000013';
 const sellerWithoutContracts = '00000000-0000-4000-a000-000000000014';
+const contractsOnly = '00000000-0000-4000-a000-000000000015';
 const db = postgres({ host: '127.0.0.1', port: 55438, database: 'gastronomy_qa', user: 'postgres', max: 6, onnotice: () => {} });
 const migration = await fs.readFile(new URL('../../supabase/migrations/20261111190000_commercial_gastronomy.sql', import.meta.url), 'utf8');
+const contractMigration = await fs.readFile(new URL('../../supabase/migrations/20261112190000_commercial_contract_history.sql', import.meta.url), 'utf8');
 const asUser = (user, operation) => db.begin(async (tx) => {
   await tx.unsafe('SET LOCAL ROLE authenticated');
   await tx`SELECT set_config('request.jwt.claim.sub',${user},true)`;
@@ -33,6 +35,7 @@ const cancel = (order, items) => asUser(seller, (tx) => tx`SELECT cancel_sale_or
 const confirm = (order, items) => asUser(seller, (tx) => tx`SELECT confirm_sale_order_items(${order},${tx.array(items)}::uuid[])`);
 const getItems = (id) => db`SELECT * FROM lot_sale_order_items WHERE order_id=${id} ORDER BY public_identifier`;
 const getStatus = async (id) => (await db`SELECT status FROM commercial_lots WHERE id=${id}`)[0].status;
+const pointHistory = (lot, user = seller) => asUser(user, async (tx) => (await tx`SELECT get_lot_contract_history(${lot}) AS result`)[0].result);
 
 try {
   assert.ok((await db`SELECT 1 FROM map_projects WHERE id=${project} AND org_id=${org}`).length, 'Disposable QA project required');
@@ -104,19 +107,25 @@ try {
   assert.equal(first.header.feesTotal,0);
 
   const docPath = org + '/orders/' + order + '/qa.pdf';
-  const pointDocPath = org + '/' + central + '/central.pdf';
-  await db`INSERT INTO storage.objects VALUES ('map-contracts',${docPath}),('map-contracts',${pointDocPath})`;
+  const pointDocPath = org + '/' + pizza + '/pizza.pdf';
+  const pointReplacement = org + '/' + pizza + '/pizza-v2.pdf';
+  const sharedReplacement = org + '/orders/' + order + '/qa-v2.pdf';
+  const rejectedReplacement = org + '/' + pizza + '/rejected.pdf';
+  await db`INSERT INTO user_capabilities VALUES (${contractsOnly},${org},'map.manage_contracts')`;
+  await db`INSERT INTO storage.objects (bucket_id,name,owner_id)
+    SELECT 'map-contracts', p, ${seller} FROM unnest(${db.array([docPath,pointDocPath,pointReplacement,sharedReplacement,rejectedReplacement])}::text[]) p`;
   await asUser(seller, (tx) => tx`SELECT attach_order_contract(${order},${tx.array([central,pizza])}::uuid[],${docPath},'qa.pdf','application/pdf',1024,'C2-TEST')`);
-  await assert.rejects(asUser(seller, (tx) => tx`SELECT register_lot_contract_version(${central},${pointDocPath},'central.pdf','application/pdf',1024,'C2-CENTRAL',${pizzaItem.sale_id})`), /SALE_CHANGED/);
-  await asUser(seller, (tx) => tx`SELECT register_lot_contract_version(${central},${pointDocPath},'central.pdf','application/pdf',1024,'C2-CENTRAL',${centralItem.sale_id})`);
+  await assert.rejects(asUser(seller, (tx) => tx`SELECT register_lot_contract_version(${pizza},${pointDocPath},'pizza.pdf','application/pdf',1024,'C2-PIZZA',${centralItem.sale_id})`), /SALE_CHANGED/);
+  await assert.rejects(asUser(seller, (tx) => tx`SELECT register_lot_contract_version(${pizza},${pointDocPath},'pizza.pdf','application/pdf',1024,'C2-PIZZA',${pizzaItem.sale_id})`), /SALE_NOT_SIGNED/);
   const attached = await detail(order);
-  assert.equal(attached.contracts.length,2);
+  assert.equal(attached.contracts.length,1);
   assert.equal(attached.contracts.find((row) => row.scope === 'ORDER_ITEMS').lotIds.length,2);
+  assert.equal((await pointHistory(pizza)).canUpload,false);
   assert.equal(await getStatus(central),'SALE_OPEN');
   const exported = (await asUser(seller, (tx) => tx`SELECT export_commercial_sale_orders(${project},p_segment_slug=>'gastronomia') AS result`))[0].result.rows;
   assert.equal(exported.length,1);
   assert.equal(exported[0].value,82464);
-  assert.equal(exported[0].documents.length,2);
+  assert.equal(exported[0].documents.length,1);
   assert.deepEqual(exported[0].locations, [{location:'Gastronomia · Restaurante · C2', lots:['Pizzaria (1 ponto de alimentação)','Restaurante Central (1 ponto de alimentação)']}]);
   const restrictedList = await asUser(sellerWithoutContracts, async (tx) => (await tx`
     SELECT list_commercial_sale_orders(${project},p_segment_slug=>'gastronomia') AS result
@@ -143,9 +152,58 @@ try {
   assert.equal(await getStatus(pizza),'SOLD');
   assert.equal(await getStatus(central),'SALE_OPEN');
   await db.begin((tx) => tx.unsafe(migration.replace(/^BEGIN;\s*/, '').replace(/COMMIT;\s*$/, '')));
+  await db.unsafe(contractMigration);
   assert.equal(await getStatus(pizza),'SOLD');
   assert.equal((await getItems(order))[1].id,pizzaItem.id);
   assert.equal((await db`SELECT count(*)::int AS n FROM commercial_lots WHERE commercial_unit='FOOD_POINT'`)[0].n,12);
+
+  const pointUpload = (user = seller) => asUser(user, (tx) => tx`SELECT register_lot_contract_version(${pizza},${pointDocPath},'pizza.pdf','application/pdf',1024,'C2-PIZZA',${pizzaItem.sale_id})`);
+  await assert.rejects(pointUpload(sellerWithoutContracts), /MAP_PERMISSION_DENIED/);
+  await pointUpload();
+  const pizzaHistory = await pointHistory(pizza);
+  const individual = pizzaHistory.contracts.find((row) => row.scope === 'LOT');
+  const orderContract = pizzaHistory.contracts.find((row) => row.scope === 'ORDER_ITEMS');
+  assert.ok(pizzaHistory.canUpload && pizzaHistory.canViewHistory && pizzaHistory.documentsAccessible);
+  assert.equal(pizzaHistory.saleId,pizzaItem.sale_id);
+  assert.equal(individual.orderId,order);
+  assert.equal(orderContract.coverageCount,2);
+  assert.equal(individual.versions[0].uploadedBy,seller);
+  assert.equal((await pointHistory(central)).contracts.length,1);
+  const publicHistory = await pointHistory(pizza,mapViewer);
+  assert.equal(publicHistory.canViewHistory,false);
+  assert.deepEqual(publicHistory.contracts,[]);
+  assert.deepEqual(publicHistory.history,[]);
+  assert.deepEqual((await pointHistory(pizza,sellerWithoutContracts)).history.map((event) => event.action).sort(), ['LOT_SALE_CONFIRMED','LOT_SALE_OPEN']);
+  assert.deepEqual((await pointHistory(pizza,contractsOnly)).history.map((event) => event.action).sort(), ['CONTRACT_UPLOADED','ORDER_CONTRACT_UPLOADED']);
+
+  const replace = (path, expected, mime = 'application/pdf') => asUser(seller, (tx) => tx`
+    SELECT register_lot_contract_version(${pizza},${path},'pizza-v2.pdf',${mime},1024,'C2-PIZZA',${pizzaItem.sale_id},${individual.contractId},${expected})
+  `);
+  await assert.rejects(replace(rejectedReplacement,1,'text/plain'), /INVALID_CONTRACT_FILE/);
+  assert.equal((await pointHistory(pizza)).contracts.find((row) => row.scope === 'LOT').activeVersion,1);
+  await replace(pointReplacement,1);
+  await assert.rejects(replace(rejectedReplacement,1), /CONTRACT_CHANGED/);
+  await asUser(seller, (tx) => tx`
+    SELECT update_commercial_contract_metadata(${individual.contractId},'C2-PIZZA-EDIT',2,${pizza},${pizzaItem.sale_id})
+  `);
+  const replaced = (await pointHistory(pizza)).contracts.find((row) => row.scope === 'LOT');
+  assert.equal(replaced.contractNumber,'C2-PIZZA-EDIT');
+  assert.deepEqual(replaced.versions.map((row) => [row.version,Boolean(row.supersededAt)]),[[2,false],[1,true]]);
+  const metaAudit = (await pointHistory(pizza)).history.find((event) => event.action === 'CONTRACT_METADATA_UPDATED');
+  assert.equal(metaAudit.actorUserId,seller);
+  assert.equal(metaAudit.beforeState.contract_number,'C2-PIZZA');
+  assert.equal(metaAudit.afterState.contract_number,'C2-PIZZA-EDIT');
+  assert.equal((await detail(order)).contracts.find((row) => row.scope === 'LOT').contractNumber,replaced.contractNumber);
+  const replaceShared = (lot, sale) => asUser(seller, (tx) => tx`
+    SELECT replace_lot_order_contract(${lot},${sale},${orderContract.contractId},1,${sharedReplacement},'shared-v2.pdf','application/pdf',1024)
+  `);
+  await assert.rejects(replaceShared(central,centralItem.sale_id), /SALE_CHANGED/);
+  await replaceShared(pizza,pizzaItem.sale_id);
+  assert.equal((await pointHistory(central)).contracts[0].activeVersion,2);
+  assert.equal((await pointHistory(pizza)).contracts.find((row) => row.scope === 'ORDER_ITEMS').versions[0].storagePath,sharedReplacement);
+  assert.equal((await asUser(seller, (tx) => tx`DELETE FROM storage.objects WHERE bucket_id='map-contracts' AND name=${pointDocPath} RETURNING name`)).length,0);
+  assert.equal((await asUser(seller, (tx) => tx`DELETE FROM storage.objects WHERE bucket_id='map-contracts' AND name=${rejectedReplacement} RETURNING name`)).length,1);
+  await assert.rejects(asUser(seller, (tx) => tx`DELETE FROM lot_contract_versions WHERE id=${replaced.versions[1].id}`), /permission denied/);
 
   await db`UPDATE lot_sale_installments SET payment_status='PAID',paid_at=now() WHERE order_id=${order} AND installment_number=1`;
   await cancel(order,[centralItem.id]);
@@ -155,11 +213,14 @@ try {
   assert.equal(remaining.installments[0].amount,first.installments[0].amount);
   assert.equal(remaining.installments[0].paymentStatus,'PAID');
   assert.equal(remaining.header.negotiatedTotal,32357);
-  assert.deepEqual(remaining.contracts.find((row) => row.scope === 'LOT').lotIds,[]);
+  assert.deepEqual(remaining.contracts.find((row) => row.scope === 'LOT').lotIds,[pizza]);
   const shared = remaining.contracts.find((row) => row.scope === 'ORDER_ITEMS');
   assert.deepEqual(shared.lotIds,[pizza]);
   assert.ok(shared.historicalLotIds.includes(central));
   assert.equal(shared.versions[0].coveredLotIds.length,2);
+  assert.equal((await pointHistory(central)).contracts[0].isCurrent,false);
+  assert.equal((await pointHistory(central)).contracts[0].versions[0].storagePath,sharedReplacement);
+  assert.equal((await pointHistory(central)).history.find((event) => event.action === 'LOT_SALE_CANCELLED').actorUserId,seller);
 
   const revise = (add) => asUser(seller, (tx) => tx`SELECT revise_sale_order_items(${order},${tx.array([add])}::uuid[],p_reason=>'QA revisão')`);
   await assert.rejects(revise(id('GAST-D3-01')), /LOT_OUTSIDE_ORDER_SCOPE/);
@@ -170,6 +231,32 @@ try {
   assert.equal(revised.header.negotiatedTotal,82464);
   assert.equal(revised.installments[0].amount,first.installments[0].amount);
   assert.deepEqual(revised.contracts.find((row) => row.scope === 'ORDER_ITEMS').lotIds,[pizza]);
+  const revision = (await pointHistory(pizza)).history.find((event) => event.action === 'LOT_SALE_ORDER_REVISED'
+    && event.afterState.lots_after.includes('GAST-C2-01'));
+  assert.equal(revision.actorUserId,seller);
+  assert.deepEqual(revision.afterState.lots_before,['GAST-C2-02']);
+  assert.equal(revision.afterState.total_after,82464);
+
+  // Removing a signed item keeps its contract in the first sale. The same lot
+  // can subsequently acquire a different current contract under another sale.
+  await asUser(seller, (tx) => tx`SELECT revise_sale_order_items(${order},p_remove_item_ids=>${tx.array([pizzaItem.id])}::uuid[],p_reason=>'QA remoção')`);
+  const removed = await pointHistory(pizza);
+  assert.equal(removed.canUpload,false);
+  assert.ok(removed.contracts.every((row) => !row.isCurrent && row.orderId === order));
+  assert.deepEqual((await detail(order)).contracts.find((row) => row.scope === 'LOT').lotIds,[]);
+  const nextOrder = await runSale('resale-pizza',[pizza],3235700);
+  const [newItem] = await getItems(nextOrder);
+  await confirm(nextOrder,[newItem.id]);
+  const newDocument = org + '/' + pizza + '/new-sale.pdf';
+  await db`INSERT INTO storage.objects (bucket_id,name,owner_id) VALUES ('map-contracts',${newDocument},${seller})`;
+  await assert.rejects(asUser(seller, (tx) => tx`SELECT register_lot_contract_version(${pizza},${newDocument},'new.pdf','application/pdf',1024,NULL,${pizzaItem.sale_id})`), /SALE_CHANGED/);
+  await asUser(seller, (tx) => tx`SELECT register_lot_contract_version(${pizza},${newDocument},'new.pdf','application/pdf',1024,NULL,${newItem.sale_id})`);
+  const resold = await pointHistory(pizza);
+  assert.equal(resold.contracts.filter((row) => row.isCurrent).length,1);
+  assert.equal(resold.contracts.find((row) => row.isCurrent).orderId,nextOrder);
+  assert.equal(resold.contracts.find((row) => row.contractId === individual.contractId).versions.length,2);
+  assert.deepEqual((await detail(nextOrder)).contracts.map((row) => row.versions[0].storagePath),[newDocument]);
+  assert.equal((await detail(order)).contracts.find((row) => row.scope === 'LOT').contractId,individual.contractId);
 
   const mirante = inventory.filter((row) => row.anchor === 'D3').map((row) => row.id);
   const fullMirante = await runSale('mirante',mirante,11027000,{method:'BOLETO_AVISTA'});
@@ -195,6 +282,14 @@ try {
     assert.equal(mixedDetail.header.negotiatedTotal,87117);
     await cancel(mixed,(await getItems(mixed)).map((item) => item.id));
   }
+  const [ordinary] = areaLots;
+  const ordinaryOrder = await runSale('ordinary-contract',[ordinary.id],200000);
+  const [ordinaryItem] = await getItems(ordinaryOrder);
+  await confirm(ordinaryOrder,[ordinaryItem.id]);
+  const ordinaryPath = org + '/' + ordinary.id + '/ordinary.pdf';
+  await db`INSERT INTO storage.objects (bucket_id,name,owner_id) VALUES ('map-contracts',${ordinaryPath},${seller})`;
+  await asUser(seller, (tx) => tx`SELECT register_lot_contract_version(${ordinary.id},${ordinaryPath},'ordinary.pdf','application/pdf',1024,'ORDINARY')`);
+  assert.equal((await detail(ordinaryOrder)).contracts[0].versions[0].storagePath,ordinaryPath);
   console.log('Gastronomia PostgreSQL QA: 12 pontos, 6 estruturas, R$ 386.541,00, carga idempotente, RLS, três pagamentos, checkout misto, concorrência, revisão, documentos, exportação e relatório OK');
 } finally {
   await db.end();

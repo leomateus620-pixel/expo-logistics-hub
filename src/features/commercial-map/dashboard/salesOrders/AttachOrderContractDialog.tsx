@@ -47,7 +47,11 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
     try {
       if (scope === 'lot') {
         setPhase('upload');
-        await uploadLotContract({ orgId, lotId: lotIds[0], file, contractNumber: number, expectedSaleId: point?.saleId ?? undefined });
+        await uploadLotContract({ orgId, lotId: lotIds[0], file, contractNumber: number,
+          expectedSaleId: point?.saleId ?? undefined,
+          document: contract ? { ...contract, saleId: point?.saleId ?? null, orderId, isCurrent: true } : undefined,
+          onProgress: setPhase,
+        });
       } else {
         await attachOrderContract({ orgId, orderId, lotIds, file, contractNumber: number, contractId: contract?.contractId ?? null,
           onProgress: (p) => { if (p !== 'done') setPhase(p); } });

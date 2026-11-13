@@ -70,6 +70,7 @@ describe('upload protegido de contrato comercial', () => {
       lotId: lot.id,
       file,
       contractNumber: '2028-0042',
+      onProgress: expect.any(Function),
     }));
     expect(onClose).toHaveBeenCalledOnce();
   });

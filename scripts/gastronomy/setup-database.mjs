@@ -34,7 +34,10 @@ CREATE SCHEMA storage;
 CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
 CREATE TABLE public.profiles(user_id uuid PRIMARY KEY,full_name text);
 CREATE TABLE public.user_capabilities(user_id uuid,org_id uuid,capability text);
-CREATE TABLE storage.objects(bucket_id text,name text,PRIMARY KEY(bucket_id,name));
+CREATE TABLE storage.objects(bucket_id text,name text,owner_id text,PRIMARY KEY(bucket_id,name));
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+GRANT USAGE ON SCHEMA storage TO authenticated;
+GRANT SELECT,INSERT,DELETE ON storage.objects TO authenticated;
 CREATE SCHEMA supabase_migrations;
 CREATE TABLE supabase_migrations.schema_migrations(
   version text PRIMARY KEY, name text, statements text[], created_by text, idempotency_key text
@@ -43,6 +46,14 @@ CREATE FUNCTION public.is_org_member(uuid,uuid) RETURNS boolean LANGUAGE sql STA
 CREATE FUNCTION public.get_user_org_role(uuid,uuid) RETURNS text LANGUAGE sql STABLE AS $$ SELECT 'member'::text $$;
 CREATE FUNCTION public.has_role(uuid,text) RETURNS boolean LANGUAGE sql STABLE AS $$ SELECT false $$;
 CREATE FUNCTION public.map_has_explicit_capability(uuid,text) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER AS $$ SELECT EXISTS(SELECT 1 FROM public.user_capabilities WHERE user_id=auth.uid() AND org_id=$1 AND capability=$2) $$;
+CREATE FUNCTION public.map_capable_org_ids(text) RETURNS SETOF uuid LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  SELECT DISTINCT org_id FROM public.user_capabilities WHERE user_id=auth.uid() AND capability=$1
+$$;
+CREATE POLICY fixture_contract_insert ON storage.objects FOR INSERT TO authenticated WITH CHECK (
+  bucket_id='map-contracts' AND owner_id=auth.uid()::text
+  AND split_part(name,'/',1)='00000000-0000-4000-a000-000000000001'
+  AND public.map_has_explicit_capability('00000000-0000-4000-a000-000000000001','map.manage_contracts')
+);
 CREATE FUNCTION public.can_view_commercial_map(uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER AS $$ SELECT public.map_has_explicit_capability($1,'map.view') $$;
 CREATE FUNCTION public.commercial_buyer_display_name(text,text) RETURNS text LANGUAGE sql IMMUTABLE AS $$ SELECT coalesce(nullif($1,''),$2) $$;
 CREATE FUNCTION public.resolve_commission_map_segment_slug(text,jsonb) RETURNS text LANGUAGE sql IMMUTABLE AS $$ SELECT $2->>'segmentId' $$;
@@ -56,6 +67,7 @@ CREATE UNIQUE INDEX fixture_orders_idempotency ON lot_sale_orders(idempotency_ke
     ['20261006205836_58212db1-66a0-421c-930c-6bb298530d78.sql', 'map_accessible_segment_ids'],
     ['20260805024054_f6ec5234-96e6-4205-92a1-57e4cad25639.sql', 'set_map_entity_canonical_segment'],
     ['20261005160542_2682ef9a-0db6-4548-a154-387b5cf213e1.sql', 'revise_sale_order_items'],
+    ['20261005181153_de12d933-0d3d-4492-beca-78cec1c047fc.sql', 'get_sale_order_revisions'],
     ['20261021223000_commercial_sales_analytics.sql', 'confirm_sale_order_items'],
     ['20260929211814_22ba0d96-330c-4d85-9a35-9a1a69a78698.sql', 'get_commission_map_segment_inventory'],
     ['20261006202148_0eb20308-f82c-413a-b0fb-5a9695916bae.sql', 'commercial_map_lot_buyers'],
@@ -143,7 +155,8 @@ INSERT INTO commercial_price_rules(project_id,stage,scope_type,pavilion_identifi
 SELECT p.id,s,CASE WHEN b='P1' THEN 'PAVILION' ELSE 'BLOCK' END,CASE WHEN b='P1' THEN b END,
  CASE WHEN b<>'P1' THEN b END,100,10,'QA' FROM map_projects p CROSS JOIN unnest(ARRAY['RENOVACAO','SEGUNDA_ETAPA']) s CROSS JOIN unnest(ARRAY['P1','E','R','U']) b;
 INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000010',org_id,cap FROM map_projects CROSS JOIN unnest(ARRAY['map.view','map.manage_sales','map.manage_contracts']) cap;
-INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000014',org_id,'map.manage_sales' FROM map_projects;
+INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000014',org_id,cap FROM map_projects CROSS JOIN unnest(ARRAY['map.view','map.manage_sales']) cap;
+INSERT INTO profiles(user_id,full_name) VALUES ('00000000-0000-4000-a000-000000000010','Operador de teste');
 INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000011',org_id,'gastronomia_access' FROM map_projects;
 INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000012',org_id,'map.view' FROM map_projects;
 INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000013',org_id,'exporural_access' FROM map_projects;
@@ -152,6 +165,7 @@ INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000013',org_
   const { sql } = await buildMigrationEnvelope();
   await db.unsafe(sql);
   await db.unsafe(sql);
+  await db.unsafe(await migration('20261112190000_commercial_contract_history.sql'));
   console.log('Banco descartável gastronomy_qa preparado em 127.0.0.1:55438.');
 } catch(e) {
   console.error(e.message, e.code, e.where ?? '', e.detail ?? '', e.position ?? '');

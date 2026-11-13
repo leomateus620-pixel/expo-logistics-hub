@@ -20,6 +20,7 @@ import {
   fetchLotActivity,
   fetchLotSaleHistory,
   fetchLotContractVersions,
+  fetchLotContractHistory,
   mergeCommercialLots,
   publishCommercialMap,
   registerLotSale,
@@ -33,6 +34,7 @@ import {
   startLotNegotiation,
   uploadMapReference,
   uploadLotContract,
+  updateLotContractMetadata,
   updateCommercialLot,
 } from '../services/commercialMapService';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
@@ -53,10 +55,14 @@ import {
 import { resolveMapPermissions } from '../utils/permissions';
 import { resolveContextualMapScope } from '../utils/contextualMapSummary';
 import { foodPointsByStructure, getCommercialMapSegment } from '../data/commercialMapSegments';
-import { scheduleCommercialMapRefresh } from '../queries/commercialMapRefresh';
+import { LOT_CONTRACT_HISTORY_KEY, refreshLotContractHistory, scheduleCommercialMapRefresh } from '../queries/commercialMapRefresh';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
   MAP_PERMISSION_DENIED: 'Você não possui permissão para concluir esta operação.',
+  SALE_CHANGED: 'A venda deste ponto mudou. Atualize a ficha antes de tentar novamente.',
+  SALE_NOT_SIGNED: 'Confirme a assinatura da venda antes de editar o contrato do ponto.',
+  CONTRACT_CHANGED: 'O contrato foi atualizado por outra pessoa. Atualize a ficha antes de tentar novamente.',
+  CONTRACT_OBJECT_NOT_FOUND: 'O armazenamento não confirmou o arquivo. Tente novamente.',
   GEOMETRY_VERSION_CONFLICT: 'A geometria foi alterada por outra pessoa. Recarregue o mapa antes de tentar novamente.',
   LOT_VERSION_CONFLICT: 'O cadastro do lote foi alterado por outra pessoa. Recarregue os dados antes de tentar novamente.',
   INVALID_POLYGON: 'O desenho gerou um polígono inválido. Corrija o traçado antes de salvar.',
@@ -93,7 +99,7 @@ const MAP_ERROR_MESSAGES: Record<string, string> = {
   MAP_SEGMENT_INVENTORY_MISMATCH: 'O inventário persistido diverge do perímetro aprovado e foi bloqueado por segurança.',
 };
 
-function mapErrorMessage(error: unknown): string {
+export function mapErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : typeof error === 'object' && error && 'message' in error ? String(error.message) : '';
   const translated = Object.entries(MAP_ERROR_MESSAGES).find(([code]) => message.includes(code));
   if (translated) return translated[1];
@@ -447,15 +453,42 @@ export function useMapMutations() {
     mutationFn: uploadLotContract,
     onSuccess: async (_data, variables) => {
       await Promise.all([
-        invalidate(),
+        refreshLotContractHistory(queryClient),
+        queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] }),
+        queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }),
         queryClient.invalidateQueries({ queryKey: ['commercial-map', 'contracts', variables.lotId] }),
+        queryClient.invalidateQueries({ queryKey: ['commercial-map', 'activity', variables.lotId] }),
       ]);
       toast.success('Contrato armazenado com acesso privado.');
     },
     onError: (error) => toast.error('Falha no envio do contrato', { description: errorMessage(error) }),
   });
 
-  return { bootstrap, exporuralSync, geometry, lotCreation, lotUpdate, lotAvailability, layerLock, verification, publish, calibration, split, merge, referenceUpload, reservation, negotiation, sale, contract };
+  const contractMetadata = useMutation({
+    mutationFn: updateLotContractMetadata,
+    onSuccess: async (_data, { lotId }) => {
+      await Promise.all([
+        refreshLotContractHistory(queryClient),
+        queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] }),
+        queryClient.invalidateQueries({ queryKey: ['commercial-map', 'contracts', lotId] }),
+        queryClient.invalidateQueries({ queryKey: ['commercial-map', 'activity', lotId] }),
+      ]);
+      toast.success('Dados do contrato atualizados.');
+    },
+  });
+
+  return { bootstrap, exporuralSync, geometry, lotCreation, lotUpdate, lotAvailability, layerLock, verification, publish, calibration, split, merge, referenceUpload, reservation, negotiation, sale, contract, contractMetadata };
+}
+
+export function useLotContractHistory(lotId: string | null, enabled = true) {
+  const { user } = useAuth();
+  const { orgId } = useCurrentOrg();
+  return useQuery({
+    queryKey: [...LOT_CONTRACT_HISTORY_KEY, lotId, orgId, user?.id],
+    queryFn: ({ signal }) => fetchLotContractHistory(lotId!, signal),
+    enabled: Boolean(lotId && enabled && orgId && user?.id && !lotId.startsWith('reference:')),
+    staleTime: 15_000,
+  });
 }
 
 export function useLotActivity(lotId: string | null) {

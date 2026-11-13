@@ -39,8 +39,8 @@
 .gastronomy-panel__counts [data-status="SOLD"] { background: #dcecff; color: #244d7d; }
 .gastronomy-panel__counts [data-status="BLOCKED"] { background: #e9ebe9; color: #48504a; }
 .gastronomy-panel__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
-.gastronomy-panel__list li { border: 1px solid #d7dfd7; border-radius: 10px; background: #fbfcfa; }
-.gastronomy-panel__list li[data-inspected="true"] { border-color: #3573a5; box-shadow: inset 0 0 0 1px #3573a5; }
+.gastronomy-panel__list > li { border: 1px solid #d7dfd7; border-radius: 10px; background: #fbfcfa; }
+.gastronomy-panel__list > li[data-inspected="true"] { border-color: #3573a5; box-shadow: inset 0 0 0 1px #3573a5; }
 .gastronomy-panel__row { display: flex; min-width: 0; align-items: center; }
 .gastronomy-panel__point-button {
   display: grid;
@@ -70,6 +70,56 @@
 .gastronomy-panel__point-detail dl > div { display: flex; justify-content: space-between; gap: 10px; }
 .gastronomy-panel__point-detail dt { color: #536259; }
 .gastronomy-panel__point-detail dd { margin: 0; text-align: right; font-weight: 650; overflow-wrap: anywhere; }
+.gastronomy-panel__contracts,
+.gastronomy-panel__contract-history,
+.gastronomy-panel__contract-status {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #d7dfd7;
+  font-size: .8rem;
+}
+.gastronomy-panel__contracts { display: grid; justify-items: start; gap: 8px; }
+.gastronomy-panel__contracts h4,
+.gastronomy-panel__contracts p,
+.gastronomy-panel__contract-status p { margin: 0; }
+.gastronomy-panel__contracts h4 { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+.gastronomy-panel__contracts h4 svg { width: 16px; height: 16px; color: #385b43; }
+.gastronomy-panel__contracts > p { color: #536259; }
+.gastronomy-panel__contract-status[role="alert"] { color: #8c3029; }
+.gastronomy-panel__contract-status > button { margin-top: 6px; }
+.gastronomy-panel__contract {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #d7dfd7;
+  border-radius: 8px;
+  background: #f5f8f3;
+}
+.gastronomy-panel__contract-name,
+.gastronomy-panel__contract-version { display: grid; min-width: 0; gap: 3px; overflow-wrap: anywhere; }
+.gastronomy-panel__contract-name > span,
+.gastronomy-panel__contract-version > span { color: #536259; font-size: .75rem; }
+.gastronomy-panel__contract-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
+.gastronomy-panel__contract-version { padding-top: 7px; border-top: 1px solid #d7dfd7; }
+.gastronomy-panel__contract-open {
+  justify-self: start;
+  min-height: 36px;
+  padding: 5px 12px;
+  border: 1px solid #376044;
+  border-radius: 8px;
+  background: #376044;
+  color: #fff;
+  font-weight: 700;
+}
+.gastronomy-panel__contract-open:hover { background: #2a4b35; }
+.gastronomy-panel__contract-open:focus-visible { outline: 2px solid #345d41; outline-offset: 2px; }
+.gastronomy-panel__contract-history > summary { width: fit-content; font-weight: 700; cursor: pointer; }
+.gastronomy-panel__contract-history > article { margin-top: 8px; }
+.gastronomy-panel__contract-history .commercial-map-activity span { min-width: 0; overflow-wrap: anywhere; }
+.gastronomy-panel__contract-history .commercial-map-activity strong { font-size: .8rem; text-transform: none; }
+.gastronomy-panel__contract-history .commercial-map-activity small { font-size: .74rem; color: #536259; }
 .gastronomy-panel__actions {
   display: flex;
   align-items: center;
@@ -105,5 +155,6 @@
   .commercial-map-viewport .gastronomy-panel[data-sheet-state="expanded"] .gastronomy-panel__body { display: block; overflow: auto; }
   .commercial-map-viewport .commercial-map-panel.gastronomy-panel.is-selling { bottom: max(70px, calc(env(safe-area-inset-bottom) + 64px)); }
   .gastronomy-panel__point-button { min-height: 56px; }
+  .gastronomy-panel__contracts button, .gastronomy-panel__contract-history button { min-height: 44px; }
 }
 .gastronomy-panel[data-sheet-state="collapsed"] .gastronomy-panel__actions { display: none; }
