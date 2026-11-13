@@ -1,5 +1,6 @@
 import { Component, lazy, Suspense, useMemo, type ComponentProps, type ReactNode } from 'react';
 import { useChristmasSession } from './christmasSession';
+import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import type ChristmasExperience from './ChristmasExperience';
 
 let runtime: Promise<typeof import('./ChristmasExperience')> | undefined;
@@ -18,7 +19,8 @@ class ChristmasBoundary extends Component<{ id: number; children: ReactNode }, {
   render() { return this.state.failed ? null : this.props.children; }
 }
 
-export function ChristmasLayer(props: Omit<ComponentProps<typeof ChristmasExperience>, 'id'>) {
+export function ChristmasLayer({ reduced, ...props }: Omit<ComponentProps<typeof ChristmasExperience>, 'id'>) {
+  const reducedGraphics = useCommercialMapStore(state => state.reducedGraphics);
   const id = useChristmasSession(state => state.id);
   const active = useChristmasSession(state => state.phase === 'preparing' || state.phase === 'flying');
   const Experience = useMemo(() => lazy(loadExperience), [id]);
@@ -26,7 +28,7 @@ export function ChristmasLayer(props: Omit<ComponentProps<typeof ChristmasExperi
 
   return (
     <ChristmasBoundary id={id} key={id}>
-      <Suspense fallback={null}><Experience {...props} id={id} /></Suspense>
+      <Suspense fallback={null}><Experience {...props} reduced={reduced || reducedGraphics} id={id} /></Suspense>
     </ChristmasBoundary>
   );
 }

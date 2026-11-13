@@ -4844,7 +4844,6 @@ const Scene = memo(function Scene({
   const sunriseRunning = useCommercialMapStore((state) => state.sunrisePhase === 'running');
   const soyCinematicActive = useSoyHarvestStore(state => state.enabled || state.status === 'restoring');
   const christmasActive = useChristmasSession(state => state.phase === 'preparing' || state.phase === 'flying');
-  const christmasReduced = useCommercialMapStore(state => state.reducedGraphics) || renderQualityTier === 'LOW';
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const fallbackSegmentId = useCommercialMapStore((state) => sceneSegmentId === undefined ? state.activeSegmentId : null);
   const activeSegmentId = sceneSegmentId === undefined ? fallbackSegmentId : sceneSegmentId;
@@ -5465,7 +5464,7 @@ const Scene = memo(function Scene({
       {christmasEnabled && !publicPolicy && <ChristmasLayer
         entities={entities}
         trees={territorialTrees}
-        reduced={christmasReduced}
+        reduced={renderQualityTier === 'LOW'}
         night={nightAtmosphereActive}
       />}
       <InteriorCameraRequestContext.Provider value={setInteriorCameraRequest}>
