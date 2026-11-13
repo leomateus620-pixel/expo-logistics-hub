@@ -5,6 +5,7 @@ const MAP_KEY = ['commercial-map'] as const;
 export const LOT_CONTRACT_HISTORY_KEY = ['commercial-lot-contract-history'] as const;
 
 export function refreshLotContractHistory(queryClient: QueryClient) {
+  if (queryClient.getQueryCache().findAll({ queryKey: LOT_CONTRACT_HISTORY_KEY }).length === 0) return Promise.resolve();
   return queryClient.invalidateQueries({ queryKey: LOT_CONTRACT_HISTORY_KEY });
 }
 

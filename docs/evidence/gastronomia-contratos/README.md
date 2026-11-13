@@ -14,6 +14,7 @@ As capturas usam compradores, usuários e documentos sintéticos. O roteiro usa 
 | Recarga da página e abertura da versão 1 | [Visualizador de PDF](pizzaria-visualizador.webp) |
 | Substituição e atualização do número | [Versões](pizzaria-versoes-e-historico.webp) · [Auditoria com autoria, horário e número anterior e novo](pizzaria-auditoria.webp) |
 | Mesmo documento na Dashboard e documento compartilhado com os dois pontos | [Contrato da Pizzaria](dashboard-pizzaria-contrato.webp) · [Abrangência em C2](dashboard-abrangencia-c2.webp) |
-| Consulta no celular | [Ficha da Pizzaria](celular-pizzaria-contratos.webp) |
+| Consulta no celular | [Ficha da Pizzaria](celular-pizzaria-contratos.webp) · [Visualizador](celular-pizzaria-visualizador.webp) |
+| Regressão do fluxo de lote comercial comum | [Lote com contrato anexado](lote-ordinario-contrato.webp) |
 
 A verificação de produção foi somente de leitura. O bucket `map-contracts` estava privado e a migration original de Gastronomia estava aplicada. Dos 12 pontos ativos, dois estavam vendidos, com itens assinados e eventos de venda e confirmação. Nenhum dos 12 tinha contrato individual ou compartilhado na consulta. A nova migration foi verificada no banco descartável da prévia.

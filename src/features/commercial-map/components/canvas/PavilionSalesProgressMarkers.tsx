@@ -8,42 +8,78 @@ import { pavilionSalesPercent, type PavilionSalesProgressAnchor } from './pavili
 
 const NO_RAYCAST = () => undefined;
 const CELL = 192;
+const TEXT_SAFE_RADIUS = 51;
 const { clamp, lerp, smoothstep } = THREE.MathUtils;
+
+function drawProgressText(ctx: CanvasRenderingContext2D, text: string, font: string, baseline: number) {
+  ctx.font = font;
+  const { actualBoundingBoxLeft, actualBoundingBoxRight, actualBoundingBoxAscent, actualBoundingBoxDescent } = ctx.measureText(text);
+  const inkWidth = actualBoundingBoxLeft + actualBoundingBoxRight;
+  const outerY = Math.max(Math.abs(baseline - actualBoundingBoxAscent), Math.abs(baseline + actualBoundingBoxDescent));
+  const chordWidth = 2 * Math.sqrt(Math.max(0, TEXT_SAFE_RADIUS ** 2 - outerY ** 2));
+  // Centre the visible ink and fit it to the shortest chord it can touch.
+  const widthScale = inkWidth > 0 ? Math.min(1, chordWidth / inkWidth) : 1;
+  ctx.save();
+  ctx.translate(0, baseline);
+  ctx.scale(widthScale, 1);
+  ctx.fillText(text, (actualBoundingBoxLeft - actualBoundingBoxRight) * 0.5, 0);
+  ctx.restore();
+}
 
 function drawProgress(ctx: CanvasRenderingContext2D, index: number, sold: number, total: number) {
   const center = CELL * 0.5;
   ctx.save();
   ctx.translate(CELL * index + center, center);
-  const face = ctx.createLinearGradient(0, -center, 0, center);
-  face.addColorStop(0, '#313b48');
-  face.addColorStop(1, '#161e29');
-  ctx.fillStyle = face;
+  const metal = ctx.createLinearGradient(-58, -86, 65, 83);
+  metal.addColorStop(0, '#d7e1eb');
+  metal.addColorStop(0.32, '#778595');
+  metal.addColorStop(0.55, '#424f61');
+  metal.addColorStop(0.84, '#273343');
+  metal.addColorStop(1, '#708195');
+  ctx.fillStyle = metal;
   ctx.beginPath();
-  ctx.arc(0, 0, 89, 0, Math.PI * 2);
+  ctx.arc(0, 0, 91, 0, Math.PI * 2);
   ctx.fill();
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = '#8c9aac';
-  ctx.stroke();
-  const start = -Math.PI / 2;
-  ctx.lineWidth = 24;
-  ctx.strokeStyle = '#697789';
+  ctx.fillStyle = '#192331';
   ctx.beginPath();
-  ctx.arc(0, 0, 72, start, start + Math.PI * 2);
+  ctx.arc(0, 0, 86, 0, Math.PI * 2);
+  ctx.fill();
+  const start = -Math.PI / 2;
+  const slate = ctx.createLinearGradient(-34, -80, 39, 80);
+  slate.addColorStop(0, '#8391a0');
+  slate.addColorStop(1, '#546174');
+  ctx.lineWidth = 20;
+  ctx.strokeStyle = slate;
+  ctx.beginPath();
+  ctx.arc(0, 0, 73, start, start + Math.PI * 2);
   ctx.stroke();
   if (sold > 0) {
-    ctx.strokeStyle = '#2766e9';
+    const cobalt = ctx.createLinearGradient(-55, -82, 70, 74);
+    cobalt.addColorStop(0, '#6297ff');
+    cobalt.addColorStop(0.48, '#2766e9');
+    cobalt.addColorStop(1, '#184cc0');
+    ctx.strokeStyle = cobalt;
     ctx.beginPath();
-    ctx.arc(0, 0, 72, start, start + Math.PI * 2 * sold / total);
+    ctx.arc(0, 0, 73, start, start + Math.PI * 2 * sold / total);
     ctx.stroke();
   }
+
+  const face = ctx.createRadialGradient(-17, -30, 5, 0, 0, 67);
+  face.addColorStop(0, '#2a3442');
+  face.addColorStop(1, '#111822');
+  ctx.fillStyle = face;
+  ctx.beginPath();
+  ctx.arc(0, 0, 62, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#344458';
+  ctx.stroke();
   ctx.fillStyle = '#fff3dc';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  const percentage = pavilionSalesPercent(sold, total);
-  ctx.font = `800 ${percentage === 100 ? 50 : 58}px system-ui, sans-serif`;
-  ctx.fillText(`${percentage}%`, 0, -7);
-  ctx.font = '700 18px system-ui, sans-serif';
-  ctx.fillText('VENDIDO', 0, 30);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  drawProgressText(ctx, `${pavilionSalesPercent(sold, total)}%`, '750 41px system-ui, sans-serif', 8);
+  ctx.fillStyle = '#c0cbd8';
+  drawProgressText(ctx, 'VENDIDO', '700 15px system-ui, sans-serif', 31);
   ctx.restore();
 }
 
