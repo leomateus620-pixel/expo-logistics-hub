@@ -1895,23 +1895,21 @@ export type Database = {
       }
       commercial_lots: {
         Row: {
-          commercial_unit: string
-          display_order: number | null
-          food_type: string | null
-          price_source: Json | null
-          unit_quantity: number | null
           accessibility_notes: string | null
           archived_at: string | null
           area_validation_status: string
           block: string | null
           calculated_area_sqm: number | null
           commercial_notes: string | null
+          commercial_unit: string
           created_at: string
           created_by: string | null
           depth_meters: number | null
           description: string | null
           display_name: string
+          display_order: number | null
           entity_id: string
+          food_type: string | null
           frontage_meters: number | null
           has_electricity: boolean
           has_internet: boolean
@@ -1924,31 +1922,31 @@ export type Database = {
           level_label: string | null
           lot_number: string | null
           official_area_sqm: number | null
+          price_source: Json | null
           project_id: string
           public_identifier: string
           status: string
           superseded_by_lot_id: string | null
+          unit_quantity: number | null
           updated_at: string
           updated_by: string | null
         }
         Insert: {
-          commercial_unit?: string
-          display_order?: number | null
-          food_type?: string | null
-          price_source?: Json | null
-          unit_quantity?: number | null
           accessibility_notes?: string | null
           archived_at?: string | null
           area_validation_status?: string
           block?: string | null
           calculated_area_sqm?: number | null
           commercial_notes?: string | null
+          commercial_unit?: string
           created_at?: string
           created_by?: string | null
           depth_meters?: number | null
           description?: string | null
           display_name: string
+          display_order?: number | null
           entity_id: string
+          food_type?: string | null
           frontage_meters?: number | null
           has_electricity?: boolean
           has_internet?: boolean
@@ -1961,31 +1959,31 @@ export type Database = {
           level_label?: string | null
           lot_number?: string | null
           official_area_sqm?: number | null
+          price_source?: Json | null
           project_id: string
           public_identifier: string
           status?: string
           superseded_by_lot_id?: string | null
+          unit_quantity?: number | null
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
-          commercial_unit?: string
-          display_order?: number | null
-          food_type?: string | null
-          price_source?: Json | null
-          unit_quantity?: number | null
           accessibility_notes?: string | null
           archived_at?: string | null
           area_validation_status?: string
           block?: string | null
           calculated_area_sqm?: number | null
           commercial_notes?: string | null
+          commercial_unit?: string
           created_at?: string
           created_by?: string | null
           depth_meters?: number | null
           description?: string | null
           display_name?: string
+          display_order?: number | null
           entity_id?: string
+          food_type?: string | null
           frontage_meters?: number | null
           has_electricity?: boolean
           has_internet?: boolean
@@ -1998,10 +1996,12 @@ export type Database = {
           level_label?: string | null
           lot_number?: string | null
           official_area_sqm?: number | null
+          price_source?: Json | null
           project_id?: string
           public_identifier?: string
           status?: string
           superseded_by_lot_id?: string | null
+          unit_quantity?: number | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -6078,25 +6078,25 @@ export type Database = {
       }
       lot_contract_lots: {
         Row: {
-          removed_at: string | null
           contract_id: string
           created_at: string
           created_by: string | null
           lot_id: string
+          removed_at: string | null
         }
         Insert: {
-          removed_at?: string | null
           contract_id: string
           created_at?: string
           created_by?: string | null
           lot_id: string
+          removed_at?: string | null
         }
         Update: {
-          removed_at?: string | null
           contract_id?: string
           created_at?: string
           created_by?: string | null
           lot_id?: string
+          removed_at?: string | null
         }
         Relationships: [
           {
@@ -6110,8 +6110,8 @@ export type Database = {
       }
       lot_contract_versions: {
         Row: {
-          covered_lot_ids: string[] | null
           contract_id: string
+          covered_lot_ids: string[] | null
           file_size: number
           id: string
           mime_type: string
@@ -6123,8 +6123,8 @@ export type Database = {
           version: number
         }
         Insert: {
-          covered_lot_ids?: string[] | null
           contract_id: string
+          covered_lot_ids?: string[] | null
           file_size: number
           id?: string
           mime_type: string
@@ -6136,8 +6136,8 @@ export type Database = {
           version: number
         }
         Update: {
-          covered_lot_ids?: string[] | null
           contract_id?: string
+          covered_lot_ids?: string[] | null
           file_size?: number
           id?: string
           mime_type?: string
@@ -6160,7 +6160,6 @@ export type Database = {
       }
       lot_contracts: {
         Row: {
-          sale_id: string | null
           active_version: number
           contract_number: string | null
           created_at: string
@@ -6169,11 +6168,11 @@ export type Database = {
           is_active: boolean
           lot_id: string | null
           order_id: string | null
+          sale_id: string | null
           scope: string
           updated_at: string
         }
         Insert: {
-          sale_id?: string | null
           active_version?: number
           contract_number?: string | null
           created_at?: string
@@ -6182,11 +6181,11 @@ export type Database = {
           is_active?: boolean
           lot_id?: string | null
           order_id?: string | null
+          sale_id?: string | null
           scope?: string
           updated_at?: string
         }
         Update: {
-          sale_id?: string | null
           active_version?: number
           contract_number?: string | null
           created_at?: string
@@ -6195,17 +6194,11 @@ export type Database = {
           is_active?: boolean
           lot_id?: string | null
           order_id?: string | null
+          sale_id?: string | null
           scope?: string
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "lot_contracts_sale_id_fkey"
-            columns: ["sale_id"]
-            isOneToOne: false
-            referencedRelation: "lot_sales"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "lot_contracts_lot_id_fkey"
             columns: ["lot_id"]
@@ -6232,6 +6225,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "lot_sale_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_contracts_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "lot_sales"
             referencedColumns: ["id"]
           },
         ]
@@ -6531,16 +6531,12 @@ export type Database = {
       }
       lot_sale_order_items: {
         Row: {
-          commercial_unit: string
-          display_name_snapshot: string | null
-          structure_id_snapshot: string | null
-          structure_identifier_snapshot: string | null
-          structure_name_snapshot: string | null
-          unit_quantity_snapshot: number | null
           cancelled_at: string | null
           cancelled_by: string | null
+          commercial_unit: string
           contract_state: string
           created_at: string
+          display_name_snapshot: string | null
           id: string
           item_total: number
           lot_id: string
@@ -6555,18 +6551,18 @@ export type Database = {
           sale_id: string | null
           signed_at: string | null
           signed_by: string | null
+          structure_id_snapshot: string | null
+          structure_identifier_snapshot: string | null
+          structure_name_snapshot: string | null
+          unit_quantity_snapshot: number | null
         }
         Insert: {
-          commercial_unit?: string
-          display_name_snapshot?: string | null
-          structure_id_snapshot?: string | null
-          structure_identifier_snapshot?: string | null
-          structure_name_snapshot?: string | null
-          unit_quantity_snapshot?: number | null
           cancelled_at?: string | null
           cancelled_by?: string | null
+          commercial_unit?: string
           contract_state?: string
           created_at?: string
+          display_name_snapshot?: string | null
           id?: string
           item_total: number
           lot_id: string
@@ -6581,18 +6577,18 @@ export type Database = {
           sale_id?: string | null
           signed_at?: string | null
           signed_by?: string | null
-        }
-        Update: {
-          commercial_unit?: string
-          display_name_snapshot?: string | null
           structure_id_snapshot?: string | null
           structure_identifier_snapshot?: string | null
           structure_name_snapshot?: string | null
           unit_quantity_snapshot?: number | null
+        }
+        Update: {
           cancelled_at?: string | null
           cancelled_by?: string | null
+          commercial_unit?: string
           contract_state?: string
           created_at?: string
+          display_name_snapshot?: string | null
           id?: string
           item_total?: number
           lot_id?: string
@@ -6607,6 +6603,10 @@ export type Database = {
           sale_id?: string | null
           signed_at?: string | null
           signed_by?: string | null
+          structure_id_snapshot?: string | null
+          structure_identifier_snapshot?: string | null
+          structure_name_snapshot?: string | null
+          unit_quantity_snapshot?: number | null
         }
         Relationships: [
           {
@@ -11470,10 +11470,9 @@ export type Database = {
     Views: {
       commercial_lot_pricing_2028: {
         Row: {
-          commercial_unit: string | null
-          unit_quantity: number | null
           area_validation_status: string | null
           block: string | null
+          commercial_unit: string | null
           corner_confirmed: boolean | null
           corner_status: string | null
           entity_id: string | null
@@ -11497,6 +11496,7 @@ export type Database = {
           segunda_rule_label: string | null
           segunda_total: number | null
           status: string | null
+          unit_quantity: number | null
         }
         Relationships: [
           {
@@ -11524,8 +11524,8 @@ export type Database = {
       }
       commercial_sale_eligibility: {
         Row: {
-          commercial_unit: string | null
           block: string | null
+          commercial_unit: string | null
           has_active_contract: boolean | null
           has_active_negotiation: boolean | null
           has_active_reservation: boolean | null
@@ -12717,7 +12717,20 @@ export type Database = {
         Args: { p_pavilion_id: string; p_project_id: string }
         Returns: Json
       }
+      commercial_sale_has_active_contract_coverage: {
+        Args: {
+          p_contract: Database["public"]["Tables"]["lot_contracts"]["Row"]
+          p_lot_ids: string[]
+          p_order_id: string
+          p_sale_id: string
+        }
+        Returns: boolean
+      }
       commercial_sale_logos: { Args: { p_project_id: string }; Returns: Json }
+      commercial_sale_revision_scope: {
+        Args: { p_lot_id: string }
+        Returns: string
+      }
       commercial_sales_analytics_summary: {
         Args: { p_project_id: string; p_reference_date?: string }
         Returns: Json
@@ -12941,12 +12954,12 @@ export type Database = {
       }
       export_commercial_sale_orders: {
         Args: {
-          p_segment_slug?: string
           p_from?: string
           p_has_document?: boolean
           p_payment_method?: string
           p_project_id: string
           p_search?: string
+          p_segment_slug?: string
           p_signature_selection?: string
           p_status?: string
           p_to?: string
@@ -13497,7 +13510,6 @@ export type Database = {
       }
       list_commercial_sale_orders: {
         Args: {
-          p_segment_slug?: string
           p_from?: string
           p_has_document?: boolean
           p_limit?: number
@@ -13505,6 +13517,7 @@ export type Database = {
           p_payment_method?: string
           p_project_id: string
           p_search?: string
+          p_segment_slug?: string
           p_status?: string
           p_to?: string
         }
@@ -13540,6 +13553,7 @@ export type Database = {
         Args: { _entity_id: string; _segment_id: string }
         Returns: boolean
       }
+      map_gastronomy_anchor_ids: { Args: never; Returns: string[] }
       map_geometry_overlaps_sellable: {
         Args: {
           _excluded_entity_ids?: string[]
@@ -13564,7 +13578,6 @@ export type Database = {
           project_id: string
         }[]
       }
-      map_gastronomy_anchor_ids: { Args: never; Returns: string[] }
       map_segment_is_complete: {
         Args: { _segment_id: string }
         Returns: boolean
@@ -13832,18 +13845,30 @@ export type Database = {
         }
         Returns: string
       }
-      register_lot_contract_version: {
-        Args: {
-          p_contract_number: string
-          p_expected_sale_id?: string
-          p_file_size: number
-          p_lot_id: string
-          p_mime_type: string
-          p_original_name: string
-          p_storage_path: string
-        }
-        Returns: string
-      }
+      register_lot_contract_version:
+        | {
+            Args: {
+              p_contract_number: string
+              p_file_size: number
+              p_lot_id: string
+              p_mime_type: string
+              p_original_name: string
+              p_storage_path: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_contract_number: string
+              p_expected_sale_id: string
+              p_file_size: number
+              p_lot_id: string
+              p_mime_type: string
+              p_original_name: string
+              p_storage_path: string
+            }
+            Returns: string
+          }
       reserve_commercial_lot: {
         Args: {
           p_company_name: string
@@ -13935,40 +13960,42 @@ export type Database = {
         Args: { _guest_ids: string[]; _org_id: string; _transport_id: string }
         Returns: undefined
       }
-      split_commercial_lot: {
-        Args: {
-          p_first_geometry: Json
-          p_first_identifier: string
-          p_first_name: string
-          p_reason: string
-          p_second_geometry: Json
-          p_second_identifier: string
-          p_second_name: string
-          p_source_lot_id: string
-        }
-        Returns: Json
-      }
-      start_commercial_negotiation: {
-        Args: {
-          p_company_name: string
-          p_contact_name: string
-          p_document_number: string
-          p_lot_id: string
-          p_notes: string
-          p_proposed_value: number
-        }
-        Returns: string
-      }
       soja_store_access: {
         Args: { _commission_id: string; _org_id: string }
         Returns: Json
       }
+      soja_store_adjust_cash: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_cancel_transfer: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
       soja_store_cash_movements: {
-        Args: { _org_id: string; _commission_id: string; _session_id: string; _limit?: number; _offset?: number }
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+          _session_id: string
+        }
         Returns: Json
       }
       soja_store_cash_sessions: {
-        Args: { _org_id: string; _commission_id: string }
+        Args: { _commission_id: string; _org_id: string }
         Returns: Json
       }
       soja_store_catalog: {
@@ -13977,73 +14004,104 @@ export type Database = {
           _limit?: number
           _offset?: number
           _org_id: string
-          _search?: string | null
-          _status?: string | null
+          _search?: string
+          _status?: string
         }
         Returns: Json
       }
       soja_store_close_cash: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_create_purchase: {
-        Args: { _commission_id: string; _org_id: string; _payload: Json; _request_id: string }
+        Args: {
+          _commission_id: string
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_create_sale: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _payload: Json }
+        Args: {
+          _commission_id: string
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_create_transfer: {
-        Args: { _commission_id: string; _org_id: string; _payload: Json; _request_id: string }
-        Returns: Json
-      }
-      soja_store_adjust_cash: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
-        Returns: Json
-      }
-      soja_store_cancel_transfer: {
-        Args: { _commission_id: string; _expected_version: number; _org_id: string; _payload: Json; _request_id: string }
-        Returns: Json
-      }
-      soja_store_dispatch_transfer: {
-        Args: { _commission_id: string; _expected_version: number; _org_id: string; _payload: Json; _request_id: string }
+        Args: {
+          _commission_id: string
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_current_dashboard: {
         Args: {
           _commission_id: string
-          _end?: string | null
-          _location_id?: string | null
+          _end?: string
+          _location_id?: string
           _org_id: string
-          _start?: string | null
+          _start?: string
         }
         Returns: Json
       }
       soja_store_customer: {
-        Args: { _org_id: string; _commission_id: string; _customer_id: string }
+        Args: { _commission_id: string; _customer_id: string; _org_id: string }
         Returns: Json
       }
       soja_store_customer_sales: {
-        Args: { _org_id: string; _commission_id: string; _customer_id: string; _limit?: number; _offset?: number }
+        Args: {
+          _commission_id: string
+          _customer_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+        }
         Returns: Json
       }
       soja_store_customers: {
-        Args: { _org_id: string; _commission_id: string; _search?: string; _limit?: number; _offset?: number }
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+          _search?: string
+        }
         Returns: Json
       }
       soja_store_dashboard: {
         Args: { _commission_id: string; _org_id: string }
         Returns: Json
       }
+      soja_store_dispatch_transfer: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
       soja_store_finance_entries: {
         Args: {
           _commission_id: string
-          _kind?: string | null
+          _kind?: string
           _limit?: number
           _offset?: number
           _org_id: string
-          _status?: string | null
+          _status?: string
           _year: number
         }
         Returns: Json
@@ -14053,7 +14111,7 @@ export type Database = {
           _commission_id: string
           _limit?: number
           _org_id: string
-          _search?: string | null
+          _search?: string
           _year: number
         }
         Returns: Json
@@ -14069,19 +14127,26 @@ export type Database = {
         Returns: Json
       }
       soja_store_finance_summary: {
-        Args: {
-          _commission_id: string
-          _org_id: string
-          _year: number
-        }
+        Args: { _commission_id: string; _org_id: string; _year: number }
         Returns: Json
       }
       soja_store_finish_sale: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_import_batches: {
-        Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string }
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+        }
         Returns: Json
       }
       soja_store_import_preview: {
@@ -14094,35 +14159,55 @@ export type Database = {
         }
         Returns: Json
       }
-      soja_store_locations: {
-        Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string }
-        Returns: Json
-      }
       soja_store_inventory_options: {
         Args: {
           _commission_id: string
           _limit?: number
-          _location_id?: string | null
+          _location_id?: string
           _org_id: string
-          _search?: string | null
-          _variant_id?: string | null
+          _search?: string
+          _variant_id?: string
         }
         Returns: Json
       }
       soja_store_inventory_position: {
-        Args: { _commission_id: string; _location_id: string; _org_id: string; _variant_id: string }
+        Args: {
+          _commission_id: string
+          _location_id: string
+          _org_id: string
+          _variant_id: string
+        }
         Returns: Json
       }
       soja_store_issue_destinations: {
-        Args: { _commission_id: string; _limit?: number; _org_id: string; _search?: string | null }
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _org_id: string
+          _search?: string
+        }
+        Returns: Json
+      }
+      soja_store_locations: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+        }
         Returns: Json
       }
       soja_store_open_cash: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _payload: Json }
+        Args: {
+          _commission_id: string
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_pos_config: {
-        Args: { _org_id: string; _commission_id: string }
+        Args: { _commission_id: string; _org_id: string }
         Returns: Json
       }
       soja_store_product: {
@@ -14130,11 +14215,7 @@ export type Database = {
         Returns: Json
       }
       soja_store_product_suppliers: {
-        Args: {
-          _commission_id: string
-          _org_id: string
-          _product_id: string
-        }
+        Args: { _commission_id: string; _org_id: string; _product_id: string }
         Returns: Json
       }
       soja_store_purchase: {
@@ -14146,7 +14227,7 @@ export type Database = {
           _commission_id: string
           _need_id: string
           _org_id: string
-          _search?: string | null
+          _search?: string
         }
         Returns: Json
       }
@@ -14163,11 +14244,11 @@ export type Database = {
         Args: {
           _commission_id: string
           _limit?: number
-          _location_id?: string | null
+          _location_id?: string
           _org_id: string
-          _search?: string | null
-          _supplier_id?: string | null
-          _variant_id?: string | null
+          _search?: string
+          _supplier_id?: string
+          _variant_id?: string
         }
         Returns: Json
       }
@@ -14175,27 +14256,27 @@ export type Database = {
         Args: {
           _commission_id: string
           _limit?: number
-          _location_id?: string | null
+          _location_id?: string
           _offset?: number
           _org_id: string
-          _status?: string | null
-          _supplier_id?: string | null
-          _variant_id?: string | null
+          _status?: string
+          _supplier_id?: string
+          _variant_id?: string
         }
         Returns: Json
       }
       soja_store_purchases_filtered: {
         Args: {
           _commission_id: string
-          _end?: string | null
+          _end?: string
           _limit?: number
-          _location_id?: string | null
+          _location_id?: string
           _offset?: number
           _org_id: string
-          _start?: string | null
-          _status?: string | null
-          _supplier_id?: string | null
-          _variant_id?: string | null
+          _start?: string
+          _status?: string
+          _supplier_id?: string
+          _variant_id?: string
         }
         Returns: Json
       }
@@ -14210,11 +14291,13 @@ export type Database = {
         Returns: Json
       }
       soja_store_receive_transfer: {
-        Args: { _commission_id: string; _expected_version: number; _org_id: string; _payload: Json; _request_id: string }
-        Returns: Json
-      }
-      soja_store_request_status: {
-        Args: { _commission_id: string; _org_id: string; _request_id: string }
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_recognize_obligation: {
@@ -14237,7 +14320,13 @@ export type Database = {
         Returns: Json
       }
       soja_store_record_sale_fiscal: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_register_institutional_issue: {
@@ -14250,8 +14339,18 @@ export type Database = {
         }
         Returns: Json
       }
+      soja_store_request_status: {
+        Args: { _commission_id: string; _org_id: string; _request_id: string }
+        Returns: Json
+      }
       soja_store_return_sale: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_reverse_settlement: {
@@ -14285,42 +14384,57 @@ export type Database = {
         Returns: Json
       }
       soja_store_sale: {
-        Args: { _org_id: string; _commission_id: string; _sale_id: string }
+        Args: { _commission_id: string; _org_id: string; _sale_id: string }
         Returns: Json
       }
       soja_store_sale_customers: {
-        Args: { _org_id: string; _commission_id: string; _search?: string | null; _limit?: number }
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _org_id: string
+          _search?: string
+        }
         Returns: Json
       }
       soja_store_sale_options: {
-        Args: { _org_id: string; _commission_id: string; _location_id: string; _search?: string }
+        Args: {
+          _commission_id: string
+          _location_id: string
+          _org_id: string
+          _search?: string
+        }
         Returns: Json
       }
       soja_store_sale_prices: {
-        Args: { _org_id: string; _commission_id: string; _variant_id: string }
+        Args: { _commission_id: string; _org_id: string; _variant_id: string }
         Returns: Json
       }
       soja_store_sales: {
-        Args: { _org_id: string; _commission_id: string; _limit?: number; _offset?: number }
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+        }
         Returns: Json
       }
       soja_store_sales_filtered: {
         Args: {
           _commission_id: string
           _confirmed?: boolean
-          _end?: string | null
+          _end?: string
           _limit?: number
-          _location_id?: string | null
+          _location_id?: string
           _offset?: number
           _org_id: string
-          _start?: string | null
+          _start?: string
         }
         Returns: Json
       }
       soja_store_save_budget: {
         Args: {
           _commission_id: string
-          _expected_version: number | null
+          _expected_version: number
           _org_id: string
           _payload: Json
           _request_id: string
@@ -14328,17 +14442,29 @@ export type Database = {
         Returns: Json
       }
       soja_store_save_customer: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number | null; _payload: Json }
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_save_interest: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number | null; _payload: Json }
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_save_location: {
         Args: {
           _commission_id: string
-          _expected_version: number | null
+          _expected_version: number
           _org_id: string
           _payload: Json
           _request_id: string
@@ -14346,13 +14472,19 @@ export type Database = {
         Returns: Json
       }
       soja_store_save_pos_rule: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number | null; _payload: Json }
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_save_product: {
         Args: {
           _commission_id: string
-          _expected_version: number | null
+          _expected_version: number
           _org_id: string
           _payload: Json
           _request_id: string
@@ -14362,7 +14494,7 @@ export type Database = {
       soja_store_save_product_supplier: {
         Args: {
           _commission_id: string
-          _expected_version: number | null
+          _expected_version: number
           _org_id: string
           _payload: Json
           _request_id: string
@@ -14370,54 +14502,32 @@ export type Database = {
         Returns: Json
       }
       soja_store_save_sale_price: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _payload: Json }
-        Returns: Json
-      }
-      soja_store_save_supplier: {
         Args: {
           _commission_id: string
-          _expected_version: number | null
           _org_id: string
           _payload: Json
           _request_id: string
         }
         Returns: Json
       }
-      soja_store_stock: {
+      soja_store_save_supplier: {
         Args: {
           _commission_id: string
-          _limit?: number
-          _location_id?: string | null
-          _offset?: number
+          _expected_version: number
           _org_id: string
-          _variant_id?: string | null
-        }
-        Returns: Json
-      }
-      soja_store_stock_movements: {
-        Args: {
-          _commission_id: string
-          _limit?: number
-          _location_id?: string | null
-          _offset?: number
-          _org_id: string
-          _variant_id?: string | null
-        }
-        Returns: Json
-      }
-      soja_store_stock_options: {
-        Args: {
-          _commission_id: string
-          _limit?: number
-          _location_id?: string | null
-          _org_id: string
-          _search?: string | null
-          _variant_id?: string | null
+          _payload: Json
+          _request_id: string
         }
         Returns: Json
       }
       soja_store_save_team_record: {
-        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number | null; _payload: Json }
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_settle_obligation: {
@@ -14431,15 +14541,64 @@ export type Database = {
         Returns: Json
       }
       soja_store_stage_import: {
-        Args: { _commission_id: string; _org_id: string; _payload: Json; _request_id: string }
+        Args: {
+          _commission_id: string
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_stock: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _location_id?: string
+          _offset?: number
+          _org_id: string
+          _variant_id?: string
+        }
+        Returns: Json
+      }
+      soja_store_stock_movements: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _location_id?: string
+          _offset?: number
+          _org_id: string
+          _variant_id?: string
+        }
+        Returns: Json
+      }
+      soja_store_stock_options: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _location_id?: string
+          _org_id: string
+          _search?: string
+          _variant_id?: string
+        }
         Returns: Json
       }
       soja_store_suppliers: {
-        Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string }
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+        }
         Returns: Json
       }
       soja_store_team: {
-        Args: { _org_id: string; _commission_id: string }
+        Args: {
+          _commission_id: string
+          _kind?: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+        }
         Returns: Json
       }
       soja_store_transfer: {
@@ -14447,18 +14606,48 @@ export type Database = {
         Returns: Json
       }
       soja_store_transfers: {
-        Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string; _status?: string | null }
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+          _status?: string
+        }
         Returns: Json
       }
       soja_store_write_purchase_need: {
         Args: {
           _commission_id: string
-          _expected_version: number | null
+          _expected_version: number
           _org_id: string
           _payload: Json
           _request_id: string
         }
         Returns: Json
+      }
+      split_commercial_lot: {
+        Args: {
+          p_first_geometry: Json
+          p_first_identifier: string
+          p_first_name: string
+          p_reason: string
+          p_second_geometry: Json
+          p_second_identifier: string
+          p_second_name: string
+          p_source_lot_id: string
+        }
+        Returns: Json
+      }
+      start_commercial_negotiation: {
+        Args: {
+          p_company_name: string
+          p_contact_name: string
+          p_document_number: string
+          p_lot_id: string
+          p_notes: string
+          p_proposed_value: number
+        }
+        Returns: string
       }
       submit_public_mobility_form: {
         Args: {
@@ -14499,7 +14688,7 @@ export type Database = {
           _actor_id: string
           _commission_id: string
           _expected_version: number
-          _path: string | null
+          _path: string
           _person_id: string
           _request_id: string
         }
@@ -14535,16 +14724,16 @@ export type Database = {
         Returns: Json
       }
       team_resolve_reconciliation: {
-        Args: { _person_id: string | null; _request_id: string }
+        Args: { _person_id: string; _request_id: string }
         Returns: undefined
       }
       team_save_volunteer: {
         Args: {
           _commission_id: string
           _email: string
-          _expected_version?: number | null
+          _expected_version?: number
           _name: string
-          _person_id?: string | null
+          _person_id?: string
           _request_id: string
         }
         Returns: Json
