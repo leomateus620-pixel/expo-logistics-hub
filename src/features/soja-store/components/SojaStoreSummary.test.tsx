@@ -88,7 +88,7 @@ it("preserva período e ponto nos links para vendas e compras", async () => {
     confirmed_sales: 5, confirmed_cents: "6543", received_cents: "6000",
     locations: [{ id: location, name: "Ponto principal" }], generated_at: "2026-11-12T15:00:00Z",
   });
-  renderSummary(["sales.view", "purchases.view", "stock.view"]);
+  renderSummary(["sales.view", "finance.view", "purchases.view", "stock.view"]);
   await screen.findByRole("option", { name: "Ponto principal" });
   fireEvent.change(screen.getByLabelText("Data inicial"), { target: { value: "2026-11-01" } });
   fireEvent.change(screen.getByLabelText("Data final"), { target: { value: "2026-11-12" } });
@@ -101,4 +101,15 @@ it("preserva período e ponto nos links para vendas e compras", async () => {
     "href", `/comissoes/soja-store/compras?situacao=ordered&local=${location}&inicio=2026-11-01&fim=2026-11-12`,
   );
   expect(screen.getByRole("link", { name: "1 Posições de estoque físico" })).toHaveAttribute("href", `/comissoes/soja-store/estoque?local=${location}`);
+});
+
+it("keeps monetary totals out of the dashboard without financial access", async () => {
+  storeRpc.mockResolvedValue({
+    confirmed_sales: 3, confirmed_cents: "10500", received_cents: "9000",
+    generated_at: "2026-11-12T15:00:00Z",
+  });
+  renderSummary(["sales.view"]);
+  expect(await screen.findByRole("link", { name: "3 Vendas confirmadas" })).toBeVisible();
+  expect(screen.queryByText("Valor confirmado após devoluções")).not.toBeInTheDocument();
+  expect(screen.queryByText("Recebido nas vendas confirmadas")).not.toBeInTheDocument();
 });

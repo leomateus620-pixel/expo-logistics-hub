@@ -24,12 +24,13 @@ export interface CommissionHeaderProps {
   unit: CommissionUnitViewModel;
   action?: WorkspacePrimaryAction;
   titleTag?: 'h1' | 'p';
+  title?: string;
   /** Rendered below the identity (usually the navigation). */
   children?: ReactNode;
   className?: string;
 }
 
-export function CommissionHeader({ unit, action, titleTag: Title = 'h1', children, className }: CommissionHeaderProps) {
+export function CommissionHeader({ unit, action, titleTag: Title = 'h1', title = unit.name, children, className }: CommissionHeaderProps) {
   const Icon = unit.icon;
   const ActionIcon = action?.icon;
   const leads = unit.leads.length > 0 ? unit.leads : unit.principal ? [unit.principal] : [];
@@ -44,8 +45,9 @@ export function CommissionHeader({ unit, action, titleTag: Title = 'h1', childre
         <span className="cw-header__icon" aria-hidden="true"><Icon /></span>
         <div className="min-w-0">
           <div className="cw-header__title-row">
-            <Title className="cw-header__name ws-display">{unit.name}</Title>
+            <Title className="cw-header__name ws-display">{title}</Title>
             <div className="cw-header__eyebrow">
+              {title !== unit.name && <span className="ws-label">{unit.name}</span>}
               <span className="ws-label">{unitTypeLabel(unit.type)}</span>
               <span className="cw-unit-status" data-status={unit.status}>{UNIT_STATUS_LABELS[unit.status]}</span>
             </div>
@@ -149,15 +151,19 @@ export interface CommissionWorkspaceShellProps {
   navigation: CommissionWorkspaceNavItem[];
   section: string;
   identityTitleTag?: 'h1' | 'p';
+  identitySection?: string;
+  identityTitle?: string;
   action?: WorkspacePrimaryAction;
   children: ReactNode;
   className?: string;
 }
 
-export function CommissionWorkspaceShell({ unit, section, identityTitleTag, action, children, className }: CommissionWorkspaceShellProps) {
+export function CommissionWorkspaceShell({ unit, section, identityTitleTag, identitySection, identityTitle, action, children, className }: CommissionWorkspaceShellProps) {
   return (
     <div className={cn('unit-workspace', className)} data-unit={unit.id} data-section={section}>
-      <CommissionHeader unit={unit} action={action} titleTag={identityTitleTag} />
+      {(!identitySection || section === identitySection) && (
+        <CommissionHeader unit={unit} action={action} titleTag={identityTitleTag} title={identityTitle} />
+      )}
       <div className="unit-workspace__content">{children}</div>
     </div>
   );

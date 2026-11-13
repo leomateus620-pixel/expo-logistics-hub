@@ -1,6 +1,6 @@
-import { useDeferredValue, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, ArrowUpRight, ClipboardCheck, PackageMinus } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, ClipboardCheck, PackageMinus, Warehouse } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { readStock, readStockOptions, type StockBalance, type StockMovement } fr
 import { InventoryCountForm } from "../components/InventoryCountForm";
 import { InstitutionalIssueForm } from "../components/InstitutionalIssueForm";
 import { StockTransfers } from "../components/StockTransfers";
-import { StoreFailure, StoreField, StoreHeading, StoreState } from "../components/StoreElements";
+import { StoreFailure, StoreField, StoreFilters, StoreHeading, StoreState } from "../components/StoreElements";
 import type { SojaStoreAccess } from "../hooks/useSojaStoreAccess";
 import { SOJA_STORE_UNIT } from "../navigation";
 
@@ -174,7 +174,11 @@ export function StockPage({ scope, queryKey, access }: {
   const [confirmation, setConfirmation] = useState("");
   const canCount = access.capabilities.includes("stock.manage");
   const canIssue = canCount && access.capabilities.includes("stock.institutional");
-  const variantSearch = useDeferredValue(search.trim());
+  const [variantSearch, setVariantSearch] = useState("");
+  useEffect(() => {
+    const timer = window.setTimeout(() => setVariantSearch(search.trim()), 250);
+    return () => window.clearTimeout(timer);
+  }, [search]);
 
   const options = useQuery({
     queryKey: [...queryKey, "stock", "options", variantSearch, locationId, variantId],
@@ -190,7 +194,8 @@ export function StockPage({ scope, queryKey, access }: {
   });
   const total = ledger.data?.total ?? 0;
   const pageCount = Math.ceil(total / pageSize);
-  const appliedFilters = Boolean(locationId || variantId);
+  const filterCount = Number(Boolean(locationId)) + Number(Boolean(variantId));
+  const appliedFilters = filterCount > 0;
 
   function updateFilter(key: "local" | "variante", value: string) {
     const next = new URLSearchParams(params);
@@ -209,7 +214,9 @@ export function StockPage({ scope, queryKey, access }: {
 
   function clearFilters() {
     setSearch("");
-    setParams(view === "movimentos" ? { visao: view } : {});
+    const next = new URLSearchParams(params);
+    ["local", "variante", "pagina"].forEach((key) => next.delete(key));
+    setParams(next);
   }
 
   function showMovement(newLocationId: string, newVariantId: string, message: string) {
@@ -223,7 +230,65 @@ export function StockPage({ scope, queryKey, access }: {
     <>
       <StoreHeading
         title="Estoque"
-        description="Consulte os saldos e confira a origem dos movimentos por local e variante."
+        icon={Warehouse}
+        controls={(
+          <div className="ss-stock-controls">
+            <nav className="ss-view-switch" aria-label="Visões de estoque">
+              <Button asChild variant={!showTransfers && view === "saldos" ? "default" : "outline"}
+                className={cn(!showTransfers && view === "saldos" && "ss-primary")}>
+                <Link data-button aria-current={!showTransfers && view === "saldos" ? "page" : undefined}
+                  to={stockLink("saldos", locationId, variantId)}>Saldos físicos</Link>
+              </Button>
+              <Button asChild variant={view === "movimentos" ? "default" : "outline"} className={cn(view === "movimentos" && "ss-primary")}>
+                <Link data-button aria-current={view === "movimentos" ? "page" : undefined}
+                  to={stockLink("movimentos", locationId, variantId)}>Movimentos</Link>
+              </Button>
+              {access.capabilities.includes("stock.transfers") && (
+                <Button asChild variant={showTransfers ? "default" : "outline"} className={cn(showTransfers && "ss-primary")}>
+                  <Link data-button aria-current={showTransfers ? "page" : undefined}
+                    to={stockLink("transferencias", locationId, variantId)}>Transferências</Link>
+                </Button>
+              )}
+            </nav>
+            {!showTransfers && !invalidFilter && (
+              <div className="ss-filterbar" aria-label="Filtros de estoque">
+                <StoreField id="ss-stock-search" label="Buscar variante">
+                  <input id="ss-stock-search" type="search" placeholder="Nome ou SKU" maxLength={120} value={search}
+                    onChange={(event) => setSearch(event.target.value)} />
+                </StoreField>
+                <StoreField id="ss-stock-variant" label="Variante">
+                  <select id="ss-stock-variant" value={variantId} onChange={(event) => updateFilter("variante", event.target.value)}>
+                    <option value="">Todas as variantes</option>
+                    {variantId && !options.data?.variants.some((option) => option.id === variantId) && (
+                      <option value={variantId}>Variante selecionada</option>
+                    )}
+                    {options.data?.variants.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.sku} · {option.product_name}{option.label && ` · ${option.label}`}
+                      </option>
+                    ))}
+                  </select>
+                </StoreField>
+                <StoreFilters count={filterCount} onClear={clearFilters}>
+                  <StoreField id="ss-stock-location" label="Local">
+                    <select id="ss-stock-location" value={locationId} onChange={(event) => updateFilter("local", event.target.value)}>
+                      <option value="">Todos os locais</option>
+                      {locationId && !options.data?.locations.some((option) => option.id === locationId) && (
+                        <option value={locationId}>Local selecionado</option>
+                      )}
+                      {options.data?.locations.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
+                    </select>
+                  </StoreField>
+                </StoreFilters>
+                {variantSearch && options.isPending && <p className="ss-filter-note" role="status">Buscando variantes…</p>}
+                {variantSearch && options.data?.variants.length === 0 && <p className="ss-filter-note" role="status">Nenhuma variante para esta busca.</p>}
+                {options.isError && <div className="basis-full">
+                  <StoreFailure message="Não foi possível carregar as opções de filtro." retry={() => void options.refetch()} />
+                </div>}
+              </div>
+            )}
+          </div>
+        )}
         action={canCount && !activeForm && !showTransfers && (
           <div className="flex flex-wrap gap-2">
             <Button type="button" className="ss-primary" onClick={() => { setConfirmation(""); setActiveForm("count"); }}>
@@ -246,21 +311,16 @@ export function StockPage({ scope, queryKey, access }: {
         />
       )}
       {confirmation && !showTransfers && <p role="status" className="ss-surface font-medium">{confirmation}</p>}
-      <nav className="flex flex-wrap gap-2" aria-label="Visões de estoque">
-        <Button asChild variant={!showTransfers && view === "saldos" ? "default" : "outline"} className={cn(!showTransfers && view === "saldos" && "ss-primary")}>
-          <Link data-button aria-current={!showTransfers && view === "saldos" ? "page" : undefined} to={stockLink("saldos", locationId, variantId)}>Saldos físicos</Link>
-        </Button>
-        <Button asChild variant={view === "movimentos" ? "default" : "outline"} className={cn(view === "movimentos" && "ss-primary")}>
-          <Link data-button aria-current={view === "movimentos" ? "page" : undefined} to={stockLink("movimentos", locationId, variantId)}>Movimentos</Link>
-        </Button>
-        {access.capabilities.includes("stock.transfers") && <Button asChild variant={showTransfers ? "default" : "outline"} className={cn(showTransfers && "ss-primary")}>
-          <Link data-button aria-current={showTransfers ? "page" : undefined} to={stockLink("transferencias", "", "")}>Transferências</Link>
-        </Button>}
-      </nav>
+
       {showTransfers && access.capabilities.includes("stock.transfers") ? (
         <StockTransfers scope={scope} queryKey={queryKey} canManage={canCount}
           selectedId={uuid.safeParse(transferId).success ? transferId : ""}
-          onSelect={(id) => setParams(id ? { visao: "transferencias", transferencia: id } : { visao: "transferencias" })}
+          onSelect={(id) => {
+            const next = new URLSearchParams(params);
+            if (id) next.set("transferencia", id);
+            else next.delete("transferencia");
+            setParams(next);
+          }}
         />
       ) : showTransfers ? (
         <StoreState title="Transferências indisponíveis" description="Aguarde a atualização do servidor para consultar transferências." />
@@ -272,44 +332,18 @@ export function StockPage({ scope, queryKey, access }: {
         />
       ) : (
         <>
-          <section className="ss-surface grid gap-3 sm:grid-cols-3" aria-label="Filtros de estoque">
-            <StoreField id="ss-stock-location" label="Local">
-              <select id="ss-stock-location" value={locationId} onChange={(event) => updateFilter("local", event.target.value)}>
-                <option value="">Todos os locais</option>
-                {locationId && !options.data?.locations.some((option) => option.id === locationId) && <option value={locationId}>Local selecionado</option>}
-                {options.data?.locations.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-              </select>
-            </StoreField>
-            <StoreField id="ss-stock-search" label="Buscar variante">
-              <input id="ss-stock-search" type="search" placeholder="Nome ou SKU" maxLength={120} value={search} onChange={(event) => setSearch(event.target.value)} />
-            </StoreField>
-            <StoreField id="ss-stock-variant" label="Variante">
-              <select id="ss-stock-variant" value={variantId} onChange={(event) => updateFilter("variante", event.target.value)}>
-                <option value="">Todas as variantes</option>
-                {variantId && !options.data?.variants.some((option) => option.id === variantId) && <option value={variantId}>Variante selecionada</option>}
-                {options.data?.variants.map((option) => (
-                  <option key={option.id} value={option.id}>{option.sku} · {option.product_name}{option.label && ` · ${option.label}`}</option>
-                ))}
-              </select>
-            </StoreField>
-            {variantSearch && options.isPending && <p className="text-sm text-[var(--ss-muted)] sm:col-span-3" role="status">Buscando variantes…</p>}
-            {variantSearch && options.data?.variants.length === 0 && <p className="text-sm text-[var(--ss-muted)] sm:col-span-3" role="status">Nenhuma variante para esta busca.</p>}
-            {options.isError && (
-              <div className="sm:col-span-3"><StoreFailure message="Não foi possível carregar as opções de filtro." retry={() => void options.refetch()} /></div>
-            )}
-          </section>
           {ledger.isPending ? (
             <StoreState title="Carregando estoque" busy />
           ) : ledger.isError ? (
             <StoreFailure message={storeError(ledger.error)} retry={() => void ledger.refetch()} />
           ) : !ledger.data.items.length ? (
             <StoreState
-              title={total ? "Nenhum registro nesta página" : view === "movimentos" ? "Nenhum movimento registrado" : "Nenhum saldo registrado"}
+              title={total ? "Nenhum registro nesta página" : appliedFilters ? "Nenhum registro para estes filtros" : view === "movimentos" ? "Nenhum movimento registrado" : "Nenhum saldo registrado"}
               description={total ? "Volte à primeira página para ver os registros." : appliedFilters ? "Confira os filtros selecionados." : "Os registros aparecem após um recebimento de compra ou uma contagem física."}
               action={total ? (
                 <Button type="button" variant="outline" onClick={() => goToPage(1)}>Ir à primeira página</Button>
               ) : appliedFilters ? (
-                <Button type="button" variant="outline" onClick={clearFilters}>Limpar filtros</Button>
+                <Button type="button" variant="outline" onClick={clearFilters}>Consultar sem filtros</Button>
               ) : undefined}
             />
           ) : (

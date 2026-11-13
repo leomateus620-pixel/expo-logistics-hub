@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { storeRpc, type StoreScope } from "../api/store";
 import type { NamedOption, PurchaseOptions } from "../domain/purchases";
 
-export function PurchaseOption({ kind, label, value, onChange, scope, queryKey, error, disabled, source = "purchase" }: {
+export function PurchaseOption({ kind, label, value, onChange, scope, queryKey, error, disabled, source = "purchase", inDialog = false }: {
   kind: keyof PurchaseOptions | "commissions" | "customers";
   label: string;
   value: NamedOption | null;
@@ -16,11 +16,14 @@ export function PurchaseOption({ kind, label, value, onChange, scope, queryKey, 
   error?: string;
   disabled?: boolean;
   source?: "purchase" | "inventory";
+  inDialog?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [term, setTerm] = useState("");
   const id = useId();
+  const trigger = useRef<HTMLButtonElement>(null);
+  const dialog = inDialog && open ? trigger.current?.closest<HTMLElement>("[role=dialog]") : undefined;
   const options = useQuery({
     queryKey: [...queryKey, kind === "commissions" || kind === "customers" ? kind : source, "options", term],
     queryFn: async () => {
@@ -48,14 +51,14 @@ export function PurchaseOption({ kind, label, value, onChange, scope, queryKey, 
       <label id={`${id}-label`} htmlFor={id}>{label}</label>
       <Popover open={open} onOpenChange={(next) => { setOpen(next); if (!next) { setSearch(""); setTerm(""); } }}>
         <PopoverTrigger asChild>
-          <Button id={id} type="button" variant="outline" disabled={disabled} aria-invalid={!!error}
+          <Button ref={trigger} id={id} type="button" variant="outline" disabled={disabled} aria-invalid={!!error}
             aria-labelledby={`${id}-label ${id}-value`} aria-describedby={error ? `${id}-error` : undefined}
-            className="min-w-0 justify-between whitespace-normal text-left font-normal">
+            className="h-auto min-h-11 min-w-0 justify-between whitespace-normal py-2 text-left font-normal">
             <span id={`${id}-value`} className="min-w-0 break-words">{value?.name ?? "Selecionar"}</span>
             <ChevronDown aria-hidden="true" className="shrink-0" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[min(23rem,calc(100vw-2rem))] p-2" align="start">
+        <PopoverContent container={dialog ?? undefined} className="flex max-h-[var(--radix-popover-content-available-height)] w-[min(23rem,calc(100vw-2rem))] flex-col p-2 motion-reduce:animate-none" align="start">
           <form
             role="search"
             aria-label={`Buscar ${label.toLowerCase()}`}
@@ -75,7 +78,7 @@ export function PurchaseOption({ kind, label, value, onChange, scope, queryKey, 
           {options.isPending ? <p role="status" className="p-2 text-sm">Carregando opções…</p> :
             options.isError ? <Button type="button" variant="ghost" className="min-h-11" onClick={() => void options.refetch()}>Tentar carregar novamente</Button> :
               !rows?.length ? <p role="status" className="p-2 text-sm">Nenhuma opção ativa encontrada.</p> : (
-                <ul className="mt-2 max-h-64 overflow-y-auto">
+                <ul className="mt-2 min-h-0 max-h-64 overflow-y-auto">
                   {rows.map((row) => (
                     <li key={row.id}>
                       <button

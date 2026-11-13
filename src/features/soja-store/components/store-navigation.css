@@ -13,6 +13,19 @@
   color: #ffac47;
 }
 
+.cw-sidebar--grouped .cw-sidebar__link svg,
+.cw-soja-quick-nav__item svg {
+  stroke-width: 1.8;
+}
+
+.cw-sidebar--grouped .cw-sidebar__nav {
+  gap: 3px;
+}
+
+.cw-sidebar--grouped .cw-sidebar__link {
+  min-height: 40px;
+}
+
 .cw-sidebar__group {
   display: grid;
   gap: 3px;

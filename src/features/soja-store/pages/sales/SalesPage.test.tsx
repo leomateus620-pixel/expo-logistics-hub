@@ -1,10 +1,15 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
-import { expect, it, vi } from "vitest";
+import { BrowserRouter, MemoryRouter } from "react-router-dom";
+import { afterEach, expect, it, vi } from "vitest";
 import { storeRpc } from "../../api/store";
 import { SalesPage } from "./SalesPage";
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
 
 vi.mock("../../api/store", async (original) => ({
   ...await original<typeof import("../../api/store")>(),
@@ -60,4 +65,48 @@ it("registra o saldo da reserva e confirma a entrega em ações separadas", asyn
     ...scope, _request_id: expect.any(String), _expected_version: 3, _payload: { sale_id: id, action: "deliver" },
   }));
   expect(await section.findByText(/Entrega confirmada em/)).toBeVisible();
+});
+
+it("registra reserva no diálogo e mantém a página e o período do histórico", async () => {
+  const scope = { _org_id: "org", _commission_id: "store" };
+  const url = "/comissoes/soja-store/vendas?pagina=2&inicio=2026-11-01&fim=2026-11-30";
+  window.history.replaceState({}, "", url);
+  vi.mocked(storeRpc).mockImplementation(async (name) => {
+    if (name === "soja_store_pos_config") return { rule: { active: true, methods: ["pix"] } };
+    if (name === "soja_store_cash_sessions") return { items: [{ id: "cash", location_id: "point", location_name: "Balcão", status: "open" }] };
+    if (name === "soja_store_sales_filtered") return { total: 31, items: [] };
+    if (name === "soja_store_sale_options") {
+      return [{ id: "variant", product_name: "Caneca", sku: "CAN-01", unit: "un", price_id: "price", price_cents: 1200, available: "3" }];
+    }
+    if (name === "soja_store_create_sale") return { id: "created", status: "pending", version: 1 };
+    throw new Error(`RPC inesperada: ${name}`);
+  });
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={client}>
+    <BrowserRouter>
+      <SalesPage scope={scope} queryKey={["store", "user", "org", "store"]} canManage reservationFlow />
+    </BrowserRouter>
+  </QueryClientProvider>);
+  const user = userEvent.setup();
+  const trigger = await screen.findByRole("button", { name: "Nova venda" });
+  expect(storeRpc).not.toHaveBeenCalledWith("soja_store_sale_options", expect.anything());
+  await user.click(trigger);
+  const dialog = within(screen.getByRole("dialog", { name: "Nova venda" }));
+  await user.click(await dialog.findByRole("button", { name: "Caneca · CAN-01" }));
+  await user.click(dialog.getByRole("checkbox", { name: "Reservar e confirmar pagamento depois" }));
+  expect(dialog.getByText("Total R$ 12,00")).toBeVisible();
+  await user.click(dialog.getByRole("button", { name: "Registrar reserva" }));
+  await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+  expect(storeRpc).toHaveBeenCalledWith("soja_store_create_sale", {
+    ...scope, _request_id: expect.any(String),
+    _payload: {
+      session_id: "cash", customer_id: null, pending: true, payments: [],
+      lines: [{ variant_id: "variant", price_id: "price", quantity: "1" }],
+    },
+  });
+  expect(window.location.pathname + window.location.search).toBe(url);
+  expect(storeRpc).toHaveBeenCalledWith("soja_store_sales_filtered", {
+    ...scope, _start: "2026-11-01", _end: "2026-11-30", _confirmed: false,
+    _location_id: null, _limit: 30, _offset: 30,
+  });
 });

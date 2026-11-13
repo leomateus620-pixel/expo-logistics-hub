@@ -17,7 +17,7 @@ O documento numerado é um comprovante interno. Ele pode ser reaberto para impre
 - A operação cobre venda própria e confirmação manual de dinheiro, PIX e cartão. A conciliação com adquirentes e bancos depende de integração futura.
 - As movimentações novas tratam estoque próprio. Custódia de terceiros, cálculo de custo de saída e apropriação contábil dependem da política aprovada. O custo de aquisição de uma compra fica separado do preço de venda. A ausência de custo de saída não vira margem.
 - A devolução física usa a venda original e o estorno correspondente. O comprovante interno fica disponível para impressão no navegador. A geração de PDF em segundo plano e o estorno financeiro desacoplado da devolução ainda precisam de fluxo próprio.
-- O Financeiro da loja registra compromissos, obrigações e liquidações da Soja Store. A publicação de lançamentos para o Financeiro Fenasoja depende da integração e do fluxo central de aprovação.
+- O Financeiro da loja registra compromissos, obrigações e liquidações da Soja Store no escopo próprio da comissão. As permissões e os lançamentos do Financeiro geral da Fenasoja pertencem a um módulo independente.
 - O módulo aproveita a equipe institucional e registra escala e treinamento da loja. As contas sem vínculo ativo continuam o fluxo institucional de acesso.
 
 ## Verificação

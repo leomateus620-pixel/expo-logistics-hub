@@ -1,6 +1,6 @@
 import { useId, useState, type FormEvent } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { ChevronRight, RefreshCw } from "lucide-react";
+import { Activity, ArrowDownToLine, Banknote, ChevronRight, ClipboardList, Package, RefreshCw, ShoppingBag, Warehouse } from "lucide-react";
 import { Link } from "react-router-dom";
 import { readOperationalFilters } from "../domain/operationalFilters";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { useCurrentOrg } from "@/hooks/useCurrentOrg";
 import { storeError, storeRpc } from "../api/store";
 import type { SojaStoreAccess } from "../hooks/useSojaStoreAccess";
 import { SOJA_STORE_UNIT } from "../navigation";
-import { StoreFailure, StoreField } from "./StoreElements";
+import { StoreFailure, StoreField, StoreFilters } from "./StoreElements";
 import "../soja-store.css";
 import "./store-summary.css";
 
@@ -28,13 +28,13 @@ type Overview = {
 const overviewCapabilities = ["catalog.view", "purchases.view", "stock.view", "sales.view"];
 const storePath = `/comissoes/${SOJA_STORE_UNIT}`;
 const metrics = [
-  { field: "active_products", capability: "catalog.view", label: "Produtos ativos", to: `${storePath}/produtos?situacao=active` },
-  { field: "ordered_purchases", capability: "purchases.view", label: "Pedidos a receber", to: `${storePath}/compras?situacao=ordered` },
-  { field: "partial_purchases", capability: "purchases.view", label: "Pedidos recebidos em parte", to: `${storePath}/compras?situacao=partially_received` },
-  { field: "stock_positions", capability: "stock.view", label: "Posições de estoque físico", to: `${storePath}/estoque` },
-  { field: "confirmed_sales", capability: "sales.view", label: "Vendas confirmadas", to: `${storePath}/vendas?situacao=confirmadas` },
-  { field: "confirmed_cents", capability: "sales.view", label: "Valor confirmado após devoluções", to: `${storePath}/vendas?situacao=confirmadas` },
-  { field: "received_cents", capability: "sales.view", label: "Recebido nas vendas confirmadas", to: `${storePath}/vendas?situacao=confirmadas` },
+  { field: "active_products", capability: "catalog.view", label: "Produtos ativos", icon: Package, help: "Catálogo atual", to: `${storePath}/produtos?situacao=active` },
+  { field: "ordered_purchases", capability: "purchases.view", label: "Pedidos a receber", icon: ClipboardList, help: "Ainda sem recebimento", to: `${storePath}/compras?situacao=ordered` },
+  { field: "partial_purchases", capability: "purchases.view", label: "Pedidos recebidos em parte", icon: ArrowDownToLine, help: "Ainda têm itens pendentes", to: `${storePath}/compras?situacao=partially_received` },
+  { field: "stock_positions", capability: "stock.view", label: "Posições de estoque físico", icon: Warehouse, help: "Por local, variante e propriedade", to: `${storePath}/estoque` },
+  { field: "confirmed_sales", capability: "sales.view", label: "Vendas confirmadas", icon: ShoppingBag, help: "Pela data da venda", to: `${storePath}/vendas?situacao=confirmadas` },
+  { field: "confirmed_cents", capability: "sales.view", label: "Valor confirmado após devoluções", icon: Banknote, financial: true, help: "Valor líquido das vendas", to: `${storePath}/vendas?situacao=confirmadas` },
+  { field: "received_cents", capability: "sales.view", label: "Recebido nas vendas confirmadas", icon: Banknote, financial: true, help: "Pagamentos líquidos de estornos", to: `${storePath}/vendas?situacao=confirmadas` },
 ] as const;
 const numbers = new Intl.NumberFormat("pt-BR");
 function metricLabel(value: string | number) {
@@ -80,7 +80,13 @@ export function SojaStoreSummary({ commissionId, access }: {
     meta: { persist: false },
   });
 
-  if (!canRead || !user?.id || !orgId) return null;
+  if (!user?.id || !orgId) return null;
+  if (!canRead) return (
+    <section className="ss-page ss-surface ss-overview" aria-labelledby={titleId}>
+      <h2 id={titleId}>Operação da loja</h2>
+      <p>Seu perfil não tem acesso aos indicadores da loja.</p>
+    </section>
+  );
 
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -92,6 +98,7 @@ export function SojaStoreSummary({ commissionId, access }: {
     setFilter(draft);
   }
   const visibleMetrics = metrics.flatMap(({ field, capability, ...metric }) => {
+    if ("financial" in metric && !access.capabilities.includes("finance.view")) return [];
     const value = summary.data?.[field];
     if ((typeof value !== "number" && typeof value !== "string") || !access.capabilities.includes(capability)) return [];
     const [path, query] = metric.to.split("?");
@@ -104,15 +111,31 @@ export function SojaStoreSummary({ commissionId, access }: {
       }
     }
     const qs = drill.toString();
-    return [{ ...metric, to: qs ? `${path}?${qs}` : path, value }];
+    return [{ ...metric, field, to: qs ? `${path}?${qs}` : path, value }];
   });
   const offline = summary.fetchStatus === "paused";
+  const filterCount = Object.values(filter).filter(Boolean).length;
+  const isFiltered = filterCount > 0;
+  const purchaseCount = summary.data?.ordered_purchases;
+  const partialCount = summary.data?.partial_purchases;
+  const orderCounts = visibleMetrics.filter(({ field }) => field === "ordered_purchases" || field === "partial_purchases");
+  const operation = visibleMetrics.filter(({ field }) => field === "active_products" || field === "stock_positions" ||
+    field === "ordered_purchases" || field === "partial_purchases");
+  const sales = visibleMetrics.filter(({ field }) => field === "confirmed_sales" || field === "confirmed_cents" || field === "received_cents");
+  const totalOrders = typeof purchaseCount === "number" && typeof partialCount === "number"
+    ? purchaseCount + partialCount : 0;
+  const canStart = access.capabilities.includes("catalog.manage") && access.capabilities.includes("catalog.view");
+  function clearFilters() {
+    setDraft(blank);
+    setFilter(blank);
+    setFilterError("");
+  }
 
   return (
     <section className="ss-page ss-surface ss-overview" aria-labelledby={titleId}>
       <header>
         <div>
-          <h2 id={titleId}>Operação da loja</h2>
+          <h2 id={titleId}><Activity size={19} aria-hidden="true" /> Operação da loja</h2>
           {summary.data && !summary.isError && !summary.isPlaceholderData && (
             <p>Consultado em <time dateTime={summary.data.generated_at}>{updatedAt.format(new Date(summary.data.generated_at))}</time></p>
           )}
@@ -124,20 +147,26 @@ export function SojaStoreSummary({ commissionId, access }: {
         )}
       </header>
       {access.capabilities.some((cap) => ["purchases.view", "stock.view", "sales.view"].includes(cap)) && (
-        <form className="flex flex-wrap items-end gap-3" onSubmit={apply} aria-label="Filtros da operação">
-          <StoreField id={`${titleId}-start`} label="Data inicial"><input id={`${titleId}-start`} type="date" value={draft.inicio} onChange={(e) => setDraft({ ...draft, inicio: e.target.value })} /></StoreField>
-          <StoreField id={`${titleId}-end`} label="Data final"><input id={`${titleId}-end`} type="date" value={draft.fim} onChange={(e) => setDraft({ ...draft, fim: e.target.value })} /></StoreField>
-          <StoreField id={`${titleId}-location`} label="Local ou ponto"><select id={`${titleId}-location`} value={draft.local} onChange={(e) => setDraft({ ...draft, local: e.target.value })}>
-            <option value="">Todos os locais</option>
-            {(summary.data?.locations ?? []).map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}
-          </select></StoreField>
-          <Button type="submit" variant="outline">Aplicar filtros</Button>
-          {(filter.inicio || filter.fim || filter.local) && <Button type="button" variant="ghost" onClick={() => {
-            setDraft(blank); setFilter(blank); setFilterError("");
-          }}>Limpar filtros</Button>}
+        <form onSubmit={apply} aria-label="Filtros da operação">
+          <StoreFilters count={filterCount} onClear={clearFilters}>
+            <StoreField id={`${titleId}-start`} label="Data inicial">
+              <input id={`${titleId}-start`} type="date" value={draft.inicio} onChange={(e) => setDraft({ ...draft, inicio: e.target.value })} />
+            </StoreField>
+            <StoreField id={`${titleId}-end`} label="Data final" error={filterError || undefined}>
+              <input id={`${titleId}-end`} type="date" value={draft.fim} aria-invalid={!!filterError}
+                aria-describedby={filterError ? `${titleId}-end-error` : undefined} onChange={(e) => setDraft({ ...draft, fim: e.target.value })} />
+            </StoreField>
+            <StoreField id={`${titleId}-location`} label="Local ou ponto">
+              <select id={`${titleId}-location`} value={draft.local} onChange={(e) => setDraft({ ...draft, local: e.target.value })}>
+                <option value="">Todos os locais</option>
+                {(summary.data?.locations ?? []).map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}
+              </select>
+            </StoreField>
+            <Button type="submit" variant="outline">Aplicar filtros</Button>
+          </StoreFilters>
         </form>
       )}
-      {filterError && <StoreFailure message={filterError} />}
+      {filterError && <span className="sr-only" role="alert">{filterError}</span>}
       {summary.isError ? (
         <StoreFailure message={(summary.error as { code?: string } | null)?.code === "PGRST202"
           ? "Os indicadores da loja estão indisponíveis neste ambiente."
@@ -149,19 +178,50 @@ export function SojaStoreSummary({ commissionId, access }: {
           {offline && <p role="status">Dados da última consulta. Aguardando conexão para atualizar.</p>}
           {visibleMetrics.length === 0 ? <p>Nenhum indicador disponível para seu perfil.</p> : (
             <>
-              {visibleMetrics.every(({ value }) => value === 0 || value === "0") && <p>Nenhum registro nos recortes abaixo.</p>}
-              {(filter.inicio || filter.fim) && typeof summary.data?.stock_positions === "number" && <p>O estoque mostra a posição atual do local.</p>}
-              {typeof summary.data?.confirmed_sales === "number" && <p>Vendas pela data da operação, com devoluções e estornos já registrados.</p>}
-              <ul className="ss-overview-metrics">
-                {visibleMetrics.map(({ label, to, value }) => (
+              {visibleMetrics.every(({ value }) => value === 0 || value === "0") && (
+                <div className="ss-overview-empty">
+                  <p>Nenhum registro nos recortes abaixo.</p>
+                  {isFiltered ? <Button type="button" variant="ghost" onClick={clearFilters}>Ver operação sem filtros</Button>
+                    : canStart && <Button variant="outline" asChild><Link to={`${storePath}/produtos`}>Abrir catálogo</Link></Button>}
+                </div>
+              )}
+              {operation.length > 0 && <ul className="ss-overview-metrics" aria-label="Catálogo, compras e estoque">
+                {operation.map(({ label, to, value, icon: Icon, help }) => (
                   <li key={label}>
                     <Link className="ss-overview-metric" to={to}>
-                      <span><strong>{metricLabel(value)}</strong><span>{label}</span></span>
-                      <ChevronRight size={18} aria-hidden="true" />
+                      <span className="ss-overview-metric-top">
+                        <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+                        <strong>{metricLabel(value)}</strong>
+                        <ChevronRight size={16} aria-hidden="true" />
+                      </span>
+                      <span>{label}</span>
                     </Link>
+                    <p>{help}</p>
                   </li>
                 ))}
-              </ul>
+              </ul>}
+              {isFiltered && <p>O período se refere à data do pedido ou da venda. O estoque mostra a posição atual e o catálogo é consultado sem filtros.</p>}
+              {orderCounts.length === 2 && totalOrders > 0 && (
+                <figure className="ss-order-composition">
+                  <figcaption>Composição dos pedidos com recebimento pendente · {numbers.format(totalOrders)} no total</figcaption>
+                  <div className="ss-order-bar" aria-hidden="true">
+                    {orderCounts.map(({ label, value }) => <span key={label} style={{ flexGrow: Number(value) }} />)}
+                  </div>
+                  <ul>
+                    {orderCounts.map(({ label, value }) => <li key={label}>{label}: <strong>{metricLabel(value)}</strong></li>)}
+                  </ul>
+                </figure>
+              )}
+              {sales.length > 0 && (
+                <ul className="ss-overview-sales" aria-label="Vendas confirmadas e recebimentos">
+                  {sales.map(({ label, to, value, icon: Icon }) => (
+                    <li key={label}><Link to={to}>
+                      <Icon size={16} aria-hidden="true" />
+                      <span><strong>{metricLabel(value)}</strong><span>{label}</span></span>
+                    </Link></li>
+                  ))}
+                </ul>
+              )}
             </>
           )}
         </>

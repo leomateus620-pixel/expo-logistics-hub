@@ -29,6 +29,7 @@ const migrationFiles = [
   '20261112121500_soja_store_current_overview',
   '20261112121600_soja_store_sale_fulfillment',
   '20261112121700_soja_store_customer_sales',
+  '20261113120000_soja_store_dashboard_finance_access',
 ];
 
 async function as(actor, callback) {
@@ -181,6 +182,15 @@ try {
   `)[0].result);
   assert.equal(filteredPurchases.items[0].id, matchingPurchase.id);
   assert.equal(filteredPurchases.total, dashboard.ordered_purchases);
+
+  // A sales reader can see the count, but the dashboard must not return monetary values.
+  await sql`DELETE FROM soja_store_private.operational_capability_registry WHERE capability = 'finance.view'`;
+  const salesOnly = await overview(first);
+  assert.equal(salesOnly.confirmed_sales, dashboard.confirmed_sales);
+  assert.equal(salesOnly.confirmed_cents, null);
+  assert.equal(salesOnly.received_cents, null);
+  await rejects(as(first, (tx) => tx`SELECT public.soja_store_finance_summary(${org}, ${store}, 2026)`), 'SOJA_STORE_FORBIDDEN');
+  await sql`INSERT INTO soja_store_private.operational_capability_registry VALUES ('finance.view')`;
 
   const buyerOptions = await read(second, 'sale_customers');
   assert.deepEqual(buyerOptions, [{ id: created.id, name: customer.name, city: customer.city }]);

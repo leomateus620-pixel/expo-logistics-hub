@@ -1,9 +1,10 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
+import { Plus, Search, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { storeError, storeRpc, type CommandResult, type StoreScope } from "../../api/store";
-import { StoreFailure, StoreField, StoreHeading, StoreState } from "../../components/StoreElements";
+import { StoreFailure, StoreField, StoreFilters, StoreHeading, StoreState } from "../../components/StoreElements";
 import { dateLabel, readCents, todayInSaoPaulo } from "../../domain/purchases";
 import { useStoreCommand } from "../../hooks/useStoreCommand";
 import { useUnsavedStoreForm } from "../../hooks/useUnsavedStoreForm";
@@ -300,24 +301,28 @@ export function FinancePage({ scope, queryKey, canManage }: Props) {
   ] : [];
 
   return <>
-    <StoreHeading title="Financeiro da loja" description="Acompanhe orçamento, títulos e liquidações da Soja Store." />
-    <form className="ss-surface flex flex-wrap items-end gap-3" onSubmit={(event) => {
-      event.preventDefault();
-      updateFilters({ ano: periodDraft ?? String(year) });
-      setBudget(undefined); setNewEntry(false); setPeriodDraft(undefined);
-    }}>
-      <StoreField id="ss-fin-year" label="Ano de competência">
-        <input id="ss-fin-year" type="number" min={2000} max={2200} required value={periodDraft ?? year} onChange={(event) => setPeriodDraft(event.target.value)} />
-      </StoreField>
-      <Button type="submit" variant="outline">Consultar ano</Button>
-    </form>
+    <StoreHeading title="Financeiro da loja" icon={Wallet} controls={
+      <form className="flex min-w-0 flex-wrap items-end gap-2" onSubmit={(event) => {
+        event.preventDefault();
+        updateFilters({ ano: periodDraft ?? String(year) });
+        setBudget(undefined);
+        setNewEntry(false);
+        setPeriodDraft(undefined);
+      }}>
+        <StoreField id="ss-fin-year" label="Ano de competência">
+          <input id="ss-fin-year" type="number" inputMode="numeric" min={2000} max={2200} required
+            value={periodDraft ?? year} onChange={(event) => setPeriodDraft(event.target.value)} />
+        </StoreField>
+        <Button type="submit" variant="outline"><Search aria-hidden="true" /> Consultar ano</Button>
+      </form>
+    } />
     {notice && <p role="status" className="text-sm font-semibold">{notice}</p>}
     {summary.isPending ? <StoreState title="Carregando orçamento" busy /> : summary.isError ?
       <StoreFailure message={financeError(summary.error)} retry={() => void summary.refetch()} /> : <>
         <section className="ss-surface grid gap-3" aria-labelledby="ss-fin-summary-title">
           <h2 id="ss-fin-summary-title">Resumo do ano</h2>
-          <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{cards.map(([label, value]) => <div className="min-w-0 rounded-lg border p-3" key={label}>
-            <dt className="text-sm">{label}</dt><dd className="break-words font-semibold">{money(value)}</dd>
+          <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{cards.map(([label, value]) => <div className="min-w-0 rounded-lg border border-[var(--ss-line)] bg-[var(--ss-paper)] p-3" key={label}>
+            <dt className="text-sm text-[var(--ss-muted)]">{label}</dt><dd className="break-words text-lg font-semibold">{money(value)}</dd>
           </div>)}</dl>
           {summary.data.overdue_count > 0 && <Button type="button" variant="outline" className="w-fit" onClick={() => updateFilters({ situacao: "overdue", tipo: "" })}>
             Ver {summary.data.overdue_count} {summary.data.overdue_count === 1 ? "título vencido" : "títulos vencidos"}
@@ -326,7 +331,7 @@ export function FinancePage({ scope, queryKey, canManage }: Props) {
         <section className="ss-surface grid gap-3" aria-labelledby="ss-fin-budgets">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 id="ss-fin-budgets">Orçamento por categoria</h2>
-            {canManage && <Button type="button" variant="outline" onClick={() => setBudget(budget === "new" ? undefined : "new")}>Nova categoria de orçamento</Button>}
+            {canManage && <Button type="button" variant="outline" onClick={() => setBudget(budget === "new" ? undefined : "new")}><Plus aria-hidden="true" /> Nova categoria de orçamento</Button>}
           </div>
           {budget === "new" && <BudgetEditor scope={scope} queryKey={queryKey} year={year} done={() => { setBudget(undefined); setNotice("Orçamento salvo."); }} />}
           {summary.data.budgets.length === 0 && <p className="text-sm text-[var(--ss-muted)]">Nenhuma categoria com orçamento aprovado neste ano.</p>}
@@ -347,15 +352,15 @@ export function FinancePage({ scope, queryKey, canManage }: Props) {
       </>}
     <section className="ss-surface grid gap-3" aria-labelledby="ss-fin-entries">
       <div className="flex flex-wrap items-center justify-between gap-2"><h2 id="ss-fin-entries">Títulos a pagar e a receber</h2>
-        {canManage && <Button type="button" className="ss-primary" onClick={() => setNewEntry(!newEntry)}>{newEntry ? "Fechar cadastro" : "Reconhecer título"}</Button>}
+        {canManage && <Button type="button" className="ss-primary" onClick={() => setNewEntry(!newEntry)}>{!newEntry && <Plus aria-hidden="true" />}{newEntry ? "Fechar cadastro" : "Reconhecer título"}</Button>}
       </div>
       {newEntry && <RecognizeForm scope={scope} queryKey={queryKey} year={year} done={() => { setNewEntry(false); setNotice("Título reconhecido."); }} />}
-      <div className="grid gap-3 sm:grid-cols-2">
+      <StoreFilters count={Number(!!kind) + Number(!!status)} onClear={() => updateFilters({ tipo: "", situacao: "" })}>
         <StoreField id="ss-fin-kind-filter" label="Tipo"><select id="ss-fin-kind-filter" value={kind} onChange={(event) => updateFilters({ tipo: event.target.value })}>
           <option value="">Todos</option>{Object.entries(kinds).map(([key, value]) => <option key={key} value={key}>{value}</option>)}</select></StoreField>
         <StoreField id="ss-fin-status-filter" label="Situação"><select id="ss-fin-status-filter" value={status} onChange={(event) => updateFilters({ situacao: event.target.value })}>
           <option value="">Todas</option>{Object.entries(statuses).map(([key, value]) => <option key={key} value={key}>{value}</option>)}</select></StoreField>
-      </div>
+      </StoreFilters>
       {entries.isPending ? <StoreState title="Carregando títulos" busy /> : entries.isError ?
         <StoreFailure message={financeError(entries.error)} retry={() => void entries.refetch()} /> : <>
           {!entries.data.items.length && <p role="status" className="text-sm text-[var(--ss-muted)]">Nenhum título para este recorte.</p>}

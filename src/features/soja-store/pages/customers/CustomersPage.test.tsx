@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, expect, it, vi } from "vitest";
+import { Toaster } from "sonner";
 import { CustomersPage } from "./CustomersPage";
 import { customersPath, type CustomerDetail } from "./types";
 
@@ -35,6 +36,7 @@ function renderPage(id?: string, canManage = true, canReadCatalog = true) {
           <Route path={`${customersPath}/${customerId}`} element={<CustomersPage scope={scope} queryKey={["store", "customers"]} canManage={canManage} canReadCatalog={canReadCatalog} detailId={customerId} />} />
         </Routes>
       </MemoryRouter>
+      <Toaster />
     </QueryClientProvider>,
   );
 }
@@ -43,7 +45,7 @@ it("mantém a lista vazia e a busca no servidor para o perfil de consulta", asyn
   storeRpc.mockResolvedValue({ items: [], total: 0 });
   renderPage(undefined, false);
   expect(await screen.findByText("Nenhum cadastro registrado")).toBeVisible();
-  expect(screen.queryByRole("link", { name: "Novo cadastro" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Novo cadastro" })).not.toBeInTheDocument();
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Santa Rosa" } });
   fireEvent.click(screen.getByRole("button", { name: "Buscar" }));
   await waitFor(() => expect(storeRpc).toHaveBeenLastCalledWith("soja_store_customers", {
@@ -51,13 +53,23 @@ it("mantém a lista vazia e a busca no servidor para o perfil de consulta", asyn
   }));
 });
 
-it("cria o cadastro mínimo sem presumir consentimento e carrega o detalhe persistido", async () => {
-  storeRpc.mockImplementation(async (name) => name === "soja_store_save_customer"
-    ? { id: customerId, status: "active", version: 1 } : customer);
+it("abre a rota antiga sobre a lista e salva sem presumir consentimento", async () => {
+  let created = false;
+  storeRpc.mockImplementation(async (name) => {
+    if (name === "soja_store_save_customer") {
+      created = true;
+      return { id: customerId, status: "active", version: 1 };
+    }
+    if (name === "soja_store_customers") return { items: created ? [customer] : [], total: Number(created) };
+    return customer;
+  });
   renderPage("novo");
-  expect(screen.getByRole("checkbox")).not.toBeChecked();
-  fireEvent.change(screen.getByRole("textbox", { name: "Nome ou razão social" }), { target: { value: customer.name } });
-  fireEvent.click(screen.getByRole("button", { name: "Salvar cadastro" }));
+  const dialog = within(screen.getByRole("dialog", { name: "Novo cadastro" }));
+  expect(dialog.getByRole("checkbox")).not.toBeChecked();
+  fireEvent.change(dialog.getByRole("textbox", { name: "Nome ou razão social" }), { target: { value: customer.name } });
+  fireEvent.click(dialog.getByRole("button", { name: "Salvar cadastro" }));
+  expect(await screen.findByRole("link", { name: new RegExp(customer.name) })).toBeVisible();
+  fireEvent.click(await screen.findByRole("button", { name: "Ver cadastro" }));
   expect(await screen.findByRole("heading", { name: customer.name })).toBeVisible();
   expect(storeRpc).toHaveBeenCalledWith("soja_store_save_customer", expect.objectContaining({
     _request_id: expect.any(String), _expected_version: null,
