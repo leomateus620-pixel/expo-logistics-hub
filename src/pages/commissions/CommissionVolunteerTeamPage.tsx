@@ -18,6 +18,7 @@ import { useSojaStoreAccess } from "@/features/soja-store/hooks/useSojaStoreAcce
 import { buildSojaStoreMenu, SOJA_STORE_UNIT } from "@/features/soja-store/navigation";
 
 const OperationsTeam = lazy(() => import("@/pages/TeamPage"));
+const StoreTeamPanel = lazy(() => import("@/features/soja-store/pages/StoreTeamPanel").then(({ StoreTeamPanel }) => ({ default: StoreTeamPanel })));
 
 function SojaStoreTeamLayout({ unit, module, children }: { unit: OrgUnit; module: CommissionModule; children: ReactNode }) {
   const { commissionIdBySlug } = useUnitIdentity(SOJA_STORE_UNIT);
@@ -25,7 +26,12 @@ function SojaStoreTeamLayout({ unit, module, children }: { unit: OrgUnit; module
   const menus = buildSojaStoreMenu(module.menus, access.isError ? undefined : access.data);
   const grouped = menus.some((item) => item.quickLabel);
   return (
-    <CommissionLayout module={module} variant={grouped ? "workspace" : "standard"} menuItems={withTeamMenu(menus)}>
+    <CommissionLayout module={module} variant={grouped ? "workspace" : "standard"} menuItems={withTeamMenu(menus)} animateContent={false}>
+      {commissionIdBySlug && !access.isError && access.data?.enabled && access.data.capabilities.includes("team.view") && (
+        <Suspense fallback={<p role="status">Carregando operação da equipe…</p>}>
+          <StoreTeamPanel commissionId={commissionIdBySlug} access={access.data} />
+        </Suspense>
+      )}
       {children}
     </CommissionLayout>
   );

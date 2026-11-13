@@ -8,12 +8,14 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { readProduct, saveProduct, storeError, type StoreScope } from "../api/store";
+import { ProductSuppliers } from "../components/ProductSuppliers";
 import { fieldError, StoreFailure, StoreField, StoreHeading, StoreState } from "../components/StoreElements";
 import {
   newVariant, productForm, productPayload, productSchema, productStatus, variantAttributes,
   type Product, type ProductForm,
 } from "../domain/catalog";
 import { useStoreCommand } from "../hooks/useStoreCommand";
+import { VariantPricePanel } from "../components/VariantPricePanel";
 import type { SojaStoreAccess } from "../hooks/useSojaStoreAccess";
 import { useUnsavedStoreForm } from "../hooks/useUnsavedStoreForm";
 import { catalogPath } from "./CatalogPage";
@@ -50,6 +52,10 @@ export function ProductDetailPage({ scope, queryKey, canManage, id, access }: {
                   {canManage ? <ProductEditor key={id} product={productQuery.data} scope={scope} queryKey={queryKey} /> :
                     <ProductOverview product={productQuery.data} />}
                   <RelatedProductRecords product={productQuery.data} access={access} />
+                  {access.capabilities.includes("suppliers.view") && <ProductSuppliers scope={scope} queryKey={queryKey} productId={id}
+                    canManage={canManage && access.capabilities.includes("purchases.manage")} />}
+                  {access.capabilities.includes("sales.checkout") && <VariantPricePanel
+                    scope={scope} queryKey={queryKey} variants={productQuery.data.variants} canManage={canManage} />}
                 </>}
     </>
   );

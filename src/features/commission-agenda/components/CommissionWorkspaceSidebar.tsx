@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation, useMatch } from 'react-router-dom';
 import { ChevronLeft, Ellipsis, LogOut, Menu } from 'lucide-react';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -20,6 +20,8 @@ interface WorkspaceSidebarProps {
 /** Exclusive workspace navigation. The sidebar used by operational/map modules is untouched. */
 export default function CommissionWorkspaceSidebar({ module, menuItems, mobileOpen, onMobileOpen, onMobileClose }: WorkspaceSidebarProps) {
   const { signOut } = useAuth();
+  const location = useLocation();
+  const workspace = useMatch('/comissoes/:moduleSlug/*');
   const items = menuItems ?? module.menus;
   const groups = new Map<string | undefined, CommissionMenuItem[]>();
   for (const item of items) {
@@ -30,11 +32,28 @@ export default function CommissionWorkspaceSidebar({ module, menuItems, mobileOp
   const quickLinks = items.filter((item) => item.quickLabel);
   const grouped = quickLinks.length > 0;
 
+  const targetFor = (item: CommissionMenuItem) => item.path.startsWith('/') ? item.path : getModuleRoute(module, item.path);
+  const currentPath = grouped && workspace
+    ? `${module.basePath}/${workspace.params['*'] ?? ''}`
+    : location.pathname;
+  const matchesCurrent = (item: CommissionMenuItem) => {
+    const target = targetFor(item);
+    return currentPath === target || currentPath.startsWith(`${target}/`);
+  };
+  const inMore = grouped && items.some((item) => !item.quickLabel && matchesCurrent(item));
+
   const renderLink = (item: CommissionMenuItem, className: string, label = item.label) => {
     const Icon = item.icon;
-    const target = item.path.startsWith('/') ? item.path : getModuleRoute(module, item.path);
+    if (grouped) {
+      return (
+        <Link key={item.path} to={targetFor(item)} onClick={onMobileClose} className={className} aria-current={matchesCurrent(item) ? 'page' : undefined}>
+          <Icon aria-hidden="true" />
+          <span>{label}</span>
+        </Link>
+      );
+    }
     return (
-      <NavLink key={item.path} to={target} onClick={onMobileClose} className={className}>
+      <NavLink key={item.path} to={targetFor(item)} onClick={onMobileClose} className={className}>
         <Icon aria-hidden="true" />
         <span>{label}</span>
       </NavLink>
@@ -83,7 +102,7 @@ export default function CommissionWorkspaceSidebar({ module, menuItems, mobileOp
           <nav className="cw-soja-quick-nav" aria-label="Atalhos da Soja Store">
             {quickLinks.map((item) => renderLink(item, 'cw-soja-quick-nav__item', item.quickLabel))}
             <SheetTrigger asChild>
-              <button type="button" className="cw-soja-quick-nav__item" data-commission-menu-open aria-label="Mais seções">
+              <button type="button" className="cw-soja-quick-nav__item" data-commission-menu-open data-current-section={inMore || undefined} aria-label={inMore ? 'Mais seções, inclui a página atual' : 'Mais seções'}>
                 <Ellipsis aria-hidden="true" />
                 <span>Mais</span>
               </button>

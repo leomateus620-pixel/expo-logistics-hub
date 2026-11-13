@@ -90,7 +90,7 @@ try {
   assert.equal((await sql`SELECT count(*)::int AS count FROM soja_store_private.scopes`)[0].count, 0);
   await sql`INSERT INTO soja_store_private.scopes (org_id, commission_id, enabled) VALUES (${ids.org}, ${ids.store}, true), (${ids.foreignOrg}, ${ids.foreignStore}, true)`;
   for (const key of ['manager', 'reader', 'secondManager', 'inactive']) {
-    await sql`INSERT INTO public.commission_people VALUES (${person[key]}, ${ids.org}, ${ids[key]})`;
+    await sql`INSERT INTO public.commission_people (id, org_id, user_id) VALUES (${person[key]}, ${ids.org}, ${ids[key]})`;
     await sql`INSERT INTO public.commission_responsibles (commission_id, org_id, person_id) VALUES (${ids.store}, ${ids.org}, ${person[key]})`;
     await sql`
       INSERT INTO soja_store_private.access_grants (org_id, commission_id, person_id, user_id, capability, granted_by)
@@ -388,6 +388,212 @@ try {
   assert.equal(receivedOverview.partial_purchases, 0);
   assert.equal(receivedOverview.stock_positions, finalStock.total);
   console.log('PASS overview totals beyond one page, capability redaction, and matching stock and purchase filters');
+
+  // Exercise migration over a populated native ledger and keep the existing receipt IDs.
+  // The rollout's role behavior is covered separately, so keep explicit grants in this fixture.
+  await sql`CREATE TABLE soja_store_private.operational_capability_registry (capability text PRIMARY KEY)`;
+  const inventoryMigration = await sql.reserve();
+  try {
+    await inventoryMigration.unsafe(await readFile(new URL('../../supabase/migrations/20261112120600_soja_store_inventory.sql', import.meta.url), 'utf8'));
+  } finally {
+    await inventoryMigration.release();
+  }
+  assert.equal((await stock(purchaseVariant.id)).items[0].quantity, '20.000000');
+  assert.equal((await stock(purchaseVariant.id)).items[0].available_quantity, '20.000000');
+  assert.equal((await stock(purchaseVariant.id)).items[0].reserved_quantity, '0');
+  const oldMovement = (await as(ids.reader, async (tx) => (await tx`
+    SELECT public.soja_store_stock_movements(${ids.org}, ${ids.store}, NULL, ${purchaseVariant.id}) AS result
+  `)[0].result)).items[0];
+  assert.equal(oldMovement.id, movements.items[0].id);
+  assert.equal(oldMovement.sku, purchaseVariant.sku);
+  assert.equal(oldMovement.inventory_count_id, null);
+
+  await sql`
+    INSERT INTO soja_store_private.access_grants (org_id, commission_id, person_id, user_id, capability, granted_by)
+    VALUES (${ids.org}, ${ids.store}, ${person.manager}, ${ids.manager}, 'stock.manage', ${ids.operator}),
+      (${ids.org}, ${ids.store}, ${person.secondManager}, ${ids.secondManager}, 'stock.manage', ${ids.operator})
+  `;
+  const openedProduct = await save(ids.manager, { ...base, name: 'Produto de contagem', variants: [{ sku: 'CONTA-1' }] });
+  const openedVariant = (await detail(ids.reader, openedProduct.id)).variants[0];
+  const countedAt = await saveDirectory(ids.manager, 'location', { ...location, name: 'Posição contada' });
+  const pos = (actor, variantId, locationId = countedAt.id) => as(actor, async (tx) => (await tx`
+    SELECT public.soja_store_inventory_position(${ids.org}, ${ids.store}, ${variantId}, ${locationId}) AS result
+  `)[0].result);
+  const record = (actor, payload, version, requestId = randomUUID()) => as(actor, async (tx) => (await tx`
+    SELECT public.soja_store_record_inventory(${ids.org}, ${ids.store}, ${requestId}, ${version}, ${tx.json(payload)}) AS result
+  `)[0].result);
+  const opening = {
+    variant_id: openedVariant.id, location_id: countedAt.id,
+    kind: 'opening_count', quantity: '7.250000', reason: 'Conferência física da posição', reference: 'Contagem 1',
+  };
+  await fails(pos(ids.reader, openedVariant.id), '42501');
+  await fails(record(ids.reader, opening, 0), '42501');
+  await fails(record(ids.manager, { ...opening, location_id: foreignLocation }, 0), 'PT404');
+  await fails(record(ids.manager, { ...opening, quantity: '-1' }, 0), '22023');
+  await fails(record(ids.manager, { ...opening, reason: '' }, 0), '22023');
+  await fails(record(ids.manager, { ...opening, kind: 'inventory_adjustment' }, 0), 'PT409', 'SOJA_STORE_OPENING_REQUIRED');
+  assert.deepEqual(await pos(ids.manager, openedVariant.id), {
+    quantity: '0', available_quantity: '0', version: 0, has_movement: false,
+  });
+  const inventoryOptions = await as(ids.manager, async (tx) => (await tx`
+    SELECT public.soja_store_inventory_options(${ids.org}, ${ids.store}, 'sem correspondência', 1,
+      ${countedAt.id}, ${openedVariant.id}) AS result
+  `)[0].result);
+  assert.equal(inventoryOptions.locations[0].id, countedAt.id);
+  assert.equal(inventoryOptions.variants[0].id, openedVariant.id);
+
+  const countRequest = randomUUID();
+  const openingResults = await Promise.all([
+    record(ids.manager, opening, 0, countRequest), record(ids.manager, opening, 0, countRequest),
+  ]);
+  assert.deepEqual(openingResults[0], openingResults[1]);
+  assert.deepEqual(await status(ids.manager, countRequest), openingResults[0]);
+  await fails(record(ids.manager, { ...opening, quantity: '8' }, 0, countRequest), 'PT409', 'SOJA_STORE_REQUEST_CONFLICT');
+  await fails(record(ids.manager, opening, 1), 'PT409', 'SOJA_STORE_OPENING_ALREADY_RECORDED');
+  assert.deepEqual(await pos(ids.manager, openedVariant.id), {
+    quantity: '7.250000', available_quantity: '7.250000', version: 1, has_movement: true,
+  });
+  await fails(saveDirectory(ids.manager, 'location', { ...location, id: countedAt.id, status: 'archived' }, randomUUID(), 1),
+    'PT409', 'SOJA_STORE_LOCATION_HAS_STOCK');
+
+  const adjustment = { ...opening, kind: 'inventory_adjustment', quantity: '4.500000', reason: 'Recontagem da posição' };
+  const adjustmentRace = await Promise.allSettled([
+    record(ids.manager, adjustment, 1), record(ids.secondManager, adjustment, 1),
+  ]);
+  assert.equal(adjustmentRace.filter((entry) => entry.status === 'fulfilled').length, 1);
+  assert.equal(adjustmentRace.find((entry) => entry.status === 'rejected').reason.message, 'SOJA_STORE_STALE_VERSION');
+  const countHistory = await as(ids.reader, async (tx) => (await tx`
+    SELECT public.soja_store_stock_movements(${ids.org}, ${ids.store}, ${countedAt.id}, ${openedVariant.id}) AS result
+  `)[0].result);
+  const adjustedMovement = countHistory.items.find((entry) => entry.movement_type === 'inventory_adjustment');
+  assert.equal(adjustedMovement.quantity, '-2.750000');
+  assert.equal(adjustedMovement.previous_quantity, '7.250000');
+  assert.equal(adjustedMovement.counted_quantity, '4.500000');
+  assert.equal(adjustedMovement.reason, adjustment.reason);
+  assert.equal(adjustedMovement.purchase_id, null);
+  assert.ok(!Object.hasOwn(adjustedMovement, 'unit_cost'));
+  await fails(sql`DELETE FROM soja_store_private.inventory_counts WHERE id = ${adjustedMovement.inventory_count_id}`,
+    '55000', 'SOJA_STORE_STOCK_HISTORY_IMMUTABLE');
+
+  const openAfterZero = await record(ids.manager, { ...adjustment, quantity: '0' }, 2);
+  assert.equal(openAfterZero.quantity, '0.000000');
+  await record(ids.manager, { ...adjustment, quantity: '0' }, 3);
+  assert.equal((await pos(ids.manager, openedVariant.id)).version, 4);
+  assert.equal((await stock(openedVariant.id)).items[0].available_quantity, '0.000000');
+
+  const concurrentBuy = await buy(ids.manager, {
+    ...purchasePayload, location_id: countedAt.id,
+    lines: [{ variant_id: openedVariant.id, quantity: '3', unit_cost: '1.000000' }],
+  });
+  const concurrentLine = (await orderDetail(ids.manager, concurrentBuy.id)).lines[0];
+  const change = await Promise.allSettled([
+    receive(ids.manager, { ...receiptPayload, purchase_id: concurrentBuy.id, lines: [{ purchase_line_id: concurrentLine.id, quantity: '3' }] }, 1),
+    record(ids.secondManager, { ...adjustment, quantity: '2' }, 4),
+  ]);
+  assert.equal(change[0].status, 'fulfilled');
+  const quantityAfterRace = Number((await pos(ids.manager, openedVariant.id)).quantity);
+  if (change[1].status === 'fulfilled') assert.equal(quantityAfterRace, 5);
+  else {
+    assert.equal(change[1].reason.message, 'SOJA_STORE_STALE_VERSION');
+    assert.equal(quantityAfterRace, 3);
+  }
+  assert.equal((await sql`
+    WITH ledger AS (
+      SELECT org_id, commission_id, variant_id, location_id, ownership, owner_supplier_id, destination, sum(quantity) AS quantity
+      FROM soja_store_private.stock_movements
+      GROUP BY org_id, commission_id, variant_id, location_id, ownership, owner_supplier_id, destination
+    )
+    SELECT count(*)::int AS mismatch FROM soja_store_private.stock_positions s
+    LEFT JOIN ledger m ON m.org_id = s.org_id AND m.commission_id = s.commission_id AND m.variant_id = s.variant_id
+      AND m.location_id = s.location_id AND m.ownership = s.ownership
+      AND m.owner_supplier_id IS NOT DISTINCT FROM s.owner_supplier_id AND m.destination = s.destination
+    WHERE m.quantity IS DISTINCT FROM s.quantity
+  `)[0].mismatch, 0);
+  console.log('PASS immutable opening count, inventory deltas, native receipt preservation, scoped grants, receipt race and stock reconciliation');
+
+  const transferMigration = await sql.reserve();
+  try {
+    await transferMigration.unsafe(await readFile(new URL('../../supabase/migrations/20261112120900_soja_store_transfers.sql', import.meta.url), 'utf8'));
+  } finally {
+    await transferMigration.release();
+  }
+  const transferAt = await saveDirectory(ids.manager, 'location', { ...location, name: 'Destino de teste' });
+  const transferPayload = {
+    origin_id: countedAt.id, destination_id: transferAt.id, variant_id: openedVariant.id,
+    quantity: '2.250000', reason: 'Reposição entre pontos',
+  };
+  const makeTransfer = (actor, payload, requestId = randomUUID()) => as(actor, async (tx) => (await tx`
+    SELECT public.soja_store_create_transfer(${ids.org}, ${ids.store}, ${requestId}, ${tx.json(payload)}) AS result
+  `)[0].result);
+  const transferCommand = (command, actor, version, payload, requestId = randomUUID()) => as(actor, async (tx) => (await tx`
+    SELECT public.${tx('soja_store_' + command + '_transfer')}(${ids.org}, ${ids.store}, ${requestId}, ${version}, ${tx.json(payload)}) AS result
+  `)[0].result);
+  const getTransfer = (actor, id) => as(actor, async (tx) => (await tx`
+    SELECT public.soja_store_transfer(${ids.org}, ${ids.store}, ${id}) AS result
+  `)[0].result);
+  await fails(makeTransfer(ids.reader, transferPayload), '42501');
+  await fails(makeTransfer(ids.manager, { ...transferPayload, destination_id: countedAt.id }), '22023');
+  await fails(makeTransfer(ids.manager, { ...transferPayload, destination_id: foreignLocation }), 'PT404');
+  await fails(makeTransfer(ids.manager, { ...transferPayload, quantity: '-1' }), '22023');
+  const transferRequest = randomUUID();
+  const transfer = await makeTransfer(ids.manager, transferPayload, transferRequest);
+  assert.deepEqual(await makeTransfer(ids.manager, transferPayload, transferRequest), transfer);
+  assert.equal(transfer.status, 'requested');
+  assert.equal(Number((await pos(ids.manager, openedVariant.id)).quantity), quantityAfterRace);
+  assert.equal(Number((await pos(ids.manager, openedVariant.id, transferAt.id)).quantity), 0);
+  await fails(saveDirectory(ids.manager, 'location', { ...location, id: transferAt.id, status: 'archived' }, randomUUID(), 1),
+    'PT409', 'SOJA_STORE_LOCATION_HAS_PENDING_TRANSFERS');
+
+  const overTransfer = await makeTransfer(ids.manager, { ...transferPayload, quantity: '30' });
+  await fails(transferCommand('dispatch', ids.manager, 1, { transfer_id: overTransfer.id }),
+    'PT409', 'SOJA_STORE_TRANSFER_INSUFFICIENT');
+  await transferCommand('cancel', ids.manager, 1, { transfer_id: overTransfer.id });
+  await fails(transferCommand('receive', ids.manager, 1, { transfer_id: transfer.id, quantity: '1' }),
+    'PT409', 'SOJA_STORE_TRANSFER_INVALID_STATUS');
+
+  const dispatchRequest = randomUUID();
+  const dispatch = await transferCommand('dispatch', ids.manager, 1, { transfer_id: transfer.id }, dispatchRequest);
+  assert.deepEqual(await transferCommand('dispatch', ids.manager, 1, { transfer_id: transfer.id }, dispatchRequest), dispatch);
+  assert.deepEqual(await status(ids.manager, dispatchRequest), dispatch);
+  assert.equal(dispatch.status, 'in_transit');
+  assert.equal(Number((await pos(ids.manager, openedVariant.id)).quantity), quantityAfterRace - 2.25);
+  assert.equal(Number((await pos(ids.manager, openedVariant.id, transferAt.id)).quantity), 0);
+  assert.equal(Number((await getTransfer(ids.reader, transfer.id)).in_transit_quantity), 2.25);
+  await fails(transferCommand('cancel', ids.manager, 2, { transfer_id: transfer.id }),
+    'PT409', 'SOJA_STORE_TRANSFER_INVALID_STATUS');
+  await fails(transferCommand('receive', ids.manager, 2, { transfer_id: transfer.id, quantity: '3' }),
+    'PT409', 'SOJA_STORE_TRANSFER_EXCEEDS_TRANSIT');
+
+  const partialTransfer = await transferCommand('receive', ids.secondManager, 2, {
+    transfer_id: transfer.id, quantity: '1', reference: 'Conferência 1',
+  });
+  assert.equal(partialTransfer.status, 'partially_received');
+  assert.equal(Number((await getTransfer(ids.reader, transfer.id)).in_transit_quantity), 1.25);
+  assert.equal(Number((await pos(ids.manager, openedVariant.id, transferAt.id)).quantity), 1);
+  const completion = { transfer_id: transfer.id, quantity: '1.250000' };
+  const competingTransfers = await Promise.allSettled([
+    transferCommand('receive', ids.manager, 3, completion), transferCommand('receive', ids.secondManager, 3, completion),
+  ]);
+  assert.equal(competingTransfers.filter((entry) => entry.status === 'fulfilled').length, 1);
+  assert.equal(competingTransfers.find((entry) => entry.status === 'rejected').reason.message, 'SOJA_STORE_STALE_VERSION');
+  const completedTransfer = await getTransfer(ids.reader, transfer.id);
+  assert.equal(completedTransfer.status, 'received');
+  assert.equal(Number(completedTransfer.in_transit_quantity), 0);
+  assert.equal(Number((await pos(ids.manager, openedVariant.id, transferAt.id)).quantity), 2.25);
+  assert.equal(completedTransfer.events.length, 3);
+  const destinationHistory = await as(ids.reader, async (tx) => (await tx`
+    SELECT public.soja_store_stock_movements(${ids.org}, ${ids.store}, ${transferAt.id}, ${openedVariant.id}) AS result
+  `)[0].result);
+  assert.equal(destinationHistory.total, 2);
+  assert.ok(destinationHistory.items.every((entry) => entry.transfer_id === transfer.id && entry.sku === openedVariant.sku));
+  const transferPage = await as(ids.reader, async (tx) => (await tx`
+    SELECT public.soja_store_transfers(${ids.org}, ${ids.store}, 'received', 1, 0) AS result
+  `)[0].result);
+  assert.equal(transferPage.total, 1);
+  assert.equal(transferPage.items[0].id, transfer.id);
+  await fails(sql`DELETE FROM soja_store_private.stock_transfer_events WHERE id = ${completedTransfer.events[0].id}`,
+    '55000', 'SOJA_STORE_STOCK_HISTORY_IMMUTABLE');
+  console.log('PASS requested transfer, dispatch, partial receipts, races, immutable events and conserved quantities');
 
   await sql`UPDATE public.commission_people SET user_id = ${ids.replacement} WHERE id = ${person.manager}`;
   assert.deepEqual(await access(ids.manager), { enabled: true, capabilities: [] });

@@ -6,9 +6,14 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type SojaStoreCapability =
   | 'catalog.view' | 'catalog.manage'
-  | 'stock.view'
+  | 'stock.view' | 'stock.manage' | 'stock.transfers' | 'stock.institutional'
   | 'purchases.view' | 'purchases.manage' | 'purchases.receive' | 'purchases.costs'
   | 'suppliers.view' | 'suppliers.manage'
+  | 'customers.view' | 'customers.manage'
+  | 'cash.view' | 'cash.manage'
+  | 'sales.view' | 'sales.manage' | 'sales.checkout' | 'sales.fulfillment'
+  | 'finance.view' | 'finance.manage'
+  | 'team.view' | 'team.manage'
   | 'settings.view' | 'settings.manage'
   | 'imports.view' | 'imports.manage';
 

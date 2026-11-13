@@ -87,6 +87,15 @@ export function storeError(error: unknown): string {
   if (details?.code === "23505" || /DUPLICATE_SKU|DUPLICATE_BARCODE/i.test(message)) return "Já existe um cadastro com este código. Revise o código e tente novamente.";
   if (/DUPLICATE_LOCATION/i.test(message)) return "Já existe um local com este nome.";
   if (/LOCATION_HAS_PENDING_PURCHASES/i.test(message)) return "Este local tem pedidos pendentes de recebimento.";
+  if (/LOCATION_HAS_STOCK/i.test(message)) return "Este local ainda tem estoque físico registrado.";
+  if (/OPENING_ALREADY_RECORDED/i.test(message)) return "Esta posição já tem movimentos. Atualize a consulta para registrar um ajuste.";
+  if (/OPENING_REQUIRED/i.test(message)) return "Registre primeiro a contagem inicial desta posição.";
+  if (/STOCK_INSUFFICIENT/i.test(message)) return "A quantidade solicitada excede o saldo físico disponível.";
+  if (/TRANSFER_INSUFFICIENT/i.test(message)) return "A origem não tem quantidade disponível para a expedição.";
+  if (/TRANSFER_EXCEEDS_TRANSIT/i.test(message)) return "A quantidade conferida supera o saldo em trânsito.";
+  if (/TRANSFER_INVALID_STATUS/i.test(message)) return "Esta transferência mudou de situação. Confira a versão atual.";
+  if (/TRANSFER_UNIT_CHANGED/i.test(message)) return "A unidade do produto mudou. Cancele a solicitação e registre uma nova.";
+  if (/LOCATION_HAS_PENDING_TRANSFERS/i.test(message)) return "Este local tem transferências em aberto.";
   if (/PRODUCT_UNIT_IN_USE/i.test(message)) return "A unidade está vinculada a pedidos. Mantenha a unidade usada nesses registros.";
   if (/RECEIPT_EXCEEDS_PENDING|PURCHASE_ALREADY_RECEIVED/i.test(message)) return "A quantidade informada supera o saldo pendente deste pedido.";
   if (/PURCHASE_SUPPLIER_UNAVAILABLE/i.test(message)) return "O fornecedor não está mais disponível para novos pedidos.";

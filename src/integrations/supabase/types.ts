@@ -13963,6 +13963,14 @@ export type Database = {
         Args: { _commission_id: string; _org_id: string }
         Returns: Json
       }
+      soja_store_cash_movements: {
+        Args: { _org_id: string; _commission_id: string; _session_id: string; _limit?: number; _offset?: number }
+        Returns: Json
+      }
+      soja_store_cash_sessions: {
+        Args: { _org_id: string; _commission_id: string }
+        Returns: Json
+      }
       soja_store_catalog: {
         Args: {
           _commission_id: string
@@ -13974,12 +13982,98 @@ export type Database = {
         }
         Returns: Json
       }
+      soja_store_close_cash: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
+        Returns: Json
+      }
       soja_store_create_purchase: {
         Args: { _commission_id: string; _org_id: string; _payload: Json; _request_id: string }
         Returns: Json
       }
+      soja_store_create_sale: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _payload: Json }
+        Returns: Json
+      }
+      soja_store_create_transfer: {
+        Args: { _commission_id: string; _org_id: string; _payload: Json; _request_id: string }
+        Returns: Json
+      }
+      soja_store_adjust_cash: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
+        Returns: Json
+      }
+      soja_store_cancel_transfer: {
+        Args: { _commission_id: string; _expected_version: number; _org_id: string; _payload: Json; _request_id: string }
+        Returns: Json
+      }
+      soja_store_dispatch_transfer: {
+        Args: { _commission_id: string; _expected_version: number; _org_id: string; _payload: Json; _request_id: string }
+        Returns: Json
+      }
+      soja_store_current_dashboard: {
+        Args: {
+          _commission_id: string
+          _end?: string | null
+          _location_id?: string | null
+          _org_id: string
+          _start?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_customer: {
+        Args: { _org_id: string; _commission_id: string; _customer_id: string }
+        Returns: Json
+      }
+      soja_store_customers: {
+        Args: { _org_id: string; _commission_id: string; _search?: string; _limit?: number; _offset?: number }
+        Returns: Json
+      }
       soja_store_dashboard: {
         Args: { _commission_id: string; _org_id: string }
+        Returns: Json
+      }
+      soja_store_finance_entries: {
+        Args: {
+          _commission_id: string
+          _kind?: string | null
+          _limit?: number
+          _offset?: number
+          _org_id: string
+          _status?: string | null
+          _year: number
+        }
+        Returns: Json
+      }
+      soja_store_finance_purchase_options: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _org_id: string
+          _search?: string | null
+          _year: number
+        }
+        Returns: Json
+      }
+      soja_store_finance_settlements: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _obligation_id: string
+          _offset?: number
+          _org_id: string
+        }
+        Returns: Json
+      }
+      soja_store_finance_summary: {
+        Args: {
+          _commission_id: string
+          _org_id: string
+          _year: number
+        }
+        Returns: Json
+      }
+      soja_store_finish_sale: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
         Returns: Json
       }
       soja_store_import_batches: {
@@ -14000,12 +14094,65 @@ export type Database = {
         Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string }
         Returns: Json
       }
+      soja_store_inventory_options: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _location_id?: string | null
+          _org_id: string
+          _search?: string | null
+          _variant_id?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_inventory_position: {
+        Args: { _commission_id: string; _location_id: string; _org_id: string; _variant_id: string }
+        Returns: Json
+      }
+      soja_store_issue_destinations: {
+        Args: { _commission_id: string; _limit?: number; _org_id: string; _search?: string | null }
+        Returns: Json
+      }
+      soja_store_open_cash: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _payload: Json }
+        Returns: Json
+      }
+      soja_store_pos_config: {
+        Args: { _org_id: string; _commission_id: string }
+        Returns: Json
+      }
       soja_store_product: {
         Args: { _commission_id: string; _org_id: string; _product_id: string }
         Returns: Json
       }
+      soja_store_product_suppliers: {
+        Args: {
+          _commission_id: string
+          _org_id: string
+          _product_id: string
+        }
+        Returns: Json
+      }
       soja_store_purchase: {
         Args: { _commission_id: string; _org_id: string; _purchase_id: string }
+        Returns: Json
+      }
+      soja_store_purchase_need_orders: {
+        Args: {
+          _commission_id: string
+          _need_id: string
+          _org_id: string
+          _search?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_purchase_needs: {
+        Args: {
+          _commission_id: string
+          _limit?: number
+          _offset?: number
+          _org_id: string
+        }
         Returns: Json
       }
       soja_store_purchase_options: {
@@ -14033,6 +14180,21 @@ export type Database = {
         }
         Returns: Json
       }
+      soja_store_purchases_filtered: {
+        Args: {
+          _commission_id: string
+          _end?: string | null
+          _limit?: number
+          _location_id?: string | null
+          _offset?: number
+          _org_id: string
+          _start?: string | null
+          _status?: string | null
+          _supplier_id?: string | null
+          _variant_id?: string | null
+        }
+        Returns: Json
+      }
       soja_store_receive_purchase: {
         Args: {
           _commission_id: string
@@ -14043,8 +14205,59 @@ export type Database = {
         }
         Returns: Json
       }
+      soja_store_receive_transfer: {
+        Args: { _commission_id: string; _expected_version: number; _org_id: string; _payload: Json; _request_id: string }
+        Returns: Json
+      }
       soja_store_request_status: {
         Args: { _commission_id: string; _org_id: string; _request_id: string }
+        Returns: Json
+      }
+      soja_store_recognize_obligation: {
+        Args: {
+          _commission_id: string
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_record_inventory: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_record_sale_fiscal: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
+        Returns: Json
+      }
+      soja_store_register_institutional_issue: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_return_sale: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number; _payload: Json }
+        Returns: Json
+      }
+      soja_store_reverse_settlement: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       soja_store_review_import_batch: {
@@ -14067,6 +14280,57 @@ export type Database = {
         }
         Returns: Json
       }
+      soja_store_sale: {
+        Args: { _org_id: string; _commission_id: string; _sale_id: string }
+        Returns: Json
+      }
+      soja_store_sale_customers: {
+        Args: { _org_id: string; _commission_id: string; _search?: string | null; _limit?: number }
+        Returns: Json
+      }
+      soja_store_sale_options: {
+        Args: { _org_id: string; _commission_id: string; _location_id: string; _search?: string }
+        Returns: Json
+      }
+      soja_store_sale_prices: {
+        Args: { _org_id: string; _commission_id: string; _variant_id: string }
+        Returns: Json
+      }
+      soja_store_sales: {
+        Args: { _org_id: string; _commission_id: string; _limit?: number; _offset?: number }
+        Returns: Json
+      }
+      soja_store_sales_filtered: {
+        Args: {
+          _commission_id: string
+          _confirmed?: boolean
+          _end?: string | null
+          _limit?: number
+          _location_id?: string | null
+          _offset?: number
+          _org_id: string
+          _start?: string | null
+        }
+        Returns: Json
+      }
+      soja_store_save_budget: {
+        Args: {
+          _commission_id: string
+          _expected_version: number | null
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_save_customer: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number | null; _payload: Json }
+        Returns: Json
+      }
+      soja_store_save_interest: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number | null; _payload: Json }
+        Returns: Json
+      }
       soja_store_save_location: {
         Args: {
           _commission_id: string
@@ -14077,6 +14341,10 @@ export type Database = {
         }
         Returns: Json
       }
+      soja_store_save_pos_rule: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number | null; _payload: Json }
+        Returns: Json
+      }
       soja_store_save_product: {
         Args: {
           _commission_id: string
@@ -14085,6 +14353,20 @@ export type Database = {
           _payload: Json
           _request_id: string
         }
+        Returns: Json
+      }
+      soja_store_save_product_supplier: {
+        Args: {
+          _commission_id: string
+          _expected_version: number | null
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
+      soja_store_save_sale_price: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _payload: Json }
         Returns: Json
       }
       soja_store_save_supplier: {
@@ -14130,12 +14412,48 @@ export type Database = {
         }
         Returns: Json
       }
+      soja_store_save_team_record: {
+        Args: { _org_id: string; _commission_id: string; _request_id: string; _expected_version: number | null; _payload: Json }
+        Returns: Json
+      }
+      soja_store_settle_obligation: {
+        Args: {
+          _commission_id: string
+          _expected_version: number
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
+        Returns: Json
+      }
       soja_store_stage_import: {
         Args: { _commission_id: string; _org_id: string; _payload: Json; _request_id: string }
         Returns: Json
       }
       soja_store_suppliers: {
         Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string }
+        Returns: Json
+      }
+      soja_store_team: {
+        Args: { _org_id: string; _commission_id: string }
+        Returns: Json
+      }
+      soja_store_transfer: {
+        Args: { _commission_id: string; _org_id: string; _transfer_id: string }
+        Returns: Json
+      }
+      soja_store_transfers: {
+        Args: { _commission_id: string; _limit?: number; _offset?: number; _org_id: string; _status?: string | null }
+        Returns: Json
+      }
+      soja_store_write_purchase_need: {
+        Args: {
+          _commission_id: string
+          _expected_version: number | null
+          _org_id: string
+          _payload: Json
+          _request_id: string
+        }
         Returns: Json
       }
       submit_public_mobility_form: {
@@ -15033,5 +15351,13 @@ export const Constants = {
         "parcial",
       ],
     },
+      soja_store_customer_sales: {
+        Args: { _org_id: string; _commission_id: string; _customer_id: string; _limit?: number; _offset?: number }
+        Returns: Json
+      },
+      soja_store_sale_customers: {
+        Args: { _org_id: string; _commission_id: string; _search?: string | null }
+        Returns: Json
+      },
   },
 } as const

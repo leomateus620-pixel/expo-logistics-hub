@@ -19,9 +19,11 @@ interface CommissionLayoutProps {
   variant?: 'standard' | 'map' | 'workspace';
   /** Optional sidebar items replacing `module.menus` (e.g. workspace sections). */
   menuItems?: CommissionMenuItem[];
+  /** Keep the content subtree mounted if an optional workspace sidebar becomes available. */
+  animateContent?: boolean;
 }
 
-export default function CommissionLayout({ module, children, variant = 'standard', menuItems }: CommissionLayoutProps) {
+export default function CommissionLayout({ module, children, variant = 'standard', menuItems, animateContent = true }: CommissionLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMap = variant === 'map';
   const isWorkspace = variant === 'workspace';
@@ -62,7 +64,7 @@ export default function CommissionLayout({ module, children, variant = 'standard
               : isScenarios2028 ? 'min-h-screen px-4 pb-8 pt-20 md:ml-[288px] md:px-5 md:pb-8 md:pt-3' : 'min-h-screen px-4 pb-8 pt-20 md:ml-[288px] md:p-8',
         )}
       >
-        {isMap || isWorkspace ? children : <PageTransition>{children}</PageTransition>}
+        {isMap || isWorkspace || !animateContent ? children : <PageTransition>{children}</PageTransition>}
       </main>
     </div>
   );

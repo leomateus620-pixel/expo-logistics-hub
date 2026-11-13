@@ -20,15 +20,28 @@ type StockPosition = {
 
 export type StockBalance = StockPosition & {
   last_movement_at: string;
+  reserved_quantity?: string;
+  available_quantity?: string;
 };
 
 export type StockMovement = StockPosition & {
   id: string;
-  movement_type: "purchase_receipt";
+  movement_type: "purchase_receipt" | "opening_count" | "inventory_adjustment" | "transfer_dispatch" | "transfer_receipt"
+    | "sale_fulfillment" | "sale_return" | "institutional_issue";
   occurred_on: string;
   recorded_at: string;
-  purchase_id: string;
-  receipt_id: string;
+  purchase_id: string | null;
+  receipt_id: string | null;
+  inventory_count_id?: string | null;
+  transfer_id?: string | null;
+  sale_id?: string | null;
+  institutional_issue_id?: string | null;
+  destination_commission_name?: string | null;
+  recipient?: string | null;
+  previous_quantity?: string | null;
+  counted_quantity?: string | null;
+  reason?: string | null;
+  reference?: string | null;
 };
 
 type StockList<T> = { total: number; items: T[] };
@@ -72,5 +85,18 @@ export function readStockOptions(scope: StoreScope, search: string, locationId: 
     _location_id: locationId || null,
     _variant_id: variantId || null,
     _limit: 30,
+  });
+}
+
+export type InventoryPosition = {
+  quantity: string;
+  available_quantity: string;
+  version: number;
+  has_movement: boolean;
+};
+
+export function readInventoryPosition(scope: StoreScope, variantId: string, locationId: string) {
+  return storeRpc<InventoryPosition>("soja_store_inventory_position", {
+    ...scope, _variant_id: variantId, _location_id: locationId,
   });
 }
