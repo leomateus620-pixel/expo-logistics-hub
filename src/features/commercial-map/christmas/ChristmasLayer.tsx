@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useMemo, type ComponentProps, type ReactNode } from 'react';
+import { Component, lazy, Suspense, useState, type ComponentProps, type ReactNode } from 'react';
 import { useChristmasSession } from './christmasSession';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import type ChristmasExperience from './ChristmasExperience';
@@ -23,12 +23,17 @@ export function ChristmasLayer({ reduced, ...props }: Omit<ComponentProps<typeof
   const reducedGraphics = useCommercialMapStore(state => state.reducedGraphics);
   const id = useChristmasSession(state => state.id);
   const active = useChristmasSession(state => state.phase === 'preparing' || state.phase === 'flying');
-  const Experience = useMemo(() => lazy(loadExperience), [id]);
   if (!active) return null;
 
+  return <ChristmasRuntime key={id} {...props} id={id} reduced={reduced || reducedGraphics} />;
+}
+
+function ChristmasRuntime(props: ComponentProps<typeof ChristmasExperience>) {
+  // Reset React.lazy's rejected result when the user starts a fresh session.
+  const [Experience] = useState(() => lazy(loadExperience));
   return (
-    <ChristmasBoundary id={id} key={id}>
-      <Suspense fallback={null}><Experience {...props} reduced={reduced || reducedGraphics} id={id} /></Suspense>
+    <ChristmasBoundary id={props.id}>
+      <Suspense fallback={null}><Experience {...props} /></Suspense>
     </ChristmasBoundary>
   );
 }

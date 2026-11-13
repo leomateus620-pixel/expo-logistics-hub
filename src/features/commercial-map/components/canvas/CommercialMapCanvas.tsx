@@ -4675,8 +4675,8 @@ function CameraRig({
     <OrbitControls
       ref={controlsRef}
       makeDefault
-      enabled={!soyEnabled && !christmasActive && !(visitEnabled && !interiorEntity) && !lunarCameraLocked && !transitionControlsLocked}
-      enableDamping={!soyEnabled && !christmasActive && !lunarCameraLocked && !transitionControlsLocked}
+      enabled={!soyEnabled && !(visitEnabled && !interiorEntity) && !lunarCameraLocked && !transitionControlsLocked && !christmasActive}
+      enableDamping={!soyEnabled && !lunarCameraLocked && !transitionControlsLocked && !christmasActive}
       dampingFactor={interiorFrame?.dampingFactor ?? (interiorEntity ? 0.11 : 0.14)}
       enablePan={!lunarCameraLocked && !transitionControlsLocked && (interiorFrame?.enablePan ?? true)}
       enableRotate={!lunarCameraLocked && !transitionControlsLocked && (interiorFrame?.enableRotate ?? true)}

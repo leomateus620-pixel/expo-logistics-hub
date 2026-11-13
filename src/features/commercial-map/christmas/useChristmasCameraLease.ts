@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type RefObject } from 'react';
+import { useCallback, useLayoutEffect, useRef, type RefObject } from 'react';
 import { MathUtils, PerspectiveCamera, Quaternion, Vector3, type Camera, type WebGLRenderer } from 'three';
 import type { OrbitControls } from 'three-stdlib';
 import { stopCommercialMapOrbitMotion } from '../utils/cameraTransition';
@@ -59,7 +59,7 @@ export function useChristmasCameraLease(
   const canAcquireRef = useRef(canAcquire);
   canAcquireRef.current = canAcquire;
 
-  function restore(id: number) {
+  const restore = useCallback((id: number) => {
     const snapshot = saved.current;
     if (snapshot?.id !== id || !(camera instanceof PerspectiveCamera)) return;
     saved.current = null;
@@ -84,7 +84,7 @@ export function useChristmasCameraLease(
     snapshot.controls.enableDamping = snapshot.enableDamping;
     lastRestore.current = performance.now();
     invalidate();
-  }
+  }, [camera, invalidate, renderer]);
 
   useLayoutEffect(() => {
     if (!eligible || !(camera instanceof PerspectiveCamera)) return;
@@ -136,7 +136,7 @@ export function useChristmasCameraLease(
       renderer.domElement.removeEventListener('webglcontextlost', lost);
       unregister();
     };
-  }, [eligible, camera, controlsRef, renderer, invalidate]); // restore reads stable values and refs.
+  }, [eligible, camera, controlsRef, renderer, invalidate, restore]);
 
   return {
     lastRestore,
