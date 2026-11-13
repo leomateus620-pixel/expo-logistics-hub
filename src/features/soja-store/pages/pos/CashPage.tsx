@@ -1,14 +1,15 @@
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Plus, Wallet } from "lucide-react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { storeError, storeRpc, type CommandResult } from "../../api/store";
 import { fieldError, StoreFailure, StoreField, StoreHeading, StoreState } from "../../components/StoreElements";
+import { StoreFormDialog } from "../../components/StoreFormDialog";
 import { moneyLabel, readCents } from "../../domain/purchases";
 import { useStoreCommand } from "../../hooks/useStoreCommand";
-import { useUnsavedStoreForm } from "../../hooks/useUnsavedStoreForm";
 import type { CashMovement, CashSession, PosConfiguration, PosPageContext } from "./types";
 
 const recordedAt = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Sao_Paulo" });
@@ -19,7 +20,7 @@ const amountLabels = { open: "Fundo inicial (R$)", supply: "Valor do suprimento 
 const movementLabels = { supply: "Suprimento", withdrawal: "Sangria", receipt: "Recebimento", refund: "Estorno" };
 const movementPageSize = 30;
 
-export function CashPage({ scope, queryKey, canManage }: PosPageContext) {
+export function CashPage({ scope, queryKey, canManage, canViewSettings = false }: PosPageContext & { canViewSettings?: boolean }) {
   const { user } = useAuth();
   const [action, setAction] = useState<Action | null>(null);
   const [movements, setMovements] = useState<string | null>(null);
@@ -31,22 +32,19 @@ export function CashPage({ scope, queryKey, canManage }: PosPageContext) {
   const selectedSession = action && "session" in action
     ? sessions.data?.items.find(({ id }) => id === action.session.id) : undefined;
   const ownOpen = sessions.data?.items.some((session) => session.status === "open" && session.operator_id === user?.id);
+  const canOpen = canManage && !ownOpen && sessions.isSuccess;
+  const openCash = () => setAction({ kind: "open" });
 
   return (
     <>
-      <StoreHeading title="Caixa" description="Acompanhe o dinheiro por sessão e registre as conferências de cada ponto."
-        action={canManage && !action && !ownOpen && !sessions.isPending && !sessions.isError && (
-          <Button type="button" className="ss-primary" onClick={() => setAction({ kind: "open" })}><Plus aria-hidden="true" /> Abrir caixa</Button>
+      <StoreHeading title="Caixa" icon={Wallet}
+        action={canOpen && (
+          <Button type="button" className="ss-primary" data-ss-create-trigger onClick={openCash}><Plus aria-hidden="true" /> Abrir caixa</Button>
         )} />
-      {action && (
-        <CashEditor key={`${action.kind}:${"session" in action ? action.session.version : "novo"}`} action={action} actorId={user?.id}
-          selectedSession={selectedSession} scope={scope} queryKey={queryKey} close={() => setAction(null)}
-          reload={selectedSession && action.kind !== "open" ? () => setAction({ kind: action.kind, session: selectedSession }) : undefined} />
-      )}
       {sessions.isPending ? <StoreState title="Carregando sessões de caixa" busy /> : sessions.isError ? (
         <StoreFailure message={storeError(sessions.error)} retry={() => void sessions.refetch()} />
       ) : sessions.data.items.length === 0 ? (
-        <StoreState title="Nenhuma sessão de caixa registrada" description="O fundo de abertura e os valores conferidos aparecerão aqui." />
+        <StoreState title="Nenhuma sessão de caixa registrada" />
       ) : (
         <section className="ss-surface space-y-3" aria-labelledby="ss-cash-sessions">
           <h2 id="ss-cash-sessions">Sessões de caixa</h2>
@@ -54,7 +52,7 @@ export function CashPage({ scope, queryKey, canManage }: PosPageContext) {
             {sessions.data.items.map((session) => (
               <li className="grid gap-3 py-4" key={session.id}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-semibold">{session.location_name}</p>
+                  <p className="min-w-0 break-words font-semibold">{session.location_name}</p>
                   <span className="ss-pill" data-status={session.status === "open" ? "active" : "archived"}>{session.status === "open" ? "Aberta" : "Fechada"}</span>
                 </div>
                 <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
@@ -66,7 +64,7 @@ export function CashPage({ scope, queryKey, canManage }: PosPageContext) {
                   {session.difference_cents !== null && <div><dt className="text-sm text-[var(--ss-muted)]">Diferença</dt><dd>{moneyLabel(session.difference_cents)}</dd></div>}
                 </dl>
                 <div className="flex flex-wrap gap-2">
-                  {canManage && !action && session.status === "open" && <>
+                  {canManage && session.status === "open" && <>
                     <Button type="button" variant="outline" onClick={() => setAction({ kind: "supply", session })}>Suprimento</Button>
                     <Button type="button" variant="outline" onClick={() => setAction({ kind: "withdrawal", session })}>Sangria</Button>
                     <Button type="button" variant="outline" onClick={() => setAction({ kind: "close", session })}><Wallet aria-hidden="true" /> Fechar caixa</Button>
@@ -81,6 +79,11 @@ export function CashPage({ scope, queryKey, canManage }: PosPageContext) {
             ))}
           </ul>
         </section>
+      )}
+      {canManage && action && (
+        <CashEditor key={action.kind} action={action} actorId={user?.id} canViewSettings={canViewSettings}
+          selectedSession={selectedSession} scope={scope} queryKey={queryKey} close={() => setAction(null)}
+          reload={selectedSession && action.kind !== "open" ? () => setAction({ kind: action.kind, session: selectedSession }) : undefined} />
       )}
     </>
   );
@@ -126,14 +129,16 @@ function CashMovements({ scope, queryKey, sessionId }: Omit<PosPageContext, "can
   );
 }
 
-function CashEditor({ action, actorId, selectedSession, scope, queryKey, close, reload }: Omit<PosPageContext, "canManage"> & {
+function CashEditor({ action, actorId, canViewSettings, selectedSession, scope, queryKey, close, reload }: Omit<PosPageContext, "canManage"> & {
   action: Action;
   actorId?: string;
+  canViewSettings: boolean;
   selectedSession?: CashSession;
   close: () => void;
   reload?: () => void;
 }) {
   const client = useQueryClient();
+  const formId = useId();
   const [dirty, setDirty] = useState(false);
   const [errors, setErrors] = useState<{ location?: string; amount?: string; reason?: string }>({});
   const [amount, setAmount] = useState("");
@@ -151,19 +156,22 @@ function CashEditor({ action, actorId, selectedSession, scope, queryKey, close, 
     kind === "open" ? "soja_store_open_cash" : kind === "close" ? "soja_store_close_cash" : "soja_store_adjust_cash", {
       ...scope, _request_id: requestId, ...(session && { _expected_version: session.version }), _payload: payload,
     },
-  ), () => {
+  ), (result) => {
     toast.success(success[kind]);
-    void client.invalidateQueries({ queryKey });
+    void client.invalidateQueries({ queryKey: [...queryKey, "cash-sessions"] });
+    if (kind === "supply" || kind === "withdrawal") {
+      void client.invalidateQueries({ queryKey: [...queryKey, "cash-movements", session?.id ?? result.id] });
+    }
     close();
   });
   const blocked = command.isPending || command.isUncertain;
-  useUnsavedStoreForm(dirty || blocked);
   const enteredCents = amount.trim() ? readCents(amount) : null;
   const difference = kind === "close" && enteredCents !== null && session ? enteredCents - session.expected_cents : null;
+  const ready = kind !== "open" || (!configuration.isError && !!configuration.data?.points.length);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (blocked || stale) return;
+    if (blocked || stale || !ready) return;
     const form = event.currentTarget;
     const data = new FormData(form);
     const locationId = String(data.get("location") ?? "");
@@ -191,50 +199,60 @@ function CashEditor({ action, actorId, selectedSession, scope, queryKey, close, 
   }
 
   return (
-    <form className="ss-surface grid gap-4" aria-labelledby="ss-cash-action" onSubmit={submit} onChange={() => setDirty(true)} noValidate>
-      <div>
-        <h2 id="ss-cash-action">{actionLabels[kind]}</h2>
-        {session && <p className="text-sm text-[var(--ss-muted)]">{session.location_name}</p>}
+    <StoreFormDialog title={actionLabels[kind]} description={session?.location_name} size="small"
+      onClose={close} dirty={dirty || command.isUncertain} busy={command.isPending} formId={formId}
+      submitLabel={actionLabels[kind]} submitDisabled={blocked || stale || !ready}>
+      <form id={formId} className="grid gap-4" key={session?.version ?? "new"} onSubmit={submit} onChange={() => setDirty(true)} noValidate>
         {takeover && <p className="text-sm text-[var(--ss-muted)]">Outra pessoa abriu esta sessão. Registre o motivo da intervenção.</p>}
-      </div>
-      {kind === "open" && configuration.isPending && <p role="status">Carregando pontos de atendimento…</p>}
-      {kind === "open" && configuration.isError && <StoreFailure message={storeError(configuration.error)} retry={() => void configuration.refetch()} />}
-      {kind === "open" && configuration.isSuccess && !configuration.data.points.length && <p>Cadastre um ponto de atendimento ativo para abrir o caixa.</p>}
-      <fieldset className="grid min-w-0 gap-3 sm:grid-cols-2" disabled={blocked || stale}>
-        {kind === "open" && (
-          <StoreField id="ss-cash-location" label="Ponto de atendimento" error={errors.location}>
-            <select {...fieldError("ss-cash-location", errors.location)} name="location" defaultValue="" required>
-              <option value="">Selecione o ponto</option>
-              {configuration.data?.points.map((point) => <option key={point.id} value={point.id}>{point.name}</option>)}
-            </select>
-          </StoreField>
+        {kind === "open" && configuration.isPending && <p role="status">Carregando pontos de atendimento…</p>}
+        {kind === "open" && configuration.isError && <StoreFailure message={storeError(configuration.error)} retry={() => void configuration.refetch()} />}
+        {kind === "open" && configuration.isSuccess && !configuration.data.points.length && (
+          <div className="grid justify-items-start gap-2">
+            <p>É preciso um ponto de atendimento ativo para abrir o caixa.</p>
+            {canViewSettings && (
+              <Button type="button" variant="outline" asChild>
+                <Link data-button to="/comissoes/soja-store/configuracoes">Ver locais em Configurações</Link>
+              </Button>
+            )}
+          </div>
         )}
-        <StoreField id="ss-cash-amount" label={amountLabels[kind]} error={errors.amount}>
-          <input {...fieldError("ss-cash-amount", errors.amount)} inputMode="decimal" maxLength={16} value={amount}
-            onChange={(event) => setAmount(event.target.value)} required />
-        </StoreField>
-        {kind !== "open" && (
-          <StoreField id="ss-cash-reason" label={kind === "close" && !takeover ? "Justificativa da diferença, quando houver" : "Motivo"} error={errors.reason}>
-            <input {...fieldError("ss-cash-reason", errors.reason)} name="reason" maxLength={600} />
-          </StoreField>
+        {ready && (
+          <fieldset className="grid min-w-0 gap-3" disabled={blocked || stale}>
+            {kind === "open" && (
+              <StoreField id="ss-cash-location" label="Ponto de atendimento" error={errors.location}>
+                <select {...fieldError("ss-cash-location", errors.location)} name="location" defaultValue="" required>
+                  <option value="">Selecione o ponto</option>
+                  {configuration.data?.points.map((point) => <option key={point.id} value={point.id}>{point.name}</option>)}
+                </select>
+              </StoreField>
+            )}
+            <StoreField id="ss-cash-amount" label={amountLabels[kind]} error={errors.amount}>
+              <input {...fieldError("ss-cash-amount", errors.amount)} inputMode="decimal" maxLength={16} value={amount}
+                onChange={(event) => setAmount(event.target.value)} required />
+            </StoreField>
+            {kind !== "open" && (
+              <StoreField id="ss-cash-reason" label={kind === "close" && !takeover ? "Justificativa da diferença, quando houver" : "Motivo"} error={errors.reason}>
+                <input {...fieldError("ss-cash-reason", errors.reason)} name="reason" maxLength={600} />
+              </StoreField>
+            )}
+            {kind === "close" && session && (
+              <p className="text-sm">
+                Dinheiro esperado {moneyLabel(session.expected_cents)}{difference !== null && ` · Diferença ${moneyLabel(difference)}`}
+              </p>
+            )}
+          </fieldset>
         )}
-        {kind === "close" && session && (
-          <p className="text-sm sm:col-span-2">
-            Dinheiro esperado {moneyLabel(session.expected_cents)}{difference !== null && ` · Diferença ${moneyLabel(difference)}`}
-          </p>
-        )}
-      </fieldset>
-      {command.isError && <StoreFailure message={storeError(command.error)} retry={command.isUncertain ? command.retry : undefined} retryLabel="Verificar envio" />}
-      {stale && !command.isUncertain && <StoreFailure message="A sessão mudou durante a conferência." retryLabel="Carregar sessão atual"
-        retry={selectedSession?.status === "open" ? reload : undefined} />}
-      <div className="flex flex-wrap gap-2">
-        <Button className="ss-primary" type="submit" disabled={blocked || stale || (kind === "open" && !configuration.data?.points.length)}>
-          {command.isPending ? "Salvando…" : actionLabels[kind]}
-        </Button>
-        <Button variant="outline" type="button" disabled={command.isPending} onClick={() => {
-          if ((!dirty && !command.isUncertain) || window.confirm("Descartar as alterações deste caixa?")) close();
-        }}>Cancelar</Button>
-      </div>
-    </form>
+        {command.isError && <StoreFailure message={storeError(command.error)} retry={command.isUncertain ? command.retry : undefined} retryLabel="Verificar envio" />}
+        {stale && !command.isUncertain && <StoreFailure message="A sessão mudou durante a conferência." retryLabel="Carregar sessão atual"
+          retry={selectedSession?.status === "open" ? () => {
+            if (dirty && !window.confirm("Carregar a sessão atual e descartar as suas alterações?")) return;
+            setDirty(false);
+            setAmount("");
+            setErrors({});
+            command.reset();
+            reload?.();
+          } : undefined} />}
+      </form>
+    </StoreFormDialog>
   );
 }

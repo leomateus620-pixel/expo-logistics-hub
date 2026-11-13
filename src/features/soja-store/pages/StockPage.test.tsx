@@ -68,7 +68,7 @@ describe("consulta de estoque", () => {
     expect(await screen.findByText("8 un")).toBeVisible();
     expect(screen.queryByRole("link", { name: "Chapéu" })).toBeNull();
     fireEvent.click(screen.getByRole("link", { name: "Ver movimentos" }));
-    expect(await screen.findByText("Nenhum movimento registrado")).toBeVisible();
+    expect(await screen.findByText("Nenhum registro para estes filtros")).toBeVisible();
     expect(stockState.readStock).toHaveBeenLastCalledWith(scope, {
       locationId, variantId, limit: 30, offset: 0,
     }, "movimentos");

@@ -1,9 +1,12 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, useSearchParams } from "react-router-dom";
+import { Plus, ShoppingBag } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PurchaseOption } from "../../components/PurchaseOption";
-import { StoreFailure, StoreField, StoreHeading, StoreState } from "../../components/StoreElements";
+import { StoreFailure, StoreField, StoreFilters, StoreHeading, StoreState } from "../../components/StoreElements";
+import { StoreFormDialog } from "../../components/StoreFormDialog";
 import { readOperationalFilters } from "../../domain/operationalFilters";
 import { dateLabel, decimalLabel, moneyLabel, readCents, readDecimal, scaledDecimal, type NamedOption } from "../../domain/purchases";
 import { storeError, storeRpc, type CommandResult, type StoreScope } from "../../api/store";
@@ -54,11 +57,17 @@ function saleMessage(error: unknown) {
 
 export function SalesPage({ scope, queryKey, canManage, reservationFlow = false }: ScopeProps & { canManage: boolean; reservationFlow?: boolean }) {
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const client = useQueryClient();
-  const [page, setPage] = useState(0);
+  const [formContext, setFormContext] = useState<{ sessionId: string; methods: string[] }>();
+  const page = Math.max(1, Math.min(333334, Number.parseInt(params.get("pagina") ?? "", 10) || 1));
   const filters = readOperationalFilters(params);
   const confirmed = params.get("situacao") === "confirmadas";
-  const filtered = confirmed || Object.values(filters).some(Boolean);
+  const start = filters._start ?? "";
+  const end = filters._end ?? "";
+  const [period, setPeriod] = useState({ start, end });
+  useEffect(() => setPeriod({ start, end }), [start, end]);
+  const filterCount = Number(confirmed) + Number(!!(start || end)) + Number(!!filters._location_id);
   function saleParams(id?: string) {
     const next = new URLSearchParams(params);
     if (id) next.set("venda", id); else next.delete("venda");
@@ -66,16 +75,16 @@ export function SalesPage({ scope, queryKey, canManage, reservationFlow = false 
   }
   const config = useQuery({
     queryKey: [...queryKey, "pos-config"], meta: { persist: false },
-    queryFn: () => storeRpc<{ rule: { active: boolean; methods: string[] } | null }>("soja_store_pos_config", scope),
+    queryFn: () => storeRpc<{ rule: { active: boolean; methods: string[] } | null; points?: NamedOption[] }>("soja_store_pos_config", scope),
   });
   const cash = useQuery({
-    queryKey: [...queryKey, "sale-cash"], meta: { persist: false },
+    queryKey: [...queryKey, "cash-sessions"], meta: { persist: false }, enabled: canManage,
     queryFn: () => storeRpc<{ items: Session[] }>("soja_store_cash_sessions", scope),
   });
   const sales = useQuery({
     queryKey: [...queryKey, "sales", filters, confirmed, page], meta: { persist: false },
     queryFn: () => storeRpc<{ total: number; items: Sale[] }>("soja_store_sales_filtered", {
-      ...scope, ...filters, _confirmed: confirmed, _limit: pageSize, _offset: page * pageSize,
+      ...scope, ...filters, _confirmed: confirmed, _limit: pageSize, _offset: (page - 1) * pageSize,
     }),
   });
   const selected = params.get("venda");
@@ -85,26 +94,109 @@ export function SalesPage({ scope, queryKey, canManage, reservationFlow = false 
     queryFn: () => storeRpc<Sale>("soja_store_sale", { ...scope, _sale_id: selected }),
   });
   const sessions = cash.data?.items.filter((session) => session.status === "open") ?? [];
-  const refresh = () => { void client.invalidateQueries({ queryKey }); };
+  const rule = config.data?.rule;
+  const points = config.data?.points ?? [];
+  const location = filters._location_id ?? "";
+  const canCreate = canManage && !!rule?.active && !!rule.methods.length && !!sessions.length && !config.isError && !cash.isError;
+  const accessDenied = (sales.error as { code?: string } | null)?.code === "42501";
+
+  function refresh() {
+    const affected = [
+      ["sales"], ["dashboard"], ["stock", "saldos"], ["stock", "movimentos"], ["inventory", "position"],
+      ["sale-options"], ["cash-sessions"], ["cash-movements"],
+    ];
+    if (selected) affected.push(["sale", selected]);
+    for (const key of affected) void client.invalidateQueries({ queryKey: [...queryKey, ...key] });
+    // Sales and reservations appear in the customer's existing history.
+    void client.invalidateQueries({ queryKey: [...queryKey, "customers"], predicate: (query) => query.queryKey[queryKey.length + 2] === "sales" });
+  }
+
+  function updateFilters(values: Record<string, string>) {
+    const next = new URLSearchParams(params);
+    for (const [key, value] of Object.entries(values)) {
+      if (value) next.set(key, value); else next.delete(key);
+    }
+    next.delete("pagina");
+    setParams(next);
+  }
+
+  function goToPage(nextPage: number) {
+    const next = new URLSearchParams(params);
+    if (nextPage === 1) next.delete("pagina"); else next.set("pagina", String(nextPage));
+    setParams(next);
+  }
+
+  function clearFilters() {
+    setPeriod({ start: "", end: "" });
+    updateFilters({ situacao: "", inicio: "", fim: "", local: "" });
+  }
+
+  function openCreate() {
+    if (!canCreate) return;
+    setFormContext({ sessionId: sessions[0].id, methods: rule.methods });
+  }
 
   return (
     <>
-      <StoreHeading title="Vendas" description="Registre vendas próprias, confirme pagamentos e acompanhe entregas e devoluções." />
-      {(config.isPending || cash.isPending) && <StoreState title="Carregando a configuração de vendas" busy />}
-      {(config.isError || cash.isError) && <StoreFailure message="Falha ao consultar a configuração de vendas." retry={refresh} />}
-      {config.data && !config.data.rule?.active && (
+      <StoreHeading title="Vendas" icon={ShoppingBag}
+        action={canCreate && !accessDenied && (
+          <Button type="button" className="ss-primary" data-ss-create-trigger onClick={openCreate}>
+            <Plus aria-hidden="true" /> Nova venda
+          </Button>
+        )}
+        controls={<form className="ss-filterbar" onSubmit={(event) => {
+          event.preventDefault();
+          updateFilters({ inicio: period.start, fim: period.end });
+        }}>
+          <StoreFilters count={filterCount} onClear={clearFilters}>
+            <StoreField id="ss-sale-status-filter" label="Situação">
+              <select id="ss-sale-status-filter" value={confirmed ? "confirmadas" : ""} onChange={(event) => updateFilters({ situacao: event.target.value })}>
+                <option value="">Todas</option>
+                <option value="confirmadas">Confirmadas</option>
+              </select>
+            </StoreField>
+            {(points.length > 0 || location) && <StoreField id="ss-sale-location-filter" label="Local">
+              <select id="ss-sale-location-filter" value={location} onChange={(event) => updateFilters({ local: event.target.value })}>
+                <option value="">Todos</option>
+                {location && !points.some((point) => point.id === location) && <option value={location}>Local selecionado</option>}
+                {points.map((point) => <option key={point.id} value={point.id}>{point.name}</option>)}
+              </select>
+            </StoreField>}
+            <StoreField id="ss-sale-date-start" label="Data inicial">
+              <input id="ss-sale-date-start" type="date" max={period.end || undefined} value={period.start}
+                onChange={(event) => setPeriod({ ...period, start: event.target.value })} />
+            </StoreField>
+            <StoreField id="ss-sale-date-end" label="Data final">
+              <input id="ss-sale-date-end" type="date" min={period.start || undefined} value={period.end}
+                onChange={(event) => setPeriod({ ...period, end: event.target.value })} />
+            </StoreField>
+            <Button type="submit" variant="outline" disabled={period.start === start && period.end === end}>Aplicar período</Button>
+          </StoreFilters>
+        </form>}
+      />
+      {canManage && (config.isPending || cash.isPending) && <p role="status" className="ss-filter-note">Verificando disponibilidade do caixa…</p>}
+      {canManage && (config.isError || cash.isError) && <StoreFailure message="Falha ao consultar a configuração de vendas." retry={() => {
+        void config.refetch();
+        void cash.refetch();
+      }} />}
+      {canManage && config.data && !rule?.active && (
         <StoreState title="Cadastre a regra de venda própria" description="Registre a aprovação e as formas de pagamento em Configurações."
           action={<Button asChild variant="outline"><Link to={`${base}/configuracoes`}>Abrir configurações</Link></Button>} />
       )}
-      {config.data?.rule?.active && cash.data && !sessions.length && (
+      {canManage && rule?.active && cash.data && !sessions.length && (
         <StoreState title="Abra um caixa para iniciar" description="O ponto de atendimento define de qual estoque saem os itens."
           action={<Button asChild variant="outline"><Link to={`${base}/caixa`}>Abrir caixa</Link></Button>} />
       )}
-      {canManage && !!sessions.length && config.data?.rule?.active && (
-        <SaleForm scope={scope} queryKey={queryKey} sessions={sessions} methodsAllowed={config.data.rule.methods}
-          buyerSelection={reservationFlow} done={(id) => {
-          setPage(0); setParams(saleParams(id)); refresh();
-        }} />
+      {canManage && formContext && (
+        <SaleForm scope={scope} queryKey={queryKey} sessions={sessions} initialSessionId={formContext.sessionId}
+          ready={canCreate} methodsAllowed={formContext.methods} buyerSelection={reservationFlow}
+          close={() => setFormContext(undefined)} done={(id, pending) => {
+            setFormContext(undefined);
+            refresh();
+            toast.success(pending ? "Reserva registrada." : "Venda registrada.", {
+              action: { label: "Ver venda", onClick: () => navigate({ pathname: `${base}/vendas`, search: saleParams(id).toString() }) },
+            });
+          }} />
       )}
       {selected && (
         <section className="ss-surface space-y-3" aria-label="Venda selecionada">
@@ -117,17 +209,16 @@ export function SalesPage({ scope, queryKey, canManage, reservationFlow = false 
       )}
       <section className="ss-surface space-y-3" aria-labelledby="ss-sale-list">
         <h2 id="ss-sale-list">Histórico de vendas</h2>
-        {filtered && <div className="flex flex-wrap items-center gap-2">
-          <p className="text-sm">
-            {confirmed ? "Vendas confirmadas" : ""}{filters._start ? ` · Desde ${dateLabel(filters._start)}` : ""}{filters._end ? ` até ${dateLabel(filters._end)}` : ""}{filters._location_id ? " · Local selecionado no painel" : ""}
-          </p>
-          <Button type="button" variant="outline" onClick={() => {
-            setPage(0); setParams(selected ? { venda: selected } : {});
-          }}>Limpar filtros</Button>
-        </div>}
-        {sales.isPending ? <p role="status">Carregando vendas…</p> : sales.isError ? (
+        {sales.isPending ? <p role="status">Carregando vendas…</p> : accessDenied ? (
+          <p role="status">Seu perfil não tem acesso ao histórico de vendas desta loja.</p>
+        ) : sales.isError ? (
           <StoreFailure message={saleMessage(sales.error)} retry={() => void sales.refetch()} />
-        ) : !sales.data.items.length ? <p>Nenhuma venda cadastrada.</p> : (
+        ) : !sales.data.items.length ? (
+          <StoreState title={sales.data.total ? "Nenhuma venda nesta página" : filterCount ? "Nenhuma venda para estes filtros" : "Nenhuma venda cadastrada"}
+            action={sales.data.total && page > 1 ? <Button type="button" variant="outline" onClick={() => goToPage(1)}>Ir à primeira página</Button> :
+              filterCount ? <Button type="button" variant="outline" onClick={clearFilters}>Limpar filtros</Button> :
+                canCreate ? <Button type="button" variant="outline" onClick={openCreate}>Registrar venda</Button> : undefined} />
+        ) : (
           <ul className="divide-y">{sales.data.items.map((sale) => (
             <li key={sale.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
               <div><strong>{moneyLabel(sale.total_cents)}</strong><p>{dateLabel(sale.occurred_on)} · {statuses[sale.status]}</p></div>
@@ -137,8 +228,8 @@ export function SalesPage({ scope, queryKey, canManage, reservationFlow = false 
         )}
         {sales.data && sales.data.total > pageSize && (
           <nav aria-label="Páginas de vendas" className="flex flex-wrap gap-2">
-            <Button variant="outline" disabled={page === 0} onClick={() => setPage(page - 1)}>Anterior</Button>
-            <Button variant="outline" disabled={(page + 1) * pageSize >= sales.data.total} onClick={() => setPage(page + 1)}>Próxima</Button>
+            <Button variant="outline" disabled={page === 1} onClick={() => goToPage(page - 1)}>Anterior</Button>
+            <Button variant="outline" disabled={page * pageSize >= sales.data.total} onClick={() => goToPage(page + 1)}>Próxima</Button>
           </nav>
         )}
       </section>
@@ -203,10 +294,19 @@ function PaymentFields({ rows, onChange, allowed, prefix }: {
   );
 }
 
-function SaleForm({ scope, queryKey, sessions, methodsAllowed, buyerSelection, done }: ScopeProps & {
-  sessions: Session[]; methodsAllowed: string[]; buyerSelection: boolean; done: (id: string) => void;
+function SaleForm({ scope, queryKey, sessions, initialSessionId, ready, methodsAllowed, buyerSelection, close, done }: ScopeProps & {
+  sessions: Session[];
+  initialSessionId: string;
+  ready: boolean;
+  methodsAllowed: string[];
+  buyerSelection: boolean;
+  close: () => void;
+  done: (id: string, pending: boolean) => void;
 }) {
-  const [sessionId, setSessionId] = useState(sessions[0].id);
+  const formId = useId();
+  const errorRegion = useRef<HTMLDivElement>(null);
+  const [sessionId, setSessionId] = useState(initialSessionId);
+  const [draftTerm, setDraftTerm] = useState("");
   const [term, setTerm] = useState("");
   const [lines, setLines] = useState<{ option: SaleOption; quantity: string }[]>([]);
   const [payments, setPayments] = useState<DraftPayment[]>([initialPayment(methodsAllowed[0])]);
@@ -214,13 +314,21 @@ function SaleForm({ scope, queryKey, sessions, methodsAllowed, buyerSelection, d
   const [customer, setCustomer] = useState<NamedOption | null>(null);
   const [validation, setValidation] = useState("");
   const session = sessions.find((item) => item.id === sessionId);
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setTerm(draftTerm.trim()), 250);
+    return () => window.clearTimeout(timeout);
+  }, [draftTerm]);
   const options = useQuery({
     queryKey: [...queryKey, "sale-options", session?.location_id, term], meta: { persist: false }, enabled: !!session,
     queryFn: () => storeRpc<SaleOption[]>("soja_store_sale_options", { ...scope, _location_id: session.location_id, _search: term || null }),
   });
   const command = useStoreCommand(scope, (request, payload: object) => storeRpc<CommandResult>("soja_store_create_sale", {
     ...scope, _request_id: request, _payload: payload,
-  }), (result) => { setLines([]); setPayments([initialPayment(methodsAllowed[0])]); setCustomer(null); setValidation(""); done(result.id); });
+  }), (result) => done(result.id, pending));
+  const locked = command.isPending || command.isUncertain;
+  const dirty = sessionId !== initialSessionId || lines.length > 0 || customer != null || pending ||
+    payments.length > 1 || payments.some(({ method, amount, tender, fee, reference }) =>
+      method !== methodsAllowed[0] || amount || tender || fee || reference);
   const total = lines.reduce((sum, row) => {
     const quantity = readDecimal(row.quantity);
     return sum + (quantity ? lineCents(quantity, row.option.price_cents) : 0);
@@ -228,8 +336,10 @@ function SaleForm({ scope, queryKey, sessions, methodsAllowed, buyerSelection, d
 
   function submit(event: FormEvent) {
     event.preventDefault();
+    if (locked || !ready) return;
     if (!session || !lines.length || !Number.isSafeInteger(total) || total <= 0) {
       setValidation("Selecione um ponto e informe os itens da venda.");
+      window.requestAnimationFrame(() => errorRegion.current?.focus());
       return;
     }
     const items = lines.map(({ option, quantity }) => {
@@ -240,6 +350,7 @@ function SaleForm({ scope, queryKey, sessions, methodsAllowed, buyerSelection, d
     const paymentRows = pending ? [] : readPayments(payments, total);
     if (items.some((item) => !item) || !paymentRows) {
       setValidation("Confira as quantidades e preencha os pagamentos até atingir o valor total.");
+      window.requestAnimationFrame(() => errorRegion.current?.focus());
       return;
     }
     setValidation("");
@@ -247,52 +358,57 @@ function SaleForm({ scope, queryKey, sessions, methodsAllowed, buyerSelection, d
   }
 
   return (
-    <form onSubmit={submit} className="ss-surface grid gap-4" aria-label="Nova venda">
-      <h2>Nova venda</h2>
-      <fieldset disabled={command.isPending || command.isUncertain} className="grid gap-3">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <StoreField id="ss-sale-session" label="Caixa aberto">
-            <select id="ss-sale-session" value={sessionId} onChange={(event) => { setSessionId(event.target.value); setLines([]); }}>
-              <option value="">Selecione o caixa</option>
-              {sessions.map((item) => <option key={item.id} value={item.id}>{item.location_name}</option>)}
-            </select>
-          </StoreField>
-          <StoreField id="ss-sale-search" label="Buscar produto ou SKU">
-            <input id="ss-sale-search" value={term} onChange={(event) => setTerm(event.target.value)} maxLength={160} />
-          </StoreField>
-        </div>
-        {options.isFetching ? <p role="status">Buscando produtos…</p> : options.isError ? (
-          <StoreFailure message={saleMessage(options.error)} retry={() => void options.refetch()} />
-        ) : !options.data?.length ? <p>Cadastre um preço vigente e confira o estoque disponível no ponto.</p> : (
-          <div className="flex max-h-52 flex-wrap gap-2 overflow-auto" aria-label="Produtos disponíveis">
-            {options.data.map((option) => <Button key={option.id} type="button" variant="outline"
-              disabled={lines.some((row) => row.option.id === option.id)}
-              onClick={() => setLines([...lines, { option, quantity: "1" }])}>{option.product_name} · {option.sku}</Button>)}
+    <StoreFormDialog title="Nova venda" size="wide" initialFocus="title" formId={formId}
+      submitLabel={pending ? "Registrar reserva" : "Confirmar pagamento e entrega"}
+      dirty={dirty || command.isUncertain} busy={command.isPending} submitDisabled={locked || !ready} onClose={close}
+      footerDetails={<p className="whitespace-nowrap font-semibold">Total {moneyLabel(total)}</p>}>
+      <form id={formId} onSubmit={submit} className="grid gap-4" aria-label="Nova venda">
+        <fieldset disabled={locked} className="grid min-w-0 gap-3">
+          <h3>Caixa e itens</h3>
+          {!ready && <StoreFailure message="O caixa ou a configuração de venda ficou indisponível. Confira a operação antes de enviar." />}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <StoreField id="ss-sale-session" label="Caixa aberto">
+              <select id="ss-sale-session" value={sessionId} onChange={(event) => { setSessionId(event.target.value); setLines([]); }}>
+                {!session && <option value={sessionId}>Selecione um caixa aberto</option>}
+                {sessions.map((item) => <option key={item.id} value={item.id}>{item.location_name}</option>)}
+              </select>
+            </StoreField>
+            <StoreField id="ss-sale-search" label="Buscar produto ou SKU">
+              <input id="ss-sale-search" type="search" value={draftTerm} onChange={(event) => setDraftTerm(event.target.value)} maxLength={160} />
+            </StoreField>
           </div>
-        )}
-        {lines.map(({ option, quantity }, index) => <div key={option.id} className="grid gap-2 rounded-md border p-3 sm:grid-cols-[1fr_9rem_auto] sm:items-end">
-          <div><strong>{option.product_name} · {option.sku}</strong><p>{moneyLabel(option.price_cents)} por {option.unit} · {decimalLabel(option.available)} disponíveis</p></div>
-          <StoreField id={`ss-sale-qty-${option.id}`} label="Quantidade">
-            <input id={`ss-sale-qty-${option.id}`} value={quantity} inputMode="decimal"
-              onChange={(event) => setLines(lines.map((item, i) => i === index ? { ...item, quantity: event.target.value } : item))} />
-          </StoreField>
-          <Button type="button" variant="ghost" onClick={() => setLines(lines.filter((row) => row.option.id !== option.id))}>Remover item</Button>
-        </div>)}
-        <p className="font-semibold">Total {moneyLabel(total)}</p>
-        <label className="flex min-h-11 items-center gap-2">
-          <input type="checkbox" checked={pending} onChange={(event) => setPending(event.target.checked)} /> Reservar e confirmar pagamento depois
-        </label>
-        {buyerSelection && <div className="grid items-end gap-2 sm:grid-cols-[minmax(0,24rem)_auto]">
-          <PurchaseOption kind="customers" label="Cliente (opcional)" value={customer} onChange={setCustomer} scope={scope} queryKey={queryKey}
-            disabled={command.isPending || command.isUncertain} />
-          {customer && <Button type="button" variant="ghost" className="w-fit" onClick={() => setCustomer(null)}>Remover cliente</Button>}
-        </div>}
-        {!pending && <PaymentFields rows={payments} onChange={setPayments} allowed={methodsAllowed} prefix="ss-sale" />}
-        <Button className="ss-primary w-fit" type="submit">{pending ? "Registrar reserva" : "Confirmar pagamento e entrega"}</Button>
-      </fieldset>
-      {validation && <StoreFailure message={validation} />}
-      {command.isError && <StoreFailure message={saleMessage(command.error)} retry={command.isUncertain ? command.retry : undefined} retryLabel="Verificar envio" />}
-    </form>
+          {draftTerm.trim() !== term || options.isFetching ? <p role="status">Buscando produtos…</p> : options.isError ? (
+            <StoreFailure message={saleMessage(options.error)} retry={() => void options.refetch()} />
+          ) : !options.data?.length ? <p>Cadastre um preço vigente e confira o estoque disponível no ponto.</p> : (
+            <div className="flex max-h-52 flex-wrap gap-2 overflow-auto" aria-label="Produtos disponíveis">
+              {options.data.map((option) => <Button key={option.id} type="button" variant="outline" className="max-w-full whitespace-normal break-words text-left"
+                disabled={lines.some((row) => row.option.id === option.id)}
+                onClick={() => setLines([...lines, { option, quantity: "1" }])}>{option.product_name} · {option.sku}</Button>)}
+            </div>
+          )}
+          {lines.map(({ option, quantity }, index) => <div key={option.id} className="grid gap-2 rounded-md border p-3 sm:grid-cols-[1fr_9rem_auto] sm:items-end">
+            <div className="min-w-0 break-words"><strong>{option.product_name} · {option.sku}</strong><p>{moneyLabel(option.price_cents)} por {option.unit} · {decimalLabel(option.available)} disponíveis</p></div>
+            <StoreField id={`ss-sale-qty-${option.id}`} label="Quantidade">
+              <input id={`ss-sale-qty-${option.id}`} value={quantity} inputMode="decimal"
+                onChange={(event) => setLines(lines.map((item, i) => i === index ? { ...item, quantity: event.target.value } : item))} />
+            </StoreField>
+            <Button type="button" variant="ghost" onClick={() => setLines(lines.filter((row) => row.option.id !== option.id))}>Remover item</Button>
+          </div>)}
+          <h3>Pagamento</h3>
+          <label className="flex min-h-11 items-center gap-2">
+            <input type="checkbox" checked={pending} onChange={(event) => setPending(event.target.checked)} /> Reservar e confirmar pagamento depois
+          </label>
+          {buyerSelection && <div className="grid items-end gap-2 sm:grid-cols-[minmax(0,24rem)_auto]">
+            <PurchaseOption kind="customers" label="Cliente (opcional)" value={customer} onChange={setCustomer} scope={scope} queryKey={queryKey}
+              disabled={command.isPending || command.isUncertain} />
+            {customer && <Button type="button" variant="ghost" className="w-fit" onClick={() => setCustomer(null)}>Remover cliente</Button>}
+          </div>}
+          {!pending && <PaymentFields rows={payments} onChange={setPayments} allowed={methodsAllowed} prefix="ss-sale" />}
+        </fieldset>
+        {validation && <div ref={errorRegion} tabIndex={-1}><StoreFailure message={validation} /></div>}
+        {command.isError && <StoreFailure message={saleMessage(command.error)} retry={command.isUncertain ? command.retry : undefined} retryLabel="Verificar envio" />}
+      </form>
+    </StoreFormDialog>
   );
 }
 

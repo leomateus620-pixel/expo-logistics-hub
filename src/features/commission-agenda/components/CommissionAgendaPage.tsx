@@ -59,6 +59,7 @@ export interface CommissionAgendaPageProps extends AgendaCallbacks {
   /** Initial filter overrides (e.g. from the URL). */
   initialFilters?: Partial<AgendaFilterState>;
   className?: string;
+  compactSummary?: boolean;
 }
 
 /** Imperative surface used by the workspace header ("+ Criar evento"). */
@@ -81,6 +82,7 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
   onSubmitEvent,
   initialFilters,
   className,
+  compactSummary = false,
   onCreateEvent,
   onOpenEvent,
   onEditEvent,
@@ -186,7 +188,10 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
       <div className="ua-agenda-heading">
         <AgendaPageHeader unit={unit} count={decoratedEvents.length} nextEvent={resolvedDashboard.nextEvent} view={filters.view} />
         <details className="ua-agenda-summary">
-          <summary className="ws-focus" aria-label="Resumo da agenda"><span className="ua-agenda-summary__label">Resumo<span className="ua-agenda-summary__label-suffix"> da agenda</span></span> <span className="ua-agenda-summary__signals">{resolvedDashboard.upcoming} futuros · {resolvedDashboard.completed} concluídos</span></summary>
+          <summary className="ws-focus" aria-label="Resumo da agenda">
+            <span className="ua-agenda-summary__label">Resumo<span className="ua-agenda-summary__label-suffix"> da agenda</span></span>
+            {!compactSummary && <span className="ua-agenda-summary__signals">{resolvedDashboard.upcoming} futuros · {resolvedDashboard.completed} concluídos</span>}
+          </summary>
           <AgendaDashboard dashboard={resolvedDashboard} showNextEvent={false} onOpenDocuments={() => openDocuments()} />
         </details>
       </div>

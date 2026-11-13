@@ -1,7 +1,7 @@
 import { VolunteerTeamById } from '@/features/volunteers/VolunteerTeam';
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { CalendarPlus, MapPinned, Building2, ArrowUpRight } from 'lucide-react';
+import { CalendarPlus, LayoutDashboard, MapPinned, Building2, ArrowUpRight } from 'lucide-react';
 import { SOY_SUMMIT_ROUTE } from '@/config/soy-summit';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { getCommissionMapPortal } from '@/modules/commissions/commissionMapPortalRegistry';
@@ -37,8 +37,10 @@ import { canManageDocuments } from '@/features/commission-agenda/lib/visibility'
 import type { AgendaEventDraft } from '@/features/commission-agenda/components/EventFormShell';
 import { SojaStoreWorkspaceRoute } from '@/features/soja-store/components/SojaStoreWorkspaceRoute';
 import { SojaStoreRouteNotice } from '@/features/soja-store/components/SojaStoreRouteNotice';
+import { StoreFailure, StoreHeading } from '@/features/soja-store/components/StoreElements';
 import { useSojaStoreAccess } from '@/features/soja-store/hooks/useSojaStoreAccess';
 import { buildSojaStoreMenu, SOJA_STORE_IMPORTS_PATH, SOJA_STORE_SECTION_PATHS, SOJA_STORE_UNIT, SOJA_STORE_WORKSPACE_PATHS, type SojaStoreSection } from '@/features/soja-store/navigation';
+import '@/features/soja-store/components/store-summary.css';
 
 const SojaStoreSummary = lazy(() => import('@/features/soja-store/components/SojaStoreSummary')
   .then(({ SojaStoreSummary }) => ({ default: SojaStoreSummary })));
@@ -46,6 +48,10 @@ const SojaStoreSummary = lazy(() => import('@/features/soja-store/components/Soj
 interface CommissionWorkspacePageProps {
   module: CommissionModule;
   entry: OfficialUnitEntry;
+}
+
+function OverviewContent({ store, children }: { store: boolean; children: ReactNode }) {
+  return store ? <div className="ss-overview-stack">{children}</div> : <>{children}</>;
 }
 
 export default function CommissionWorkspacePage({ module, entry }: CommissionWorkspacePageProps) {
@@ -94,6 +100,8 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
   const {
     documents,
     isLoading: documentsLoading,
+    isError: documentsError,
+    refetch: refetchDocuments,
     upload,
     remove: removeDocument,
     openDocument,
@@ -294,7 +302,7 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
     [mayManageDocuments, removeDocument],
   );
 
-  const documentsState: AgendaLoadState = documentsLoading ? 'loading' : 'ready';
+  const documentsState: AgendaLoadState = isSojaStore && documentsError ? 'error' : documentsLoading ? 'loading' : 'ready';
   const storeRoute = (routeSection: SojaStoreSection) => (
     <SojaStoreWorkspaceRoute
       section={routeSection}
@@ -310,7 +318,8 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         unit={unit}
         navigation={navigation}
         section={section}
-        identityTitleTag={storeSection ? 'p' : 'h1'}
+        identitySection={isSojaStore ? 'agenda' : undefined}
+        identityTitle={isSojaStore ? 'Agenda' : undefined}
         action={section === 'team' || storeSection || (isSojaStore && section !== 'agenda') ? undefined : { label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
       >
         <PageTransition>
@@ -325,9 +334,18 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
             <Route
               path={WORKSPACE_SECTION_PATHS.overview}
               element={
-                <>
+                <OverviewContent store={isSojaStore}>
+                  {isSojaStore && (
+                    <div className="ss-page ss-overview-identity">
+                      <StoreHeading eyebrow="Soja Store" title="Visão geral" icon={LayoutDashboard}
+                        description="Operação da loja e atividades da comissão." />
+                    </div>
+                  )}
+                  {isSojaStore && storeAccess.isError && (
+                    <StoreFailure message="Não foi possível verificar o acesso à operação da loja." retry={() => void storeAccess.refetch()} />
+                  )}
                   {isSojaStore && commissionIdBySlug && !storeAccess.isError && storeAccess.data?.enabled && (
-                    <Suspense fallback={null}>
+                    <Suspense fallback={<p role="status">Carregando operação da loja…</p>}>
                       <SojaStoreSummary commissionId={commissionIdBySlug} access={storeAccess.data} />
                     </Suspense>
                   )}
@@ -337,13 +355,16 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
                     documents={documents}
                     state={state}
                     onOpenEvent={openEventInAgenda}
-                    onCreateEvent={requestCreate}
+                    onCreateEvent={isSojaStore ? undefined : requestCreate}
                     onOpenDocument={(doc) => void handleOpenDocument(doc)}
                     onDownloadDocument={(doc) => void handleOpenDocument(doc, true)}
-                    onAddDocument={handleAddDocument}
+                    onAddDocument={!isSojaStore || mayManageDocuments ? handleAddDocument : undefined}
                     onRetry={retry}
+                    variant={isSojaStore ? 'soja-store' : undefined}
+                    documentsLoading={isSojaStore && documentsLoading}
+                    onRetryDocuments={isSojaStore && documentsError ? () => void refetchDocuments() : undefined}
                   />
-                </>
+                </OverviewContent>
               }
             />
             <Route
@@ -355,6 +376,7 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
                   events={events}
                   documents={documents}
                   state={state}
+                  compactSummary={isSojaStore}
                   peopleOptions={peopleOptions}
                   unitOptions={unitOptions}
                   onRetry={retry}
@@ -373,6 +395,8 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
                   unit={unit}
                   documents={documents}
                   state={documentsState}
+                  standalone={isSojaStore}
+                  onRetry={isSojaStore ? () => void refetchDocuments() : undefined}
                   onOpenDocument={(doc) => void handleOpenDocument(doc)}
                   onDownloadDocument={(doc) => void handleOpenDocument(doc, true)}
                   onDeleteDocument={mayManageDocuments ? (doc) => void handleDeleteDocument(doc) : undefined}
@@ -381,7 +405,7 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
               }
             />
             <Route path={WORKSPACE_SECTION_PATHS.team} element={<VolunteerTeamById commissionId={commissionId} />} />
-            <Route path={WORKSPACE_SECTION_PATHS.tasks} element={<CommissionTasksPage unit={unit} />} />
+            <Route path={WORKSPACE_SECTION_PATHS.tasks} element={<CommissionTasksPage unit={unit} standalone={isSojaStore} />} />
             {isSojaStore && (
               <>
                 <Route path={SOJA_STORE_SECTION_PATHS.produtos} element={storeRoute('produtos')} />

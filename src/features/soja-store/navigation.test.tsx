@@ -59,6 +59,16 @@ describe('navegação da Soja Store', () => {
     expect(resolveWorkspaceSection(`${basePath}/importacoes/lote`, basePath, SOJA_STORE_WORKSPACE_PATHS)).toBe('importacoes');
   });
 
+  it('mostra as quatro áreas da operação atual conforme a autorização do servidor', () => {
+    const paths = ['vendas', 'caixa', 'clientes', 'financeiro'];
+    const full = buildSojaStoreMenu(baseMenu, {
+      enabled: true, capabilities: ['sales.view', 'sales.checkout', 'cash.view', 'customers.view', 'finance.view'],
+    });
+    expect(full.map(({ path }) => path).filter((path) => paths.includes(path))).toEqual(paths);
+    const salesReader = buildSojaStoreMenu(baseMenu, { enabled: true, capabilities: ['sales.view'] });
+    expect(salesReader.map(({ path }) => path).filter((path) => paths.includes(path))).toEqual(['vendas']);
+  });
+
   it('explica o endereço legado de importações e oferece retorno à visão geral', () => {
     render(<MemoryRouter><SojaStoreRouteNotice imports /></MemoryRouter>);
     expect(screen.getByText('Importações não fazem parte da operação da Soja Store.')).toBeVisible();

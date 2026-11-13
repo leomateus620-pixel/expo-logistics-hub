@@ -24,6 +24,9 @@ export interface CommissionOverviewPageProps {
   onAddDocument?: () => void;
   onRetry?: () => void;
   className?: string;
+  variant?: 'soja-store';
+  documentsLoading?: boolean;
+  onRetryDocuments?: () => void;
 }
 
 const PREVIEW_LIMIT = 4;
@@ -41,7 +44,11 @@ export function CommissionOverviewPage({
   onAddDocument,
   onRetry,
   className,
+  variant,
+  documentsLoading = false,
+  onRetryDocuments,
 }: CommissionOverviewPageProps) {
+  const store = variant === 'soja-store';
   const todayKey = todayKeyProp ?? getTodayKey();
   const unitLabel = unitArticleLabel(unit.type);
   const agendaPath = `${unit.basePath}/${WORKSPACE_SECTION_PATHS.agenda}`;
@@ -55,7 +62,7 @@ export function CommissionOverviewPage({
   const recentDocuments = [...documents].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
   const team = [...unit.leads, ...unit.members];
 
-  if (state === 'error') {
+  if (state === 'error' && !store) {
     return (
       <div className={cn('ua-page', className)}>
         <AgendaErrorState onRetry={onRetry} label="a visão geral" />
@@ -67,7 +74,7 @@ export function CommissionOverviewPage({
 
   return (
     <div className={cn('ua-page', className)}>
-      <div className="ua-overview">
+      <div className={cn('ua-overview', store && 'ss-commission-overview')}>
         <section className="ws-panel ua-section ua-overview__full" aria-labelledby="overview-next-events">
           <header className="ua-section__header">
             <h2 id="overview-next-events" className="ua-section__title ws-section-title">
@@ -80,7 +87,7 @@ export function CommissionOverviewPage({
             </Link>
           </header>
 
-          {loading ? (
+          {state === 'error' ? <AgendaErrorState onRetry={onRetry} label="os próximos eventos" /> : loading ? (
             <div className="grid gap-2">
               <AgendaEventCardSkeleton />
               <AgendaEventCardSkeleton />
@@ -124,9 +131,9 @@ export function CommissionOverviewPage({
           )}
         </section>
 
-        <div className="ua-overview__full">
+        {!store && <div className="ua-overview__full">
           {loading ? <AgendaKpiSkeleton /> : <AgendaDashboard dashboard={dashboard} showNextEvent={false} />}
-        </div>
+        </div>}
 
         <section className="ws-panel ua-section" aria-labelledby="overview-documents">
           <header className="ua-section__header">
@@ -134,14 +141,15 @@ export function CommissionOverviewPage({
               <FileText aria-hidden="true" />
               <span className="truncate">Documentos</span>
             </h2>
-            {documents.length > 0 && (
+            {(store || documents.length > 0) && (
               <Link to={documentsPath} className="ua-section__link ws-focus">
-                Ver todos
+                {store ? 'Ver documentos' : 'Ver todos'}
                 <ArrowRight aria-hidden="true" />
               </Link>
             )}
           </header>
-          {recentDocuments.length === 0 ? (
+          {onRetryDocuments ? <AgendaErrorState onRetry={onRetryDocuments} label="os documentos" />
+            : documentsLoading ? <p role="status">Carregando documentos…</p> : recentDocuments.length === 0 ? (
             <DocumentsEmptyState unitLabel={unitLabel} onAddDocument={onAddDocument} compact />
           ) : (
             <div className="ua-documents">
@@ -183,8 +191,17 @@ export function CommissionOverviewPage({
                 </div>
               ))}
               {unit.members.length > 0 && (
-                <div className="flex flex-wrap items-center gap-3">
-                  <AvatarStack people={unit.members} max={6} size="md" tone="light" />
+                <div className={store ? 'grid gap-2' : 'flex flex-wrap items-center gap-3'}>
+                  {store ? (
+                    <ul className="ss-overview-team">
+                      {unit.members.slice(0, 6).map((person) => (
+                        <li key={person.id}>
+                          <PersonAvatar person={person} size="sm" tone="light" />
+                          <span>{person.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : <AvatarStack people={unit.members} max={6} size="md" tone="light" />}
                   <span className="ws-meta-secondary">
                     {unit.members.length} {unit.members.length === 1 ? 'integrante' : 'integrantes'}
                   </span>

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, PackageCheck } from "lucide-react";
+import { ArrowLeft, ClipboardList, PackageCheck } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -12,19 +12,17 @@ import {
 } from "../domain/purchases";
 import { useStoreCommand } from "../hooks/useStoreCommand";
 import { useUnsavedStoreForm } from "../hooks/useUnsavedStoreForm";
-import { NewPurchasePage } from "./NewPurchasePage";
 import { purchasesPath } from "./PurchasesPage";
 
 type PurchaseDetailProps = {
   id: string;
   scope: StoreScope;
   queryKey: readonly unknown[];
-  canManage: boolean;
   canReceive: boolean;
   canViewStock: boolean;
 };
 
-export function PurchaseDetailPage({ id, scope, queryKey, canManage, canReceive, canViewStock }: PurchaseDetailProps) {
+export function PurchaseDetailPage({ id, scope, queryKey, canReceive, canViewStock }: PurchaseDetailProps) {
   const { search } = useLocation();
   const [receiptVersion, setReceiptVersion] = useState<number | null>(null);
   const validId = z.string().uuid().safeParse(id).success;
@@ -40,10 +38,7 @@ export function PurchaseDetailPage({ id, scope, queryKey, canManage, canReceive,
       <Button asChild variant="outline" className="w-fit">
         <Link data-button to={{ pathname: purchasesPath, search }}><ArrowLeft aria-hidden="true" /> Compras</Link>
       </Button>
-      {id === "novo" ? (
-        canManage ? <NewPurchasePage scope={scope} queryKey={queryKey} /> :
-          <StoreFailure message="Seu perfil precisa de permissão para registrar um pedido." />
-      ) : !validId ? <StoreState title="Pedido não encontrado" /> :
+      {!validId ? <StoreState title="Pedido não encontrado" /> :
         query.isPending ? <StoreState title="Carregando pedido" busy /> :
           query.isError ? <StoreFailure message={storeError(query.error)} retry={() => void query.refetch()} /> :
             <PurchaseRecord purchase={query.data} canViewStock={canViewStock}
@@ -87,7 +82,7 @@ function PurchaseRecord({ purchase, action, children, canViewStock }: {
   ];
   return (
     <>
-      <StoreHeading title={purchase.supplier_name} description="Pedido de compra" action={action} />
+      <StoreHeading title={purchase.supplier_name} icon={ClipboardList} eyebrow="Pedido de compra" action={action} />
       <section className="ss-surface space-y-3" aria-labelledby="ss-purchase-summary">
         <h2 id="ss-purchase-summary">Resumo do pedido</h2>
         <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

@@ -21,6 +21,7 @@ export interface CommissionDocumentsPageProps {
   onAddDocument?: () => void;
   onRetry?: () => void;
   className?: string;
+  standalone?: boolean;
 }
 
 type DocumentScope = 'all' | 'unit' | 'events';
@@ -31,10 +32,11 @@ const SCOPE_LABELS: Record<DocumentScope, string> = {
   events: 'De eventos',
 };
 
-export function CommissionDocumentsPage({ unit, documents, state = 'ready', onOpenDocument, onDownloadDocument, onDeleteDocument, onAddDocument, onRetry, className }: CommissionDocumentsPageProps) {
+export function CommissionDocumentsPage({ unit, documents, state = 'ready', onOpenDocument, onDownloadDocument, onDeleteDocument, onAddDocument, onRetry, className, standalone = false }: CommissionDocumentsPageProps) {
   const [search, setSearch] = useState('');
   const [scope, setScope] = useState<DocumentScope>('all');
   const unitLabel = unitArticleLabel(unit.type);
+  const Title = standalone ? 'h1' : 'h2';
 
   const sorted = useMemo(() => [...documents].sort((a, b) => b.date.localeCompare(a.date)), [documents]);
   const counts = useMemo(
@@ -65,14 +67,17 @@ export function CommissionDocumentsPage({ unit, documents, state = 'ready', onOp
   }, [visible, unitLabel]);
 
   if (state === 'error') {
-    return <div className={cn('ua-page', className)}><AgendaErrorState onRetry={onRetry} label="os documentos" /></div>;
+    return <div className={cn('ua-page', className)}>
+      {standalone && <h1 className="ua-header__title ws-title">Documentos</h1>}
+      <AgendaErrorState onRetry={onRetry} label="os documentos" />
+    </div>;
   }
 
   return (
     <div className={cn('ua-page', className)}>
       <header className="ua-header">
         <div className="min-w-0">
-          <h2 className="ua-header__title ws-title">Documentos</h2>
+          <Title className="ua-header__title ws-title">Documentos</Title>
           {documents.length > 0 && <p className="ua-header__meta ws-meta-secondary">
             {`${documents.length} ${documents.length === 1 ? 'documento publicado' : 'documentos publicados'}`}
           </p>}

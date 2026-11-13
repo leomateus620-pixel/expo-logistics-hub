@@ -50,7 +50,7 @@ it("abre caixa com fundo de abertura zero e confirma o ponto na leitura seguinte
   await screen.findByRole("option", { name: session.location_name });
   fireEvent.change(screen.getByRole("combobox", { name: "Ponto de atendimento" }), { target: { value: "point" } });
   fireEvent.change(screen.getByRole("textbox", { name: "Fundo inicial (R$)" }), { target: { value: "0" } });
-  fireEvent.click(screen.getByRole("button", { name: "Abrir caixa" }));
+  fireEvent.click(within(screen.getByRole("dialog", { name: "Abrir caixa" })).getByRole("button", { name: "Abrir caixa" }));
   expect(within(await screen.findByRole("region", { name: "Sessões de caixa" })).getByText(session.location_name)).toBeVisible();
   expect(storeRpc).toHaveBeenCalledWith("soja_store_open_cash", {
     ...scope, _request_id: expect.any(String), _payload: { location_id: "point", opening_cents: 0 },
@@ -68,7 +68,7 @@ it("exige justificativa da diferença antes de fechar a versão conferida", asyn
   });
   renderPos("cash");
   fireEvent.click(await screen.findByRole("button", { name: "Fechar caixa" }));
-  const form = within(screen.getByRole("form", { name: "Fechar caixa" }));
+  const form = within(screen.getByRole("dialog", { name: "Fechar caixa" }));
   fireEvent.change(form.getByRole("textbox", { name: "Dinheiro contado (R$)" }), { target: { value: "12,00" } });
   fireEvent.click(form.getByRole("button", { name: "Fechar caixa" }));
   expect(form.getByText("Informe o motivo.")).toBeVisible();

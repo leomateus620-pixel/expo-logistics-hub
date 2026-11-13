@@ -7,15 +7,17 @@ import { AgendaEmptyState } from './AgendaStates';
 export interface CommissionTasksPageProps {
   unit: CommissionUnitViewModel;
   className?: string;
+  standalone?: boolean;
 }
 
-export function CommissionTasksPage({ unit, className }: CommissionTasksPageProps) {
+export function CommissionTasksPage({ unit, className, standalone = false }: CommissionTasksPageProps) {
   const unitLabel = unitArticleLabel(unit.type);
+  const Title = standalone ? 'h1' : 'h2';
   return (
     <div className={cn('ua-page', className)}>
       <header className="ua-header">
         <div className="min-w-0">
-          <h2 className="ua-header__title ws-title">Tarefas {unitLabel}</h2>
+          <Title className="ua-header__title ws-title">{standalone ? 'Tarefas' : `Tarefas ${unitLabel}`}</Title>
         </div>
       </header>
       <AgendaEmptyState

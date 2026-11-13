@@ -507,7 +507,8 @@ const App = () => (
       buster: lastUserId,
       dehydrateOptions: {
         shouldDehydrateQuery: (query) =>
-          query.queryKey[0] !== 'commercial-map' && query.queryKey[0] !== 'financial-operational' && query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
+          !['commercial-map', 'financial-operational', 'soja-store'].includes(String(query.queryKey[0])) &&
+          query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
       },
     }}
   >

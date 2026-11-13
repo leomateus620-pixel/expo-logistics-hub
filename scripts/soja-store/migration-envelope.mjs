@@ -109,6 +109,11 @@ const migrations = {
     tables: [],
     functions: ['soja_store_customer_sales'],
   },
+  '20261113120000': {
+    name: 'soja_store_dashboard_finance_access',
+    tables: [],
+    functions: ['soja_store_current_dashboard'],
+  },
 };
 
 function sqlArray(values) {

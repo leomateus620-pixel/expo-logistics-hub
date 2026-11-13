@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Users } from "lucide-react";
 import { useOrgCommissions } from "@/hooks/useOrgCommissions";
 import { useModuleAccess } from "@/hooks/useModuleAccess";
 import { useUnitIdentity } from "@/hooks/useUnitAgenda";
@@ -16,6 +17,7 @@ import type { OrgUnit } from "@/lib/org-units";
 import type { CommissionModule } from "@/modules/commissions/commissionRegistry";
 import { useSojaStoreAccess } from "@/features/soja-store/hooks/useSojaStoreAccess";
 import { buildSojaStoreMenu, SOJA_STORE_UNIT } from "@/features/soja-store/navigation";
+import { StoreHeading } from "@/features/soja-store/components/StoreElements";
 
 const OperationsTeam = lazy(() => import("@/pages/TeamPage"));
 const StoreTeamPanel = lazy(() => import("@/features/soja-store/pages/StoreTeamPanel").then(({ StoreTeamPanel }) => ({ default: StoreTeamPanel })));
@@ -27,6 +29,7 @@ function SojaStoreTeamLayout({ unit, module, children }: { unit: OrgUnit; module
   const grouped = menus.some((item) => item.quickLabel);
   return (
     <CommissionLayout module={module} variant={grouped ? "workspace" : "standard"} menuItems={withTeamMenu(menus)} animateContent={false}>
+      <div className="ss-page mb-3"><StoreHeading title="Equipe" icon={Users} /></div>
       {commissionIdBySlug && !access.isError && access.data?.enabled && access.data.capabilities.includes("team.view") && (
         <Suspense fallback={<p role="status">Carregando operação da equipe…</p>}>
           <StoreTeamPanel commissionId={commissionIdBySlug} access={access.data} />

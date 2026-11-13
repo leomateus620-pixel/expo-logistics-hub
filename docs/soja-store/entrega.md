@@ -58,6 +58,6 @@ A verificação encontrou 16 tabelas privadas com RLS e sem leitura ou escrita d
 - Compras cobrem registro de pedido e recebimento. Cotações, alçadas, rateios, adiantamentos, devolução ao fornecedor e obrigações financeiras continuam pendentes.
 - O estoque entregue é físico e cobre as entradas de compra própria. Contagem inicial, inventário, ajustes, distribuição institucional, reservas, transferências, saídas, custos de saída e custódia de terceiros precisam de novos comandos e testes.
 - Atendimento, pagamentos, caixa, entrega, estornos e recibos dependem de implementação e da decisão formal sobre modalidade, documentos, responsáveis e destinações. Parcerias e repasses precisam de condições vigentes aprovadas.
-- Orçamento, liquidações, integração explícita com o Financeiro Fenasoja, cadastro de clientes e apoiadores, encomendas, escalas, treinamento, tarefas persistidas e relatórios exportáveis continuam pendentes.
+- Orçamento e liquidações da Soja Store, cadastro de clientes e apoiadores, encomendas, escalas, treinamento, tarefas persistidas e relatórios exportáveis continuam pendentes.
 - A importação histórica depende de validação de recorte e de data-base, incluindo a cobertura dos dois consolidados de 2025. A comissão precisa validar os saldos iniciais, os locais reais e as capacidades das contas antes da liberação.
 - Os ensaios com leitor de tela, zoom de texto, redução de movimento e metas de desempenho em ambiente representativo ainda precisam ser executados.

@@ -30,32 +30,34 @@ export default function SojaStorePage({ section, commissionId, detailId, access 
   const queryKey = ["soja-store", user.id, orgId, commissionId, capabilityKey] as const;
   const canManage = access.capabilities.includes("catalog.manage");
   const canManagePurchases = access.capabilities.includes("purchases.manage");
+  const creating = detailId === "novo";
 
   return (
-    <div className="ss-page grid gap-4" key={queryKey.join(":")}>
-      {section === "produtos" ? detailId ? (
+    <div className="ss-page grid gap-3" key={queryKey.join(":")}>
+      {section === "produtos" ? detailId && !creating ? (
         <ProductDetailPage scope={scope} queryKey={queryKey} canManage={canManage} id={detailId} access={access} />
       ) : (
-        <CatalogPage scope={scope} queryKey={queryKey} canManage={canManage} />
+        <CatalogPage scope={scope} queryKey={queryKey} canManage={canManage} initialCreate={creating} />
       ) : section === "estoque" ? (
         <StockPage scope={scope} queryKey={queryKey} access={access} />
       ) : section === "caixa" ? (
-        <CashPage scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("cash.manage")} />
+        <CashPage scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("cash.manage")}
+          canViewSettings={access.capabilities.includes("settings.view")} />
       ) : section === "vendas" ? (
         <SalesPage scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("sales.manage")}
           reservationFlow={access.capabilities.includes("sales.fulfillment")} />
-      ) : section === "compras" ? detailId ? (
+      ) : section === "compras" ? detailId && !creating ? (
         <PurchaseDetailPage
           scope={scope}
           queryKey={queryKey}
           id={detailId}
-          canManage={canManagePurchases}
           canReceive={canManagePurchases || access.capabilities.includes("purchases.receive")}
           canViewStock={access.capabilities.includes("stock.view")}
         />
       ) : (
-        <PurchasesPage scope={scope} queryKey={queryKey} canManage={canManagePurchases}
-          canViewCosts={access.capabilities.includes("purchases.costs")} />
+        <PurchasesPage scope={scope} queryKey={queryKey} canManage={canManagePurchases} initialCreate={creating}
+          canViewCosts={canManagePurchases || access.capabilities.includes("purchases.costs")}
+          canViewQuotes={access.capabilities.includes("purchases.costs")} />
       ) : section === "fornecedores" ? (
         <DirectoryPage kind="suppliers" scope={scope} queryKey={queryKey} canManage={access.capabilities.includes("suppliers.manage")} />
       ) : section === "clientes" ? (

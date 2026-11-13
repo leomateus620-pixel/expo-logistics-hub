@@ -95,7 +95,9 @@ export const SOJA_STORE_WORKSPACE_PATHS = {
 } as const;
 
 export function canOpenSojaStoreSection(access: SojaStoreAccess | undefined, section: SojaStoreSection): boolean {
-  return access?.enabled === true && access.capabilities.includes(SOJA_STORE_SECTIONS[section].capability);
+  if (access?.enabled !== true) return false;
+  if (section === 'vendas') return access.capabilities.includes('sales.view') || access.capabilities.includes('sales.checkout');
+  return access.capabilities.includes(SOJA_STORE_SECTIONS[section].capability);
 }
 
 export function buildSojaStoreMenu(baseMenu: CommissionMenuItem[], access: SojaStoreAccess | undefined): CommissionMenuItem[] {

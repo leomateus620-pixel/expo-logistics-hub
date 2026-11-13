@@ -200,6 +200,8 @@ export function useUnitDocuments(
     documents,
     records,
     isLoading: listQuery.isLoading,
+    isError: listQuery.isError,
+    refetch: listQuery.refetch,
     upload: upload.mutateAsync,
     uploading: upload.isPending,
     remove: remove.mutateAsync,
