@@ -5387,7 +5387,7 @@ const Scene = memo(function Scene({
   const contextualLabel = useContextualMapLabel({
     selectedEntityId,
     hoveredEntityId,
-    enabled: labelsVisible && !visitEnabled && !soyCinematicActive && !christmasActive && !interiorEntity && !hydrologicalModeActive && !lunarCinematicActive,
+    enabled: labelsVisible && !visitEnabled && !soyCinematicActive && !interiorEntity && !hydrologicalModeActive && !lunarCinematicActive && !christmasActive,
   });
   const contextualLabelEntities = useMemo(() => {
     const ids = [contextualLabel.selectedId, contextualLabel.hoveredId].filter(
