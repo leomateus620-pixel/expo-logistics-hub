@@ -59,6 +59,8 @@ import { CommercialMapPresentation } from './CommercialMapPresentation';
 import { useCommercialMapPresentationVisible } from './CommercialMapPresentationContext';
 import { GastronomyStructureMarkers, type GastronomyMarkerAnchor } from './GastronomyStructureMarkers';
 import { resolveGastronomyMarkerAnchor } from './gastronomyMarkerAnchor';
+import { PavilionSalesProgressMarkers } from './PavilionSalesProgressMarkers';
+import { countPavilionSalesProgress, pavilionSalesProgressAnchor } from './pavilionSalesProgress';
 import { COMMERCIAL_MAP_PRESENTATION_EVENT, isCommercialMapPresentationVisible } from '../../utils/frameActivity';
 import { readPreparedHeadquartersGeometry } from './headquarters/headquartersPreparationResource';
 import { CommercialMapInteractiveBoot, DeferredSceneLayer } from './DeferredSceneLayer';
@@ -4715,13 +4717,7 @@ function NightAwareResidentialDistrict(props: ComponentProps<typeof LateralResid
   return <LateralResidentialDistrict {...props} nightMode={night || props.nightMode} />;
 }
 
-function ExteriorGastronomyMarkers({
-  night,
-  qualityTier,
-  ...props
-}: Omit<ComponentProps<typeof GastronomyStructureMarkers>, 'motionEnabled' | 'reducedGraphics' | 'limitedAnimation'> & {
-  qualityTier: CommercialMapQualityTier;
-}) {
+function useExteriorMarkerPresentation(night: boolean, qualityTier: CommercialMapQualityTier) {
   const presentationVisible = useCommercialMapPresentationVisible();
   const globalNight = useCommercialMapStore((state) => state.nightModeActive);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
@@ -4739,13 +4735,24 @@ function ExteriorGastronomyMarkers({
     };
   }, []);
 
-  return <GastronomyStructureMarkers
-    {...props}
-    night={globalNight || night}
-    motionEnabled={presentationVisible && motionAllowed}
-    reducedGraphics={reducedGraphics || qualityTier === 'LOW'}
-    limitedAnimation={qualityTier === 'MEDIUM'}
-  />;
+  return {
+    night: globalNight || night,
+    motionEnabled: presentationVisible && motionAllowed,
+    reducedGraphics: reducedGraphics || qualityTier === 'LOW',
+    limitedAnimation: qualityTier === 'MEDIUM',
+  };
+}
+
+type ExteriorMarkerQuality = { qualityTier: CommercialMapQualityTier };
+type ExteriorMarkerProps<T extends { motionEnabled: boolean; reducedGraphics: boolean; limitedAnimation?: boolean }> =
+  Omit<T, 'motionEnabled' | 'reducedGraphics' | 'limitedAnimation'> & ExteriorMarkerQuality;
+
+function ExteriorGastronomyMarkers({ night, qualityTier, ...props }: ExteriorMarkerProps<ComponentProps<typeof GastronomyStructureMarkers>>) {
+  return <GastronomyStructureMarkers {...props} {...useExteriorMarkerPresentation(night, qualityTier)} />;
+}
+
+function ExteriorPavilionMarkers({ night, qualityTier, ...props }: ExteriorMarkerProps<ComponentProps<typeof PavilionSalesProgressMarkers>>) {
+  return <PavilionSalesProgressMarkers {...props} {...useExteriorMarkerPresentation(night, qualityTier)} />;
 }
 
 const EMPTY_PUBLIC_SALES: ReadonlySet<string> = new Set();
@@ -5106,6 +5113,23 @@ const Scene = memo(function Scene({
   const selectedGastronomyAnchor = showGastronomyMarkers
     ? gastronomyMarkerAnchors.find(({ id }) => id === selectedEntityId)?.position
     : undefined;
+  const allowPavilionMarkers = !publicPolicy && !publicPavilion && !interiorEntity && !visitEnabled
+    && !hydrologicalModeActive && !lunarCinematicActive && !soyCinematicActive && !sunriseRunning
+    && !parkingInspectionOpen && !isolatedArea && !segmentOverride
+    && (!activeSegmentId || activeSegmentId === 'industria-comercio-servicos');
+  const pavilionMarkerAnchors = useMemo(() => {
+    if (!allowPavilionMarkers) return [];
+    const progress = countPavilionSalesProgress(entities, lots);
+    return structuralEntities.flatMap((entity) => {
+      const counts = progress.get(entity.id);
+      if (!counts || !canInspectEntity(entity.id) || layerVisibility[entity.layerId] === false
+        || (layerOpacity[entity.layerId] ?? 1) <= 0.015
+        || (entityFiltersActive && !presentedMatchingEntityIds.has(entity.id))) return [];
+      const anchor = pavilionSalesProgressAnchor(entity, counts);
+      return anchor ? [anchor] : [];
+    });
+  }, [allowPavilionMarkers, canInspectEntity, entities, entityFiltersActive, layerOpacity, layerVisibility, lots,
+    presentedMatchingEntityIds, structuralEntities]);
   const pavilionComplexEntities = useMemo(() => publicPolicy
     ? structuralEntities.filter(entity => publicPolicy.activeScope.has(entity.id))
     : structuralEntities, [publicPolicy, structuralEntities]);
@@ -5736,6 +5760,11 @@ const Scene = memo(function Scene({
             qualityTier={renderQualityTier}
           />
         )}
+      {pavilionMarkerAnchors.length > 0 && <ExteriorPavilionMarkers
+        anchors={pavilionMarkerAnchors}
+        night={nightAtmosphereActive}
+        qualityTier={renderQualityTier}
+      />}
         </group></PublicContextGroup>}
       </InteriorCameraRequestContext.Provider>
       <CameraRig
