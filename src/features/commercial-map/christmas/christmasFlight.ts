@@ -8,6 +8,7 @@ import { commercialTreeGroundElevation } from '../utils/treeLayer';
 export const CHRISTMAS_MODEL_SCALE = 0.48;
 export const CHRISTMAS_CAMERA_FOV = 40;
 const FLIGHT_TIME = 8;
+const ALTITUDE_ABOVE_CORRIDOR = 4.70;
 const CAMERA_DIRECTION = new Vector3(0.40, 0.61, 0.92).normalize();
 
 export interface ChristmasFlight {
@@ -57,9 +58,9 @@ export function resolveChristmasFlight(entities: readonly MapEntity[], trees: re
     }
   }
 
-  // Covers a -2.1-unit skid/hoof, 0.10 rad of bank and the slight
-  // downward pitch in the cruise, with margin above the tallest obstacle.
-  return { startX, endX, startZ, endZ, clearanceY: highest + 2.35 };
+  // Keep the skids and hooves clear during banking and pitch, with enough
+  // altitude for the pavilions and roads to read below the formation.
+  return { startX, endX, startZ, endZ, clearanceY: highest + ALTITUDE_ABOVE_CORRIDOR };
 }
 
 export function sampleChristmasFlight(flight: ChristmasFlight, seconds: number, position: Vector3) {
@@ -89,7 +90,7 @@ export function sampleChristmasCamera(
   const entry = 1 - MathUtils.smoothstep(seconds, 0, 1.2);
   const exit = MathUtils.smoothstep(seconds, 5.8, 8);
   target.x += 2.55 + entry * (4.6 + halfWidth * 0.97) - exit * (6 + halfWidth * 0.87);
-  target.y = flight.clearanceY - (portrait ? 2.3 : 1.4) + exit * 2.2;
+  target.y = flight.clearanceY - (portrait ? 3.05 : 2.35) + exit * 2.2;
   target.z -= 0.3;
   position.copy(target).addScaledVector(CAMERA_DIRECTION, distance);
 }
