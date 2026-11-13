@@ -3,9 +3,11 @@ import { useVisitStore } from '../visit/useVisitStore';
 import { FenasojaHarvestIcon } from '../components/controls/FenasojaMapIcons';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSoyHarvestStore } from './useSoyHarvestStore';
+import { isChristmasCameraOwned, useChristmasSession } from '../christmas/christmasSession';
 
 export function soyHarvestUnavailableReason() {
   const m=useCommercialMapStore.getState();
+  if (isChristmasCameraOwned()) return 'Aguarde o encerramento do Modo Natal.';
   if (useVisitStore.getState().enabled) return 'Encerre a visita para ver o ciclo.';
   if (m.lunarLaunchPhase!=='idle' || m.lunarLaunchReturning) return 'Aguarde o encerramento do foguete.';
   if (m.interiorEntityId) return 'Volte à área externa.';
@@ -20,6 +22,7 @@ export function SoyHarvestButton({className=''}:{className?:string}) {
   // Subscribe to discrete modes only; never to navigation or the playback clock.
   useCommercialMapStore(s=>[s.parkingInspectionOpen,s.hydrologicalModeActive,s.salesPresentationActive,s.interiorEntityId,s.lunarLaunchPhase,s.lunarLaunchReturning,s.workspaceMode].join('|'));
   useVisitStore(s=>s.enabled);
+  useChristmasSession(s=>s.phase==='preparing' || s.phase==='flying' || s.returning);
   const active=useSoyHarvestStore(s=>s.enabled || s.status==='restoring');
   const reason=soyHarvestUnavailableReason();
   return <Tooltip><TooltipTrigger asChild><button type="button" aria-label="Ver ciclo da soja"

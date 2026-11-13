@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { isSoyHarvestCameraOwned } from '../harvest/soyHarvestOwnership';
+import { isChristmasCameraOwned } from '../christmas/christmasSession';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import type { VisitPOI } from './VisitPOIManager';
 
@@ -54,7 +55,7 @@ export const useVisitStore = create<VisitState>((set, get) => ({
   activePOI: null, activeInterior: null, isRunning: false, qualityPreset: 'BALANCED',
   error: null, requestedEntityId: null, session: 0, requestedAtMs: 0,
   start: (options) => {
-    if (get().enabled || isSoyHarvestCameraOwned()) return;
+    if (get().enabled || isSoyHarvestCameraOwned() || isChristmasCameraOwned()) return;
     const m = useCommercialMapStore.getState();
     // A cinematic already owns the lens; the mode selector disables this case.
     if (m.lunarLaunchPhase !== 'idle' || m.lunarLaunchReturning || m.interiorEntityId) return;

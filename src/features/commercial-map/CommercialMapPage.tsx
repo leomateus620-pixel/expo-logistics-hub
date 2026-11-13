@@ -2,7 +2,7 @@ import { commercialMapDiagnosticsEnabled } from './utils/performanceDiagnostics'
 import { CommercialMapBootLoader } from './components/CommercialMapBootLoader';
 import { useCommercialMapBootVisit } from './hooks/useCommercialMapBootVisit';
 import { useExporuralRevisionSelection } from './hooks/useExporuralRevisionSelection';
-import { Profiler, lazy, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react';
+import { Profiler, lazy, Suspense, useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentType, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -37,6 +37,9 @@ import { VisitOverlay } from './visit/VisitOverlay';
 import { SoyHarvestOverlay } from './harvest/SoyHarvestOverlay';
 import { useSoyHarvestStore } from './harvest/useSoyHarvestStore';
 import { useSoyHarvestLifecycle } from './harvest/useSoyHarvestLifecycle';
+import { isSoyHarvestCameraOwned } from './harvest/soyHarvestOwnership';
+import { ChristmasOverlay } from './christmas/ChristmasOverlay';
+import { useChristmasSession } from './christmas/christmasSession';
 import { preloadCommercialMapCanvas } from './utils/preloadCanvas';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { classifyCommercialMapFailure } from './queries/commercialMapRetryPolicy';
@@ -51,6 +54,7 @@ import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
 import { CommercialMapDock } from './components/dock/CommercialMapDock';
 import { CommercialMapHeaderTools } from './components/shell/CommercialMapHeaderTools';
 import { SalesModeLayer } from './sales/components/SalesModeLayer';
+import { useSalesStore } from './sales/useSalesSelection';
 const GeometryEditor = lazy(() => import('./components/editor/GeometryEditor').then((m) => ({ default: m.GeometryEditor })));
 const LotCreationWorkspace = lazy(() => import('./components/editor/LotCreationWorkspace').then((m) => ({ default: m.LotCreationWorkspace })));
 const EntityDetailsPanel = lazy(() => import('./components/panels/MapPanels').then((m) => ({ default: m.EntityDetailsPanel })));
@@ -81,7 +85,7 @@ import {
 import { canUseTechnicalValidationOverlay } from './utils/technicalValidation';
 import { lunarLaunchPhaseLabel } from './utils/lunarLaunch';
 import { recordCommercialMapProfiler } from './utils/profilerDiagnostics';
-import { markCommercialMapStage } from './utils/performanceDiagnostics';
+import { getCommercialMapBootSnapshot, markCommercialMapStage, subscribeCommercialMapBoot } from './utils/performanceDiagnostics';
 import { canHandleCommercialDashboardEscape, canHandleCommercialMapEscape, getCommercialDashboardFocusableElements } from './utils/contextualNavigation';
 import { buildPavilionModuleCommercialIndex, resolveCommercialPavilionModuleNavigationTarget } from './utils/pavilionModuleCommercial';
 import { useCommercialDashboardSync } from './dashboard/useCommercialDashboardSync';
@@ -274,6 +278,17 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     : 'full-map';
   const lunarLaunchActive = lunarLaunchPhase !== 'idle';
   const lunarCinematicUiActive = lunarLaunchActive || lunarLaunchReturning;
+  const christmasPhase = useChristmasSession((state) => state.phase);
+  const christmasPlaying = christmasPhase === 'preparing' || christmasPhase === 'flying';
+  const christmasSessionOpen = christmasPhase !== 'idle';
+  const checkoutOpen = useSalesStore((state) => state.checkoutOpen);
+  const salesModeActive = useSalesStore((state) => state.salesModeActive);
+  const sunriseInDaylight = useCommercialMapStore((state) => state.sunrisePhase === 'running' && !state.nightModeActive);
+  const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
+  const rendererStatusForChristmas = useSyncExternalStore(subscribeCommercialMapBoot, () => {
+    const boot = getCommercialMapBootSnapshot();
+    return boot.failed ? 'failed' : boot.commercialMapReady ? 'ready' : 'loading';
+  });
   const previousMapScope = useRef(mapScopeKey);
 
   useEffect(() => {
@@ -388,6 +403,71 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     && group.spaces.some((space) => space.entityId === selectedEntityId || space.entityId === selectedEntity?.parentEntityId));
   const selectedLot = scopedData.lots.find((lot) => lot.entityId === selectedEntityId);
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
+  const christmasEligible = Boolean(data) && areaScope === 'park' && !isCommissionScope
+    && !activeSegmentId && !interiorEntityId
+    && (workspaceMode === '3d' || (!webglAvailable && workspaceMode === 'list'));
+  const christmasBlocked = visitEnabled || soyHarvestActive || lunarCinematicUiActive || hydrologicalModeActive
+    || parkingInspectionOpen || salesModeActive || checkoutOpen || dashboardOpen || Boolean(saleResolution)
+    || (webglAvailable && rendererStatusForChristmas !== 'failed' && (
+      rendererStatusForChristmas === 'loading' || cameraNavigating || (sunriseInDaylight && selectedKind !== 'amusement-park')
+    ));
+  const startChristmas = () => {
+    const map = useCommercialMapStore.getState();
+    const sales = useSalesStore.getState();
+    if (!christmasEligible || christmasBlocked || map.interiorEntityId || map.activeSegmentId
+      || (map.workspaceMode !== '3d' && (webglAvailable || map.workspaceMode !== 'list'))
+      || map.lunarLaunchPhase !== 'idle' || map.lunarLaunchReturning || isSoyHarvestCameraOwned()
+      || useVisitStore.getState().enabled || sales.salesModeActive || sales.checkoutOpen) return false;
+    const boot = getCommercialMapBootSnapshot();
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    if (webglAvailable && !boot.failed && (!boot.commercialMapReady || map.cameraNavigating)) return false;
+    return useChristmasSession.getState().start(!webglAvailable || reducedMotion || boot.failed);
+  };
+
+  useLayoutEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      const session = useChristmasSession.getState();
+      if (event.key !== 'Escape' || event.isComposing || session.phase === 'idle') return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      session.close(session.id);
+    };
+    window.addEventListener('keydown', closeOnEscape, true);
+    let frame = 0;
+    const unsubscribe = useChristmasSession.subscribe((session, previous) => {
+      if (session.phase !== 'idle' || previous.phase === 'idle') return;
+      frame = window.requestAnimationFrame(() => {
+        if (useChristmasSession.getState().phase !== 'idle') return;
+        const shell = dashboardViewportRef.current?.closest<HTMLElement>('.commercial-map-shell');
+        const selectors = ['[data-commercial-map-control="christmas"]', '[data-commercial-map-dock-toggle]'];
+        const control = selectors
+          .map((selector) => shell?.querySelector<HTMLElement>(selector))
+          .find((candidate) => candidate?.getClientRects().length
+            && getComputedStyle(candidate).visibility !== 'hidden' && !candidate.closest('[inert]'));
+        (control ?? document.getElementById('commercial-map-main'))?.focus({ preventScroll: true });
+      });
+    });
+    return () => {
+      unsubscribe();
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('keydown', closeOnEscape, true);
+      const session = useChristmasSession.getState();
+      session.close(session.id);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!christmasSessionOpen) return;
+    const session = useChristmasSession.getState();
+    if (!christmasEligible || dashboardOpen || visitEnabled || soyHarvestActive || lunarCinematicUiActive
+      || hydrologicalModeActive || parkingInspectionOpen || checkoutOpen || salesModeActive || saleResolution) {
+      session.close(session.id);
+    } else if (!webglAvailable) {
+      session.greet(session.id);
+    }
+  }, [christmasEligible, christmasSessionOpen, checkoutOpen, dashboardOpen, hydrologicalModeActive,
+    lunarCinematicUiActive, parkingInspectionOpen, saleResolution, salesModeActive, soyHarvestActive, visitEnabled, webglAvailable]);
+
   const interiorEntity = data?.entities.find((entity) => entity.id === interiorEntityId) ?? null;
   const interiorKind = interiorEntity ? resolveStrategicLandmarkKind(interiorEntity) : null;
   const interiorPavilionPlan = interiorKind === 'commercial-pavilion' && interiorEntity
@@ -430,6 +510,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
 
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
+      if (useChristmasSession.getState().phase !== 'idle') return;
       const visit = useVisitStore.getState();
       if (visit.enabled) {
         if (visit.activeInterior && canHandleCommercialMapEscape(event)) {
@@ -740,6 +821,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     <section
       className={`commercial-map-shell ${dashboardOpen ? 'is-dashboard-open' : ''} ${visitEnabled ? 'is-visit-mode' : ''} ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''} ${lunarCinematicUiActive ? 'is-lunar-launch-active' : ''} ${lunarLaunchReturnAvailable ? 'has-lunar-launch-return' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
+      data-christmas-playing={christmasPlaying || undefined}
     >
       <CommercialMapHeaderTools
         managementActions={managementActions}
@@ -747,7 +829,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         dashboardAvailable={dashboardAvailable}
         onOpenDashboard={() => setDashboardOpen(true)}
         salesAvailable={webglAvailable && data.source === 'database' && permissions.canManageSales}
-        visitAvailable={(areaScope === 'park' || isCommissionScope) && webglAvailable && !interiorEntity && !lunarCinematicUiActive && !soyHarvestActive}
+        visitAvailable={(areaScope === 'park' || isCommissionScope) && webglAvailable && !interiorEntity && !lunarCinematicUiActive && !soyHarvestActive && !christmasSessionOpen}
         visitEntityId={selectedLot && selectedEntity?.classification !== 'INTERNAL_STAND' ? selectedEntity?.id : undefined}
       />
 
@@ -766,6 +848,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           interiorEntity={interiorEntity}
           matchingEntityIds={mapFilter.matchingEntityIds}
           filtersActive={mapFilter.hasActiveCriteria}
+          christmasAction={christmasEligible ? { disabled: christmasBlocked || christmasSessionOpen, start: startChristmas } : undefined}
           moduleSaleActive={selectedModuleSaleActive}
           moduleCard={interiorPavilionPlan && interiorEntity ? <PavilionModuleCard
             embedded
@@ -817,6 +900,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   isolatedArea={areaScope === 'park' || commissionSceneEntities ? null : areaScope}
                   segmentOverride={isCommissionScope ? scopedSegment : null}
                   technicalValidationAllowed={technicalValidationAllowed}
+                  christmasEnabled={christmasEligible && !dashboardOpen}
                 />
               </Profiler>
               <CommercialMapRendererStatus active={workspaceMode === '3d'} onOpenList={() => setWorkspaceMode('list')} />
@@ -860,7 +944,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   Restaurando a vista anterior…
                 </div>
               )}
-              {lunarLaunchReturnAvailable && !lunarCinematicUiActive && !visitEnabled && (
+              {lunarLaunchReturnAvailable && !lunarCinematicUiActive && !visitEnabled && !christmasPlaying && (
                 <button
                   type="button"
                   className="commercial-map-lunar-return"
@@ -872,7 +956,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                 </button>
               )}
               {!interiorEntity && (
-                <div style={{ display: visitEnabled || soyHarvestActive ? 'none' : 'contents' }} data-visit-preserved-controls>
+                <div style={{ display: visitEnabled || soyHarvestActive || christmasPlaying ? 'none' : 'contents' }} data-visit-preserved-controls>
                   {!lunarCinematicUiActive && <CommercialMapTopBar
                     soyHarvestAvailable={soyHarvestAvailable}
                     areaScope={areaScope}
@@ -924,7 +1008,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               && (
                 <div
                   className="commercial-map-details-panel-presence"
-                  hidden={visitEnabled || activePanel !== 'details' || lunarCinematicUiActive}
+                  hidden={visitEnabled || activePanel !== 'details' || lunarCinematicUiActive || christmasPlaying}
                 >
                   <MapPanelBoundary resetKey={selectedEntity.id}>
                     <Suspense fallback={<EntityDetailsPanelSkeleton />}>
@@ -987,6 +1071,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
             {webglAttempts > 0 && ` Verificação ${webglAttempts}/3: WebGL 2 continua indisponível.`}
           </span></div>
         )}
+        <ChristmasOverlay viewportRef={dashboardViewportRef} />
         </div>
         {saleResolution && !dashboardOpen && !inspectingGastronomy && (
           <SaleInspectionPanel

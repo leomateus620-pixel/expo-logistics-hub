@@ -1,0 +1,640 @@
+{
+  "browser": "157.0.8103.51",
+  "platform": "Darwin 25.6.0 arm64",
+  "scenarios": {
+    "desktop-dia-video": {
+      "passed": true,
+      "screen": {
+        "id": "desktop-dia",
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "quality": "HIGH",
+        "mobile": false,
+        "night": false,
+        "video": true
+      },
+      "capture": true,
+      "viewport": [
+        1440,
+        900
+      ],
+      "devicePixelRatio": 1,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "quality": {
+        "logicalTier": "HIGH",
+        "sceneTier": "HIGH",
+        "effectTier": "HIGH",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "HIGH",
+        "reason": "viewport-sync"
+      },
+      "durationMs": 8002.1,
+      "restoredCamera": true,
+      "logo": {
+        "loaded": true,
+        "name": "Marca oficial da FENASOJA",
+        "source": "/alvorada/fenasoja-symbol-official.png"
+      },
+      "errors": []
+    },
+    "celular-noite-video": {
+      "passed": true,
+      "screen": {
+        "id": "celular-noite",
+        "width": 390,
+        "height": 844,
+        "dpr": 2,
+        "quality": "LOW",
+        "mobile": true,
+        "night": true,
+        "video": true
+      },
+      "capture": true,
+      "viewport": [
+        390,
+        844
+      ],
+      "devicePixelRatio": 2,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "durationMs": 8015.4,
+      "restoredCamera": true,
+      "logo": {
+        "loaded": true,
+        "name": "Marca oficial da FENASOJA",
+        "source": "/alvorada/fenasoja-symbol-official.png"
+      },
+      "errors": []
+    },
+    "celular-noite": {
+      "passed": true,
+      "screen": {
+        "id": "celular-noite",
+        "width": 390,
+        "height": 844,
+        "dpr": 2,
+        "quality": "LOW",
+        "mobile": true,
+        "night": true,
+        "video": true
+      },
+      "capture": false,
+      "viewport": [
+        390,
+        844
+      ],
+      "devicePixelRatio": 2,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "durationMs": 8016.9,
+      "restoredCamera": true,
+      "logo": {
+        "loaded": true,
+        "name": "Marca oficial da FENASOJA",
+        "source": "/alvorada/fenasoja-symbol-official.png"
+      },
+      "measurements": {
+        "before": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 17.1,
+            "p95": 22.3
+          },
+          "cpuFrameMs": {
+            "p50": 14.6,
+            "p95": 19.1
+          },
+          "drawCalls": {
+            "min": 848,
+            "median": 848,
+            "max": 848
+          },
+          "trianglesMedian": 744833
+        },
+        "mainPass": {
+          "frames": 269,
+          "frameIntervalMs": {
+            "p50": 16.7,
+            "p95": 19.6
+          },
+          "cpuFrameMs": {
+            "p50": 7.9,
+            "p95": 11.3
+          },
+          "drawCalls": {
+            "min": 262,
+            "median": 316,
+            "max": 358
+          },
+          "trianglesMedian": 681004
+        },
+        "atMatchedCamera": {
+          "frames": 20,
+          "frameIntervalMs": {
+            "p50": 16.3,
+            "p95": 19.9
+          },
+          "cpuFrameMs": {
+            "p50": 7.2,
+            "p95": 10
+          },
+          "drawCalls": {
+            "min": 312,
+            "median": 330,
+            "max": 347
+          },
+          "trianglesMedian": 662838
+        },
+        "after": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 16.5,
+            "p95": 19.3
+          },
+          "cpuFrameMs": {
+            "p50": 12.8,
+            "p95": 15.4
+          },
+          "drawCalls": {
+            "min": 848,
+            "median": 848,
+            "max": 848
+          },
+          "trianglesMedian": 744833
+        },
+        "matchedCameraNoFlight": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 16.4,
+            "p95": 18.4
+          },
+          "cpuFrameMs": {
+            "p50": 7.8,
+            "p95": 9.4
+          },
+          "drawCalls": {
+            "min": 299,
+            "median": 301,
+            "max": 301
+          },
+          "trianglesMedian": 591355
+        }
+      },
+      "errors": []
+    },
+    "desktop-noite": {
+      "passed": true,
+      "screen": {
+        "id": "desktop-noite",
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "quality": "HIGH",
+        "mobile": false,
+        "night": true,
+        "video": false
+      },
+      "capture": false,
+      "viewport": [
+        1440,
+        900
+      ],
+      "devicePixelRatio": 1,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "quality": {
+        "logicalTier": "HIGH",
+        "sceneTier": "HIGH",
+        "effectTier": "HIGH",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "HIGH",
+        "reason": "viewport-sync"
+      },
+      "durationMs": 8014.8,
+      "restoredCamera": true,
+      "logo": {
+        "loaded": true,
+        "name": "Marca oficial da FENASOJA",
+        "source": "/alvorada/fenasoja-symbol-official.png"
+      },
+      "measurements": {
+        "before": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 29.9,
+            "p95": 40.9
+          },
+          "cpuFrameMs": {
+            "p50": 15.4,
+            "p95": 19.4
+          },
+          "drawCalls": {
+            "min": 860,
+            "median": 860,
+            "max": 860
+          },
+          "trianglesMedian": 791315
+        },
+        "mainPass": {
+          "frames": 251,
+          "frameIntervalMs": {
+            "p50": 16.6,
+            "p95": 21.8
+          },
+          "cpuFrameMs": {
+            "p50": 10.6,
+            "p95": 15.9
+          },
+          "drawCalls": {
+            "min": 379,
+            "median": 448,
+            "max": 493
+          },
+          "trianglesMedian": 751244
+        },
+        "atMatchedCamera": {
+          "frames": 21,
+          "frameIntervalMs": {
+            "p50": 16.6,
+            "p95": 21.8
+          },
+          "cpuFrameMs": {
+            "p50": 11.2,
+            "p95": 12.2
+          },
+          "drawCalls": {
+            "min": 475,
+            "median": 477,
+            "max": 480
+          },
+          "trianglesMedian": 680029
+        },
+        "after": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 28.8,
+            "p95": 32.9
+          },
+          "cpuFrameMs": {
+            "p50": 16.4,
+            "p95": 20.5
+          },
+          "drawCalls": {
+            "min": 879,
+            "median": 879,
+            "max": 879
+          },
+          "trianglesMedian": 791334
+        },
+        "matchedCameraNoFlight": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 17.4,
+            "p95": 20.1
+          },
+          "cpuFrameMs": {
+            "p50": 9.9,
+            "p95": 12.5
+          },
+          "drawCalls": {
+            "min": 466,
+            "median": 466,
+            "max": 466
+          },
+          "trianglesMedian": 604563
+        }
+      },
+      "errors": []
+    },
+    "celular-dia": {
+      "passed": true,
+      "screen": {
+        "id": "celular-dia",
+        "width": 390,
+        "height": 844,
+        "dpr": 2,
+        "quality": "LOW",
+        "mobile": true,
+        "night": false,
+        "video": false
+      },
+      "capture": false,
+      "viewport": [
+        390,
+        844
+      ],
+      "devicePixelRatio": 2,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "quality": {
+        "logicalTier": "LOW",
+        "sceneTier": "LOW",
+        "effectTier": "LOW",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "LOW",
+        "reason": "viewport-sync"
+      },
+      "durationMs": 8017.6,
+      "restoredCamera": true,
+      "logo": {
+        "loaded": true,
+        "name": "Marca oficial da FENASOJA",
+        "source": "/alvorada/fenasoja-symbol-official.png"
+      },
+      "measurements": {
+        "before": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 16.5,
+            "p95": 31.3
+          },
+          "cpuFrameMs": {
+            "p50": 10.1,
+            "p95": 12.4
+          },
+          "drawCalls": {
+            "min": 832,
+            "median": 832,
+            "max": 832
+          },
+          "trianglesMedian": 714115
+        },
+        "mainPass": {
+          "frames": 276,
+          "frameIntervalMs": {
+            "p50": 16.6,
+            "p95": 21.1
+          },
+          "cpuFrameMs": {
+            "p50": 7,
+            "p95": 11.5
+          },
+          "drawCalls": {
+            "min": 257,
+            "median": 309,
+            "max": 679
+          },
+          "trianglesMedian": 654756
+        },
+        "atMatchedCamera": {
+          "frames": 24,
+          "frameIntervalMs": {
+            "p50": 16.7,
+            "p95": 19.2
+          },
+          "cpuFrameMs": {
+            "p50": 7,
+            "p95": 9.7
+          },
+          "drawCalls": {
+            "min": 303,
+            "median": 322,
+            "max": 340
+          },
+          "trianglesMedian": 631140
+        },
+        "after": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 16.7,
+            "p95": 20.8
+          },
+          "cpuFrameMs": {
+            "p50": 16,
+            "p95": 18.7
+          },
+          "drawCalls": {
+            "min": 832,
+            "median": 832,
+            "max": 832
+          },
+          "trianglesMedian": 714115
+        },
+        "matchedCameraNoFlight": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 16.5,
+            "p95": 22.1
+          },
+          "cpuFrameMs": {
+            "p50": 8.9,
+            "p95": 13.5
+          },
+          "drawCalls": {
+            "min": 294,
+            "median": 294,
+            "max": 630
+          },
+          "trianglesMedian": 565909
+        }
+      },
+      "errors": []
+    },
+    "desktop-dia": {
+      "passed": true,
+      "screen": {
+        "id": "desktop-dia",
+        "width": 1440,
+        "height": 900,
+        "dpr": 1,
+        "quality": "HIGH",
+        "mobile": false,
+        "night": false,
+        "video": true
+      },
+      "capture": false,
+      "metFirstAvailableFrame": true,
+      "viewport": [
+        1440,
+        900
+      ],
+      "devicePixelRatio": 1,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "quality": {
+        "logicalTier": "HIGH",
+        "sceneTier": "HIGH",
+        "effectTier": "HIGH",
+        "baseDpr": 1,
+        "effectiveDpr": 1,
+        "hardwareCeiling": "HIGH",
+        "reason": "viewport-sync"
+      },
+      "durationMs": 8014.8,
+      "postFlightIdle": {
+        "frames": 34,
+        "observedMs": 780.1,
+        "pendingReasons": 0
+      },
+      "restoredCamera": true,
+      "logo": {
+        "loaded": true,
+        "name": "Marca oficial da FENASOJA",
+        "source": "/alvorada/fenasoja-symbol-official.png"
+      },
+      "measurements": {
+        "before": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 31.4,
+            "p95": 39.9
+          },
+          "cpuFrameMs": {
+            "p50": 16.7,
+            "p95": 22
+          },
+          "drawCalls": {
+            "min": 844,
+            "median": 844,
+            "max": 844
+          },
+          "trianglesMedian": 760597
+        },
+        "mainPass": {
+          "frames": 256,
+          "frameIntervalMs": {
+            "p50": 16.6,
+            "p95": 24.5
+          },
+          "cpuFrameMs": {
+            "p50": 10.7,
+            "p95": 17.2
+          },
+          "drawCalls": {
+            "min": 374,
+            "median": 432,
+            "max": 814
+          },
+          "trianglesMedian": 725744
+        },
+        "atMatchedCamera": {
+          "frames": 12,
+          "frameIntervalMs": {
+            "p50": 18.7,
+            "p95": 30.4
+          },
+          "cpuFrameMs": {
+            "p50": 14.8,
+            "p95": 309.6
+          },
+          "drawCalls": {
+            "min": 464,
+            "median": 470,
+            "max": 814
+          },
+          "trianglesMedian": 689743
+        },
+        "after": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 22.2,
+            "p95": 32.3
+          },
+          "cpuFrameMs": {
+            "p50": 13.3,
+            "p95": 19.9
+          },
+          "drawCalls": {
+            "min": 863,
+            "median": 863,
+            "max": 863
+          },
+          "trianglesMedian": 760616
+        },
+        "matchedCameraNoFlight": {
+          "frames": 30,
+          "frameIntervalMs": {
+            "p50": 17.1,
+            "p95": 21.9
+          },
+          "cpuFrameMs": {
+            "p50": 10.5,
+            "p95": 16.8
+          },
+          "drawCalls": {
+            "min": 453,
+            "median": 453,
+            "max": 795
+          },
+          "trianglesMedian": 565741
+        }
+      },
+      "errors": []
+    },
+    "vendas": {
+      "passed": true,
+      "cartAndCheckoutOpened": true,
+      "checkoutTitle": "Finalizar venda",
+      "writes": 0,
+      "errors": []
+    },
+    "regressao": {
+      "passed": true,
+      "preservedLotAndStatus": true,
+      "cameraRestoredOnEscapeAndSkip": true,
+      "restoredTopView": true,
+      "repeated": true,
+      "visibilityInjectedMs": 2101.1,
+      "visibleTimeMs": 8016.8,
+      "contextLossViaExtension": true,
+      "leftRouteDuringFlight": true,
+      "errors": []
+    },
+    "reduced-motion": {
+      "passed": true,
+      "mode": "reduced-motion",
+      "greeting": true,
+      "errors": []
+    },
+    "asset-error": {
+      "passed": true,
+      "mode": "asset-error",
+      "viewport": [
+        1440,
+        900
+      ],
+      "greeting": true,
+      "errors": [
+        "Falha local ao carregar a passagem de Natal.",
+        "Falha local ao carregar a passagem de Natal."
+      ]
+    },
+    "webgl-unavailable-mobile": {
+      "passed": true,
+      "mode": "webgl-unavailable",
+      "viewport": [
+        390,
+        844
+      ],
+      "greeting": true,
+      "errors": []
+    },
+    "webgl-unavailable": {
+      "passed": true,
+      "mode": "webgl-unavailable",
+      "viewport": [
+        1440,
+        900
+      ],
+      "greeting": true,
+      "errors": []
+    }
+  }
+}

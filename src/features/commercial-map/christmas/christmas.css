@@ -1,0 +1,152 @@
+.commercial-christmas-start {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 10px;
+  border: 1px solid #e0c6b0;
+  border-radius: 9px;
+  background: #fff8ec;
+  color: #792b36;
+  font-size: .78rem;
+  font-weight: 750;
+  text-align: left;
+}
+.commercial-christmas-start svg { width: 26px; height: 23px; flex: none; }
+.commercial-christmas-start:hover:not([aria-disabled="true"]) { background: #f8ead5; border-color: #c59375; }
+.commercial-christmas-start[aria-disabled="true"] { opacity: .6; cursor: default; }
+.commercial-christmas-start:focus-visible { outline: 2px solid #792b36; outline-offset: 2px; }
+
+.commercial-map-shell[data-christmas-playing] .commercial-map-dock.is-mobile,
+.commercial-map-shell[data-christmas-playing] .commercial-map-layer-panel,
+.commercial-map-shell[data-christmas-playing] .commercial-map-results-panel,
+.commercial-map-shell[data-christmas-playing] .commercial-map-onboarding-note {
+  visibility: hidden;
+}
+
+.commercial-christmas-shade,
+.commercial-christmas-position { position: absolute; inset: 0; }
+.commercial-christmas-shade { z-index: 48; }
+.commercial-christmas-shade.is-greeting {
+  background: radial-gradient(ellipse at center, rgb(32 13 19 / .15), rgb(27 10 16 / .44));
+  animation: commercial-christmas-shade-in 320ms ease-out both;
+}
+.commercial-christmas-position {
+  z-index: 49;
+  display: grid;
+  align-items: start;
+  justify-items: end;
+  padding: 12px max(14px, env(safe-area-inset-right)) 12px max(14px, env(safe-area-inset-left));
+  pointer-events: none;
+}
+.commercial-christmas-position.is-greeting {
+  place-items: center;
+  padding-block: 16px max(16px, env(safe-area-inset-bottom));
+}
+.commercial-christmas-hud,
+.commercial-christmas-card { pointer-events: auto; }
+.commercial-christmas-hud {
+  display: flex;
+  max-width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: end;
+  gap: 6px 12px;
+}
+.commercial-christmas-skip,
+.commercial-christmas-close,
+.commercial-christmas-hud__status {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 13px;
+  border: 1px solid rgb(248 216 162 / .64);
+  border-radius: 10px;
+  background: #451824;
+  color: #fff3d7;
+  font-size: .79rem;
+  font-weight: 700;
+}
+.commercial-christmas-skip { box-shadow: 0 4px 18px #2b151955; }
+.commercial-christmas-skip:hover { background: #622635; }
+.commercial-christmas-skip svg,
+.commercial-christmas-hud__status svg { width: 16px; height: 16px; flex: none; color: #f7d18b; }
+.commercial-christmas-hud__status svg { animation: commercial-christmas-spin 900ms linear infinite; }
+.commercial-christmas-skip:focus-visible,
+.commercial-christmas-close:focus-visible { outline: 2px solid #ffe6b4; outline-offset: 3px; }
+
+.commercial-christmas-card {
+  position: relative;
+  display: flex;
+  width: min(100%, 510px);
+  max-height: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(16px, 3vh, 24px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: clamp(24px, 5vw, 42px) clamp(14px, 4vw, 36px);
+  border: 1px solid #e5b877;
+  border-radius: 25px;
+  background:
+    radial-gradient(ellipse at 50% -24%, #a23446 0%, transparent 70%),
+    linear-gradient(165deg, #621e2d 0%, #45131e 78%);
+  box-shadow: 0 24px 75px rgb(27 6 13 / .5), inset 0 0 35px rgb(42 4 15 / .35);
+  color: #fff7e5;
+  text-align: center;
+  animation: commercial-christmas-card-in 380ms cubic-bezier(.2,.8,.22,1) both;
+}
+.commercial-christmas-card::before {
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgb(242 192 117 / .33);
+  border-radius: 18px;
+  content: '';
+  pointer-events: none;
+}
+.commercial-christmas-card__brand {
+  position: relative;
+  display: grid;
+  width: clamp(66px, 12vh, 92px);
+  aspect-ratio: 1;
+  flex: none;
+  place-items: center;
+  border: 1px solid #e5b877;
+  border-radius: 50%;
+  background: #fffbf0;
+  box-shadow: 0 5px 27px rgb(247 180 114 / .24);
+}
+.commercial-christmas-card__brand img { display: block; width: 80%; height: auto; object-fit: contain; }
+.commercial-christmas-card__title { position: relative; display: grid; gap: 6px; }
+.commercial-christmas-card__title span { font-size: clamp(.73rem, 2.3vw, .93rem); font-weight: 700; letter-spacing: .15em; }
+.commercial-christmas-card__title strong {
+  color: #ffde9d;
+  font-family: Georgia, serif;
+  font-size: clamp(1.92rem, 8.5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -.045em;
+  text-shadow: 0 2px 13px rgb(248 167 94 / .22);
+}
+.commercial-christmas-card__lights { position: absolute; inset: 8px; pointer-events: none; color: #ffd38e; }
+.commercial-christmas-card__lights svg { position: absolute; width: 14px; height: 14px; opacity: .68; }
+.commercial-christmas-card__lights svg:nth-child(1) { top: 15%; left: 16%; }
+.commercial-christmas-card__lights svg:nth-child(2) { top: 27%; left: 27%; width: 8px; height: 8px; }
+.commercial-christmas-card__lights svg:nth-child(3) { top: 15%; right: 16%; width: 9px; height: 9px; }
+.commercial-christmas-card__lights svg:nth-child(4) { top: 29%; right: 23%; }
+.commercial-christmas-card__lights svg:nth-child(5) { bottom: 13%; left: 12%; width: 8px; height: 8px; opacity: .44; }
+.commercial-christmas-close { position: relative; min-width: 112px; background: #f1d196; color: #4b1c23; }
+.commercial-christmas-close:hover { background: #ffe1a9; }
+
+@keyframes commercial-christmas-spin { to { transform: rotate(360deg); } }
+@keyframes commercial-christmas-shade-in { from { opacity: 0; } }
+@keyframes commercial-christmas-card-in { from { opacity: 0; transform: translateY(7px) scale(.98); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .commercial-christmas-shade,
+  .commercial-christmas-card,
+  .commercial-christmas-hud__status svg { animation: none; }
+}
