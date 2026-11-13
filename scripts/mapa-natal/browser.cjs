@@ -495,9 +495,14 @@ async function fallback(browser, screen, mode) {
     assert.equal(await skipExists(page), false);
     await button(page, 'Fechar').click();
     await greeting(page).waitFor({ state: 'hidden' });
-    if (noWebGL) assert.equal(await page.locator('.commercial-map-list-view').count(), 1);
-    else await waitRestored(page);
-    return { mode, greeting: true, errors: session.errors };
+    if (noWebGL) {
+      await page.locator('.commercial-map-list-view').waitFor();
+      assert.equal(await page.locator('canvas').count(), 0);
+    } else await waitRestored(page);
+    const hasExpectedAssetError = session.errors.every(error => mode === 'asset-error'
+      && /Falha local ao carregar|dynamically imported module/i.test(error));
+    assert(hasExpectedAssetError, session.errors.join(', '));
+    return { mode, viewport: [screen.width, screen.height], greeting: true, errors: session.errors };
   } finally {
     await session.context.close();
   }
@@ -562,9 +567,10 @@ async function main() {
       }
     }
     if (enabled('regressao')) await run('regressao', () => regression(browser, screens[0]));
-    if (enabled('alternativas')) {
-      for (const mode of ['reduced-motion', 'webgl-unavailable', 'asset-error']) {
+    for (const mode of ['reduced-motion', 'webgl-unavailable', 'asset-error']) {
+      if (enabled('alternativas') || enabled(mode)) {
         await run(mode, () => fallback(browser, screens[0], mode));
+        if (mode === 'webgl-unavailable') await run('webgl-unavailable-mobile', () => fallback(browser, screens[1], mode));
       }
     }
     if (salesBase && enabled('vendas')) await run('vendas', () => salesRegression(browser, screens[0]));
