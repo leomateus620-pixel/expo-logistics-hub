@@ -14024,6 +14024,10 @@ export type Database = {
         Args: { _org_id: string; _commission_id: string; _customer_id: string }
         Returns: Json
       }
+      soja_store_customer_sales: {
+        Args: { _org_id: string; _commission_id: string; _customer_id: string; _limit?: number; _offset?: number }
+        Returns: Json
+      }
       soja_store_customers: {
         Args: { _org_id: string; _commission_id: string; _search?: string; _limit?: number; _offset?: number }
         Returns: Json
@@ -15351,13 +15355,5 @@ export const Constants = {
         "parcial",
       ],
     },
-      soja_store_customer_sales: {
-        Args: { _org_id: string; _commission_id: string; _customer_id: string; _limit?: number; _offset?: number }
-        Returns: Json
-      },
-      soja_store_sale_customers: {
-        Args: { _org_id: string; _commission_id: string; _search?: string | null }
-        Returns: Json
-      },
   },
 } as const
