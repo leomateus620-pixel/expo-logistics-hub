@@ -15,6 +15,7 @@ import type { CommercialMapSegmentId } from '../data/commercialMapSegments';
 import type { ParkingCameraView } from '../utils/parkingViewport';
 import type { LunarLaunchPhase } from '../utils/lunarLaunch';
 import { isSoyHarvestCameraOwned } from '../harvest/soyHarvestOwnership';
+import { isChristmasCameraOwned } from '../christmas/christmasSession';
 
 export type CommercialMapDockSection =
   | 'search'
@@ -644,7 +645,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),
   // The sunrise is the natural way out of the night: replaying it always
   // restores daylight instead of animating a sun nobody can see.
-  requestSunrise: () => set((state) => ({
+  requestSunrise: () => set((state) => isChristmasCameraOwned() ? state : ({
     sunrisePhase: 'running',
     sunriseSequence: state.sunriseSequence + 1,
     sunriseStartedAt: monotonicNow(),
@@ -664,7 +665,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     arenaShowSequence: state.arenaShowSequence + 1,
   })),
   setNightModeActive: (nightModeActive) => set((state) => (
-    state.nightModeActive === nightModeActive ? state : { nightModeActive }
+    state.nightModeActive === nightModeActive || isChristmasCameraOwned() ? state : { nightModeActive }
   )),
   toggleNightMode: () => get().setNightModeActive(!get().nightModeActive),
   setRainModeActive: (rainModeActive) => set((state) => (
@@ -672,7 +673,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   )),
   toggleRainMode: () => get().setRainModeActive(!get().rainModeActive),
   requestLunarLaunch: () => set((state) => {
-    if (state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning || isSoyHarvestCameraOwned()) return state;
+    if (state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning || isSoyHarvestCameraOwned() || isChristmasCameraOwned()) return state;
     return {
       ...CLEARED_PARKING_INSPECTION,
       lunarLaunchPhase: 'ignition',
@@ -713,7 +714,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     cameraNavigating: false,
   })),
   requestLunarLaunchReturn: () => set((state) => {
-    if (!state.lunarLaunchReturnAvailable || state.lunarLaunchPhase !== 'idle') return state;
+    if (!state.lunarLaunchReturnAvailable || state.lunarLaunchPhase !== 'idle' || isChristmasCameraOwned()) return state;
     return {
       ...CLEARED_PARKING_INSPECTION,
       lunarLaunchReturnAvailable: false,

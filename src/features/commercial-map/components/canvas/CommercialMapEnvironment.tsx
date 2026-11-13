@@ -7,7 +7,7 @@ import { advanceRainBlend, commercialRainRuntime } from '../../utils/rainRuntime
 import { markCommercialMapStage } from '../../utils/performanceDiagnostics';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { COMMERCIAL_MAP_ANIMATION, markCommercialMapPresentedFrame, requestCommercialMapAnimationFrame } from '../../utils/frameActivity';
+import { commercialMapFrameActivity, COMMERCIAL_MAP_ANIMATION, markCommercialMapPresentedFrame, requestCommercialMapAnimationFrame } from '../../utils/frameActivity';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import {
   BlendFunction,
@@ -1550,6 +1550,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     const nightBlend = nightSettled ? nightTarget : dampedNight;
     const nightChanged = nightBlend !== timeline.current.nightBlend;
     timeline.current.nightBlend = nightBlend;
+    commercialMapFrameActivity(gl).nightBlend = nightBlend;
     const rainBlend = advanceRainBlend(rain.blend.value, liveState.rainModeActive, delta);
     const rainChanged = rainBlend !== rain.blend.value;
     rain.blend.value = rainBlend;

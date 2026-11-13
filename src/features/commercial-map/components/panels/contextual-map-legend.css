@@ -16,6 +16,7 @@
 .commercial-context-summary strong { font-size: 23px; color: #153d2e; font-weight: 800; font-variant-numeric: tabular-nums; }
 .commercial-context-summary span { color: #50685c; }
 .commercial-context-summary small { display: block; margin-top: 3px; color: #536c60; line-height: 1.4; }
+.commercial-context-park-action { margin-block: 8px; }
 .commercial-context-plan { width: 64px; height: 64px; flex: 0 0 64px; border: 1px solid var(--context-line); border-radius: 7px; background: #f1f5ef; }
 .commercial-context-status-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; font-size: 11px; font-weight: 700; }
 .commercial-context-status-heading > span { padding-block: 7px; }

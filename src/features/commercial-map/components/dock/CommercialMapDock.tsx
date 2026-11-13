@@ -7,6 +7,7 @@ import { TERRITORY_SYMBOLS } from '../../utils/territorialOrientation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CommercialLot, MapEntity } from '../../types';
 import { ContextualMapLegend } from '../panels/ContextualMapLegend';
+import { ChristmasButton } from '../../christmas/ChristmasOverlay';
 import { FENASOJA_RESTAURANT_PRESENTATION_NAME } from '../../utils/fenasojaRestaurant';
 import './commercial-map-dock.css';
 
@@ -23,13 +24,14 @@ interface CommercialMapDockProps {
   filtersActive?: boolean;
   moduleCard?: ReactNode;
   moduleSaleActive?: boolean;
+  christmasAction?: { disabled: boolean; start: () => boolean };
 }
 
 const COMPACT_QUERY = '(max-width: 720px), (max-width: 950px) and (max-height: 520px)';
 
 /** One contextual panel, rendered as a rail or a nonmodal sheet. */
 export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSelect, onSegmentClear,
-  scopeTitle, isCommissionScope, interiorEntity = null, matchingEntityIds, filtersActive, moduleCard, moduleSaleActive = false,
+  scopeTitle, isCommissionScope, interiorEntity = null, matchingEntityIds, filtersActive, moduleCard, moduleSaleActive = false, christmasAction,
 }: CommercialMapDockProps) {
   const dockExpanded = useCommercialMapStore((s) => s.dockExpanded);
   const setDockExpanded = useCommercialMapStore((s) => s.setDockExpanded);
@@ -135,7 +137,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
     <div className="commercial-map-dock__head">
       {returnButton || <span className="commercial-map-dock__brand"><Layers3 aria-hidden="true" /><span>{compact && sheet === 'collapsed' ? activeSegment?.name ?? 'Segmentos e legenda' : 'Parque Fenasoja'}</span></span>}
       {compact && sheet !== 'collapsed' && <button type="button" className="commercial-map-dock__toggle" aria-label="Recolher painel do mapa" onClick={() => setSheet('collapsed')}><ChevronDown aria-hidden="true" /></button>}
-      <button ref={toggleRef} type="button" className="commercial-map-dock__toggle" onClick={toggle}
+      <button ref={toggleRef} type="button" className="commercial-map-dock__toggle" data-commercial-map-dock-toggle onClick={toggle}
         aria-label={compact ? sheet === 'expanded' ? 'Resumir painel do mapa' : 'Expandir painel do mapa' : expanded ? 'Recolher painel do mapa' : 'Expandir painel do mapa'}
         aria-expanded={compact ? sheet === 'expanded' : expanded}>
         {compact ? sheet === 'expanded' ? <ChevronDown /> : <ChevronUp /> : expanded ? <PanelLeftClose /> : <PanelLeftOpen />}
@@ -211,6 +213,9 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
       </div> : <ContextualMapLegend
         entities={entities} lots={lots} interiorEntity={interiorEntity} activeSegmentId={activeSegmentId}
         scopeTitle={scopeTitle} matchingEntityIds={matchingEntityIds} filtersActive={filtersActive}
+        parkAction={christmasAction && <ChristmasButton disabled={christmasAction.disabled} onStart={() => {
+          if (!christmasAction.disabled && christmasAction.start() && compact) setSheet('collapsed');
+        }} />}
         compact={compact && sheet === 'summary'} />}
     </div>}
   </aside>;

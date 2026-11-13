@@ -1,4 +1,4 @@
-import { memo, useId, useMemo, type CSSProperties } from 'react';
+import { memo, useId, useMemo, type CSSProperties, type ReactNode } from 'react';
 import { Check, ChevronDown, FilterX } from 'lucide-react';
 import { EXTERNAL_LOT_PALETTE, externalLotFrameColor, isExternalPresentationLot } from '../../utils/externalLotPresentation';
 import { COMMERCIAL_PHASES, STATUS_CONFIG } from '../../constants';
@@ -22,6 +22,7 @@ export interface ContextualMapLegendProps extends ContextualMapScopeInput {
   compact?: boolean;
   className?: string;
   showHeading?: boolean;
+  parkAction?: ReactNode;
 }
 
 /** Uses the official plan cells, including irregular footprints, only as a small overview. */
@@ -67,6 +68,7 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
   compact = false,
   className = '',
   showHeading = true,
+  parkAction,
 }: ContextualMapLegendProps) {
   const headingId = useId();
   const statusFilters = useCommercialMapStore((state) => state.statusFilters);
@@ -135,6 +137,7 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
         {scope.plan && !compact && <small>Identificação 01–{String(scope.plan.cells.length).padStart(2, '0')}</small>}
       </div>
     </div>
+    {scope.kind === 'park' && parkAction && <div className="commercial-context-park-action">{parkAction}</div>}
      {statusFilters.length > 0 && <p className="commercial-context-filter-note">Filtro: {[...new Set(statusFilters.map(toCommercialPhase))].map((status) => STATUS_CONFIG[status].label).join(', ')}</p>}
     {compact ? <details className="commercial-context-expand"><summary>Situações e legenda<ChevronDown aria-hidden="true" /></summary>{statuses}</details> : statuses}
     {scope.unit !== 'pontos' && !compact && <dl className="commercial-context-primary-area"><OfficialArea label="Área oficial dos lotes no escopo" value={summary.officialArea} /></dl>}

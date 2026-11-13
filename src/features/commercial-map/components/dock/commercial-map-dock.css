@@ -105,6 +105,10 @@
 .commercial-map-dock button:focus-visible { outline: 3px solid #25825c; outline-offset: 2px; }
 .commercial-map-dock__drag { display: none; }
 .commercial-map-dock.is-mobile { position: absolute; inset: auto 0 0; z-index: 32; width: 100%; max-height: calc(100% - 64px); border: 1px solid #c2d3c6; border-radius: 16px 16px 0 0; box-shadow: 0 -5px 20px #163c2818; padding-bottom: env(safe-area-inset-bottom, 0px); }
+.commercial-map-shell:has(.commercial-map-viewport.is-webgl-fallback) .commercial-map-dock.is-mobile { z-index: 43; }
+.commercial-map-shell:has(.commercial-map-dock.is-mobile[data-sheet-state="collapsed"]) .is-webgl-fallback .commercial-map-webgl-note {
+  bottom: calc(var(--commercial-map-context-sheet-height, 52px) + 8px);
+}
 .commercial-map-dock.is-mobile .commercial-map-dock__head { padding: 4px max(10px, env(safe-area-inset-right)) 4px max(10px, env(safe-area-inset-left)); min-height: 52px; flex-direction: row; }
 .commercial-map-dock.is-mobile .commercial-map-dock__brand { display: flex; font-size: 12px; }
 .commercial-map-dock.is-mobile .commercial-map-dock__back { flex: 0 1 auto; margin-right: auto; width: auto; }
