@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { toast } from 'sonner';
+import { useOptionalMeetingCapture } from '@/features/agenda-meeting-intelligence/provider/meetingCaptureContext';
+import { COLLAPSE_NOTICE as MEETING_COLLAPSE_NOTICE } from '../meeting-intelligence/meetingCopy';
 import {
   AlertTriangle,
   CalendarClock,
@@ -90,9 +93,11 @@ export function MobileEventScreen({
   const [discardTarget, setDiscardTarget] = useState<DiscardTarget>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [meetingCaptureActive, setMeetingCaptureActive] = useState(false);
-  const [confirmMeetingExit, setConfirmMeetingExit] = useState(false);
-  const meetingExitHandlerRef = useRef<(() => Promise<void>) | null>(null);
+  // The recording lives in the app-level provider: back/close only change the interface.
+  const meetingCapture = useOptionalMeetingCapture();
+  const meetingCaptureActive = Boolean(
+    event?.id && meetingCapture?.isActive && meetingCapture.target?.eventId === event.id,
+  );
   const workspaceTargetRef = useRef<CronogramaEvent | null>(null);
   const completionPendingRef = useRef(false);
   const eventIdentity = event?.sourceKey ?? event?.id;
@@ -105,18 +110,7 @@ export function MobileEventScreen({
     setSaving(false);
     setSaveError(null);
     setDiscardTarget(null);
-    setMeetingCaptureActive(false);
-    setConfirmMeetingExit(false);
-    meetingExitHandlerRef.current = null;
   }, [canManage, eventIdentity, open, startInEdit]);
-
-  const handleMeetingCaptureChange = useCallback((
-    active: boolean,
-    cancelForExit: (() => Promise<void>) | null,
-  ) => {
-    meetingExitHandlerRef.current = cancelForExit;
-    setMeetingCaptureActive(active);
-  }, []);
 
   const progress = useMemo(() => (event ? getSubeventProgress(event) : null), [event]);
   const { responsible: eventResponsible, guests: eventGuests } = useMemo(
@@ -125,9 +119,10 @@ export function MobileEventScreen({
   );
   const overlayHistory = useMobileOverlayHistory({
     open: open && Boolean(event),
-    dirty: (editMode && dirty) || saving || meetingCaptureActive,
+    dirty: (editMode && dirty) || saving,
     onClose: () => {
       onOpenChange(false);
+      if (meetingCaptureActive) toast.info(MEETING_COLLAPSE_NOTICE);
       const workspaceTarget = workspaceTargetRef.current;
       workspaceTargetRef.current = null;
       if (workspaceTarget && onEditWorkspace) {
@@ -135,10 +130,6 @@ export function MobileEventScreen({
       }
     },
     onDirtyClose: () => {
-      if (meetingCaptureActive) {
-        setConfirmMeetingExit(true);
-        return;
-      }
       if (!saving) setDiscardTarget('close');
     },
   });
@@ -305,7 +296,7 @@ export function MobileEventScreen({
                     type="button"
                     variant="outline"
                     onClick={performCompletion}
-                    disabled={saving || meetingCaptureActive}
+                    disabled={saving}
                     className="is-wide rounded-xl"
                   >
                     {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
@@ -318,7 +309,7 @@ export function MobileEventScreen({
                 <Button
                   type="button"
                   onClick={handleEdit}
-                  disabled={saving || meetingCaptureActive}
+                  disabled={saving}
                   className="rounded-xl"
                 >
                   <Edit3 className="h-4 w-4" />Editar
@@ -477,7 +468,6 @@ export function MobileEventScreen({
                 {...meetingIntelligence}
                 className="cronograma-mobile-event-section"
                 eventTitle={event.title}
-                onActiveCaptureChange={handleMeetingCaptureChange}
               />
             )}
 
@@ -539,27 +529,6 @@ export function MobileEventScreen({
         confirmLabel={discardTarget === 'close' ? 'Descartar e fechar' : 'Descartar alterações'}
         onConfirm={handleConfirmDiscard}
         onCancel={() => setDiscardTarget(null)}
-      />
-
-      <MobileConfirmDialog
-        open={confirmMeetingExit}
-        title="Interromper a captura ativa?"
-        description="Fechar agora cancela a sessão e interrompe o microfone. Se o servidor estiver indisponível, o spool criptografado permanece recuperável por até 24 horas."
-        confirmLabel="Cancelar sessão e fechar"
-        cancelLabel="Voltar à reunião"
-        onConfirm={() => {
-          const cancelForExit = meetingExitHandlerRef.current;
-          if (!cancelForExit) return;
-          void cancelForExit()
-            .catch(() => undefined)
-            .finally(() => {
-              meetingExitHandlerRef.current = null;
-              setConfirmMeetingExit(false);
-              setMeetingCaptureActive(false);
-              overlayHistory.discardAndClose();
-            });
-        }}
-        onCancel={() => setConfirmMeetingExit(false)}
       />
 
       {onDelete && (

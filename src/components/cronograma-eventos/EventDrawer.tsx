@@ -22,6 +22,9 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { resolveCronogramaReturnFocus } from '@/lib/cronograma-focus';
+import { toast } from 'sonner';
+import { useOptionalMeetingCapture } from '@/features/agenda-meeting-intelligence/provider/meetingCaptureContext';
+import { COLLAPSE_NOTICE as MEETING_COLLAPSE_NOTICE } from './meeting-intelligence/meetingCopy';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -112,9 +115,11 @@ export function EventDrawer({
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [meetingCaptureActive, setMeetingCaptureActive] = useState(false);
-  const [confirmMeetingExit, setConfirmMeetingExit] = useState(false);
-  const meetingExitHandlerRef = useRef<(() => Promise<void>) | null>(null);
+  // Recording belongs to the app-level provider: closing details never stops it.
+  const meetingCapture = useOptionalMeetingCapture();
+  const meetingCaptureActive = Boolean(
+    event?.id && meetingCapture?.isActive && meetingCapture.target?.eventId === event.id,
+  );
   const completionPendingRef = useRef(false);
 
 
@@ -125,18 +130,7 @@ export function EventDrawer({
     setSaving(false);
     setSaveError(null);
     setConfirmDiscard(false);
-    setMeetingCaptureActive(false);
-    setConfirmMeetingExit(false);
-    meetingExitHandlerRef.current = null;
   }, [canManage, event?.id, open, startInEdit]);
-
-  const handleMeetingCaptureChange = useCallback((
-    active: boolean,
-    cancelForExit: (() => Promise<void>) | null,
-  ) => {
-    meetingExitHandlerRef.current = cancelForExit;
-    setMeetingCaptureActive(active);
-  }, []);
 
   const progress = useMemo(() => (event ? getSubeventProgress(event) : null), [event]);
 
@@ -150,14 +144,11 @@ export function EventDrawer({
     setDirty(false);
     setConfirmDiscard(false);
     onOpenChange(false);
+    if (meetingCaptureActive) toast.info(MEETING_COLLAPSE_NOTICE);
   };
 
   const requestClose = () => {
     if (saving) return;
-    if (meetingCaptureActive) {
-      setConfirmMeetingExit(true);
-      return;
-    }
     if (editMode && dirty) {
       setConfirmDiscard(true);
       return;
@@ -245,10 +236,7 @@ export function EventDrawer({
             focusTarget.focus({ preventScroll: true });
           }}
           onEscapeKeyDown={(escapeEvent) => {
-            if (saving || meetingCaptureActive) {
-              escapeEvent.preventDefault();
-              if (meetingCaptureActive) setConfirmMeetingExit(true);
-            }
+            if (saving) escapeEvent.preventDefault();
           }}
         >
           <div className="cronograma-drawer-header relative">
@@ -404,7 +392,6 @@ export function EventDrawer({
                   <LazyAgendaMeetingWorkspace
                     {...meetingIntelligence}
                     eventTitle={event.title}
-                    onActiveCaptureChange={handleMeetingCaptureChange}
                   />
                 )}
 
@@ -520,7 +507,7 @@ export function EventDrawer({
                     </Button>
                   )}
                   {canManage && event.status !== 'completed' && (
-                    <Button type="button" variant="outline" onClick={handleMarkCompleted} disabled={saving || meetingCaptureActive} className="cronograma-complete-action rounded-lg">
+                    <Button type="button" variant="outline" onClick={handleMarkCompleted} disabled={saving} className="cronograma-complete-action rounded-lg">
                       {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                       Marcar concluído
                     </Button>
@@ -530,7 +517,7 @@ export function EventDrawer({
                     <Button
                       type="button"
                       onClick={() => onEditWorkspace ? onEditWorkspace(event) : setEditMode(true)}
-                      disabled={saving || meetingCaptureActive}
+                      disabled={saving}
                       className="rounded-lg"
                     >
                       <Edit3 className="h-4 w-4" /> Editar evento
@@ -559,42 +546,6 @@ export function EventDrawer({
               <AlertDialogCancel>Continuar editando</AlertDialogCancel>
               <AlertDialogAction onClick={closeDrawer} className="bg-red-700 text-white hover:bg-red-800">
                 Descartar e fechar
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-
-      {confirmMeetingExit && (
-        <AlertDialog open onOpenChange={(nextOpen) => {
-          if (!nextOpen) setConfirmMeetingExit(false);
-        }}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Interromper a captura ativa?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Fechar os detalhes agora cancela esta sessão e interrompe o microfone. Se o servidor estiver indisponível, o spool criptografado permanece recuperável por até 24 horas; nenhuma fala será reconstruída artificialmente.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Voltar à reunião</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-red-700 text-white hover:bg-red-800"
-                onClick={(event) => {
-                  event.preventDefault();
-                  const cancelForExit = meetingExitHandlerRef.current;
-                  if (!cancelForExit) return;
-                  void cancelForExit()
-                    .catch(() => undefined)
-                    .finally(() => {
-                      meetingExitHandlerRef.current = null;
-                      setConfirmMeetingExit(false);
-                      setMeetingCaptureActive(false);
-                      closeDrawer();
-                    });
-                }}
-              >
-                Cancelar sessão e fechar
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

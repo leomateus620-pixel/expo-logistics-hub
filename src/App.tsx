@@ -1,6 +1,6 @@
 import { InstitutionalPeopleProvider } from '@/features/volunteers/InstitutionalPeopleProvider';
 import { deserializeQueryCache } from './lib/queryPersistence';
-import { Suspense, type ReactNode } from 'react';
+import { lazy, Suspense, type ReactNode } from 'react';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { CommercialMapBootLoader } from '@/features/commercial-map/components/CommercialMapBootLoader';
 import { beginCommercialMapBoot, captureCommercialMapStageRecorder } from '@/features/commercial-map/utils/performanceDiagnostics';
@@ -15,6 +15,8 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
+import { MeetingCaptureProvider } from './features/agenda-meeting-intelligence/provider/MeetingCaptureProvider';
+import { useOptionalMeetingCapture } from './features/agenda-meeting-intelligence/provider/meetingCaptureContext';
 import { CapabilitiesProvider } from './contexts/CapabilitiesProvider';
 import { LogisticsCycleProvider } from './contexts/LogisticsCycleProvider';
 import { useAuth } from './hooks/useAuth';
@@ -498,6 +500,17 @@ function LegacyLogisticsRoutes() {
   );
 }
 
+const MeetingCaptureDock = lazy(async () => ({
+  default: (await import('./components/cronograma-eventos/meeting-intelligence/MeetingCaptureDock')).MeetingCaptureDock,
+}));
+
+/** Loads the compact recording bar only when a meeting is bound to this client. */
+function MeetingCaptureDockGate() {
+  const capture = useOptionalMeetingCapture();
+  if (!capture?.target) return null;
+  return <Suspense fallback={null}><MeetingCaptureDock /></Suspense>;
+}
+
 const App = () => (
   <PersistQueryClientProvider
     client={queryClient}
@@ -519,6 +532,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+           <MeetingCaptureProvider>
             <Routes>
               <Route path="/" element={<RootRoute />} />
               <Route path="/equipes" element={<AuthGuard><OrgGuard><Suspended><TeamsDirectoryPage /></Suspended></OrgGuard></AuthGuard>} />
@@ -563,6 +577,8 @@ const App = () => (
             </Routes>
             <WorkersLauncher />
             <PushPermissionPrompt />
+            <MeetingCaptureDockGate />
+           </MeetingCaptureProvider>
           </BrowserRouter>
         </TooltipProvider></InstitutionalPeopleProvider>
        </CapabilitiesProvider>

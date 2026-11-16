@@ -46,10 +46,13 @@ export interface UseAgendaMeetingSessionsOptions {
   eventId: string | null;
   enabled?: boolean;
   client?: AgendaMeetingEdgeClient;
+  refetchInterval?: number | false;
 }
 
-export interface UseAgendaMeetingSessionDetailOptions extends UseAgendaMeetingSessionsOptions {
+export interface UseAgendaMeetingSessionDetailOptions extends Omit<UseAgendaMeetingSessionsOptions, 'refetchInterval'> {
   sessionId: string | null;
+  /** Poll while the backend is still transcribing or generating the report. */
+  refetchInterval?: (detail: AgendaMeetingSessionDetail | undefined) => number | false;
 }
 
 function buildSessionDetail(
@@ -67,6 +70,7 @@ function buildSessionDetail(
     minutesVersions: result.minutesVersions,
     insights: result.insights,
     actionItems: result.actions,
+    artifacts: result.artifacts ?? [],
   };
 }
 
@@ -88,6 +92,7 @@ export function useAgendaMeetingSessions(options: UseAgendaMeetingSessionsOption
     },
     staleTime: 15_000,
     retry: 1,
+    refetchInterval: options.refetchInterval ?? false,
     meta: { persist: false },
   });
 }
@@ -116,6 +121,7 @@ export function useAgendaMeetingSessionDetail(options: UseAgendaMeetingSessionDe
     },
     staleTime: 10_000,
     retry: 1,
+    refetchInterval: options.refetchInterval ? (query) => options.refetchInterval?.(query.state.data) ?? false : false,
     meta: { persist: false },
   });
 }

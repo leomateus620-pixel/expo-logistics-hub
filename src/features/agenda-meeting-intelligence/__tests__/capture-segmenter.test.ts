@@ -1,104 +1,117 @@
 import { webcrypto } from 'node:crypto';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { CaptureSegmenter } from '../capture/CaptureSegmenter';
-import { blobToText } from '../capture/blob';
+import { StreamingDownsampler } from '../capture/downsampler';
+import { encodeInt16Wav, PcmChunker } from '../capture/pcmChunker';
 import type { CapturedAudioSegment, CaptureGapMarker, CaptureInterruptionReason } from '../types';
 
 const cryptoApi = webcrypto as unknown as Crypto;
 const SESSION_ID = '30000000-0000-4000-8000-000000000001';
+const RATE = 16_000;
+
+function tone(seconds: number, amplitude = 0.3, rate = RATE) {
+  const samples = new Float32Array(Math.round(seconds * rate));
+  for (let index = 0; index < samples.length; index += 1) samples[index] = amplitude * Math.sin((2 * Math.PI * 220 * index) / rate);
+  return samples;
+}
+
+function concat(...parts: Float32Array[]) {
+  const output = new Float32Array(parts.reduce((sum, part) => sum + part.length, 0));
+  let offset = 0;
+  for (const part of parts) {
+    output.set(part, offset);
+    offset += part.length;
+  }
+  return output;
+}
+
+describe('PcmChunker', () => {
+  it('cuts in a silence after the minimum length and keeps parts contiguous', () => {
+    const chunker = new PcmChunker({ minChunkMs: 2_000, maxChunkMs: 6_000 });
+    const chunks = chunker.push(concat(tone(2.5), new Float32Array(RATE * 0.6), tone(2)));
+    expect(chunks).toHaveLength(1);
+    const [first] = chunks;
+    // Cut lands inside the silent stretch (2.5 s .. 3.1 s), never in speech.
+    expect(first.endSample).toBeGreaterThan(2.5 * RATE);
+    expect(first.endSample).toBeLessThan(3.1 * RATE);
+    const rest = chunker.flush();
+    expect(rest?.startSample).toBe(first.endSample);
+    expect(first.samples.length + (rest?.samples.length ?? 0)).toBe(Math.round(5.1 * RATE));
+    expect(first.stats.voicedRatio).toBeGreaterThan(0.5);
+  });
+
+  it('forces a cut at the maximum length without dropping or duplicating samples', () => {
+    const chunker = new PcmChunker({ minChunkMs: 2_000, maxChunkMs: 4_000 });
+    const chunks = chunker.push(tone(10));
+    const tail = chunker.flush();
+    const all = tail ? [...chunks, tail] : chunks;
+    expect(all.length).toBeGreaterThanOrEqual(3);
+    for (let index = 1; index < all.length; index += 1) expect(all[index].startSample).toBe(all[index - 1].endSample);
+    expect(all.reduce((sum, chunk) => sum + chunk.samples.length, 0)).toBe(10 * RATE);
+    expect(Math.max(...all.map((chunk) => chunk.samples.length))).toBeLessThanOrEqual(4 * RATE + 320);
+  });
+
+  it('starts offsets after an earlier capture when resuming a recovered session', () => {
+    const chunker = new PcmChunker({ minChunkMs: 1_000, maxChunkMs: 2_000, startSample: 90 * RATE });
+    chunker.push(tone(0.5));
+    expect(chunker.flush()?.startSample).toBe(90 * RATE);
+  });
+});
+
+describe('StreamingDownsampler and WAV', () => {
+  it('converts 48 kHz to 16 kHz across calls without losing samples', () => {
+    const downsampler = new StreamingDownsampler(48_000, RATE);
+    const first = downsampler.process(tone(0.5, 0.3, 48_000));
+    const second = downsampler.process(tone(0.5, 0.3, 48_000));
+    expect(first.length + second.length).toBe(RATE);
+  });
+
+  it('writes a canonical 16-bit mono PCM header', async () => {
+    const wav = encodeInt16Wav(new Int16Array(RATE), RATE);
+    const view = new DataView(await wav.arrayBuffer());
+    expect(String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), view.getUint8(3))).toBe('RIFF');
+    expect(view.getUint16(22, true)).toBe(1);
+    expect(view.getUint32(24, true)).toBe(RATE);
+    expect(view.getUint16(34, true)).toBe(16);
+    expect(view.getUint32(40, true)).toBe(RATE * 2);
+    expect(wav.size).toBe(44 + RATE * 2);
+  });
+});
 
 class FakeTrack extends EventTarget {
   stopped = false;
+  label = 'Microfone';
+  getSettings(): MediaTrackSettings { return { deviceId: 'microphone-1' }; }
+  stop(): void { this.stopped = true; }
+}
 
-  getSettings(): MediaTrackSettings {
-    return { deviceId: 'microphone-1' };
-  }
-
-  stop(): void {
-    this.stopped = true;
+class FakeScriptProcessor {
+  onaudioprocess: ((event: { inputBuffer: { getChannelData: () => Float32Array } }) => void) | null = null;
+  connect() {}
+  disconnect() {}
+  feed(samples: Float32Array) {
+    this.onaudioprocess?.({ inputBuffer: { getChannelData: () => samples } });
   }
 }
 
-class FakeMediaRecorder extends EventTarget {
-  static instances: FakeMediaRecorder[] = [];
-  static isTypeSupported(value: string): boolean {
-    return value === 'audio/webm;codecs=opus';
-  }
-
-  readonly mimeType: string;
-  state: RecordingState = 'inactive';
-
-  constructor(_stream: MediaStream, options?: MediaRecorderOptions) {
-    super();
-    this.mimeType = options?.mimeType ?? 'audio/webm;codecs=opus';
-    FakeMediaRecorder.instances.push(this);
-  }
-
-  start(): void {
-    this.state = 'recording';
-  }
-
-  stop(): void {
-    if (this.state === 'inactive') return;
-    const payload = new Blob([`cycle-${FakeMediaRecorder.instances.indexOf(this)}`], {
-      type: this.mimeType,
-    });
-    const dataEvent = new Event('dataavailable') as BlobEvent;
-    Object.defineProperty(dataEvent, 'data', { value: payload });
-    this.dispatchEvent(dataEvent);
-    this.state = 'inactive';
-    this.dispatchEvent(new Event('stop'));
-  }
-
-  pause(): void {
-    this.state = 'paused';
-  }
-
-  resume(): void {
-    this.state = 'recording';
-  }
-
-  requestData(): void {}
-}
-
-class FakeSpeechRecognition extends EventTarget {
-  static instances: FakeSpeechRecognition[] = [];
-  lang = '';
-  continuous = false;
-  interimResults = false;
-  maxAlternatives = 1;
-  onresult: ((event: unknown) => void) | null = null;
-  onerror: ((event: unknown) => void) | null = null;
-  onend: (() => void) | null = null;
-
+class FakeAudioContext extends EventTarget {
+  static last: FakeAudioContext | null = null;
+  readonly sampleRate = RATE;
+  state: AudioContextState = 'running';
+  destination = {} as AudioDestinationNode;
+  processor = new FakeScriptProcessor();
   constructor() {
     super();
-    FakeSpeechRecognition.instances.push(this);
+    FakeAudioContext.last = this;
   }
-
-  start(): void {
-    this.emit(`fala-${FakeSpeechRecognition.instances.indexOf(this)}`);
-  }
-
-  emit(transcript: string): void {
-    this.onresult?.({
-      resultIndex: 0,
-      results: {
-        length: 1,
-        0: { isFinal: true, length: 1, 0: { transcript, confidence: 0.9 } },
-      },
-    });
-  }
-
-  stop(): void {}
-
-  abort(): void {}
+  resume() { this.state = 'running'; return Promise.resolve(); }
+  close() { this.state = 'closed'; return Promise.resolve(); }
+  createMediaStreamSource() { return { connect() {}, disconnect() {} }; }
+  createGain() { return { gain: { value: 1 }, connect() {}, disconnect() {} }; }
+  createScriptProcessor() { return this.processor; }
 }
 
-const speechRecognitionConstructor =
-  FakeSpeechRecognition as unknown as new () => never;
-
-function mediaEnvironment() {
+function environment() {
   const track = new FakeTrack();
   const stream = {
     getAudioTracks: () => [track as unknown as MediaStreamTrack],
@@ -110,189 +123,87 @@ function mediaEnvironment() {
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
   } as unknown as MediaDevices;
-  return { track, stream, devices };
+  return { track, devices };
 }
 
-describe('CaptureSegmenter', () => {
-  beforeEach(() => {
-    FakeMediaRecorder.instances = [];
-    FakeSpeechRecognition.instances = [];
+function segmenterFor(options: {
+  segments: CapturedAudioSegment[];
+  gaps?: CaptureGapMarker[];
+  interruptions?: CaptureInterruptionReason[];
+  maxActiveDurationMs?: number;
+}) {
+  const { devices, track } = environment();
+  const segmenter = new CaptureSegmenter({
+    mediaDevices: devices,
+    audioContextConstructor: FakeAudioContext as unknown as typeof AudioContext,
+    crypto: cryptoApi,
+    documentTarget: new EventTarget() as unknown as Document,
+    windowTarget: new EventTarget() as unknown as Window,
+    minChunkMs: 2_000,
+    maxChunkMs: 4_000,
+    maxActiveDurationMs: options.maxActiveDurationMs,
+    onSegment: (segment) => { options.segments.push(segment); },
+    onGap: (gap) => { options.gaps?.push(gap); },
+    onInterruption: (reason) => { options.interruptions?.push(reason); },
   });
+  return { segmenter, track };
+}
 
-  it('keeps a single long-lived recognition and flushes text segments with UUID IDs/hash', async () => {
-    const { devices } = mediaEnvironment();
-    let monotonic = 0;
+const flushMicrotasks = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+describe('CaptureSegmenter (real audio)', () => {
+  it('emits contiguous WAV parts and keeps the audio spoken before a pause and the last words at stop', async () => {
     const segments: CapturedAudioSegment[] = [];
-    let firstSegment: (() => void) | null = null;
-    const firstSegmentPromise = new Promise<void>((resolve) => {
-      firstSegment = resolve;
-    });
-    const segmenter = new CaptureSegmenter({
-      mediaDevices: devices,
-      mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
-      speechRecognitionConstructor,
-      audioContextConstructor: undefined,
-      crypto: cryptoApi,
-      monotonicNow: () => monotonic,
-      wallClockNow: () => Date.parse('2026-08-13T12:00:00.000Z') + monotonic,
-      segmentDurationMs: 10,
-      onSegment: (value) => {
-        segments.push(value);
-        firstSegment?.();
-        firstSegment = null;
-      },
-    });
-
-    expect(await segmenter.prepare()).toMatchObject({
-      backend: 'media_recorder',
-      mimeType: 'text/plain;charset=utf-8',
-      selectedDeviceId: 'microphone-1',
-    });
+    const { segmenter, track } = segmenterFor({ segments });
+    const prepared = await segmenter.prepare();
+    expect(prepared).toMatchObject({ backend: 'script_processor_wav', mimeType: 'audio/wav' });
     await segmenter.start({ sessionId: SESSION_ID });
-    monotonic = 30_000;
-    await firstSegmentPromise;
-    await Promise.resolve();
-    await Promise.resolve();
-    FakeSpeechRecognition.instances[0]?.emit('fala-1');
-    monotonic = 45_000;
-    await segmenter.stop();
-
-    expect(FakeSpeechRecognition.instances).toHaveLength(1);
-    expect(segments).toHaveLength(2);
-    expect(segments.map((value) => value.metadata.sequence)).toEqual([0, 1]);
-    expect(segments[0]?.metadata).toMatchObject({
-      captureStartMs: 0,
-      captureEndMs: 30_000,
-      durationMs: 30_000,
-      backend: 'media_recorder',
-      mimeType: 'text/plain;charset=utf-8',
-    });
-    expect(segments[0]?.metadata.id).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
-    );
-    expect(segments[0]?.metadata.sha256).toMatch(/^[0-9a-f]{64}$/);
-    expect(await blobToText(segments[0]?.audio as Blob)).toBe('fala-0');
-    expect(await blobToText(segments[1]?.audio as Blob)).toBe('fala-1');
-  });
-
-  it('counts only active time across pause/resume', async () => {
-    const { devices } = mediaEnvironment();
-    let monotonic = 0;
-    const segmenter = new CaptureSegmenter({
-      mediaDevices: devices,
-      mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
-      speechRecognitionConstructor,
-      audioContextConstructor: undefined,
-      crypto: cryptoApi,
-      monotonicNow: () => monotonic,
-      segmentDurationMs: 120_000,
-      onSegment: () => undefined,
-    });
-    await segmenter.prepare();
-    await segmenter.start({ sessionId: SESSION_ID });
-    monotonic = 1_000;
+    const processor = FakeAudioContext.last!.processor;
+    for (let second = 0; second < 5; second += 1) processor.feed(tone(1));
+    await flushMicrotasks();
     await segmenter.pause();
-    expect(segmenter.activeDurationMs).toBe(1_000);
-
-    monotonic = 61_000;
+    // Audio arriving while paused is not recorded.
+    processor.feed(tone(2));
+    expect(segmenter.activeDurationMs).toBe(5_000);
     await segmenter.resume();
-    monotonic = 62_000;
+    processor.feed(tone(1.5));
     await segmenter.stop();
-    expect(segmenter.activeDurationMs).toBe(2_000);
+
+    expect(segments.length).toBeGreaterThanOrEqual(3);
+    segments.forEach((segment, index) => {
+      expect(segment.metadata.sequence).toBe(index);
+      expect(segment.metadata.mimeType).toBe('audio/wav');
+      expect(segment.metadata.sha256).toMatch(/^[0-9a-f]{64}$/);
+      expect(segment.audio.size).toBe(segment.metadata.bytes);
+      if (index > 0) expect(segment.metadata.captureStartMs).toBe(segments[index - 1].metadata.captureEndMs);
+    });
+    expect(segments.at(-1)?.metadata.captureEndMs).toBe(6_500);
+    expect(track.stopped).toBe(true);
   });
 
-  it('marks pagehide and ended tracks as real interruptions rather than claiming continuous capture', async () => {
-    const first = mediaEnvironment();
-    const reasons: CaptureInterruptionReason[] = [];
+  it('records an explicit gap when the microphone track ends', async () => {
+    const segments: CapturedAudioSegment[] = [];
     const gaps: CaptureGapMarker[] = [];
-    let interrupted: (() => void) | null = null;
-    const interruptionPromise = new Promise<void>((resolve) => {
-      interrupted = resolve;
-    });
-    const segmenter = new CaptureSegmenter({
-      mediaDevices: first.devices,
-      mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
-      speechRecognitionConstructor,
-      audioContextConstructor: undefined,
-      crypto: cryptoApi,
-      segmentDurationMs: 120_000,
-      onSegment: () => undefined,
-      onGap: (gap) => {
-        gaps.push(gap);
-      },
-      onInterruption: (reason) => {
-        reasons.push(reason);
-        interrupted?.();
-      },
-    });
+    const interruptions: CaptureInterruptionReason[] = [];
+    const { segmenter, track } = segmenterFor({ segments, gaps, interruptions });
     await segmenter.prepare();
     await segmenter.start({ sessionId: SESSION_ID });
-    window.dispatchEvent(new Event('pagehide'));
-    await interruptionPromise;
-    expect(reasons).toEqual(['pagehide']);
-    expect(first.track.stopped).toBe(true);
-
-    const second = mediaEnvironment();
-    let trackInterrupted: (() => void) | null = null;
-    const trackPromise = new Promise<void>((resolve) => {
-      trackInterrupted = resolve;
-    });
-    const trackSegmenter = new CaptureSegmenter({
-      mediaDevices: second.devices,
-      mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
-      speechRecognitionConstructor,
-      audioContextConstructor: undefined,
-      crypto: cryptoApi,
-      segmentDurationMs: 120_000,
-      onSegment: () => undefined,
-      onGap: (gap) => {
-        gaps.push(gap);
-      },
-      onInterruption: (reason) => {
-        reasons.push(reason);
-        trackInterrupted?.();
-      },
-    });
-    await trackSegmenter.prepare();
-    await trackSegmenter.start({ sessionId: SESSION_ID });
-    second.track.dispatchEvent(new Event('ended'));
-    await trackPromise;
-    expect(reasons).toEqual(['pagehide', 'track_ended']);
-    expect(gaps.map((gap) => ({ sequence: gap.sequence,reason: gap.reason }))).toEqual([
-      { sequence: 1,reason: 'pagehide' },
-      { sequence: 1,reason: 'track_ended' },
-    ]);
+    FakeAudioContext.last!.processor.feed(tone(1));
+    track.dispatchEvent(new Event('ended'));
+    await vi.waitFor(() => expect(interruptions).toEqual(['track_ended']));
+    expect(segments).toHaveLength(1);
+    expect(gaps).toHaveLength(1);
+    expect(gaps[0].sequence).toBe(1);
   });
 
-  it('enforces the active-duration cap independently of pause time', async () => {
-    const { devices } = mediaEnvironment();
-    let monotonic = 0;
-    let resolveInterruption: (() => void) | null = null;
-    const interrupted = new Promise<void>((resolve) => {
-      resolveInterruption = resolve;
-    });
-    const reasons: CaptureInterruptionReason[] = [];
-    const segmenter = new CaptureSegmenter({
-      mediaDevices: devices,
-      mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
-      speechRecognitionConstructor,
-      audioContextConstructor: undefined,
-      crypto: cryptoApi,
-      monotonicNow: () => monotonic,
-      maxActiveDurationMs: 1_000,
-      segmentDurationMs: 120_000,
-      onSegment: () => undefined,
-      onInterruption: (reason) => {
-        reasons.push(reason);
-        resolveInterruption?.();
-      },
-    });
+  it('stops at the active-duration cap without counting paused time', async () => {
+    const segments: CapturedAudioSegment[] = [];
+    const interruptions: CaptureInterruptionReason[] = [];
+    const { segmenter } = segmenterFor({ segments, interruptions, maxActiveDurationMs: 3_000 });
     await segmenter.prepare();
     await segmenter.start({ sessionId: SESSION_ID });
-    monotonic = 1_000;
-    await new Promise((resolve) => setTimeout(resolve, 275));
-    await interrupted;
-    expect(segmenter.activeDurationMs).toBe(1_000);
-    expect(reasons).toEqual(['max_duration']);
+    FakeAudioContext.last!.processor.feed(tone(5));
+    await vi.waitFor(() => expect(interruptions).toEqual(['max_duration']));
+    expect(segments.reduce((sum, segment) => sum + segment.metadata.durationMs, 0)).toBe(3_000);
   });
 });
