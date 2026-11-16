@@ -1,187 +1,104 @@
 import {
-  AnalysisProviderError,
   deduplicateTranscriptOverlaps,
   type MeetingAnalysisInput,
-  validateMeetingAnalysisOutput,
+  renderReportMarkdown,
+  resolveRelativeDueDate,
+  validateMeetingReport,
 } from "./analysis.ts";
+import { ProviderError } from "./gateway.ts";
 
-const SEGMENT_ID = "10000000-0000-4000-8000-000000000001";
-const MEMBER_ID = "20000000-0000-4000-8000-000000000001";
+const A = "10000000-0000-4000-8000-000000000001";
+const B = "10000000-0000-4000-8000-000000000002";
 
 const input: MeetingAnalysisInput = {
-  eventContext: { title: "Credenciamento FENASOJA" },
+  eventContext: { title: "Comissão de Logística", location: "Casa Fenasoja", commissions: [{ name: "Logística" }] },
   transcriptVersionId: "30000000-0000-4000-8000-000000000001",
+  transcriptVersionNumber: 1,
   transcriptCoverage: "complete",
   missingSequenceCount: 0,
-  transcriptSegments: [{
-    id: SEGMENT_ID,
-    text: "Maria Silva deve publicar o formulário até 20 de agosto de 2026.",
-    captureStartMs: 0,
-    captureEndMs: 30_000,
-  }],
-  members: [{ userId: MEMBER_ID, name: "Maria Silva" }],
+  meetingDate: "2026-11-16",
+  transcriptSegments: [
+    { id: A, text: "Ficou decidido que a Fernanda vai enviar a lista de voos até sexta-feira.", captureStartMs: 0, captureEndMs: 30_000 },
+    { id: B, text: "O Roberto sugeriu reduzir a decoração, mas a Zélia discordou. Fica pendente.", captureStartMs: 30_000, captureEndMs: 60_000 },
+  ],
 };
 
-Deno.test("deduplicates only grounded text at overlapping capture boundaries", () => {
-  const secondId = "10000000-0000-4000-8000-000000000002";
-  const segments = deduplicateTranscriptOverlaps([
-    {
-      id: SEGMENT_ID,
-      text: "Precisamos fechar o contrato até sexta",
-      captureStartMs: 0,
-      captureEndMs: 30_000,
-    },
-    {
-      id: secondId,
-      text: "contrato até sexta e avisar a comissão",
-      captureStartMs: 29_000,
-      captureEndMs: 59_000,
-    },
-  ]);
-  if (
-    segments.length !== 2 || segments[1].id !== secondId ||
-    segments[1].text !== "e avisar a comissão"
-  ) {
-    throw new Error("overlapping transcript boundary was not deduplicated");
-  }
-});
-
-function rawAnalysis(overrides: Record<string, unknown> = {}) {
+function raw(overrides: Record<string, unknown> = {}) {
   return {
-    title: "Título fornecido pelo modelo",
-    executiveSummary: "A publicação do formulário foi encaminhada.",
-    minutesMarkdown: "## Encaminhamento\nMaria Silva publicará o formulário.",
-    decisions: [{
-      title: "Publicar formulário",
-      detail: "A publicação foi definida.",
-      evidenceSegmentIds: [SEGMENT_ID],
-    }],
-    pendingItems: [],
+    title: "Reunião de logística",
+    executiveSummary: "Lista de voos encaminhada; decoração pendente.",
+    themes: [{ title: "Decoração", discussion: "Redução proposta e contestada.", arguments: ["Custo"], divergences: ["Zélia discordou"], evidenceSegmentIds: [B] }],
+    decisions: [{ title: "Lista de voos", detail: "Fernanda enviará a lista.", evidenceSegmentIds: [A] }],
+    proposals: [{ title: "Reduzir decoração", detail: "Sugestão do Roberto.", status: "em_discussao", evidenceSegmentIds: [B] }],
+    actionItems: [{ title: "Enviar lista de voos", description: "Lista dos convidados.", responsibleText: "Fernanda", dueDateText: "até sexta-feira", dueDate: "2026-11-20", evidenceSegmentIds: [A] }],
+    pendingItems: [{ title: "Decoração", detail: "Sem decisão.", evidenceSegmentIds: [B] }],
     risks: [],
-    importantPoints: [],
+    openQuestions: [],
     nextSteps: [],
     nextMeetings: [],
-    actionItems: [{
-      title: "Publicar formulário",
-      description: "Disponibilizar o formulário aprovado.",
-      responsibleText: "Maria Silva",
-      dueDateText: "20 de agosto de 2026",
-      dueDate: "2026-08-20",
-      evidenceSegmentIds: [SEGMENT_ID],
-    }],
+    coverageNotes: [],
     ...overrides,
   };
 }
 
-Deno.test("validates grounded analysis and suggests only the unique exact member", () => {
-  const result = validateMeetingAnalysisOutput(rawAnalysis(), input);
-  const action = result.actionItems[0];
+Deno.test("keeps grounded responsible and resolves an unambiguous weekday in São Paulo time", () => {
+  const report = validateMeetingReport(raw(), input);
+  const action = report.actionItems[0];
+  if (action.responsibleText !== "Fernanda") throw new Error("responsible dropped");
+  if (action.dueDate !== "2026-11-20") throw new Error(`weekday not resolved: ${action.dueDate}`);
+  if (report.partial || report.coverage.status !== "complete") throw new Error("coverage mislabeled");
+});
 
-  if (result.title !== "Ata — Credenciamento FENASOJA") {
-    throw new Error("event title was not authoritative");
-  }
-  if (action.responsibleText !== "Maria Silva") {
-    throw new Error("grounded responsible was removed");
-  }
-  if (action.suggestedMemberId !== MEMBER_ID) {
-    throw new Error("unique member was not suggested");
-  }
-  if (action.dueDate !== "2026-08-20") {
-    throw new Error("explicit date was not retained");
+Deno.test("drops responsible names and dates that are not in the evidence", () => {
+  const report = validateMeetingReport(raw({
+    actionItems: [{ title: "X", description: "Y", responsibleText: "Maria", dueDateText: "dia 30", dueDate: "2026-11-30", evidenceSegmentIds: [A] }],
+  }), input);
+  const action = report.actionItems[0];
+  if (action.responsibleText !== null || action.dueDateText !== null || action.dueDate !== null) {
+    throw new Error("invented responsible or deadline kept");
   }
 });
 
-Deno.test("does not invent responsible users or deadlines", () => {
-  const result = validateMeetingAnalysisOutput(
-    rawAnalysis({
-      actionItems: [{
-        title: "Publicar formulário",
-        description: "Disponibilizar o formulário aprovado.",
-        responsibleText: "João Souza",
-        dueDateText: "amanhã",
-        dueDate: "2026-08-21",
-        evidenceSegmentIds: [SEGMENT_ID],
-      }],
-    }),
-    input,
-  );
-  const action = result.actionItems[0];
-
-  if (action.responsibleText !== null || action.suggestedMemberId !== null) {
-    throw new Error("ungrounded responsible was retained");
-  }
-  if (action.dueDateText !== null || action.dueDate !== null) {
-    throw new Error("ungrounded deadline was retained");
-  }
-});
-
-Deno.test("rejects a calendar date that normalizes to another day", () => {
-  const impossibleDateInput: MeetingAnalysisInput = {
-    ...input,
-    transcriptSegments: [{
-      ...input.transcriptSegments[0],
-      text: "O prazo mencionado foi 30 de fevereiro de 2026.",
-    }],
-  };
-  const result = validateMeetingAnalysisOutput(
-    rawAnalysis({
-      actionItems: [{
-        title: "Validar prazo",
-        description: "Confirmar o prazo mencionado.",
-        responsibleText: null,
-        dueDateText: "30 de fevereiro de 2026",
-        dueDate: "2026-02-30",
-        evidenceSegmentIds: [SEGMENT_ID],
-      }],
-    }),
-    impossibleDateInput,
-  );
-  if (result.actionItems[0].dueDate !== null) {
-    throw new Error("impossible normalized date was persisted");
-  }
-});
-
-Deno.test("does not suggest an ambiguous member match", () => {
-  const result = validateMeetingAnalysisOutput(rawAnalysis(), {
-    ...input,
-    members: [
-      ...input.members,
-      { userId: "20000000-0000-4000-8000-000000000002", name: "Maria Silva" },
-    ],
-  });
-  if (result.actionItems[0].suggestedMemberId !== null) {
-    throw new Error("ambiguous member was suggested");
-  }
-});
-
-Deno.test("rejects unknown evidence and extra schema fields", () => {
-  const unknownEvidence = rawAnalysis({
-    decisions: [{
-      title: "Sem fonte",
-      detail: "Não existe no segmento.",
-      evidenceSegmentIds: ["40000000-0000-4000-8000-000000000001"],
-    }],
-  });
-  let unknownEvidenceError: unknown;
+Deno.test("rejects evidence IDs that do not exist", () => {
+  let rejected = false;
   try {
-    validateMeetingAnalysisOutput(unknownEvidence, input);
+    validateMeetingReport(raw({ decisions: [{ title: "A", detail: "B", evidenceSegmentIds: ["10000000-0000-4000-8000-0000000000ff"] }] }), input);
   } catch (error) {
-    unknownEvidenceError = error;
+    rejected = error instanceof ProviderError;
   }
-  if (!(unknownEvidenceError instanceof AnalysisProviderError)) {
-    throw new Error("unknown evidence was accepted");
-  }
+  if (!rejected) throw new Error("unknown evidence accepted");
+});
 
-  let schemaError: unknown;
+Deno.test("rejects extra fields from the model", () => {
+  let rejected = false;
   try {
-    validateMeetingAnalysisOutput(rawAnalysis({ inventedField: true }), input);
+    validateMeetingReport({ ...raw(), html: "<b>x</b>" }, input);
   } catch (error) {
-    schemaError = error;
+    rejected = error instanceof ProviderError && error.message === "analysis_schema_invalid";
   }
-  if (
-    !(schemaError instanceof AnalysisProviderError) ||
-    schemaError.message !== "analysis_schema_invalid"
-  ) {
-    throw new Error("strict schema accepted an extra field");
-  }
+  if (!rejected) throw new Error("extra field accepted");
+});
+
+Deno.test("marks the report as partial when the transcript has gaps", () => {
+  const report = validateMeetingReport(raw(), { ...input, transcriptCoverage: "with_gaps", missingSequenceCount: 2 });
+  if (!report.partial) throw new Error("partial report not flagged");
+  if (!renderReportMarkdown(report).includes("PARCIAL")) throw new Error("partial label missing from minutes");
+});
+
+Deno.test("leaves ambiguous relative dates unresolved", () => {
+  if (resolveRelativeDueDate("até a próxima sexta", "2026-11-16") !== null) throw new Error("ambiguous date resolved");
+  if (resolveRelativeDueDate("amanhã", "2026-11-16") !== "2026-11-17") throw new Error("tomorrow not resolved");
+});
+
+Deno.test("deduplicates only overlapping legacy boundaries", () => {
+  const segments = deduplicateTranscriptOverlaps([
+    { id: A, text: "Precisamos fechar o contrato até sexta", captureStartMs: 0, captureEndMs: 30_000 },
+    { id: B, text: "contrato até sexta e avisar a comissão", captureStartMs: 29_000, captureEndMs: 59_000 },
+  ]);
+  if (segments[1].text !== "e avisar a comissão") throw new Error("overlap not removed");
+  const contiguous = deduplicateTranscriptOverlaps([
+    { id: A, text: "contrato até sexta", captureStartMs: 0, captureEndMs: 30_000 },
+    { id: B, text: "contrato até sexta de novo", captureStartMs: 30_000, captureEndMs: 60_000 },
+  ]);
+  if (contiguous[1].text !== "contrato até sexta de novo") throw new Error("contiguous audio parts must keep repeated speech");
 });

@@ -165,3 +165,38 @@ export function mapDatabaseError(
     token ?? (error?.code ? `pg:${error.code}` : null),
   );
 }
+
+/**
+ * RPC/table access for routines added by the audio pipeline migration, which are not
+ * part of the hand-maintained `MeetingDatabase` type map.
+ */
+// deno-lint-ignore no-explicit-any
+export function looseClient(client: MeetingSupabaseClient): SupabaseClient<any> {
+  // deno-lint-ignore no-explicit-any
+  return client as unknown as SupabaseClient<any>;
+}
+
+export const MEETING_AUDIO_BUCKET = "agenda-meeting-audio";
+export const MEETING_EXPORTS_BUCKET = "agenda-meeting-exports";
+
+/** Removes every object under `{org}/{event}/{session}/` in the meeting buckets. */
+export async function removeSessionStorage(
+  admin: MeetingSupabaseClient,
+  scope: { orgId: string; eventId: string; sessionId: string },
+) {
+  const prefix = `${scope.orgId}/${scope.eventId}/${scope.sessionId}`;
+  let removed = 0;
+  for (const bucket of [MEETING_AUDIO_BUCKET, MEETING_EXPORTS_BUCKET]) {
+    for (let page = 0; page < 50; page += 1) {
+      const { data, error } = await admin.storage.from(bucket).list(prefix, { limit: 1000 });
+      if (error || !data?.length) break;
+      const paths = data.filter((item) => item.name).map((item) => `${prefix}/${item.name}`);
+      if (!paths.length) break;
+      const { error: removeError } = await admin.storage.from(bucket).remove(paths);
+      if (removeError) break;
+      removed += paths.length;
+      if (data.length < 1000) break;
+    }
+  }
+  return removed;
+}

@@ -1,5 +1,7 @@
 import {
   type AgendaMeetingControlAction,
+  CONTROL_V3_ACTIONS,
+  CONTROL_V3_AUTHORIZATION,
   isPlainObject,
   isUuid,
   type JsonObject,
@@ -19,7 +21,10 @@ import {
   authenticateMeetingUser,
   authorizeMeetingAction,
   createMeetingAdminClient,
+  looseClient,
   mapDatabaseError,
+  MEETING_EXPORTS_BUCKET,
+  removeSessionStorage,
 } from "../_shared/agenda-meeting/supabase.ts";
 
 const MAX_CONTROL_BODY_BYTES = 4 * 1_024 * 1_024;
@@ -71,23 +76,25 @@ function normalizePayload(
         !["backend", "mimeType", "segmentDurationMs", "audioPersistence"]
           .includes(key)
       ) ||
-      !["media_recorder", "audio_worklet_wav"].includes(
+      !["media_recorder", "audio_worklet_wav", "script_processor_wav"].includes(
         String(capture.backend),
       ) ||
       typeof capture.mimeType !== "string" ||
       !CAPTURE_MIME_TYPES.has(
         capture.mimeType.toLowerCase().replace(/\s+/g, ""),
       ) ||
-      capture.segmentDurationMs !== 30_000 ||
-      capture.audioPersistence !== "ephemeral_encrypted_only"
+      !Number.isSafeInteger(capture.segmentDurationMs) ||
+      Number(capture.segmentDurationMs) < 15_000 ||
+      Number(capture.segmentDurationMs) > 60_000 ||
+      !["ephemeral_encrypted_only", "server_temporary_private"].includes(String(capture.audioPersistence))
     ) {
       throw new HttpError(400, "invalid_capture_contract");
     }
     normalized.capture = {
       backend: capture.backend,
       mimeType: capture.mimeType.toLowerCase().replace(/\s+/g, ""),
-      segmentDurationMs: 30_000,
-      audioPersistence: "ephemeral_encrypted_only",
+      segmentDurationMs: Number(capture.segmentDurationMs),
+      audioPersistence: capture.audioPersistence,
     };
   }
 
@@ -251,6 +258,19 @@ function normalizePayload(
     throw new HttpError(400, "invalid_partial_analysis_confirmation");
   }
 
+  if (action === "regenerate_report") {
+    if (payload.transcriptVersionId !== undefined && payload.transcriptVersionId !== null && !isUuid(payload.transcriptVersionId)) {
+      throw new HttpError(400, "invalid_transcript_version_id");
+    }
+    if (payload.allowPartial !== undefined && typeof payload.allowPartial !== "boolean") {
+      throw new HttpError(400, "invalid_partial_analysis_confirmation");
+    }
+  }
+
+  if (action === "delete_report" && !isUuid(payload.minutesVersionId)) {
+    throw new HttpError(400, "invalid_minutes_version_id");
+  }
+
   if (action === "get_segment_receipt") {
     const hasSegmentId = isUuid(payload.segmentId);
     const hasSequence = Number.isSafeInteger(payload.sequence) &&
@@ -275,28 +295,79 @@ Deno.serve(async (req) => {
     );
     // The user-scoped authorization RPC runs before any service-role client is created.
     const caller = await authenticateMeetingUser(req);
+    const isV3 = CONTROL_V3_ACTIONS.has(request.action);
     await authorizeMeetingAction(
       caller.client,
-      request.action,
+      (isV3 ? CONTROL_V3_AUTHORIZATION[request.action] : request.action) as AgendaMeetingControlAction,
       request.orgId,
       request.eventId,
       request.sessionId,
     );
 
     const admin = createMeetingAdminClient();
-    const { data, error } = await admin.rpc("agenda_meeting_control", {
-      p_action: request.action,
-      p_actor_user_id: caller.id,
-      p_org_id: request.orgId,
-      p_event_id: request.eventId,
-      p_session_id: request.sessionId,
-      p_mutation_id: request.mutationId,
-      p_expected_version: request.expectedVersion,
-      p_payload: normalizePayload(request.action, request.payload),
-    });
-    if (error) throw mapDatabaseError(error);
+    const payload = normalizePayload(request.action, request.payload);
+
+    if (request.action === "start") {
+      const { data: settings } = await looseClient(admin).rpc("agenda_meeting_runtime_settings");
+      if (isPlainObject(settings) && settings.audio_pipeline_enabled === false) {
+        throw new HttpError(423, "meeting_audio_pipeline_disabled");
+      }
+      // One live capture per user across tabs and devices.
+      const { data: live } = await looseClient(admin).from("agenda_meeting_sessions")
+        .select("id")
+        .eq("started_by", caller.id)
+        .eq("capture_state", "recording")
+        .is("deleted_at", null)
+        .gte("heartbeat_at", new Date(Date.now() - 120_000).toISOString())
+        .limit(1);
+      if (Array.isArray(live) && live.length > 0) {
+        throw new HttpError(409, "meeting_capture_active_elsewhere");
+      }
+    }
+
+    const { data, error } = isV3
+      ? await looseClient(admin).rpc("agenda_meeting_control_v3", {
+        p_action: request.action,
+        p_actor_user_id: caller.id,
+        p_org_id: request.orgId,
+        p_event_id: request.eventId,
+        p_session_id: request.sessionId,
+        p_mutation_id: request.mutationId,
+        p_expected_version: request.expectedVersion,
+        p_payload: payload,
+      })
+      : await admin.rpc("agenda_meeting_control", {
+        p_action: request.action,
+        p_actor_user_id: caller.id,
+        p_org_id: request.orgId,
+        p_event_id: request.eventId,
+        p_session_id: request.sessionId,
+        p_mutation_id: request.mutationId,
+        p_expected_version: request.expectedVersion,
+        p_payload: payload,
+      });
+    if (error) {
+      const raw = `${error.message ?? ""}`;
+      if (raw.includes("REPORT_LIMIT_REACHED")) throw new HttpError(422, "meeting_report_limit_reached");
+      if (raw.includes("REPORT_ALREADY_QUEUED")) throw new HttpError(409, "meeting_report_already_queued");
+      if (raw.includes("TRANSCRIPT_HAS_NO_SPEECH")) throw new HttpError(422, "meeting_transcript_has_no_speech");
+      if (raw.includes("PARTIAL_ANALYSIS_CONFIRMATION_REQUIRED")) throw new HttpError(422, "meeting_partial_confirmation_required");
+      if (raw.includes("TRANSCRIPT_NOT_READY")) throw new HttpError(422, "meeting_transcript_not_ready");
+      throw mapDatabaseError(error);
+    }
     if (!isPlainObject(data)) {
       throw new HttpError(503, "invalid_control_result", true);
+    }
+
+    // Files are removed only after the database confirmed the deletion scope.
+    if (request.sessionId && (request.action === "delete" || request.action === "cancel")) {
+      await removeSessionStorage(admin, { orgId: request.orgId, eventId: request.eventId, sessionId: request.sessionId })
+        .catch(() => undefined);
+    }
+    if (request.action === "delete_report" && Array.isArray(data.removedArtifactPaths) && data.removedArtifactPaths.length) {
+      await admin.storage.from(MEETING_EXPORTS_BUCKET)
+        .remove(data.removedArtifactPaths.filter((path): path is string => typeof path === "string"))
+        .catch(() => undefined);
     }
 
     return jsonResponse(req, { ok: true, action: request.action, data });

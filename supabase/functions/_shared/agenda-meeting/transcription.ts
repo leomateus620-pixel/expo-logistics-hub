@@ -100,7 +100,7 @@ export async function transcribeAudioPart(
   const model = configuredModel("AGENDA_MEETING_TRANSCRIPTION_MODEL", DEFAULT_TRANSCRIPTION_MODEL, "google");
   const form = new FormData();
   form.append("model", model.gatewayId);
-  form.append("file", new Blob([audio], { type: "audio/wav" }), fileName);
+  form.append("file", new Blob([audio as unknown as BlobPart], { type: "audio/wav" }), fileName);
   form.append("response_format", "json");
   form.append("stream", "true");
   form.append("language", options.language ?? "pt-BR");

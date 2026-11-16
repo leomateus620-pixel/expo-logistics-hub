@@ -280,10 +280,13 @@ export class SegmentUploadCoordinator {
       await this.setTerminal(segmentId, 'transcription_receipt_mismatch');
       return;
     }
-    if (receipt.status === 'transcribed') {
+    // A server receipt for an audio part is durable: the audio is stored privately and
+    // transcription continues in the backend. Only then the local copy is discarded.
+    if (receipt.status === 'transcribed' || receipt.status === 'accepted' || receipt.status === 'processing') {
+      const status: CaptureSegmentStatus = receipt.status === 'transcribed' ? 'transcribed' : 'accepted';
       const updated = await this.spool.update(segmentId, (metadata) => ({
         ...metadata,
-        status: 'transcribed',
+        status,
         canonicalReceiptId: receipt.canonicalReceiptId,
         nextRetryAtMs: null,
         errorCode: null,
@@ -298,46 +301,7 @@ export class SegmentUploadCoordinator {
       await this.setTerminal(segmentId, receipt.errorCode ?? 'transcription_terminal_error');
       return;
     }
-    if (receipt.status === 'retryable_error') {
-      await this.scheduleRetry(segmentId, receipt.errorCode ?? 'transcription_retryable_error', receipt.retryAfterMs);
-      return;
-    }
-
-    const processingStatus = receipt.status === 'accepted' ? 'accepted' : 'processing';
-    const updated = await this.spool.update(segmentId, (metadata) => ({
-      ...metadata,
-      status: processingStatus,
-      canonicalReceiptId: receipt.canonicalReceiptId,
-      nextRetryAtMs: null,
-      errorCode: null,
-    }));
-    this.emitSegment(updated.metadata);
-    await this.pollUntilTerminal(updated.metadata);
-  }
-
-  private async pollUntilTerminal(metadata: CaptureSegmentState): Promise<void> {
-    while (!this.stopped && this.now() - metadata.retryWindowStartedAtMs < this.retryWindowMs) {
-      await this.delay(this.pollIntervalMs);
-      const { receipt } = await this.transport.getSegmentReceipt({
-        mutationId: createMeetingMutationId(this.crypto),
-        eventId: this.eventId,
-        orgId: this.orgId,
-        sessionId: this.sessionId,
-        segmentId: metadata.id,
-        sequence: metadata.sequence,
-      });
-      if (!receipt || receipt.status === 'accepted' || receipt.status === 'processing') {
-        if (receipt) {
-          const status: CaptureSegmentStatus = receipt.status === 'accepted' ? 'accepted' : 'processing';
-          const updated = await this.spool.update(metadata.id, (current) => ({ ...current, status }));
-          this.emitSegment(updated.metadata);
-        }
-        continue;
-      }
-      await this.handleReceipt(metadata.id, receipt);
-      return;
-    }
-    if (!this.stopped) await this.setTerminal(metadata.id, 'transcription_callback_timeout');
+    await this.scheduleRetry(segmentId, receipt.errorCode ?? 'transcription_retryable_error', receipt.retryAfterMs);
   }
 
   private async scheduleRetry(

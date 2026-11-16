@@ -9,7 +9,6 @@ import {
 import { createMeetingMutationId } from '../capture/identity';
 import { listSupportedMediaRecorderMimeTypes } from '../capture/mime';
 import { evaluateMeetingCapability, meetingDiagnostics } from '../capture/meetingDiagnostics';
-import { isNativeSpeechRecognitionSupported } from '../capture/NativeMeetingTranscriptionAdapter';
 import {
   INITIAL_AGENDA_MEETING_CAPTURE_STATE,
   agendaMeetingCaptureReducer,
@@ -24,7 +23,6 @@ import {
   type AgendaMeetingStartInput,
   type AgendaMeetingStartResult,
   type AgendaMeetingStateResult,
-  type AgendaMeetingLiveTranscript,
   AGENDA_MEETING_MAX_SEGMENT_BYTES,
   AGENDA_MEETING_SEGMENT_DURATION_MS,
   AGENDA_MEETING_SPOOL_TTL_MS,
@@ -251,8 +249,8 @@ function detectCaptureCapabilities(): AgendaMeetingCaptureCapabilities {
   return {
     mediaRecorder: supportedMimeTypes.length > 0,
     audioWorkletWav: Boolean(AudioContextConstructor && typeof AudioWorkletNode !== 'undefined'),
+    scriptProcessorWav: Boolean(AudioContextConstructor),
     encryptedIndexedDb: Boolean(globalThis.crypto?.subtle && globalThis.indexedDB),
-    nativeSpeechRecognition: isNativeSpeechRecognitionSupported(),
     supportedMimeTypes,
   };
 }
@@ -267,12 +265,6 @@ export function useAgendaMeetingCapture(
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [inputLevel, setInputLevel] = useState<number | null>(null);
   const [preferredDeviceId, setPreferredDeviceId] = useState<string | null>(null);
-  const [liveTranscript, setLiveTranscript] = useState<AgendaMeetingLiveTranscript>({
-    recognition: 'idle',
-    canonical: '',
-    interim: '',
-    finalSegmentCount: 0,
-  });
   const capabilities = useMemo(detectCaptureCapabilities, []);
   const client = useMemo(() => options.client ?? new AgendaMeetingEdgeClient(), [options.client]);
   const spoolRef = useRef<EncryptedSegmentSpool | null>(null);
@@ -512,21 +504,6 @@ export function useAgendaMeetingCapture(
           });
         }
       },
-      onInterimTranscript: (text) => {
-        if (mountedRef.current) setLiveTranscript((previous) => ({ ...previous, interim: text }));
-      },
-      onFinalTranscript: (_segmentText, canonical) => {
-        if (!mountedRef.current) return;
-        setLiveTranscript((previous) => ({
-          ...previous,
-          canonical,
-          interim: '',
-          finalSegmentCount: previous.finalSegmentCount + 1,
-        }));
-      },
-      onTranscriptionState: (recognition) => {
-        if (mountedRef.current) setLiveTranscript((previous) => ({ ...previous, recognition }));
-      },
       onGap: registerGap,
       onLifecycleSignal: (reason) => {
         if (reason === 'device_changed') void refreshDevices();
@@ -570,8 +547,9 @@ export function useAgendaMeetingCapture(
           capture: {
             backend: prepared.backend,
             mimeType: prepared.mimeType,
-            segmentDurationMs: 30_000,
-            audioPersistence: 'ephemeral_encrypted_only',
+            segmentDurationMs: AGENDA_MEETING_SEGMENT_DURATION_MS,
+            // Audio parts are kept temporarily in private storage until transcribed.
+            audioPersistence: 'server_temporary_private',
           },
         };
         meetingDiagnostics.record('STEP_CONTROL_START');
@@ -921,7 +899,6 @@ export function useAgendaMeetingCapture(
     await coordinatorRef.current?.purgeSession();
     coordinatorRef.current = null;
     removeRecovery(storage, options.orgId, options.eventId);
-    setLiveTranscript({ recognition: 'idle', canonical: '', interim: '', finalSegmentCount: 0 });
     dispatch({ type: 'reset' });
   }, [client, options.eventId, options.orgId, storage]);
 
@@ -1233,7 +1210,6 @@ export function useAgendaMeetingCapture(
 
   return {
     state,
-    liveTranscript,
     capabilities,
     mic: {
       devices,

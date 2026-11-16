@@ -20,10 +20,12 @@ import {
   type SegmentReceiptStatus,
   type SegmentTranscriptionReceipt,
 } from '../types';
-import { isAllowedAudioMimeType, normalizeAudioMimeType } from '../capture/mime';
+import { AGENDA_MEETING_AUDIO_SEGMENT_MIME_TYPE } from '../capture/mime';
 
 const CONTROL_FUNCTION = 'agenda-meeting-control';
 const TRANSCRIBE_FUNCTION = 'agenda-meeting-transcribe-segment';
+const EXPORT_FUNCTION = 'agenda-meeting-export';
+const EXPORT_TIMEOUT_MS = 60_000;
 const CONTROL_TIMEOUT_MS = 20_000;
 const SEGMENT_UPLOAD_TIMEOUT_MS = 60_000;
 
@@ -155,19 +157,6 @@ function requireConfiguration(value: string | undefined, code: string): string {
   return value.replace(/\/+$/, '');
 }
 
-async function readBlobText(blob: Blob): Promise<string> {
-  if (typeof blob.text === 'function') return blob.text();
-  if (typeof blob.arrayBuffer === 'function') {
-    return new TextDecoder().decode(await blob.arrayBuffer());
-  }
-  return await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ''));
-    reader.onerror = () => reject(new AgendaMeetingEdgeError('segment_read_failed', false));
-    reader.readAsText(blob);
-  });
-}
-
 export class AgendaMeetingEdgeClient {
   private readonly supabaseUrl: string;
   private readonly publishableKey: string;
@@ -228,19 +217,37 @@ export class AgendaMeetingEdgeClient {
     throw new AgendaMeetingEdgeError('request_failed', true);
   }
 
+  /**
+   * Sends one complete WAV part. The server stores it privately and answers with a
+   * durable receipt; transcription happens asynchronously in the backend worker.
+   */
   async uploadSegment(input: AgendaMeetingUploadInput): Promise<AgendaMeetingUploadResult> {
     const { metadata } = input.segment;
     if (input.segment.audio.size !== metadata.bytes) {
       throw new AgendaMeetingEdgeError('segment_size_mismatch', false);
     }
-    if (metadata.bytes <= 0 || metadata.bytes > AGENDA_MEETING_MAX_SEGMENT_BYTES) {
+    if (metadata.bytes <= 44 || metadata.bytes > AGENDA_MEETING_MAX_SEGMENT_BYTES) {
       throw new AgendaMeetingEdgeError('segment_size_out_of_bounds', false);
     }
-    // Somente texto reconhecido localmente trafega para o backend.
-    const transcript = (await readBlobText(input.segment.audio)).trim();
-    if (!transcript) {
-      throw new AgendaMeetingEdgeError('empty_transcript_segment', false);
+    if (metadata.mimeType !== AGENDA_MEETING_AUDIO_SEGMENT_MIME_TYPE) {
+      throw new AgendaMeetingEdgeError('segment_mime_unsupported', false);
     }
+    const form = new FormData();
+    form.append('metadata', JSON.stringify({
+      sessionId: metadata.sessionId,
+      segmentId: metadata.id,
+      mutationId: input.mutationId,
+      sequence: metadata.sequence,
+      captureStartMs: metadata.captureStartMs,
+      captureEndMs: metadata.captureEndMs,
+      sha256: metadata.sha256,
+      stats: metadata.stats ?? {},
+    }));
+    form.append(
+      'audio',
+      new Blob([input.segment.audio], { type: AGENDA_MEETING_AUDIO_SEGMENT_MIME_TYPE }),
+      `parte-${String(metadata.sequence).padStart(5, '0')}.wav`,
+    );
 
     const token = await this.getAccessToken();
     const response = await fetchWithTimeout(
@@ -248,21 +255,8 @@ export class AgendaMeetingEdgeClient {
       `${this.supabaseUrl}/functions/v1/${TRANSCRIBE_FUNCTION}`,
       {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          apikey: this.publishableKey,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId: metadata.sessionId,
-          segmentId: metadata.id,
-          mutationId: input.mutationId,
-          sequence: metadata.sequence,
-          captureStartMs: metadata.captureStartMs,
-          captureEndMs: metadata.captureEndMs,
-          transcript,
-          confidence: null,
-        }),
+        headers: { Authorization: `Bearer ${token}`, apikey: this.publishableKey },
+        body: form,
       },
       SEGMENT_UPLOAD_TIMEOUT_MS,
     );
@@ -285,6 +279,37 @@ export class AgendaMeetingEdgeClient {
       throw new AgendaMeetingEdgeError('transcription_receipt_mismatch', false, response.status);
     }
     return { receipt };
+  }
+
+  /** Generates (or reuses) the stored export of an exact version and returns a short-lived URL. */
+  async exportArtifact(input: {
+    eventId: string;
+    orgId: string;
+    sessionId: string;
+    kind: 'report_pdf' | 'transcript_pdf' | 'transcript_txt';
+    versionId: string;
+  }): Promise<{ url: string; fileName: string; reused: boolean }> {
+    const token = await this.getAccessToken();
+    const response = await fetchWithTimeout(
+      this.fetcher,
+      `${this.supabaseUrl}/functions/v1/${EXPORT_FUNCTION}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          apikey: this.publishableKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(input),
+      },
+      EXPORT_TIMEOUT_MS,
+    );
+    const payload = await safeJson(response);
+    if (!response.ok) throw classifyHttpError(response.status, payload);
+    if (!isRecord(payload) || payload.ok !== true || typeof payload.url !== 'string' || typeof payload.fileName !== 'string') {
+      throw new AgendaMeetingEdgeError('invalid_export_response', false, response.status);
+    }
+    return { url: payload.url, fileName: payload.fileName, reused: payload.reused === true };
   }
 
   list(input: {

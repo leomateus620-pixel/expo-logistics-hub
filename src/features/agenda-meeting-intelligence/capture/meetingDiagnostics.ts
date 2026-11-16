@@ -2,7 +2,7 @@
  * Camada de diagnóstico da Inteligência de Reuniões.
  *
  * Registra, em memória e em ordem cronológica, o ciclo de vida real da captura
- * e do reconhecimento de fala. Nunca guarda transcrição, tokens ou credenciais:
+ * de áudio. Nunca guarda áudio, transcrição, tokens ou credenciais:
  * apenas nomes de eventos, códigos de erro e metadados do runtime.
  */
 
@@ -18,9 +18,9 @@ export interface MeetingRuntimeEnvironment {
   readonly secureContext: boolean;
   readonly topLevel: boolean;
   readonly userAgent: string;
-  readonly hasSpeechRecognition: boolean;
-  readonly hasWebkitSpeechRecognition: boolean;
-  readonly selectedImplementation: 'SpeechRecognition' | 'webkitSpeechRecognition' | 'none';
+  readonly hasAudioContext: boolean;
+  readonly hasAudioWorklet: boolean;
+  readonly selectedImplementation: 'audio_worklet' | 'script_processor' | 'none';
   readonly hasMediaDevices: boolean;
 }
 
@@ -37,8 +37,8 @@ function readWindow(): (Window & Record<string, unknown>) | undefined {
 
 export function describeMeetingRuntime(): MeetingRuntimeEnvironment {
   const scope = readWindow();
-  const hasStandard = Boolean(scope && 'SpeechRecognition' in scope && scope.SpeechRecognition);
-  const hasWebkit = Boolean(scope && 'webkitSpeechRecognition' in scope && scope.webkitSpeechRecognition);
+  const hasAudioContext = Boolean(scope && (('AudioContext' in scope && scope.AudioContext) || ('webkitAudioContext' in scope && scope.webkitAudioContext)));
+  const hasAudioWorklet = Boolean(scope && 'AudioWorkletNode' in scope && scope.AudioWorkletNode);
   let topLevel = true;
   try {
     topLevel = Boolean(scope) && scope!.top === scope!.self;
@@ -51,9 +51,9 @@ export function describeMeetingRuntime(): MeetingRuntimeEnvironment {
     secureContext: Boolean(scope?.isSecureContext),
     topLevel,
     userAgent: scope?.navigator?.userAgent ?? 'unknown',
-    hasSpeechRecognition: hasStandard,
-    hasWebkitSpeechRecognition: hasWebkit,
-    selectedImplementation: hasStandard ? 'SpeechRecognition' : hasWebkit ? 'webkitSpeechRecognition' : 'none',
+    hasAudioContext,
+    hasAudioWorklet,
+    selectedImplementation: !hasAudioContext ? 'none' : hasAudioWorklet ? 'audio_worklet' : 'script_processor',
     hasMediaDevices: Boolean(scope?.navigator?.mediaDevices?.getUserMedia),
   };
 }
@@ -74,8 +74,8 @@ class MeetingDiagnosticsRecorder {
       secureContext: environment.secureContext,
       topLevel: environment.topLevel,
       userAgent: environment.userAgent.slice(0, 180),
-      speechRecognition: environment.hasSpeechRecognition,
-      webkitSpeechRecognition: environment.hasWebkitSpeechRecognition,
+      audioContext: environment.hasAudioContext,
+      audioWorklet: environment.hasAudioWorklet,
       implementation: environment.selectedImplementation,
       mediaDevices: environment.hasMediaDevices,
     });
@@ -165,7 +165,7 @@ export interface MeetingCapabilityEvaluation {
 export function evaluateMeetingCapability(): MeetingCapabilityEvaluation {
   const environment = describeMeetingRuntime();
   if (environment.selectedImplementation === 'none') {
-    return { state: 'unsupported_by_runtime', reason: 'speech_recognition_unavailable', environment };
+    return { state: 'unsupported_by_runtime', reason: 'audio_capture_unavailable', environment };
   }
   if (!environment.secureContext) {
     return { state: 'supported_requires_configuration', reason: 'insecure_context', environment };

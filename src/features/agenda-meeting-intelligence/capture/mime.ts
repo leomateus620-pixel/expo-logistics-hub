@@ -8,6 +8,7 @@ export const AGENDA_MEETING_ALLOWED_MIME_TYPES = [
 ] as const;
 
 export const AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE = 'text/plain;charset=utf-8';
+export const AGENDA_MEETING_AUDIO_SEGMENT_MIME_TYPE = 'audio/wav';
 
 export type AgendaMeetingAllowedMimeType = (typeof AGENDA_MEETING_ALLOWED_MIME_TYPES)[number];
 

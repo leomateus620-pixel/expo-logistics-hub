@@ -7,9 +7,9 @@ import {
 } from '@/features/agenda-meeting-intelligence/capture/meetingDiagnostics';
 
 const CAPABILITY_LABEL: Record<string, string> = {
-  supported_and_ready: 'Reconhecimento nativo disponível',
+  supported_and_ready: 'Captura de áudio disponível',
   supported_requires_configuration: 'Disponível, mas o contexto atual bloqueia o microfone',
-  unsupported_by_runtime: 'Navegador sem reconhecimento de fala nativo',
+  unsupported_by_runtime: 'Navegador sem captura de áudio compatível',
 };
 
 const REASON_LABEL: Record<string, string> = {
@@ -18,7 +18,7 @@ const REASON_LABEL: Record<string, string> = {
   embedded_context:
     'A tela está em uma janela incorporada (pré-visualização). Abra o sistema em uma aba própria para liberar o microfone.',
   media_devices_unavailable: 'Este navegador não expõe dispositivos de áudio para a página.',
-  speech_recognition_unavailable: 'Use Google Chrome ou Microsoft Edge no computador.',
+  audio_capture_unavailable: 'Atualize o navegador (Chrome, Edge, Safari ou Firefox recentes).',
 };
 
 export function MeetingDiagnosticsPanel({ defaultOpen = false }: { defaultOpen?: boolean }) {

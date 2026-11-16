@@ -1,5 +1,9 @@
 export const AGENDA_MEETING_MAX_ACTIVE_DURATION_MS = 4 * 60 * 60 * 1_000;
 export const AGENDA_MEETING_SEGMENT_DURATION_MS = 30_000;
+/** Nominal part length bounds: parts are cut in a silence between these limits. */
+export const AGENDA_MEETING_MIN_PART_MS = 25_000;
+export const AGENDA_MEETING_MAX_PART_MS = 55_000;
+export const AGENDA_MEETING_AUDIO_SAMPLE_RATE = 16_000;
 export const AGENDA_MEETING_SPOOL_TTL_MS = 24 * 60 * 60 * 1_000;
 export const AGENDA_MEETING_MAX_BACKLOG_DURATION_MS = 20 * 60 * 1_000;
 export const AGENDA_MEETING_MAX_BACKLOG_BYTES = 64 * 1_024 * 1_024;
@@ -63,7 +67,7 @@ export type SegmentReceiptStatus =
   | 'retryable_error'
   | 'terminal_error';
 
-export type CaptureBackendKind = 'media_recorder' | 'audio_worklet_wav';
+export type CaptureBackendKind = 'media_recorder' | 'audio_worklet_wav' | 'script_processor_wav';
 
 export type CaptureInterruptionReason =
   | 'page_hidden'
@@ -101,6 +105,8 @@ export interface CaptureSegmentMetadata {
   bytes: number;
   sha256: string;
   backend: CaptureBackendKind;
+  /** Audio level summary used server-side to tell validated silence from failures. */
+  stats?: { peakLevel: number; rmsLevel: number; voicedRatio: number; sampleRate: number };
 }
 
 export interface CapturedAudioSegment {
@@ -153,7 +159,7 @@ export interface AgendaMeetingFinishInput {
 export interface AgendaMeetingCaptureCapabilities {
   mediaRecorder: boolean;
   audioWorkletWav: boolean;
-  nativeSpeechRecognition: boolean;
+  scriptProcessorWav: boolean;
   encryptedIndexedDb: boolean;
   supportedMimeTypes: readonly string[];
 }
@@ -164,30 +170,8 @@ export interface AgendaMeetingMicrophoneTelemetry {
   inputLevel: number | null;
 }
 
-export type AgendaMeetingLiveTranscriptionState =
-  | 'idle'
-  | 'initializing'
-  | 'listening'
-  | 'speech_detected'
-  | 'recovering'
-  | 'paused'
-  | 'stopping'
-  | 'completed'
-  | 'error';
-
-export interface AgendaMeetingLiveTranscript {
-  /** Estado do reconhecimento nativo (reinícios internos aparecem como `recovering`). */
-  recognition: AgendaMeetingLiveTranscriptionState;
-  /** Texto consolidado de todos os resultados finais da sessão. */
-  canonical: string;
-  /** Texto provisório (volátil) exibido enquanto o navegador ainda não confirmou. */
-  interim: string;
-  finalSegmentCount: number;
-}
-
 export interface AgendaMeetingCaptureController {
   state: AgendaMeetingCaptureState;
-  liveTranscript: AgendaMeetingLiveTranscript;
   capabilities: AgendaMeetingCaptureCapabilities;
   mic: AgendaMeetingMicrophoneTelemetry;
   refreshDevices(): Promise<void>;
@@ -252,6 +236,59 @@ export interface AgendaMeetingSessionSummary {
   actionItemCount: number;
   pendingActionItemCount: number;
   version: number;
+  pipeline?: AgendaMeetingPipeline;
+  sttProvider?: string;
+  sttModel?: string;
+  analysisModel?: string;
+  errorCode?: string | null;
+}
+
+export type AgendaMeetingPipeline = 'legacy_pre_audio' | 'audio_gemini_v1';
+
+export interface AgendaMeetingCoverageStats {
+  expectedSegments: number | null;
+  receivedSegments: number;
+  transcribedSegments: number;
+  silentSegments: number;
+  pendingSegments: number;
+  failedSegments: number;
+  lostSegments: number;
+  audioBytes: number;
+  audioRetainedSegments: number;
+  transcribedDurationMs: number;
+}
+
+export interface AgendaMeetingArtifact {
+  id: string;
+  kind: 'report_pdf' | 'transcript_pdf' | 'transcript_txt';
+  sourceVersionId: string;
+  byteSize: number;
+  createdAt: string;
+}
+
+export interface AgendaMeetingReportInsight {
+  title: string;
+  detail: string;
+  evidenceSegmentIds: string[];
+}
+
+export interface AgendaMeetingStructuredReport {
+  title: string;
+  executiveSummary: string;
+  themes: Array<{ title: string; discussion: string; arguments: string[]; divergences: string[]; evidenceSegmentIds: string[] }>;
+  decisions: AgendaMeetingReportInsight[];
+  proposals: Array<AgendaMeetingReportInsight & { status: 'em_discussao' | 'nao_aprovada' | 'adiada' }>;
+  actionItems: Array<{ title: string; description: string; responsibleText: string | null; dueDateText: string | null; dueDate: string | null; evidenceSegmentIds: string[] }>;
+  pendingItems: AgendaMeetingReportInsight[];
+  risks: AgendaMeetingReportInsight[];
+  openQuestions: AgendaMeetingReportInsight[];
+  nextSteps: AgendaMeetingReportInsight[];
+  nextMeetings: AgendaMeetingReportInsight[];
+  coverageNotes: string[];
+  meeting?: { eventTitle: string; meetingDate: string | null; location: string | null; commissions: string[] };
+  coverage?: { transcriptVersionId: string; transcriptVersion: number; status: 'complete' | 'with_gaps'; missingSegmentCount: number; segmentCount: number };
+  partial?: boolean;
+  model?: string;
 }
 
 export interface AgendaMeetingTranscriptSegment {
@@ -294,6 +331,9 @@ export interface AgendaMeetingMinutesVersion {
   createdAt: string;
   reviewedAt: string | null;
   reviewedBy: string | null;
+  report?: AgendaMeetingStructuredReport | null;
+  reportFormat?: 'legacy_markdown' | 'structured_v3';
+  isPartial?: boolean;
 }
 
 export type AgendaMeetingInsightKind =
@@ -347,6 +387,16 @@ export interface AgendaMeetingSessionDetail extends AgendaMeetingSessionSummary 
   failedStage: string | null;
   errorCode: string | null;
   retryable: boolean;
+  coverageStats?: AgendaMeetingCoverageStats;
+  retryableStage?: 'transcription' | 'assembly' | 'analysis' | null;
+  reportQueued?: boolean;
+  providerPaused?: boolean;
+  audioRetentionHours?: number;
+  unresolvedSequences?: number[];
+  missingSequences?: number[];
+  closedSequence?: number | null;
+  partialAnalysisConfirmed?: boolean;
+  artifacts: AgendaMeetingArtifact[];
 }
 
 export interface MeetingAnalysisOutput {
@@ -409,7 +459,11 @@ export type AgendaMeetingControlAction =
   | 'list'
   | 'detail'
   | 'get_segment_receipt'
-  | 'mark_lost';
+  | 'mark_lost'
+  | 'retry_transcription'
+  | 'accept_transcription_gaps'
+  | 'regenerate_report'
+  | 'delete_report';
 
 export interface AgendaMeetingControlRequest<TPayload extends AgendaMeetingJson = AgendaMeetingJson> {
   action: AgendaMeetingControlAction;
@@ -434,6 +488,8 @@ export interface SegmentTranscriptionReceipt {
   canonicalReceiptId: string | null;
   retryAfterMs: number | null;
   errorCode: string | null;
+  /** True when the server holds the part (audio stored or text transcribed). */
+  durable?: boolean;
 }
 
 export interface AgendaMeetingStartResult {
@@ -454,7 +510,17 @@ export interface AgendaMeetingDetailResult {
     failedStage: string | null;
     errorCode: string | null;
     retryable: boolean;
+    coverageStats?: AgendaMeetingCoverageStats;
+    retryableStage?: 'transcription' | 'assembly' | 'analysis' | null;
+    reportQueued?: boolean;
+    providerPaused?: boolean;
+    audioRetentionHours?: number;
+    unresolvedSequences?: number[];
+    missingSequences?: number[];
+    closedSequence?: number | null;
+    partialAnalysisConfirmed?: boolean;
   };
+  artifacts?: AgendaMeetingArtifact[];
   receipts: SegmentTranscriptionReceipt[];
   transcriptVersions: Array<Omit<AgendaMeetingTranscriptVersion, 'segments'>>;
   transcriptSegments: AgendaMeetingTranscriptSegment[];

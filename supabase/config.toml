@@ -10,6 +10,8 @@ project_id = "btfaumhroqtqzxomqorx"
     verify_jwt = true
   [functions.agenda-meeting-worker]
     verify_jwt = false
+  [functions.agenda-meeting-export]
+    verify_jwt = true
   [functions.event-reminders]
     verify_jwt = false
   [functions.google-calendar-oauth]
