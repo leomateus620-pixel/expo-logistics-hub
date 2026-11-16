@@ -207,4 +207,15 @@ describe('CaptureSegmenter (real audio)', () => {
     await vi.waitFor(() => expect(interruptions).toEqual(['max_duration']));
     expect(segments.reduce((sum, segment) => sum + segment.metadata.durationMs, 0)).toBe(3_000);
   });
+  it('keeps the words spoken while the session was being created (up to 15 s)', async () => {
+    const segments: CapturedAudioSegment[] = [];
+    const { segmenter } = segmenterFor({ segments });
+    await segmenter.prepare();
+    const processor = FakeAudioContext.last!.processor;
+    processor.feed(tone(1.5));
+    await segmenter.start({ sessionId: SESSION_ID });
+    processor.feed(tone(1));
+    await segmenter.stop();
+    expect(segments.reduce((sum, segment) => sum + segment.metadata.durationMs, 0)).toBe(2_500);
+  });
 });

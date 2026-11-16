@@ -15,6 +15,8 @@ import { sha256Blob } from './sha256';
 
 const DURATION_TICK_MS = 250;
 const FLUSH_TIMEOUT_MS = 400;
+/** Speech captured between opening the microphone and the server confirming the session. */
+const PREROLL_MAX_MS = 15_000;
 const WORKLET_NAME = 'fenasoja-meeting-pcm-tap';
 
 type SegmenterMode = 'idle' | 'prepared' | 'recording' | 'paused' | 'stopped' | 'interrupted';
@@ -117,6 +119,8 @@ export class CaptureSegmenter {
   private lifecycleAttached = false;
   private pendingFlush: (() => void) | null = null;
   private emitting: Promise<void> = Promise.resolve();
+  private preroll: Float32Array[] = [];
+  private prerollSamples = 0;
 
   private readonly onVisibilityChange = () => {
     // A hidden tab does not end the meeting: audio continues while the browser allows.
@@ -251,6 +255,12 @@ export class CaptureSegmenter {
     });
     if (this.audioContext?.state === 'suspended') await this.audioContext.resume().catch(() => undefined);
     this.mode = 'recording';
+    // Keep what was said while the session was being created: the microphone
+    // was already open for this meeting, so dropping it would lose the opening words.
+    const preroll = this.preroll;
+    this.preroll = [];
+    this.prerollSamples = 0;
+    for (const samples of preroll) this.handleSamples(samples);
     this.startDurationTimer();
   }
 
@@ -395,6 +405,15 @@ export class CaptureSegmenter {
   }
 
   private handleSamples(samples: Float32Array | undefined) {
+    if (this.mode === 'prepared' && samples?.length) {
+      const maxSamples = Math.round(((this.audioContext?.sampleRate ?? AGENDA_MEETING_AUDIO_SAMPLE_RATE) * PREROLL_MAX_MS) / 1_000);
+      this.preroll.push(samples);
+      this.prerollSamples += samples.length;
+      while (this.prerollSamples > maxSamples && this.preroll.length > 1) {
+        this.prerollSamples -= (this.preroll.shift() as Float32Array).length;
+      }
+      return;
+    }
     if (this.mode !== 'recording' || !samples?.length || !this.downsampler || !this.chunker) return;
     const resampled = this.downsampler.process(samples);
     const remainingSamples = Math.max(0,
@@ -496,6 +515,8 @@ export class CaptureSegmenter {
 
   private async releaseCaptureResources(): Promise<void> {
     this.clearTimers();
+    this.preroll = [];
+    this.prerollSamples = 0;
     try {
       if (this.tap && 'port' in this.tap) this.tap.port.onmessage = null;
       if (this.tap && 'onaudioprocess' in this.tap) this.tap.onaudioprocess = null;

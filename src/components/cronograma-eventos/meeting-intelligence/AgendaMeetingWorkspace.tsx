@@ -625,7 +625,7 @@ function PersistedMeetingWorkspace({ eventId, orgId, eventTitle, canRecord, canR
       ) : (
         <div className="agenda-meeting__consent">
           <div className="agenda-meeting__notice">
-            O áudio do microfone é enviado em partes para uma área privada, transcrito pelo Gemini 3.5 Transcribe e apagado automaticamente após o processamento. O relatório é gerado pelo GPT-6.1 Sol.
+            O áudio do microfone é enviado em partes para uma área privada, transcrito pelo Gemini 3.5 Transcribe e apagado automaticamente até 72 horas depois (ou na hora, se a reunião for excluída). O relatório é gerado pelo GPT-6.1 Sol.
           </div>
           <label className="agenda-meeting__consent-check">
             <input checked={participantsInformed} onChange={(event) => setParticipantsInformed(event.target.checked)} type="checkbox" />

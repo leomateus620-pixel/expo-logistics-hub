@@ -1,6 +1,7 @@
 .agenda-meeting {
   --meeting-ink: #163229;
   --meeting-green: #166534;
+  --meeting-on-green: #f9fafb;
   --meeting-green-strong: #0f512a;
   --meeting-green-soft: #eef7f1;
   --meeting-gold: #9a6a16;
@@ -422,12 +423,14 @@
 .agenda-meeting__session[data-selected='true'] { border-color: var(--meeting-green); background: var(--meeting-green-soft); }
 
 .agenda-meeting__session-title {
+  display: block;
   color: var(--meeting-ink);
   font-size: 12px;
   font-weight: 850;
 }
 
 .agenda-meeting__session-meta {
+  display: block;
   margin-top: 4px;
   color: var(--muted-foreground);
   font-size: 10px;
@@ -660,6 +663,7 @@
 .dark .agenda-meeting {
   --meeting-ink: #e7f6ed;
   --meeting-green: #6fcb8d;
+  --meeting-on-green: #0b2416;
   --meeting-green-strong: #b6e8c6;
   --meeting-green-soft: #13281d;
   --meeting-gold: #d9ad58;
@@ -985,6 +989,7 @@
 
 .meeting-dock {
   --meeting-green: #166534;
+  --meeting-on-green: #f9fafb;
   --meeting-gold: #9a6a16;
   position: fixed;
   z-index: 45;
@@ -1046,6 +1051,8 @@
 }
 .meeting-dock__button--primary { border-color: var(--meeting-green); background: var(--meeting-green); color: var(--primary-foreground, #fff); }
 .meeting-dock__sheet { width: 100%; }
+/* Keep the recording badge clear of the sheet close button. */
+.meeting-dock__sheet .agenda-meeting__capture-heading { padding-right: 44px; }
 @media (min-width: 768px) { .meeting-dock__sheet { max-width: 460px !important; } }
 @media (max-width: 520px) {
   .meeting-dock { grid-template-columns: auto minmax(0, 1fr); }
@@ -1060,10 +1067,10 @@
   padding: 14px 16px;
   border-radius: 14px;
   background: linear-gradient(135deg, var(--meeting-green-strong), var(--meeting-green));
-  color: var(--primary-foreground, #fff);
+  color: var(--meeting-on-green);
 }
-.agenda-meeting__report-header h4 { margin: 0; font-size: 1.05rem; line-height: 1.3; }
-.agenda-meeting__report-header p { margin: 0; font-size: 0.78rem; opacity: 0.9; }
+.agenda-meeting__report-header h4 { margin: 0; font-size: 1.05rem; line-height: 1.3; color: var(--meeting-on-green); }
+.agenda-meeting__report-header p { margin: 0; font-size: 0.78rem; opacity: 0.9; color: var(--meeting-on-green); }
 .agenda-meeting__report-badges { display: flex; flex-wrap: wrap; gap: 6px; }
 .agenda-meeting__badge {
   display: inline-flex;

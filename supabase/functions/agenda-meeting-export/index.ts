@@ -54,8 +54,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return optionsResponse(req);
   if (req.method !== "POST") return jsonResponse(req, { error: "method_not_allowed" }, 405);
   try {
-    const request = parseRequest(await readJsonBody(req, 16 * 1_024));
+    // Authenticate before reading the body so anonymous callers always get 401.
     const caller = await authenticateMeetingUser(req);
+    const request = parseRequest(await readJsonBody(req, 16 * 1_024));
     // Downloads require the same read authorization as the meeting detail.
     await authorizeMeetingAction(caller.client, "detail", request.orgId, request.eventId, request.sessionId);
     const admin = createMeetingAdminClient();

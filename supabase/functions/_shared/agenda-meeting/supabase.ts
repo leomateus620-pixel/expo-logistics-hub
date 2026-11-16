@@ -184,18 +184,29 @@ export async function removeSessionStorage(
   admin: MeetingSupabaseClient,
   scope: { orgId: string; eventId: string; sessionId: string },
 ) {
-  const prefix = `${scope.orgId}/${scope.eventId}/${scope.sessionId}`;
+  const root = `${scope.orgId}/${scope.eventId}/${scope.sessionId}`;
   let removed = 0;
   for (const bucket of [MEETING_AUDIO_BUCKET, MEETING_EXPORTS_BUCKET]) {
-    for (let page = 0; page < 50; page += 1) {
-      const { data, error } = await admin.storage.from(bucket).list(prefix, { limit: 1000 });
-      if (error || !data?.length) break;
-      const paths = data.filter((item) => item.name).map((item) => `${prefix}/${item.name}`);
-      if (!paths.length) break;
-      const { error: removeError } = await admin.storage.from(bucket).remove(paths);
-      if (removeError) break;
-      removed += paths.length;
-      if (data.length < 1000) break;
+    // Storage listing is not recursive: session files live in sub-folders
+    // (audio/, exports/), so walk every folder below the session prefix.
+    const folders = [root];
+    for (let visited = 0; folders.length && visited < 200; visited += 1) {
+      const folder = folders.shift() as string;
+      for (let page = 0; page < 50; page += 1) {
+        const { data, error } = await admin.storage.from(bucket).list(folder, { limit: 1000 });
+        if (error || !data?.length) break;
+        const files: string[] = [];
+        for (const item of data) {
+          if (!item.name) continue;
+          if (item.id === null || item.id === undefined) folders.push(`${folder}/${item.name}`);
+          else files.push(`${folder}/${item.name}`);
+        }
+        if (!files.length) break;
+        const { error: removeError } = await admin.storage.from(bucket).remove(files);
+        if (removeError) break;
+        removed += files.length;
+        if (data.length < 1000) break;
+      }
     }
   }
   return removed;
