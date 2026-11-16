@@ -12700,6 +12700,21 @@ export type Database = {
         Args: { p_legal: string; p_trade: string }
         Returns: string
       }
+      commercial_contract_audit_action: {
+        Args: { p_action: string }
+        Returns: boolean
+      }
+      commercial_contract_versions_json: {
+        Args: {
+          p_contract: Database["public"]["Tables"]["lot_contracts"]["Row"]
+          p_lot_id?: string
+        }
+        Returns: Json
+      }
+      commercial_history_state: {
+        Args: { p_contract_event: boolean; p_state: Json }
+        Returns: Json
+      }
       commercial_map_lot_buyers: {
         Args: { _project_id: string }
         Returns: {
@@ -12717,6 +12732,7 @@ export type Database = {
         Args: { p_pavilion_id: string; p_project_id: string }
         Returns: Json
       }
+      commercial_registered_contract_paths: { Args: never; Returns: string[] }
       commercial_sale_has_active_contract_coverage: {
         Args: {
           p_contract: Database["public"]["Tables"]["lot_contracts"]["Row"]
@@ -12753,6 +12769,10 @@ export type Database = {
           p_project_id: string
         }
         Returns: Json
+      }
+      commercial_signed_food_point_sale: {
+        Args: { p_lot: Database["public"]["Tables"]["commercial_lots"]["Row"] }
+        Returns: string
       }
       commission_leadership_user_ids: {
         Args: { _commission_id: string }
@@ -13438,6 +13458,7 @@ export type Database = {
           lineage_delta: number
         }[]
       }
+      get_lot_contract_history: { Args: { p_lot_id: string }; Returns: Json }
       get_sale_order_revisions: { Args: { p_order_id: string }; Returns: Json }
       get_user_org_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_org_role: {
@@ -13532,6 +13553,37 @@ export type Database = {
           role: string
           user_id: string
         }[]
+      }
+      lock_commercial_contract_upload: {
+        Args: { p_storage_path: string }
+        Returns: undefined
+      }
+      lock_food_point_order_contract: {
+        Args: {
+          p_contract_id: string
+          p_expected_sale_id: string
+          p_expected_version: number
+          p_lot_id: string
+        }
+        Returns: {
+          active_version: number
+          contract_number: string | null
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          lot_id: string | null
+          order_id: string | null
+          sale_id: string | null
+          scope: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "lot_contracts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       map_accessible_segment_ids: { Args: never; Returns: string[] }
       map_any_visible_lot_ids: { Args: never; Returns: string[] }
@@ -13869,6 +13921,34 @@ export type Database = {
             }
             Returns: string
           }
+        | {
+            Args: {
+              p_contract_id: string
+              p_contract_number: string
+              p_expected_sale_id: string
+              p_expected_version: number
+              p_file_size: number
+              p_lot_id: string
+              p_mime_type: string
+              p_original_name: string
+              p_storage_path: string
+            }
+            Returns: string
+          }
+      replace_lot_order_contract: {
+        Args: {
+          p_contract_id: string
+          p_contract_number?: string
+          p_expected_sale_id: string
+          p_expected_version: number
+          p_file_size: number
+          p_lot_id: string
+          p_mime_type: string
+          p_original_name: string
+          p_storage_path: string
+        }
+        Returns: Json
+      }
       reserve_commercial_lot: {
         Args: {
           p_company_name: string
@@ -14743,6 +14823,16 @@ export type Database = {
         Returns: undefined
       }
       team_visible_org_ids: { Args: never; Returns: string[] }
+      update_commercial_contract_metadata: {
+        Args: {
+          p_contract_id: string
+          p_contract_number: string
+          p_expected_sale_id?: string
+          p_expected_version: number
+          p_lot_id?: string
+        }
+        Returns: Json
+      }
       update_commercial_lot: {
         Args: {
           p_expected_updated_at: string
