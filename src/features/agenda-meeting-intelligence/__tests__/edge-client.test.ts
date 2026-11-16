@@ -8,7 +8,7 @@ const SESSION_ID = '30000000-0000-4000-8000-000000000001';
 const SEGMENT_ID = '40000000-0000-4000-8000-000000000001';
 
 function sourceSegment(): CapturedAudioSegment {
-  const audio = new Blob(['transcricao nativa do navegador'], { type: 'text/plain;charset=utf-8' });
+  const audio = new Blob([new Uint8Array(44 + 3_200)], { type: 'audio/wav' });
   return {
     audio,
     metadata: {
@@ -19,10 +19,11 @@ function sourceSegment(): CapturedAudioSegment {
       captureEndMs: 240_000,
       durationMs: 30_000,
       capturedAtIso: '2026-08-13T12:00:00.000Z',
-      mimeType: 'text/plain;charset=utf-8',
+      mimeType: 'audio/wav',
       bytes: audio.size,
       sha256: 'd'.repeat(64),
-      backend: 'media_recorder',
+      backend: 'audio_worklet_wav',
+      stats: { peakLevel: 0.4, rmsLevel: 0.1, voicedRatio: 0.6, sampleRate: 16_000 },
     },
   };
 }
@@ -37,61 +38,47 @@ function client(fetcher: typeof fetch) {
 }
 
 describe('AgendaMeetingEdgeClient', () => {
-  it('uploads the natively recognized transcript as JSON with the canonical identity', async () => {
+  it('uploads the WAV part as multipart with its canonical identity and accepts a durable receipt', async () => {
     const fetcher = vi.fn<typeof fetch>(async () =>
       new Response(
-        JSON.stringify({
-          ok: true,
-          status: 'transcribed',
-          canonicalReceiptId: 'receipt-id',
-        }),
+        JSON.stringify({ ok: true, status: 'accepted', receipt: { segmentId: SEGMENT_ID, sequence: 7, status: 'accepted', canonicalReceiptId: null, retryAfterMs: null, errorCode: null, durable: true } }),
         { status: 200, headers: { 'Content-Type': 'application/json' } },
       ),
     );
-    const meetingClient = client(fetcher);
-    const segment = sourceSegment();
+    const result = await client(fetcher).uploadSegment({ segment: sourceSegment(), mutationId: 'mutation-id' });
 
-    const result = await meetingClient.uploadSegment({ segment, mutationId: 'mutation-id' });
-
-    expect(result.receipt).toMatchObject({
-      segmentId: SEGMENT_ID,
-      sequence: 7,
-      status: 'transcribed',
-      canonicalReceiptId: 'receipt-id',
-    });
-    const [, init] = fetcher.mock.calls[0];
+    expect(result.receipt).toMatchObject({ segmentId: SEGMENT_ID, sequence: 7, status: 'accepted', durable: true });
+    const [url, init] = fetcher.mock.calls[0];
+    expect(String(url)).toBe('https://project.supabase.co/functions/v1/agenda-meeting-transcribe-segment');
     const headers = new Headers(init?.headers);
     expect(headers.get('Authorization')).toBe('Bearer user-jwt');
-    expect(headers.get('apikey')).toBe('sb_publishable_test');
-    expect(headers.get('Content-Type')).toBe('application/json');
-    expect(JSON.parse(String(init?.body))).toEqual({
+    expect(headers.get('Content-Type')).toBeNull();
+    const body = init?.body as FormData;
+    expect(JSON.parse(String(body.get('metadata')))).toEqual({
       sessionId: SESSION_ID,
       segmentId: SEGMENT_ID,
       mutationId: 'mutation-id',
       sequence: 7,
       captureStartMs: 210_000,
       captureEndMs: 240_000,
-      transcript: 'transcricao nativa do navegador',
-      confidence: null,
+      sha256: 'd'.repeat(64),
+      stats: { peakLevel: 0.4, rmsLevel: 0.1, voicedRatio: 0.6, sampleRate: 16_000 },
     });
+    const audio = body.get('audio') as File;
+    expect(audio.type).toBe('audio/wav');
+    expect(audio.size).toBe(44 + 3_200);
   });
 
-  it('rejects empty or inconsistent transcript segments before network access', async () => {
+  it('rejects inconsistent or non-audio parts before network access', async () => {
     const fetcher = vi.fn<typeof fetch>();
     const meetingClient = client(fetcher);
     const mismatched = sourceSegment();
     mismatched.metadata.bytes = mismatched.metadata.bytes + 10;
+    await expect(meetingClient.uploadSegment({ segment: mismatched, mutationId: 'mutation-id' })).rejects.toMatchObject({ code: 'segment_size_mismatch' });
 
-    await expect(meetingClient.uploadSegment({ segment: mismatched, mutationId: 'mutation-id' })).rejects.toMatchObject({
-      code: 'segment_size_mismatch',
-    });
-
-    const blank = sourceSegment();
-    blank.audio = new Blob(['   '], { type: 'text/plain;charset=utf-8' });
-    blank.metadata.bytes = blank.audio.size;
-    await expect(meetingClient.uploadSegment({ segment: blank, mutationId: 'mutation-id' })).rejects.toMatchObject({
-      code: 'empty_transcript_segment',
-    });
+    const text = sourceSegment();
+    text.metadata.mimeType = 'text/plain;charset=utf-8';
+    await expect(meetingClient.uploadSegment({ segment: text, mutationId: 'mutation-id' })).rejects.toMatchObject({ code: 'segment_mime_unsupported' });
     expect(fetcher).not.toHaveBeenCalled();
   });
 

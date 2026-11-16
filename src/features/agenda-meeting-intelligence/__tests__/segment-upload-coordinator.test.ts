@@ -102,24 +102,36 @@ describe('SegmentUploadCoordinator', () => {
     expect(await spool.list(SESSION_ID)).toEqual([]);
   });
 
-  it('keeps encrypted audio after accepted/processing and deletes it when polling sees transcribed', async () => {
+  it('discards the local audio only after the durable server receipt, without polling transcription', async () => {
     const now = Date.parse('2026-08-13T12:00:00.000Z');
-    const poll = vi
-      .fn<AgendaMeetingSegmentTransport['getSegmentReceipt']>()
-      .mockResolvedValueOnce({ receipt: receipt('processing') })
-      .mockResolvedValueOnce({ receipt: receipt('transcribed') });
-    const transport = baseTransport(
-      vi.fn(async () => ({ receipt: receipt('accepted') })),
-      poll,
-    );
-    const { coordinator, spool, changes } = setup(() => now, transport);
+    const poll = vi.fn<AgendaMeetingSegmentTransport['getSegmentReceipt']>();
+    const upload = vi.fn<AgendaMeetingSegmentTransport['uploadSegment']>(async () => ({ receipt: receipt('accepted') }));
+    const transport = baseTransport(upload, poll);
+    const { coordinator, spool, changes, deleted } = setup(() => now, transport);
 
     await coordinator.enqueue(segment(now));
     await coordinator.waitForIdle();
 
-    expect(poll).toHaveBeenCalledTimes(2);
-    expect(changes).toEqual(expect.arrayContaining(['accepted', 'processing', 'transcribed']));
+    expect(upload).toHaveBeenCalledOnce();
+    expect(poll).not.toHaveBeenCalled();
+    expect(changes).toEqual(expect.arrayContaining(['uploading', 'accepted']));
+    expect(deleted).toEqual([SEGMENT_ID]);
     expect(await spool.list(SESSION_ID)).toEqual([]);
+  });
+
+  it('keeps the local audio when the upload fails before any receipt', async () => {
+    const now = Date.parse('2026-08-13T12:00:00.000Z');
+    const upload = vi.fn<AgendaMeetingSegmentTransport['uploadSegment']>(async () => {
+      throw new AgendaMeetingEdgeError('session_expired', false, 401);
+    });
+    const transport = baseTransport(upload);
+    transport.markLost = vi.fn(async () => { throw new AgendaMeetingEdgeError('network_error', true); });
+    const { coordinator, spool } = setup(() => now, transport);
+
+    await coordinator.enqueue(segment(now));
+    await coordinator.waitForIdle();
+
+    expect((await spool.list(SESSION_ID)).length).toBe(1);
   });
 
   it('retries transient submission failures at most five times inside the window', async () => {

@@ -1,5 +1,6 @@
 import { webcrypto } from 'node:crypto';
 import { describe, expect, it, vi } from 'vitest';
+import { blobToArrayBuffer } from '../capture/blob';
 import { CaptureSegmenter } from '../capture/CaptureSegmenter';
 import { StreamingDownsampler } from '../capture/downsampler';
 import { encodeInt16Wav, PcmChunker } from '../capture/pcmChunker';
@@ -68,7 +69,7 @@ describe('StreamingDownsampler and WAV', () => {
 
   it('writes a canonical 16-bit mono PCM header', async () => {
     const wav = encodeInt16Wav(new Int16Array(RATE), RATE);
-    const view = new DataView(await wav.arrayBuffer());
+    const view = new DataView(await blobToArrayBuffer(wav));
     expect(String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), view.getUint8(3))).toBe('RIFF');
     expect(view.getUint16(22, true)).toBe(1);
     expect(view.getUint32(24, true)).toBe(RATE);

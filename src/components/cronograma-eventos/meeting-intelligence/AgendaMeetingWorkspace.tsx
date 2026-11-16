@@ -723,6 +723,10 @@ export function AgendaMeetingWorkspace({ eventId, orgId, eventTitle, persistedEv
   const [expanded, setExpanded] = useState(recordingHere);
   const registerVisiblePanel = capture?.registerVisiblePanel;
 
+  // Showing another event resets the panel; the event being recorded opens expanded.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => setExpanded(recordingHere), [eventId]);
+
   // Panel visibility only hides the compact bar; it never affects the capture itself.
   useEffect(() => {
     if (!expanded || !available || !eventId || !registerVisiblePanel) return;

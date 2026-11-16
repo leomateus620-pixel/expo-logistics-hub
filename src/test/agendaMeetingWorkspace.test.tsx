@@ -1,11 +1,14 @@
 // @vitest-environment jsdom
 
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState, type ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AgendaMeetingWorkspace } from '@/components/cronograma-eventos/meeting-intelligence/AgendaMeetingWorkspace';
+import { MeetingCaptureDock } from '@/components/cronograma-eventos/meeting-intelligence/MeetingCaptureDock';
+import { MeetingCaptureProvider } from '@/features/agenda-meeting-intelligence/provider/MeetingCaptureProvider';
 import type {
   AgendaMeetingCaptureController,
   AgendaMeetingSessionDetail,
@@ -18,307 +21,288 @@ const mocks = vi.hoisted(() => ({
   membersHook: vi.fn(),
   detailHook: vi.fn(),
   control: vi.fn(),
+  exportArtifact: vi.fn(),
 }));
 
 vi.mock('@/features/agenda-meeting-intelligence/hooks/useAgendaMeetingCapture', () => ({
   useAgendaMeetingCapture: mocks.captureHook,
 }));
-
+vi.mock('@/features/agenda-meeting-intelligence/provider/MeetingCaptureEngine', async () => {
+  const { useEffect, useRef } = await import('react');
+  return {
+    default: function Engine(props: {
+      target: { eventId: string; orgId: string };
+      pendingStart: { id: number; input: unknown; resolve: () => void; reject: (e: unknown) => void } | null;
+      onPendingHandled: (id: number) => void;
+      onController: (controller: AgendaMeetingCaptureController) => void;
+    }) {
+      const controller = mocks.captureHook({ eventId: props.target.eventId, orgId: props.target.orgId, persistedEvent: true }) as AgendaMeetingCaptureController;
+      const handled = useRef<number | null>(null);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      useEffect(() => { props.onController(controller); }, [controller.state]);
+      useEffect(() => {
+        if (!props.pendingStart || handled.current === props.pendingStart.id) return;
+        handled.current = props.pendingStart.id;
+        props.onPendingHandled(props.pendingStart.id);
+        controller.start(props.pendingStart.input as never).then(props.pendingStart.resolve, props.pendingStart.reject);
+      });
+      return null;
+    },
+  };
+});
 vi.mock('@/features/agenda-meeting-intelligence/hooks/useAgendaMeetingSessions', () => ({
-  agendaMeetingQueryKeys: { all: ['agenda-meeting-intelligence'] },
+  agendaMeetingQueryKeys: { all: ['agenda-meeting-intelligence'], detail: () => ['agenda-meeting-intelligence', 'detail'] },
   useAgendaMeetingSessions: mocks.sessionsHook,
   useAgendaMeetingMemberOptions: mocks.membersHook,
   useAgendaMeetingSessionDetail: mocks.detailHook,
 }));
-
 vi.mock('@/features/agenda-meeting-intelligence/api/AgendaMeetingEdgeClient', () => ({
   AgendaMeetingEdgeClient: class AgendaMeetingEdgeClient {
     control = mocks.control;
+    exportArtifact = mocks.exportArtifact;
   },
 }));
-
-vi.mock('@/hooks/useAuth', () => ({
-  useAuth: () => ({ user: { id: '9dd0d8d4-cb4f-4c0a-bd5e-e900e6698955' } }),
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: { auth: { onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => undefined } } }) } },
 }));
+vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: { id: '9dd0d8d4-cb4f-4c0a-bd5e-e900e6698955' } }) }));
+vi.mock('@/hooks/useCurrentOrg', () => ({ useCurrentOrg: () => ({ myRole: 'gestor' }) }));
 
-vi.mock('@/hooks/useCurrentOrg', () => ({
-  useCurrentOrg: () => ({ myRole: 'gestor' }),
-}));
-
-const EVENT_ID = '64ac2654-48cb-4bca-ab17-78367d8c41cb';
+const EVENT_A = '64ac2654-48cb-4bca-ab17-78367d8c41cb';
+const EVENT_B = '7d1d0b8e-1111-4bca-ab17-78367d8c41cb';
 const ORG_ID = 'ee4d6232-d169-4e39-b6a3-a3f061b61572';
 const SESSION_ID = '2cba2ceb-5da4-43ff-ae29-f2249b1f1cd3';
-const TRANSCRIPT_VERSION_ID = 'bf33d84e-3042-45fb-aab4-a74b2254b98d';
-const TRANSCRIPT_SEGMENT_ID = '03692145-aafa-49fc-93ff-e69c08107fde';
+const TRANSCRIPT_ID = 'bf33d84e-3042-45fb-aab4-a74b2254b98d';
+const SEGMENT_A = '03692145-aafa-49fc-93ff-e69c08107fde';
+const SEGMENT_B = '13692145-aafa-49fc-93ff-e69c08107fde';
+const MINUTES_ID = 'c1111111-3042-45fb-aab4-a74b2254b98d';
 
-function createCaptureController(
-  phase: AgendaMeetingCaptureController['state']['phase'] = 'idle',
-): AgendaMeetingCaptureController {
-  return {
-    liveTranscript: { recognition: 'listening', canonical: '', interim: '', finalSegmentCount: 0 },
-  state: {
-      phase,
-      sessionId: phase === 'idle' ? null : SESSION_ID,
-      sessionVersion: phase === 'idle' ? null : 2,
-      activeDurationMs: phase === 'idle' ? 0 : 93_000,
-      startedAtIso: phase === 'idle' ? null : '2026-08-14T12:00:00.000Z',
-      backend: phase === 'idle' ? null : 'media_recorder',
-      mimeType: phase === 'idle' ? null : 'audio/webm;codecs=opus',
-      selectedDeviceId: 'mic-1',
-      interruption: null,
-      backlog: {
-        segments: phase === 'recording' ? 1 : 0,
-        bytes: phase === 'recording' ? 24_000 : 0,
-        durationMs: phase === 'recording' ? 30_000 : 0,
-        isAtCapacity: false,
-        limitedBy: null,
-      },
-      segments: [],
-      error: null,
-    },
-    capabilities: {
-      mediaRecorder: true,
-      audioWorkletWav: true,
-    nativeSpeechRecognition: true,
-      encryptedIndexedDb: true,
-      supportedMimeTypes: ['audio/webm;codecs=opus'],
-    },
-    mic: {
-      devices: [{ deviceId: 'mic-1', groupId: 'group-1', kind: 'audioinput', label: 'Microfone da sala', toJSON: () => ({}) }],
-      selectedDeviceId: 'mic-1',
-      inputLevel: phase === 'recording' ? 0.42 : null,
-    },
-    refreshDevices: vi.fn().mockResolvedValue(undefined),
+/** A stateful fake controller: one instance per app, like the real provider engine. */
+function createController() {
+  let phase: AgendaMeetingCaptureController['state']['phase'] = 'idle';
+  let duration = 0;
+  const listeners = new Set<() => void>();
+  const build = () => ({
+        phase,
+        sessionId: phase === 'idle' ? null : SESSION_ID,
+        sessionVersion: 2,
+        activeDurationMs: duration,
+        startedAtIso: null,
+        backend: 'audio_worklet_wav' as const,
+        mimeType: 'audio/wav',
+        selectedDeviceId: 'mic-1',
+        interruption: null,
+        backlog: { segments: 0, bytes: 0, durationMs: 0, isAtCapacity: false, limitedBy: null },
+        segments: [],
+        error: null,
+  });
+  let state = build();
+  const notify = () => { state = build(); listeners.forEach((listener) => listener()); };
+  const controller = {
+    get state() { return state; },
+    capabilities: { mediaRecorder: true, audioWorkletWav: true, scriptProcessorWav: true, encryptedIndexedDb: true, supportedMimeTypes: [] },
+    mic: { devices: [], selectedDeviceId: 'mic-1', inputLevel: 0.3 },
+    refreshDevices: vi.fn(async () => undefined),
     selectDevice: vi.fn(),
-    start: vi.fn().mockResolvedValue(undefined),
-    pause: vi.fn().mockResolvedValue(undefined),
-    resume: vi.fn().mockResolvedValue(undefined),
-    finish: vi.fn().mockResolvedValue(undefined),
-    cancel: vi.fn().mockResolvedValue(undefined),
-    retrySegment: vi.fn().mockResolvedValue(undefined),
-    purge: vi.fn().mockResolvedValue(undefined),
-    purgeForLogout: vi.fn().mockResolvedValue(undefined),
+    start: vi.fn(async () => { phase = 'recording'; notify(); }),
+    pause: vi.fn(async () => { phase = 'paused'; notify(); }),
+    resume: vi.fn(async () => { phase = 'recording'; notify(); }),
+    finish: vi.fn(async () => { phase = 'awaiting_transcripts'; notify(); }),
+    cancel: vi.fn(async () => { phase = 'idle'; notify(); }),
+    retrySegment: vi.fn(async () => undefined),
+    purge: vi.fn(async () => { phase = 'idle'; notify(); }),
+    purgeForLogout: vi.fn(async () => undefined),
+    advance(ms: number) { duration += ms; notify(); },
+    subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
   };
+  return controller;
 }
 
-const sessionSummary: AgendaMeetingSessionSummary = {
-  id: SESSION_ID,
-  orgId: ORG_ID,
-  eventId: EVENT_ID,
-  state: 'review_required',
-  captureState: 'ended',
-  processingState: 'review_required',
-  createdBy: '9dd0d8d4-cb4f-4c0a-bd5e-e900e6698955',
-  createdAt: '2026-08-14T12:00:00.000Z',
-  startedAt: '2026-08-14T12:00:05.000Z',
-  endedAt: '2026-08-14T13:00:05.000Z',
-  activeDurationMs: 3_600_000,
-  transcriptCoverage: 'with_gaps',
-  transcriptSegmentCount: 2,
-  actionItemCount: 1,
-  pendingActionItemCount: 1,
-  version: 4,
+let controller: ReturnType<typeof createController>;
+
+const summary: AgendaMeetingSessionSummary = {
+  id: SESSION_ID, orgId: ORG_ID, eventId: EVENT_A, state: 'review_required', captureState: 'ended', processingState: 'review_required',
+  createdBy: '9dd0d8d4-cb4f-4c0a-bd5e-e900e6698955', createdAt: '2026-11-16T12:00:00.000Z', startedAt: '2026-11-16T12:00:05.000Z',
+  endedAt: '2026-11-16T13:00:05.000Z', activeDurationMs: 3_600_000, transcriptCoverage: 'with_gaps', transcriptSegmentCount: 2,
+  actionItemCount: 1, pendingActionItemCount: 1, version: 4, pipeline: 'audio_gemini_v1',
 };
 
-const sessionDetail: AgendaMeetingSessionDetail = {
-  ...sessionSummary,
-  eventSnapshot: {
-    title: 'Conselho operacional',
-    description: null,
-    startsAt: '2026-08-14T12:00:00.000Z',
-    endsAt: '2026-08-14T13:00:00.000Z',
-    location: 'Sala do conselho',
-    responsibleNames: ['Responsável real'],
-    commissionNames: ['Comissão Central'],
-  },
+const detail: AgendaMeetingSessionDetail = {
+  ...summary,
+  eventSnapshot: { title: 'Conselho operacional', description: null, startsAt: null, endsAt: null, location: 'Casa Fenasoja', responsibleNames: [], commissionNames: [] },
   transcriptVersions: [{
-    id: TRANSCRIPT_VERSION_ID,
-    version: 1,
-    kind: 'canonical',
-    coverage: 'with_gaps',
-    language: 'pt-BR',
-    sha256: 'a'.repeat(64),
-    createdAt: '2026-08-14T13:00:10.000Z',
-    createdBy: null,
+    id: TRANSCRIPT_ID, version: 1, kind: 'canonical', coverage: 'with_gaps', language: 'pt-BR', sha256: 'a'.repeat(64), createdAt: '2026-11-16T13:01:00.000Z', createdBy: null,
     segments: [
-      {
-        id: TRANSCRIPT_SEGMENT_ID,
-        transcriptVersionId: TRANSCRIPT_VERSION_ID,
-        sequence: 0,
-        kind: 'speech',
-        captureStartMs: 0,
-        captureEndMs: 30_000,
-        text: 'A comissão aprovou a abertura do credenciamento.',
-        confidence: 0.96,
-        speakerLabel: null,
-        sourceSegmentId: TRANSCRIPT_SEGMENT_ID,
-      },
-      {
-        id: 'c0e81d7b-95fa-48ae-b8f1-bfe0e9c92222',
-        transcriptVersionId: TRANSCRIPT_VERSION_ID,
-        sequence: 1,
-        kind: 'gap',
-        captureStartMs: 30_000,
-        captureEndMs: 60_000,
-        text: '',
-        confidence: null,
-        speakerLabel: null,
-        sourceSegmentId: null,
-      },
+      { id: SEGMENT_A, transcriptVersionId: TRANSCRIPT_ID, sequence: 0, kind: 'speech', captureStartMs: 0, captureEndMs: 30_000, text: 'Ficou decidido que a Fernanda envia a lista.', confidence: null, speakerLabel: null, sourceSegmentId: SEGMENT_A },
+      { id: `${TRANSCRIPT_ID}:gap:1`, transcriptVersionId: TRANSCRIPT_ID, sequence: 1, kind: 'gap', captureStartMs: 30_000, captureEndMs: 60_000, text: '', confidence: null, speakerLabel: null, sourceSegmentId: null },
+      { id: SEGMENT_B, transcriptVersionId: TRANSCRIPT_ID, sequence: 2, kind: 'speech', captureStartMs: 60_000, captureEndMs: 90_000, text: '', confidence: null, speakerLabel: null, sourceSegmentId: SEGMENT_B },
     ],
   }],
   minutesVersions: [{
-    id: '1298be0c-af0a-4236-ad6d-b2be38619f3f',
-    version: 1,
-    state: 'ai_draft',
-    title: 'Ata — Credenciamento',
-    executiveSummary: 'A comissão aprovou o credenciamento e definiu acompanhamento operacional.',
-    minutesMarkdown: 'A comissão registrou a decisão e os próximos passos com evidências da transcrição.',
-    sourceTranscriptVersionId: TRANSCRIPT_VERSION_ID,
-    coverage: 'with_gaps',
-    model: 'gpt-5.6-terra',
-    promptVersion: 'agenda-v1',
-    schemaVersion: '1',
-    createdAt: '2026-08-14T13:01:00.000Z',
-    reviewedAt: null,
-    reviewedBy: null,
+    id: MINUTES_ID, version: 1, state: 'ai_draft', title: 'Relatório', executiveSummary: 'Resumo fiel.', minutesMarkdown: '# x',
+    sourceTranscriptVersionId: TRANSCRIPT_ID, coverage: 'with_gaps', model: 'gpt-6.1-sol', promptVersion: 'v3', schemaVersion: 's3',
+    createdAt: '2026-11-16T13:02:00.000Z', reviewedAt: null, reviewedBy: null, reportFormat: 'structured_v3', isPartial: true,
+    report: {
+      title: 'Reunião', executiveSummary: 'Lista de voos encaminhada; decoração pendente.',
+      themes: [{ title: 'Decoração', discussion: 'Redução proposta.', arguments: [], divergences: ['Zélia discordou'], evidenceSegmentIds: [SEGMENT_A] }],
+      decisions: [{ title: 'Lista de voos', detail: 'Fernanda envia.', evidenceSegmentIds: [SEGMENT_A] }],
+      proposals: [], actionItems: [{ title: 'Enviar lista', description: 'Lista de voos', responsibleText: 'Fernanda', dueDateText: 'até sexta-feira', dueDate: '2026-11-20', evidenceSegmentIds: [SEGMENT_A] }],
+      pendingItems: [], risks: [], openQuestions: [], nextSteps: [], nextMeetings: [], coverageNotes: [],
+      coverage: { transcriptVersionId: TRANSCRIPT_ID, transcriptVersion: 1, status: 'with_gaps', missingSegmentCount: 1, segmentCount: 2 },
+    },
   }],
-  insights: [{
-    id: '6f0a88a3-d755-4ec5-a356-ad5f92d97572',
-    kind: 'decision',
-    title: 'Abrir credenciamento',
-    detail: 'A abertura foi aprovada pela comissão.',
-    evidence: [{ transcriptSegmentId: TRANSCRIPT_SEGMENT_ID, quoteStartMs: 0, quoteEndMs: 20_000 }],
-  }],
-  actionItems: [{
-    id: 'f3dc511f-32d1-452d-993c-d38317d3bdfc',
-    title: 'Publicar o formulário',
-    description: 'Disponibilizar a versão revisada.',
-    status: 'proposed',
-    responsibleText: 'Equipe de credenciamento',
-    suggestedMemberId: null,
-    confirmedMemberId: null,
-    responsibleResolution: 'unresolved',
-    dueDateText: 'na próxima semana',
-    dueDate: null,
-    dueDateConfirmed: false,
-    evidence: [{ transcriptSegmentId: TRANSCRIPT_SEGMENT_ID, quoteStartMs: 5_000, quoteEndMs: 25_000 }],
-  }],
+  insights: [],
+  actionItems: [],
   failedStage: null,
   errorCode: null,
   retryable: false,
+  artifacts: [],
 };
 
-function renderWorkspace(props: Partial<React.ComponentProps<typeof AgendaMeetingWorkspace>> = {}) {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <AgendaMeetingWorkspace
-        canDelete
-        canRecord
-        canReview
-        eventId={EVENT_ID}
-        eventTitle="Conselho operacional"
-        orgId={ORG_ID}
-        persistedEvent
-        {...props}
-      />
-    </QueryClientProvider>,
+function Harness({ children }: { children: ReactNode }) {
+  const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { retry: false } } }));
+  return (
+    <QueryClientProvider client={client}>
+      <MeetingCaptureProvider>
+        {children}
+        <MeetingCaptureDock />
+      </MeetingCaptureProvider>
+    </QueryClientProvider>
   );
 }
 
-describe('AgendaMeetingWorkspace', () => {
+function Workspace({ eventId, title }: { eventId: string | null; title: string }) {
+  return (
+    <AgendaMeetingWorkspace canDelete canRecord canReview eventId={eventId} eventTitle={title} orgId={ORG_ID} persistedEvent={Boolean(eventId)} />
+  );
+}
+
+describe('Fenasoja Meeting — captura independente do painel', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    mocks.captureHook.mockReturnValue(createCaptureController());
-    mocks.sessionsHook.mockReturnValue({
-      data: [],
-      isLoading: false,
-      isFetching: false,
-      isError: false,
-      refetch: vi.fn().mockResolvedValue(undefined),
+    localStorage.clear();
+    controller = createController();
+    mocks.captureHook.mockReset();
+    mocks.captureHook.mockImplementation(() => {
+      const [, setTick] = useState(0);
+      // Re-render the engine whenever the fake controller changes.
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      useStateSubscription(setTick);
+      // Like the real hook, every render yields a new object with the current state.
+      return { ...controller, state: controller.state };
     });
-    mocks.membersHook.mockReturnValue({ data: [],isLoading: false,isError: false });
+    mocks.sessionsHook.mockReturnValue({ data: [], isLoading: false, isFetching: false, isError: false, refetch: vi.fn() });
+    mocks.membersHook.mockReturnValue({ data: [] });
     mocks.detailHook.mockReturnValue({ data: undefined, isLoading: false, isError: false });
-    mocks.control.mockResolvedValue({});
+    mocks.control.mockReset();
+    mocks.exportArtifact.mockReset();
   });
 
-  it('bloqueia seed/offline sem fabricar um UUID ou montar captura', () => {
-    renderWorkspace({ eventId: null, persistedEvent: false });
-
-    expect(screen.getByRole('button', { name: /ata vinculada/i })).toBeDisabled();
-    expect(screen.getByText(/nenhuma sessão será criada/i)).toBeInTheDocument();
+  it('bloqueia eventos sem UUID persistido', () => {
+    render(<Harness><Workspace eventId={null} title="Rascunho" /></Harness>);
+    expect(screen.getByRole('button', { name: /Fenasoja Meeting/ })).toBeDisabled();
     expect(mocks.captureHook).not.toHaveBeenCalled();
   });
 
-  it('exige consentimento informado antes de iniciar a sessão canônica', async () => {
-    const controller = createCaptureController();
-    mocks.captureHook.mockReturnValue(controller);
-    renderWorkspace();
-
-    fireEvent.click(screen.getByRole('button', { name: /ata vinculada/i }));
-    const startButton = screen.getByRole('button', { name: /iniciar reunião/i });
-    expect(startButton).toBeDisabled();
-
-    fireEvent.click(screen.getByRole('checkbox', { name: /todas as pessoas foram informadas/i }));
-    fireEvent.click(startButton);
-
-    await waitFor(() => expect(controller.start).toHaveBeenCalledWith({
-      consentVersion: 'fenasoja-agenda-meeting-consent-v1',
-      participantsInformed: true,
-      deviceId: 'mic-1',
-    }));
+  it('exige confirmação de que os participantes foram informados', () => {
+    render(<Harness><Workspace eventId={EVENT_A} title="Reunião A" /></Harness>);
+    fireEvent.click(screen.getByRole('button', { name: /Fenasoja Meeting/ }));
+    const start = screen.getByRole('button', { name: /Iniciar gravação/ });
+    expect(start).toBeDisabled();
+    fireEvent.click(screen.getByRole('checkbox'));
+    expect(start).toBeEnabled();
   });
 
-  it('expõe estado inequívoco, telemetria real e proteção de captura ativa', async () => {
-    const controller = createCaptureController('recording');
-    const onActiveCaptureChange = vi.fn();
-    mocks.captureHook.mockReturnValue(controller);
-    renderWorkspace({ onActiveCaptureChange });
+  it('fechar o painel e os detalhes não interrompe a gravação; reabrir mostra a mesma sessão', async () => {
+    const view = render(<Harness><Workspace eventId={EVENT_A} title="Reunião A" /></Harness>);
+    fireEvent.click(screen.getByRole('button', { name: /Fenasoja Meeting/ }));
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', { name: /Iniciar gravação/ }));
+    await waitFor(() => expect(controller.start).toHaveBeenCalledOnce());
+    await screen.findByRole('region', { name: 'Gravação da reunião' });
+    act(() => controller.advance(30_000)); // fala A
 
-    fireEvent.click(screen.getByRole('button', { name: /ata vinculada/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Fechar painel/ }));
+    expect(screen.queryByRole('region', { name: 'Gravação da reunião' })).not.toBeInTheDocument();
+    const dock = await screen.findByRole('region', { name: 'Reunião em gravação' });
+    expect(within(dock).getByText('Reunião A')).toBeInTheDocument();
 
-    expect(screen.getByText('Gravando')).toBeInTheDocument();
-    expect(screen.getByText('00:01:33')).toBeInTheDocument();
-    expect(screen.getByText('Microfone da sala')).toBeInTheDocument();
-    expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '42');
-    await waitFor(() => expect(onActiveCaptureChange).toHaveBeenLastCalledWith(true, controller.cancel));
+    // Close the event details entirely and use another event of the agenda.
+    view.rerender(<Harness><Workspace eventId={EVENT_B} title="Reunião B" /></Harness>);
+    act(() => controller.advance(30_000)); // fala B com o painel fechado
+    fireEvent.click(screen.getByRole('button', { name: /Fenasoja Meeting/ }));
+    expect(screen.getByText(/Há uma reunião em gravação/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Iniciar gravação/ })).not.toBeInTheDocument();
+    expect(mocks.captureHook).toHaveBeenLastCalledWith(expect.objectContaining({ eventId: EVENT_A }));
 
-    fireEvent.click(screen.getByRole('button', { name: /pausar/i }));
-    expect(controller.pause).toHaveBeenCalledOnce();
+    view.rerender(<Harness><Workspace eventId={EVENT_A} title="Reunião A" /></Harness>);
+    const panel = await screen.findByRole('region', { name: 'Gravação da reunião' });
+    expect(within(panel).getByText('00:01:00')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /ata vinculada/i }));
-    expect(screen.getByText('Gravando')).toBeInTheDocument();
+    expect(controller.start).toHaveBeenCalledOnce();
+    expect(controller.cancel).not.toHaveBeenCalled();
+    expect(controller.pause).not.toHaveBeenCalled();
+    expect(controller.finish).not.toHaveBeenCalled();
   });
 
-  it('renderiza conhecimento tipado, lacunas e ações sem superfície de áudio histórico', async () => {
-    mocks.sessionsHook.mockReturnValue({
-      data: [sessionSummary],
-      isLoading: false,
-      isFetching: false,
-      isError: false,
-      refetch: vi.fn().mockResolvedValue(undefined),
-    });
-    mocks.detailHook.mockReturnValue({ data: sessionDetail, isLoading: false, isError: false });
-    renderWorkspace();
+  it('a barra compacta reabre o painel e pausar/retomar/finalizar são comandos distintos', async () => {
+    render(<Harness><Workspace eventId={EVENT_A} title="Reunião A" /></Harness>);
+    fireEvent.click(screen.getByRole('button', { name: /Fenasoja Meeting/ }));
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', { name: /Iniciar gravação/ }));
+    await screen.findByRole('region', { name: 'Gravação da reunião' });
+    fireEvent.click(screen.getByRole('button', { name: /Fechar painel/ }));
+    const dock = await screen.findByRole('region', { name: 'Reunião em gravação' });
+    fireEvent.click(within(dock).getByRole('button', { name: /Reabrir/ }));
+    const sheet = await screen.findByRole('dialog');
+    fireEvent.click(within(sheet).getByRole('button', { name: /Pausar/ }));
+    await waitFor(() => expect(controller.pause).toHaveBeenCalledOnce());
+    fireEvent.click(await within(sheet).findByRole('button', { name: /Retomar/ }));
+    await waitFor(() => expect(controller.resume).toHaveBeenCalledOnce());
+    expect(controller.finish).not.toHaveBeenCalled();
+    fireEvent.click(within(sheet).getByRole('button', { name: /Finalizar reunião/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /^Finalizar reunião$/ }));
+    await waitFor(() => expect(controller.finish).toHaveBeenCalledWith({ allowPartial: false }));
+    expect(controller.cancel).not.toHaveBeenCalled();
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: /ata vinculada/i }));
-    expect(await screen.findByText(/resumo executivo/i)).toBeInTheDocument();
-    expect(screen.getByText(/modelo efetivo: gpt-5.6-terra/i)).toBeInTheDocument();
+  it('mostra o relatório estruturado, a marca de parcial, lacunas, trechos sem fala e downloads', async () => {
+    mocks.sessionsHook.mockReturnValue({ data: [summary], isLoading: false, isFetching: false, isError: false, refetch: vi.fn() });
+    mocks.detailHook.mockReturnValue({ data: detail, isLoading: false, isError: false });
+    mocks.exportArtifact.mockResolvedValue({ url: 'https://signed.example/file.pdf', fileName: 'relatorio.pdf', reused: false });
+    render(<Harness><Workspace eventId={EVENT_A} title="Reunião A" /></Harness>);
+    fireEvent.click(screen.getByRole('button', { name: /Fenasoja Meeting/ }));
 
-    const decisionsTab = screen.getByRole('tab', { name: 'Decisões' });
-    fireEvent.mouseDown(decisionsTab, { button: 0, ctrlKey: false });
-    expect(await screen.findByText('Abrir credenciamento')).toBeInTheDocument();
+    const report = await screen.findByRole('article', { name: 'Relatório da reunião' });
+    expect(within(report).getByText(/Parcial · transcrição com lacunas/)).toBeInTheDocument();
+    expect(within(report).getByText('Lista de voos encaminhada; decoração pendente.')).toBeInTheDocument();
+    expect(within(report).getByText('Fernanda')).toBeInTheDocument();
+    expect(within(report).getByText('20/11/2026')).toBeInTheDocument();
+    expect(within(report).getByText(/GPT-6.1 Sol/)).toBeInTheDocument();
 
-    const actionsTab = screen.getByRole('tab', { name: 'Ações' });
-    fireEvent.mouseDown(actionsTab, { button: 0, ctrlKey: false });
-    expect(await screen.findByText('Publicar o formulário')).toBeInTheDocument();
-    expect(screen.getByText(/aguardando confirmação humana/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Baixar relatório em PDF/ }));
+    await waitFor(() => expect(mocks.exportArtifact).toHaveBeenCalledWith(expect.objectContaining({ kind: 'report_pdf', versionId: MINUTES_ID, sessionId: SESSION_ID })));
 
-    const transcriptTab = screen.getByRole('tab', { name: 'Transcrição' });
-    fireEvent.mouseDown(transcriptTab, { button: 0, ctrlKey: false });
-    expect(await screen.findByText(/nenhuma fala foi reconstruída/i)).toBeInTheDocument();
-    expect(screen.queryByText(/^Áudio$/i)).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /download|retranscrever/i })).not.toBeInTheDocument();
+    fireEvent.mouseDown(screen.getByRole('tab', { name: 'Transcrição' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Transcrição' }));
+    expect(await screen.findByText(/trecho sem transcrição/)).toBeInTheDocument();
+    expect(screen.getByText(/Nenhuma fala identificada neste trecho/)).toBeInTheDocument();
+  });
+
+  it('excluir relatório pede confirmação com o alcance e não exclui a transcrição', async () => {
+    mocks.sessionsHook.mockReturnValue({ data: [summary], isLoading: false, isFetching: false, isError: false, refetch: vi.fn() });
+    mocks.detailHook.mockReturnValue({ data: detail, isLoading: false, isError: false });
+    mocks.control.mockResolvedValue({});
+    render(<Harness><Workspace eventId={EVENT_A} title="Reunião A" /></Harness>);
+    fireEvent.click(screen.getByRole('button', { name: /Fenasoja Meeting/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Excluir relatório/ }));
+    expect(await screen.findByText(/A transcrição continua disponível/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
+    await waitFor(() => expect(mocks.control).toHaveBeenCalledWith(expect.objectContaining({ action: 'delete_report', payload: { minutesVersionId: MINUTES_ID } })));
   });
 });
+
+function useStateSubscription(setTick: (updater: (value: number) => number) => void) {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { useEffect } = require('react') as typeof import('react');
+  useEffect(() => controller.subscribe(() => setTick((value) => value + 1)), [setTick]);
+}
