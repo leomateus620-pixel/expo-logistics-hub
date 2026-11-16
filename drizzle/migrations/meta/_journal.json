@@ -190,6 +190,13 @@
       "when": 1792627634019,
       "tag": "0026_commercial_sales_analytics",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794815459515,
+      "tag": "0027_pin_email_queue_function_search_path",
+      "breakpoints": true
     }
   ]
 }
