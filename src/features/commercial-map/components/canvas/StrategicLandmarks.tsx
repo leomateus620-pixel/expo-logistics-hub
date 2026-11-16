@@ -58,6 +58,8 @@ import {
 } from '../../utils/landmarks';
 import { LivestockPavilion } from './LivestockPavilion';
 import { ViaExpressa } from './ViaExpressa';
+import { ChoppTruck } from './ChoppTruck';
+import { resolveChoppTruckTransform } from '../../utils/choppTruck';
 import { LivestockTent } from './LivestockTent';
 
 import { MirantePavilion } from './MirantePavilion';
@@ -326,6 +328,18 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     metal: '#4d5c5f',
   },
   'via-expressa': VIA_EXPRESSA_LAYOUT.palette,
+  'chopp-truck': {
+    wall: '#e7e9e2',
+    roof: '#aeb9b6',
+    accent: '#cbd3cf',
+    trim: '#d6dad4',
+    dark: '#1c2221',
+    glass: '#384e51',
+    green: '#225541',
+    white: '#f7f3e6',
+    platform: '#3a413a',
+    metal: '#a6afaa',
+  },
   'livestock-tent': LIVESTOCK_TENT_LAYOUT.palette,
 
   'mirante-pavilion': {
@@ -601,6 +615,18 @@ function useLandmarkMaterials(
       result.accent.metalness = 0.22;
       result.platform.roughness = 0.98;
       result.trim.roughness = 0.42;
+      result.trim.metalness = 0.36;
+    }
+    if (kind === 'chopp-truck') {
+      result.wall.roughness = 0.42;
+      result.wall.metalness = 0.21;
+      result.glass.roughness = 0.24;
+      result.roof.roughness = 0.47;
+      result.roof.metalness = 0.25;
+      result.dark.roughness = 0.92;
+      result.metal.roughness = 0.45;
+      result.metal.metalness = 0.46;
+      result.trim.roughness = 0.39;
       result.trim.metalness = 0.36;
     }
     if (kind === 'mirante-pavilion') {
@@ -3115,12 +3141,12 @@ export interface StrategicLandmarkMeshProps {
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
   moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
   exporuralRestroomEntityId?: string;
+  reducedTruckGraphics?: boolean;
 }
 
 /**
  * The amusement park comes alive either when it is the selected focus or when
- * the whole park is in Night Mode. Only this landmark subscribes to the night
- * flag, so toggling the night never re-renders the other structures.
+ * the whole park is in Night Mode. Subscribe locally to the night flag.
  */
 function NightAwareAmusementPark({
   bounds,
@@ -3158,9 +3184,14 @@ export function StrategicLandmarkMesh({
   onCursor,
   moduleStateById,
   exporuralRestroomEntityId,
+  reducedTruckGraphics,
 }: StrategicLandmarkMeshProps) {
   const kind = resolveStrategicLandmarkKind(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
+  const choppTruck = useMemo(
+    () => kind === 'chopp-truck' ? resolveChoppTruckTransform(entity) : null,
+    [entity, kind],
+  );
   const height = strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight;
   const facingRadians = strategicLandmarkFacingRadians(entity);
   // The official A4 marker is smaller than the architectural portal. Share one
@@ -3285,7 +3316,7 @@ export function StrategicLandmarkMesh({
   useEffect(() => {
     gl.shadowMap.needsUpdate = true;
     invalidate();
-  }, [gl, invalidate, selected, showDetail, showFocusDetail]);
+  }, [gl, invalidate, reducedTruckGraphics, selected, showDetail, showFocusDetail]);
 
   if (!kind) return null;
 
@@ -3330,7 +3361,9 @@ export function StrategicLandmarkMesh({
 
   return (
     <group
-      position={[bounds.centerX, entity.geometry.elevation, bounds.centerZ]}
+      position={choppTruck
+        ? [choppTruck.center[0], choppTruck.ground, choppTruck.center[1]]
+        : [bounds.centerX, entity.geometry.elevation, bounds.centerZ]}
       visible={selected || layerOpacity > 0.015}
       dispose={null}
     >
@@ -3400,6 +3433,12 @@ export function StrategicLandmarkMesh({
         {kind === 'third-age-pavilion' && <ThirdAgePavilion {...modelProps} />}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
         {kind === 'via-expressa' && <ViaExpressa {...modelProps} />}
+        {choppTruck && <ChoppTruck
+          transform={choppTruck}
+          materials={materials}
+          detailed={showDetail}
+          reducedGraphics={reducedGraphics || !!reducedTruckGraphics}
+        />}
         {kind === 'livestock-tent' && <LivestockTent {...modelProps} />}
 
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}

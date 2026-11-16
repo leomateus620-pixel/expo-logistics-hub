@@ -15,6 +15,8 @@ const contractsOnly = '00000000-0000-4000-a000-000000000015';
 const db = postgres({ host: '127.0.0.1', port: 55438, database: 'gastronomy_qa', user: 'postgres', max: 6, onnotice: () => {} });
 const migration = await fs.readFile(new URL('../../supabase/migrations/20261111190000_commercial_gastronomy.sql', import.meta.url), 'utf8');
 const contractMigration = await fs.readFile(new URL('../../supabase/migrations/20261112190000_commercial_contract_history.sql', import.meta.url), 'utf8');
+const expansionMigration = await fs.readFile(new URL('../../supabase/migrations/20261116180000_commercial_gastronomy_via_expressa_chopp.sql', import.meta.url), 'utf8');
+const expansionSeed = expansionMigration.replace(/^BEGIN;\s*/, '').replace(/COMMIT;\s*$/, '');
 const asUser = (user, operation) => db.begin(async (tx) => {
   await tx.unsafe('SET LOCAL ROLE authenticated');
   await tx`SELECT set_config('request.jwt.claim.sub',${user},true)`;
@@ -291,6 +293,100 @@ try {
   await asUser(seller, (tx) => tx`SELECT register_lot_contract_version(${ordinary.id},${ordinaryPath},'ordinary.pdf','application/pdf',1024,'ORDINARY')`);
   assert.equal((await detail(ordinaryOrder)).contracts[0].versions[0].storagePath,ordinaryPath);
   console.log('Gastronomia PostgreSQL QA: 12 pontos, 6 estruturas, R$ 386.541,00, carga idempotente, RLS, três pagamentos, checkout misto, concorrência, revisão, documentos, exportação e relatório OK');
+
+  // A collision on the last item also rolls back the truck and all of D2.
+  await assert.rejects(db.begin(async (tx) => {
+    await tx`INSERT INTO map_entities(project_id,layer_id,parent_entity_id,public_identifier,name,classification,is_sellable)
+      SELECT project_id,layer_id,id,'GAST-CHOPP-01','Outro ponto','FOOD_POINT',true FROM map_entities WHERE public_identifier='D3'`;
+    await tx.unsafe(expansionSeed);
+  }), /GASTRONOMY_POINT_IDENTITY_CONFLICT:GAST-CHOPP-01/);
+  assert.equal((await db`SELECT id FROM map_entities WHERE public_identifier LIKE 'GAST-CHOPP%' OR public_identifier LIKE 'GAST-D2-%'`).length, 0);
+
+  await db.begin((tx) => tx.unsafe(expansionSeed));
+  const expansion = () => db`
+    SELECT l.id,l.entity_id,l.public_identifier,l.status,l.display_order,l.food_type,l.price_source,
+      p.renovacao_total,p.segunda_total,p.official_area_sqm,a.public_identifier AS anchor,e.parent_entity_id,
+      fp.id AS price_id,q.is_sellable
+    FROM commercial_lots l JOIN map_entities e ON e.id=l.entity_id JOIN map_entities a ON a.id=e.parent_entity_id
+    JOIN commercial_lot_pricing_2028 p ON p.lot_id=l.id JOIN lot_prices fp ON fp.lot_id=l.id AND fp.is_active
+    JOIN commercial_sale_eligibility q ON q.lot_id=l.id
+    WHERE l.project_id=${project} AND l.commercial_unit='FOOD_POINT' AND a.public_identifier IN ('D2','GAST-CHOPP')
+    ORDER BY a.public_identifier,l.display_order
+  `;
+  const added = await expansion();
+  const via = added.filter((row) => row.anchor === 'D2');
+  const truck = added.find((row) => row.anchor === 'GAST-CHOPP');
+  assert.equal(added.length,12);
+  assert.deepEqual(via.map((row) => row.food_type),['Crepes','Churros','Lanche','Sorvete','Crepes','Churros','Cocada','Espetinho','Espetinho','Morango','Crepes']);
+  assert.deepEqual(via.map((row) => row.price_source.cell),Array.from({length:11},(_,index) => 'J' + (14 + index)));
+  assert.deepEqual(via.map((row) => Number(row.renovacao_total)),[20965,13100,7050,8260,20965,13100,8018,12000,12000,19150,21072]);
+  assert.equal(via.reduce((sum,row) => sum + Number(row.renovacao_total),0),155680);
+  assert.equal(Number(truck.renovacao_total),24500);
+  assert.equal(truck.food_type,'Chope');
+  assert.equal(truck.price_source.categoryCell,'C32');
+  assert.equal(truck.price_source.cell,'J32');
+  assert.ok(added.every((row) => row.status==='AVAILABLE' && row.is_sellable && row.official_area_sqm===null && row.renovacao_total===row.segunda_total));
+  const total = (await db`SELECT count(*)::int AS points,count(DISTINCT e.parent_entity_id)::int AS anchors,sum((l.price_source->>'initialTotal')::numeric)::int AS value
+    FROM commercial_lots l JOIN map_entities e ON e.id=l.entity_id WHERE l.project_id=${project} AND l.commercial_unit='FOOD_POINT'`)[0];
+  assert.deepEqual(total,{points:24,anchors:8,value:566721});
+  assert.equal((await db`SELECT map_segment_is_complete(${segmentId}) AS valid`)[0].valid,true);
+  assert.deepEqual(await visible(gastronomyMember),[['FOOD_POINT',24]]);
+  assert.deepEqual(await visible(ruralMember),[['SQUARE_METER',1]]);
+  assert.deepEqual(await visible(mapViewer),[['FOOD_POINT',24],['SQUARE_METER',4]]);
+  const newAnchors = await asUser(gastronomyMember, (tx) => tx`
+    SELECT e.public_identifier FROM map_entities e JOIN map_entity_geometries g ON g.entity_id=e.id
+    WHERE g.is_current AND e.public_identifier IN ('D2','GAST-CHOPP') ORDER BY e.public_identifier
+  `);
+  assert.deepEqual(newAnchors.map((row) => row.public_identifier),['D2','GAST-CHOPP']);
+  await assert.rejects(runSale('no-write-truck',[truck.id],2450000,{user:gastronomyMember}), /MAP_PERMISSION_DENIED/);
+
+  // Use the existing checkout and contracts for both new anchors.
+  const expansionOrder = await runSale('via-chopp',[via[0].id,truck.id],4546500);
+  const [truckItem,viaItem] = await getItems(expansionOrder);
+  assert.equal(truckItem.structure_identifier_snapshot,'GAST-CHOPP');
+  assert.equal(viaItem.structure_identifier_snapshot,'D2');
+  assert.equal(await getStatus(via[0].id),'SALE_OPEN');
+  assert.equal(await getStatus(truck.id),'SALE_OPEN');
+  for (const point of via.slice(1)) assert.equal(await getStatus(point.id),'AVAILABLE');
+  const viaDocument = org + '/orders/' + expansionOrder + '/via.pdf';
+  const truckDocument = org + '/' + truck.id + '/chopp.pdf';
+  await db`INSERT INTO storage.objects (bucket_id,name,owner_id) VALUES ('map-contracts',${viaDocument},${seller}),('map-contracts',${truckDocument},${seller})`;
+  await asUser(seller, (tx) => tx`SELECT attach_order_contract(${expansionOrder},${tx.array([via[0].id])}::uuid[],${viaDocument},'via.pdf','application/pdf',1024,'VIA-TEST')`);
+  await confirm(expansionOrder,[truckItem.id,viaItem.id]);
+  await assert.rejects(asUser(sellerWithoutContracts, (tx) => tx`SELECT register_lot_contract_version(${truck.id},${truckDocument},'chopp.pdf','application/pdf',1024,'CHOPP-TEST',${truckItem.sale_id})`), /MAP_PERMISSION_DENIED/);
+  await asUser(seller, (tx) => tx`SELECT register_lot_contract_version(${truck.id},${truckDocument},'chopp.pdf','application/pdf',1024,'CHOPP-TEST',${truckItem.sale_id})`);
+  assert.deepEqual((await pointHistory(via[0].id)).contracts.map((row) => row.versions[0].storagePath),[viaDocument]);
+  assert.deepEqual((await pointHistory(truck.id)).contracts.map((row) => row.versions[0].storagePath),[truckDocument]);
+  assert.deepEqual((await pointHistory(truck.id,mapViewer)).contracts,[]);
+  assert.deepEqual((await detail(expansionOrder)).contracts.map((row) => row.versions[0].storagePath).sort(),[truckDocument,viaDocument].sort());
+
+  await db`UPDATE lot_prices SET base_price=25000 WHERE id=${truck.price_id}`;
+  const beforeExpansionReplay = await expansion();
+  const beforeTruckHistory = await pointHistory(truck.id);
+  const beforeViaHistory = await pointHistory(via[0].id);
+  const beforeExpansionItems = await getItems(expansionOrder);
+  await db.begin((tx) => tx.unsafe(expansionSeed));
+  assert.deepEqual(await expansion(),beforeExpansionReplay);
+  assert.deepEqual(await pointHistory(truck.id),beforeTruckHistory);
+  assert.deepEqual(await pointHistory(via[0].id),beforeViaHistory);
+  assert.deepEqual(await getItems(expansionOrder),beforeExpansionItems);
+  assert.equal(await getStatus(truck.id),'SOLD');
+  assert.equal(await getStatus(via[0].id),'SOLD');
+
+  const revisionOrder = await runSale('via-revision',[via[1].id],1310000);
+  await assert.rejects(asUser(seller, (tx) => tx`SELECT revise_sale_order_items(${revisionOrder},
+    p_add_lot_ids=>${tx.array([id('GAST-D3-01')])}::uuid[],p_reason=>'QA outra estrutura')`), /LOT_OUTSIDE_ORDER_SCOPE/);
+  await asUser(seller, (tx) => tx`SELECT revise_sale_order_items(${revisionOrder},
+    p_add_lot_ids=>${tx.array([via[2].id])}::uuid[],p_reason=>'QA revisão Via Expressa')`);
+  const revisionItems = await getItems(revisionOrder);
+  assert.deepEqual(revisionItems.map((item) => item.lot_id),[via[1].id,via[2].id]);
+  assert.equal(await getStatus(via[2].id),'SALE_OPEN');
+  await cancel(revisionOrder,revisionItems.map((item) => item.id));
+  assert.equal(await getStatus(via[1].id),'AVAILABLE');
+  assert.equal(await getStatus(via[2].id),'AVAILABLE');
+  assert.equal(await getStatus(via[0].id),'SOLD');
+  assert.equal(await getStatus(truck.id),'SOLD');
+  console.log('Expansão PostgreSQL QA: 11 pontos D2 e 1 caminhão, R$ 180.180,00, colisão atômica, RLS e reaplicação após vendas e contratos OK');
 } finally {
   await db.end();
 }

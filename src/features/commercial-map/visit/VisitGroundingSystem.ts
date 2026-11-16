@@ -27,6 +27,7 @@ import { COMMERCIAL_MAP_TREES } from '../data/commercialTrees';
 import { buildUbiretamaRoadPresentation, isUbiretamaPresentationSegment, type UbiretamaRoadPresentation } from '../utils/ubiretamaRoadPresentation';
 import { buildGateNineAccessPresentation, type GateNineAccessPresentation } from '../utils/gateNineRoadPresentation';
 import { buildExporuralSouthRoadPresentation, withExporuralSouthRoadPresentation } from '../utils/exporuralSouthRoadPresentation';
+import { CHOPP_TRUCK_IDENTIFIER } from '../utils/choppTruck';
 
 export function visitBoundsRing(bounds: VisitBounds): VisitRing {
   return [[bounds.minX, bounds.minZ], [bounds.maxX, bounds.minZ], [bounds.maxX, bounds.maxZ], [bounds.minX, bounds.maxZ]];
@@ -239,9 +240,9 @@ export function buildVisitGroundSurfaces(
   const presentedEntities = withExporuralSouthRoadPresentation(entities, buildExporuralSouthRoadPresentation(entities));
   for (const entity of presentedEntities) {
     if (entity.isArchived || entity.geometry.coordinates[0]?.length < 3) continue;
-    // D1 is classified FOOD_AREA, but its cadastral extrusion is a picking
-    // volume. The Alameda adapter supplies the actual split floor and stairs.
-    if (entity.publicIdentifier === 'D1') continue;
+    // The truck roof is a collision volume. D1 supplies its own split floor
+    // and stairs through the Alameda adapter.
+    if (entity.publicIdentifier === 'D1' || entity.publicIdentifier === CHOPP_TRUCK_IDENTIFIER) continue;
     const classification = entity.classification;
     let height: number | null = null;
     if (classification === 'ROAD' || classification === 'PEDESTRIAN_PATH') height = entity.geometry.elevation + roadSurfaceHeight(entity);

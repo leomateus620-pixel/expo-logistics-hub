@@ -42,6 +42,7 @@ import { buildBrigadaMilitaryWingPresentation } from '../utils/brigadaMilitaryWi
 import { createAdministrativeCenterEntranceLayout, administrativeEntranceLawnHeight } from '../utils/administrativeCenterEntrance';
 import { commercialTreeWoodStructure } from '../utils/commercialTreeWoodStructure';
 import { GATE_NINE_COMMUNICATION_TOWER } from '../data/gateNineCommunicationTower';
+import { choppTruckGroundElevation } from '../utils/choppTruck';
 
 const SOLID_CLASSIFICATIONS = new Set(['PAVILION', 'BUILDING', 'RESTAURANT', 'RESTROOM', 'CHEMICAL_RESTROOM', 'ADMINISTRATION', 'SECURITY', 'EMERGENCY', 'SERVICE', 'EVENT_VENUE']);
 
@@ -350,7 +351,7 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
     }
     if (kind === 'campeira-track' || kind === 'nations-square' || entity.classification === 'GATE') continue;
     if (SOLID_CLASSIFICATIONS.has(entity.classification) || (kind && entity.classification !== 'GREEN_AREA')) {
-      const base = entity.geometry.elevation;
+      const base = kind === 'chopp-truck' ? choppTruckGroundElevation(entity.geometry.elevation) : entity.geometry.elevation;
       polygon(entity.id, entity.geometry.coordinates[0] ?? [], base, Math.max(0.3, strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight));
     } else if (entity.classification === 'WATER') {
       // Water is not a walkable shortcut, even though the display plane is flat.

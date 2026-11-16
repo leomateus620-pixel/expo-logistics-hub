@@ -1,8 +1,9 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GastronomyStructurePanel } from '@/features/commercial-map/components/panels/GastronomyStructurePanel';
 import { OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features/commercial-map/data/officialReference2026';
 import type { LotContractHistoryDocument } from '@/features/commercial-map/services/commercialMapService';
+import { useSaleInspectionStore } from '@/features/commercial-map/state/useSaleInspectionStore';
 import type { CommercialLot } from '@/features/commercial-map/types';
 
 const useLotContractHistory = vi.hoisted(() => vi.fn());
@@ -56,9 +57,27 @@ function expand(name: string) {
 }
 
 beforeEach(() => useLotContractHistory.mockReset());
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  useSaleInspectionStore.getState().clear();
+});
 
 describe('contratos no card de um ponto de Gastronomia', () => {
+  it('troca o ponto inspecionado sem fechar a ficha quando ambos usam a mesma estrutura', () => {
+    useLotContractHistory.mockReturnValue(pointResponse());
+    const inspection = useSaleInspectionStore.getState();
+    inspection.start({ recordId: 'sale', reference: 'PV-001', displayName: 'Expositor', lotIds: points.map(({ lot }) => lot.id) });
+    inspection.focusFoodPoint(points[0].lot.id);
+    render(panel());
+    const first = screen.getByRole('button', { name: /^Restaurante Central/ });
+    const second = screen.getByRole('button', { name: /^Pizzaria/ });
+    expect(first).toHaveAttribute('aria-expanded', 'true');
+    act(() => inspection.focusFoodPoint(points[1].lot.id));
+    expect(first).toHaveAttribute('aria-expanded', 'false');
+    expect(second).toHaveAttribute('aria-expanded', 'true');
+    expect(useLotContractHistory).toHaveBeenLastCalledWith(points[1].lot.id);
+  });
+
   it('carrega o ponto expandido e exibe a anexação assim que a venda é elegível no servidor', () => {
     useLotContractHistory.mockReturnValue(pointResponse());
     const view = render(panel());

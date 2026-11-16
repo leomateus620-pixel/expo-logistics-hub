@@ -2,18 +2,26 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
-export async function buildMigrationEnvelope() {
-  const version = '20261111190000';
-  const name = 'commercial_gastronomy';
+export async function buildMigrationEnvelope({ viaExpressaChopp = false } = {}) {
+  const version = viaExpressaChopp ? '20261116180000' : '20261111190000';
+  const name = viaExpressaChopp ? 'commercial_gastronomy_via_expressa_chopp' : 'commercial_gastronomy';
   const file = new URL(`../../supabase/migrations/${version}_${name}.sql`, import.meta.url);
   const source = await readFile(file, 'utf8');
   const prefix = 'BEGIN;';
   const suffix = source.match(/\nCOMMIT;\s*$/)?.[0];
-  const delimiter = '$gastronomy_source_20261111190000$';
+  const delimiter = `$gastronomy_source_${version}$`;
   if (!source.startsWith(prefix) || !suffix || source.includes(delimiter)) {
     throw new Error('Unexpected migration transaction format');
   }
   const hash = createHash('sha256').update(source).digest('hex');
+  const initialInventoryCheck = viaExpressaChopp ? '' : `
+  IF NOT EXISTS (
+    SELECT 1 FROM public.commercial_lot_pricing_2028 p
+    JOIN public.map_entities e ON e.id=p.entity_id AND e.project_id=p.project_id
+    WHERE p.project_id='0538d132-34dd-4347-a33c-526edac7339c' AND p.commercial_unit='FOOD_POINT'
+    HAVING count(*)=12 AND count(DISTINCT e.parent_entity_id)=6
+      AND sum(p.renovacao_total)=386541 AND sum(p.segunda_total)=386541
+  ) THEN RAISE EXCEPTION 'GASTRONOMY_INITIAL_TOTAL_MISMATCH'; END IF;`;
   const sql = `DO $gastronomy_deploy$
 DECLARE
   migration_source constant text := ${delimiter}${source}${delimiter};
@@ -26,14 +34,7 @@ BEGIN
     IF existing IS DISTINCT FROM ARRAY[migration_source] THEN RAISE EXCEPTION 'MIGRATION_SOURCE_CONFLICT'; END IF;
     RETURN;
   END IF;
-  EXECUTE left(substr(migration_source,${prefix.length + 1}),-${suffix.length});
-  IF NOT EXISTS (
-    SELECT 1 FROM public.commercial_lot_pricing_2028 p
-    JOIN public.map_entities e ON e.id=p.entity_id AND e.project_id=p.project_id
-    WHERE p.project_id='0538d132-34dd-4347-a33c-526edac7339c' AND p.commercial_unit='FOOD_POINT'
-    HAVING count(*)=12 AND count(DISTINCT e.parent_entity_id)=6
-      AND sum(p.renovacao_total)=386541 AND sum(p.segunda_total)=386541
-  ) THEN RAISE EXCEPTION 'GASTRONOMY_INITIAL_TOTAL_MISMATCH'; END IF;
+  EXECUTE left(substr(migration_source,${prefix.length + 1}),-${suffix.length});${initialInventoryCheck}
   INSERT INTO supabase_migrations.schema_migrations(version,name,statements,created_by,idempotency_key)
   VALUES('${version}','${name}',ARRAY[migration_source],
     'Codex via Lovable; sha256=${hash}','commercial-gastronomy-${version}');
@@ -42,5 +43,5 @@ END $gastronomy_deploy$;`;
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
-  process.stdout.write((await buildMigrationEnvelope()).sql);
+  process.stdout.write((await buildMigrationEnvelope({ viaExpressaChopp: process.argv.includes('--via-expressa-chopp') })).sql);
 }

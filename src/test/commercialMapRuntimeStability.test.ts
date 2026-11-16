@@ -11,7 +11,9 @@ describe('contrato de estabilidade do mapa comercial', () => {
     expect(canvas.match(/<Canvas\b/g)).toHaveLength(1);
     expect(page).toContain('data-canvas-lifecycle="persistent"');
     expect(page).toContain("workspaceMode === 'create' && (");
-    expect(page).toContain("workspaceMode === 'edit' && selectedEntity && (");
+    expect(page).toContain("selectedEntity?.classification === 'FOOD_POINT' ? null : selectedEntity");
+    expect(page).toContain("workspaceMode === 'edit' && selectedGeometryEntity && (");
+    expect(page).toContain('<GeometryEditor entity={selectedGeometryEntity}');
     expect(page).toContain("workspaceMode === 'list' || (!webglAvailable && workspaceMode === '3d')");
     expect(page).not.toContain('<EntityDetailsPanel key=');
   });

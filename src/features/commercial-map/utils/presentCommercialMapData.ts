@@ -5,10 +5,11 @@ import { withFenasojaComplexReconstruction } from '../data/fenasojaComplexRecons
 import { withMiranteComplexReconstruction } from '../data/miranteComplexReconstruction';
 import { withCommercialMapSegments } from '../data/commercialMapSegments';
 import { withUnifiedFenasojaRestaurant } from './fenasojaRestaurant';
+import { withChoppTruckReference } from './choppTruck';
 
 /** Shared authorized snapshot presentation; cadastral records stay unchanged. */
 export function presentCommercialMapData<T extends CommercialMapData>(data: T): T {
-  return withCommercialMapSegments(withUnifiedFenasojaRestaurant(
+  return withChoppTruckReference(withCommercialMapSegments(withUnifiedFenasojaRestaurant(
     withRuralPavilionReconstruction(withArenaReconstruction(withMiranteComplexReconstruction(withFenasojaComplexReconstruction(data)))),
-  ));
+  )));
 }

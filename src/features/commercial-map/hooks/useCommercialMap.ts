@@ -282,22 +282,30 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
       verificationFilters,
       sortOrder,
     });
-    // The explorer opens the same structure as the scene, including when the
-    // query matched a point's own name or individual commercial status.
-    const filteredItems = [...new Map(matches.flatMap((item) => {
-      if (item.entity.classification !== 'FOOD_POINT') return [[item.entity.id, item] as const];
+    const searching = Boolean(normalizeExplorerText(debouncedSearch));
+    const explorerItems = new Map<string, EntityExplorerItem>();
+    const sceneEntities = new Map<string, MapEntity>();
+    const matchingEntityIds = new Set<string>();
+    for (const item of matches) {
       const parentId = item.entity.parentEntityId;
-      const parent = parentId && foodStructures.has(parentId) ? itemsById.get(parentId) : null;
-      return parent ? [[parent.entity.id, parent] as const] : [];
-    })).values()];
-    const filteredEntities = filteredItems.map((item) => item.entity);
+      const target = item.entity.classification === 'FOOD_POINT'
+        ? (parentId && foodStructures.get(parentId)?.some(({ entity }) => entity.id === item.entity.id)
+          ? itemsById.get(parentId) : null)
+        : item;
+      if (!target) continue;
+      const result = searching ? item : target;
+      explorerItems.set(result.entity.id, result);
+      sceneEntities.set(target.entity.id, target.entity);
+      matchingEntityIds.add(item.entity.id);
+      matchingEntityIds.add(target.entity.id);
+    }
 
     return {
-      entities: filteredEntities,
-      items: filteredItems,
-      matchingEntityIds: new Set([...filteredEntities, ...matches.map((item) => item.entity)].map((entity) => entity.id)),
+      entities: [...sceneEntities.values()],
+      items: [...explorerItems.values()],
+      matchingEntityIds,
       hasActiveCriteria: Boolean(
-        normalizeExplorerText(debouncedSearch)
+        searching
         || statusFilters.length
         || classificationFilters.length
         || locationFilter
@@ -305,7 +313,7 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
         || (!interiorScope && activeSegmentId)
       ),
       totalCount: interiorScope ? segmentItems.length : visibleItems.length,
-      filteredCount: filteredItems.length,
+      filteredCount: explorerItems.size,
       facets,
     };
   }, [activeSegmentId, classificationFilters, debouncedSearch, facets, foodStructures, interiorScope, itemsById, locationFilter, segmentItems, sortOrder, statusFilters, verificationFilters, visibleItems.length]);

@@ -99,6 +99,7 @@ import { createUbiretamaRoadPresentationResolver } from '../../utils/ubiretamaRo
 import { buildGateNineAccessPresentation } from '../../utils/gateNineRoadPresentation';
 import { createExporuralSouthRoadPresentationResolver, withExporuralSouthRoadPresentation } from '../../utils/exporuralSouthRoadPresentation';
 import { withPavilion12TreeGroundSupport } from '../../data/pavilion12FrontTrees';
+import { CHOPP_TRUCK_SITE, resolveChoppTruckTransform } from '../../utils/choppTruck';
 import { buildElectricalSceneLayout, selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialHydrologicalInfrastructureForScene } from '../../utils/hydrologicalInfrastructure';
 import {
@@ -703,6 +704,9 @@ function focusProfileForEntity(entity: MapEntity) {
   if (landmark === 'via-expressa') {
     return { ...profile, contextRatio: 0.05, fitPadding: 1.18, minDistanceRatio: 0.042, maxDistanceRatio: 0.32, minimumDirectionY: 0.36 };
   }
+  if (landmark === 'chopp-truck') {
+    return { ...profile, contextRatio: 0.022, fitPadding: 1.18, minimumDirectionY: 0.36 };
+  }
   if (landmark === 'livestock-tent') {
     return { ...profile, contextRatio: 0.052, fitPadding: 1.2, minDistanceRatio: 0.044, maxDistanceRatio: 0.32, minimumDirectionY: 0.34 };
   }
@@ -916,6 +920,7 @@ interface EntityMeshProps {
   exporuralSteakhousePresentationAvailable: boolean;
   brigadaWingPresentationHeight?: number;
   exporuralRestroomEntityId?: string;
+  reducedTruckGraphics?: boolean;
   isMatch: boolean;
   layerOpacity: number;
   sceneCenter: readonly [number, number];
@@ -1346,6 +1351,7 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
         onCursor={props.onCursor}
         moduleStateById={props.moduleStateById}
         exporuralRestroomEntityId={props.exporuralRestroomEntityId}
+        reducedTruckGraphics={props.reducedTruckGraphics}
       />
     );
   }
@@ -2311,11 +2317,13 @@ function CameraRig({
     }),
     [extent, miranteExtent, segmentExtent, size.height, size.width],
   );
-  // Registered close ranges for the Brasília frontage; global limits remain shared.
+  // Registered close ranges for small landmarks; global limits remain shared.
   const requestedMinimumDistance = lactalisSelected
     ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance
     : selectedKind === 'fenasoja-headquarters' && !interiorEntity
       ? 1.5
+    : selectedKind === 'chopp-truck' && !interiorEntity
+      ? CHOPP_TRUCK_SITE.minimumCameraDistance
     : miranteExtent
     ? Math.max(7.5, miranteExtent.diagonal * 0.8)
     : segmentExtent && activeSegment
@@ -3111,10 +3119,11 @@ function CameraRig({
     const compactSidePanelMirante = landmarkKind === 'mirante-pavilion'
       && panelWidth > 0
       && usableWidth < 420;
+    const truck = landmarkKind === 'chopp-truck' ? resolveChoppTruckTransform(entity) : null;
     const entityCenter = new THREE.Vector3(
-      entityExtent.centerX,
-      entity.geometry.elevation + entityExtent.maxHeight * 0.28,
-      entityExtent.centerZ,
+      truck?.center[0] ?? entityExtent.centerX,
+      (truck?.ground ?? entity.geometry.elevation) + entityExtent.maxHeight * (truck ? 0.48 : 0.28),
+      truck?.center[1] ?? entityExtent.centerZ,
     );
     const currentTarget = controlsRef.current?.target ?? targetLookAt.current;
     const direction = camera.position.clone().sub(currentTarget);
@@ -3125,11 +3134,15 @@ function CameraRig({
       // Preserve a small amount of spatial continuity while making the public
       // facade deterministic after rapid switches or a lateral manual view.
       const deterministicDirection = new THREE.Vector3(...landmarkFocusDirection).normalize();
-      if (landmarkKind === 'mirante-pavilion' || landmarkKind === 'lactalis-cultural-stage') direction.copy(deterministicDirection);
+      if (truck || landmarkKind === 'mirante-pavilion' || landmarkKind === 'lactalis-cultural-stage') direction.copy(deterministicDirection);
       else direction.lerp(deterministicDirection, 0.92).normalize();
     }
     const compactStage = landmarkKind === 'lactalis-cultural-stage';
     const compactHeadquarters = landmarkKind === 'fenasoja-headquarters';
+    const minimumFocusDistance = compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance
+      : compactHeadquarters ? 1.5
+      : truck ? CHOPP_TRUCK_SITE.minimumCameraDistance
+      : undefined;
     const minimumDirectionY = compactStage && aspect < 0.72
       ? LACTALIS_STAGE_LAYOUT.camera.focusPortraitMinimumDirectionY
       : focusProfile.minimumDirectionY;
@@ -3141,11 +3154,13 @@ function CameraRig({
       aspect,
       direction,
       focusProfile.fitPadding,
-      compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : compactHeadquarters ? 1.5 : undefined,
+      minimumFocusDistance,
     );
+    const minimumSelectionDistance = truck ? CHOPP_TRUCK_SITE.minimumCameraDistance
+      : compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : compactHeadquarters ? 1.5 : Math.max(10, extent.diagonal * focusProfile.minDistanceRatio);
     const fittedSelectionDistance = THREE.MathUtils.clamp(
       Math.max(fittedDistance, compactStage ? LACTALIS_STAGE_LAYOUT.camera.focusedDistance : extent.diagonal * focusProfile.contextRatio),
-      compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : compactHeadquarters ? 1.5 : Math.max(10, extent.diagonal * focusProfile.minDistanceRatio),
+      minimumSelectionDistance,
       controlsMaximumDistance,
     );
     const distance = compactSidePanelMirante
@@ -4810,7 +4825,7 @@ const Scene = memo(function Scene({
     bootStarted.current = true;
     markCommercialMapStage('critical-scene:start');
   }
-  const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
+  const selectedRecordId = useCommercialMapStore((state) => state.selectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const hoveredEntityId = useCommercialMapStore((state) => state.hoveredEntityId);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
@@ -5032,7 +5047,12 @@ const Scene = memo(function Scene({
       )),
     );
   }, [activeSegmentId, resolvedSegmentByEntity]);
-  const selectedEntity = entities.find((entity) => entity.id === selectedEntityId) ?? null;
+  const selectedRecord = entities.find((entity) => entity.id === selectedRecordId);
+  // Food point selection is kept in the detail panel; the scene frames its physical parent.
+  const selectedEntity = (selectedRecord?.classification === 'FOOD_POINT'
+    ? entities.find((entity) => entity.id === selectedRecord.parentEntityId && gastronomyStructureIds.has(entity.id))
+    : selectedRecord) ?? null;
+  const selectedEntityId = selectedEntity?.id ?? null;
   const lunarTreeEntity = useMemo(
     () => entities.find((entity) => resolveStrategicLandmarkKind(entity) === 'lunar-tree') ?? null,
     [entities],
@@ -5650,6 +5670,7 @@ const Scene = memo(function Scene({
           brigadaWingPresentationHeight={brigadaWingPresentationAvailable && entity.id === brigadaWing?.entityId
             ? brigadaWing.height : undefined}
           exporuralRestroomEntityId={exporuralRestroomEntityId}
+          reducedTruckGraphics={kind === 'chopp-truck' && renderQualityTier === 'LOW'}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           layerOpacity={layerOpacity[entity.layerId] ?? 1}
           sceneCenter={sceneCenter}

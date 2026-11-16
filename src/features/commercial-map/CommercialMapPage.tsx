@@ -403,6 +403,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     && group.spaces.some((space) => space.entityId === selectedEntityId || space.entityId === selectedEntity?.parentEntityId));
   const selectedLot = scopedData.lots.find((lot) => lot.entityId === selectedEntityId);
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
+  const selectedGeometryEntity = selectedEntity?.classification === 'FOOD_POINT' ? null : selectedEntity;
+  const visitEntityId = selectedLot && selectedEntity && selectedEntity.classification !== 'INTERNAL_STAND'
+    ? (selectedEntity.classification === 'FOOD_POINT' ? selectedEntity.parentEntityId ?? undefined : selectedEntity.id)
+    : undefined;
   const christmasEligible = Boolean(data) && areaScope === 'park' && !isCommissionScope
     && !activeSegmentId && !interiorEntityId
     && (workspaceMode === '3d' || (!webglAvailable && workspaceMode === 'list'));
@@ -593,8 +597,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   }, [interiorEntityId, visitEnabled]);
 
   useEffect(() => {
-    if (workspaceMode === 'edit' && !selectedEntity) setWorkspaceMode('3d');
-  }, [selectedEntity, setWorkspaceMode, workspaceMode]);
+    if (workspaceMode === 'edit' && !selectedGeometryEntity) setWorkspaceMode('3d');
+  }, [selectedGeometryEntity, setWorkspaceMode, workspaceMode]);
 
   const projectStats = useMemo(() => {
     if (!data) return null;
@@ -653,7 +657,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   size="sm"
                   variant="outline"
                   onClick={() => setWorkspaceMode(workspaceMode === 'edit' ? '3d' : 'edit')}
-                  disabled={!selectedEntity}
+                  disabled={!selectedGeometryEntity}
                 >
                   <MousePointer2 />
                   {workspaceMode === 'edit' ? 'Sair da edição' : 'Editar geometria'}
@@ -830,7 +834,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         onOpenDashboard={() => setDashboardOpen(true)}
         salesAvailable={webglAvailable && data.source === 'database' && permissions.canManageSales}
         visitAvailable={(areaScope === 'park' || isCommissionScope) && webglAvailable && !interiorEntity && !lunarCinematicUiActive && !soyHarvestActive && !christmasSessionOpen}
-        visitEntityId={selectedLot && selectedEntity?.classification !== 'INTERNAL_STAND' ? selectedEntity?.id : undefined}
+        visitEntityId={visitEntityId}
       />
 
       <div className="commercial-map-body">
@@ -1042,9 +1046,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
             <MapFeatureBoundary id="create"><LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={scopedData.entities} /></MapFeatureBoundary>
           </div>
         )}
-        {workspaceMode === 'edit' && selectedEntity && (
+        {workspaceMode === 'edit' && selectedGeometryEntity && (
           <div className="commercial-map-workspace-layer">
-            <MapFeatureBoundary id={selectedEntity.id}><GeometryEditor entity={selectedEntity} calibration={data.calibration} /></MapFeatureBoundary>
+            <MapFeatureBoundary id={selectedGeometryEntity.id}><GeometryEditor entity={selectedGeometryEntity} calibration={data.calibration} /></MapFeatureBoundary>
           </div>
         )}
         {(workspaceMode === 'list' || (!webglAvailable && workspaceMode === '3d')) && (

@@ -136,6 +136,7 @@ INSERT INTO map_entities(project_id,layer_id,public_identifier,name,classificati
 SELECT l.project_id,l.id,v.code,v.name,v.kind,jsonb_strip_nulls(jsonb_build_object('segmentId',v.segment)) FROM map_layers l CROSS JOIN (VALUES
  ('C1','Centro de Eventos Fenasoja','EVENT_VENUE',NULL),('C2','Restaurante Central','RESTAURANT','industria-comercio-servicos'),('C3','Pizzaria','RESTAURANT','industria-comercio-servicos'),
  ('C4','Churrascaria Exporural','RESTAURANT','exporural'),('D1','Alameda Gastronômica','FOOD_AREA','industria-comercio-servicos'),
+ ('D2','Via Expressa','ATTRACTION','industria-comercio-servicos'),
  ('D3','Espaço Mirante','ATTRACTION','industria-comercio-servicos'),('D4','Tenda da Pecuária','LIVESTOCK_AREA',NULL),
  ('B1','Pavilhão 1','PAVILION','industria-comercio-servicos')) v(code,name,kind,segment);
 INSERT INTO map_entity_geometries(project_id,entity_id,geometry,change_reason)
@@ -166,6 +167,10 @@ INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000013',org_
   await db.unsafe(sql);
   await db.unsafe(sql);
   await db.unsafe(await migration('20261112190000_commercial_contract_history.sql'));
+  if (process.argv.includes('--via-expressa-chopp')) {
+    const expansion = await buildMigrationEnvelope({ viaExpressaChopp: true });
+    await db.unsafe(expansion.sql);
+  }
   console.log('Banco descartável gastronomy_qa preparado em 127.0.0.1:55438.');
 } catch(e) {
   console.error(e.message, e.code, e.where ?? '', e.detail ?? '', e.position ?? '');

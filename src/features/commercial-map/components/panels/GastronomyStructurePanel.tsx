@@ -1,7 +1,9 @@
-import { useRef, useState } from 'react';
-import { ArrowLeft, ChevronDown, DoorOpen, FileLock2, Paperclip, Pencil, ShoppingCart, Utensils, X } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef, useState, type SyntheticEvent } from 'react';
+import { ArrowLeft, BookOpen, ChevronDown, DoorOpen, FileLock2, Paperclip, Pencil, ShoppingCart, Utensils, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { STATUS_CONFIG } from '../../constants';
+import { getHistoryIdForEntity } from '../../history/bindings';
+import { HistoryExperience } from '../../history/HistoryExperience';
 import { useCompactDetailSheet } from '../../hooks/useCompactDetailSheet';
 import { useLotContractHistory } from '../../hooks/useCommercialMap';
 import type { SaleContractVersion } from '../../dashboard/salesOrders/salesOrdersService';
@@ -22,9 +24,14 @@ import './gastronomy-structure-panel.css';
 
 type PointPermissions = Pick<MapPermissions, 'canManageSales' | 'canManageContracts'>;
 
-export function GastronomyStructurePanel({ structure, points, canSell, permissions, mapData, onEnterInterior, onClose }: {
+function stopMapGesture(event: SyntheticEvent) {
+  event.stopPropagation();
+}
+
+export function GastronomyStructurePanel({ structure, points, selectedPointId, canSell, permissions, mapData, onEnterInterior, onClose }: {
   structure: MapEntity;
   points: readonly { entity: MapEntity; lot: CommercialLot }[];
+  selectedPointId?: string;
   canSell: boolean;
   permissions: PointPermissions;
   mapData: Pick<CommercialMapData, 'lots' | 'entities'>;
@@ -32,14 +39,21 @@ export function GastronomyStructurePanel({ structure, points, canSell, permissio
   onClose: () => void;
 }) {
   const inspection = useSaleInspectionStore((state) => state.context);
+  const inspectedSalePoint = useSaleInspectionStore((state) => state.focusedFoodLotId);
   const salesMode = useSalesStore((state) => state.salesModeActive);
   const cart = useSalesStore((state) => state.selection);
   const eligible = useSalesStore((state) => state.eligibleLotIds);
   const addLot = useSalesStore((state) => state.addLot);
   const [draft, setDraft] = useState<ReadonlySet<string>>(() => new Set());
-  const [inspectedPoint, setInspectedPoint] = useState<string | null>(() => useSaleInspectionStore.getState().focusedFoodLotId);
+  const requestedPoint = selectedPointId ?? inspectedSalePoint;
+  const [inspectedPoint, setInspectedPoint] = useState(requestedPoint);
+  const requestedPointRow = useRef<HTMLLIElement>(null);
+  const historyId = getHistoryIdForEntity(structure);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const historyTrigger = useRef<HTMLButtonElement>(null);
   const opener = useRef(document.activeElement instanceof HTMLElement ? document.activeElement : null);
   const sheet = useCompactDetailSheet(structure.id, true);
+  const { setSheetState } = sheet;
   const selling = salesMode && canSell && !inspection;
   const name = structure.publicIdentifier === 'C2' ? FENASOJA_RESTAURANT_PRESENTATION_NAME : structure.name;
   const pricedPoints = points.map((point) => ({
@@ -55,11 +69,24 @@ export function GastronomyStructurePanel({ structure, points, canSell, permissio
   const sold = points.filter(({ lot }) => lot.status === 'SOLD').length;
   const other = points.length - available - saleOpen - sold;
   const counts = [
-    { status: 'AVAILABLE', count: available, label: 'disponíveis' },
+    { status: 'AVAILABLE', count: available, label: available === 1 ? 'disponível' : 'disponíveis' },
     { status: 'SALE_OPEN', count: saleOpen, label: 'em aberto' },
-    { status: 'SOLD', count: sold, label: 'vendidos' },
-    { status: 'BLOCKED', count: other, label: 'bloqueados' },
+    { status: 'SOLD', count: sold, label: sold === 1 ? 'vendido' : 'vendidos' },
+    { status: 'BLOCKED', count: other, label: other === 1 ? 'bloqueado' : 'bloqueados' },
   ] as const;
+
+  useLayoutEffect(() => {
+    setInspectedPoint(requestedPoint);
+    if (!requestedPoint) return;
+    setHistoryOpen(false);
+    setSheetState((current) => current === 'collapsed' ? 'half' : current);
+  }, [requestedPoint, setSheetState]);
+
+  useEffect(() => {
+    if (inspectedPoint === requestedPoint && requestedPoint) {
+      requestedPointRow.current?.scrollIntoView?.({ block: 'nearest' });
+    }
+  }, [inspectedPoint, requestedPoint]);
 
   function addSelected() {
     selected.forEach(({ lot, entity }) => addLot(toSalesEntry(lot, null, entity, structure)));
@@ -74,90 +101,107 @@ export function GastronomyStructurePanel({ structure, points, canSell, permissio
     });
   }
 
+  function closeHistory() {
+    setHistoryOpen(false);
+    requestAnimationFrame(() => historyTrigger.current?.focus({ preventScroll: true }));
+  }
+
   return (
     <aside ref={sheet.panelRef}
       className={`commercial-map-panel commercial-map-details-panel gastronomy-panel${selling ? ' is-selling' : ''}`}
       data-sheet-state={sheet.sheetState}
+      data-history-open={historyOpen}
       aria-label={`Pontos de alimentação em ${name}`}
-      onPointerDown={(event) => event.stopPropagation()} onWheel={(event) => event.stopPropagation()}>
-      <div className="commercial-map-panel-header">
-        <div><span className="gastronomy-panel__identity"><Utensils aria-hidden="true" /> Gastronomia · {structure.publicIdentifier}</span>
-          <h2>{name}</h2></div>
-        <button type="button" aria-label={inspection ? 'Voltar à venda' : 'Fechar painel'} onClick={close}>
-          {inspection ? <ArrowLeft className="h-4 w-4" /> : <X className="h-4 w-4" />}
-        </button>
-      </div>
-      <CompactDetailSheetControls sheet={sheet} subject="estrutura">
-        {onEnterInterior && !inspection && <Button type="button" variant="outline" onClick={onEnterInterior}><DoorOpen />Ver interior</Button>}
-      </CompactDetailSheetControls>
-      <div className="commercial-map-panel-scroll gastronomy-panel__body">
-        <h3>{points.length} {points.length === 1 ? 'ponto de alimentação' : 'pontos de alimentação'}</h3>
-        <div className="gastronomy-panel__distribution" aria-hidden="true">
-          {counts.filter(({ count }) => count > 0).map(({ status, count }) => (
-            <span key={status} data-status={status} style={{ flexGrow: count }} />
-          ))}
+      onPointerDown={stopMapGesture} onPointerMove={stopMapGesture} onPointerUp={stopMapGesture}
+      onTouchStart={stopMapGesture} onTouchMove={stopMapGesture} onTouchEnd={stopMapGesture} onWheel={stopMapGesture}>
+      {historyOpen && historyId && <>
+        <div className="fenasoja-history-sheet-controls"><CompactDetailSheetControls sheet={sheet} subject="estrutura" /></div>
+        <HistoryExperience historyId={historyId} onClose={closeHistory} />
+      </>}
+      <div className="commercial-map-commercial-view" hidden={historyOpen}>
+        <div className="commercial-map-panel-header">
+          <div><span className="gastronomy-panel__identity"><Utensils aria-hidden="true" /> Gastronomia · {structure.publicIdentifier}</span>
+            <h2>{name}</h2></div>
+          <button type="button" aria-label={inspection ? 'Voltar à venda' : 'Fechar painel'} onClick={close}>
+            {inspection ? <ArrowLeft className="h-4 w-4" /> : <X className="h-4 w-4" />}
+          </button>
         </div>
-        <div className="gastronomy-panel__counts" aria-label="Situação dos pontos">
-          {counts.filter(({ status, count }) => status !== 'BLOCKED' || count > 0).map(({ status, count, label }) => (
-            <span key={status} data-status={status}>{count} {label}</span>
-          ))}
-        </div>
-        <ul className="gastronomy-panel__list">
-          {pricedPoints.map(({ lot, price, inCart }) => {
-            const status = STATUS_CONFIG[toCommercialPhase(lot.status)];
-            const selectable = selling && !inCart && lot.status === 'AVAILABLE' && isSellableLot(lot, eligible)
-              && price != null && price > 0;
-            const expanded = inspectedPoint === lot.id;
-            return <li key={lot.id} data-inspected={expanded || inspection?.lotIds.includes(lot.id) || undefined}>
-              <div className="gastronomy-panel__row">
-                {selling && <label className="gastronomy-panel__checkbox"><input type="checkbox" aria-label={`Selecionar ${lot.displayName}`}
-                  checked={inCart || (selectable && draft.has(lot.id))} disabled={!selectable}
-                  onChange={(event) => {
-                    const checked = event.currentTarget.checked;
-                    setDraft((current) => {
-                      const next = new Set(current);
-                      if (checked) next.add(lot.id); else next.delete(lot.id);
-                      return next;
-                    });
-                  }} /></label>}
-                <button type="button" className="gastronomy-panel__point-button" aria-expanded={expanded}
-                  aria-controls={`food-point-${lot.id}`} onClick={() => setInspectedPoint(expanded ? null : lot.id)}>
-                  <span className="gastronomy-panel__point">
-                    <strong>{lot.displayName}</strong>
-                    {lot.foodType && <small>{lot.foodType}</small>}
-                    <span className="gastronomy-panel__status" style={{ background: status.surface, color: status.border }}>
-                      {inCart ? 'Na venda' : status.label}
+        {historyId && <Button ref={historyTrigger} type="button" variant="outline" className="commercial-map-history-trigger"
+          onClick={() => setHistoryOpen(true)}><BookOpen aria-hidden="true" />Conhecer a história</Button>}
+        <CompactDetailSheetControls sheet={sheet} subject="estrutura">
+          {onEnterInterior && !inspection && <Button type="button" variant="outline" onClick={onEnterInterior}
+            data-commercial-map-interior-trigger={structure.id}><DoorOpen />Ver interior</Button>}
+        </CompactDetailSheetControls>
+        <div className="commercial-map-panel-scroll gastronomy-panel__body">
+          <h3>{points.length} {points.length === 1 ? 'ponto de alimentação' : 'pontos de alimentação'}</h3>
+          <div className="gastronomy-panel__distribution" aria-hidden="true">
+            {counts.filter(({ count }) => count > 0).map(({ status, count }) => (
+              <span key={status} data-status={status} style={{ flexGrow: count }} />
+            ))}
+          </div>
+          <div className="gastronomy-panel__counts" aria-label="Situação dos pontos">
+            {counts.filter(({ status, count }) => status !== 'BLOCKED' || count > 0).map(({ status, count, label }) => (
+              <span key={status} data-status={status}>{count} {label}</span>
+            ))}
+          </div>
+          <ul className="gastronomy-panel__list">
+            {pricedPoints.map(({ lot, price, inCart }) => {
+              const status = STATUS_CONFIG[toCommercialPhase(lot.status)];
+              const selectable = selling && !inCart && lot.status === 'AVAILABLE' && isSellableLot(lot, eligible)
+                && price != null && price > 0;
+              const expanded = inspectedPoint === lot.id;
+              return <li key={lot.id} ref={lot.id === requestedPoint ? requestedPointRow : undefined}
+                data-inspected={expanded || inspection?.lotIds.includes(lot.id) || undefined}>
+                <div className="gastronomy-panel__row">
+                  {selling && <label className="gastronomy-panel__checkbox"><input type="checkbox" aria-label={`Selecionar ${lot.displayName}`}
+                    checked={inCart || (selectable && draft.has(lot.id))} disabled={!selectable}
+                    onChange={(event) => {
+                      const checked = event.currentTarget.checked;
+                      setDraft((current) => {
+                        const next = new Set(current);
+                        if (checked) next.add(lot.id); else next.delete(lot.id);
+                        return next;
+                      });
+                    }} /></label>}
+                  <button type="button" className="gastronomy-panel__point-button" aria-expanded={expanded}
+                    aria-controls={`food-point-${lot.id}`} onClick={() => setInspectedPoint(expanded ? null : lot.id)}>
+                    <span className="gastronomy-panel__point">
+                      <strong>{lot.displayName}</strong>
+                      {lot.foodType && <small>{lot.foodType}</small>}
+                      <span className="gastronomy-panel__status" style={{ background: status.surface, color: status.border }}>
+                        {inCart ? 'Na venda' : status.label}
+                      </span>
                     </span>
-                  </span>
-                  <span className="gastronomy-panel__price">
-                    <strong>{formatBrl(price) ?? 'Preço pendente'}</strong>
-                    {price != null && <small>por ponto</small>}
-                  </span>
-                  <ChevronDown aria-hidden="true" />
-                </button>
-              </div>
-              <div id={`food-point-${lot.id}`} hidden={!expanded} className="gastronomy-panel__point-detail">
-                {expanded && <>
-                  <dl>
-                    <div><dt>Identificador</dt><dd>{lot.publicIdentifier}</dd></div>
-                    <div><dt>Unidade comercial</dt><dd>1 ponto de alimentação</dd></div>
-                    {lot.currentBuyer && <div><dt>Expositor</dt><dd>{lot.currentBuyer}</dd></div>}
-                  </dl>
-                  {canSell && lot.status === 'SALE_OPEN' && <SaleOpenSection lotId={lot.id} canManageSales mapData={mapData} />}
-                  {(permissions.canManageContracts || permissions.canManageSales) && !lot.id.startsWith('reference:') && !lot.archivedAt && (
-                    <GastronomyPointContracts lot={lot} structureName={name} permissions={permissions} />
-                  )}
-                </>}
-              </div>
-            </li>;
-          })}
-        </ul>
+                    <span className="gastronomy-panel__price">
+                      <strong>{formatBrl(price) ?? 'Preço pendente'}</strong>
+                      {price != null && <small>por ponto</small>}
+                    </span>
+                    <ChevronDown aria-hidden="true" />
+                  </button>
+                </div>
+                <div id={`food-point-${lot.id}`} hidden={!expanded} className="gastronomy-panel__point-detail">
+                  {expanded && <>
+                    <dl>
+                      <div><dt>Identificador</dt><dd>{lot.publicIdentifier}</dd></div>
+                      <div><dt>Unidade comercial</dt><dd>1 ponto de alimentação</dd></div>
+                      {lot.currentBuyer && <div><dt>Expositor</dt><dd>{lot.currentBuyer}</dd></div>}
+                    </dl>
+                    {canSell && lot.status === 'SALE_OPEN' && <SaleOpenSection lotId={lot.id} canManageSales mapData={mapData} />}
+                    {(permissions.canManageContracts || permissions.canManageSales) && !lot.id.startsWith('reference:') && !lot.archivedAt && (
+                      <GastronomyPointContracts lot={lot} structureName={name} permissions={permissions} />
+                    )}
+                  </>}
+                </div>
+              </li>;
+            })}
+          </ul>
+        </div>
+        {selling && <footer className="gastronomy-panel__actions">
+          <span aria-live="polite"><small>{selected.length > 0 ? `${selected.length} ${selected.length === 1 ? 'ponto selecionado' : 'pontos selecionados'}` : 'Subtotal da seleção'}</small>
+            <strong>{formatCents(subtotal)}</strong></span>
+          <Button type="button" disabled={!selected.length} onClick={addSelected}><ShoppingCart />Adicionar à venda</Button>
+        </footer>}
       </div>
-      {selling && <footer className="gastronomy-panel__actions">
-        <span aria-live="polite"><small>{selected.length > 0 ? `${selected.length} ${selected.length === 1 ? 'ponto selecionado' : 'pontos selecionados'}` : 'Subtotal da seleção'}</small>
-          <strong>{formatCents(subtotal)}</strong></span>
-        <Button type="button" disabled={!selected.length} onClick={addSelected}><ShoppingCart />Adicionar à venda</Button>
-      </footer>}
     </aside>
   );
 }
