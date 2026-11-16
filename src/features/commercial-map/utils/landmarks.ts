@@ -51,6 +51,12 @@ import {
   viaExpressaVisualHeight,
 } from './viaExpressa';
 import {
+  CHOPP_TRUCK_IDENTIFIER,
+  CHOPP_TRUCK_SITE,
+  choppTruckRotation,
+  resolveChoppTruckTransform,
+} from './choppTruck';
+import {
   LIVESTOCK_TENT_LAYOUT,
   livestockTentVisualHeight,
 } from './livestockTent';
@@ -71,6 +77,7 @@ export type StrategicLandmarkKind =
   | 'third-age-pavilion'
   | 'livestock-pavilion'
   | 'via-expressa'
+  | 'chopp-truck'
   | 'livestock-tent'
 
   | 'mirante-pavilion'
@@ -269,6 +276,13 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: VIA_EXPRESSA_LAYOUT.facingRadians,
     focusDirection: VIA_EXPRESSA_LAYOUT.focusDirection,
     visualHeight: viaExpressaVisualHeight,
+  },
+  [CHOPP_TRUCK_IDENTIFIER]: {
+    kind: 'chopp-truck',
+    aliases: ['Caminhão de Chope', 'Caminhão Chopp', 'Food Truck de Chopp'],
+    facingRadians: 0,
+    focusDirection: [0.44, 0.36, 0.9],
+    visualHeight: () => CHOPP_TRUCK_SITE.size.height,
   },
   D3: {
     kind: 'mirante-pavilion',
@@ -536,6 +550,7 @@ export function strategicLandmarkSearchAliases(
 export function strategicLandmarkFacingRadians(
   entity: Pick<MapEntity, 'publicIdentifier'> & Partial<Pick<MapEntity, 'geometry'>>,
 ): number {
+  if (normalizedIdentifier(entity) === CHOPP_TRUCK_IDENTIFIER) return choppTruckRotation(entity.geometry);
   if (normalizedIdentifier(entity) === 'B13' && entity.geometry) {
     const bounds = strategicLandmarkBounds({ geometry: entity.geometry });
     return lactalisStageFacingRadians([bounds.centerX, bounds.centerZ]);
@@ -546,6 +561,10 @@ export function strategicLandmarkFacingRadians(
 export function strategicLandmarkFocusDirection(
   entity: Pick<MapEntity, 'publicIdentifier'> & Partial<Pick<MapEntity, 'geometry'>>,
 ): readonly [number, number, number] | null {
+  if (normalizedIdentifier(entity) === CHOPP_TRUCK_IDENTIFIER && entity.geometry) {
+    const { serviceNormal } = resolveChoppTruckTransform({ geometry: entity.geometry });
+    return [serviceNormal[0], 0.36, serviceNormal[1]];
+  }
   if (normalizedIdentifier(entity) === 'B13' && entity.geometry) {
     const bounds = strategicLandmarkBounds({ geometry: entity.geometry });
     const front = lactalisStageFrontVector([bounds.centerX, bounds.centerZ]);
@@ -583,6 +602,9 @@ export function strategicLandmarkVisualHeight(entity: MapEntity): number | null 
   const definition = STRATEGIC_LANDMARKS[normalizedIdentifier(entity)];
   if (!definition) return null;
   const visualHeight = definition.visualHeight(strategicLandmarkBounds(entity));
+  if (definition.kind === 'chopp-truck') {
+    return entity.geometry.extrusionHeight > 0 ? entity.geometry.extrusionHeight : visualHeight;
+  }
   if (definition.kind === 'third-age-pavilion') {
     return Math.min(THIRD_AGE_PAVILION_LAYOUT.maximumVisualHeight, visualHeight);
   }

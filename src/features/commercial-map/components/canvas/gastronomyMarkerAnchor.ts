@@ -1,4 +1,5 @@
 import type { MapEntity } from '../../types';
+import { choppTruckRoofAnchor } from '../../utils/choppTruck';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
 import { eventCenterEnvelope, eventCenterModelBounds } from '../../utils/eventCenter';
 import { EXPORURAL_STEAKHOUSE_LAYOUT, resolveExporuralSteakhouseDimensions } from '../../utils/exporuralSteakhouse';
@@ -14,6 +15,7 @@ import { resolveMarkerPresentationLift } from '../../utils/mapPresentation';
 import { createMiranteLayout } from '../../utils/mirante';
 import { safeLotAnchor } from '../../utils/soldLotPresentation';
 import { DEFAULT_FLAT_SURFACE_CLASSIFICATIONS, entitySurfaceHeight } from '../../utils/spatialSurface';
+import { createViaExpressaLayout, viaExpressaModelBounds } from '../../utils/viaExpressa';
 import { MIRANTE_SITE_PROFILE } from './MirantePavilion';
 
 const ROOF_CLEARANCE = 0.025;
@@ -64,6 +66,14 @@ export function resolveGastronomyMarkerAnchor(entity: MapEntity): [number, numbe
     }
     case 'livestock-tent':
       return onRoof(0, height + 0.0225, 0);
+    case 'via-expressa': {
+      const layout = createViaExpressaLayout(viaExpressaModelBounds(bounds, yaw), height, false);
+      return onRoof(0, layout.height + layout.roofThickness * 0.68, layout.centerZ);
+    }
+    case 'chopp-truck': {
+      const [x, y, z] = choppTruckRoofAnchor(entity);
+      return [x, y + ROOF_CLEARANCE, z];
+    }
     default: {
       const anchor = safeLotAnchor(coordinates);
       if (!anchor) return null;

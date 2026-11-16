@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import { resolveGastronomyMarkerAnchor } from '@/features/commercial-map/components/canvas/gastronomyMarkerAnchor';
 import { foodPointsByStructure } from '@/features/commercial-map/data/commercialMapSegments';
-import { OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features/commercial-map/data/officialReference2026';
+import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features/commercial-map/data/officialReference2026';
 import { buildCommercialDashboardSnapshot } from '@/features/commercial-map/dashboard/commercialDashboardAnalytics';
 import { saleStateLabel } from '@/features/commercial-map/dashboard/salesOrders/salesOrdersPresentation';
 import { draftsSumCents, initialSalesPayment, redistributeAutomatic } from '@/features/commercial-map/sales/salesInstallments';
 import { buildCartLine, summarizeCart } from '@/features/commercial-map/sales/salesPricing';
 import type { SalesSelectionEntry } from '@/features/commercial-map/sales/salesTypes';
 import type { CommercialLot, MapEntity } from '@/features/commercial-map/types';
+import { CHOPP_TRUCK_IDENTIFIER, choppTruckRoofAnchor, withChoppTruckReference } from '@/features/commercial-map/utils/choppTruck';
+import { strategicLandmarkBounds, strategicLandmarkFacingRadians, strategicLandmarkVisualHeight } from '@/features/commercial-map/utils/landmarks';
 import type { LotPricing2028 } from '@/features/commercial-map/utils/lotPricing2028';
+import { createViaExpressaLayout, viaExpressaModelBounds } from '@/features/commercial-map/utils/viaExpressa';
 import { withDashboardValue } from './helpers/dashboardFinancialFixture';
 
 function selection(id: string): SalesSelectionEntry {
@@ -25,6 +29,21 @@ function pointPrice(id: string, price: number): LotPricing2028 {
 }
 
 describe('Gastronomia no Mapa Comercial', () => {
+  it('ancora cada novo emblema no teto de sua própria estrutura', () => {
+    const via = OFFICIAL_REFERENCE_ENTITIES.find(({ publicIdentifier }) => publicIdentifier === 'D2')!;
+    const bounds = strategicLandmarkBounds(via);
+    const yaw = strategicLandmarkFacingRadians(via);
+    const roof = createViaExpressaLayout(viaExpressaModelBounds(bounds, yaw), strategicLandmarkVisualHeight(via), false);
+    const viaAnchor = resolveGastronomyMarkerAnchor(via)!;
+    expect(viaAnchor[0]).toBeCloseTo(bounds.centerX + Math.sin(yaw) * roof.centerZ);
+    expect(viaAnchor[1]).toBeCloseTo(via.geometry.elevation + roof.height + roof.roofThickness * 0.68 + 0.025);
+    expect(viaAnchor[2]).toBeCloseTo(bounds.centerZ + Math.cos(yaw) * roof.centerZ);
+
+    const truck = withChoppTruckReference(OFFICIAL_REFERENCE_DATA).entities.find(({ publicIdentifier }) => publicIdentifier === CHOPP_TRUCK_IDENTIFIER)!;
+    const [x, y, z] = choppTruckRoofAnchor(truck);
+    expect(resolveGastronomyMarkerAnchor(truck)).toEqual([x, y + 0.025, z]);
+  });
+
   it('soma cada preço fixo em ambas as etapas e separa pontos e metragem no carrinho misto', () => {
     const central = pointPrice('central', 50107);
     const pizza = pointPrice('pizza', 32357);

@@ -7,6 +7,9 @@ const user = { id: `00000000-0000-4000-a000-00000000001${restricted ? '4' : '0'}
 const session = { user, access_token: 'gastronomy-qa' };
 const ok = (data: unknown) => ({ data, error: null });
 const reference = OFFICIAL_REFERENCE_DATA;
+const officialById = new Map(reference.entities.map((entity) => [entity.id, entity]));
+const officialCodes = new Set(reference.entities.map((entity) => entity.publicIdentifier));
+const referenceLayerIds = new Map(reference.layers.map((layer) => [layer.key, layer.id]));
 const qaIdentity = { 'x-gastronomy-qa-user': restricted ? 'sem-contratos' : 'vendas' };
 let pendingInventory: Promise<any> | null = null;
 
@@ -38,7 +41,13 @@ async function tableRows(table: string): Promise<Record<string, any>[]> {
   }));
   const snapshot = await inventory();
   const liveByCode = new Map<string, any>(snapshot.entities.map((entity: any) => [entity.public_identifier, entity]));
-  const officialById = new Map(reference.entities.map((entity) => [entity.id, entity]));
+  const foodPoints = snapshot.entities.filter((row: any) => row.classification === 'FOOD_POINT');
+  const foodAnchorIds = new Set(foodPoints.map((row: any) => row.parent_entity_id));
+  const currentGeometryById = new Map<string, any>(snapshot.geometries.map((row: any) => [row.entity_id, row]));
+  // Fixture geometry for the existing park stays in the reference. New food
+  // anchors are rendered from their real, persisted geometry in the test DB.
+  const persistedAnchors = snapshot.entities.filter((row: any) => foodAnchorIds.has(row.id)
+    && !officialCodes.has(row.public_identifier) && currentGeometryById.has(row.id));
   const toEntityId = (id: string | null) => id ? liveByCode.get(officialById.get(id)?.publicIdentifier ?? '')?.id ?? id : null;
   const cadastralRows = reference.entities.map((entity) => {
     const persisted = liveByCode.get(entity.publicIdentifier);
@@ -51,15 +60,18 @@ async function tableRows(table: string): Promise<Record<string, any>[]> {
     };
   });
   if (table === 'map_entities') {
-    const byId = new Map(cadastralRows.map((entity) => [entity.id, entity]));
-    return [...cadastralRows, ...snapshot.entities.filter((row: any) => row.classification === 'FOOD_POINT')
+    const structures = [...cadastralRows, ...persistedAnchors.map((row: any) => ({
+      ...row, layer_id: referenceLayerIds.get(row.layer_key),
+    }))];
+    const byId = new Map(structures.map((entity) => [entity.id, entity]));
+    return [...structures, ...foodPoints
       .map((row: any) => ({ ...row, layer_id: byId.get(row.parent_entity_id)?.layer_id }))];
   }
-  if (table === 'map_entity_geometries') return reference.entities.map((entity) => ({
+  if (table === 'map_entity_geometries') return [...reference.entities.map((entity) => ({
     id: entity.geometry.id ?? entity.id, project_id: project, entity_id: toEntityId(entity.id), geometry: entity.geometry,
     elevation: entity.geometry.elevation, extrusion_height: entity.geometry.extrusionHeight, rotation: entity.geometry.rotation,
     version: 1, is_current: true, calibration_version: entity.geometry.calibrationVersion,
-  }));
+  })), ...persistedAnchors.map((row: any) => currentGeometryById.get(row.id))];
   if (table === 'commercial_lots') return snapshot.lots;
   if (table === 'map_segments') return snapshot.segments;
   if (table === 'commercial_lot_pricing_2028') return snapshot.pricing;

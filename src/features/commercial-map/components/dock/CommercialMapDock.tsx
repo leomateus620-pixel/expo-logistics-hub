@@ -182,7 +182,8 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
         {entities.filter((entity) => structures.has(entity.id)).sort((a, b) => a.publicIdentifier.localeCompare(b.publicIdentifier)).map((entity) => {
           const points = structures.get(entity.id)!;
           const available = points.filter(({ lot }) => lot.status === 'AVAILABLE').length;
-          return <button key={entity.id} type="button" aria-current={selectedEntityId === entity.id || undefined}
+          const selected = selectedEntityId === entity.id || points.some(({ entity: point }) => selectedEntityId === point.id);
+          return <button key={entity.id} type="button" aria-current={selected || undefined}
             onClick={() => selectStructure(entity.id)}>
             <span>{entity.publicIdentifier}</span>
             <span><strong>{entity.publicIdentifier === 'C2' ? FENASOJA_RESTAURANT_PRESENTATION_NAME : entity.name}</strong>

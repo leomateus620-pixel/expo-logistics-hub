@@ -68,7 +68,7 @@
 .commercial-map-dock__gastronomy h3 { font-size: .74rem; font-weight: 750; margin: 0 4px 4px; }
 .commercial-map-dock__gastronomy button {
   display: grid;
-  grid-template-columns: 27px minmax(0, 1fr) 14px;
+  grid-template-columns: fit-content(40%) minmax(0, 1fr) 14px;
   align-items: center;
   gap: 6px;
   min-height: 44px;
@@ -79,8 +79,8 @@
 }
 .commercial-map-dock__gastronomy button:hover,
 .commercial-map-dock__gastronomy button[aria-current="true"] { background: #f5e9d5; }
-.commercial-map-dock__gastronomy button > span:first-child { color: #754a1b; font-weight: 700; }
-.commercial-map-dock__gastronomy button > span:nth-child(2) { display: grid; gap: 2px; min-width: 0; }
+.commercial-map-dock__gastronomy button > span:first-child { min-width: 27px; color: #754a1b; font-weight: 700; overflow-wrap: anywhere; }
+.commercial-map-dock__gastronomy button > span:nth-child(2) { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
 .commercial-map-dock__gastronomy button small { color: #536259; font-size: .66rem; }
 .commercial-map-dock__gastronomy svg { width: 14px; }
 .commercial-map-dock__segments strong { white-space: normal; overflow-wrap: break-word; font-size: 12px; line-height: 1.25; font-weight: 750; }

@@ -156,6 +156,7 @@ function buildLocation(
 
 export function buildEntityExplorerIndex(entities: MapEntity[], lots: CommercialLot[]): EntityExplorerItem[] {
   const lotByEntity = new Map(lots.map((lot) => [lot.entityId, lot]));
+  const entityById = new Map(entities.map((entity) => [entity.id, entity]));
   const segmentByEntity = buildCommercialMapSegmentIndex(entities, lots);
 
   return entities.map((entity) => {
@@ -163,6 +164,9 @@ export function buildEntityExplorerIndex(entities: MapEntity[], lots: Commercial
     const metadata = normalizeMapEntityMetadata(entity, lot);
     const segment = segmentByEntity.get(entity.id) ?? null;
     const location = buildLocation(entity, lot, metadata);
+    const structure = entity.classification === 'FOOD_POINT' && entity.parentEntityId
+      ? entityById.get(entity.parentEntityId) : undefined;
+    if (structure) location.locationLabel = `${structure.name} · ${structure.publicIdentifier}`;
     const commercialStatus = lot?.status ?? 'NOT_COMMERCIAL';
     const statusLabel = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)].label : 'Não comercial';
     const identifiers = normalizedValues([
@@ -194,6 +198,7 @@ export function buildEntityExplorerIndex(entities: MapEntity[], lots: Commercial
       statusLabel,
       entity.description,
       lot?.description,
+      lot?.foodType,
       segment?.name,
       segment?.code,
     ]);

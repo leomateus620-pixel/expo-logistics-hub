@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three-stdlib';
@@ -8,6 +8,7 @@ import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/official
 import { canHandleCommercialDashboardEscape, canHandleCommercialMapEscape, getCommercialDashboardFocusableElements } from '@/features/commercial-map/utils/contextualNavigation';
 import { applyContextualCameraViewOffset, fitCameraAboveContextualPanel, readContextualCameraViewOffset, readContextualViewportInsets, resolveContextualViewportInsets } from '@/features/commercial-map/utils/contextualViewport';
 import { resolveCameraTransitionDuration } from '@/features/commercial-map/utils/interaction';
+import type { MapEntity } from '@/features/commercial-map/types';
 
 beforeEach(() => {
   useCommercialMapStore.setState(useCommercialMapStore.getInitialState(), true);
@@ -97,6 +98,25 @@ describe('navegação contextual atômica', () => {
     act(() => store.exitInterior());
     expect([...hook.result.current.matchingEntityIds]).toEqual([...ruralIds]);
     hook.unmount();
+  });
+
+  it('encontra o ponto da Via Expressa por código e aplica o filtro da cena à estrutura', async () => {
+    const structure = OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'D2')!;
+    const point: MapEntity = { ...structure, id: 'via-point', publicIdentifier: 'GAST-D2-01', name: 'Ponto 01 · Crepes',
+      classification: 'FOOD_POINT', parentEntityId: structure.id, isSellable: true,
+      segmentId: 'gastronomia', segmentSource: 'database', geometry: { ...structure.geometry, coordinates: [] } };
+    const foodLot = { ...OFFICIAL_REFERENCE_DATA.lots[0], id: 'food-lot', entityId: point.id,
+      publicIdentifier: point.publicIdentifier, displayName: point.name, commercialUnit: 'FOOD_POINT',
+      officialAreaSqm: null, displayOrder: 1, foodType: 'Crepes' } as const;
+    const store = useCommercialMapStore.getState();
+    store.requestSegmentFocus('gastronomia');
+    const hook = renderHook(() => useMapEntityFilter([structure, point], [foodLot]));
+    expect(hook.result.current.items.map(({ entity }) => entity.id)).toEqual([structure.id]);
+    act(() => store.setSearch('GAST-D2-01'));
+    await waitFor(() => expect(hook.result.current.items.map(({ entity }) => entity.id)).toEqual([point.id]));
+    expect(hook.result.current.items[0].locationLabel).toBe('Via Expressa · D2');
+    expect(hook.result.current.entities).toEqual([structure]);
+    expect(hook.result.current.matchingEntityIds).toEqual(new Set([point.id, structure.id]));
   });
 });
 

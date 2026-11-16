@@ -77,6 +77,7 @@ const CLASSIFICATION_INITIALS: Partial<Record<MapClassification, string>> = {
   BUILDING: 'ED',
   RESTAURANT: 'RE',
   FOOD_AREA: 'AL',
+  FOOD_POINT: 'PA',
   RESTROOM: 'WC',
   CHEMICAL_RESTROOM: 'BQ',
   GATE: 'PT',
@@ -503,7 +504,9 @@ export const ResultsPanel = memo(function ResultsPanel({ explorer }: { explorer:
               tabIndex={index === firstTabIndex ? 0 : -1}
               buttonRef={(element) => { resultRefs.current[index] = element; }}
               onSelect={() => openExplorerEntity(item)}
-              onHover={(hovered) => setHoveredEntityId(hovered ? item.entity.id : null)}
+              onHover={(hovered) => setHoveredEntityId(hovered
+                ? item.entity.classification === 'FOOD_POINT' ? item.entity.parentEntityId : item.entity.id
+                : null)}
               onKeyDown={(event) => handleResultKeyDown(event, index)}
             />
           ))}
@@ -549,6 +552,7 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
         )}
         {items.map((item) => {
           const selected = item.entity.id === selectedEntityId;
+          const foodPoint = item.lot?.commercialUnit === 'FOOD_POINT';
           return (
             <tr
               key={item.entity.id}
@@ -582,7 +586,8 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
               </td>
               <td data-label="Situação"><EntityStatusBadge item={item} /></td>
               <td data-label="Área oficial">
-                {item.lot?.officialAreaSqm
+                {foodPoint ? <span className="commercial-map-table-muted" aria-label="Área oficial não se aplica">—</span>
+                  : item.lot?.officialAreaSqm
                   ? <span className="commercial-map-table-primary">{number.format(item.lot.officialAreaSqm)} m²</span>
                   : <span className="commercial-map-table-muted">Não validada</span>}
               </td>
@@ -594,7 +599,7 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
               <td data-label="Ações">
                 <div className="commercial-map-table-actions">
                   <Button size="sm" variant="ghost" onClick={() => onOpen(item)}>{sceneAvailable ? 'Ver no mapa' : 'Ver detalhes'}<ChevronRight className="h-4 w-4" /></Button>
-                  {item.lot && permissions.canManageLots && (
+                  {item.lot && !foodPoint && permissions.canManageLots && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button type="button" aria-label={`Mais ações para ${item.metadata.officialDisplayName}`}><MoreHorizontal /></button>

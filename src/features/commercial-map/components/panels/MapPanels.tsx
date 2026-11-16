@@ -345,6 +345,7 @@ export function EntityDetailsPanel(props: EntityDetailsPanelProps) {
     ? entities.find((item) => item.id === entity.parentEntityId) : entity;
   const points = structure && groups.get(structure.id);
   if (structure && points?.length) return <GastronomyStructurePanel key={structure.id} structure={structure} points={points}
+    selectedPointId={points.find((point) => point.entity.id === entity.id)?.lot.id}
     mapData={{ entities, lots }} onEnterInterior={sceneAvailable && strategicLandmarkSupportsInterior(structure)
       ? () => enterInterior(structure.id) : undefined}
     permissions={permissions} canSell={permissions.canManageSales && sceneAvailable} onClose={() => setSelectedEntityId(null)} />;

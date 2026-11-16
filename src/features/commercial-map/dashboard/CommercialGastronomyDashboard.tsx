@@ -15,13 +15,13 @@ function knownValue(value: number, priced: number, count: number) {
 
 function FoodCounts({ aggregate }: { aggregate: DashboardAggregate }) {
   return <span className="dashboard-gastronomy__counts">
-    <span>{aggregate.availableLots} disponíveis</span>
+    <span>{aggregate.availableLots} {aggregate.availableLots === 1 ? 'disponível' : 'disponíveis'}</span>
     <span>{aggregate.saleOpenLots} em aberto</span>
-    <span>{aggregate.soldLots} vendidos</span>
-    {aggregate.reservedLots > 0 && <span>{aggregate.reservedLots} reservados</span>}
+    <span>{aggregate.soldLots} {aggregate.soldLots === 1 ? 'vendido' : 'vendidos'}</span>
+    {aggregate.reservedLots > 0 && <span>{aggregate.reservedLots} {aggregate.reservedLots === 1 ? 'reservado' : 'reservados'}</span>}
     {aggregate.negotiationLots > 0 && <span>{aggregate.negotiationLots} em negociação</span>}
-    {aggregate.blockedLots > 0 && <span>{aggregate.blockedLots} bloqueados</span>}
-    {aggregate.unavailableLots > 0 && <span>{aggregate.unavailableLots} indisponíveis</span>}
+    {aggregate.blockedLots > 0 && <span>{aggregate.blockedLots} {aggregate.blockedLots === 1 ? 'bloqueado' : 'bloqueados'}</span>}
+    {aggregate.unavailableLots > 0 && <span>{aggregate.unavailableLots} {aggregate.unavailableLots === 1 ? 'indisponível' : 'indisponíveis'}</span>}
   </span>;
 }
 

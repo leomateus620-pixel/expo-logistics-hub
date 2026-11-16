@@ -56,11 +56,14 @@ const postgresFixture: Plugin = {
           if (!(await tx`SELECT 1 FROM map_projects WHERE org_id=${organization}`).length) throw new Error('QA database required');
           if (req.url === '/inventory') {
             const [permission] = await tx`SELECT map_has_explicit_capability(${organization},'map.manage_contracts') AS allowed`;
-            const [lots, entities, segments, pricing, eligibility, items, orders, exhibitors, installments, activity, contracts] = await Promise.all([
+            const [lots, entities, geometries, segments, pricing, eligibility, items, orders, exhibitors, installments, activity, contracts] = await Promise.all([
               tx`SELECT l.*, (SELECT jsonb_agg(to_jsonb(s)) FROM lot_sales s WHERE s.lot_id=l.id) lot_sales,
                 (SELECT jsonb_agg(to_jsonb(p)) FROM lot_prices p WHERE p.lot_id=l.id) lot_prices
                 FROM commercial_lots l WHERE l.archived_at IS NULL ORDER BY l.id`,
-              tx`SELECT * FROM map_entities WHERE NOT is_archived ORDER BY id`,
+              tx`SELECT e.*, l.layer_key FROM map_entities e JOIN map_layers l ON l.id = e.layer_id
+                WHERE NOT e.is_archived ORDER BY e.id`,
+              tx`SELECT g.* FROM map_entity_geometries g JOIN map_entities e ON e.id = g.entity_id
+                WHERE g.is_current AND NOT e.is_archived ORDER BY g.entity_id`,
               tx`SELECT * FROM map_segments WHERE is_active ORDER BY id`,
               tx`SELECT * FROM commercial_lot_pricing_2028 ORDER BY lot_id`,
               tx`SELECT * FROM commercial_sale_eligibility ORDER BY lot_id`,
@@ -73,7 +76,7 @@ const postgresFixture: Plugin = {
               permission.allowed ? tx`SELECT c.*, (SELECT jsonb_agg(to_jsonb(v)) FROM lot_contract_versions v WHERE v.contract_id=c.id) lot_contract_versions
                 FROM lot_contracts c WHERE c.scope='LOT'` : [],
             ]);
-            return { lots, entities, segments, pricing, eligibility, items, orders, exhibitors, installments, activity, contracts };
+            return { lots, entities, geometries, segments, pricing, eligibility, items, orders, exhibitors, installments, activity, contracts };
           }
           if (req.url?.startsWith('/storage/') && req.method === 'POST') {
             const [capability] = await tx`SELECT map_has_explicit_capability(${organization},'map.manage_contracts') AS allowed`;

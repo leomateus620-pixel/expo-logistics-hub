@@ -114,6 +114,29 @@ afterEach(() => {
 });
 
 describe('história integrada ao painel comercial persistente', () => {
+  it('preserva a história da Via Expressa e a consulta do ponto selecionado', async () => {
+    const structure: MapEntity = { ...fixture('via-expressa', 'D2').entity, name: 'Via Expressa', classification: 'ATTRACTION', isSellable: false };
+    const { entity, lot } = fixture('via-expressa-point', 'GAST-D2-01');
+    const point: MapEntity = { ...entity, name: 'Ponto 01 · Crepes', classification: 'FOOD_POINT', parentEntityId: structure.id,
+      segmentSource: 'database', segmentId: 'gastronomia', geometry: { ...entity.geometry, coordinates: [] } };
+    const foodLot = { ...lot, commercialUnit: 'FOOD_POINT', displayName: point.name, officialAreaSqm: null, foodType: 'Crepes' } as const;
+    mocks.entries.push({ ...mocks.entries[0], id: 'H29', publicIdentifiers: ['D2'], title: 'Via Expressa — história de teste' });
+
+    render(<EntityDetailsPanel entity={point} entities={[structure, point]} lots={[foodLot]}
+      permissions={{ ...permissions, canManageSales: false, canManageContracts: false }} />);
+    const trigger = screen.getByRole('button', { name: 'Conhecer a história' });
+    const row = screen.getByRole('button', { name: /^Ponto 01 · Crepes/ });
+    expect(row).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.click(trigger);
+    await act(async () => { await vi.dynamicImportSettled(); });
+    expect(screen.getByRole('heading', { name: 'Via Expressa — história de teste' })).toBeVisible();
+    expect(row).not.toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar às informações' }));
+    await waitFor(() => expect(trigger).toHaveFocus());
+    expect(row).toBeVisible();
+    expect(row).toHaveAttribute('aria-expanded', 'true');
+  });
+
   it('carrega o conteúdo apenas ao abrir e restaura informações, ações, seleção e foco ao fechar', async () => {
     configureImages([image('primeira')]);
     render(panel());
