@@ -1,13 +1,14 @@
 # Roadmap
 
 ## Fenasoja Meeting — áudio real, Gemini 3.5 Transcribe e relatório GPT‑6.1 Sol
-- [ ] Banco: pipeline de áudio, constraints/defaults dos provedores efetivos, fila de transcrição, relatório estruturado, artefatos, flag e limites (migração aditiva).
-- [ ] Armazenamento privado: áudio temporário e exportações.
-- [ ] Backend: ingestão autenticada de áudio, worker de transcrição Gemini, relatório Sol sem fallback silencioso, exportação PDF/TXT, exclusão com limpeza de arquivos, retenção do áudio.
-- [ ] Captura real de áudio (WAV 16 kHz em partes com corte em silêncio) e envio durável/idempotente.
-- [ ] Provider persistente acima da Agenda + barra compacta; fechar painel não interrompe a gravação.
-- [ ] Interface: Relatório / Transcrição / Histórico, downloads, nova versão, exclusões, estados honestos.
-- [ ] Testes de domínio/UI, deploy das funções, validação real ponta a ponta com os dois provedores.
+- [x] Banco: pipeline de áudio, provedores efetivos, fila de transcrição, relatório estruturado, artefatos, flag e limites (migração aditiva).
+- [x] Armazenamento privado: áudio temporário (até 72 h) e exportações.
+- [x] Backend: ingestão autenticada, worker Gemini, relatório Sol, exportação PDF/TXT, exclusão com limpeza recursiva de arquivos.
+- [x] Captura real (WAV 16 kHz em partes, inclui as primeiras palavras ditas durante o início) e envio durável.
+- [x] Provider acima das rotas + barra compacta; fechar painel/detalhes/voltar não interrompe a gravação.
+- [x] Interface: Relatório / Transcrição / Histórico, downloads, exclusões, estados honestos.
+- [x] Validação real ponta a ponta (computador e celular) com fixture isolada, recusas de acesso e limpeza.
+- [ ] Testar em iPhone/Android reais com tela bloqueada e microfone Bluetooth — bloqueio: exige aparelho físico.
 - Não publicar sem pedido.
 
 ## Pavilhão 5 — Floriculturas
