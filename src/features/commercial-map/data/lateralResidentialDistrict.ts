@@ -212,6 +212,18 @@ const Q5: readonly DistrictParcel[] = [
     { pool: pool([352, 82], [5, 7], 'rounded'), palms: [[332, 86]], frontage: 'south' }),
   lot('Q5', 'villa-faixa-campo', [329, 90, 357, 101], house([339, 95], [15, 7], 'flat-modern', SILVER, 2),
     { pool: pool([352, 95], [6, 7]), frontage: 'south' }),
+  lot('Q5', 'moderna-benvenuto', [358, 11, 392, 26], house([371, 17.5], [15, 8], 'flat-modern', SILVER, 2),
+    { pool: pool([385, 19], [5, 6], 'rounded'), palms: [[388.5, 23]], frontage: 'avenue', confidence: 'inferred' }),
+  lot('Q5', 'villa-grafite-jardim', [358, 27, 392, 40], house([373, 34], [16, 9], 'hip-villa', GRAPHITE),
+    { pool: pool([385.5, 34], [5, 6]), trees: [[361.4, 38]], confidence: 'inferred' }),
+  lot('Q5', 'casa-patio-areia', [358, 41, 392, 64], house([379, 53], [17, 14], 'courtyard', SAND_TILE, 2, true, '#dfcdb0'),
+    { palms: [[365, 59.5]], trees: [[362, 45]], confidence: 'inferred' }),
+  lot('Q5', 'chale-terracota', [358, 65, 392, 75], house([370, 70], [14, 7], 'gable', TERRACOTTA, 1, false),
+    { pool: pool([384, 70], [7, 4], 'kidney'), confidence: 'inferred' }),
+  lot('Q5', 'sobrado-vinho', [358, 76, 392, 89], house([375, 82.5], [16, 9], 'split-level', WINE, 2),
+    { palms: [[388, 83]], confidence: 'inferred' }),
+  lot('Q5', 'villa-prata-campo', [358, 90, 392, 101], house([368, 95.5], [13, 7], 'hip-villa', SILVER, 1, false),
+    { pool: pool([383, 95.5], [6, 5]), trees: [[389, 94]], confidence: 'inferred' }),
 ];
 
 export const LATERAL_DISTRICT_BLOCKS: readonly DistrictBlock[] = [
@@ -223,9 +235,8 @@ export const LATERAL_DISTRICT_BLOCKS: readonly DistrictBlock[] = [
     referenceSummary: { occupiedEstimate: [11, 13], poolsVisible: 10, notes: 'Onze propriedades adotadas, grande villa com piscina orgânica no sudoeste e três villas orientais; uma cobertura cerâmica sem piscina identificável.' } },
   { id: 'Q4', name: 'Rua 10 de Agosto — Rua Fenasoja', polygon: rectangle([250, 11, 318, 101]), parcels: Q4,
     referenceSummary: { occupiedEstimate: [11, 13], poolsVisible: 6, notes: 'Doze conjuntos volumétricos adotados; grande jardim norte/leste preservado; a cobertura longa pode ser anexo da propriedade vizinha. Seis piscinas visíveis.' } },
-  // The two former institutional placeholders are represented by etniasAdjacentSite.
-  { id: 'Q5', name: 'Faixa residencial da Rua Fenasoja', polygon: rectangle([329, 11, 357, 101]), parcels: Q5,
-    referenceSummary: { occupiedEstimate: [5, 6], poolsVisible: 5, notes: 'Cinco a seis residências na faixa estreita voltada para a Rua Fenasoja.' } },
+  { id: 'Q5', name: 'Faixa residencial da Rua Fenasoja', polygon: rectangle([329, 11, 392, 101]), parcels: Q5,
+    referenceSummary: { occupiedEstimate: [5, 6], poolsVisible: 5, notes: 'Seis residências de referência e seis inferidas na faixa até a divisa com a RBS TV.' } },
 ];
 
 /** Avenue already belongs to ParkAccessInfrastructure; only new branch streets live here. */

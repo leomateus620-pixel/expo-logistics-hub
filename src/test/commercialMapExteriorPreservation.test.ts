@@ -70,8 +70,10 @@ it("preserves retained building anchors, protected roads and the lateral residen
   expect(unchangedDistrict).toEqual(oldDistrict);
   expect(blocks.slice(0, 4)).toEqual(oldBlocks.slice(0, 4));
   expect(counts.slice(0, 4)).toEqual(oldCounts.slice(0, 4));
-  expect(blocks[4].parcels).toEqual(oldBlocks[4].parcels.filter(({ id }: { id: string }) => !replaced.includes(id)));
-  expect(vegetation).toEqual(oldVegetation.filter(({ id }: { id: string }) => !replaced.some((parcel) => id.startsWith(parcel + '-'))));
+  const retainedParcels = oldBlocks[4].parcels.filter(({ id }: { id: string }) => !replaced.includes(id));
+  expect(blocks[4].parcels.slice(0, retainedParcels.length)).toEqual(retainedParcels);
+  const retainedVegetation = oldVegetation.filter(({ id }: { id: string }) => !replaced.some((parcel) => id.startsWith(parcel + '-')));
+  expect(vegetation.slice(0, retainedVegetation.length)).toEqual(retainedVegetation);
   snapshot.buildings.forEach((b: { id: string }) => expect(b).toEqual(prior.buildings.find((p: { id: string }) => p.id === b.id)));
   const oldRoads = preserved(prior).roads;
   const newRoads = preserved(snapshot).roads;

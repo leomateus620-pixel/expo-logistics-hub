@@ -60,14 +60,27 @@ function roofSection(
   return { wallTop: edge(walls), eaves, roofEdge: edge(roof), roofFaces, finish };
 }
 
-// The light metal run wraps the two gray wings. Roof bounds include overhangs.
-// Wall bounds meet at the joints between the wings and the long rear volume.
+// The low glazed wings flank the raised frontage seen in the street photo.
+// The original roof survey still sets the wings and backs of these volumes.
+export const ETNIAS_SITE_RBS_WEST_WING = roofSection(
+  [12.2, 31.5, 21.4, 37.7], [12.48, 31.8, 21.14, 37.62], 4.25, 0, 'z', 'slab',
+);
+export const ETNIAS_SITE_RBS_EAST_WING = roofSection(
+  [30.35, 31.82, 38.15, 47.6], [30.48, 31.72, 37.84, 47.52], 3.92, 0.63, 'z', 'gray',
+);
+export const ETNIAS_SITE_RBS_ENTRY = {
+  centerX: 27.105, frontZ: 33.76, backZ: 37.86, width: 6.17, height: 7.25,
+  roof: roofSection([23.92, 33.64, 30.29, 37.94], [24.02, 33.76, 30.19, 37.86], 7.25, 0, 'z', 'slab'),
+};
+
+// The light metal run wraps the wings. Roof bounds include overhangs and
+// wall bounds meet at the joints between the volumes.
 export const ETNIAS_SITE_LARGE_BUILDING: readonly SiteBuildingSection[] = [
-  roofSection([12.2, 31.5, 21.4, 37.7], [12.48, 31.8, 21.14, 37.62], 4.25, 0, 'z', 'slab'),
+  ETNIAS_SITE_RBS_WEST_WING,
   roofSection([11.6, 37.5, 21.9, 56.2], [11.92, 37.62, 21.71, 56.12], 3.65, 0.58, 'z', 'gray'),
   roofSection([21.5, 37.6, 30.5, 44.5], [21.71, 37.86, 30.48, 44.4], 3.52, 0.24, 'x', 'gray'),
-  roofSection([23.8, 33.5, 30.3, 37.88], [24.02, 33.76, 30.19, 37.86], 4.05, 0, 'z', 'slab'),
-  roofSection([30.35, 31.4, 38.15, 47.6], [30.48, 31.72, 37.84, 47.52], 3.92, 0.63, 'z', 'gray'),
+  ETNIAS_SITE_RBS_ENTRY.roof,
+  ETNIAS_SITE_RBS_EAST_WING,
   roofSection([21.48, 44.24, 30.66, 56.34], [21.71, 44.4, 30.57, 56.12], 3.95, 0.78, 'z', 'zinc'),
   roofSection([30.54, 47.36, 38.25, 54.18], [30.57, 47.52, 37.96, 54.03], 3.75, 0.48, 'x', 'zinc'),
   roofSection([30.55, 53.95, 41.1, 56.37], [30.57, 54.03, 40.75, 56.12], 3.22, 0, 'x', 'slab'),
@@ -147,11 +160,16 @@ export const ETNIAS_SITE_CIRCULAR_EQUIPMENT = [
   { center: [59.0, 72.9], radius: 1.43, height: 1.85, tilt: 0.34, heading: 0.25 },
   { center: [49.7, 81.2], radius: 1.9, height: 1.72, tilt: 0.28, heading: 0.75 },
 ] as const;
-export const ETNIAS_SITE_VERTICAL_SUPPORT = { center: [47.3, 76.8], height: 8.5 } as const;
 
 // [x, z, height, crown radius], in metres. Leave the centre and rear lawn open.
 export const ETNIAS_SITE_FORECOURT_TREES = [
   [13.6, 18.0, 8.9, 4.8], [22.2, 19.4, 9.5, 5.4], [32.7, 17.4, 8.1, 4.8],
+] as const;
+
+export const ETNIAS_SITE_ENTRY_PALMS = [
+  [23.15, 32.35, 3.55, 1.25],
+  [30.05, 31.85, 5.45, 1.55],
+  [30.9, 30.8, 3.95, 1.18],
 ] as const;
 
 export const ETNIAS_SITE_TREES = [

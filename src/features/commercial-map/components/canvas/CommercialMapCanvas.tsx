@@ -5539,7 +5539,7 @@ const Scene = memo(function Scene({
               vegetationVisible={treesVisible}
               nightMode={nightAtmosphereActive}
             />
-            <EtniasAdjacentSiteLayer vegetationVisible={treesVisible} />
+            <EtniasAdjacentSiteLayer vegetationVisible={treesVisible} reducedGraphics={reducedGraphics} />
             </EssentialSceneLayer>
           )}
           {/* Rear approaches and external roads share one polygon union. */}

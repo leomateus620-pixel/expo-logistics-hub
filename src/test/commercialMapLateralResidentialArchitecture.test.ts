@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
 import { LATERAL_DISTRICT_BLOCKS, lateralDistrictWorldPointToLocal } from '../features/commercial-map/data/lateralResidentialDistrict';
+import { PARK_ACCESS_SPATIAL_PLAN } from '../features/commercial-map/data/parkAccessSpatialPlan';
 import { buildLateralResidentialRenderPlan, LATERAL_RESIDENTIAL_SHARED_ACCESS,
   type ResidentialInstance } from '../features/commercial-map/utils/lateralResidentialGeometry';
+import { splitLateralResidentialSidewalk } from '../features/commercial-map/utils/lateralResidentialStreetIntegration';
+import { pointInPolygon } from '../features/commercial-map/utils/spatialSurface';
 
 const plan = buildLateralResidentialRenderPlan();
 const matrix = (item: ResidentialInstance) => new THREE.Matrix4().compose(
@@ -118,6 +121,7 @@ describe('lateral residential architectural attachments and shared access', () =
 
   it('replaces landlocked vehicle driveways with open pedestrian links through compounds', () => {
     const surfaces = plan.flatMap((cell) => cell.surfaces);
+    const fenasojaSidewalk = surfaces.find((surface) => surface.id === 'district-fenasoja-1-walk--1')!;
     const solids = plan.flatMap((cell) => [...cell.batches.masonry, ...cell.batches.poolRect,
       ...cell.batches.poolRounded, ...cell.batches.poolKidney]).filter((item) => !item.id.endsWith('-plinth')
         && (!item.id.includes('-pool-') || item.id.endsWith('-pool-deck')));
@@ -129,8 +133,21 @@ describe('lateral residential architectural attachments and shared access', () =
       for (const path of paths) for (const solid of solids) {
         expect.soft(overlaps(path.polygon, footprint(solid)), `${path.id} blocked by ${solid.id}`).toBe(false);
       }
-      const endpoint = paths.at(-1)!.polygon.map(lateralDistrictWorldPointToLocal);
-      expect(endpoint.some(([s, t]) => t <= 10.2 || s < 98 || s < 250 && s > 248), connection.parcelId).toBe(true);
+      const lastSegment = paths.at(-1)!.polygon;
+      if (connection.parcelId.startsWith('Q5-')) {
+        expect(lastSegment.some((point) => pointInPolygon(point, fenasojaSidewalk.polygon)), connection.parcelId).toBe(true);
+      } else {
+        const endpoint = lastSegment.map(lateralDistrictWorldPointToLocal);
+        expect(endpoint.some(([s, t]) => t <= 10.2 || s < 98 || s < 250 && s > 248), connection.parcelId).toBe(true);
+      }
     }
+  });
+
+  it('connects the new avenue house to the existing south sidewalk', () => {
+    const sidewalk = PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.find(({ id }) => id === 'benvenuto-south-sidewalk')!;
+    const driveway = plan.flatMap((cell) => cell.surfaces).find(({ id }) => id === 'Q5-moderna-benvenuto-driveway')!;
+    expect(splitLateralResidentialSidewalk(sidewalk).some((fragment) => driveway.polygon.some((point) => (
+      pointInPolygon(point, fragment.polygon)
+    )))).toBe(true);
   });
 });
