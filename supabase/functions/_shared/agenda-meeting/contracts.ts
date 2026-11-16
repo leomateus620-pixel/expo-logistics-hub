@@ -22,7 +22,27 @@ export const CONTROL_ACTIONS = [
   "update_action",
   "retry_analysis",
   "delete",
+  "retry_transcription",
+  "accept_transcription_gaps",
+  "regenerate_report",
+  "delete_report",
 ] as const;
+
+/** Actions served by `agenda_meeting_control_v3` (audio pipeline). */
+export const CONTROL_V3_ACTIONS = new Set<string>([
+  "retry_transcription",
+  "accept_transcription_gaps",
+  "regenerate_report",
+  "delete_report",
+]);
+
+/** Authorization verb checked by `agenda_meeting_authorize` for each v3 action. */
+export const CONTROL_V3_AUTHORIZATION: Record<string, string> = {
+  retry_transcription: "retry_analysis",
+  accept_transcription_gaps: "finalize",
+  regenerate_report: "retry_analysis",
+  delete_report: "delete",
+};
 
 export type AgendaMeetingControlAction = typeof CONTROL_ACTIONS[number];
 
@@ -41,6 +61,10 @@ const SESSION_REQUIRED_ACTIONS = new Set<AgendaMeetingControlAction>([
   "update_action",
   "retry_analysis",
   "delete",
+  "retry_transcription",
+  "accept_transcription_gaps",
+  "regenerate_report",
+  "delete_report",
 ]);
 
 const CONTROL_PAYLOAD_KEYS: Record<
@@ -82,6 +106,10 @@ const CONTROL_PAYLOAD_KEYS: Record<
   ],
   retry_analysis: ["confirmPartial"],
   delete: [],
+  retry_transcription: [],
+  accept_transcription_gaps: [],
+  regenerate_report: ["transcriptVersionId", "allowPartial"],
+  delete_report: ["minutesVersionId"],
 };
 
 const UUID_PATTERN =
