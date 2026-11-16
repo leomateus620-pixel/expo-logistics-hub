@@ -6,6 +6,7 @@ import { auditLateralResidentialRenderPlan, buildLateralResidentialRenderPlan,
   resolveResidentialDetailVisibility } from '../features/commercial-map/utils/lateralResidentialGeometry';
 import { createResidentialRoof, createResidentialSharedAssets, createResidentialGround } from '../features/commercial-map/utils/lateralResidentialAssets';
 import { pointInPolygon } from '../features/commercial-map/utils/spatialSurface';
+import { ETNIAS_SITE_PERIMETER, etniasAdjacentSitePointToWorld } from '../features/commercial-map/data/etniasAdjacentSite';
 
 const parcels = LATERAL_DISTRICT_BLOCKS.flatMap((block) => block.parcels);
 function corners(center: readonly number[], size: readonly number[], rotation = 0, margin = 0) {
@@ -17,11 +18,26 @@ function corners(center: readonly number[], size: readonly number[], rotation = 
 describe('satellite-registered lateral residential district', () => {
   it('retains five distinct urban units and all residences and pools', () => {
     expect(LATERAL_DISTRICT_BLOCKS).toHaveLength(5);
-    expect(LATERAL_DISTRICT_REFERENCE_COUNTS.map((entry) => entry.occupiedParcels)).toEqual([2, 9, 11, 12, 6]);
+    expect(LATERAL_DISTRICT_REFERENCE_COUNTS.map((entry) => entry.occupiedParcels)).toEqual([2, 9, 11, 12, 12]);
     expect(parcels.filter((parcel) => parcel.use === 'vacant')).toHaveLength(3);
-    expect(parcels.filter((parcel) => parcel.use === 'residential')).toHaveLength(37);
-    expect(parcels.filter((parcel) => parcel.pool)).toHaveLength(27);
-    expect(LATERAL_DISTRICT_ROADS.map((road) => road.name)).toContain('Rua Fenasoja');
+    expect(parcels.filter((parcel) => parcel.use === 'residential')).toHaveLength(43);
+    expect(parcels.filter((parcel) => parcel.pool)).toHaveLength(31);
+    expect(LATERAL_DISTRICT_ROADS.map((road) => road.name)).toEqual([
+      'Acesso diagonal sul', 'Rua Campeira', 'Rua Musicanto', 'Rua 10 de Agosto', 'Rua Fenasoja',
+    ]);
+  });
+  it('fills the strip beside Q5 inside the existing avenue, field and RBS site limits', () => {
+    const rbsMinX = Math.min(...ETNIAS_SITE_PERIMETER.map((point) => etniasAdjacentSitePointToWorld(point)[0]));
+    const expansion = parcels.filter((parcel) => parcel.blockId === 'Q5' && parcel.bounds[0] > 357);
+    expect(expansion).toHaveLength(6);
+    for (const { bounds, house, confidence } of expansion) {
+      const [, nearAvenue, farEdge, nearField] = bounds;
+      expect(house).toBeDefined();
+      expect(confidence).toBe('inferred');
+      expect(nearAvenue).toBeGreaterThanOrEqual(11);
+      expect(nearField).toBeLessThanOrEqual(101);
+      expect(lateralDistrictPointToWorld([farEdge, nearField])[0]).toBeLessThan(rbsMinX);
+    }
   });
   it('places the district only on the exterior side with reversible metre calibration', () => {
     for (const point of [[25,11], [160,70], [409,101]] as const) {

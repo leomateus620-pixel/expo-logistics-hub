@@ -335,10 +335,8 @@ function addHouse(cell: ResidentialRenderCell, parcel: DistrictParcel) {
 }
 
 /**
- * Interior roofs are read as annexes within shared holdings, not properties
- * with an invented vehicle driveway through their neighbor. These narrow
- * pedestrian connections use existing yard strips and one-metre separators;
- * their owning compounds retain the actual street access.
+ * Interior homes use shared pedestrian connections along yard strips and
+ * one-metre separators. The compounds retain their existing street access.
  */
 export const LATERAL_RESIDENTIAL_SHARED_ACCESS: readonly {
   parcelId: string; ownerId: string; width: number; path: readonly DistrictPoint[];
@@ -351,6 +349,17 @@ export const LATERAL_RESIDENTIAL_SHARED_ACCESS: readonly {
     path: [[284.3, 44], [286.5, 44], [286.5, 36.5], [298.9, 36.5], [298.9, 9.7]] },
   { parcelId: 'Q4-casa-vinho-central', ownerId: 'Q4-casa-vinho-sul', width: .8,
     path: [[269.6, 61], [268.5, 61], [268.5, 55.5], [249.3, 55.5]] },
+  // The second row of Q5 reaches the Rua Fenasoja sidewalk through the existing lot gaps.
+  { parcelId: 'Q5-villa-grafite-jardim', ownerId: 'Q5-casa-faixa-moderna', width: .8,
+    path: [[365, 34], [357.5, 34], [357.5, 26.5], [328.8, 26.5]] },
+  { parcelId: 'Q5-casa-patio-areia', ownerId: 'Q5-villa-ceramica-composta', width: .8,
+    path: [[370.5, 53], [357.5, 53], [357.5, 40.5], [328.8, 40.5]] },
+  { parcelId: 'Q5-chale-terracota', ownerId: 'Q5-casa-anexa-escura', width: .8,
+    path: [[363, 70], [357.5, 70], [357.5, 64.5], [328.8, 64.5]] },
+  { parcelId: 'Q5-sobrado-vinho', ownerId: 'Q5-villa-faixa-cinza', width: .8,
+    path: [[367, 82.5], [357.5, 82.5], [357.5, 75.5], [328.8, 75.5]] },
+  { parcelId: 'Q5-villa-prata-campo', ownerId: 'Q5-villa-faixa-campo', width: .8,
+    path: [[361.5, 95.5], [357.5, 95.5], [357.5, 89.5], [328.8, 89.5]] },
 ];
 
 /** A passage must also open the low compound boundary it crosses. */
