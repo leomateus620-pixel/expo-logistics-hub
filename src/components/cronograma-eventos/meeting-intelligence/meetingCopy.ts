@@ -92,6 +92,8 @@ export function meetingErrorMessage(code: string | null | undefined): string {
       return 'Já existe um relatório sendo gerado para esta reunião.';
     case 'meeting_partial_confirmation_required':
       return 'A transcrição tem lacunas. Confirme que deseja um relatório parcial.';
+    case 'analysis_transcript_missing_audio':
+      return 'Há trechos sem transcrição. O relatório precisa de pelo menos um trecho com fala transcrita.';
     case 'meeting_transcript_has_no_speech':
     case 'analysis_transcript_has_no_speech':
       return 'Nenhuma fala foi identificada nesta reunião, por isso não há relatório.';
@@ -167,7 +169,10 @@ export function serverStageOf(session: AgendaMeetingSessionSummary & {
   if (session.captureState === 'recording') return 'recording';
   if (session.captureState === 'paused') return 'paused';
   if (session.captureState === 'interrupted') return 'interrupted';
-  if (session.errorCode === 'analysis_transcript_has_no_speech') return 'no_speech';
+  if (session.errorCode === 'analysis_transcript_missing_audio') return 'needs_gap_decision';
+  if (session.errorCode === 'analysis_transcript_has_no_speech') {
+    return session.transcriptCoverage === 'with_gaps' ? 'needs_gap_decision' : 'no_speech';
+  }
   if (session.state === 'failed') return 'failed';
   if (session.reportQueued || session.state === 'analysis_queued' || session.state === 'analyzing') return 'generating_report';
   if (session.state === 'completed') return 'reviewed';

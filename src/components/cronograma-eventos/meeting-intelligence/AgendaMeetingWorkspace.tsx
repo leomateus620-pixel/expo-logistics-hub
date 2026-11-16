@@ -75,11 +75,19 @@ type ConfirmIntent =
   | { kind: 'delete-session' }
   | { kind: 'delete-report'; minutesVersionId: string; version: number }
   | { kind: 'partial-report'; transcriptVersionId: string }
-  | { kind: 'accept-gaps' }
+  | { kind: 'accept-gaps'; sessionId: string }
   | { kind: 'submit-revision' }
   | null;
 
 const PROCESSING_STAGES = new Set<ServerStage>(['transcribing', 'generating_report', 'recording', 'paused']);
+const REPORT_PENDING_TEXT = 'O relatório aparecerá aqui assim que a transcrição completa for consolidada e analisada.';
+const REPORT_EMPTY_TEXT: Partial<Record<ServerStage, string>> = {
+  no_speech: 'Nenhuma fala identificada: não há relatório para esta reunião.',
+  needs_gap_decision: 'O relatório fica pendente até haver uma parte com fala transcrita.',
+  transcribing: REPORT_PENDING_TEXT,
+  generating_report: REPORT_PENDING_TEXT,
+  partial_transcript: 'A transcrição está incompleta. Gere um relatório parcial somente se fizer sentido para a reunião.',
+};
 
 interface WorkspaceProps extends AgendaMeetingWorkspaceProps {
   className?: string;
@@ -196,15 +204,27 @@ function TranscriptRow({ segment, canEdit, editedText, onTextChange, highlighted
   );
 }
 
-function StageBanner({ detail, stage, canReview, busyKey, onRun }: {
+function canAcceptTranscriptionGaps(detail: AgendaMeetingSessionDetail, stage: ServerStage) {
+  const stats = detail.coverageStats;
+  return detail.captureState === 'ended' && detail.closedSequence != null
+    && (detail.unresolvedSequences?.length ?? 0) > 0
+    && (stage === 'failed' || stage === 'transcribing')
+    && stats !== undefined && stats.pendingSegments === 0
+    && stats.transcribedSegments > stats.silentSegments
+    && detail.retryableStage !== 'transcription' && detail.retryableStage !== 'assembly';
+}
+
+function StageBanner({ detail, stage, canReview, busyKey, onRun, onConfirm }: {
   detail: AgendaMeetingSessionDetail;
   stage: ServerStage;
   canReview: boolean;
   busyKey: string | null;
   onRun: (action: AgendaMeetingControlAction, payload: AgendaMeetingJson, key: string) => void;
+  onConfirm: (intent: ConfirmIntent) => void;
 }) {
   const stats = detail.coverageStats;
-  const tone = stage === 'failed' || stage === 'no_speech' ? 'error' : stage === 'partial_transcript' || stage === 'interrupted' ? 'warn' : undefined;
+  const tone = stage === 'failed' || stage === 'no_speech' ? 'error'
+    : stage === 'partial_transcript' || stage === 'interrupted' || stage === 'needs_gap_decision' ? 'warn' : undefined;
   let text: string;
   switch (stage) {
     case 'transcribing':
@@ -217,6 +237,9 @@ function StageBanner({ detail, stage, canReview, busyKey, onRun }: {
       break;
     case 'no_speech':
       text = 'Nenhuma fala identificada. A gravação foi transcrita, mas não há conteúdo para relatório.';
+      break;
+    case 'needs_gap_decision':
+      text = 'O áudio desta reunião está incompleto. Há trechos sem transcrição e nenhuma fala disponível para o relatório.';
       break;
     case 'partial_transcript':
       text = 'A transcrição tem lacunas (áudio que não chegou ou não pôde ser transcrito). O relatório completo não é gerado automaticamente.';
@@ -231,9 +254,8 @@ function StageBanner({ detail, stage, canReview, busyKey, onRun }: {
       text = SERVER_STAGE_LABELS[stage];
   }
   const showRetryTranscription = canReview && (detail.retryableStage === 'transcription' || detail.retryableStage === 'assembly');
-  const showAcceptGaps = canReview && detail.closedSequence !== null && detail.closedSequence !== undefined
-    && (detail.unresolvedSequences?.length ?? 0) > 0 && (stage === 'failed' || stage === 'transcribing');
-  const showRetryReport = canReview && detail.retryableStage === 'analysis';
+  const showAcceptGaps = canReview && canAcceptTranscriptionGaps(detail, stage);
+  const showRetryReport = canReview && detail.retryableStage === 'analysis' && stage !== 'no_speech' && stage !== 'needs_gap_decision';
   return (
     <div className="agenda-meeting__stage" data-tone={tone} role="status">
       {PROCESSING_STAGES.has(stage) ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : tone ? <AlertTriangle className="h-4 w-4 shrink-0" /> : <CheckCircle2 className="h-4 w-4 shrink-0" />}
@@ -244,7 +266,7 @@ function StageBanner({ detail, stage, canReview, busyKey, onRun }: {
         </button>
       )}
       {showAcceptGaps && (
-        <button className="agenda-meeting__button agenda-meeting__button--compact" disabled={busyKey !== null} onClick={() => onRun('accept_transcription_gaps', {}, 'accept-gaps')} type="button">
+        <button className="agenda-meeting__button agenda-meeting__button--compact" disabled={busyKey !== null} onClick={() => onConfirm({ kind: 'accept-gaps', sessionId: detail.id })} type="button">
           Seguir com lacunas
         </button>
       )}
@@ -305,7 +327,7 @@ function SessionDetail({ detail, canReview, canDelete, busyKey, members, onRun, 
 
   return (
     <section className="agenda-meeting__detail" aria-label="Resultado da reunião">
-      <StageBanner busyKey={busyKey} canReview={canReview} detail={detail} onRun={onRun} stage={stage} />
+      <StageBanner busyKey={busyKey} canReview={canReview} detail={detail} onConfirm={onConfirm} onRun={onRun} stage={stage} />
       {isLegacy && (
         <div className="agenda-meeting__notice">Registro anterior ao upgrade: o texto foi reconhecido pelo navegador durante a reunião e nenhum áudio foi guardado.</div>
       )}
@@ -372,13 +394,7 @@ function SessionDetail({ detail, canReview, canDelete, busyKey, members, onRun, 
             </>
           ) : (
             <div className="agenda-meeting__empty">
-              {stage === 'no_speech'
-                ? 'Nenhuma fala identificada: não há relatório para esta reunião.'
-                : stage === 'generating_report' || stage === 'transcribing'
-                  ? 'O relatório aparecerá aqui assim que a transcrição completa for consolidada e analisada.'
-                  : stage === 'partial_transcript'
-                    ? 'A transcrição está incompleta. Gere um relatório parcial somente se fizer sentido para a reunião.'
-                    : 'Ainda não há relatório para esta reunião.'}
+              {REPORT_EMPTY_TEXT[stage] ?? 'Ainda não há relatório para esta reunião.'}
               {canReview && latestTranscript && transcriptHasSpeech && !detail.reportQueued && stage !== 'generating_report' && (
                 <div className="agenda-meeting__controls agenda-meeting__controls--inline">
                   <button className="agenda-meeting__button agenda-meeting__button--primary" disabled={busyKey !== null} onClick={() => requestReport(latestTranscript.id)} type="button">
@@ -610,6 +626,8 @@ function PersistedMeetingWorkspace({ eventId, orgId, eventTitle, canRecord, canR
   };
 
   const canDeleteDetail = canDelete && (myRole === 'admin' || myRole === 'gestor' || detail?.createdBy === user?.id);
+  const canConfirmGaps = canReview && confirm?.kind === 'accept-gaps'
+    && detail?.id === confirm.sessionId && canAcceptTranscriptionGaps(detail, serverStageOf(detail));
 
   return (
     <div className="agenda-meeting__body">
@@ -670,7 +688,7 @@ function PersistedMeetingWorkspace({ eventId, orgId, eventTitle, canRecord, canR
       )}
 
       <AlertDialog open={confirm !== null} onOpenChange={(open) => { if (!open) setConfirm(null); }}>
-        <AlertDialogContent>
+        <AlertDialogContent className="agenda-meeting__confirmation" overlayClassName="agenda-meeting__confirmation-overlay">
           <AlertDialogHeader>
             <AlertDialogTitle>
               {confirm?.kind === 'delete-session' ? 'Excluir a sessão e todos os conteúdos?'
@@ -687,7 +705,7 @@ function PersistedMeetingWorkspace({ eventId, orgId, eventTitle, canRecord, canR
                   : confirm?.kind === 'partial-report'
                     ? 'A transcrição não cobre toda a reunião. O relatório será marcado como PARCIAL na tela e no PDF, e nada será deduzido sobre os trechos ausentes.'
                     : confirm?.kind === 'accept-gaps'
-                      ? 'As partes de áudio que faltam ficarão registradas como lacunas explícitas e a transcrição será consolidada sem elas.'
+                      ? 'Os trechos indisponíveis ficarão sinalizados na transcrição. Você poderá gerar um relatório parcial depois.'
                       : 'A transcrição original não é alterada. A correção vira uma nova versão, e os relatórios antigos continuam ligados à versão que usaram.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -695,6 +713,7 @@ function PersistedMeetingWorkspace({ eventId, orgId, eventTitle, canRecord, canR
             <AlertDialogCancel>Voltar</AlertDialogCancel>
             <AlertDialogAction
               className={confirm?.kind === 'delete-session' || confirm?.kind === 'delete-report' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : undefined}
+              disabled={confirm?.kind === 'accept-gaps' && !canConfirmGaps}
               onClick={() => {
                 const intent = confirm;
                 setConfirm(null);
@@ -702,7 +721,9 @@ function PersistedMeetingWorkspace({ eventId, orgId, eventTitle, canRecord, canR
                 if (intent.kind === 'delete-session') void runControl('delete', {}, 'delete');
                 if (intent.kind === 'delete-report') void runControl('delete_report', { minutesVersionId: intent.minutesVersionId }, 'delete-report');
                 if (intent.kind === 'partial-report') void runControl('regenerate_report', { transcriptVersionId: intent.transcriptVersionId, allowPartial: true }, 'regenerate');
-                if (intent.kind === 'accept-gaps') void runControl('accept_transcription_gaps', {}, 'accept-gaps');
+                if (intent.kind === 'accept-gaps' && canConfirmGaps) {
+                  void runControl('accept_transcription_gaps', {}, 'accept-gaps');
+                }
                 if (intent.kind === 'submit-revision') submitRevision();
               }}
             >

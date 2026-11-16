@@ -1142,3 +1142,14 @@
 .agenda-meeting__stage { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--meeting-green-soft); font-size: 0.88rem; }
 .agenda-meeting__stage[data-tone='warn'] { background: var(--meeting-gold-soft); }
 .agenda-meeting__stage[data-tone='error'] { background: color-mix(in srgb, var(--meeting-danger) 10%, var(--background)); }
+.agenda-meeting__confirmation-overlay {
+  /* Portaled above the Agenda's full-screen mobile event dialog (71). */
+  z-index: 80;
+}
+
+.agenda-meeting__confirmation {
+  z-index: 81;
+  width: min(calc(100% - 2rem), 32rem);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+}

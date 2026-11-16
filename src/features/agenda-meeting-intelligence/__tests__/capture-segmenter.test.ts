@@ -1,7 +1,7 @@
 import { webcrypto } from 'node:crypto';
 import { describe, expect, it, vi } from 'vitest';
 import { blobToArrayBuffer } from '../capture/blob';
-import { CaptureSegmenter } from '../capture/CaptureSegmenter';
+import { CaptureSegmenter, type CaptureSegmenterOptions } from '../capture/CaptureSegmenter';
 import { StreamingDownsampler } from '../capture/downsampler';
 import { encodeInt16Wav, PcmChunker } from '../capture/pcmChunker';
 import type { CapturedAudioSegment, CaptureGapMarker, CaptureInterruptionReason } from '../types';
@@ -132,6 +132,7 @@ function segmenterFor(options: {
   gaps?: CaptureGapMarker[];
   interruptions?: CaptureInterruptionReason[];
   maxActiveDurationMs?: number;
+  onGap?: CaptureSegmenterOptions['onGap'];
 }) {
   const { devices, track } = environment();
   const segmenter = new CaptureSegmenter({
@@ -144,7 +145,10 @@ function segmenterFor(options: {
     maxChunkMs: 4_000,
     maxActiveDurationMs: options.maxActiveDurationMs,
     onSegment: (segment) => { options.segments.push(segment); },
-    onGap: (gap) => { options.gaps?.push(gap); },
+    onGap: (gap) => {
+      options.gaps?.push(gap);
+      return options.onGap?.(gap);
+    },
     onInterruption: (reason) => { options.interruptions?.push(reason); },
   });
   return { segmenter, track };
@@ -195,6 +199,48 @@ describe('CaptureSegmenter (real audio)', () => {
     expect(segments).toHaveLength(1);
     expect(gaps).toHaveLength(1);
     expect(gaps[0].sequence).toBe(1);
+  });
+
+  it('saves audio and finishes even if the suspended device never closes its audio context', async () => {
+    const segments: CapturedAudioSegment[] = [];
+    const { segmenter, track } = segmenterFor({ segments });
+    await segmenter.prepare();
+    const context = FakeAudioContext.last!;
+    const close = vi.spyOn(context, 'close').mockReturnValue(new Promise<void>(() => undefined));
+    await segmenter.start({ sessionId: SESSION_ID });
+    context.processor.feed(tone(1));
+
+    const finished = vi.fn();
+    void segmenter.stop().then(finished);
+    await vi.waitFor(() => expect(finished).toHaveBeenCalledOnce());
+    expect(segments[0].metadata.durationMs).toBe(1000);
+    expect(track.stopped).toBe(true);
+    expect(close).toHaveBeenCalledOnce();
+  });
+
+  it('waits for an in-flight interruption to save the final audio and gap', async () => {
+    const segments: CapturedAudioSegment[] = [];
+    let completeGap = () => {};
+    const savingGap = new Promise<void>((resolve) => { completeGap = resolve; });
+    const onGap = vi.fn(() => savingGap);
+    const { segmenter } = segmenterFor({ segments, onGap });
+    await segmenter.prepare();
+    await segmenter.start({ sessionId: SESSION_ID });
+    FakeAudioContext.last!.processor.feed(tone(1));
+
+    const interrupted = segmenter.interrupt('track_ended');
+    const finished = vi.fn();
+    const ending = segmenter.stop().then(finished);
+    try {
+      await vi.waitFor(() => expect(onGap).toHaveBeenCalledWith(expect.objectContaining({ sequence: 1 })));
+      expect(segments[0].metadata.durationMs).toBe(1000);
+      expect(finished).not.toHaveBeenCalled();
+    } finally {
+      completeGap();
+      await interrupted;
+      await ending;
+    }
+    expect(finished).toHaveBeenCalledOnce();
   });
 
   it('stops at the active-duration cap without counting paused time', async () => {

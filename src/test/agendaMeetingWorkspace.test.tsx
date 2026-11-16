@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AgendaMeetingWorkspace } from '@/components/cronograma-eventos/meeting-intelligence/AgendaMeetingWorkspace';
 import { MeetingCaptureDock } from '@/components/cronograma-eventos/meeting-intelligence/MeetingCaptureDock';
+import { MobileDialogFrame } from '@/components/cronograma-eventos/mobile/MobileDialogFrame';
 import { MeetingCaptureProvider } from '@/features/agenda-meeting-intelligence/provider/MeetingCaptureProvider';
 import type {
   AgendaMeetingCaptureController,
@@ -112,6 +113,7 @@ function createController() {
     retrySegment: vi.fn(async () => undefined),
     purge: vi.fn(async () => { phase = 'idle'; notify(); }),
     purgeForLogout: vi.fn(async () => undefined),
+    interrupt() { phase = 'capture_interrupted'; notify(); },
     advance(ms: number) { duration += ms; notify(); },
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
   };
@@ -175,6 +177,38 @@ function Workspace({ eventId, title }: { eventId: string | null; title: string }
   return (
     <AgendaMeetingWorkspace canDelete canRecord canReview eventId={eventId} eventTitle={title} orgId={ORG_ID} persistedEvent={Boolean(eventId)} />
   );
+}
+
+const pendingCoverage: NonNullable<AgendaMeetingSessionDetail['coverageStats']> = {
+  expectedSegments: 2,
+  receivedSegments: 2,
+  transcribedSegments: 0,
+  silentSegments: 0,
+  pendingSegments: 2,
+  failedSegments: 0,
+  lostSegments: 0,
+  audioBytes: 90_000,
+  audioRetainedSegments: 2,
+  transcribedDurationMs: 0,
+};
+
+function openMeetingResult(patch: Partial<AgendaMeetingSessionDetail>) {
+  const result: AgendaMeetingSessionDetail = {
+    ...detail,
+    state: 'finalizing_transcript',
+    processingState: 'finalizing_transcript',
+    transcriptCoverage: 'pending',
+    transcriptVersions: [],
+    minutesVersions: [],
+    closedSequence: 1,
+    unresolvedSequences: [0, 1],
+    coverageStats: pendingCoverage,
+    ...patch,
+  };
+  mocks.sessionsHook.mockReturnValue({ data: [result], isLoading: false, isFetching: false, isError: false, refetch: vi.fn() });
+  mocks.detailHook.mockReturnValue({ data: result, isLoading: false, isError: false });
+  render(<Harness><Workspace eventId={EVENT_A} title="Reunião A" /></Harness>);
+  fireEvent.click(screen.getByRole('button', { name: /Fenasoja Meeting/ }));
 }
 
 describe('Fenasoja Meeting — captura independente do painel', () => {
@@ -263,6 +297,92 @@ describe('Fenasoja Meeting — captura independente do painel', () => {
     fireEvent.click(await screen.findByRole('button', { name: /^Finalizar reunião$/ }));
     await waitFor(() => expect(controller.finish).toHaveBeenCalledWith({ allowPartial: false }));
     expect(controller.cancel).not.toHaveBeenCalled();
+  });
+
+  it('abre a confirmação acima do evento móvel e finaliza uma gravação interrompida', async () => {
+    const closeEvent = vi.fn();
+    render(<Harness><MobileDialogFrame open title="Detalhes do evento" onRequestClose={closeEvent}>
+      <Workspace eventId={EVENT_A} title="Reunião A" />
+    </MobileDialogFrame></Harness>);
+    const event = screen.getByRole('dialog', { name: 'Detalhes do evento' });
+    fireEvent.click(within(event).getByRole('button', { name: /Fenasoja Meeting/ }));
+    fireEvent.click(within(event).getByRole('checkbox'));
+    fireEvent.click(within(event).getByRole('button', { name: /Iniciar gravação/ }));
+    await within(event).findByRole('region', { name: 'Gravação da reunião' });
+    act(() => controller.interrupt());
+
+    fireEvent.click(within(event).getByRole('button', { name: 'Finalizar reunião' }));
+    const confirmation = await screen.findByRole('alertdialog', { name: 'Finalizar a reunião?' });
+    expect(confirmation).toHaveClass('agenda-meeting__confirmation');
+    expect(document.querySelector('.agenda-meeting__confirmation-overlay')).toBeInTheDocument();
+    expect(controller.finish).not.toHaveBeenCalled();
+    fireEvent.click(within(confirmation).getByRole('button', { name: 'Finalizar reunião' }));
+
+    await waitFor(() => expect(controller.finish).toHaveBeenCalledExactlyOnceWith({ allowPartial: false }));
+    expect(controller.cancel).not.toHaveBeenCalled();
+    expect(closeEvent).not.toHaveBeenCalled();
+  });
+
+  it('mantém o áudio recebido na fila durante a transcrição', async () => {
+    openMeetingResult({
+      coverageStats: { ...pendingCoverage, transcribedSegments: 1, pendingSegments: 1 },
+      unresolvedSequences: [1],
+    });
+    expect(await screen.findByText(/1 de 2 parte\(s\) de áudio transcritas/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Seguir com lacunas' })).not.toBeInTheDocument();
+    expect(mocks.control).not.toHaveBeenCalled();
+  });
+
+  it('oferece nova tentativa para áudio com falha recuperável', async () => {
+    openMeetingResult({
+      state: 'failed',
+      errorCode: 'transcription_provider_network_error',
+      retryableStage: 'transcription',
+      coverageStats: { ...pendingCoverage, transcribedSegments: 1, pendingSegments: 0, failedSegments: 1 },
+      unresolvedSequences: [1],
+    });
+    expect(await screen.findByRole('button', { name: 'Tentar transcrição novamente' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Seguir com lacunas' })).not.toBeInTheDocument();
+  });
+
+  it('pede confirmação antes de consolidar fala transcrita com trechos indisponíveis', async () => {
+    openMeetingResult({
+      coverageStats: { ...pendingCoverage, receivedSegments: 1, transcribedSegments: 1, pendingSegments: 0, audioRetainedSegments: 1 },
+      unresolvedSequences: [1],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Seguir com lacunas' }));
+    const dialog = screen.getByRole('alertdialog', { name: 'Seguir com lacunas?' });
+    expect(within(dialog).getByText(/Os trechos indisponíveis ficarão sinalizados/)).toBeInTheDocument();
+    expect(mocks.control).not.toHaveBeenCalled();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Confirmar' }));
+    await waitFor(() => expect(mocks.control).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({
+      action: 'accept_transcription_gaps', sessionId: SESSION_ID,
+    })));
+  });
+
+  it.each(['analysis_transcript_has_no_speech', 'analysis_transcript_missing_audio'])('mostra áudio incompleto para reunião com lacunas (%s)', async (errorCode) => {
+    openMeetingResult({
+      state: 'transcript_ready_with_gaps',
+      processingState: 'transcript_ready_with_gaps',
+      transcriptCoverage: 'with_gaps',
+      errorCode,
+      coverageStats: { ...pendingCoverage, lostSegments: 2, pendingSegments: 0 },
+    });
+    expect(await screen.findByText('Áudio incompleto')).toBeInTheDocument();
+    expect(screen.getByText(/Há trechos sem transcrição/)).toBeInTheDocument();
+    expect(screen.queryByText(/Nenhuma fala identificada/)).not.toBeInTheDocument();
+  });
+
+  it('indica quando o áudio foi transcrito integralmente sem fala', async () => {
+    openMeetingResult({
+      state: 'failed',
+      transcriptCoverage: 'complete',
+      errorCode: 'analysis_transcript_has_no_speech',
+      coverageStats: { ...pendingCoverage, transcribedSegments: 2, silentSegments: 2, pendingSegments: 0 },
+      unresolvedSequences: [],
+    });
+    expect(await screen.findByText('Nenhuma fala identificada')).toBeInTheDocument();
+    expect(screen.getByText(/A gravação foi transcrita/)).toBeInTheDocument();
   });
 
   it('mostra o relatório estruturado, a marca de parcial, lacunas, trechos sem fala e downloads', async () => {
