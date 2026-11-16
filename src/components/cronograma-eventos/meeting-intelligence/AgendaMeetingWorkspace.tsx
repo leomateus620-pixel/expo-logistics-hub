@@ -670,7 +670,7 @@ function PersistedMeetingWorkspace({ eventId, orgId, eventTitle, canRecord, canR
       )}
 
       <AlertDialog open={confirm !== null} onOpenChange={(open) => { if (!open) setConfirm(null); }}>
-        <AlertDialogContent>
+        <AlertDialogContent className="agenda-meeting__confirmation" overlayClassName="agenda-meeting__confirmation-overlay">
           <AlertDialogHeader>
             <AlertDialogTitle>
               {confirm?.kind === 'delete-session' ? 'Excluir a sessão e todos os conteúdos?'

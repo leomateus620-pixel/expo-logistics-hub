@@ -227,7 +227,7 @@ export class CaptureSegmenter {
       this.source.connect(this.tap as AudioNode);
       (this.tap as AudioNode).connect(this.sink);
     } catch (error) {
-      await this.releaseCaptureResources();
+      this.releaseCaptureResources();
       throw error instanceof Error ? error : new Error('supported_audio_capture_unavailable');
     }
     meetingDiagnostics.record('AUDIO_CAPTURE_READY', {
@@ -298,6 +298,11 @@ export class CaptureSegmenter {
   }
 
   async stop(): Promise<void> {
+    if (this.mode === 'stopped' || this.mode === 'interrupted') {
+      // An interruption marks its mode before saving the last audio and gap.
+      await this.operation;
+      return;
+    }
     if (!['recording', 'paused', 'prepared'].includes(this.mode)) return;
     const wasRecording = this.mode === 'recording';
     await this.enqueue(async () => {
@@ -307,7 +312,7 @@ export class CaptureSegmenter {
         this.clearTimers();
         await this.emitChunk(this.chunker?.flush() ?? null);
       } finally {
-        await this.releaseCaptureResources();
+        this.releaseCaptureResources();
         this.options.onDuration?.(this.activeDurationMs);
       }
     });
@@ -318,7 +323,7 @@ export class CaptureSegmenter {
     this.mode = 'stopped';
     this.clearTimers();
     await this.enqueue(async () => {
-      await this.releaseCaptureResources();
+      this.releaseCaptureResources();
       this.options.onDuration?.(this.activeDurationMs);
     });
   }
@@ -337,7 +342,7 @@ export class CaptureSegmenter {
           await this.emitGapMarker(reason);
         }
       } finally {
-        await this.releaseCaptureResources();
+        this.releaseCaptureResources();
         this.options.onInterruption?.(reason, error);
       }
     });
@@ -392,15 +397,20 @@ export class CaptureSegmenter {
     if (!(this.tap && 'port' in this.tap)) return;
     const tap = this.tap;
     await new Promise<void>((resolve) => {
-      const timer = setTimeout(() => {
+      const finish = () => {
+        clearTimeout(timer);
         this.pendingFlush = null;
         resolve();
-      }, FLUSH_TIMEOUT_MS);
-      this.pendingFlush = () => {
-        clearTimeout(timer);
-        resolve();
       };
-      tap.port.postMessage('flush');
+      const timer = setTimeout(finish, FLUSH_TIMEOUT_MS);
+      this.pendingFlush = finish;
+      try {
+        tap.port.postMessage('flush');
+      } catch {
+        // The browser can close the worklet before acknowledging the flush.
+        // Continue with the samples that already reached the chunker.
+        finish();
+      }
     });
   }
 
@@ -513,7 +523,7 @@ export class CaptureSegmenter {
     this.stream = null;
   }
 
-  private async releaseCaptureResources(): Promise<void> {
+  private releaseCaptureResources(): void {
     this.clearTimers();
     this.preroll = [];
     this.prerollSamples = 0;
@@ -530,11 +540,14 @@ export class CaptureSegmenter {
     this.source = null;
     this.sink = null;
     this.stopTracks();
-    if (this.audioContext) {
-      this.audioContext.removeEventListener('statechange', this.onContextStateChange);
-      await this.audioContext.close().catch(() => undefined);
-    }
+    const context = this.audioContext;
     this.audioContext = null;
     this.detachLifecycleListeners();
+    if (context) {
+      context.removeEventListener('statechange', this.onContextStateChange);
+      // iOS can leave close() pending after the device suspends capture.
+      // All tracks/nodes are detached; finalization can proceed independently.
+      if (context.state !== 'closed') void context.close().catch(() => undefined);
+    }
   }
 }

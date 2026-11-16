@@ -100,7 +100,7 @@ export function MeetingCaptureDock() {
       </Sheet>
 
       <AlertDialog open={confirmFinish} onOpenChange={setConfirmFinish}>
-        <AlertDialogContent>
+        <AlertDialogContent className="agenda-meeting__confirmation" overlayClassName="agenda-meeting__confirmation-overlay">
           <AlertDialogHeader>
             <AlertDialogTitle>Finalizar a reunião?</AlertDialogTitle>
             <AlertDialogDescription>

@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AgendaMeetingWorkspace } from '@/components/cronograma-eventos/meeting-intelligence/AgendaMeetingWorkspace';
 import { MeetingCaptureDock } from '@/components/cronograma-eventos/meeting-intelligence/MeetingCaptureDock';
+import { MobileDialogFrame } from '@/components/cronograma-eventos/mobile/MobileDialogFrame';
 import { MeetingCaptureProvider } from '@/features/agenda-meeting-intelligence/provider/MeetingCaptureProvider';
 import type {
   AgendaMeetingCaptureController,
@@ -112,6 +113,7 @@ function createController() {
     retrySegment: vi.fn(async () => undefined),
     purge: vi.fn(async () => { phase = 'idle'; notify(); }),
     purgeForLogout: vi.fn(async () => undefined),
+    interrupt() { phase = 'capture_interrupted'; notify(); },
     advance(ms: number) { duration += ms; notify(); },
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
   };
@@ -263,6 +265,30 @@ describe('Fenasoja Meeting — captura independente do painel', () => {
     fireEvent.click(await screen.findByRole('button', { name: /^Finalizar reunião$/ }));
     await waitFor(() => expect(controller.finish).toHaveBeenCalledWith({ allowPartial: false }));
     expect(controller.cancel).not.toHaveBeenCalled();
+  });
+
+  it('abre a confirmação acima do evento móvel e finaliza uma gravação interrompida', async () => {
+    const closeEvent = vi.fn();
+    render(<Harness><MobileDialogFrame open title="Detalhes do evento" onRequestClose={closeEvent}>
+      <Workspace eventId={EVENT_A} title="Reunião A" />
+    </MobileDialogFrame></Harness>);
+    const event = screen.getByRole('dialog', { name: 'Detalhes do evento' });
+    fireEvent.click(within(event).getByRole('button', { name: /Fenasoja Meeting/ }));
+    fireEvent.click(within(event).getByRole('checkbox'));
+    fireEvent.click(within(event).getByRole('button', { name: /Iniciar gravação/ }));
+    await within(event).findByRole('region', { name: 'Gravação da reunião' });
+    act(() => controller.interrupt());
+
+    fireEvent.click(within(event).getByRole('button', { name: 'Finalizar reunião' }));
+    const confirmation = await screen.findByRole('alertdialog', { name: 'Finalizar a reunião?' });
+    expect(confirmation).toHaveClass('agenda-meeting__confirmation');
+    expect(document.querySelector('.agenda-meeting__confirmation-overlay')).toBeInTheDocument();
+    expect(controller.finish).not.toHaveBeenCalled();
+    fireEvent.click(within(confirmation).getByRole('button', { name: 'Finalizar reunião' }));
+
+    await waitFor(() => expect(controller.finish).toHaveBeenCalledExactlyOnceWith({ allowPartial: false }));
+    expect(controller.cancel).not.toHaveBeenCalled();
+    expect(closeEvent).not.toHaveBeenCalled();
   });
 
   it('mostra o relatório estruturado, a marca de parcial, lacunas, trechos sem fala e downloads', async () => {

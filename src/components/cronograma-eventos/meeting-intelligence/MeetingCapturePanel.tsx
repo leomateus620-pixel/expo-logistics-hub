@@ -165,7 +165,7 @@ export function MeetingCapturePanel({ controller, eventTitle, onCollapse, collap
       )}
 
       <AlertDialog open={confirm !== null} onOpenChange={(open) => { if (!open) setConfirm(null); }}>
-        <AlertDialogContent>
+        <AlertDialogContent className="agenda-meeting__confirmation" overlayClassName="agenda-meeting__confirmation-overlay">
           <AlertDialogHeader>
             <AlertDialogTitle>{confirm === 'finish' ? 'Finalizar a reunião?' : 'Cancelar e descartar a gravação?'}</AlertDialogTitle>
             <AlertDialogDescription>
