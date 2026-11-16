@@ -1,5 +1,15 @@
 # Roadmap
 
+## Fenasoja Meeting — áudio real, Gemini 3.5 Transcribe e relatório GPT‑6.1 Sol
+- [ ] Banco: pipeline de áudio, constraints/defaults dos provedores efetivos, fila de transcrição, relatório estruturado, artefatos, flag e limites (migração aditiva).
+- [ ] Armazenamento privado: áudio temporário e exportações.
+- [ ] Backend: ingestão autenticada de áudio, worker de transcrição Gemini, relatório Sol sem fallback silencioso, exportação PDF/TXT, exclusão com limpeza de arquivos, retenção do áudio.
+- [ ] Captura real de áudio (WAV 16 kHz em partes com corte em silêncio) e envio durável/idempotente.
+- [ ] Provider persistente acima da Agenda + barra compacta; fechar painel não interrompe a gravação.
+- [ ] Interface: Relatório / Transcrição / Histórico, downloads, nova versão, exclusões, estados honestos.
+- [ ] Testes de domínio/UI, deploy das funções, validação real ponta a ponta com os dois provedores.
+- Não publicar sem pedido.
+
 ## Pavilhão 5 — Floriculturas
 - [x] Alinhar referências, atividade e identificação pública com o nome oficial aprovado.
 - [x] Atualizar exclusivamente o nome persistido de B8 e da planta interna com auditoria; conferir preservação dos demais campos e 35 testes aprovados.

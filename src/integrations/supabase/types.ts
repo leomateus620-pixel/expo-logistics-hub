@@ -164,6 +164,62 @@ export type Database = {
         }
         Relationships: []
       }
+      agenda_meeting_artifacts: {
+        Row: {
+          byte_size: number
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          kind: string
+          org_id: string
+          renderer_version: string
+          session_id: string
+          sha256: string
+          source_content_hash: string
+          source_version_id: string
+          storage_path: string
+        }
+        Insert: {
+          byte_size: number
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          id?: string
+          kind: string
+          org_id: string
+          renderer_version: string
+          session_id: string
+          sha256: string
+          source_content_hash: string
+          source_version_id: string
+          storage_path: string
+        }
+        Update: {
+          byte_size?: number
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          kind?: string
+          org_id?: string
+          renderer_version?: string
+          session_id?: string
+          sha256?: string
+          source_content_hash?: string
+          source_version_id?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_artifacts_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+        ]
+      }
       agenda_meeting_audit_events: {
         Row: {
           action: string
@@ -285,13 +341,17 @@ export type Database = {
           analysis_model: string
           created_at: string
           event_id: string
+          generation_key: string | null
           id: string
+          is_partial: boolean
           minutes_markdown: string
           org_id: string
           prompt_version: string
           provider_response_id: string | null
           provider_usage: Json
           reasoning_effort: string
+          report: Json | null
+          report_format: string
           review_note: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -308,13 +368,17 @@ export type Database = {
           analysis_model?: string
           created_at?: string
           event_id: string
+          generation_key?: string | null
           id?: string
+          is_partial?: boolean
           minutes_markdown: string
           org_id: string
           prompt_version: string
           provider_response_id?: string | null
           provider_usage?: Json
           reasoning_effort?: string
+          report?: Json | null
+          report_format?: string
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -331,13 +395,17 @@ export type Database = {
           analysis_model?: string
           created_at?: string
           event_id?: string
+          generation_key?: string | null
           id?: string
+          is_partial?: boolean
           minutes_markdown?: string
           org_id?: string
           prompt_version?: string
           provider_response_id?: string | null
           provider_usage?: Json
           reasoning_effort?: string
+          report?: Json | null
+          report_format?: string
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -418,6 +486,8 @@ export type Database = {
           lease_token: string | null
           max_attempts: number
           org_id: string
+          provider_request_id: string | null
+          receipt_id: string | null
           session_id: string
           status: string
           transcript_version_id: string | null
@@ -437,6 +507,8 @@ export type Database = {
           lease_token?: string | null
           max_attempts?: number
           org_id: string
+          provider_request_id?: string | null
+          receipt_id?: string | null
           session_id: string
           status?: string
           transcript_version_id?: string | null
@@ -456,6 +528,8 @@ export type Database = {
           lease_token?: string | null
           max_attempts?: number
           org_id?: string
+          provider_request_id?: string | null
+          receipt_id?: string | null
           session_id?: string
           status?: string
           transcript_version_id?: string | null
@@ -470,6 +544,13 @@ export type Database = {
             referencedColumns: ["id", "org_id", "event_id"]
           },
           {
+            foreignKeyName: "agenda_meeting_processing_jobs_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_segment_receipts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "agenda_meeting_processing_jobs_transcript_version_id_fkey"
             columns: ["transcript_version_id"]
             isOneToOne: false
@@ -478,10 +559,51 @@ export type Database = {
           },
         ]
       }
+      agenda_meeting_runtime_config: {
+        Row: {
+          audio_pipeline_enabled: boolean
+          audio_retention_hours: number
+          id: boolean
+          max_active_duration_ms: number
+          max_report_generations_per_session: number
+          max_session_audio_bytes: number
+          provider_pause_reason: string | null
+          provider_paused_until: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          audio_pipeline_enabled?: boolean
+          audio_retention_hours?: number
+          id?: boolean
+          max_active_duration_ms?: number
+          max_report_generations_per_session?: number
+          max_session_audio_bytes?: number
+          provider_pause_reason?: string | null
+          provider_paused_until?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          audio_pipeline_enabled?: boolean
+          audio_retention_hours?: number
+          id?: boolean
+          max_active_duration_ms?: number
+          max_report_generations_per_session?: number
+          max_session_audio_bytes?: number
+          provider_pause_reason?: string | null
+          provider_paused_until?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       agenda_meeting_segment_receipts: {
         Row: {
           attempt_count: number
           attempt_id: string
+          audio_deleted_at: string | null
+          audio_storage_path: string | null
           byte_size: number | null
           callback_digest: string | null
           callback_received_at: string | null
@@ -489,6 +611,7 @@ export type Database = {
           callback_token_hash: string | null
           capture_end_ms: number
           capture_start_ms: number
+          client_audio_stats: Json
           created_at: string
           error_code: string | null
           event_id: string
@@ -504,13 +627,18 @@ export type Database = {
           sequence: number
           session_id: string
           sha256: string | null
+          speech_detected: boolean | null
           status: string
           transcribed_at: string | null
+          transcription_model: string | null
+          transcription_usage: Json
           updated_at: string
         }
         Insert: {
           attempt_count?: number
           attempt_id?: string
+          audio_deleted_at?: string | null
+          audio_storage_path?: string | null
           byte_size?: number | null
           callback_digest?: string | null
           callback_received_at?: string | null
@@ -518,6 +646,7 @@ export type Database = {
           callback_token_hash?: string | null
           capture_end_ms: number
           capture_start_ms: number
+          client_audio_stats?: Json
           created_at?: string
           error_code?: string | null
           event_id: string
@@ -533,13 +662,18 @@ export type Database = {
           sequence: number
           session_id: string
           sha256?: string | null
+          speech_detected?: boolean | null
           status?: string
           transcribed_at?: string | null
+          transcription_model?: string | null
+          transcription_usage?: Json
           updated_at?: string
         }
         Update: {
           attempt_count?: number
           attempt_id?: string
+          audio_deleted_at?: string | null
+          audio_storage_path?: string | null
           byte_size?: number | null
           callback_digest?: string | null
           callback_received_at?: string | null
@@ -547,6 +681,7 @@ export type Database = {
           callback_token_hash?: string | null
           capture_end_ms?: number
           capture_start_ms?: number
+          client_audio_stats?: Json
           created_at?: string
           error_code?: string | null
           event_id?: string
@@ -562,8 +697,11 @@ export type Database = {
           sequence?: number
           session_id?: string
           sha256?: string | null
+          speech_detected?: boolean | null
           status?: string
           transcribed_at?: string | null
+          transcription_model?: string | null
+          transcription_usage?: Json
           updated_at?: string
         }
         Relationships: [
@@ -606,6 +744,7 @@ export type Database = {
           org_id: string
           partial_analysis_confirmed: boolean
           paused_at: string | null
+          pipeline: string
           processing_state: string
           started_at: string | null
           started_by: string
@@ -644,6 +783,7 @@ export type Database = {
           org_id: string
           partial_analysis_confirmed?: boolean
           paused_at?: string | null
+          pipeline?: string
           processing_state?: string
           started_at?: string | null
           started_by: string
@@ -682,6 +822,7 @@ export type Database = {
           org_id?: string
           partial_analysis_confirmed?: boolean
           paused_at?: string | null
+          pipeline?: string
           processing_state?: string
           started_at?: string | null
           started_by?: string
@@ -12134,6 +12275,13 @@ export type Database = {
         Args: { p_segment_ids: Json; p_session_id: string }
         Returns: Json
       }
+      agenda_meeting_audio_cleanup_candidates: {
+        Args: { p_limit?: number }
+        Returns: {
+          receipt_id: string
+          storage_path: string
+        }[]
+      }
       agenda_meeting_authorize: {
         Args: {
           p_action: string
@@ -12167,6 +12315,42 @@ export type Database = {
           lease_token: string | null
           max_attempts: number
           org_id: string
+          provider_request_id: string | null
+          receipt_id: string | null
+          session_id: string
+          status: string
+          transcript_version_id: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "agenda_meeting_processing_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      agenda_meeting_claim_jobs_v2: {
+        Args: {
+          p_batch_size?: number
+          p_kinds?: string[]
+          p_lease_seconds?: number
+        }
+        Returns: {
+          attempts: number
+          available_at: string
+          completed_at: string | null
+          created_at: string
+          dedupe_key: string
+          event_id: string
+          id: string
+          kind: string
+          last_error_code: string | null
+          lease_expires_at: string | null
+          lease_token: string | null
+          max_attempts: number
+          org_id: string
+          provider_request_id: string | null
+          receipt_id: string | null
           session_id: string
           status: string
           transcript_version_id: string | null
@@ -12194,6 +12378,17 @@ export type Database = {
         Args: { p_job_id: string; p_lease_token: string }
         Returns: Json
       }
+      agenda_meeting_complete_report_job: {
+        Args: {
+          p_job_id: string
+          p_lease_token: string
+          p_provider_response_id: string
+          p_result: Json
+          p_transcript_version_id: string
+          p_usage?: Json
+        }
+        Returns: Json
+      }
       agenda_meeting_complete_segment: {
         Args: {
           p_attempt_id: string
@@ -12204,6 +12399,17 @@ export type Database = {
           p_provider_request_id: string
           p_transcript: string
           p_words?: Json
+        }
+        Returns: Json
+      }
+      agenda_meeting_complete_transcription_job: {
+        Args: {
+          p_job_id: string
+          p_lease_token: string
+          p_provider_model: string
+          p_provider_request_id: string
+          p_transcript: string
+          p_usage?: Json
         }
         Returns: Json
       }
@@ -12220,7 +12426,24 @@ export type Database = {
         }
         Returns: Json
       }
+      agenda_meeting_control_v3: {
+        Args: {
+          p_action: string
+          p_actor_user_id: string
+          p_event_id: string
+          p_expected_version?: number
+          p_mutation_id: string
+          p_org_id: string
+          p_payload?: Json
+          p_session_id: string
+        }
+        Returns: Json
+      }
       agenda_meeting_detail_json: {
+        Args: { p_session_id: string }
+        Returns: Json
+      }
+      agenda_meeting_detail_json_base: {
         Args: { p_session_id: string }
         Returns: Json
       }
@@ -12259,6 +12482,17 @@ export type Database = {
         }
         Returns: Json
       }
+      agenda_meeting_fail_transcription_job: {
+        Args: {
+          p_error_code: string
+          p_job_id: string
+          p_lease_token: string
+          p_pause_provider?: boolean
+          p_provider_request_id?: string
+          p_retry_after_seconds?: number
+        }
+        Returns: Json
+      }
       agenda_meeting_has_explicit_capability: {
         Args: { p_capability: string; p_org_id: string; p_user_id: string }
         Returns: boolean
@@ -12277,6 +12511,14 @@ export type Database = {
         }
         Returns: Json
       }
+      agenda_meeting_mark_audio_deleted: {
+        Args: { p_receipt_ids: string[] }
+        Returns: number
+      }
+      agenda_meeting_pause_provider: {
+        Args: { p_minutes?: number; p_reason: string }
+        Returns: undefined
+      }
       agenda_meeting_prepare_segment: {
         Args: {
           p_actor_user_id: string
@@ -12293,6 +12535,14 @@ export type Database = {
           p_sha256: string
         }
         Returns: Json
+      }
+      agenda_meeting_recent_deleted_sessions: {
+        Args: { p_since: string }
+        Returns: {
+          event_id: string
+          org_id: string
+          session_id: string
+        }[]
       }
       agenda_meeting_refresh_sequence_state: {
         Args: { p_session_id: string }
@@ -12325,6 +12575,7 @@ export type Database = {
           org_id: string
           partial_analysis_confirmed: boolean
           paused_at: string | null
+          pipeline: string
           processing_state: string
           started_at: string | null
           started_by: string
@@ -12341,6 +12592,58 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      agenda_meeting_register_artifact: {
+        Args: {
+          p_actor_user_id: string
+          p_byte_size: number
+          p_kind: string
+          p_renderer_version: string
+          p_session_id: string
+          p_sha256: string
+          p_source_hash: string
+          p_source_version_id: string
+          p_storage_path: string
+        }
+        Returns: Json
+      }
+      agenda_meeting_register_audio_segment: {
+        Args: {
+          p_actor_user_id: string
+          p_byte_size: number
+          p_capture_end_ms: number
+          p_capture_start_ms: number
+          p_client_stats?: Json
+          p_mime_type: string
+          p_mutation_id: string
+          p_segment_id: string
+          p_sequence: number
+          p_session_id: string
+          p_sha256: string
+          p_storage_path: string
+        }
+        Returns: Json
+      }
+      agenda_meeting_runtime_settings: {
+        Args: never
+        Returns: {
+          audio_pipeline_enabled: boolean
+          audio_retention_hours: number
+          id: boolean
+          max_active_duration_ms: number
+          max_report_generations_per_session: number
+          max_session_audio_bytes: number
+          provider_pause_reason: string | null
+          provider_paused_until: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "agenda_meeting_runtime_config"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       agenda_meeting_session_readable: {
         Args: {
           p_event_id: string
@@ -12351,6 +12654,10 @@ export type Database = {
         Returns: boolean
       }
       agenda_meeting_session_summary_json: {
+        Args: { p_session_id: string }
+        Returns: Json
+      }
+      agenda_meeting_session_summary_json_base: {
         Args: { p_session_id: string }
         Returns: Json
       }
