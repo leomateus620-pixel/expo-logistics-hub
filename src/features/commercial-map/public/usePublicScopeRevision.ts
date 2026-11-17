@@ -42,5 +42,5 @@ export function usePublicScopeRevision(slug: string, token: string, initialRevis
     // A revoked token must retire the already displayed inventory too.
     void client.invalidateQueries({ queryKey: ['public-map', 'inventory', slug, token] });
   }, [client, query.error, slug, token]);
-  return { revision: query.data?.revision ?? null, lotCount: query.data?.lotCount ?? null };
+  return { revision: query.data?.revision ?? null, lotCount: query.data?.lotCount ?? null, error: query.error };
 }

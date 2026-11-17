@@ -13,7 +13,7 @@ import { PublicMapLegend } from './PublicMapLegend';
 import { COMMERCIAL_MAP_RENDER_RETRY_EVENT } from '../utils/renderingHealth';
 import { fetchSaleLogoUrls } from '../sales/saleLogo';
 import { useQuery } from '@tanstack/react-query';
-import { getPublicArea } from './publicAreaRegistry';
+import { getPublicArea, hasPublicSoldCompanies } from './publicAreaRegistry';
 import { applyPublicShareMetadata } from './publicShareMetadata';
 import { findPavilionEntity, PublicMapAccessError } from './publicMapService';
 import { usePublicCanvasLots, usePublicMapContext, usePublicMapInventory, usePublicMapTelemetry } from './usePublicMapArea';
@@ -26,10 +26,12 @@ import { usePublicMapRenderState } from './usePublicMapRenderState';
 import { PublicLotDetails } from './PublicLotDetails';
 import { PublicLotList } from './PublicLotList';
 import type { PublicLot } from './publicMapTypes';
+import { getPublicSoldCompanies } from './publicSoldCompanies';
 import './public-map.css';
 
 const loadPublicCanvas = () => preloadCommercialMapCanvas({ prepareHeadquarters: false });
 const EMPTY_MATCHES: ReadonlySet<string> = new Set();
+const EMPTY_COMPANIES = getPublicSoldCompanies([]);
 
 class PublicCanvasBoundary extends Component<{ children: ReactNode; fallback: ReactNode; onFailure: () => void }, { failed: boolean }> {
   state = { failed: false };
@@ -54,17 +56,20 @@ export default function PublicAreaMapPage() {
 function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const area = getPublicArea(slug);
   const usesParkContext = Boolean(area && area.kind !== 'PAVILION');
+  const showCompanies = hasPublicSoldCompanies(slug);
   const inventory = usePublicMapInventory(area ? slug : '', token);
   // Independent, authorized RPCs start together; no exterior is mounted with temporary bounds.
   const context = usePublicMapContext(usesParkContext ? slug : '', token);
   const track = usePublicMapTelemetry(area ? slug : '', token);
   const { available: webglAvailable } = useWebGLAvailability();
-  usePublicScopeRevision(inventory.data ? slug : '', token, inventory.data?.revision, inventory.data?.contextRevision);
+  const scopeRevision = usePublicScopeRevision(inventory.data ? slug : '', token, inventory.data?.revision, inventory.data?.contextRevision);
   // Reading during render must be repeatable if React retries a suspended mount.
   const [restoredNavigation] = useState(readPublicNavigation);
   useEffect(() => { takePublicNavigation(); }, []);
   const [viewMode, setViewMode] = useState<'map' | 'list'>(restoredNavigation?.viewMode ?? 'map');
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null);
+  const [companyFocus, setCompanyFocus] = useState<{ requestId: number; entityIds: readonly string[] } | null>(null);
+  const companyFocusSequence = useRef(0);
   const [lotGoneNotice, setLotGoneNotice] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [rendererAttempt, setRendererAttempt] = useState(0);
@@ -79,17 +84,23 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const setSelectedModuleId = useCommercialMapStore(state => state.setSelectedModuleId);
   const clearLotInspection = useCommercialMapStore(state => state.clearLotInspection);
   const data = inventory.data;
+  const invalidLink = inventory.error instanceof PublicMapAccessError || context.error instanceof PublicMapAccessError
+    || scopeRevision.error instanceof PublicMapAccessError;
   useEffect(() => {
-    applyPublicShareMetadata(slug, Boolean(data && area && !inventory.error && !context.error), window.location.href);
-  }, [slug, area, data, inventory.error, context.error]);
+    applyPublicShareMetadata(slug, Boolean(data && area && !invalidLink && !inventory.error && !context.error), window.location.href);
+  }, [slug, area, data, invalidLink, inventory.error, context.error]);
   const lots = useMemo(() => data?.lots ?? [], [data?.lots]);
+  const companiesCurrent = showCompanies && !inventory.isError && !scopeRevision.error && !invalidLink
+    && (!scopeRevision.revision || scopeRevision.revision === data?.revision);
+  const companies = useMemo(() => companiesCurrent ? getPublicSoldCompanies(lots) : EMPTY_COMPANIES, [companiesCurrent, lots]);
   const logos = useQuery({
     queryKey: ['public-map', 'sale-logos', slug, token, data?.revision],
     queryFn: () => fetchSaleLogoUrls({ slug, token }),
-    enabled: Boolean(data), staleTime: 10 * 60 * 1000, refetchInterval: 10 * 60 * 1000,
+    enabled: Boolean(data && !invalidLink), staleTime: 10 * 60 * 1000, refetchInterval: 10 * 60 * 1000,
     meta: { persist: false },
   });
-  const canvasLots = usePublicCanvasLots(lots, logos.data);
+  const scopedLogos = !showCompanies || companiesCurrent ? logos.data : undefined;
+  const canvasLots = usePublicCanvasLots(lots, scopedLogos, !showCompanies);
   const lotsByEntity = useMemo(() => new Map(lots.map(lot => [lot.entityId, lot])), [lots]);
   const pavilionEntity = useMemo(() => data ? findPavilionEntity(data.entities, data.scope.pavilionIdentifier) : null, [data]);
   const inventoryEntities = data?.entities;
@@ -154,6 +165,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
     track('lot_details_viewed', { lotId });
   }, [interactionScope, lotIdByModuleKey, lotsByEntity, selectedEntityId, selectedModuleId, track]);
   const selectedLot = useMemo(() => lots.find(lot => lot.id === selectedLotId) ?? null, [lots, selectedLotId]);
+  const selectedCompany = selectedLot ? companies.byEntityId.get(selectedLot.entityId) : undefined;
   usePublicAutoRefresh(Boolean(selectedLot) || cameraNavigating);
   useEffect(() => {
     const save = () => savePublicNavigation({ selectedLotId, viewMode });
@@ -163,6 +175,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const closeDetails = useCallback(() => {
     lastSelection.current = null;
     setSelectedLotId(null);
+    setCompanyFocus(null);
     clearLotInspection();
   }, [clearLotInspection]);
   useEffect(() => {
@@ -179,6 +192,11 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
       const module = [...lotIdByModuleKey].find(([, id]) => id === lot.id)?.[0];
       if (module) setSelectedModuleId(module);
     } else setSelectedEntityId(lot.entityId);
+  };
+  const focusSelectedCompany = () => {
+    if (!selectedCompany || !webglAvailable) return;
+    setViewMode('map');
+    setCompanyFocus({ requestId: ++companyFocusSequence.current, entityIds: selectedCompany.entityIds });
   };
   const refitArea = () => {
     closeDetails();
@@ -198,7 +216,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
     if (!data && !inventory.isFetching) void inventory.refetch();
     if (usesParkContext && !context.data && !context.isFetching) void context.refetch();
   };
-  if (!area || !token || inventory.error instanceof PublicMapAccessError || context.error instanceof PublicMapAccessError) return <InvalidLink />;
+  if (!area || !token || invalidLink) return <InvalidLink />;
   const fallback = <div className="public-map-stage" role="alert">
     <strong>Não foi possível preparar o mapa.</strong><p>A consulta dos lotes continua disponível na lista.</p>
     <div className="public-map-stage__actions"><button onClick={retry}>Tentar novamente</button><button onClick={() => setViewMode('list')}>Ver lista de lotes</button></div>
@@ -228,15 +246,20 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
           <Suspense fallback={null}><CommercialMapCanvas entities={sceneEntities} lots={canvasLots} calibration={null} matchingEntityIds={EMPTY_MATCHES} filtersActive={false}
             sceneSegmentId={null} sceneInteriorEntityId={pavilionEntity?.id ?? null} isolatedArea={null}
             interactiveEntityIds={interactionScope.interactiveEntityIds} publicFocusEntityIds={usesParkContext ? publicScenePolicy?.interactiveEntityIds : null}
-            publicScenePolicy={publicScenePolicy} initialPublicView={restoredNavigation} active={showMap} /></Suspense>
+            publicScenePolicy={publicScenePolicy} initialPublicView={restoredNavigation} active={showMap}
+            publicCompanyGroups={showCompanies ? companies.groups : undefined}
+            publicCompanyFocus={companiesCurrent ? companyFocus : null} /></Suspense>
           {renderState !== 'ready' && <div className="public-map-stage" role="status" aria-live="polite">
             {(renderState === 'preparing' || renderState === 'recovering') && <span className="public-map-stage__spinner" aria-hidden="true" />}<strong>{renderState === 'failed' ? 'Não foi possível desenhar o mapa neste dispositivo.' : renderState === 'slow' ? 'O mapa está demorando mais que o normal.' : renderState === 'recovering' ? 'Restaurando a visualização do mapa…' : 'Preparando o mapa da área…'}</strong>
             <div className="public-map-stage__actions">{renderState !== 'preparing' && <button onClick={retry}>Tentar novamente</button>}<button onClick={() => setViewMode('list')}>Ver lista de lotes</button></div>
           </div>}
         </PublicCanvasBoundary>
       </div>}
-      {data && !showMap && <PublicLotList lots={lots} selectedLotId={selectedLotId} onSelect={selectFromList} areaName={data.scope.name} />}
-      {selectedLot && <PublicLotDetails lot={selectedLot} onClose={closeDetails} compact={usesParkContext} areaName={data?.scope.name} />}
+      {data && !showMap && <PublicLotList lots={lots} selectedLotId={selectedLotId} onSelect={selectFromList}
+        areaName={data.scope.name} companiesByEntityId={showCompanies ? companies.byEntityId : undefined} />}
+      {selectedLot && <PublicLotDetails lot={selectedLot} onClose={closeDetails} compact={usesParkContext} areaName={data?.scope.name}
+        useCompanyIdentity={showCompanies} company={selectedCompany} companyLogoUrl={selectedCompany ? scopedLogos?.[selectedLot.id] : undefined}
+        onFocusCompany={webglAvailable ? focusSelectedCompany : undefined} />}
     </div>
     <footer className="public-map-footer"><span>Fenasoja 2028 · Consulta pública do Mapa Comercial</span><span>Valores oficiais sujeitos a confirmação pela organização.</span></footer>
   </main>;

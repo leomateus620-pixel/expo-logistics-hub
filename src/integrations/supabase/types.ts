@@ -8331,6 +8331,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           display_name: string
+          expires_at: string | null
           id: string
           is_active: boolean
           org_id: string
@@ -8350,6 +8351,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           display_name: string
+          expires_at?: string | null
           id?: string
           is_active?: boolean
           org_id: string
@@ -8369,6 +8371,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           display_name?: string
+          expires_at?: string | null
           id?: string
           is_active?: boolean
           org_id?: string
@@ -14029,6 +14032,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           display_name: string
+          expires_at: string | null
           id: string
           is_active: boolean
           org_id: string

@@ -100,20 +100,21 @@ export function usePublicMapTelemetry(slug: string, token: string) {
   return track;
 }
 
-export function usePublicCanvasLots(lots: PublicLot[] | undefined, logos?: Record<string, string>) {
-  const cache = useRef(new Map<string, { source: PublicLot; value: CommercialLot }>());
+export function usePublicCanvasLots(lots: PublicLot[] | undefined, logos?: Record<string, string>, includeBuyerName = true) {
+  const cache = useRef(new Map<string, { source: PublicLot; value: CommercialLot; includeBuyerName: boolean }>());
   return useMemo(() => {
-    const next = new Map<string, { source: PublicLot; value: CommercialLot }>();
+    const next = new Map<string, { source: PublicLot; value: CommercialLot; includeBuyerName: boolean }>();
     const result = (lots ?? []).map(lot => {
       const previous = cache.current.get(lot.id);
       const logo = lot.availability === 'SOLD' ? logos?.[lot.id] ?? null : null;
-      const record = previous?.source === lot && previous.value.saleLogoUrl === logo ? previous : { source: lot, value: { ...toCanvasLot(lot), saleLogoUrl: logo } };
+      const record = previous?.source === lot && previous.value.saleLogoUrl === logo && previous.includeBuyerName === includeBuyerName
+        ? previous : { source: lot, value: { ...toCanvasLot(lot, includeBuyerName), saleLogoUrl: logo }, includeBuyerName };
       next.set(lot.id, record);
       return record.value;
     });
     cache.current = next;
     return result;
-  }, [lots, logos]);
+  }, [lots, logos, includeBuyerName]);
 }
 
 /**

@@ -24,6 +24,10 @@ export interface PublicLot {
   displayName: string;
   availability: PublicLotAvailability;
   buyerName: string | null;
+  /** Present on the three external scopes after the public projection migration. */
+  buyerIdentityEligible?: boolean;
+  buyerGroupKey?: string | null;
+  buyerTradeName?: string | null;
   officialAreaSqm: number | null;
   isCorner: boolean;
   isCovered: boolean;

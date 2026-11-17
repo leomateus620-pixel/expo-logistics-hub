@@ -5,6 +5,7 @@ import { formatAreaSqmLabel, formatBrl } from '../utils/lotPricing2028';
 import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from './publicMapTypes';
 import { resolveLotIdentity } from '../utils/lotIdentity';
 import { publicAvailability } from './publicAvailability';
+import type { PublicSoldCompanyGroup } from './publicSoldCompanies';
 
 /** Lista acessível do mesmo escopo — nunca amplia para o parque inteiro. */
 export const PublicLotList = memo(function PublicLotList({
@@ -12,18 +13,22 @@ export const PublicLotList = memo(function PublicLotList({
   selectedLotId,
   onSelect,
   areaName,
+  companiesByEntityId,
 }: {
   lots: PublicLot[];
   selectedLotId: string | null;
   onSelect: (lot: PublicLot) => void;
   areaName?: string | null;
+  companiesByEntityId?: ReadonlyMap<string, PublicSoldCompanyGroup>;
 }) {
   const [term, setTerm] = useState('');
+  const searchLabel = companiesByEntityId ? 'Buscar lote ou empresa nesta área' : 'Buscar lote nesta área';
   const filtered = useMemo(() => {
     if (!term.trim()) return lots;
     // Índice público: identificadores do lote + nome de exibição autorizado (já resolvido no servidor).
-    return lots.filter((lot) => matchesBuyerNames(term, lot.displayName, lot.publicIdentifier, lot.block, lot.buyerName));
-  }, [lots, term]);
+    return lots.filter((lot) => matchesBuyerNames(term, lot.displayName, lot.publicIdentifier, lot.block,
+      companiesByEntityId ? companiesByEntityId.get(lot.entityId)?.tradeName : lot.buyerName));
+  }, [companiesByEntityId, lots, term]);
 
   return (
     <div className="public-map-list">
@@ -32,8 +37,8 @@ export const PublicLotList = memo(function PublicLotList({
         <input
           type="search"
           value={term}
-          placeholder="Buscar lote nesta área"
-          aria-label="Buscar lote nesta área"
+          placeholder={searchLabel}
+          aria-label={searchLabel}
           onChange={(event) => setTerm(event.target.value.toLocaleUpperCase('pt-BR'))}
         />
       </label>
@@ -54,6 +59,8 @@ export const PublicLotList = memo(function PublicLotList({
                   : 'Valor sob consulta'}
               </span>
               <small data-availability={publicAvailability(lot.availability)}>{PUBLIC_AVAILABILITY_LABEL[lot.availability]}</small>
+              {companiesByEntityId?.get(lot.entityId)?.tradeName &&
+                <small className="public-map-list-company">{companiesByEntityId.get(lot.entityId)?.tradeName}</small>}
             </button>
           </li>
         ))}

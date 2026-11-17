@@ -52,6 +52,10 @@ export function isPublicAreaSlug(slug?: string | null): boolean {
   return Boolean(getPublicArea(slug));
 }
 
+export function hasPublicSoldCompanies(slug: string): boolean {
+  return slug === 'exporural' || slug === 'industria-comercio-servicos-externo' || slug === 'espaco-automovel';
+}
+
 /** Áreas publicadas dependem de links opacos autorizados pelo servidor. */
 export const PUBLIC_MAP_EXCLUDED_PAVILIONS: readonly string[] = [];
 

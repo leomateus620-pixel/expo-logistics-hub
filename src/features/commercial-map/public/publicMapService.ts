@@ -136,7 +136,7 @@ const AVAILABILITY_TO_STATUS: Record<PublicLot['availability'], CommercialStatus
  * Converte o lote público no formato que o canvas já conhece, sem inventar
  * dados internos: somente o comprador de lote vendido é publicável.
  */
-export function toCanvasLot(lot: PublicLot): CommercialLot {
+export function toCanvasLot(lot: PublicLot, includeBuyerName = true): CommercialLot {
   return {
     id: lot.id,
     entityId: lot.entityId,
@@ -166,7 +166,7 @@ export function toCanvasLot(lot: PublicLot): CommercialLot {
     accessibilityNotes: null,
     commercialNotes: null,
     internalNotes: null,
-    currentBuyer: lot.availability === 'SOLD' ? lot.buyerName?.trim() || null : null,
+    currentBuyer: includeBuyerName && lot.availability === 'SOLD' ? lot.buyerName?.trim() || null : null,
     reservationExpiresAt: null,
     saleDate: null,
     salespersonName: null,
