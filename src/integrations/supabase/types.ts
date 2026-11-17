@@ -13133,6 +13133,10 @@ export type Database = {
         Returns: string
       }
       create_org_with_member: { Args: { org_nome: string }; Returns: string }
+      cronograma_agenda_permissions: {
+        Args: { _org_id: string }
+        Returns: Json
+      }
       cronograma_can_view_planning: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
@@ -13167,6 +13171,8 @@ export type Database = {
         Returns: boolean
       }
       cronograma_managed_commission_ids: { Args: never; Returns: string[] }
+      cronograma_member_org_ids: { Args: never; Returns: string[] }
+      cronograma_planning_org_ids: { Args: never; Returns: string[] }
       cronograma_reorder_subevents: {
         Args: { event_id: string; ordered_ids: string[] }
         Returns: Json
@@ -13245,6 +13251,7 @@ export type Database = {
       }
       cronograma_visible_event_ids: { Args: never; Returns: string[] }
       cronograma_writable_event_ids: { Args: never; Returns: string[] }
+      cronograma_writer_org_ids: { Args: never; Returns: string[] }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
