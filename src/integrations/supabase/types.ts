@@ -8331,7 +8331,6 @@ export type Database = {
           created_at: string
           created_by: string | null
           display_name: string
-          expires_at: string | null
           id: string
           is_active: boolean
           org_id: string
@@ -8351,7 +8350,6 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           display_name: string
-          expires_at?: string | null
           id?: string
           is_active?: boolean
           org_id: string
@@ -8371,7 +8369,6 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           display_name?: string
-          expires_at?: string | null
           id?: string
           is_active?: boolean
           org_id?: string
@@ -13246,10 +13243,6 @@ export type Database = {
           units: Json
         }[]
       }
-      cronograma_agenda_permissions: {
-        Args: { _org_id: string }
-        Returns: Json
-      }
       cronograma_unit_can_manage: {
         Args: { _commission_id: string; _user_id: string }
         Returns: boolean
@@ -14032,7 +14025,6 @@ export type Database = {
           created_at: string
           created_by: string | null
           display_name: string
-          expires_at: string | null
           id: string
           is_active: boolean
           org_id: string
