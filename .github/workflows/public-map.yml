@@ -27,7 +27,7 @@ jobs:
       - name: Scope, inspection, public statuses and renderer recovery
         run: >-
           npx vitest run --maxWorkers=2 --testTimeout=30000
-          src/test/publicMap src/test/publicCommercialMap
+          src/test/publicMap src/test/publicCommercialMap src/test/publicSoldCompany
           src/test/commercialMapPreparationRecovery.test.tsx
           src/test/commercialMapSceneShaderWarmup.test.ts
           src/test/commercialMapPavilionWayfinding.test.ts
