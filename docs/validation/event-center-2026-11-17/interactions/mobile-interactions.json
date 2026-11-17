@@ -1,0 +1,85 @@
+{
+  "mobile": true,
+  "errors": [],
+  "search": {
+    "C1": [
+      "C1"
+    ],
+    "Centro de Eventos Fenasoja": [
+      "C1",
+      "QA-C1-FOOD"
+    ],
+    "Fenasoja Event Center": [
+      "C1"
+    ]
+  },
+  "selection": {
+    "selected": "reference:2026:c1",
+    "expected": "reference:2026:c1"
+  },
+  "doubleClick": {
+    "selected": "reference:2026:c1",
+    "interior": null
+  },
+  "deselection": null,
+  "focusBefore": [
+    4.74545454545455,
+    2.2,
+    7.254545490963853
+  ],
+  "focusAfter": [
+    -11.057679856139337,
+    16.766727940416725,
+    10.770144965994394
+  ],
+  "marker": {
+    "anchor": [
+      20.66835015369266,
+      2.251954545454544,
+      7.249556866158401
+    ],
+    "exists": true,
+    "visible": true,
+    "batches": [
+      {
+        "name": "gastronomy-emblem-body",
+        "count": 1,
+        "visible": true
+      },
+      {
+        "name": "gastronomy-emblem-face",
+        "count": 1,
+        "visible": true
+      },
+      {
+        "name": "gastronomy-marker-beam",
+        "count": 1,
+        "visible": true
+      }
+    ],
+    "decorativeHits": 0
+  },
+  "segment": {
+    "active": "gastronomia",
+    "building": true,
+    "marker": true
+  },
+  "night": 0.85,
+  "day": {
+    "emission": 0,
+    "wash": false,
+    "windowNight": 0
+  },
+  "contextRecoverySupported": true,
+  "recovery": {
+    "health": {
+      "status": "ready",
+      "path": "post",
+      "presentedFrames": 783,
+      "contextLosses": 1,
+      "lastErrorCode": null
+    },
+    "building": true,
+    "marker": true
+  }
+}

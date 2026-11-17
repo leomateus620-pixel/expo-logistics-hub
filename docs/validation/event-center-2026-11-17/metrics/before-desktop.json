@@ -1,0 +1,687 @@
+{
+  "phase": "before",
+  "mobile": false,
+  "readyMs": 4208,
+  "browser": "157.0.8103.79",
+  "row": {
+    "id": "reference:2026:c1",
+    "bounds": {
+      "minX": 14.618181818181824,
+      "maxX": 24.872727272727275,
+      "minZ": 4.472727295180718,
+      "maxZ": 10.036363686746988,
+      "width": 10.25454545454545,
+      "depth": 5.56363639156627,
+      "centerX": 19.74545454545455,
+      "centerZ": 7.254545490963853
+    },
+    "yaw": -1.565390974146972,
+    "elevation": 0
+  },
+  "poses": {
+    "front": {
+      "target": [
+        17.34548960677388,
+        1,
+        7.267518274145878
+      ],
+      "position": [
+        6.745644460934253,
+        3,
+        7.324814733199825
+      ]
+    },
+    "side": {
+      "target": [
+        20.345445780124717,
+        1,
+        7.251302295168347
+      ],
+      "position": [
+        17.675214520984685,
+        4,
+        -5.734453940904755
+      ]
+    },
+    "aerial": {
+      "target": [
+        19.74545454545455,
+        0.3,
+        7.254545490963853
+      ],
+      "position": [
+        18.746009686970186,
+        20,
+        7.359949356401391
+      ]
+    },
+    "oblique": {
+      "target": [
+        19.74545454545455,
+        0.8,
+        7.254545490963853
+      ],
+      "position": [
+        7.794277788983795,
+        8,
+        16.319277926926492
+      ]
+    },
+    "close": {
+      "target": [
+        16.345504215656934,
+        1.1,
+        7.272923600471723
+      ],
+      "position": [
+        11.55854712147762,
+        1.7,
+        9.698834105516443
+      ]
+    },
+    "distant": {
+      "target": [
+        19.74545454545455,
+        0,
+        7.254545490963853
+      ],
+      "position": [
+        -28.053847154102623,
+        30,
+        44.513460625931366
+      ]
+    }
+  },
+  "errors": [],
+  "measurements": {
+    "day-front": {
+      "model": {
+        "frame": 3732,
+        "calls": 11,
+        "triangles": 1592,
+        "points": 0,
+        "lines": 0
+      },
+      "samples": 128,
+      "medianMs": 16.699999999254942,
+      "p95Ms": 17,
+      "mapPrimary": {
+        "frame": 3731,
+        "calls": 146,
+        "triangles": 572197,
+        "points": 0,
+        "lines": 9147,
+        "geometries": 641,
+        "textures": 148,
+        "programs": 275
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "probeSample": {
+        "at": 9894.199999999255,
+        "deltaMs": 16.59999999962747,
+        "visible": true,
+        "focused": true,
+        "position": [
+          6.745644460934253,
+          3,
+          7.324814733199825
+        ],
+        "quaternion": [
+          -0.06601527412457121,
+          -0.7021297459366436,
+          -0.06565939923592272,
+          0.7059352992627439
+        ],
+        "target": [
+          17.34548960677388,
+          1,
+          7.267518274145878
+        ],
+        "projection": [
+          2.0380427211760157,
+          0,
+          0,
+          0,
+          0,
+          2.904210877675822,
+          0,
+          0,
+          0,
+          0,
+          -1.0000700529103914,
+          -1,
+          0,
+          0,
+          -0.08989505899605081,
+          0
+        ],
+        "width": 1425,
+        "height": 1000,
+        "dpr": 1,
+        "sunVisible": true,
+        "sunIntensity": 2.46,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": false,
+        "navigating": false,
+        "programs": 275,
+        "calls": 165,
+        "geometries": 641,
+        "textures": 148,
+        "triangles": 572216,
+        "rain": false,
+        "hydrology": false
+      },
+      "callRange": [
+        165,
+        535
+      ],
+      "memory": {
+        "usedJSHeapSize": 212684843
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 365,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "day-side": {
+      "model": {
+        "frame": 7234,
+        "calls": 11,
+        "triangles": 1592,
+        "points": 0,
+        "lines": 0
+      },
+      "samples": 128,
+      "medianMs": 16.699999999254942,
+      "p95Ms": 16.800000000745058,
+      "mapPrimary": {
+        "frame": 7233,
+        "calls": 260,
+        "triangles": 656676,
+        "points": 0,
+        "lines": 9135,
+        "geometries": 636,
+        "textures": 148,
+        "programs": 275
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "probeSample": {
+        "at": 14276.099999999627,
+        "deltaMs": 16.800000000745058,
+        "visible": true,
+        "focused": true,
+        "position": [
+          17.675214520984685,
+          4,
+          -5.734453940904755
+        ],
+        "quaternion": [
+          0.01124027049918102,
+          0.9887110264612513,
+          0.11047011157366611,
+          -0.1006007799271255
+        ],
+        "target": [
+          20.345445780124717,
+          1,
+          7.251302295168347
+        ],
+        "projection": [
+          2.038042721176016,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0000882738889376,
+          -1,
+          0,
+          0,
+          -0.11327704173214662,
+          0
+        ],
+        "width": 1425,
+        "height": 1000,
+        "dpr": 1,
+        "sunVisible": true,
+        "sunIntensity": 2.46,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": false,
+        "navigating": false,
+        "programs": 275,
+        "calls": 279,
+        "geometries": 636,
+        "textures": 148,
+        "triangles": 656695,
+        "rain": false,
+        "hydrology": false
+      },
+      "callRange": [
+        279,
+        279
+      ],
+      "memory": {
+        "usedJSHeapSize": 198072752
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 517,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "day-distant": {
+      "model": {
+        "frame": 12576,
+        "calls": 7,
+        "triangles": 460,
+        "points": 0,
+        "lines": 0
+      },
+      "samples": 127,
+      "medianMs": 16.699999999254942,
+      "p95Ms": 16.800000000745058,
+      "mapPrimary": {
+        "frame": 12575,
+        "calls": 565,
+        "triangles": 772778,
+        "points": 0,
+        "lines": 9309,
+        "geometries": 664,
+        "textures": 148,
+        "programs": 275
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "probeSample": {
+        "at": 18742.900000000373,
+        "deltaMs": 16.59999999962747,
+        "visible": true,
+        "focused": true,
+        "position": [
+          -28.053847154102623,
+          30,
+          44.513460625931366
+        ],
+        "quaternion": [
+          -0.20469352574232202,
+          -0.4273341928778587,
+          -0.09997739775630561,
+          0.8749231783730981
+        ],
+        "target": [
+          19.74545454545455,
+          0,
+          7.254545490963853
+        ],
+        "projection": [
+          2.0380427211760157,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0004392432395013,
+          -1,
+          0,
+          0,
+          -0.5636567661205923,
+          0
+        ],
+        "width": 1425,
+        "height": 1000,
+        "dpr": 1,
+        "sunVisible": true,
+        "sunIntensity": 2.46,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": false,
+        "navigating": false,
+        "programs": 275,
+        "calls": 584,
+        "geometries": 664,
+        "textures": 148,
+        "triangles": 772797,
+        "rain": false,
+        "hydrology": false
+      },
+      "callRange": [
+        584,
+        584
+      ],
+      "memory": {
+        "usedJSHeapSize": 186624166
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 749,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "night-front": {
+      "model": {
+        "frame": 17918,
+        "calls": 11,
+        "triangles": 1592,
+        "points": 0,
+        "lines": 0
+      },
+      "samples": 127,
+      "medianMs": 16.699999999254942,
+      "p95Ms": 16.800000000745058,
+      "mapPrimary": {
+        "frame": 17917,
+        "calls": 153,
+        "triangles": 598435,
+        "points": 0,
+        "lines": 9147,
+        "geometries": 646,
+        "textures": 148,
+        "programs": 275
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "probeSample": {
+        "at": 23194.199999999255,
+        "deltaMs": 16.699999999254942,
+        "visible": true,
+        "focused": true,
+        "position": [
+          6.745644460934253,
+          3,
+          7.324814733199825
+        ],
+        "quaternion": [
+          -0.06601527412457121,
+          -0.7021297459366436,
+          -0.06565939923592272,
+          0.7059352992627439
+        ],
+        "target": [
+          17.34548960677388,
+          1,
+          7.267518274145878
+        ],
+        "projection": [
+          2.0380427211760157,
+          0,
+          0,
+          0,
+          0,
+          2.904210877675822,
+          0,
+          0,
+          0,
+          0,
+          -1.0000700529103914,
+          -1,
+          0,
+          0,
+          -0.08989505899605081,
+          0
+        ],
+        "width": 1425,
+        "height": 1000,
+        "dpr": 1,
+        "sunVisible": true,
+        "sunIntensity": 0,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": true,
+        "navigating": false,
+        "programs": 275,
+        "calls": 172,
+        "geometries": 646,
+        "textures": 148,
+        "triangles": 598454,
+        "rain": false,
+        "hydrology": false
+      },
+      "callRange": [
+        172,
+        172
+      ],
+      "memory": {
+        "usedJSHeapSize": 203227956
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1052,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "night-side": {
+      "model": {
+        "frame": 23260,
+        "calls": 11,
+        "triangles": 1592,
+        "points": 0,
+        "lines": 0
+      },
+      "samples": 127,
+      "medianMs": 16.699999999254942,
+      "p95Ms": 16.800000000745058,
+      "mapPrimary": {
+        "frame": 23259,
+        "calls": 267,
+        "triangles": 682914,
+        "points": 0,
+        "lines": 9135,
+        "geometries": 645,
+        "textures": 148,
+        "programs": 275
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "probeSample": {
+        "at": 27644.199999999255,
+        "deltaMs": 16.799999998882413,
+        "visible": true,
+        "focused": true,
+        "position": [
+          17.675214520984685,
+          4,
+          -5.734453940904755
+        ],
+        "quaternion": [
+          0.01124027049918102,
+          0.9887110264612513,
+          0.11047011157366611,
+          -0.1006007799271255
+        ],
+        "target": [
+          20.345445780124717,
+          1,
+          7.251302295168347
+        ],
+        "projection": [
+          2.038042721176016,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0000882738889376,
+          -1,
+          0,
+          0,
+          -0.11327704173214662,
+          0
+        ],
+        "width": 1425,
+        "height": 1000,
+        "dpr": 1,
+        "sunVisible": true,
+        "sunIntensity": 0,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": true,
+        "navigating": false,
+        "programs": 275,
+        "calls": 286,
+        "geometries": 629,
+        "textures": 148,
+        "triangles": 682933,
+        "rain": false,
+        "hydrology": false
+      },
+      "callRange": [
+        286,
+        648
+      ],
+      "memory": {
+        "usedJSHeapSize": 192866903
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1294,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "night-distant": {
+      "model": {
+        "frame": 28602,
+        "calls": 7,
+        "triangles": 460,
+        "points": 0,
+        "lines": 0
+      },
+      "samples": 127,
+      "medianMs": 16.699999999254942,
+      "p95Ms": 16.800000000745058,
+      "mapPrimary": {
+        "frame": 28601,
+        "calls": 573,
+        "triangles": 799022,
+        "points": 0,
+        "lines": 9309,
+        "geometries": 656,
+        "textures": 148,
+        "programs": 275
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "probeSample": {
+        "at": 32093.299999998882,
+        "deltaMs": 16.700000001117587,
+        "visible": true,
+        "focused": true,
+        "position": [
+          -28.053847154102623,
+          30,
+          44.513460625931366
+        ],
+        "quaternion": [
+          -0.20469352574232202,
+          -0.4273341928778587,
+          -0.09997739775630561,
+          0.8749231783730981
+        ],
+        "target": [
+          19.74545454545455,
+          0,
+          7.254545490963853
+        ],
+        "projection": [
+          2.0380427211760157,
+          0,
+          0,
+          0,
+          0,
+          2.9042108776758226,
+          0,
+          0,
+          0,
+          0,
+          -1.0004392432395013,
+          -1,
+          0,
+          0,
+          -0.5636567661205923,
+          0
+        ],
+        "width": 1425,
+        "height": 1000,
+        "dpr": 1,
+        "sunVisible": true,
+        "sunIntensity": 0,
+        "sunPosition": [
+          -3.089995454545452,
+          84.99529937767083,
+          -191.28574982984622
+        ],
+        "shadowVersion": 1,
+        "sunrise": "complete",
+        "night": true,
+        "navigating": false,
+        "programs": 275,
+        "calls": 592,
+        "geometries": 656,
+        "textures": 148,
+        "triangles": 799041,
+        "rain": false,
+        "hydrology": false
+      },
+      "callRange": [
+        592,
+        592
+      ],
+      "memory": {
+        "usedJSHeapSize": 207884963
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1597,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  },
+  "measurement": "Actual WebGL primary scene submissions; cached shadows, no postprocessing passes. C1 includes its adjacent pavement. RAF timing is sampled in the normal complete pipeline."
+}
