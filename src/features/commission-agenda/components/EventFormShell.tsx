@@ -70,7 +70,7 @@ export interface EventFormShellProps {
   onSavingChange?: (saving: boolean) => void;
 }
 
-const STATUS_OPTIONS: EventStatus[] = ['requested', 'confirmed', 'draft', 'rescheduled'];
+const STATUS_OPTIONS: EventStatus[] = ['requested', 'confirmed', 'rescheduled'];
 
 export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], unitOptions = [], onSubmit, onCancel, onSavingChange }: EventFormShellProps) {
   const id = useId();

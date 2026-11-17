@@ -11,9 +11,9 @@ import type { AgendaEventDraft } from '../components/EventFormShell';
 import type { AgendaEventViewModel, EventStatus, PersonSummary } from '../types';
 
 const STATUS_TO_DB: Record<EventStatus, string> = {
-  requested: 'aguardando_definicao',
+  requested: 'planejado',
   confirmed: 'planejado',
-  draft: 'aguardando_definicao',
+  draft: 'planejado',
   completed: 'concluido',
   cancelled: 'cancelado',
   rescheduled: 'planejado',
@@ -101,7 +101,7 @@ export function draftToSaveEventPayload(
     source_year: year,
     start_date: startDate,
     end_date: endDate,
-    status: editing?.status === draft.status && editing.persistedStatus ? editing.persistedStatus : STATUS_TO_DB[draft.status] ?? 'planejado',
+    status: editing?.status === draft.status && editing.persistedStatus && editing.persistedStatus !== 'aguardando_definicao' ? editing.persistedStatus : STATUS_TO_DB[draft.status] ?? 'planejado',
     location: draft.location.trim() || null,
     location_code: draft.locationCode ?? null,
     event_time: draft.startTime || null,

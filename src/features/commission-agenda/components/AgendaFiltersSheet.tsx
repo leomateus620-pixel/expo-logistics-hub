@@ -6,7 +6,7 @@ import { DEFAULT_SECONDARY_FILTERS, EVENT_STATUS_LABELS } from '../lib/agenda-pr
 import { PersonAvatar, WorkspaceButton } from './primitives';
 import { WorkspaceSheet } from './WorkspaceSheet';
 
-const STATUS_OPTIONS: EventStatus[] = ['requested', 'confirmed', 'draft', 'rescheduled', 'completed', 'cancelled'];
+const STATUS_OPTIONS: EventStatus[] = ['requested', 'confirmed', 'rescheduled', 'completed', 'cancelled'];
 
 const PERIOD_OPTIONS: Array<{ value: AgendaSecondaryFilters['period']; label: string }> = [
   { value: 'all', label: 'Todo o ano' },

@@ -84,7 +84,7 @@ describe('cronograma adapter', () => {
     expect(mapCronogramaStatus('confirmed')).toBe('confirmed');
     expect(mapCronogramaStatus('planejado')).toBe('requested');
     expect(mapCronogramaStatus('cancelado')).toBe('cancelled');
-    expect(mapCronogramaStatus(null)).toBe('draft');
+    expect(mapCronogramaStatus(null)).toBe('requested');
 
     const event = toAgendaEventViewModel(
       {

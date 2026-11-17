@@ -57,17 +57,17 @@ const STATUS_MAP: Record<string, EventStatus> = {
   cancelled: 'cancelled',
   canceled: 'cancelled',
   cancelado: 'cancelled',
-  draft: 'draft',
-  rascunho: 'draft',
-  undated: 'draft',
-  in_definition: 'draft',
-  aguardando_definicao: 'draft',
+  draft: 'requested',
+  rascunho: 'requested',
+  undated: 'requested',
+  in_definition: 'requested',
+  aguardando_definicao: 'requested',
   aguardando_responsavel: 'requested',
   blocked: 'requested',
 };
 
 export function mapCronogramaStatus(status: string | null | undefined): EventStatus {
-  if (!status) return 'draft';
+  if (!status) return 'requested';
   return STATUS_MAP[status.trim().toLowerCase()] ?? 'requested';
 }
 
