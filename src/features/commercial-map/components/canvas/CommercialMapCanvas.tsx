@@ -21,8 +21,10 @@ import { resolveSaleInspectionInteriorView } from '../../utils/saleInspectionCam
 import { publicLotOutlinePositions } from '../../public/publicLotOutline';
 import { PUBLIC_NAVIGATION_SAVE_EVENT, savePublicNavigation, type PublicNavigation } from '../../public/publicNavigation';
 import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
+import { preparePublicSoldCompanyGeometry, type PublicSoldCompanyGroupInput } from '../../public/publicSoldCompanyGeometry';
 import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
+import { PublicSoldCompanyLabels } from './PublicSoldCompanyLabels';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
 import { ExternalLotFrames } from './ExternalLotFrames';
@@ -335,12 +337,19 @@ interface CommercialMapCanvasProps {
   /** Consulta pública: entidades que definem o enquadramento inicial. */
   publicFocusEntityIds?: ReadonlySet<string> | null;
   publicScenePolicy?: PublicExternalScenePolicy | null;
+  publicCompanyGroups?: readonly PublicSoldCompanyGroupInput[];
+  publicCompanyFocus?: PublicCompanyFocus | null;
   initialPublicView?: PublicNavigation | null;
   technicalValidationAllowed?: boolean;
   christmasEnabled?: boolean;
   active?: boolean;
   /** Opaque dashboard/workspace coverage; never discards spatial resources. */
   presentationVisible?: boolean;
+}
+
+interface PublicCompanyFocus {
+  requestId: number;
+  entityIds: readonly string[];
 }
 
 interface CommercialMapSceneProps extends CommercialMapCanvasProps {
@@ -1532,6 +1541,7 @@ function BatchedLots({
   layerOpacity,
   segmentByEntity,
   salesSelectedLotIds,
+  groupedPublicEntityIds,
   onSelect,
   onHover,
   onFocus,
@@ -1549,6 +1559,7 @@ function BatchedLots({
   segmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
   /** Espaços no carrinho de Vendas: realce forte, sem alterar geometria. */
   salesSelectedLotIds: ReadonlySet<string>;
+  groupedPublicEntityIds: ReadonlySet<string>;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onFocus: () => void;
@@ -1575,11 +1586,14 @@ function BatchedLots({
   });
   visualStateRef.current = { selectedEntityId, hoveredEntityId };
   const entryByEntity = useMemo(() => new Map(entries.map((entry) => [entry.entity.id, entry])), [entries]);
-  const lockSurfaces = useMemo(() => entries.map(({ entity, lot }) => ({
-    id: entity.id, status: lot.status, logoUrl: lot.saleLogoUrl, geometry: entity.geometry,
-    confirmation: isExternalPresentationLot(entity, lot),
-    hideMarker: Boolean(publicPolicy) && isExternalPresentationLot(entity, lot),
-  })), [entries, publicPolicy]);
+  const lockSurfaces = useMemo(() => entries.map(({ entity, lot }) => {
+    const confirmation = isExternalPresentationLot(entity, lot);
+    const grouped = groupedPublicEntityIds.has(entity.id);
+    return {
+      id: entity.id, status: lot.status, logoUrl: grouped ? null : lot.saleLogoUrl, geometry: entity.geometry,
+      confirmation, hideMarker: grouped || (Boolean(publicPolicy) && confirmation),
+    };
+  }), [entries, groupedPublicEntityIds, publicPolicy]);
   const inspectionOutline = useMemo(() => {
     if (publicPolicy || !saleInspectionLotIds.size) return null;
     const positions = entries.filter(entry => saleInspectionLotIds.has(entry.lot.id)).flatMap(({ entity }) => (
@@ -1661,6 +1675,7 @@ function BatchedLots({
           positions.getZ(positionIndex),
         );
         edgeColors.push(borderColor.r, borderColor.g, borderColor.b);
+        if (publicPolicy) edgeColors.push(1);
       }
       edgeGeometry.dispose();
       geometry.dispose();
@@ -1670,7 +1685,7 @@ function BatchedLots({
     (mesh.geometry.getAttribute('externalLotStatus') as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
     const edgeGeometry = new THREE.BufferGeometry();
     edgeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
-    edgeGeometry.setAttribute('color', new THREE.Float32BufferAttribute(edgeColors, 3));
+    edgeGeometry.setAttribute('color', new THREE.Float32BufferAttribute(edgeColors, publicPolicy ? 4 : 3).setUsage(THREE.DynamicDrawUsage));
     mesh.computeBoundingBox();
     mesh.computeBoundingSphere();
     mesh.perObjectFrustumCulled = true;
@@ -1681,6 +1696,21 @@ function BatchedLots({
   // Entity identities are structurally shared by React Query across price/status updates.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geometryEntities, Boolean(publicPolicy)]);
+
+  useLayoutEffect(() => {
+    if (!batch || !publicPolicy) return;
+    const colors = batch.edgeGeometry.getAttribute('color') as THREE.BufferAttribute;
+    // The union replaces the grouped cadastral lines. Keep their buffer ranges
+    // allocated so a cancellation can restore each original border in place.
+    for (const [id, { start, count }] of batch.edgeRanges) {
+      const alpha = groupedPublicEntityIds.has(id) ? 0 : 1;
+      if (count === 0 || colors.getW(start) === alpha) continue;
+      for (let i = start; i < start + count; i++) colors.setW(i, alpha);
+      colors.addUpdateRange(start * 4, count * 4);
+      colors.needsUpdate = true;
+    }
+    invalidate();
+  }, [batch, groupedPublicEntityIds, invalidate, publicPolicy]);
 
   useLayoutEffect(() => {
     if (!batch) return;
@@ -1746,7 +1776,7 @@ function BatchedLots({
       const colors = batch.edgeGeometry.getAttribute('color') as THREE.BufferAttribute;
       if (Math.abs(colors.getX(edgeRange.start) - border.r) + Math.abs(colors.getY(edgeRange.start) - border.g) + Math.abs(colors.getZ(edgeRange.start) - border.b) > 1e-6) {
         for (let i = edgeRange.start; i < edgeRange.start + edgeRange.count; i++) colors.setXYZ(i, border.r, border.g, border.b);
-        colors.addUpdateRange(edgeRange.start * 3, edgeRange.count * 3);
+        colors.addUpdateRange(edgeRange.start * colors.itemSize, edgeRange.count * colors.itemSize);
         colors.needsUpdate = true;
       }
     }
@@ -1818,6 +1848,7 @@ function BatchedLots({
       <ExternalLotFrames entries={entries} selectedId={selectedEntityId} hoveredId={hoveredEntityId}
         cartIds={salesSelectedLotIds} matchingIds={matchingEntityIds} filtersActive={filtersActive}
         infrastructureMode={infrastructureMode} publicScene={Boolean(publicPolicy)}
+        groupedPublicEntityIds={groupedPublicEntityIds}
         opacity={entries.length ? layerOpacity[entries[0].entity.layerId] ?? 1 : 1} />
       {!infrastructureMode && !publicPolicy ? (
         <>
@@ -2134,6 +2165,7 @@ function CameraRig({
   gastronomyStructureIds,
   segmentOverride,
   publicFocusEntityIds,
+  publicCompanyFocus,
   initialPublicView,
   hydrologicalModeActive,
 }: {
@@ -2149,6 +2181,7 @@ function CameraRig({
   gastronomyStructureIds: ReadonlySet<string>;
   segmentOverride?: CommercialMapSegmentDefinition | null;
   publicFocusEntityIds?: ReadonlySet<string> | null;
+  publicCompanyFocus?: PublicCompanyFocus | null;
   initialPublicView?: PublicNavigation | null;
   hydrologicalModeActive: boolean;
 }) {
@@ -2413,6 +2446,7 @@ function CameraRig({
   const previousInteriorFrame = useRef<InteriorCameraRequest | null>(null);
   const interiorCommand = useCommercialMapStore(state => state.interiorViewCommand);
   const consumedInteriorCommand = useRef(0);
+  const consumedPublicCompanyFocus = useRef<number | null>(null);
   const interiorOverview = useRef<'vertical' | 'horizontal' | null>(null);
   const interiorOrbitScratch = useRef({ from: new THREE.Spherical(), to: new THREE.Spherical(), offset: new THREE.Vector3() });
   const previousSegment = useRef(activeSegment?.id ?? null);
@@ -3959,6 +3993,19 @@ function CameraRig({
   }, [cancelScheduledResizeRefit, exteriorRenderedEntities, interiorEntity, interiorFrame, publicPolicy, queueInterior, queueSegment, saleFrameEntityIds, saleFrameSequence]);
 
   useLayoutEffect(() => {
+    if (!publicPolicy || interiorEntity || !publicCompanyFocus
+      || publicCompanyFocus.requestId === consumedPublicCompanyFocus.current) return;
+    const requestedIds = new Set(publicCompanyFocus.entityIds);
+    const targets = exteriorRenderedEntities.filter(entity => requestedIds.has(entity.id)
+      && publicPolicy.interactiveEntityIds.has(entity.id));
+    if (!targets.length) return;
+    consumedPublicCompanyFocus.current = publicCompanyFocus.requestId;
+    cancelScheduledResizeRefit();
+    pendingResizeRefit.current = false;
+    queueSegment(PUBLIC_FOCUS_FRAMING, targets);
+  }, [cancelScheduledResizeRefit, exteriorRenderedEntities, interiorEntity, publicCompanyFocus, publicPolicy, queueSegment]);
+
+  useLayoutEffect(() => {
     if (!interiorFrame?.pavilion || !interiorCommand
       || interiorCommand.entityId !== interiorEntity?.id
       || interiorCommand.requestId <= consumedInteriorCommand.current) return;
@@ -4804,6 +4851,7 @@ function ExteriorPavilionMarkers({ night, qualityTier, ...props }: ExteriorMarke
 }
 
 const EMPTY_PUBLIC_SALES: ReadonlySet<string> = new Set();
+const EMPTY_GROUPED_PUBLIC_ENTITIES: ReadonlySet<string> = new Set();
 
 const Scene = memo(function Scene({
   entities,
@@ -4819,6 +4867,8 @@ const Scene = memo(function Scene({
   segmentOverride,
   interactiveEntityIds = null,
   publicFocusEntityIds = null,
+  publicCompanyGroups,
+  publicCompanyFocus,
   initialPublicView,
   technicalValidationAllowed = false,
   renderQualityTier = 'HIGH',
@@ -5120,6 +5170,24 @@ const Scene = memo(function Scene({
   const lotEntries = useMemo(() => exteriorRenderedEntities
     .map((entity) => ({ entity, lot: lotByEntity.get(entity.id) }))
     .filter((entry): entry is LotEntry => Boolean(entry.lot)), [exteriorRenderedEntities, lotByEntity]);
+  const publicCompanyLayerActive = Boolean(publicPolicy && publicCompanyGroups?.length && !interiorEntity && !hydrologicalModeActive);
+  const publicCompanyEntities = useMemo(() => publicCompanyLayerActive && publicPolicy && interactiveEntityIds
+    ? exteriorRenderedEntities.filter(entity => interactiveEntityIds.has(entity.id)
+      && publicPolicy.interactiveEntityIds.has(entity.id)
+      && layerVisibility[entity.layerId] !== false
+      && (layerOpacity[entity.layerId] ?? 1) > 0.015)
+    : [], [exteriorRenderedEntities, interactiveEntityIds, layerOpacity, layerVisibility, publicCompanyLayerActive, publicPolicy]);
+  const publicCompanyGeometry = useMemo(() => publicCompanyGroups?.length && publicCompanyEntities.length
+    ? measureCommercialMapSync('public-company-geometry', () => preparePublicSoldCompanyGeometry(publicCompanyGroups, publicCompanyEntities))
+    : [], [publicCompanyEntities, publicCompanyGroups]);
+  const groupedPublicEntityIds = useMemo(() => publicCompanyGeometry.length
+    ? new Set(publicCompanyGeometry.flatMap(group => group.entityIds))
+    : EMPTY_GROUPED_PUBLIC_ENTITIES, [publicCompanyGeometry]);
+  const publicCompanyFocusCommand = useMemo(() => {
+    if (!publicCompanyFocus) return null;
+    const entityIds = publicCompanyFocus.entityIds.filter(id => groupedPublicEntityIds.has(id));
+    return entityIds.length ? { ...publicCompanyFocus, entityIds } : null;
+  }, [groupedPublicEntityIds, publicCompanyFocus]);
   const nonLotEntities = useMemo(() => exteriorRenderedEntities.filter((entity) => (
     !lotByEntity.has(entity.id)
   )), [exteriorRenderedEntities, lotByEntity]);
@@ -5636,6 +5704,7 @@ const Scene = memo(function Scene({
         obstacles={lotLockObstacles}
         confirmationObstacles={externalMarkerObstacles}
         salesSelectedLotIds={interactiveEntityIds ? EMPTY_PUBLIC_SALES : salesSelectedLotIds}
+        groupedPublicEntityIds={groupedPublicEntityIds}
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
         hoveredEntityId={hoveredEntityId}
@@ -5649,6 +5718,11 @@ const Scene = memo(function Scene({
         onFocus={handleEntityFocus}
         onCursor={setCanvasCursor}
       />
+      {publicCompanyGeometry.length > 0 && <PublicSoldCompanyLabels
+        groups={publicCompanyGeometry}
+        selectedEntityId={selectedEntityId}
+        hoveredEntityId={hoveredEntityId}
+      />}
       </group>
       <PavilionConnectedComplex
         entities={pavilionComplexEntities}
@@ -5789,7 +5863,8 @@ const Scene = memo(function Scene({
         <CommercialMapRainLayer entities={entities} qualityTier={renderQualityTier} active={!interiorEntity && !salesPresentationActive} />
       </DeferredSceneLayer></>}
       {contextualLabelEntities.filter((entity) => (
-        (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))
+        !groupedPublicEntityIds.has(entity.id)
+        && (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))
       )).map((entity) => (
         <EntityLabel
           key={`label:${entity.id}`}
@@ -5852,6 +5927,7 @@ const Scene = memo(function Scene({
         gastronomyStructureIds={gastronomyStructureIds}
         segmentOverride={segmentOverride}
         publicFocusEntityIds={publicFocusEntityIds}
+        publicCompanyFocus={publicCompanyFocusCommand}
         initialPublicView={initialPublicView}
         hydrologicalModeActive={hydrologicalModeActive}
       />

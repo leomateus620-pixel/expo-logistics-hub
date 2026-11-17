@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { Crosshair, X } from 'lucide-react';
 import {
   UNPRICED_PAVILION_LABEL,
   formatAreaSqmLabel,
@@ -9,6 +9,7 @@ import {
 import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from './publicMapTypes';
 import { resolveLotIdentity } from '../utils/lotIdentity';
 import { publicAvailability } from './publicAvailability';
+import type { PublicSoldCompanyGroup } from './publicSoldCompanies';
 
 const PENDING_LABEL = 'Valor sob consulta';
 
@@ -26,11 +27,19 @@ export const PublicLotDetails = memo(function PublicLotDetails({
   onClose,
   compact = false,
   areaName,
+  useCompanyIdentity = false,
+  company,
+  companyLogoUrl,
+  onFocusCompany,
 }: {
   lot: PublicLot;
   onClose: () => void;
   compact?: boolean;
   areaName?: string | null;
+  useCompanyIdentity?: boolean;
+  company?: PublicSoldCompanyGroup;
+  companyLogoUrl?: string;
+  onFocusCompany?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
@@ -62,6 +71,17 @@ export const PublicLotDetails = memo(function PublicLotDetails({
       </header>
       {compact && <button type="button" className="public-map-details-expand" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'Recolher ficha' : 'Expandir ficha'}</button>}
 
+      {company && <section className="public-map-details-company" aria-label="Empresa e lotes vinculados">
+        <h3>{companyLogoUrl && <img src={companyLogoUrl} alt="" />}<span>{company.tradeName ?? 'Empresa não informada'}</span></h3>
+        <ul aria-label="Lotes vinculados">
+          {company.lots.map(member => {
+            const linked = resolveLotIdentity(member, null, null, areaName);
+            return <li key={member.id}>{[linked.title, linked.location].filter(Boolean).join(' · ')}</li>;
+          })}
+        </ul>
+        {onFocusCompany && <button type="button" onClick={onFocusCompany}><Crosshair aria-hidden="true" />Enquadrar {company.lots.length === 1 ? 'lote' : 'lotes vinculados'}</button>}
+      </section>}
+
       <dl className="public-map-details-grid">
         <div>
           <dt>Metragem oficial</dt>
@@ -71,7 +91,7 @@ export const PublicLotDetails = memo(function PublicLotDetails({
           <dt>Disponibilidade</dt>
           <dd data-availability={publicAvailability(lot.availability)}>{PUBLIC_AVAILABILITY_LABEL[lot.availability]}</dd>
         </div>
-        {lot.availability === 'SOLD' && lot.buyerName?.trim() && (
+        {!useCompanyIdentity && lot.availability === 'SOLD' && lot.buyerName?.trim() && (
           <div>
             <dt>Comprador</dt>
             <dd>{lot.buyerName.trim()}</dd>

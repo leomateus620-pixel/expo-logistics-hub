@@ -11,6 +11,7 @@ import { usePublicScopeRevision } from '@/features/commercial-map/public/usePubl
 import type { PublicMapInventory, PublicLot } from '@/features/commercial-map/public/publicMapTypes';
 import type { MapEntity } from '@/features/commercial-map/types';
 import { PUBLIC_MAP_AREAS } from '@/features/commercial-map/public/publicAreaRegistry';
+import { PublicMapAccessError } from '@/features/commercial-map/public/publicMapService';
 
 const mocks = vi.hoisted(() => ({ inventory: vi.fn(), context: vi.fn(), revision: vi.fn(), track: vi.fn(), mount: vi.fn(), props: vi.fn() }));
 vi.mock('@/features/commercial-map/public/publicMapService', async (original) => ({
@@ -42,6 +43,12 @@ const inventory = {
   entities:[entity], lots:[lot], layers:[], revision:'r1', contextRevision:'c1',
 } as PublicMapInventory;
 const key = ['public-map','inventory','exporural','test-token'];
+const revisionKey = ['public-map', 'revision', 'exporural', 'test-token'];
+const groupKey = 'a'.repeat(64);
+const soldLot: PublicLot = {
+  ...lot, availability: 'SOLD', buyerName: 'Razão social no payload antigo',
+  buyerIdentityEligible: true, buyerGroupKey: groupKey, buyerTradeName: '  Marca Rural  ',
+};
 let client: QueryClient;
 const initialState = useCommercialMapStore.getState();
 function wrapper({ children }: { children: ReactNode }) { return <QueryClientProvider client={client}>{children}</QueryClientProvider>; }
@@ -68,10 +75,11 @@ describe('public page lifecycle', () => {
     const policy = mocks.props.mock.calls.at(-1)?.[0].publicScenePolicy;
     const selectionEvents = () => mocks.track.mock.calls.filter(call => call[2].eventType === 'lot_selected').length;
     expect(selectionEvents()).toBe(1);
-    await act(async () => client.setQueryData(key, { ...inventory, lots:[{ ...lot, availability:'SOLD', buyerName:'Leonardo', pricing:{ ...lot.pricing, renovacaoTotal:12000 } }] }));
+    await act(async () => client.setQueryData(key, { ...inventory, lots:[{ ...soldLot, pricing:{ ...lot.pricing, renovacaoTotal:12000 } }] }));
     await waitFor(() => expect(screen.getByRole('complementary')).toHaveTextContent('Vendido'));
-    expect(screen.getByRole('complementary')).toHaveTextContent('Comprador');
-    expect(screen.getByRole('complementary')).toHaveTextContent('Leonardo');
+    expect(screen.getByRole('heading', { name: 'Marca Rural' })).toBeInTheDocument();
+    expect(screen.getByRole('complementary')).not.toHaveTextContent(soldLot.buyerName!);
+    expect(mocks.props.mock.calls.at(-1)?.[0].publicCompanyGroups).toMatchObject([{ key: groupKey, tradeName: 'Marca Rural', entityIds: ['e-1'] }]);
     expect(screen.getByTestId('scene')).toBe(canvas);
     expect(mocks.mount).toHaveBeenCalledTimes(1);
     expect(mocks.props.mock.calls.at(-1)?.[0].publicScenePolicy).toBe(policy);
@@ -82,6 +90,75 @@ describe('public page lifecycle', () => {
     fireEvent.click(screen.getByRole('button', { name:'Mapa' }));
     expect(screen.getByTestId('scene')).toBe(canvas);
     expect(mocks.mount).toHaveBeenCalledTimes(1);
+  });
+  it('shows only linked in-scope lots in the accessible detail and fits them on demand', async () => {
+    const sibling = { ...soldLot, id:'l-2', entityId:'e-2', lotNumber:'2', publicIdentifier:'R-02' };
+    const sameNameOtherCompany = { ...soldLot, id:'l-3', entityId:'e-3', lotNumber:'3', buyerGroupKey:'b'.repeat(64) };
+    const pending = { ...soldLot, id:'l-4', entityId:'e-4', lotNumber:'4', availability: 'SALE_OPEN' as const };
+    mocks.inventory.mockResolvedValue({ ...inventory, lots:[soldLot, sibling, sameNameOtherCompany, pending] });
+    page();
+    await screen.findByTestId('scene');
+    act(() => useCommercialMapStore.getState().setSelectedEntityId('e-1'));
+    const linked = await screen.findByRole('list', { name: 'Lotes vinculados' });
+    expect(linked).toHaveTextContent('Lote 1 · Quadra R');
+    expect(linked).toHaveTextContent('Lote 2 · Quadra R');
+    expect(linked).not.toHaveTextContent(/Lote [34]/);
+    expect(mocks.props.mock.calls.at(-1)?.[0].publicCompanyFocus).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Enquadrar lotes vinculados' }));
+    expect(mocks.props.mock.calls.at(-1)?.[0].publicCompanyFocus).toMatchObject({ entityIds: ['e-1', 'e-2'] });
+    fireEvent.click(screen.getByRole('button', { name: 'Lista' }));
+    const search = screen.getByRole('searchbox');
+    fireEvent.change(search, { target: { value: 'Marca Rural' } });
+    expect(screen.getAllByText('Marca Rural', { selector: '.public-map-list-company' })).toHaveLength(3);
+    expect(screen.queryByRole('button', { name: /Lote 4/ })).toBeNull();
+  });
+  it('does not infer buyer identity from old payloads or publicly blue open sales', async () => {
+    mocks.inventory.mockResolvedValue({ ...inventory, lots: [
+      { ...lot, availability: 'SOLD', buyerName:'Nome sem projeção' },
+    ] });
+    page();
+    await screen.findByTestId('scene');
+    act(() => useCommercialMapStore.getState().setSelectedEntityId('e-1'));
+    const detail = await screen.findByRole('complementary');
+    expect(detail).toHaveTextContent('Vendido');
+    expect(detail).not.toHaveTextContent('Nome sem projeção');
+    await act(async () => client.setQueryData(key, { ...inventory, lots:[{ ...soldLot, availability: 'SALE_OPEN' }] }));
+    expect(detail).toHaveTextContent('Vendido');
+    expect(detail).not.toHaveTextContent('Marca Rural');
+    expect(mocks.props.mock.calls.at(-1)?.[0].lots[0]).toMatchObject({ status: 'SOLD', currentBuyer: null });
+    expect(mocks.props.mock.calls.at(-1)?.[0].publicCompanyGroups).toEqual([]);
+    await act(async () => client.setQueryData(key, { ...inventory, lots:[{ ...soldLot, buyerTradeName: '   ' }] }));
+    expect(await screen.findByRole('heading', { name: 'Empresa não informada' })).toBeInTheDocument();
+    expect(mocks.props.mock.calls.at(-1)?.[0].publicCompanyGroups).toMatchObject([{ tradeName: null }]);
+  });
+  it('suspends stale identity until the new revision, then updates rename and cancel without remount', async () => {
+    mocks.inventory.mockResolvedValue({ ...inventory, lots: [soldLot] });
+    page();
+    const canvas = await screen.findByTestId('scene');
+    act(() => useCommercialMapStore.getState().setSelectedEntityId('e-1'));
+    await screen.findByRole('heading', { name: 'Marca Rural' });
+    let deliver: (data: PublicMapInventory) => void = () => {};
+    mocks.inventory.mockImplementationOnce(() => new Promise(resolve => { deliver = resolve; }));
+    await act(async () => client.setQueryData(revisionKey, { revision: 'r2', contextRevision: 'c1' }));
+    await waitFor(() => expect(mocks.inventory).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Marca Rural' })).toBeNull());
+    await act(async () => deliver({ ...inventory, revision: 'r2', lots:[{ ...soldLot, buyerTradeName: 'Marca Revista' }] }));
+    await screen.findByRole('heading', { name: 'Marca Revista' });
+
+    mocks.inventory.mockResolvedValue({ ...inventory, revision: 'r3', lots:[lot] });
+    await act(async () => client.setQueryData(revisionKey, { revision: 'r3', contextRevision: 'c1' }));
+    await waitFor(() => expect(screen.getByRole('complementary')).toHaveTextContent('Disponível'));
+    expect(screen.queryByRole('heading', { name: 'Marca Revista' })).toBeNull();
+    expect(screen.getByTestId('scene')).toBe(canvas);
+    expect(mocks.mount).toHaveBeenCalledTimes(1);
+  });
+  it('retires the active scene on explicit access denial from the revision RPC', async () => {
+    page();
+    await screen.findByTestId('scene');
+    mocks.revision.mockRejectedValueOnce(new PublicMapAccessError());
+    await act(async () => client.invalidateQueries({ queryKey: revisionKey }));
+    expect(await screen.findByRole('heading', { name: 'Link indisponível' })).toBeInTheDocument();
+    expect(screen.queryByTestId('scene')).toBeNull();
   });
   it('closes a removed lot with an explanation without rebuilding the Canvas', async () => {
     page(); await screen.findByTestId('scene');
@@ -146,6 +223,7 @@ describe('direct pavilion inspection without leaving the interior', () => {
     const data={...inventory,scope:{...inventory.scope,slug:area.slug,name:area.name,kind:'PAVILION' as const,pavilionIdentifier:area.pavilionIdentifier!,lotCount:2},entities:[parent,...entities],lots};
     mocks.inventory.mockResolvedValue(data);
     page(area.slug);await screen.findByTestId('scene');
+    expect(mocks.props.mock.calls.at(-1)?.[0].publicCompanyGroups).toBeUndefined();
     expect(mocks.context).not.toHaveBeenCalled();
     expect(useCommercialMapStore.getState().interiorEntityId).toBe(parent.id);
     act(()=>useCommercialMapStore.getState().requestInteriorView(parent.id,'horizontal'));

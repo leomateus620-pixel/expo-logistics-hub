@@ -114,6 +114,11 @@ export const OFFICIAL_2026_SOURCE_MANIFEST = {
 
 const CROP = OFFICIAL_2026_SOURCE_MANIFEST.parkCropPdf;
 const LOT_INSET = 1.45;
+/** Gap between facing edges after two parcels in a reference grid are inset. */
+export const OFFICIAL_2026_CARTOGRAPHIC_LOT_GAP = {
+  x: 2 * LOT_INSET * MAP_REFERENCE_WIDTH / CROP.width,
+  z: 2 * LOT_INSET * MAP_REFERENCE_HEIGHT / CROP.height,
+} as const;
 
 function slug(value: string) {
   return value.toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');

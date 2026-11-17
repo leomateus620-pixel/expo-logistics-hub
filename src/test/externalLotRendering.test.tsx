@@ -112,7 +112,7 @@ describe('external frame instance lifecycle', () => {
     const entry = (status: CommercialStatus) => [{ entity: outer, lot: { ...lot, status } }];
     const props = { entries: entry('AVAILABLE'), selectedId: null as string | null, hoveredId: null as string | null,
       cartIds: new Set<string>(), matchingIds: new Set([outer.id]), filtersActive: false,
-      infrastructureMode: false, opacity: 1, publicScene: false };
+      infrastructureMode: false, opacity: 1, publicScene: false, groupedPublicEntityIds: new Set<string>() };
     const { result, rerender, unmount } = renderHook(input => ExternalLotFrames(input), { initialProps: props });
     const mesh = result.current!.props.object as THREE.BatchedMesh;
     const geometry = mesh.geometry, material = mesh.material as THREE.MeshBasicMaterial, color = new THREE.Color(), matrix = new THREE.Matrix4();
@@ -145,6 +145,14 @@ describe('external frame instance lifecycle', () => {
     expect(matrix.elements[13]).toBeCloseTo(lotPresentationTop(outer) + .018 + .09);
     rerender({ ...props, entries: entry('SOLD'), infrastructureMode: true });
     expect(mesh.getVisibleAt(0)).toBe(false);
+    const groupedPublicEntityIds = new Set([outer.id]);
+    rerender({ ...props, entries: entry('SOLD'), publicScene: true, groupedPublicEntityIds });
+    expect(mesh.getVisibleAt(0)).toBe(false);
+    rerender({ ...props, entries: entry('SOLD'), publicScene: true });
+    expect(mesh.getVisibleAt(0)).toBe(true);
+    rerender({ ...props, entries: entry('SOLD'), groupedPublicEntityIds });
+    expect(mesh.getVisibleAt(0)).toBe(true);
+    expect(mesh.geometry).toBe(geometry);
     const intersections: THREE.Intersection[] = [];
     mesh.raycast(new THREE.Raycaster(), intersections);
     expect(intersections).toHaveLength(0);

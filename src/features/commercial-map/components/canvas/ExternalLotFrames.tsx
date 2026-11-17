@@ -12,11 +12,12 @@ const FRAME_SURFACE_OFFSET = .018;
 type Entry = { entity: MapEntity; lot: CommercialLot };
 
 /** One batch for both phases. Geometry survives status/selection/filter changes. */
-export function ExternalLotFrames({ entries, selectedId, hoveredId, cartIds, matchingIds, filtersActive, infrastructureMode, opacity }: {
+export function ExternalLotFrames({ entries, selectedId, hoveredId, cartIds, matchingIds, filtersActive, infrastructureMode, opacity, publicScene, groupedPublicEntityIds }: {
   entries: readonly Entry[];
   selectedId: string | null; hoveredId: string | null;
   cartIds: ReadonlySet<string>; matchingIds: ReadonlySet<string>;
   filtersActive: boolean; infrastructureMode: boolean; opacity: number; publicScene: boolean;
+  groupedPublicEntityIds?: ReadonlySet<string>;
 }) {
   const invalidate = useThree(state => state.invalidate);
   const eligible = entries.filter(({ entity, lot }) => isExternalPresentationLot(entity, lot));
@@ -62,7 +63,8 @@ export function ExternalLotFrames({ entries, selectedId, hoveredId, cartIds, mat
       const id = resources.ids.get(entity.id);
       if (id === undefined) continue;
       const statusColor = externalLotFrameColor(lot.status);
-      resources.mesh.setVisibleAt(id, Boolean(statusColor) && !infrastructureMode);
+      const grouped = publicScene && groupedPublicEntityIds?.has(entity.id);
+      resources.mesh.setVisibleAt(id, Boolean(statusColor) && !infrastructureMode && !grouped);
       if (!statusColor) continue;
       color.set(statusColor);
       if (filtersActive && !matchingIds.has(entity.id) && selectedId !== entity.id) color.lerp(muted, .76);
@@ -77,7 +79,7 @@ export function ExternalLotFrames({ entries, selectedId, hoveredId, cartIds, mat
     if (resources.material.transparent !== transparent) { resources.material.transparent = transparent; resources.material.needsUpdate = true; }
     resources.material.depthWrite = opacity > .42;
     invalidate();
-  }, [resources, entries, selectedId, hoveredId, cartIds, matchingIds, filtersActive, infrastructureMode, opacity, invalidate]);
+  }, [resources, entries, selectedId, hoveredId, cartIds, matchingIds, filtersActive, infrastructureMode, opacity, publicScene, groupedPublicEntityIds, invalidate]);
   useEffect(() => () => { disposeBatchedMesh(resources?.mesh); resources?.material.dispose(); }, [resources]);
   return resources ? <primitive object={resources.mesh} dispose={null} /> : null;
 }
