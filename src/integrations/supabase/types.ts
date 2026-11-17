@@ -12136,6 +12136,15 @@ export type Database = {
       }
     }
     Functions: {
+      _cancel_sale_order_items_core: {
+        Args: {
+          p_actor: string
+          p_item_ids: string[]
+          p_order_id: string
+          p_reason: string
+        }
+        Returns: Json
+      }
       _commercial_analytics_access: {
         Args: { p_project: string }
         Returns: undefined

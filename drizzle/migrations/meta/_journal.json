@@ -218,6 +218,13 @@
       "when": 1794922190323,
       "tag": "0030_google_sync_only_linked_events",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1794946276819,
+      "tag": "0031_cancel_signed_sale_items",
+      "breakpoints": true
     }
   ]
 }

@@ -241,6 +241,8 @@ const CONTRACT_ERROR_MESSAGES: Array<[RegExp, string]> = [
   [/ORDER_NOT_ACTIVE/, 'Este pedido não está mais ativo. Atualize o mapa para ver a situação atual.'],
   [/ITEM_NOT_PENDING:(.+)/, 'O item $1 não está mais aguardando assinatura. Atualize o mapa.'],
   [/LOT_NOT_SALE_OPEN:(.+)/, 'O espaço $1 não está mais com venda em aberto. Atualize o mapa.'],
+  [/LOT_NOT_SOLD:(.+)/, 'O espaço $1 não está vendido nem em aberto. Atualize o mapa.'],
+  [/LOT_IN_OTHER_SALE:(.+)/, 'O espaço $1 já pertence a outra venda ativa.'],
   [/ITEM_NOT_IN_ORDER/, 'Um dos itens não pertence a este pedido.'],
   [/AUTH_REQUIRED/, 'Sessão expirada. Entre novamente para continuar.'],
 ];
@@ -260,7 +262,7 @@ export async function confirmSaleOrderItems(orderId: string, itemIds: string[]):
   if (error) throw new Error(describeContractError(error.message ?? ''));
 }
 
-/** Cancela itens ainda em aberto; cada lote volta a Disponível. */
+/** Cancela itens em aberto ou assinados; cada lote volta a Disponível e o histórico é preservado. */
 export async function cancelSaleOrderItems(orderId: string, itemIds: string[], reason?: string): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase.rpc as any)('cancel_sale_order_items', { p_order_id: orderId, p_item_ids: itemIds, p_reason: reason ?? null });

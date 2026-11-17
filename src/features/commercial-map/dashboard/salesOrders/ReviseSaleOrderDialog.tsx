@@ -10,6 +10,7 @@ import { formatDashboardCurrency } from '../commercialDashboardFormatters';
 import { parseReaisInputToCents } from '../../sales/salesMoney';
 import { describeReviseError, fetchSaleOrderRevisions, reviseSaleOrder, type SaleOrderDetail } from './salesOrdersService';
 import { previewRevision } from './saleRevision';
+import { cancelSaleOrderItems } from '../../sales/salesService';
 import {
   buildAutomaticRevisionReason,
   candidateDisabledReason,
@@ -115,7 +116,19 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, entities, locatio
   const submit = async () => {
     if (submitting.current) return;
     if (!changed) { setError('Nenhuma alteração para salvar.'); return; }
-    if (remaining === 0) { setError('A venda precisa manter ao menos um espaço.'); return; }
+    if (remaining === 0) {
+      if (added.length > 0) { setError('A venda precisa manter ao menos um espaço.'); return; }
+      if (!window.confirm('Todos os espaços serão retirados e a venda será cancelada. Os módulos ficam disponíveis e o cancelamento fica no histórico. Confirmar?')) return;
+      submitting.current = true; setBusy(true); setError(null);
+      try {
+        await cancelSaleOrderItems(orderId, Array.from(removed), reason.trim() || 'Venda cancelada');
+        await queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-revisions', orderId] });
+        await onSaved();
+        onClose();
+      } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+      finally { submitting.current = false; setBusy(false); }
+      return;
+    }
     if (preview.belowPaid) { setError('O novo total ficaria abaixo do valor já recebido.'); return; }
     submitting.current = true; setBusy(true); setError(null);
     try {
@@ -268,8 +281,8 @@ export function ReviseSaleOrderDialog({ orderId, detail, lots, entities, locatio
               <p><strong>{remaining} {remaining === 1 ? 'espaço' : 'espaços'}</strong><span> após a alteração</span></p>
               <div className="cso-attach-actions">
                 <Button type="button" variant="outline" className="cso-attach-cancel" disabled={busy} onClick={onClose}>Cancelar</Button>
-                <Button type="submit" className="cso-attach-submit" disabled={busy || !changed || remaining === 0 || version.isLoading}>
-                  {busy ? <><Loader2 aria-hidden="true" />Salvando…</> : 'Salvar alterações'}
+                <Button type="submit" className="cso-attach-submit" disabled={busy || !changed || (remaining === 0 && added.length > 0) || version.isLoading}>
+                  {busy ? <><Loader2 aria-hidden="true" />Salvando…</> : remaining === 0 ? 'Cancelar venda' : 'Salvar alterações'}
                 </Button>
               </div>
             </footer>
