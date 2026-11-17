@@ -1,0 +1,11 @@
+{
+  "rows": [
+    {
+      "committed_test_events": 35,
+      "completed_at": "2026-11-17 17:37:18.627593+00",
+      "real_events_preserved": 348,
+      "test_account_removed": true,
+      "test_org_removed": true
+    }
+  ]
+}

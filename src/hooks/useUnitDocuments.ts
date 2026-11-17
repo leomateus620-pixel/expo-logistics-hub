@@ -75,7 +75,8 @@ export function useUnitDocuments(
   const enabled = Boolean(commissionId && orgId);
 
   const listQuery = useQuery({
-    queryKey: ['unit-documents', orgId, commissionId, eventKey],
+    queryKey: ['unit-documents', orgId, user?.id, commissionId, eventKey],
+    meta: { persist: false },
     enabled,
     staleTime: 30_000,
     queryFn: async (): Promise<UnitDocumentRecord[]> => {
@@ -132,7 +133,7 @@ export function useUnitDocuments(
   const byId = useMemo(() => new Map(records.map((item) => [item.id, item])), [records]);
 
   const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ['unit-documents', orgId, commissionId] });
+    queryClient.invalidateQueries({ queryKey: ['unit-documents', orgId] });
     queryClient.invalidateQueries({ queryKey: ['unit-metrics', orgId, commissionId] });
   };
 

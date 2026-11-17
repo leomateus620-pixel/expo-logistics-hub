@@ -23,6 +23,7 @@ import {
 export interface AgendaEventCardActions {
   onOpen?: (event: AgendaEventViewModel) => void;
   onEdit?: (event: AgendaEventViewModel) => void;
+  canEdit?: (eventId: string) => boolean;
   onOpenDocuments?: (event: AgendaEventViewModel) => void;
   onOpenHistory?: (event: AgendaEventViewModel) => void;
 }
@@ -38,7 +39,7 @@ export interface AgendaEventCardProps extends AgendaEventCardActions {
   className?: string;
 }
 
-export function AgendaEventCard({ event, unitId, todayKey, hideDate = false, onOpen, onEdit, onOpenDocuments, onOpenHistory, className }: AgendaEventCardProps) {
+export function AgendaEventCard({ event, unitId, todayKey, hideDate = false, onOpen, onEdit, canEdit, onOpenDocuments, onOpenHistory, className }: AgendaEventCardProps) {
   const isToday = todayKey ? event.date === todayKey : false;
   const duration = getEventDuration(event);
   const people = event.people ?? [];
@@ -101,7 +102,7 @@ export function AgendaEventCard({ event, unitId, todayKey, hideDate = false, onO
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="unit-workspace commission-workspace-menu min-w-[200px]">
                 <DropdownMenuItem onSelect={() => onOpen?.(event)}><ArrowRight className="mr-2 h-4 w-4" />Abrir</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => onEdit?.(event)}><Edit3 className="mr-2 h-4 w-4" />Editar</DropdownMenuItem>
+                {onEdit && (!canEdit || canEdit(event.id)) && <DropdownMenuItem onSelect={() => onEdit(event)}><Edit3 className="mr-2 h-4 w-4" />Editar</DropdownMenuItem>}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={() => onOpenDocuments?.(event)}><FileText className="mr-2 h-4 w-4" />Documentos</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => onOpenHistory?.(event)}><History className="mr-2 h-4 w-4" />Histórico</DropdownMenuItem>

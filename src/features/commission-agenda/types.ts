@@ -20,17 +20,23 @@ export interface PersonSummary {
   /** Used only to resolve an official portrait; optional. */
   userId?: string | null;
   photoUrl?: string | null;
+  isPrimary?: boolean;
+  unitLabel?: string | null;
 }
 
 export interface UnitSummary {
   id: string;
+  commissionId?: string;
+  slug?: string;
+  relationRole?: string;
   name: string;
   shortName?: string;
-  type: OrganizationalUnitType;
+  type: OrganizationalUnitType | 'conselho';
 }
 
 /** Identity of the organizational unit that owns the workspace. */
 export interface CommissionUnitViewModel extends UnitSummary {
+  type: OrganizationalUnitType;
   description?: string;
   status: OrganizationalUnitStatus;
   icon: LucideIcon;
@@ -54,6 +60,10 @@ export type EventStatus =
 
 export interface AgendaEventViewModel {
   id: string;
+  originSource?: 'unidade' | 'agenda_central';
+  originCommissionId?: string | null;
+  ownerUnit?: { commissionId: string; slug: string; name: string } | null;
+  persistedStatus?: string | null;
   sourceKey?: string | null;
   lockVersion?: number | null;
   locationCode?: string | null;

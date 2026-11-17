@@ -1,0 +1,332 @@
+{
+  "rows": [
+    {
+      "kind": "counts",
+      "value": {
+        "duplicate_source_keys": 0,
+        "duplicate_titles_period": 8,
+        "events": 348,
+        "invalid_accounts": 0,
+        "invalid_people": 0,
+        "synthetic_users": 0
+      }
+    },
+    {
+      "kind": "units",
+      "value": [
+        {
+          "active": true,
+          "id": "07fb35ca-cfb9-45fd-9638-f86872fdfca4",
+          "legacy": false,
+          "name": "Assessoria de Sistemas",
+          "official": true,
+          "slug": "assessoria-de-sistemas"
+        },
+        {
+          "active": true,
+          "id": "db726fd0-eb47-4161-9a87-c7976925dc9e",
+          "legacy": false,
+          "name": "Assessoria de Sustentabilidade",
+          "official": true,
+          "slug": "assessoria-de-sustentabilidade"
+        },
+        {
+          "active": true,
+          "id": "57378343-21cf-4ac9-82ed-e85904f52541",
+          "legacy": false,
+          "name": "Assessoria de Imprensa",
+          "official": true,
+          "slug": "assessoria-de-imprensa"
+        },
+        {
+          "active": true,
+          "id": "1a8d4f15-448f-43cc-9e4b-b17776c34846",
+          "legacy": false,
+          "name": "Assessoria de Projetos e Captações",
+          "official": true,
+          "slug": "assessoria-projetos-e-captacoes-institucionais"
+        },
+        {
+          "active": true,
+          "id": "0e396dd8-016f-4748-b278-3b65956a33d9",
+          "legacy": false,
+          "name": "Assessoria Jurídica",
+          "official": true,
+          "slug": "assessoria-juridica"
+        },
+        {
+          "active": true,
+          "id": "92170d2f-27e4-4f81-ba26-40a9fa06b5a3",
+          "legacy": false,
+          "name": "Assessoria de Relações Internacionais",
+          "official": true,
+          "slug": "assessoria-de-relacoes-internacionais"
+        },
+        {
+          "active": true,
+          "id": "c112962d-dddd-4836-a95e-23c84ee5dcfa",
+          "legacy": false,
+          "name": "Assessoria de Protocolo",
+          "official": true,
+          "slug": "assessoria-de-protocolo"
+        },
+        {
+          "active": true,
+          "id": "8cd0f332-4f42-4bb6-9252-0a60e62eaca2",
+          "legacy": false,
+          "name": "Agricultura, Soja e Derivados",
+          "official": true,
+          "slug": "agricultura-soja-e-derivados"
+        },
+        {
+          "active": true,
+          "id": "8837250f-0ad6-410f-8fec-8c123e2e5d79",
+          "legacy": false,
+          "name": "Soy Summit",
+          "official": true,
+          "slug": "soy-summit"
+        },
+        {
+          "active": true,
+          "id": "98740251-32de-440c-8c75-b0c25f0ef653",
+          "legacy": false,
+          "name": "Inovação e Tecnologia",
+          "official": true,
+          "slug": "inovacao-e-experiencia"
+        },
+        {
+          "active": true,
+          "id": "a78d8c79-1f27-40c2-8125-43450705bc22",
+          "legacy": false,
+          "name": "Arte e Cultura",
+          "official": true,
+          "slug": "arte-e-cultura"
+        },
+        {
+          "active": true,
+          "id": "573c6cff-cb11-4b37-8855-a920b933778c",
+          "legacy": false,
+          "name": "Bilheteria",
+          "official": true,
+          "slug": "bilheteria"
+        },
+        {
+          "active": true,
+          "id": "39a30458-ab9a-4aa0-8d1a-4dfa3a5041ce",
+          "legacy": false,
+          "name": "Credenciamento",
+          "official": true,
+          "slug": "credenciamento"
+        },
+        {
+          "active": true,
+          "id": "bdffa0d2-f0dc-4080-849d-8f2ee2bae723",
+          "legacy": false,
+          "name": "Cooperativismo",
+          "official": true,
+          "slug": "cooperativismo"
+        },
+        {
+          "active": true,
+          "id": "73228ac5-a18d-404e-89a1-475ef15a8564",
+          "legacy": false,
+          "name": "Espaço do Automóvel",
+          "official": true,
+          "slug": "espaco-do-automovel"
+        },
+        {
+          "active": true,
+          "id": "2fc57f56-96ce-4c49-963b-3a0a4f794908",
+          "legacy": false,
+          "name": "Exporural",
+          "official": true,
+          "slug": "exporural"
+        },
+        {
+          "active": true,
+          "id": "6c9d59a8-2ff9-4909-89d6-044a1fe1b393",
+          "legacy": false,
+          "name": "Indústria, Comércio e Serviços",
+          "official": true,
+          "slug": "industria-comercio-e-servicos"
+        },
+        {
+          "active": true,
+          "id": "913feda9-df46-4cd4-82e7-e2cf48cdd165",
+          "legacy": false,
+          "name": "Infraestrutura e Segurança do Trabalho",
+          "official": true,
+          "slug": "infraestrutura-e-seguranca-do-trabalho"
+        },
+        {
+          "active": true,
+          "id": "c66810cf-5be2-48e0-826b-6dd1865fbd11",
+          "legacy": false,
+          "name": "Relacionamento e Experiência",
+          "official": true,
+          "slug": "relacionamento-e-experiencia"
+        },
+        {
+          "active": true,
+          "id": "a2af4952-6867-43ba-a1d4-5fc223a9db09",
+          "legacy": false,
+          "name": "Logística, Hotelaria e Turismo",
+          "official": true,
+          "slug": "logistica-hotelaria-e-turismo"
+        },
+        {
+          "active": true,
+          "id": "6fed6627-d1bb-464f-be35-e5f90c50468d",
+          "legacy": false,
+          "name": "Novas Gerações",
+          "official": true,
+          "slug": "novas-geracoes"
+        },
+        {
+          "active": true,
+          "id": "f4e5766f-81f3-4ee1-b871-84403eaea322",
+          "legacy": false,
+          "name": "Pecuária",
+          "official": true,
+          "slug": "pecuaria"
+        },
+        {
+          "active": true,
+          "id": "41233e20-f343-49c5-b802-2c2455081b06",
+          "legacy": false,
+          "name": "Prevenção e Combate a Incêndio",
+          "official": true,
+          "slug": "prevencao-e-combate-a-incendio"
+        },
+        {
+          "active": true,
+          "id": "2a8c091b-db23-4874-8bb6-19707dec0184",
+          "legacy": false,
+          "name": "Recepção e Eventos",
+          "official": true,
+          "slug": "recepcao-e-cerimonial"
+        },
+        {
+          "active": true,
+          "id": "b876af2b-a67e-4f3c-85c3-460dc2db58d4",
+          "legacy": false,
+          "name": "Relações Estratégicas",
+          "official": true,
+          "slug": "relacoes-estrategicas"
+        },
+        {
+          "active": true,
+          "id": "b11c767d-2b89-4d05-81b3-cfe2209f919e",
+          "legacy": false,
+          "name": "Saúde, Bem-Estar e Acessibilidade",
+          "official": true,
+          "slug": "saude-bem-estar-e-acessibilidade"
+        },
+        {
+          "active": true,
+          "id": "cba9ca3a-350e-45a8-a511-78a106f71d3b",
+          "legacy": false,
+          "name": "Segurança",
+          "official": true,
+          "slug": "seguranca"
+        },
+        {
+          "active": true,
+          "id": "72906f8b-2be3-4a8b-abb0-e5dee0178151",
+          "legacy": false,
+          "name": "Mercosul",
+          "official": true,
+          "slug": "mercosul"
+        },
+        {
+          "active": true,
+          "id": "225b4fd1-ac34-44b6-99ac-c58f133a66ea",
+          "legacy": false,
+          "name": "Serviços",
+          "official": true,
+          "slug": "servicos"
+        },
+        {
+          "active": true,
+          "id": "63baa491-c2c7-4e24-8db1-af1cfd6236bf",
+          "legacy": false,
+          "name": "Soja Store",
+          "official": true,
+          "slug": "soja-store"
+        },
+        {
+          "active": true,
+          "id": "ee7c2dcc-08cc-4ec6-9dd2-3e50655252e6",
+          "legacy": false,
+          "name": "Shows",
+          "official": true,
+          "slug": "shows"
+        },
+        {
+          "active": true,
+          "id": "e70ac6b3-9aa7-425e-aff9-69420d30c2df",
+          "legacy": false,
+          "name": "Gastronomia",
+          "official": true,
+          "slug": "gastronomia"
+        },
+        {
+          "active": true,
+          "id": "156275a6-8d25-4dd5-a702-ef0e9a5bf618",
+          "legacy": false,
+          "name": "Acolhimento e Bem Comum",
+          "official": true,
+          "slug": "acolhimento-e-bem-comum"
+        },
+        {
+          "active": true,
+          "id": "39d18a2a-b2e0-4756-9896-53e261cbde45",
+          "legacy": true,
+          "name": "ETNIAS",
+          "official": false,
+          "slug": "etnias"
+        },
+        {
+          "active": true,
+          "id": "0e5be0f4-1af8-421e-9ce0-f9521c9cf02b",
+          "legacy": true,
+          "name": "RELAÇÕES INSTITUCIONAIS",
+          "official": false,
+          "slug": "relacoes-institucionais"
+        },
+        {
+          "active": true,
+          "id": "d85594df-142b-46f1-a5af-598b7d504efd",
+          "legacy": false,
+          "name": "Comissão Central",
+          "official": true,
+          "slug": "central"
+        },
+        {
+          "active": true,
+          "id": "ed23de8f-6293-4321-a8c2-852a1f83f5ec",
+          "legacy": false,
+          "name": "ASSESSORIA DE MARKETING/COMUNICAÇÃO",
+          "official": true,
+          "slug": "assessoria-de-marketing"
+        },
+        {
+          "active": false,
+          "id": "0734ec46-4b1c-4240-ba5a-553615f6048e",
+          "legacy": false,
+          "name": "Fotografia",
+          "official": true,
+          "slug": "fotografia"
+        },
+        {
+          "active": true,
+          "id": "0f2b084c-1795-429b-a00a-5e3717d9efac",
+          "legacy": false,
+          "name": "CCPF — Conselho Consultivo Permanente Fenasoja",
+          "official": true,
+          "slug": "ccpf"
+        }
+      ]
+    }
+  ]
+}

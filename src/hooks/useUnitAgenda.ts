@@ -1,14 +1,16 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { useOrgCommissions } from './useOrgCommissions';
-import { resolveOfficialUnit } from '@/modules/commissions/officialCommissionCatalog';
+import { resolveUnitDirectory } from '@/features/commission-agenda/lib/unit-identity';
+import { useAuth } from './useAuth';
+import { invalidateInstitutionalAgendas } from '@/lib/institutional-agenda-cache';
 import {
   toUnitAgendaEvents,
+  canonicalEventToUnitAgendaRow,
   type UnitAgendaRow,
 } from '@/features/commission-agenda/adapters/unit-agenda.adapter';
-import type { UnitSummary } from '@/features/commission-agenda/types';
 
 export interface UnitMetrics {
   total: number;
@@ -44,45 +46,8 @@ const unitAgendaRpc = supabase as unknown as {
  * `commissions.id` real da organização. Nada é vinculado por nome.
  */
 export function useUnitIdentity(entryId: string | null | undefined) {
-  const { units, isLoading } = useOrgCommissions();
-
-  return useMemo(() => {
-    const bySlug = new Map<string, UnitSummary>();
-    const byCanonicalId = new Map<string, { commissionId: string; slug: string; name: string }>();
-    let commissionId: string | null = null;
-    let commissionIdBySlug: string | null = null;
-    let commissionSlug: string | null = null;
-
-    for (const unit of units) {
-      const officialSlug = resolveOfficialUnit(unit.slug);
-      const official = officialSlug ?? resolveOfficialUnit(unit.name);
-      const canonicalId = official?.entry.id ?? unit.slug;
-      bySlug.set(unit.slug, {
-        id: canonicalId,
-        name: official?.entry.name ?? unit.name,
-        shortName: official?.entry.shortName,
-        type: unit.type === 'assessoria' ? 'assessoria' : 'comissao',
-      });
-      byCanonicalId.set(canonicalId, { commissionId: unit.id, slug: unit.slug, name: unit.name });
-      if (entryId && canonicalId === entryId) {
-        commissionId = unit.id;
-        commissionSlug = unit.slug;
-      }
-      if (entryId && (officialSlug?.entry.id ?? unit.slug) === entryId && (!commissionIdBySlug || unit.slug === entryId)) {
-        commissionIdBySlug = unit.id;
-      }
-    }
-
-    return {
-      commissionId,
-      commissionIdBySlug,
-      commissionSlug,
-      unitOptions: Array.from(bySlug.values()).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
-      byCanonicalId,
-      resolveUnit: (slug: string) => bySlug.get(slug),
-      isLoading,
-    };
-  }, [units, entryId, isLoading]);
+  const { units, directoryPeople, isLoading, error } = useOrgCommissions();
+  return useMemo(() => ({ ...resolveUnitDirectory(units, entryId), resolvePerson: (id: string) => directoryPeople.find(person => person.id === id), isLoading, error }), [units, directoryPeople, entryId, isLoading, error]);
 }
 
 /**
@@ -91,20 +56,25 @@ export function useUnitIdentity(entryId: string | null | undefined) {
  */
 export function useUnitAgenda(entryId: string | null | undefined) {
   const { orgId } = useCurrentOrg();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const {
     commissionId,
     commissionIdBySlug,
     commissionSlug,
     resolveUnit,
+    resolvePerson,
     unitOptions,
     byCanonicalId,
     isLoading: identityLoading,
+    identityError,
+    error: directoryError,
   } = useUnitIdentity(entryId);
 
   const agendaQuery = useQuery({
-    queryKey: ['unit-agenda', orgId, commissionId],
-    enabled: Boolean(orgId && commissionId),
+    queryKey: ['unit-agenda', orgId, user?.id, commissionId],
+    enabled: Boolean(orgId && user && commissionId),
+    meta: { persist: false },
     staleTime: 30_000,
     queryFn: async (): Promise<UnitAgendaRow[]> => {
       const { data, error } = await unitAgendaRpc.rpc('cronograma_unit_agenda', {
@@ -116,8 +86,9 @@ export function useUnitAgenda(entryId: string | null | undefined) {
   });
 
   const metricsQuery = useQuery({
-    queryKey: ['unit-metrics', orgId, commissionId],
-    enabled: Boolean(orgId && commissionId),
+    queryKey: ['unit-metrics', orgId, user?.id, commissionId],
+    enabled: Boolean(orgId && user && commissionId),
+    meta: { persist: false },
     staleTime: 30_000,
     queryFn: async (): Promise<UnitMetrics> => {
       const { data, error } = await unitAgendaRpc.rpc('cronograma_unit_metrics', {
@@ -137,15 +108,20 @@ export function useUnitAgenda(entryId: string | null | undefined) {
   });
 
   const rows = agendaQuery.data ?? EMPTY_AGENDA_ROWS;
-  const events = useMemo(() => toUnitAgendaEvents(rows, { resolveUnit }), [rows, resolveUnit]);
+  const events = useMemo(() => toUnitAgendaEvents(rows, { resolveUnit, resolvePerson }), [rows, resolveUnit, resolvePerson]);
 
-  const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ['unit-agenda', orgId, commissionId] });
-    queryClient.invalidateQueries({ queryKey: ['unit-metrics', orgId, commissionId] });
-    queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
-    queryClient.invalidateQueries({ queryKey: ['venue-operations', orgId] });
-    queryClient.invalidateQueries({ queryKey: ['restaurant-event-alert', orgId] });
-  };
+  const cacheSavedEvent = useCallback((saved: unknown) => {
+    const row = canonicalEventToUnitAgendaRow(saved);
+    if (!row) return;
+    for (const [key, rows] of queryClient.getQueriesData<UnitAgendaRow[]>({ queryKey: ['unit-agenda', orgId, user?.id] })) {
+      const linked = row.units?.some(unit => unit.commission_id === key[3]);
+      const previous = rows?.find(event => event.id === row.id);
+      const remaining = (rows ?? []).filter(event => event.id !== row.id);
+      queryClient.setQueryData(key, linked ? [...remaining, { ...row, document_count: previous?.document_count ?? 0 }] : remaining);
+    }
+  }, [queryClient, orgId, user?.id]);
+
+  const invalidate = useCallback(() => invalidateInstitutionalAgendas(queryClient, orgId), [queryClient, orgId]);
 
   return {
     commissionId,
@@ -157,9 +133,11 @@ export function useUnitAgenda(entryId: string | null | undefined) {
     events,
     metrics: metricsQuery.data ?? EMPTY_METRICS,
     identityLoading,
+    identityError,
     isLoading: identityLoading || agendaQuery.isLoading,
-    isError: agendaQuery.isError,
+    isError: agendaQuery.isError || Boolean(directoryError) || (!identityLoading && Boolean(identityError)),
     refetch: agendaQuery.refetch,
     invalidate,
+    cacheSavedEvent,
   };
 }

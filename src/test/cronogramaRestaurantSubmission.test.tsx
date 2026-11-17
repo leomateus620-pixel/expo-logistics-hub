@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { EventForm } from '@/components/cronograma-eventos/EventForm';
 import type { CronogramaEvent } from '@/components/cronograma-eventos/types';
@@ -17,20 +17,20 @@ afterEach(cleanup);
 const sourceForm: CronogramaEvent = { id: 'source-id', sourceKey: 'source-key', title: 'Evento do Centro', summary: '', date: null, year: 2028, category: 'governanca', status: 'planned', priority: 'medium', kind: 'event', location: 'CENTRO DE EVENTOS FENASOJA', locationCode: 'centro_eventos_fenasoja', lockVersion: 2 };
 
 describe('submissão da Agenda para o Restaurante', () => {
-  it('retains a new source identity and filled fields through retries and correction', () => {
+  it('retains a new source identity and filled fields through retries and correction', async () => {
     const onSubmit = vi.fn();
     const props = { onSubmit, onCancel: vi.fn(), showSubevents: false, showRelational: false };
     const { rerender } = render(<EventForm {...props} />);
     fireEvent.change(screen.getByLabelText('Título'), { target: { value: 'Evento de teste local' } });
-    fireEvent.submit(document.querySelector('form')!);
+    await act(async () => { fireEvent.submit(document.querySelector('form')!); });
     const sourceKey = onSubmit.mock.calls[0][0].sourceKey;
     expect(sourceKey).toMatch(/^manual-[0-9a-f-]{36}$/);
     rerender(<EventForm {...props} submitError="Não foi possível confirmar o salvamento. Tente novamente." />);
     expect(screen.getByLabelText('Título')).toHaveValue('Evento de teste local');
-    fireEvent.submit(document.querySelector('form')!);
+    await act(async () => { fireEvent.submit(document.querySelector('form')!); });
     expect(onSubmit.mock.calls[1][0].sourceKey).toBe(sourceKey);
     fireEvent.change(screen.getByLabelText('Título'), { target: { value: 'Evento corrigido' } });
-    fireEvent.submit(document.querySelector('form')!);
+    await act(async () => { fireEvent.submit(document.querySelector('form')!); });
     expect(onSubmit.mock.calls[2][0].sourceKey).toBe(sourceKey);
   });
 

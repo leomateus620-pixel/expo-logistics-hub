@@ -1,0 +1,14 @@
+{
+  "rows": [
+    {
+      "audit": {
+        "events": 348,
+        "hidden_by_old_filter": 2,
+        "invalid_origin": 0,
+        "null_dates": 30,
+        "unit_events": 2,
+        "without_principal": 115
+      }
+    }
+  ]
+}

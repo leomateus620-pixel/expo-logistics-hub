@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import { useAuth } from './useAuth';
 import { useCurrentOrg } from './useCurrentOrg';
 import { logAudit } from '@/services/auditService';
 
@@ -17,6 +18,7 @@ type AddOrgMemberInput = Pick<OrgMemberInsert, 'user_id'> & {
 };
 
 export function useOrgMembers() {
+  const { user } = useAuth();
   const { orgId } = useCurrentOrg();
   const qc = useQueryClient();
 
@@ -25,7 +27,8 @@ export function useOrgMembers() {
     isLoading: isLoadingMembers,
     error,
   } = useQuery({
-    queryKey: ['org-members', orgId],
+    queryKey: ['org-members', orgId, user?.id],
+    meta: { persist: false },
     queryFn: async () => {
       if (!orgId) return [];
       const { data, error: memberError } = await supabase
@@ -46,7 +49,8 @@ export function useOrgMembers() {
     isLoading: isLoadingCommissionNames,
     error: commissionNamesError,
   } = useQuery({
-    queryKey: ['org-member-commission-names', orgId],
+    queryKey: ['org-member-commission-names', orgId, user?.id],
+    meta: { persist: false },
     queryFn: async () => {
       if (!orgId) return [];
       const { data, error: commissionsError } = await supabase
@@ -79,7 +83,8 @@ export function useOrgMembers() {
     isLoading: isLoadingLoginMembers,
     error: loginMembersError,
   } = useQuery({
-    queryKey: ['org-login-members', orgId],
+    queryKey: ['org-login-members', orgId, user?.id],
+    meta: { persist: false },
     queryFn: async () => {
       if (!orgId) return [];
       const { data, error } = await supabase.rpc('list_org_login_members', { _org_id: orgId });

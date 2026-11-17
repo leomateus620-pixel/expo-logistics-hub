@@ -1,0 +1,323 @@
+{
+  "date": "2026-11-17T17:25:21.326Z",
+  "actor": {
+    "orgRole": "leitura",
+    "globalWrite": false,
+    "relationshipRole": "principal",
+    "agendaReadAccess": true
+  },
+  "routes": [
+    {
+      "id": "acolhimento-e-bem-comum",
+      "eventId": "9fd42d1f-bfcc-4571-9327-0f41244a679e",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "agricultura-soja-e-derivados",
+      "eventId": "322b1da9-9908-447e-b55c-ac15e5fea675",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "arte-e-cultura",
+      "moduleSlug": "arte-cultura",
+      "eventId": "aa7db8ae-6a62-4f6d-9b13-61ee981c2d0d",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": true
+    },
+    {
+      "id": "bilheteria",
+      "eventId": "957bb00c-71fc-4407-b737-a6e44b38f5c1",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "credenciamento",
+      "eventId": "2ec92c7f-390a-4b9d-835a-174d9af2a337",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "cooperativismo",
+      "eventId": "4dc43a8d-cca5-4514-b593-f3ed4d677c3c",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "espaco-do-automovel",
+      "eventId": "721da9d0-91f6-41a1-b609-5d3902096f4d",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "exporural",
+      "moduleSlug": "exporural",
+      "eventId": "b0ad3884-964e-4718-9255-ae158858b821",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "gastronomia",
+      "moduleSlug": "gastronomia",
+      "eventId": "df58166d-01af-410f-913a-4e0e7768faac",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "industria-comercio-e-servicos",
+      "moduleSlug": "industria-comercio-servicos",
+      "eventId": "f129d73e-2c8c-440d-8a34-a472f0fa080f",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": true
+    },
+    {
+      "id": "infraestrutura-e-seguranca-do-trabalho",
+      "moduleSlug": "infraestrutura",
+      "eventId": "4cd36bb3-e57c-4684-8906-5b516f8fe6c5",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": true
+    },
+    {
+      "id": "inovacao-e-experiencia",
+      "eventId": "e53ef7bf-cd55-4377-8134-f4fb5999d8b1",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "logistica-hotelaria-e-turismo",
+      "moduleSlug": "logistica",
+      "eventId": "35ba946d-b244-4fe5-9a5a-de1c3ceb588f",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": true
+    },
+    {
+      "id": "mercosul",
+      "eventId": "ddbf0441-c577-40d5-9615-98a13ebe70c9",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "novas-geracoes",
+      "moduleSlug": "novas-geracoes",
+      "eventId": "d160c4fc-056f-408a-86c3-b31b29bde5d6",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "pecuaria",
+      "eventId": "8d5e2323-c984-4936-b849-b0151e101764",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "prevencao-e-combate-a-incendio",
+      "eventId": "d96b5791-ea16-4df3-9eba-6df18e982898",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "recepcao-e-cerimonial",
+      "eventId": "0b807c95-c929-48ad-894e-fe71b892b83c",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "relacionamento-e-experiencia",
+      "eventId": "ce330718-ae36-4310-a909-6e5a561e0620",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "relacoes-estrategicas",
+      "eventId": "d2648bfa-8ccf-42e1-a292-90b13abe6786",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "saude-bem-estar-e-acessibilidade",
+      "eventId": "b80feafd-66ed-4dac-9528-3c6c7dd64ec6",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "seguranca",
+      "moduleSlug": "seguranca",
+      "eventId": "4c8fb8fe-bb63-416b-949b-b92669fa7001",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "servicos",
+      "moduleSlug": "servicos",
+      "eventId": "5364af47-ec3a-4f7d-9187-66ab38255f94",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "shows",
+      "eventId": "01fdc1a6-6644-47e9-a4a4-a3969c5fe12c",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "soja-store",
+      "eventId": "e036b463-0818-4be0-8090-3379b5d1308f",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "soy-summit",
+      "eventId": "5f22a5ad-e4d9-4d3f-abd7-88bf80bfb9fa",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "assessoria-de-sustentabilidade",
+      "eventId": "f64369f8-a45a-41d5-bdea-66a5fefaa09b",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "assessoria-de-imprensa",
+      "eventId": "b7eca541-0cba-400f-9a48-ce03cdc0e766",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "assessoria-juridica",
+      "eventId": "86287a12-2d67-4ca6-88a9-6d35550ee089",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "assessoria-de-relacoes-internacionais",
+      "eventId": "47435653-4295-4a19-af3d-95cd654991db",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "assessoria-de-protocolo",
+      "eventId": "821fb006-8cf4-452f-95c0-bc97af3fe629",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "assessoria-de-marketing",
+      "eventId": "cbabee42-1603-4c27-9c5f-81c23d531318",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    },
+    {
+      "id": "assessoria-de-sistemas",
+      "eventId": "b1c99fb1-3cf3-40c6-b414-0bfa8cb4ed2b",
+      "location": "sala_voluntarios",
+      "responsibles": 2,
+      "reload": true,
+      "deepLink": true,
+      "aliasVerified": false
+    }
+  ],
+  "errors": [],
+  "participantEdit": true,
+  "centralAgenda": true,
+  "secondDevice": true,
+  "mobileNoHorizontalOverflow": true,
+  "mobileForm": true
+}

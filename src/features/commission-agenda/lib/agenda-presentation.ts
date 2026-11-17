@@ -56,7 +56,7 @@ export function toDateKey(date: Date): string {
 }
 
 export function getTodayKey(now: Date = new Date()): string {
-  return toDateKey(now);
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
 }
 
 export function parseDateKey(key: string): Date {
@@ -78,30 +78,35 @@ export function getDateParts(key: string) {
 
 /** `22 SET` */
 export function formatDayMonth(key: string): string {
+  if (!key) return 'Data a definir';
   const { day, monthShort } = getDateParts(key);
   return `${String(day).padStart(2, '0')} ${monthShort}`;
 }
 
 /** `22/09/2026` */
 export function formatNumericDate(key: string): string {
+  if (!key) return 'Data a definir';
   const { day, month, year } = getDateParts(key);
   return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
 }
 
 /** `Terça-feira · 22 SET` */
 export function formatDayHeading(key: string): string {
+  if (!key) return 'Data a definir';
   const { weekday } = getDateParts(key);
   return `${weekday} · ${formatDayMonth(key)}`;
 }
 
 /** `22 de setembro de 2026` */
 export function formatLongDate(key: string): string {
+  if (!key) return 'Data a definir';
   const { day, monthLong, year } = getDateParts(key);
   return `${day} de ${monthLong.toLocaleLowerCase('pt-BR')} de ${year}`;
 }
 
 /** `Setembro 2026` */
 export function formatMonthHeading(monthKey: string): string {
+  if (!monthKey) return 'Data a definir';
   const [year, month] = monthKey.split('-').map(Number);
   return `${MONTH_LONG_LABELS[(month ?? 1) - 1]} ${year}`;
 }
@@ -143,12 +148,12 @@ export function isCompletedLike(event: AgendaEventViewModel, todayKey: string): 
   if (event.status === 'completed') return true;
   if (event.status === 'cancelled') return false;
   const last = event.endDate ?? event.date;
-  return last < todayKey;
+  return Boolean(last) && last < todayKey;
 }
 
 export function sortByChronology(events: AgendaEventViewModel[]): AgendaEventViewModel[] {
   return [...events].sort((a, b) => {
-    const dateOrder = a.date.localeCompare(b.date);
+    const dateOrder = (a.date || '9999').localeCompare(b.date || '9999');
     if (dateOrder !== 0) return dateOrder;
     return (a.startTime ?? '').localeCompare(b.startTime ?? '');
   });
@@ -210,7 +215,7 @@ export function filterEvents(
   const term = normalizeSearch(filters.search);
   return sortByChronology(events).filter((event) => {
     const { year, month } = getDateParts(event.date);
-    if (year !== filters.year) return false;
+    if (event.date && year !== filters.year) return false;
     if (filters.month !== 'all' && month !== filters.month) return false;
     if (!matchesStatusFilter(event, filters.status, todayKey)) return false;
     if (!matchesSecondary(event, filters.secondary, todayKey)) return false;
@@ -268,7 +273,7 @@ export function countEventsByMonth(events: AgendaEventViewModel[], year: number)
 
 export function getAvailableYears(events: AgendaEventViewModel[], fallbackYear: number): number[] {
   const years = new Set<number>([fallbackYear]);
-  for (const event of events) years.add(getDateParts(event.date).year);
+  for (const event of events) if (event.date) years.add(getDateParts(event.date).year);
   return Array.from(years).sort((a, b) => a - b);
 }
 

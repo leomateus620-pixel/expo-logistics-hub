@@ -18,7 +18,7 @@ const units: UnitSummary[] = [
   { id: 'other', name: 'Saúde e Acessibilidade', type: 'comissao' },
 ];
 const event: AgendaEventViewModel = {
-  id: 'canonical-event-id', title: 'Reunião de preparação', date: '2026-10-24',
+  id: 'canonical-event-id', ownerUnit: { commissionId: 'owner-db', slug: 'acolhimento', name: 'Acolhimento e Bem Comum' }, lockVersion: 1, title: 'Reunião de preparação', date: '2026-10-24',
   startTime: '07:30', endTime: '09:00', status: 'requested',
   people: [people[1], people[0]], units: [units[1], units[0]],
 };

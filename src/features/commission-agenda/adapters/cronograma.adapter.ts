@@ -119,6 +119,7 @@ export function toCommissionUnitViewModel({ module, entry, people }: ToCommissio
 
   return {
     ...toUnitSummary(entry),
+    type: entry.type,
     description: entry.description,
     status: MODULE_STATUS_MAP[module.status] ?? 'structuring',
     icon: entry.icon,

@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import { newRequestId } from '@/lib/cronograma-rpc';
+import { EventLocationField } from '@/components/cronograma-eventos/EventLocationField';
 import { matchesCronogramaLocation } from '@/lib/cronograma-agenda-mode';
 import { CalendarDays, Check, FileText, Layers3, MapPin, Text, Users } from 'lucide-react';
 import type { AgendaEventViewModel, EventStatus, PersonSummary, UnitSummary } from '../types';
@@ -21,6 +22,7 @@ export interface AgendaEventDraft {
   location: string;
   status: EventStatus;
   peopleIds: string[];
+  externalPeople?: Array<{ id: string; name: string }>;
   unitIds: string[];
 }
 
@@ -65,11 +67,12 @@ export interface EventFormShellProps {
   unitOptions?: UnitSummary[];
   onSubmit?: (draft: AgendaEventDraft) => void | boolean | Promise<void | boolean>;
   onCancel?: () => void;
+  onSavingChange?: (saving: boolean) => void;
 }
 
 const STATUS_OPTIONS: EventStatus[] = ['requested', 'confirmed', 'draft', 'rescheduled'];
 
-export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], unitOptions = [], onSubmit, onCancel }: EventFormShellProps) {
+export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], unitOptions = [], onSubmit, onCancel, onSavingChange }: EventFormShellProps) {
   const id = useId();
   const sourceIdentity = useRef<string>();
   if (!event && !sourceIdentity.current) sourceIdentity.current = `unidade-${unitId ?? 'agenda'}-${newRequestId()}`;
@@ -87,12 +90,12 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
   // A saved selection absent from the current catalog remains visible and editable.
   // Identity and order come from IDs, never from matching names.
   const people = useMemo(() => {
-    const options = [...peopleOptions];
+    const options: PersonSummary[] = [...peopleOptions, ...(draft.externalPeople ?? [])];
     for (const person of event?.people ?? []) {
       if (!options.some((option) => option.id === person.id)) options.push(person);
     }
     return options;
-  }, [peopleOptions, event]);
+  }, [peopleOptions, event, draft.externalPeople]);
   const units = useMemo(() => {
     const options = [...unitOptions];
     for (const unit of event?.units ?? []) {
@@ -104,7 +107,7 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
   const titleError = touched.title && draft.title.trim().length <= 2 ? 'Informe um título com pelo menos 3 caracteres.' : undefined;
   const dateError = touched.date && !draft.date ? 'Informe a data do evento.' : undefined;
   const endDateError = draft.endDate && draft.endDate < draft.date ? 'A data final não pode ser anterior à inicial.' : undefined;
-  const endTimeError = draft.startTime && draft.endTime && !draft.endDate && draft.endTime < draft.startTime ? 'O horário final não pode ser anterior ao inicial.' : undefined;
+  const endTimeError = draft.startTime && draft.endTime && (!draft.endDate || draft.endDate === draft.date) && draft.endTime < draft.startTime ? 'O horário final não pode ser anterior ao inicial.' : undefined;
 
   const update = <K extends keyof AgendaEventDraft>(key: K, value: AgendaEventDraft[K]) => setDraft((current) => ({ ...current, [key]: value }));
   const toggle = (key: 'peopleIds' | 'unitIds', value: string) => setDraft((current) => ({
@@ -117,23 +120,25 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
     if (submissionPending.current) return;
     submissionPending.current = true;
     setSaving(true);
+    onSavingChange?.(true);
     setSubmitError(null);
     try {
       const saved = await onSubmit?.(draft);
-      if (saved === false) setSubmitError('O evento não foi salvo. Revise a orientação exibida e tente novamente. Seus campos foram preservados.');
+      if (saved !== true) setSubmitError('O evento não foi salvo. Revise a orientação exibida e tente novamente. Seus campos foram preservados.');
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Não foi possível salvar. Seus campos foram preservados; tente novamente.');
     } finally {
       submissionPending.current = false;
       setSaving(false);
+      onSavingChange?.(false);
     }
   };
 
-  const canSubmit = draft.title.trim().length > 2 && draft.date.length > 0;
+  const canSubmit = draft.title.trim().length > 2 && draft.date.length > 0 && !endDateError && !endTimeError;
 
   return (
-    <form id={`${id}-form`} className="ua-form" onSubmit={handleSubmit} noValidate>
-      <div className="ua-form__body">
+    <form id={`${id}-form`} className="ua-form" aria-busy={saving} onSubmit={handleSubmit} noValidate>
+      <fieldset disabled={saving} className="ua-form__body min-w-0">
       {submitError && <p className="ua-field__error" role="alert">{submitError}</p>}
       <section className="ua-form__section" aria-labelledby={`${id}-info`}>
         <h3 id={`${id}-info`} className="ua-form__section-title ws-label"><Text className="h-4 w-4" aria-hidden="true" />Informações</h3>
@@ -186,8 +191,8 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
       <section className="ua-form__section" aria-labelledby={`${id}-where`}>
         <h3 id={`${id}-where`} className="ua-form__section-title ws-label"><MapPin className="h-4 w-4" aria-hidden="true" />Local</h3>
         <div className="ua-field">
-          <label htmlFor={`${id}-location`} className="ua-field__label ws-meta">Local do evento</label>
-          <input id={`${id}-location`} name="location" autoComplete="off" value={draft.location} onChange={(e) => setDraft((current) => ({ ...current, location: e.target.value, locationCode: null }))} placeholder="Ex.: Casa Fenasoja" />
+          <EventLocationField value={draft.location} code={draft.locationCode}
+            onChange={(location, locationCode) => setDraft(current => ({ ...current, location, locationCode }))} />
           {matchesCronogramaLocation(draft, 'centro_eventos_fenasoja') && <p className="ua-field__hint" role="note">Este evento também será encaminhado ao Restaurante para validação.</p>}
         </div>
       </section>
@@ -198,10 +203,14 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
           <WorkspaceRelationalSelect
             label="Pessoas responsáveis"
             description="O primeiro selecionado é o responsável principal."
-            options={people.map((person) => ({ id: person.id, label: person.name, description: person.role, leading: <PersonAvatar person={person} size="xs" tone="light" /> }))}
+            options={people.map((person) => ({ id: person.id, label: person.name, description: [person.role, person.unitLabel].filter(Boolean).join(' · '), leading: <PersonAvatar person={person} size="xs" tone="light" /> }))}
             value={draft.peopleIds}
             primaryId={draft.peopleIds[0]}
             onToggle={(personId) => toggle('peopleIds', personId)}
+            onCreateExternal={(name) => {
+              const person = { id: `external:${newRequestId()}`, name };
+              setDraft(current => ({ ...current, peopleIds: [...current.peopleIds, person.id], externalPeople: [...(current.externalPeople ?? []), person] }));
+            }}
             emptyLabel="Nenhuma pessoa selecionada."
           />
           <div className="ua-form__fronts">
@@ -218,7 +227,7 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
             <WorkspaceRelationalSelect
               label="Comissões e assessorias participantes"
               description="Outras frentes vinculadas ao evento."
-              options={units.filter((unit) => unit.id !== unitId).map((unit) => ({ id: unit.id, label: unit.name, description: unit.type === 'assessoria' ? 'Assessoria' : 'Comissão', leading: <Layers3 aria-hidden="true" /> }))}
+              options={units.filter((unit) => unit.id !== unitId).map((unit) => ({ id: unit.id, label: unit.name, description: unit.type === 'assessoria' ? 'Assessoria' : unit.type === 'conselho' ? 'Conselho' : 'Comissão', leading: <Layers3 aria-hidden="true" /> }))}
               value={draft.unitIds.filter((selectedId) => selectedId !== unitId)}
               onToggle={(selectedId) => toggle('unitIds', selectedId)}
               emptyLabel="Nenhuma outra frente selecionada."
@@ -231,12 +240,12 @@ export function EventFormShell({ event, unitId, unitLabel, peopleOptions = [], u
         <h3 id={`${id}-docs`} className="ua-form__section-title ws-label"><FileText className="h-4 w-4" aria-hidden="true" />Documentos</h3>
         <p className="ua-field__hint ws-meta-secondary">Publique arquivos na seção Documentos após salvar o evento.</p>
       </section>
-      </div>
+      </fieldset>
 
       <div className="ua-form__footer">
         <WorkspaceButton onClick={onCancel} disabled={saving}>Cancelar</WorkspaceButton>
         <WorkspaceButton type="submit" variant="primary" icon={Check} disabled={!canSubmit || saving}>
-          {event ? 'Salvar alterações' : 'Criar evento'}
+          {saving ? 'Salvando…' : event ? 'Salvar alterações' : 'Criar evento'}
         </WorkspaceButton>
       </div>
     </form>
@@ -250,16 +259,18 @@ export interface EventFormSheetProps extends EventFormShellProps {
 }
 
 export function EventFormSheet({ open, onOpenChange, unitLabel, onCancel, ...props }: EventFormSheetProps) {
+  const saving = useRef(false);
+  const changeOpen = (next: boolean) => { if (!saving.current) onOpenChange(next); };
   return (
     <WorkspaceSheet
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={changeOpen}
       eyebrow={props.event ? 'Editar evento' : 'Criar evento'}
       title={unitLabel}
       description="As informações serão sincronizadas com a Agenda Fenasoja."
       wide
     >
-      {open && <EventFormShell {...props} unitLabel={unitLabel} onCancel={() => { onCancel?.(); onOpenChange(false); }} />}
+      {open && <EventFormShell {...props} onSavingChange={(next) => { saving.current = next; }} unitLabel={unitLabel} onCancel={() => { onCancel?.(); onOpenChange(false); }} />}
     </WorkspaceSheet>
   );
 }

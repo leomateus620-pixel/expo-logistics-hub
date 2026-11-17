@@ -23,6 +23,8 @@ export type CronogramaRpcErrorCode =
   | 'CRONOGRAMA_ORIGIN_IMMUTABLE'
   | 'CRONOGRAMA_CREATOR_IMMUTABLE'
   | 'CRONOGRAMA_CREATOR_INVALID'
+  | 'CRONOGRAMA_CONNECTION_ERROR'
+  | 'CRONOGRAMA_SERVER_UNAVAILABLE'
   | 'CRONOGRAMA_UNKNOWN';
 
 export class CronogramaRpcError extends Error {
@@ -59,6 +61,8 @@ const codeMessages: Record<CronogramaRpcErrorCode, string> = {
   CRONOGRAMA_ORIGIN_IMMUTABLE: 'A frente de origem deste evento precisa ser preservada. Recarregue o evento antes de tentar novamente.',
   CRONOGRAMA_CREATOR_IMMUTABLE: 'A autoria original deste evento precisa ser preservada. Recarregue o evento antes de tentar novamente.',
   CRONOGRAMA_CREATOR_INVALID: 'Não foi possível verificar o criador deste evento na organização. Solicite a revisão do vínculo antes de salvar.',
+  CRONOGRAMA_CONNECTION_ERROR: 'Falha de conexão. Seus dados foram preservados; tente novamente para confirmar a mesma submissão.',
+  CRONOGRAMA_SERVER_UNAVAILABLE: 'Servidor temporariamente indisponível. Aguarde um momento e tente novamente; seus dados foram preservados.',
   CRONOGRAMA_UNKNOWN: 'Não foi possível confirmar o salvamento. Seus campos foram preservados. Tente novamente para conferir a mesma submissão com segurança.',
 };
 
@@ -74,6 +78,9 @@ function normalize(err: unknown): CronogramaRpcError {
   if (pgCode === '42501' || /row-level security/i.test(raw)) {
     return new CronogramaRpcError('CRONOGRAMA_PERMISSION_DENIED', codeMessages.CRONOGRAMA_PERMISSION_DENIED, raw);
   }
+  if (/fetch|network|offline|conexão/i.test(raw)) return new CronogramaRpcError('CRONOGRAMA_CONNECTION_ERROR', codeMessages.CRONOGRAMA_CONNECTION_ERROR, raw);
+  if (/^08|^53|^57/.test(pgCode) || /timeout|temporarily/i.test(raw)) return new CronogramaRpcError('CRONOGRAMA_SERVER_UNAVAILABLE', codeMessages.CRONOGRAMA_SERVER_UNAVAILABLE, raw);
+  if (['23503', '22023'].includes(pgCode)) return new CronogramaRpcError('CRONOGRAMA_RELATIONSHIP_INVALID', codeMessages.CRONOGRAMA_RELATIONSHIP_INVALID, raw);
   return new CronogramaRpcError('CRONOGRAMA_UNKNOWN', codeMessages.CRONOGRAMA_UNKNOWN, raw);
 }
 
@@ -81,7 +88,7 @@ export interface CronogramaCommissionLinkInput {
   commission_id?: string | null;
   commission_slug?: string | null;
   commission_name?: string | null;
-  relation_role?: 'principal' | 'participante';
+  relation_role?: string;
 }
 
 export interface CronogramaResponsibleLinkInput {
@@ -232,6 +239,12 @@ export async function cronogramaSaveEvent(
         expected_lock_version: expectedLockVersion ?? undefined,
       });
       if (error) throw normalize(error);
+      const saved = data as { id?: unknown; org_id?: unknown; lock_version?: unknown } | null;
+      if (!saved || typeof saved.id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(saved.id)
+        || saved.org_id !== payload.org_id || typeof saved.lock_version !== 'number' || saved.lock_version < 1
+        || (payload.id && saved.id !== payload.id)) {
+        throw new CronogramaRpcError('CRONOGRAMA_UNKNOWN', codeMessages.CRONOGRAMA_UNKNOWN, 'Invalid canonical save response');
+      }
       return data;
     } catch (error) {
       throw error instanceof CronogramaRpcError ? error : normalize(error);

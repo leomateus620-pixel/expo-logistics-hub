@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type SetStateAction } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -14,6 +14,9 @@ import {
   type CronogramaSaveSubeventPayload,
   type CronogramaSubeventPlanItemInput,
 } from '@/lib/cronograma-rpc';
+import { useAuth } from '@/hooks/useAuth';
+import { useAgendaPermissions } from '@/hooks/useAgendaPermissions';
+import { invalidateInstitutionalAgendas } from '@/lib/institutional-agenda-cache';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
@@ -68,6 +71,7 @@ interface SupabaseQueryBuilder extends PromiseLike<SupabaseResult<unknown[]>> {
   eq(column: string, value: unknown): SupabaseQueryBuilder;
   in(column: string, values: unknown[]): SupabaseQueryBuilder;
   order(column: string, options?: Record<string, unknown>): SupabaseQueryBuilder;
+  range(from: number, to: number): SupabaseQueryBuilder;
   limit(count: number): Promise<SupabaseResult<unknown[]>>;
   upsert(values: unknown, options?: Record<string, unknown>): SupabaseQueryBuilder;
   insert(values: unknown): SupabaseQueryBuilder;
@@ -740,8 +744,8 @@ async function saveRelationalSubevent(
   return { parent, subevent: created };
 }
 
-export function cronogramaEventsQueryKey(orgId: string | null | undefined) {
-  return ['cronograma-eventos', orgId] as const;
+export function cronogramaEventsQueryKey(orgId: string | null | undefined, userId?: string | null) {
+  return ['cronograma-eventos', orgId, userId] as const;
 }
 
 /** Single source of truth for reading the module dataset, so every consumer
@@ -752,17 +756,23 @@ export interface CronogramaDataset {
 }
 
 export async function fetchCronogramaDatasetForOrg(orgId: string): Promise<CronogramaDataset> {
-  const [eventsResult, tombstonesResult] = await Promise.all([
-    cronogramaDb.from('cronograma_eventos_full').select('*').eq('org_id', orgId)
-      .order('start_date', { ascending: true, nullsFirst: false }).order('title', { ascending: true }).limit(1000),
-    cronogramaDb.from('cronograma_evento_tombstones').select('source_key').eq('org_id', orgId).limit(1000),
+  const readAll = async (table: string, columns: string, order: string) => {
+    const rows: unknown[] = [];
+    for (let from = 0; ; from += 500) {
+      const result = await cronogramaDb.from(table).select(columns).eq('org_id', orgId)
+        .order(order, { ascending: true }).range(from, from + 499);
+      if (result.error) throw result.error;
+      rows.push(...(result.data ?? []));
+      if (!result.data || result.data.length < 500) return rows;
+    }
+  };
+  const [events, tombstones] = await Promise.all([
+    readAll('cronograma_eventos_full', '*', 'id'),
+    readAll('cronograma_evento_tombstones', 'source_key', 'source_key'),
   ]);
-  if (eventsResult.error) throw eventsResult.error;
-  if (tombstonesResult.error) throw tombstonesResult.error;
   return {
-    events: (eventsResult.data ?? []).map(fromDbRow) as CronogramaEvent[],
-    deletedSourceKeys: (tombstonesResult.data ?? [])
-      .map((row) => readString(row as Record<string, unknown>, 'source_key'))
+    events: sortCronogramaEvents(events.map(fromDbRow) as CronogramaEvent[]),
+    deletedSourceKeys: tombstones.map(row => readString(row as Record<string, unknown>, 'source_key'))
       .filter((key): key is string => Boolean(key)),
   };
 }
@@ -773,11 +783,14 @@ export async function fetchCronogramaEventsForOrg(orgId: string): Promise<Cronog
 
 
 export function useCronogramaEventos() {
+  const { user } = useAuth();
+  const agendaPermissions = useAgendaPermissions();
   const { orgId, myRole } = useCurrentOrg();
   const { capSet } = useCapabilities();
   // Escrita liberada para papéis operacionais OU para quem recebeu a
   // capability explícita (ex.: presidente de comissão com visão restrita).
-  const canWriteCronograma = isWritableRole(myRole) || capSet.has('cronograma_eventos_write');
+  const canWriteCronograma = (isWritableRole(myRole) && !(myRole === 'operador' && capSet.has('restricted_scope')))
+    || capSet.has('cronograma_eventos_write') || capSet.has('full_access');
   // Visão restrita (ex.: presidente de comissão): a tela mostra exclusivamente o
   // que o banco liberou por RLS — o catálogo oficial embutido no app nunca é mesclado.
   const hasScopedCronogramaView = capSet.has('cronograma_scoped_access');
@@ -791,7 +804,13 @@ export function useCronogramaEventos() {
   );
   const queryClient = useQueryClient();
   const isOnline = useOnlineStatus();
-  const [sessionEvents, setSessionEvents] = useState<CronogramaEvent[]>(localSeedEvents);
+  const sessionScope = `${orgId ?? ''}:${user?.id ?? ''}`;
+  const [sessionState, setSessionState] = useState({ scope: sessionScope, events: localSeedEvents });
+  const sessionEvents = sessionState.scope === sessionScope ? sessionState.events : localSeedEvents;
+  const setSessionEvents = useCallback((next: SetStateAction<CronogramaEvent[]>) => {
+    setSessionState(current => ({ scope: sessionScope, events: typeof next === 'function'
+      ? next(current.scope === sessionScope ? current.events : localSeedEvents) : next }));
+  }, [sessionScope, localSeedEvents]);
 
   const [dbUnavailable, setDbUnavailable] = useState(false);
   const [relationshipsUnavailable, setRelationshipsUnavailable] = useState(false);
@@ -819,8 +838,9 @@ export function useCronogramaEventos() {
 
 
   const query = useQuery<CronogramaDataset>({
-    queryKey: cronogramaEventsQueryKey(orgId),
-    enabled: !!orgId,
+    queryKey: cronogramaEventsQueryKey(orgId, user?.id),
+    enabled: !!orgId && !!user,
+    meta: { persist: false },
     staleTime: 30000,
     queryFn: async () => {
       if (!orgId) return { events: [], deletedSourceKeys: [] };
@@ -856,7 +876,7 @@ export function useCronogramaEventos() {
       return (data ?? []).map(fromDbRow) as CronogramaEvent[];
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      void invalidateInstitutionalAgendas(queryClient, orgId);
     },
     onError: (error) => {
       if (isStructuralCronogramaReadError(error)) setDbUnavailable(true);
@@ -885,7 +905,7 @@ export function useCronogramaEventos() {
       seedAttemptedForOrg.current.add(orgId);
       seedMissingOfficialData(missingOfficialEvents);
     }
-  }, [hasScopedCronogramaView, isSeedingOfficialData, localSeedEvents, myRole, orgId, query.data, seedMissingOfficialData]);
+  }, [hasScopedCronogramaView, isSeedingOfficialData, localSeedEvents, myRole, orgId, query.data, seedMissingOfficialData, setSessionEvents]);
 
 
   const googleSyncEligibility = useRef<Record<string, boolean>>({});
@@ -935,7 +955,7 @@ export function useCronogramaEventos() {
         if (existingIndex === -1) return sortCronogramaEvents([...current, event]);
         return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
       });
-      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      void invalidateInstitutionalAgendas(queryClient, orgId);
       queryClient.invalidateQueries({ queryKey: ['venue-operations', orgId] });
       queryClient.invalidateQueries({ queryKey: ['restaurant-event-alert', orgId] });
       triggerSyncWorker();
@@ -1039,7 +1059,7 @@ export function useCronogramaEventos() {
     },
     onSuccess: (event) => {
       replaceSessionEvent(event);
-      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      void invalidateInstitutionalAgendas(queryClient, orgId);
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
       queryClient.invalidateQueries({ queryKey: ['venue-operations', orgId] });
       queryClient.invalidateQueries({ queryKey: ['restaurant-event-alert', orgId] });
@@ -1067,11 +1087,11 @@ export function useCronogramaEventos() {
     },
     onSuccess: (result) => {
       setSessionEvents((prev) => prev.filter((item) => item.id !== result.id && item.sourceKey !== result.sourceKey));
-      queryClient.setQueryData<CronogramaDataset>(cronogramaEventsQueryKey(orgId), (current) => current ? ({
+      queryClient.setQueryData<CronogramaDataset>(cronogramaEventsQueryKey(orgId, user?.id), (current) => current ? ({
         events: current.events.filter((event) => event.id !== result.id && event.sourceKey !== result.sourceKey),
         deletedSourceKeys: Array.from(new Set([...current.deletedSourceKeys, result.sourceKey])),
       }) : current);
-      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      void invalidateInstitutionalAgendas(queryClient, orgId);
       queryClient.invalidateQueries({ queryKey: ['venue-operations', orgId] });
       queryClient.invalidateQueries({ queryKey: ['restaurant-event-alert', orgId] });
       triggerSyncWorker();
@@ -1154,7 +1174,7 @@ export function useCronogramaEventos() {
     onSuccess: (result) => {
       if (!result.event) return;
       replaceSessionEvent(result.event);
-      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      void invalidateInstitutionalAgendas(queryClient, orgId);
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', result.event.id] });
     },
   });
@@ -1224,7 +1244,7 @@ export function useCronogramaEventos() {
     },
     onSuccess: ({ synced }) => {
       if (synced === 0) return;
-      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      void invalidateInstitutionalAgendas(queryClient, orgId);
     },
   });
 
@@ -1301,7 +1321,7 @@ export function useCronogramaEventos() {
     onSuccess: (event) => {
       if (!event) return;
       replaceSessionEvent(event);
-      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      void invalidateInstitutionalAgendas(queryClient, orgId);
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
     },
   });
@@ -1343,7 +1363,7 @@ export function useCronogramaEventos() {
     onSuccess: (event) => {
       if (!event) return;
       replaceSessionEvent(event);
-      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      void invalidateInstitutionalAgendas(queryClient, orgId);
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
     },
   });
@@ -1364,7 +1384,7 @@ export function useCronogramaEventos() {
     onSuccess: (event) => {
       if (!event) return;
       replaceSessionEvent(event);
-      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      void invalidateInstitutionalAgendas(queryClient, orgId);
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
     },
   });
@@ -1402,22 +1422,22 @@ export function useCronogramaEventos() {
   const saveEventRpc = useMutation({
     mutationFn: async (input: { payload: CronogramaSaveEventPayload; expectedLockVersion?: number | null }) =>
       cronogramaSaveEvent(input.payload, input.expectedLockVersion),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cronograma-eventos', orgId] }); },
+    onSuccess: () => invalidateInstitutionalAgendas(queryClient, orgId),
   });
   const saveSubeventRpc = useMutation({
     mutationFn: async (input: { payload: CronogramaSaveSubeventPayload; expectedLockVersion?: number | null }) =>
       cronogramaSaveSubevent(input.payload, input.expectedLockVersion),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cronograma-eventos', orgId] }); },
+    onSuccess: () => invalidateInstitutionalAgendas(queryClient, orgId),
   });
   const deleteSubeventRpc = useMutation({
     mutationFn: async (input: { subeventId: string; expectedLockVersion?: number | null }) =>
       cronogramaDeleteSubevent(input.subeventId, input.expectedLockVersion),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cronograma-eventos', orgId] }); },
+    onSuccess: () => invalidateInstitutionalAgendas(queryClient, orgId),
   });
   const reorderSubeventsRpc = useMutation({
     mutationFn: async (input: { eventId: string; orderedIds: string[] }) =>
       cronogramaReorderSubevents(input.eventId, input.orderedIds),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cronograma-eventos', orgId] }); },
+    onSuccess: () => invalidateInstitutionalAgendas(queryClient, orgId),
   });
 
   return {
@@ -1431,6 +1451,8 @@ export function useCronogramaEventos() {
     refetch: query.refetch,
     canManage: canWriteCronograma,
     canWriteEvents,
+    canEditEvent: agendaPermissions.canEditEvent,
+    canDeleteEvent: agendaPermissions.canDeleteEvent,
     canDeleteSubevents: canWriteCronograma,
     relationshipsUnavailable,
     relationshipSyncUnavailable,
@@ -1456,10 +1478,12 @@ export function useCronogramaEventos() {
 
 
 export function useCronogramaEventHistory(eventId: string | null | undefined) {
-  const { myRole } = useCurrentOrg();
+  const { orgId, myRole } = useCurrentOrg();
+  const { user } = useAuth();
   const canViewHistory = myRole === 'admin' || myRole === 'gestor';
   const query = useQuery({
-    queryKey: ['cronograma-event-history', eventId],
+    queryKey: ['cronograma-event-history', eventId, orgId, user?.id],
+    meta: { persist: false },
     enabled: canViewHistory && isUuid(eventId),
     staleTime: 15000,
     retry: false,

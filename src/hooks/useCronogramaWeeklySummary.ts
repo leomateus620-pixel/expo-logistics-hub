@@ -13,8 +13,9 @@ export function useCronogramaWeeklySummary() {
   const { orgId, membership } = useCurrentOrg();
 
   const query = useQuery({
-    queryKey: cronogramaEventsQueryKey(orgId),
-    enabled: !!orgId,
+    queryKey: cronogramaEventsQueryKey(orgId, user?.id),
+    enabled: !!orgId && !!user,
+    meta: { persist: false },
     staleTime: 30000,
     retry: false,
     queryFn: async () => (orgId
@@ -27,7 +28,7 @@ export function useCronogramaWeeklySummary() {
     ?? null;
 
   const summary: WeeklySummary = useMemo(
-    () => buildWeeklySummary(filterCronogramaAgendaMode(query.data?.events ?? [], agendaMode), { userId: user?.id ?? null, displayName }),
+    () => buildWeeklySummary(filterCronogramaAgendaMode(query.data?.events ?? [], agendaMode), { userId: user?.id ?? null, displayName }, { includeWeekend: true }),
     [agendaMode, displayName, query.data, user?.id],
   );
 

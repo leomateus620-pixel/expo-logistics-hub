@@ -14,6 +14,7 @@ interface WorkspaceRelationalSelectProps {
   options: WorkspaceRelationOption[];
   value: string[];
   onToggle: (id: string) => void;
+  onCreateExternal?: (name: string) => void;
   lockedIds?: string[];
   primaryId?: string;
   lockedLabel?: string;
@@ -23,7 +24,7 @@ interface WorkspaceRelationalSelectProps {
 const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
 
 /** Workspace-only presentation: selections are matched by ID and keep their input order. */
-export function WorkspaceRelationalSelect({ label, description, options, value, onToggle, lockedIds = [], primaryId, lockedLabel = 'Obrigatória', emptyLabel }: WorkspaceRelationalSelectProps) {
+export function WorkspaceRelationalSelect({ label, description, options, value, onToggle, onCreateExternal, lockedIds = [], primaryId, lockedLabel = 'Obrigatória', emptyLabel }: WorkspaceRelationalSelectProps) {
   const id = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -98,6 +99,12 @@ export function WorkspaceRelationalSelect({ label, description, options, value, 
           <p className="ua-relation__results ws-caption" role="status">{matching.length} {matching.length === 1 ? 'resultado' : 'resultados'}</p>
           <div ref={listRef} className="ua-relation__options" role="group" aria-labelledby={`${id}-label`}>
             {matching.length === 0 && <p className="ua-relation__no-results ws-meta-secondary">Nenhum resultado. Tente outro nome.</p>}
+            {matching.length === 0 && onCreateExternal && search.trim().length >= 3 && (
+              <button type="button" className="ua-relation__option ws-focus" onClick={() => {
+                onCreateExternal(search.trim());
+                setSearch('');
+              }}>Adicionar como convidado externo: {search.trim()}</button>
+            )}
             {matching.map((option) => {
               const isSelected = value.includes(option.id);
               const locked = lockedIds.includes(option.id);

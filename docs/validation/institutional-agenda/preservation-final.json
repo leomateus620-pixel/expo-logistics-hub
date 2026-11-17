@@ -1,0 +1,54 @@
+{
+  "rows": [
+    {
+      "relation": "commissions",
+      "rows": 39,
+      "unchanged": true
+    },
+    {
+      "relation": "commission_people",
+      "rows": 60,
+      "unchanged": true
+    },
+    {
+      "relation": "commission_responsibles",
+      "rows": 64,
+      "unchanged": true
+    },
+    {
+      "relation": "cronograma_eventos",
+      "rows": 348,
+      "unchanged": true
+    },
+    {
+      "relation": "cronograma_evento_comissoes",
+      "rows": 419,
+      "unchanged": true
+    },
+    {
+      "relation": "cronograma_evento_responsaveis",
+      "rows": 630,
+      "unchanged": true
+    },
+    {
+      "relation": "cronograma_evento_logs",
+      "rows": 505,
+      "unchanged": true
+    },
+    {
+      "relation": "cronograma_evento_anexos",
+      "rows": 35,
+      "unchanged": true
+    },
+    {
+      "relation": "cronograma_unidade_anexos",
+      "rows": 0,
+      "unchanged": true
+    },
+    {
+      "relation": "cronograma_subeventos",
+      "rows": 6,
+      "unchanged": true
+    }
+  ]
+}
