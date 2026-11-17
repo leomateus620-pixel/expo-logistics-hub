@@ -1,3 +1,6 @@
+import { EventCenterForecourt } from './EventCenterForecourt';
+import { VisitorGateGrille, VisitorGateFences } from './VisitorGateGrilles';
+import { isVisitorGrilleGate, visitorGateProfile } from '../../utils/visitorGateArchitecture';
 import { InteriorViewControls } from '../InteriorViewControls';
 import { PavilionConnectedComplex } from './pavilions/PavilionConnectedComplex';
 import { PavilionTreePitEdges } from './pavilions/PavilionTreePitEdges';
@@ -919,6 +922,7 @@ interface EntityMeshProps {
   nationsDistrictPresentationAvailable: boolean;
   exporuralSteakhousePresentationAvailable: boolean;
   brigadaWingPresentationHeight?: number;
+  visitorGatePresentation?: NonNullable<ReturnType<typeof visitorGateProfile>>;
   exporuralRestroomEntityId?: string;
   reducedTruckGraphics?: boolean;
   isMatch: boolean;
@@ -943,6 +947,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   nationsDistrictPresentationAvailable,
   exporuralSteakhousePresentationAvailable,
   brigadaWingPresentationHeight,
+  visitorGatePresentation,
   isMatch,
   layerOpacity,
   sceneCenter,
@@ -958,6 +963,8 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const isPavilion = classification === 'PAVILION';
   const isGate = classification === 'GATE';
   const isRearGate5 = isGate && entity.publicIdentifier === 'A5';
+  const grilleGate = isGate && isVisitorGrilleGate(entity.publicIdentifier) ? entity.publicIdentifier : null;
+  const grilleProfile = grilleGate ? (visitorGatePresentation ?? visitorGateProfile(grilleGate)) : null;
   const detailedParkAccessHitArea = isGate
     ? DETAILED_PARK_ACCESS_GATE_HIT_AREAS.get(entity.publicIdentifier)
     : undefined;
@@ -1036,10 +1043,10 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const markerCenter = useMemo(() => isRearGate5
     ? REAR_GATE_5_PRESENTATION.center
     : geometryCentroid(entity.geometry), [entity.geometry, isRearGate5]);
-  const gateRotation = useMemo(() => isRearGate5 ? REAR_GATE_5_PRESENTATION.rotation : Math.atan2(
+  const gateRotation = useMemo(() => grilleGate ? 0 : isRearGate5 ? REAR_GATE_5_PRESENTATION.rotation : Math.atan2(
     sceneCenter[0] - markerCenter[0],
     sceneCenter[1] - markerCenter[1],
-  ), [isRearGate5, markerCenter, sceneCenter]);
+  ), [grilleGate, isRearGate5, markerCenter, sceneCenter]);
   const gateAccessMode = useMemo(() => resolveGateAccessMode(entity.name), [entity.name]);
   const baseColor = openGroundProfile
     ? openGroundProfile.baseColor
@@ -1061,7 +1068,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   // even while selected. Selection is already conveyed by emissive tint and
   // outline; lifting the whole slab made it overtake roads at oblique angles.
   const selectedLift = selected
-    ? openGroundProfile || usesBrigadaWingPresentation ? 0 : isFlat ? 0.055 : 0.11
+    ? openGroundProfile || usesBrigadaWingPresentation || grilleGate ? 0 : isFlat ? 0.055 : 0.11
     : 0;
   const displayColor = useMemo(() => {
     if (!solidRendering || selected) return baseColor;
@@ -1188,7 +1195,12 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
 
       {isGate && (
         <group position={[markerCenter[0], 0, markerCenter[1]]} rotation={[0, gateRotation, 0]}>
-          {detailedParkAccessHitArea ? (
+          {grilleProfile ? (
+            <mesh position={[grilleProfile.centerX, grilleProfile.height / 2, grilleProfile.width / 4 - 0.015]} {...interactionProps}>
+              <boxGeometry args={[grilleProfile.width + 0.18, grilleProfile.height + 0.08, grilleProfile.width / 2 + 0.16]} />
+              <meshBasicMaterial visible={false} />
+            </mesh>
+          ) : detailedParkAccessHitArea ? (
             <mesh
               position={[0, detailedParkAccessHitArea.height / 2, 0]}
               rotation={[0, detailedParkAccessHitArea.rotationRadians - gateRotation, 0]}
@@ -1207,7 +1219,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
               <meshBasicMaterial visible={false} />
             </mesh>
           )}
-          {isRearGate5 ? (
+          {grilleGate ? <VisitorGateGrille identifier={grilleGate} profile={grilleProfile!} reducedGraphics={openGroundReducedGraphics} /> : isRearGate5 ? (
             <group name="gate-5-physical-access">
               {[-1, 1].map((side) => (
                 <mesh key={side} position={[side * (REAR_GATE_5_PRESENTATION.clearWidth / 2 + 0.055), 0.44, 0]}
@@ -4962,6 +4974,9 @@ const Scene = memo(function Scene({
   const ubiretamaPresentation = useMemo(() => !isolatedArea
     ? resolveUbiretamaPresentation(entities) : null, [entities, isolatedArea, resolveUbiretamaPresentation]);
   const gateNineAccessPresentation = useMemo(() => buildGateNineAccessPresentation(entities), [entities]);
+  const visitorGateProfiles = useMemo(() => new Map(entities.filter(e => isVisitorGrilleGate(e.publicIdentifier))
+    .map(e => [e.publicIdentifier, visitorGateProfile(e.publicIdentifier, Boolean(gateNineAccessPresentation), entities)!])),
+    [entities, gateNineAccessPresentation]);
   const resolveExporuralSouthRoad = useMemo(createExporuralSouthRoadPresentationResolver, []);
   const exporuralSouthRoadPresentation = useMemo(() => resolveExporuralSouthRoad(entities), [entities, resolveExporuralSouthRoad]);
   const rearRoadDebugVisible = useMemo(() => import.meta.env.DEV
@@ -5587,6 +5602,12 @@ const Scene = memo(function Scene({
         />
         </EssentialSceneLayer>
       )}
+      <EventCenterForecourt entities={entities} reducedGraphics={reducedGraphics}
+        visible={!hydrologicalModeActive && exteriorRenderedEntities.some(e => e.publicIdentifier === 'C1'
+          && ((layerOpacity[e.layerId] ?? 1) > 0.015 || selectedEntityId === e.id))} />
+      {parkAccessScope && <VisitorGateFences entities={entities} reducedGraphics={reducedGraphics}
+        visible={!hydrologicalModeActive && exteriorRenderedEntities.some(e => isVisitorGrilleGate(e.publicIdentifier)
+          && ((layerOpacity[e.layerId] ?? 1) > 0.015 || selectedEntityId === e.id))} />}
       {parkAccessScope && (
         <group visible={!hydrologicalModeActive}>
           {parkAccessScope === 'all' && (
@@ -5669,6 +5690,7 @@ const Scene = memo(function Scene({
           exporuralSteakhousePresentationAvailable={exporuralSteakhousePresentationAvailable}
           brigadaWingPresentationHeight={brigadaWingPresentationAvailable && entity.id === brigadaWing?.entityId
             ? brigadaWing.height : undefined}
+          visitorGatePresentation={visitorGateProfiles.get(entity.publicIdentifier)}
           exporuralRestroomEntityId={exporuralRestroomEntityId}
           reducedTruckGraphics={kind === 'chopp-truck' && renderQualityTier === 'LOW'}
           isMatch={presentedMatchingEntityIds.has(entity.id)}

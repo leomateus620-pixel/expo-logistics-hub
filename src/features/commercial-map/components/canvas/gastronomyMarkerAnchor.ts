@@ -1,7 +1,8 @@
 import type { MapEntity } from '../../types';
 import { choppTruckRoofAnchor } from '../../utils/choppTruck';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
-import { eventCenterEnvelope, eventCenterModelBounds } from '../../utils/eventCenter';
+import { eventCenterModelBounds } from '../../utils/eventCenter';
+import { eventCenterArchitectureDimensions } from '../../utils/eventCenterArchitecture';
 import { EXPORURAL_STEAKHOUSE_LAYOUT, resolveExporuralSteakhouseDimensions } from '../../utils/exporuralSteakhouse';
 import { createFenasojaRestaurantLayout } from '../../utils/fenasojaRestaurant';
 import { createGastronomicAlamedaLayout, fitRotatedStructureBounds } from '../../utils/fenasojaReferenceStructures';
@@ -37,10 +38,8 @@ export function resolveGastronomyMarkerAnchor(entity: MapEntity): [number, numbe
 
   switch (resolveStrategicLandmarkKind(entity)) {
     case 'fenasoja-event-center': {
-      const envelope = eventCenterEnvelope(eventCenterModelBounds(bounds));
-      // The entrance cross gable passes over the centre of the main hall.
-      const crossGableRidge = 0.085 + height * (0.48 * 0.95 + 0.43 * 1.02);
-      return onRoof(0, crossGableRidge, envelope.hallRearOffset);
+      const { marker } = eventCenterArchitectureDimensions(eventCenterModelBounds(bounds, yaw), height);
+      return onRoof(...marker);
     }
     case 'fenasoja-restaurant': {
       // The presentation has already merged C2 and C3. Use the hall ridge

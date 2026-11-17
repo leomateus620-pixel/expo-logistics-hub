@@ -1,3 +1,4 @@
+import { eventCenterForecourtTreeProfile } from '../../utils/eventCenterForecourtTrees';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -655,18 +656,19 @@ function CommercialTreeInstances({
       const trunkPalette = (referenceQuadras ? QUADRAS_AB_TRUNK_PALETTES : TRUNK_PALETTES)[tree.speciesGroup];
       const foliagePalette = (referenceQuadras ? QUADRAS_AB_FOLIAGE_PALETTES : COMMERCIAL_TREE_FOLIAGE_PALETTES)[tree.speciesGroup];
       const profile = commercialTreePresentationProfile(tree);
-      const wood = commercialTreeWoodStructure(tree);
+      const forecourt = eventCenterForecourtTreeProfile(tree);
+      const wood = forecourt?.wood ?? commercialTreeWoodStructure(tree);
 
       transform.position.set(x, groundY + wood.trunkHeight / 2, z);
       transform.rotation.set(0, profile.rotation, 0);
       transform.scale.set(
-        tree.trunkRadius * profile.trunkScaleX * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
+        tree.trunkRadius * profile.trunkScaleX * (forecourt?.trunkRadiusScale ?? 1) * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
         wood.trunkHeight,
-        tree.trunkRadius * profile.trunkScaleZ * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
+        tree.trunkRadius * profile.trunkScaleZ * (forecourt?.trunkRadiusScale ?? 1) * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
       );
       transform.updateMatrix();
       trunkMesh.setMatrixAt(treeIndex, transform.matrix);
-      trunkColor.set(trunkPalette[tree.visualVariant % trunkPalette.length]);
+      trunkColor.set(forecourt?.barkColor ?? trunkPalette[tree.visualVariant % trunkPalette.length]);
       trunkMesh.setColorAt(treeIndex, trunkColor);
 
       for (let branchIndex = 0; branchIndex < COMMERCIAL_TREE_BRANCHES; branchIndex += 1) {
@@ -674,16 +676,16 @@ function CommercialTreeInstances({
         const angle = profile.rotation + tree.visualVariant * 0.71 + branchIndex * Math.PI * 0.93;
         start.set(x, groundY + wood.branches[branchIndex].startY, z);
         end.set(
-          x + Math.cos(angle) * tree.canopyRadius * 0.3,
+          x + Math.cos(angle) * tree.canopyRadius * 0.3 * (forecourt?.branchSpreadScale ?? 1),
           groundY + wood.branches[branchIndex].endY,
-          z + Math.sin(angle) * tree.canopyRadius * 0.3,
+          z + Math.sin(angle) * tree.canopyRadius * 0.3 * (forecourt?.branchSpreadScale ?? 1),
         );
         direction.subVectors(end, start);
         midpoint.addVectors(start, end).multiplyScalar(0.5);
         quaternion.setFromUnitVectors(UNIT_Y, direction.clone().normalize());
         transform.position.copy(midpoint);
         transform.quaternion.copy(quaternion);
-        const branchRadius = tree.trunkRadius * 0.52 * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1);
+        const branchRadius = tree.trunkRadius * 0.52 * (forecourt?.branchRadiusScale ?? 1) * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1);
         transform.scale.set(branchRadius, direction.length(), branchRadius);
         transform.updateMatrix();
         branchMesh.setMatrixAt(instanceIndex, transform.matrix);
@@ -696,7 +698,7 @@ function CommercialTreeInstances({
         const lobe = crownLobeTransform(tree, lobeIndex, lobeCount, referenceQuadras);
         transform.position.set(
           x + lobe.offsetX,
-          crownBaseY + lobe.offsetY + lobe.lift,
+          crownBaseY + lobe.offsetY + lobe.lift + (forecourt?.crownLift ?? 0),
           z + lobe.offsetZ,
         );
         transform.rotation.set(referenceQuadras ? 0 : lobe.rotation * 0.08, lobe.rotation, referenceQuadras ? 0 : -lobe.rotation * 0.045);
@@ -705,7 +707,11 @@ function CommercialTreeInstances({
         // Close-up QA: .99 replaces .86 (about +32% nominal scaled area),
         // keeping the authored lobe centers and the existing shared leaf atlas.
         const openCrown = tree.id === EXPORURAL_SCENE_CORRECTIONS.tree.id ? .99 : 1;
-        transform.scale.set(lobe.scaleX * openCrown, lobe.scaleY * openCrown, lobe.scaleZ * openCrown);
+        transform.scale.set(
+          lobe.scaleX * openCrown * (forecourt?.crownScaleXZ ?? 1),
+          lobe.scaleY * openCrown * (forecourt?.crownScaleY ?? 1),
+          lobe.scaleZ * openCrown * (forecourt?.crownScaleXZ ?? 1),
+        );
         transform.updateMatrix();
         crownMesh.setMatrixAt(instanceIndex, transform.matrix);
         const foliageIndex = (

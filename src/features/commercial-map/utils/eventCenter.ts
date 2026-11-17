@@ -1,6 +1,6 @@
 import { commercialPavilionModelBounds } from './commercialPavilions';
 
-export const FENASOJA_EVENT_CENTER_REVISION = '2026.9-event-center-qe12.1';
+export const FENASOJA_EVENT_CENTER_REVISION = '2026.11-event-center-architecture.2';
 
 /**
  * Cartographic alignment of Centro de Eventos Fenasoja (C1) to lot Q-E-12.
@@ -19,11 +19,11 @@ export const EVENT_CENTER_QE12_ALIGNMENT = Object.freeze({
 });
 
 /**
- * Architectural reading of attachments IMG_9673–IMG_9675.
+ * Cartographic envelope inherited from the existing C1 model.
  *
  * The official 2026 map remains the cartographic authority for placement and
- * footprint. The photographs only inform the composition inside that envelope:
- * a long, low hall, a light multi-pitch roof, and a dark central entrance gable.
+ * footprint. The current screenshots and architectural inspiration guide the
+ * visual revision; missing lateral/aerial photographs are not survey evidence.
  */
 export const FENASOJA_EVENT_CENTER_LAYOUT = {
   sourceBounds: [4020, 3180, 4490, 3435] as const,
@@ -36,21 +36,21 @@ export const FENASOJA_EVENT_CENTER_LAYOUT = {
     depthRatio: 0.94,
     hallDepthRatio: 0.69,
     hallRearOffsetRatio: -0.09,
-    entranceWidthRatio: 0.225,
+    entranceWidthRatio: 0.386,
   },
   identity: {
     symbolAsset: '/alvorada/fenasoja-symbol-official.png',
     wordmark: 'FENASOJA',
   },
   palette: {
-    wall: '#a7a6a0',
-    wallLight: '#d6d4cb',
-    roof: '#c8cbca',
-    roofEdge: '#e3e4df',
+    wall: '#dedbd1',
+    wallLight: '#e2ded3',
+    roof: '#818b89',
+    roofEdge: '#9ea7a0',
     fronton: '#20272a',
     glass: '#27464b',
-    metal: '#697477',
-    concrete: '#85857d',
+    metal: '#7d8784',
+    concrete: '#a7a496',
     landscape: '#315e3d',
   },
 } as const;
@@ -61,19 +61,13 @@ export const FENASOJA_EVENT_CENTER_LAYOUT = {
  * roof and landscape details are instanced or batched by material.
  */
 export const FENASOJA_EVENT_CENTER_RENDER_BUDGET = {
-  basePrimaryDrawCalls: 9,
-  detailPrimaryDrawCalls: 13,
+  // Night + selected overlay, bounded by compiled geometry tests. Actual GL
+  // submissions are recorded separately in docs/validation/event-center-2026-11-17.
+  basePrimaryDrawCalls: 14,
+  detailPrimaryDrawCalls: 15,
   focusPrimaryDrawCalls: 15,
-  measuredModelBasePrimaryDrawCalls: 7,
-  measuredModelDetailPrimaryDrawCalls: 10,
-  measuredModelFocusPrimaryDrawCalls: 11,
-  measuredBaseWithOverlayDrawCalls: 9,
-  measuredDetailWithOverlayDrawCalls: 12,
-  measuredFocusWithOverlayDrawCalls: 13,
-  maxRepeatedOrBatchedElements: 96,
-  measuredFocusRepeatedOrBatchedElements: 90,
-  maxApproximateTriangles: 1_800,
-  measuredFocusApproximateTriangles: 1_592,
+  maxRepeatedOrBatchedElements: 850,
+  maxApproximateTriangles: 11_000,
 } as const;
 
 export interface EventCenterFootprint {
@@ -107,14 +101,14 @@ export function eventCenterVisualHeight(footprint: EventCenterFootprint): number
  * the long hall remains inside the official east-west C1 envelope after yaw.
  */
 export function eventCenterCardinalFacingRadians(
-  facingRadians = FENASOJA_EVENT_CENTER_LAYOUT.facingRadians,
+  facingRadians: number = FENASOJA_EVENT_CENTER_LAYOUT.facingRadians,
 ): number {
   return Math.round(facingRadians / (Math.PI / 2)) * (Math.PI / 2);
 }
 
 export function eventCenterModelBounds<Bounds extends EventCenterFootprint>(
   bounds: Bounds,
-  facingRadians = FENASOJA_EVENT_CENTER_LAYOUT.facingRadians,
+  facingRadians: number = FENASOJA_EVENT_CENTER_LAYOUT.facingRadians,
 ): Bounds {
   return commercialPavilionModelBounds(bounds, eventCenterCardinalFacingRadians(facingRadians));
 }

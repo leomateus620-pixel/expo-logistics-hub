@@ -1,0 +1,100 @@
+{
+  "phase": "before",
+  "gates": [
+    {
+      "id": "reference:2026:a7",
+      "identifier": "A7",
+      "center": [
+        -1.8109090909090906,
+        -27.752727412048195
+      ]
+    },
+    {
+      "id": "reference:2026:a8",
+      "identifier": "A8",
+      "center": [
+        40.49454545454546,
+        -36.501818365060245
+      ]
+    },
+    {
+      "id": "reference:2026:a9",
+      "identifier": "A9",
+      "center": [
+        13.396363636363635,
+        -36.501818365060245
+      ]
+    },
+    {
+      "id": "reference:2026:a11",
+      "identifier": "A11",
+      "center": [
+        56.81454545454545,
+        -36.69818200240964
+      ]
+    }
+  ],
+  "errors": [],
+  "interactions": {},
+  "map": {
+    "at": 16727.199999999255,
+    "deltaMs": 14.699999999254942,
+    "visible": true,
+    "focused": true,
+    "position": [
+      28,
+      43,
+      -59
+    ],
+    "quaternion": [
+      0,
+      0.8710394190015726,
+      0.4912131213082595,
+      0
+    ],
+    "target": [
+      28,
+      0,
+      -33
+    ],
+    "projection": [
+      2.0380427211760157,
+      0,
+      0,
+      0,
+      0,
+      2.9042108776758226,
+      0,
+      0,
+      0,
+      0,
+      -1.0003263703303564,
+      -1,
+      0,
+      0,
+      -0.4188131504889226,
+      0
+    ],
+    "width": 1425,
+    "height": 1000,
+    "dpr": 1,
+    "sunVisible": true,
+    "sunIntensity": 2.46,
+    "sunPosition": [
+      -3.089995454545452,
+      84.99529937767083,
+      -191.28574982984622
+    ],
+    "shadowVersion": 1,
+    "sunrise": "complete",
+    "night": false,
+    "navigating": false,
+    "programs": 274,
+    "calls": 272,
+    "geometries": 644,
+    "textures": 148,
+    "triangles": 566488,
+    "rain": false,
+    "hydrology": false
+  }
+}
