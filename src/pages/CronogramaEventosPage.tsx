@@ -69,7 +69,6 @@ import {
   isCronogramaCycleYear,
   type CronogramaCycleYear,
 } from '@/lib/cronograma-cycle';
-import { isVisibleInCentralTimeline } from '@/lib/cronograma-eventos';
 import { filterCronogramaAgendaMode } from '@/lib/cronograma-agenda-mode';
 import { cronogramaSaveSuccessMessage } from '@/lib/cronograma-rpc';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
@@ -229,11 +228,7 @@ export default function CronogramaEventosPage() {
   );
   const eventsForView = useMemo(() => {
     if (filters.scopeEventIds?.length) return events;
-    if (activeView === 'timeline') return eventBuckets.timeline.filter((event) => isVisibleInCentralTimeline({
-      originSource: event.originSource,
-      commissionSlug: event.commission ?? null,
-      linkedCommissions: (event.relatedCommissionIds ?? []).map((slug) => ({ slug })),
-    }));
+    if (activeView === 'timeline') return eventBuckets.timeline;
     if (activeView === 'completed') return eventBuckets.completed;
     // Pendências: a exclusão de concluídos/cancelados é aplicada pelo board,
     // depois dos filtros globais — aqui a visão recebe o universo completo.
@@ -478,7 +473,7 @@ export default function CronogramaEventosPage() {
       : null;
     setDrawerStartsEditing(edit);
     setDrawerOpen(true);
-    const identity = event.sourceKey ?? event.id;
+    const identity = event.id || event.sourceKey;
     setSearchParams((current) => {
       const next = new URLSearchParams(current);
       if (identity) next.set('event', identity);
@@ -492,7 +487,7 @@ export default function CronogramaEventosPage() {
   useEffect(() => {
     if (!deepLinkEvent) return;
     if (cronograma.isLoading) return;
-    const current = selectedEvent?.sourceKey ?? selectedEvent?.id;
+    const current = selectedEvent?.id || selectedEvent?.sourceKey;
     if (drawerOpen && current === deepLinkEvent) return;
     // Authorized direct links remain usable; an out-of-mode detail carries an explicit notice.
     const match = allAuthorizedEvents.find((event) => event.id === deepLinkEvent || event.sourceKey === deepLinkEvent);
@@ -513,7 +508,7 @@ export default function CronogramaEventosPage() {
     setPresentationLock(null);
     setSearchParams((current) => {
       const next = new URLSearchParams(current);
-      next.set('workspace', event.sourceKey ?? event.id);
+      next.set('workspace', event.id || event.sourceKey);
       return next;
     });
     window.setTimeout(() => window.scrollTo({ left: 0, top: 0, behavior: 'auto' }), 0);
@@ -543,7 +538,7 @@ export default function CronogramaEventosPage() {
         return next;
       }, { replace: true });
       const { x, y } = timelinePositionRef.current;
-      const closingEventIdentity = selectedEvent?.sourceKey ?? selectedEvent?.id;
+      const closingEventIdentity = selectedEvent?.id || selectedEvent?.sourceKey;
       window.setTimeout(() => {
         if (workspaceTransitionRef.current) {
           workspaceTransitionRef.current = false;
@@ -554,7 +549,7 @@ export default function CronogramaEventosPage() {
           setSelectedEvent((current) => (
             shouldReleaseClosedMobileSelection(
               overlayOpenRef.current.drawer,
-              current?.sourceKey ?? current?.id,
+              current?.id || current?.sourceKey,
               closingEventIdentity,
             ) ? null : current
           ));
@@ -653,7 +648,7 @@ export default function CronogramaEventosPage() {
 
 
   const handleCompleteEvent = async (event: CronogramaEvent) => {
-    if (!cronograma.canWriteEvents) {
+    if (!cronograma.canEditEvent(event.id)) {
       throw new Error(
         'A conclusão exige conexão com a base sincronizada. O evento foi mantido na Linha do tempo sem alterações.',
       );
@@ -745,7 +740,7 @@ export default function CronogramaEventosPage() {
       storage: 'relational',
     }, workspaceEvent.subevents?.length ?? 0);
     const result = await cronograma.createSubevent.mutateAsync({
-      eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
+      eventId: workspaceEvent.id || workspaceEvent.sourceKey,
       draft,
       requestId: input.requestId,
     });
@@ -769,7 +764,7 @@ export default function CronogramaEventosPage() {
       commissionSlug: input.commissionSlug || undefined,
     }, subevent.sortOrder ?? 0);
     await cronograma.updateSubevent.mutateAsync({
-      eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
+      eventId: workspaceEvent.id || workspaceEvent.sourceKey,
       subeventId: subevent.id,
       draft,
     });
@@ -780,7 +775,7 @@ export default function CronogramaEventosPage() {
       throw new Error('Não foi possível identificar este subevento. Atualize a página e tente novamente.');
     }
     await cronograma.deleteSubevent.mutateAsync({
-      eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
+      eventId: workspaceEvent.id || workspaceEvent.sourceKey,
       subeventId: subevent.id,
     });
   };
@@ -789,7 +784,7 @@ export default function CronogramaEventosPage() {
     if (!workspaceEvent) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
     const existingCount = workspaceEvent.subevents?.length ?? 0;
     await cronograma.saveSubeventPlan.mutateAsync({
-      eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
+      eventId: workspaceEvent.id || workspaceEvent.sourceKey,
       subevents: items.map((item, index) => {
         const draft = visualSubeventToSourceDraft({
           id: item.id,
@@ -1125,6 +1120,7 @@ export default function CronogramaEventosPage() {
               onRemoveSubevent={handleRemoveSubevent}
               onSaveSubeventPlan={handleSaveSubeventPlan}
               canManage={cronograma.canManage}
+              canEditMain={cronograma.canEditEvent(workspaceEvent.id)}
               canDeleteSubevents={cronograma.canDeleteSubevents}
               relationshipsUnavailable={cronograma.relationshipSyncUnavailable}
               pendingRelationshipCount={cronograma.pendingRelationshipCount}
@@ -1227,8 +1223,8 @@ export default function CronogramaEventosPage() {
             onEditWorkspace={openWorkspace}
             onDelete={handleDeleteEvent}
             startInEdit={drawerStartsEditing}
-            canManage={cronograma.canManage}
-            canDelete={cronograma.canDeleteSubevents}
+            canManage={Boolean(selectedEvent && cronograma.canEditEvent(selectedEvent.id))}
+            canDelete={Boolean(selectedEvent && cronograma.canDeleteEvent(selectedEvent.id))}
             returnFocusRef={drawerReturnFocusRef}
             history={eventHistory.entries}
             historyLoading={eventHistory.isLoading}
@@ -1248,8 +1244,8 @@ export default function CronogramaEventosPage() {
           onEditWorkspace={openWorkspace}
           onDelete={handleDeleteEvent}
           startInEdit={drawerStartsEditing}
-          canManage={cronograma.canManage}
-          canDelete={cronograma.canDeleteSubevents}
+          canManage={Boolean(selectedEvent && cronograma.canEditEvent(selectedEvent.id))}
+          canDelete={Boolean(selectedEvent && cronograma.canDeleteEvent(selectedEvent.id))}
           returnFocusRef={drawerReturnFocusRef}
           history={eventHistory.entries}
           historyLoading={eventHistory.isLoading}

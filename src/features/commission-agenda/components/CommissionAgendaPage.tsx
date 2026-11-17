@@ -55,7 +55,10 @@ export interface CommissionAgendaPageProps extends AgendaCallbacks {
   /** Presentation-only resolvers for the detail panel. */
   getEventDocuments?: (eventId: string) => DocumentViewModel[];
   getEventHistory?: (eventId: string) => EventHistoryEntry[];
-  onSubmitEvent?: (draft: AgendaEventDraft, editing: AgendaEventViewModel | null) => void | boolean | Promise<void | boolean>;
+  onSubmitEvent?: (draft: AgendaEventDraft, editing: AgendaEventViewModel | null) => boolean | Promise<boolean>;
+  canCreate?: boolean;
+  canEditEvent?: (event: AgendaEventViewModel['id']) => boolean;
+  ownerUnitId?: string;
   /** Initial filter overrides (e.g. from the URL). */
   initialFilters?: Partial<AgendaFilterState>;
   className?: string;
@@ -80,6 +83,9 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
   getEventDocuments,
   getEventHistory,
   onSubmitEvent,
+  canCreate = true,
+  canEditEvent = () => true,
+  ownerUnitId,
   initialFilters,
   className,
   compactSummary = false,
@@ -148,11 +154,13 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
     onOpenEvent?.(event);
   };
   const openCreate = () => {
+    if (!canCreate) return;
     setEditingEvent(null);
     setFormOpen(true);
     onCreateEvent?.();
   };
   const openEdit = (event: AgendaEventViewModel) => {
+    if (!canEditEvent(event.id)) return;
     setEditingEvent(event);
     setDetailOpen(false);
     setFormOpen(true);
@@ -161,7 +169,7 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
   const openDocuments = (event?: AgendaEventViewModel) => onOpenDocuments?.(event);
   const submitEvent = async (draft: AgendaEventDraft) => {
     const saved = await onSubmitEvent?.(draft, editingEvent);
-    if (saved === false) return false;
+    if (saved !== true) return false;
     setFormOpen(false);
     return true;
   };
@@ -197,7 +205,7 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
       </div>
 
       {isEmptyAgenda ? (
-        <AgendaNoEventsState unitLabel={unitLabel} onCreateEvent={openCreate} />
+        <AgendaNoEventsState unitLabel={unitLabel} onCreateEvent={canCreate ? openCreate : undefined} />
       ) : (
         <>
           <section className="ua-command-surface" aria-label="Busca e filtros da agenda">
@@ -232,7 +240,7 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
                 hasAnyFilter ? (
                   <AgendaSearchEmptyState onClear={clearFilters} />
                 ) : (
-                  <AgendaNoEventsState unitLabel={unitLabel} onCreateEvent={openCreate} />
+                  <AgendaNoEventsState unitLabel={unitLabel} onCreateEvent={canCreate ? openCreate : undefined} />
                 )
               ) : (
                 <AgendaTimeline
@@ -241,6 +249,7 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
                   todayKey={todayKey}
                   onOpen={openEvent}
                   onEdit={openEdit}
+                  canEdit={canEditEvent}
                   onOpenDocuments={openDocuments}
                   onOpenHistory={openEvent}
                 />
@@ -282,7 +291,7 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
         todayKey={todayKey}
         documents={selectedEvent ? getEventDocuments?.(selectedEvent.id) ?? documents.filter((document) => document.eventId === selectedEvent.id) : []}
         history={selectedEvent ? getEventHistory?.(selectedEvent.id) ?? [] : []}
-        onEdit={openEdit}
+        onEdit={selectedEvent && canEditEvent(selectedEvent.id) ? openEdit : undefined}
         onOpenDocuments={openDocuments}
         onOpenDocument={onOpenDocument}
         onDownloadDocument={onDownloadDocument}
@@ -293,8 +302,8 @@ export const CommissionAgendaPage = forwardRef<CommissionAgendaPageHandle, Commi
         open={formOpen}
         onOpenChange={setFormOpen}
         event={editingEvent}
-        unitId={unit.id}
-        unitLabel={unit.shortName ?? unit.name}
+        unitId={editingEvent?.ownerUnit?.commissionId ?? ownerUnitId ?? unit.id}
+        unitLabel={editingEvent?.ownerUnit?.name ?? unit.shortName ?? unit.name}
         peopleOptions={peopleOptions ?? people}
         unitOptions={unitOptions}
         onSubmit={submitEvent}

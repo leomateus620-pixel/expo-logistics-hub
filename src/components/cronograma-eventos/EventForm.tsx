@@ -125,6 +125,8 @@ export function EventForm({
   showSubevents?: boolean;
   showRelational?: boolean;
 }) {
+  const submissionPending = useRef(false);
+  const [localSubmitError, setLocalSubmitError] = useState<string | null>(null);
   const formInstanceId = useId().replace(/:/g, '');
   const fieldId = (name: string) => `${formInstanceId}-${name}`;
   const { user } = useAuth();
@@ -279,9 +281,9 @@ export function EventForm({
 
 
 
-  const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (submitEvent: FormEvent<HTMLFormElement>) => {
     submitEvent.preventDefault();
-    if (isSaving) return;
+    if (isSaving || submissionPending.current) return;
 
     const normalizedDate = form.date?.trim() ? form.date : null;
     const rangeEndDate = multiDay && normalizedDate && form.endDate?.trim() ? form.endDate.trim() : null;
@@ -335,25 +337,33 @@ export function EventForm({
     });
     const primaryResponsible = normalizedResponsibles.find((link) => link.isPrimary);
 
-    onSubmit({
-      ...form,
-      title: form.title.trim(),
-      summary: form.summary.trim(),
-      date: normalizedDate,
-      endDate: spansDays ? rangeEndDate : normalizedDate,
-      year: nextYear,
-      startTime: form.startTime?.trim() || undefined,
-      endTime: form.endTime?.trim() || undefined,
-      location: form.location?.trim() || undefined,
-      locationCode: form.locationCode ?? locationCodeForText(form.location),
-      owner: primaryResponsible?.name?.trim() || currentUserName || form.owner?.trim() || undefined,
-      commission: form.commission?.trim() || undefined,
-      pendingReason: form.pendingReason?.trim() || undefined,
-      decisionNeeded: form.decisionNeeded?.trim() || undefined,
-      subevents: normalizedSubevents,
-      commissionsRel: selectionsToCommissionLinks(commissionSelections, commissions),
-      responsiblesRel: normalizedResponsibles,
-    });
+    submissionPending.current = true;
+    setLocalSubmitError(null);
+    try {
+      await onSubmit({
+        ...form,
+        title: form.title.trim(),
+        summary: form.summary.trim(),
+        date: normalizedDate,
+        endDate: spansDays ? rangeEndDate : normalizedDate,
+        year: nextYear,
+        startTime: form.startTime?.trim() || undefined,
+        endTime: form.endTime?.trim() || undefined,
+        location: form.location?.trim() || undefined,
+        locationCode: form.locationCode ?? locationCodeForText(form.location),
+        owner: primaryResponsible?.name?.trim() || currentUserName || form.owner?.trim() || undefined,
+        commission: form.commission?.trim() || undefined,
+        pendingReason: form.pendingReason?.trim() || undefined,
+        decisionNeeded: form.decisionNeeded?.trim() || undefined,
+        subevents: normalizedSubevents,
+        commissionsRel: selectionsToCommissionLinks(commissionSelections, commissions),
+        responsiblesRel: normalizedResponsibles,
+      });
+    } catch (error) {
+      setLocalSubmitError(error instanceof Error ? error.message : 'Não foi possível salvar. Seus campos foram preservados.');
+    } finally {
+      submissionPending.current = false;
+    }
   };
 
   return (
@@ -691,7 +701,7 @@ export function EventForm({
         </div>
       )}
 
-      {submitError && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-900" role="alert">{submitError}</p>}
+      {(submitError || localSubmitError) && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-900" role="alert">{submitError || localSubmitError}</p>}
 
       {showActions && (
         <div className="flex flex-wrap justify-end gap-2 border-t border-border/50 pt-4">

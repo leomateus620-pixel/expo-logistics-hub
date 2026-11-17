@@ -147,6 +147,7 @@ interface EventDateBadgeProps {
 }
 
 export function EventDateBadge({ date, endDate, showYear = false, size = 'md', emphasis = 'default', className }: EventDateBadgeProps) {
+  if (!date) return <span className={cn('ua-event-date', className)} aria-label="Data a definir"><span className="ws-caption">A definir</span></span>;
   const parts = getDateParts(date);
   const end = endDate && endDate !== date ? getDateParts(endDate) : null;
   return (

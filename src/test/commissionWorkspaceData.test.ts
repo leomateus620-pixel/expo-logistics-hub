@@ -56,8 +56,8 @@ describe('adapter da agenda da unidade', () => {
     expect(event.documentCount).toBe(3);
   });
 
-  it('ignora linhas sem data inicial', () => {
-    expect(toUnitAgendaEvents([row({ start_date: null })])).toHaveLength(0);
+  it('preserva eventos ainda sem data inicial', () => {
+    expect(toUnitAgendaEvents([row({ start_date: null })])[0]).toMatchObject({ id: 'event-1', date: '' });
   });
   it('keeps the original row revision and explicit location identity for editing', () => {
     const [event] = toUnitAgendaEvents([row({ lock_version: 4, source_key: 'stable-source', location_code: 'sala_voluntarios', location: 'CENTRO DE EVENTOS FENASOJA' })]);
@@ -88,8 +88,8 @@ describe('regras centralizadas de acesso', () => {
     expect(canManageDocuments({ memberCommissionIds: [] }, OWNER)).toBe(false);
   });
 
-  it('mantém eventos internos fora da agenda central', () => {
-    expect(canViewInCentralAgenda(subject, { centralCommissionId: CENTRAL })).toBe(false);
+  it('inclui todos os eventos autorizados na agenda central', () => {
+    expect(canViewInCentralAgenda(subject, { centralCommissionId: CENTRAL })).toBe(true);
     const withCentral = toAccessSubject(
       row({
         units: [
@@ -103,7 +103,7 @@ describe('regras centralizadas de acesso', () => {
 
   it('aplica a mesma regra na timeline da Agenda Fenasoja', () => {
     expect(isVisibleInCentralTimeline({ originSource: 'agenda_central' })).toBe(true);
-    expect(isVisibleInCentralTimeline({ originSource: 'unidade', commissionSlug: 'mercosul' })).toBe(false);
+    expect(isVisibleInCentralTimeline({ originSource: 'unidade', commissionSlug: 'mercosul' })).toBe(true);
     expect(
       isVisibleInCentralTimeline({ originSource: 'unidade', linkedCommissions: [{ slug: 'central' }] }),
     ).toBe(true);
@@ -153,7 +153,7 @@ describe('formulário da unidade → evento canônico', () => {
   it('preserva o mesmo ID ao editar', () => {
     const payload = draftToSaveEventPayload(baseDraft, {
       ...options,
-      editing: { id: 'event-1', title: 'x', date: '2026-05-04', status: 'confirmed' },
+      editing: { id: 'event-1', title: 'x', date: '2026-05-04', status: 'confirmed', ownerUnit: options.owner, lockVersion: 1 },
     });
     expect(payload.id).toBe('event-1');
     expect(payload.source_key).toBeUndefined();

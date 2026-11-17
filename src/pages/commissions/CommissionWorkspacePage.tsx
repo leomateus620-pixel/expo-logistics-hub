@@ -7,7 +7,8 @@ import { useCapabilities } from '@/hooks/useCapabilities';
 import { getCommissionMapPortal } from '@/modules/commissions/commissionMapPortalRegistry';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useCommissionPeople } from '@/hooks/useCommissionPeople';
-import { useAuth } from '@/hooks/useAuth';
+import { useAgendaPermissions } from '@/hooks/useAgendaPermissions';
+import { useCronogramaRelationOptions } from '@/components/cronograma-eventos/useCronogramaRelationOptions';
 import { useUnitAgenda } from '@/hooks/useUnitAgenda';
 import { useUnitDocuments } from '@/hooks/useUnitDocuments';
 import { toast } from '@/hooks/use-toast';
@@ -33,7 +34,6 @@ import {
   type PersonSummary,
 } from '@/features/commission-agenda';
 import { draftToSaveEventPayload, validateDraft } from '@/features/commission-agenda/lib/event-draft';
-import { canManageDocuments } from '@/features/commission-agenda/lib/visibility';
 import type { AgendaEventDraft } from '@/features/commission-agenda/components/EventFormShell';
 import { SojaStoreWorkspaceRoute } from '@/features/soja-store/components/SojaStoreWorkspaceRoute';
 import { SojaStoreRouteNotice } from '@/features/soja-store/components/SojaStoreRouteNotice';
@@ -55,15 +55,18 @@ function OverviewContent({ store, children }: { store: boolean; children: ReactN
 }
 
 export default function CommissionWorkspacePage({ module, entry }: CommissionWorkspacePageProps) {
-  const { orgId, myRole } = useCurrentOrg();
-  const { user } = useAuth();
+  const { orgId } = useCurrentOrg();
   const { byUnit, isLoading: peopleLoading } = useCommissionPeople();
   const location = useLocation();
   const navigate = useNavigate();
   const { moduleSlug } = useParams();
   const agendaRef = useRef<CommissionAgendaPageHandle>(null);
+  const handledEventId = useRef<string | null>(null);
   const [pendingCreate, setPendingCreate] = useState(false);
   const [saving, setSaving] = useState(false);
+  const submissionPending = useRef(false);
+  const permissions = useAgendaPermissions();
+  const relations = useCronogramaRelationOptions();
 
   const isSojaStore = entry.id === SOJA_STORE_UNIT;
   const currentBasePath = moduleSlug ? `/comissoes/${moduleSlug}` : module.basePath;
@@ -79,16 +82,18 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
     events,
     metrics,
     identityLoading,
+    identityError,
     isLoading: agendaLoading,
     isError,
     refetch,
     invalidate,
+    cacheSavedEvent,
   } = useUnitAgenda(entry.id);
   const storeAccess = useSojaStoreAccess(isSojaStore ? commissionIdBySlug : null);
 
   const unit = useMemo(
-    () => toCommissionUnitViewModel({ module, entry, people: byUnit.get(entry.id) }),
-    [module, entry, byUnit],
+    () => toCommissionUnitViewModel({ module: { ...module, basePath: currentBasePath }, entry, people: byUnit.get(entry.id) }),
+    [module, entry, byUnit, currentBasePath],
   );
 
   const eventTitles = useMemo(() => {
@@ -109,35 +114,33 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
 
   const peopleOptions = useMemo<PersonSummary[]>(() => {
     const map = new Map<string, PersonSummary>();
-    for (const person of [...unit.leads, ...unit.members]) map.set(person.id, person);
+    const directory = new Map(relations.units.flatMap(area => area.responsibles.map(person => [person.personId ?? person.userId ?? person.id, person] as const)));
+    for (const option of relations.responsibleOptions) {
+      const personId = option.id.startsWith('person:') ? option.id.slice(7) : undefined;
+      const id = personId ?? option.id;
+      const person = directory.get(id);
+      map.set(id, { id, personId, name: option.label, role: option.description ?? option.hint,
+        unitLabel: option.context, userId: person?.userId ?? (!personId && !id.startsWith('legacy:') ? id : null),
+        photoUrl: person?.photoUrl, legacyPhoto: person?.legacyPhoto });
+    }
     for (const event of events) {
       for (const person of event.people ?? []) if (!map.has(person.id)) map.set(person.id, person);
     }
     return Array.from(map.values());
-  }, [unit.leads, unit.members, events]);
+  }, [relations.units, relations.responsibleOptions, events]);
 
-  const memberCommissionIds = useMemo(() => {
-    if (!user || !commissionId) return [] as string[];
-    const belongs = [...unit.leads, ...unit.members].some((person) => person.userId === user.id);
-    return belongs ? [commissionId] : [];
-  }, [user, commissionId, unit.leads, unit.members]);
-
-  const accessContext = useMemo(
-    () => ({ userId: user?.id ?? null, orgRole: (myRole ?? null) as never, memberCommissionIds }),
-    [user?.id, myRole, memberCommissionIds],
-  );
-
-  const mayManageDocuments = canManageDocuments(accessContext, commissionId);
+  const mayManageDocuments = permissions.canCreateInUnit(commissionId);
 
   const state: AgendaLoadState = isError ? 'error' : agendaLoading || peopleLoading ? 'loading' : 'ready';
+  const canCreate = permissions.canCreateInUnit(commissionId) && !identityError;
 
   const navigation = useMemo(
-    () => buildWorkspaceNavigation(module.basePath, {
+    () => buildWorkspaceNavigation(currentBasePath, {
       agenda: metrics.total || events.length,
       team: unit.leads.length + unit.members.length,
       documents: documents.length,
     }),
-    [module.basePath, metrics.total, events.length, unit.leads.length, unit.members.length, documents.length],
+    [currentBasePath, metrics.total, events.length, unit.leads.length, unit.members.length, documents.length],
   );
 
   const { hasCapability } = useCapabilities();
@@ -159,18 +162,19 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
     return isSojaStore ? buildSojaStoreMenu(items, storeAccess.isError ? undefined : storeAccess.data) : items;
   }, [navigation, mapPortal, hasCapability, entry.id, isSojaStore, storeAccess.data, storeAccess.isError]);
 
-  const agendaPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.agenda}`;
-  const overviewPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.overview}`;
-  const documentsPath = `${module.basePath}/${WORKSPACE_SECTION_PATHS.documents}`;
+  const agendaPath = `${currentBasePath}/${WORKSPACE_SECTION_PATHS.agenda}`;
+  const overviewPath = `${currentBasePath}/${WORKSPACE_SECTION_PATHS.overview}`;
+  const documentsPath = `${currentBasePath}/${WORKSPACE_SECTION_PATHS.documents}`;
 
   const requestCreate = useCallback(() => {
+    if (!canCreate || submissionPending.current) return;
     if (section === 'agenda' && agendaRef.current) {
       agendaRef.current.openCreate();
       return;
     }
     setPendingCreate(true);
     navigate(agendaPath);
-  }, [section, navigate, agendaPath]);
+  }, [section, navigate, agendaPath, canCreate]);
 
   useEffect(() => {
     if (!pendingCreate || section !== 'agenda') return;
@@ -187,28 +191,29 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         agendaRef.current.openEvent(event);
         return;
       }
-      navigate(agendaPath, { state: { openEventId: event.id } });
+      navigate(`${agendaPath}?event=${encodeURIComponent(event.id)}`);
     },
     [section, navigate, agendaPath],
   );
 
-  const openEventId = (location.state as { openEventId?: string } | null)?.openEventId;
+  const openEventId = new URLSearchParams(location.search).get('event') ?? (location.state as { openEventId?: string } | null)?.openEventId;
   useEffect(() => {
-    if (!openEventId || section !== 'agenda' || state !== 'ready') return;
+    if (!openEventId || section !== 'agenda' || state !== 'ready' || handledEventId.current === openEventId) return;
     const target = events.find((event) => event.id === openEventId);
     const frame = window.requestAnimationFrame(() => {
-      if (target) agendaRef.current?.openEvent(target);
-      navigate(location.pathname, { replace: true, state: null });
+      if (target) { handledEventId.current = openEventId; agendaRef.current?.openEvent(target); }
+      if (!new URLSearchParams(location.search).has('event')) navigate(`${location.pathname}?event=${encodeURIComponent(openEventId)}`, { replace: true, state: null });
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [openEventId, section, state, events, navigate, location.pathname]);
+  }, [openEventId, section, state, events, navigate, location.pathname, location.search]);
 
   const retry = () => void refetch();
 
   const submitEvent = useCallback(
     async (draft: AgendaEventDraft, editing: AgendaEventViewModel | null) => {
+      if (submissionPending.current) return false;
       if (!orgId || !commissionId || !commissionSlug) {
-        toast({ title: 'Não foi possível salvar', description: 'Frente sem cadastro nesta organização.', variant: 'destructive' });
+        toast({ title: 'Não foi possível salvar', description: identityError ?? 'Unidade institucional não identificada nesta organização.', variant: 'destructive' });
         return false;
       }
       const problem = validateDraft(draft);
@@ -217,6 +222,10 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         return false;
       }
 
+      if (editing ? !permissions.canEditEvent(editing.id) : !canCreate) {
+        throw new Error('Você não tem permissão para salvar eventos nesta unidade. Solicite a revisão do seu vínculo institucional.');
+      }
+      submissionPending.current = true;
       setSaving(true);
       try {
         const payload = draftToSaveEventPayload(draft, {
@@ -228,11 +237,14 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         });
 
         const saved = (await cronogramaSaveEvent(payload, editing?.lockVersion)) as { id?: string; restaurant_forwarding?: CronogramaRestaurantForwarding | null } | null;
-        invalidate();
+        handledEventId.current = null;
+        cacheSavedEvent(saved);
+        await invalidate();
         toast({
           title: editing ? 'Evento atualizado' : 'Evento criado',
-          description: cronogramaSaveSuccessMessage({ restaurantForwarding: saved?.restaurant_forwarding }, 'O evento também aparece na Agenda Fenasoja quando envolve a Comissão Central.'),
+          description: cronogramaSaveSuccessMessage({ restaurantForwarding: saved?.restaurant_forwarding }, 'Disponível na agenda da sua comissão e na Agenda Fenasoja.'),
         });
+        if (saved?.id) navigate(`${agendaPath}?event=${encodeURIComponent(saved.id)}`, { replace: true });
         return true;
       } catch (error) {
         toast({
@@ -240,12 +252,13 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
           description: error instanceof Error ? error.message : 'Tente novamente.',
           variant: 'destructive',
         });
-        return false;
+        throw error;
       } finally {
+        submissionPending.current = false;
         setSaving(false);
       }
     },
-    [orgId, commissionId, commissionSlug, unit.name, byCanonicalId, peopleOptions, invalidate],
+    [orgId, commissionId, commissionSlug, unit.name, byCanonicalId, peopleOptions, invalidate, cacheSavedEvent, identityError, permissions, canCreate, navigate, agendaPath],
   );
 
   const handleAddDocument = useCallback(() => {
@@ -320,9 +333,11 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
         section={section}
         identitySection={isSojaStore ? 'agenda' : undefined}
         identityTitle={isSojaStore ? 'Agenda' : undefined}
-        action={section === 'team' || storeSection || (isSojaStore && section !== 'agenda') ? undefined : { label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
+        action={!canCreate || section === 'team' || storeSection || (isSojaStore && section !== 'agenda') ? undefined : { label: saving ? 'Salvando…' : 'Criar evento', icon: CalendarPlus, onClick: requestCreate }}
       >
         <PageTransition>
+          {identityError && <p role="alert" className="mb-4 text-sm text-destructive">{identityError}</p>}
+          {permissions.isError && <p role="alert" className="mb-4 text-sm text-destructive">Não foi possível verificar as permissões da agenda. Atualize a página para tentar novamente.</p>}
           {entry.id === 'soy-summit' && section === 'overview' && <Link to={SOY_SUMMIT_ROUTE}
             className="mb-5 flex min-h-16 items-center gap-3 rounded-xl border border-amber-700/20 bg-amber-50 p-4 text-emerald-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
             <Building2 className="h-6 w-6 shrink-0" aria-hidden="true" />
@@ -355,7 +370,7 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
                     documents={documents}
                     state={state}
                     onOpenEvent={openEventInAgenda}
-                    onCreateEvent={isSojaStore ? undefined : requestCreate}
+                    onCreateEvent={isSojaStore || !canCreate ? undefined : requestCreate}
                     onOpenDocument={(doc) => void handleOpenDocument(doc)}
                     onDownloadDocument={(doc) => void handleOpenDocument(doc, true)}
                     onAddDocument={!isSojaStore || mayManageDocuments ? handleAddDocument : undefined}
@@ -384,7 +399,13 @@ export default function CommissionWorkspacePage({ module, entry }: CommissionWor
                   onOpenDocument={(doc) => void handleOpenDocument(doc)}
                   onDownloadDocument={(doc) => void handleOpenDocument(doc, true)}
                   onOpenDocuments={() => navigate(documentsPath)}
-                  onSubmitEvent={(draft, editing) => void submitEvent(draft, editing)}
+                  canCreate={canCreate}
+                  canEditEvent={permissions.canEditEvent}
+                  ownerUnitId={commissionId ?? undefined}
+                  onOpenEvent={(event) => {
+                    if (openEventId !== event.id) navigate(`${agendaPath}?event=${encodeURIComponent(event.id)}`, { replace: true });
+                  }}
+                  onSubmitEvent={submitEvent}
                 />
               }
             />

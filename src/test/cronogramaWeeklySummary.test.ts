@@ -117,6 +117,15 @@ describe('resumo semanal', () => {
     expect(summary.days[0].weekdayLabel).toBe('Segunda-feira');
   });
 
+  it('includes institutional weekend invitations and keeps canonical event links', () => {
+    const summary = buildWeeklySummary([
+      makeEvent({ id: 'canonical-saturday', sourceKey: 'legacy-saturday', startDate: '2026-08-08' }),
+      makeEvent({ id: 'canonical-sunday', sourceKey: 'legacy-sunday', startDate: '2026-08-09' }),
+    ], VIEWER, { ...WEEK, includeWeekend: true });
+    expect(summary.eventCount).toBe(2);
+    expect(summary.days.flatMap(day => day.entries.map(entry => entry.identity))).toEqual(['canonical-saturday', 'canonical-sunday']);
+  });
+
   it('conta evento sem duração informada', () => {
     const summary = buildWeeklySummary(
       [makeEvent({ id: 'evt-9', endTime: null })],

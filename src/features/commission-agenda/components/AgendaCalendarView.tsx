@@ -22,13 +22,14 @@ export interface AgendaCalendarViewProps {
 
 export function AgendaCalendarView({ events, year, month, todayKey, onMonthChange, onOpenEvent, className }: AgendaCalendarViewProps) {
   const resolvedMonth = month === 'all'
-    ? (Number(todayKey.slice(0, 4)) === year ? Number(todayKey.slice(5, 7)) : (events[0] ? Number(events[0].date.slice(5, 7)) : 1))
+    ? (Number(todayKey.slice(0, 4)) === year ? Number(todayKey.slice(5, 7)) : (events.find(event => event.date) ? Number(events.find(event => event.date)!.date.slice(5, 7)) : 1))
     : month;
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   const eventsByDay = useMemo(() => {
     const map = new Map<string, AgendaEventViewModel[]>();
     for (const event of sortByChronology(events)) {
+      if (!event.date) continue;
       const start = new Date(`${event.date}T12:00:00`);
       const end = new Date(`${event.endDate ?? event.date}T12:00:00`);
       for (let cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
@@ -56,7 +57,7 @@ export function AgendaCalendarView({ events, year, month, todayKey, onMonthChang
   const activeDay = selectedDay && selectedDay.startsWith(`${year}-${String(resolvedMonth).padStart(2, '0')}`) ? selectedDay : null;
   const listEvents = activeDay
     ? eventsByDay.get(activeDay) ?? []
-    : sortByChronology(events.filter((event) => event.date.startsWith(`${year}-${String(resolvedMonth).padStart(2, '0')}`)));
+    : sortByChronology(events.filter((event) => !event.date || event.date.startsWith(`${year}-${String(resolvedMonth).padStart(2, '0')}`)));
 
   const step = (delta: number) => {
     const next = resolvedMonth + delta;

@@ -98,6 +98,15 @@ function WorkspaceHarness({ onCreate }: { onCreate: (input: CronogramaSubeventIn
 }
 
 describe('EventRelationshipWorkspace', () => {
+  it('permits scoped main-event editing without granting subevent management', () => {
+    render(<EventRelationshipWorkspace event={baseEvent} onBack={vi.fn()} onSaveEvent={vi.fn()}
+      onCreateSubevent={vi.fn()} onUpdateSubevent={vi.fn()} onRemoveSubevent={vi.fn()}
+      canManage={false} canEditMain canDeleteSubevents={false} />);
+    expect(screen.getByRole('button', { name: 'Editar evento' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Adicionar subevento' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /Editar subevento/ })).not.toBeInTheDocument();
+  });
+
   beforeEach(() => {
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
       callback(0);

@@ -79,6 +79,7 @@ export function EventRelationshipWorkspace({
   onRemoveSubevent,
   onSaveSubeventPlan,
   canManage,
+  canEditMain = canManage,
   canDeleteSubevents,
   relationshipsUnavailable = false,
   pendingRelationshipCount = 0,
@@ -94,6 +95,7 @@ export function EventRelationshipWorkspace({
   onRemoveSubevent: (subevent: CronogramaSubevent) => Promise<void> | void;
   onSaveSubeventPlan?: (items: CronogramaSubeventPlanDraft[]) => Promise<void> | void;
   canManage: boolean;
+  canEditMain?: boolean;
   canDeleteSubevents: boolean;
   relationshipsUnavailable?: boolean;
   pendingRelationshipCount?: number;
@@ -214,6 +216,7 @@ export function EventRelationshipWorkspace({
   };
 
   const handleSaveMain = async (nextEvent: CronogramaEvent) => {
+    if (!canEditMain || mainSaving) return;
     setMainSaving(true);
     setMainSaveError(null);
     try {
@@ -351,13 +354,14 @@ export function EventRelationshipWorkspace({
             </div>
             <div><dt><MapPin aria-hidden="true" /> Local</dt><dd>{event.location || 'A definir'}</dd></div>
           </dl>
-          {canManage && (
+          {canEditMain && (
             <div className="cronograma-main-anchor-actions">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setEditingMain((current) => !current)}
                 className="rounded-xl"
+                disabled={mainSaving}
                 aria-expanded={editingMain}
               >
                 <Edit3 className="h-4 w-4" aria-hidden="true" />
@@ -368,7 +372,7 @@ export function EventRelationshipWorkspace({
           <span className="cronograma-main-anchor-port" aria-hidden="true"><Link2 /></span>
         </article>
 
-        {editingMain && (
+        {editingMain && canEditMain && (
           <div className="cronograma-main-editor" data-testid="main-event-editor">
             <div className="cronograma-main-editor-heading">
               <div>

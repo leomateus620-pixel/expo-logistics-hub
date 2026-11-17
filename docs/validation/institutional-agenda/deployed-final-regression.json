@@ -1,0 +1,1330 @@
+{
+  "authorization": [
+    {
+      "name": "leader has unit write without global capability",
+      "passed": true
+    },
+    {
+      "name": "persisted with canonical id and all explicit links",
+      "passed": true
+    },
+    {
+      "name": "durable idempotent retry returns same id",
+      "passed": true
+    },
+    {
+      "name": "general agenda and both unit RPCs return the same id without Central",
+      "passed": true
+    },
+    {
+      "name": "verified invited account is linked; volunteer without account remains valid",
+      "passed": true
+    },
+    {
+      "name": "participant leader edits same event preserving origin and owner",
+      "passed": true
+    },
+    {
+      "name": "stale concurrent edit rejected",
+      "passed": true
+    },
+    {
+      "name": "origin cannot be transferred during editing",
+      "passed": true
+    },
+    {
+      "name": "advisory creates its own event",
+      "passed": true
+    },
+    {
+      "name": "read-only unit member sees event without acquiring write",
+      "passed": true
+    },
+    {
+      "name": "read-only creation denied by RPC",
+      "passed": true
+    },
+    {
+      "name": "invited person can read without edit or automatic unit distribution",
+      "passed": true
+    },
+    {
+      "name": "invalid relationship rolls back the entire creation",
+      "passed": true
+    },
+    {
+      "name": "cannot acquire write access by attaching own unit to unrelated event",
+      "passed": true
+    },
+    {
+      "name": "cross-organization creation denied",
+      "passed": true
+    },
+    {
+      "name": "cross-organization relationship denied",
+      "passed": true
+    },
+    {
+      "name": "foreign organization permission query returns no grants",
+      "passed": true
+    },
+    {
+      "name": "uninvited scoped reader cannot see or edit unrelated event",
+      "passed": true
+    },
+    {
+      "name": "anonymous cannot execute canonical mutation or permission RPC",
+      "passed": true
+    },
+    {
+      "name": "RLS remains enabled",
+      "passed": true
+    },
+    {
+      "name": "restricted operator has own-unit authority without global write",
+      "passed": true
+    },
+    {
+      "name": "restricted operator canonical deletion denied",
+      "passed": true
+    },
+    {
+      "name": "restricted operator direct deletion denied by RLS",
+      "passed": true
+    },
+    {
+      "name": "unrestricted operational writer keeps existing authority",
+      "passed": true
+    },
+    {
+      "name": "administrator keeps existing authority",
+      "passed": true
+    },
+    {
+      "name": "institutional manager keeps existing authority",
+      "passed": true
+    }
+  ],
+  "units": [
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "acolhimento-e-bem-comum",
+      "unit_name": "Acolhimento e Bem Comum"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "acolhimento-e-bem-comum",
+      "unit_name": "Acolhimento e Bem Comum"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "acolhimento-e-bem-comum",
+      "unit_name": "Acolhimento e Bem Comum"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "acolhimento-e-bem-comum",
+      "unit_name": "Acolhimento e Bem Comum"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "agricultura-soja-e-derivados",
+      "unit_name": "Agricultura, Soja e Derivados"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "agricultura-soja-e-derivados",
+      "unit_name": "Agricultura, Soja e Derivados"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "agricultura-soja-e-derivados",
+      "unit_name": "Agricultura, Soja e Derivados"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "agricultura-soja-e-derivados",
+      "unit_name": "Agricultura, Soja e Derivados"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "arte-e-cultura",
+      "unit_name": "Arte e Cultura"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "arte-e-cultura",
+      "unit_name": "Arte e Cultura"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "arte-e-cultura",
+      "unit_name": "Arte e Cultura"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "arte-e-cultura",
+      "unit_name": "Arte e Cultura"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-de-imprensa",
+      "unit_name": "Assessoria de Imprensa"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-de-imprensa",
+      "unit_name": "Assessoria de Imprensa"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-de-imprensa",
+      "unit_name": "Assessoria de Imprensa"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-de-imprensa",
+      "unit_name": "Assessoria de Imprensa"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 3,
+      "slug": "assessoria-de-marketing",
+      "unit_name": "ASSESSORIA DE MARKETING/COMUNICAÇÃO"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 3,
+      "slug": "assessoria-de-marketing",
+      "unit_name": "ASSESSORIA DE MARKETING/COMUNICAÇÃO"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 3,
+      "slug": "assessoria-de-marketing",
+      "unit_name": "ASSESSORIA DE MARKETING/COMUNICAÇÃO"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 3,
+      "slug": "assessoria-de-marketing",
+      "unit_name": "ASSESSORIA DE MARKETING/COMUNICAÇÃO"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-protocolo",
+      "unit_name": "Assessoria de Protocolo"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-protocolo",
+      "unit_name": "Assessoria de Protocolo"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-protocolo",
+      "unit_name": "Assessoria de Protocolo"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-protocolo",
+      "unit_name": "Assessoria de Protocolo"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 3,
+      "slug": "assessoria-de-relacoes-internacionais",
+      "unit_name": "Assessoria de Relações Internacionais"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 3,
+      "slug": "assessoria-de-relacoes-internacionais",
+      "unit_name": "Assessoria de Relações Internacionais"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 3,
+      "slug": "assessoria-de-relacoes-internacionais",
+      "unit_name": "Assessoria de Relações Internacionais"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 3,
+      "slug": "assessoria-de-relacoes-internacionais",
+      "unit_name": "Assessoria de Relações Internacionais"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-sistemas",
+      "unit_name": "Assessoria de Sistemas"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-sistemas",
+      "unit_name": "Assessoria de Sistemas"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-sistemas",
+      "unit_name": "Assessoria de Sistemas"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-sistemas",
+      "unit_name": "Assessoria de Sistemas"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-sustentabilidade",
+      "unit_name": "Assessoria de Sustentabilidade"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-sustentabilidade",
+      "unit_name": "Assessoria de Sustentabilidade"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-sustentabilidade",
+      "unit_name": "Assessoria de Sustentabilidade"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "assessoria-de-sustentabilidade",
+      "unit_name": "Assessoria de Sustentabilidade"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-juridica",
+      "unit_name": "Assessoria Jurídica"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-juridica",
+      "unit_name": "Assessoria Jurídica"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-juridica",
+      "unit_name": "Assessoria Jurídica"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-juridica",
+      "unit_name": "Assessoria Jurídica"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-projetos-e-captacoes-institucionais",
+      "unit_name": "Assessoria de Projetos e Captações"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-projetos-e-captacoes-institucionais",
+      "unit_name": "Assessoria de Projetos e Captações"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-projetos-e-captacoes-institucionais",
+      "unit_name": "Assessoria de Projetos e Captações"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "assessoria-projetos-e-captacoes-institucionais",
+      "unit_name": "Assessoria de Projetos e Captações"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "bilheteria",
+      "unit_name": "Bilheteria"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "bilheteria",
+      "unit_name": "Bilheteria"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "bilheteria",
+      "unit_name": "Bilheteria"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "bilheteria",
+      "unit_name": "Bilheteria"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 4,
+      "slug": "ccpf",
+      "unit_name": "CCPF — Conselho Consultivo Permanente Fenasoja"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 4,
+      "slug": "ccpf",
+      "unit_name": "CCPF — Conselho Consultivo Permanente Fenasoja"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 4,
+      "slug": "ccpf",
+      "unit_name": "CCPF — Conselho Consultivo Permanente Fenasoja"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 4,
+      "slug": "ccpf",
+      "unit_name": "CCPF — Conselho Consultivo Permanente Fenasoja"
+    },
+    {
+      "central_linked": true,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 10,
+      "slug": "central",
+      "unit_name": "Comissão Central"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 10,
+      "slug": "central",
+      "unit_name": "Comissão Central"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 10,
+      "slug": "central",
+      "unit_name": "Comissão Central"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 10,
+      "slug": "central",
+      "unit_name": "Comissão Central"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "cooperativismo",
+      "unit_name": "Cooperativismo"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "cooperativismo",
+      "unit_name": "Cooperativismo"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "cooperativismo",
+      "unit_name": "Cooperativismo"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "cooperativismo",
+      "unit_name": "Cooperativismo"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "credenciamento",
+      "unit_name": "Credenciamento"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "credenciamento",
+      "unit_name": "Credenciamento"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "credenciamento",
+      "unit_name": "Credenciamento"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "credenciamento",
+      "unit_name": "Credenciamento"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "espaco-do-automovel",
+      "unit_name": "Espaço do Automóvel"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "espaco-do-automovel",
+      "unit_name": "Espaço do Automóvel"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "espaco-do-automovel",
+      "unit_name": "Espaço do Automóvel"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "espaco-do-automovel",
+      "unit_name": "Espaço do Automóvel"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "etnias",
+      "unit_name": "ETNIAS"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "etnias",
+      "unit_name": "ETNIAS"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "etnias",
+      "unit_name": "ETNIAS"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "etnias",
+      "unit_name": "ETNIAS"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "exporural",
+      "unit_name": "Exporural"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "exporural",
+      "unit_name": "Exporural"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "exporural",
+      "unit_name": "Exporural"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "exporural",
+      "unit_name": "Exporural"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "gastronomia",
+      "unit_name": "Gastronomia"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "gastronomia",
+      "unit_name": "Gastronomia"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "gastronomia",
+      "unit_name": "Gastronomia"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "gastronomia",
+      "unit_name": "Gastronomia"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "industria-comercio-e-servicos",
+      "unit_name": "Indústria, Comércio e Serviços"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "industria-comercio-e-servicos",
+      "unit_name": "Indústria, Comércio e Serviços"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "industria-comercio-e-servicos",
+      "unit_name": "Indústria, Comércio e Serviços"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "industria-comercio-e-servicos",
+      "unit_name": "Indústria, Comércio e Serviços"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "infraestrutura-e-seguranca-do-trabalho",
+      "unit_name": "Infraestrutura e Segurança do Trabalho"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "infraestrutura-e-seguranca-do-trabalho",
+      "unit_name": "Infraestrutura e Segurança do Trabalho"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "infraestrutura-e-seguranca-do-trabalho",
+      "unit_name": "Infraestrutura e Segurança do Trabalho"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "infraestrutura-e-seguranca-do-trabalho",
+      "unit_name": "Infraestrutura e Segurança do Trabalho"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "inovacao-e-experiencia",
+      "unit_name": "Inovação e Tecnologia"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "inovacao-e-experiencia",
+      "unit_name": "Inovação e Tecnologia"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "inovacao-e-experiencia",
+      "unit_name": "Inovação e Tecnologia"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "inovacao-e-experiencia",
+      "unit_name": "Inovação e Tecnologia"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "logistica-hotelaria-e-turismo",
+      "unit_name": "Logística, Hotelaria e Turismo"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "logistica-hotelaria-e-turismo",
+      "unit_name": "Logística, Hotelaria e Turismo"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "logistica-hotelaria-e-turismo",
+      "unit_name": "Logística, Hotelaria e Turismo"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "logistica-hotelaria-e-turismo",
+      "unit_name": "Logística, Hotelaria e Turismo"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "mercosul",
+      "unit_name": "Mercosul"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "mercosul",
+      "unit_name": "Mercosul"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "mercosul",
+      "unit_name": "Mercosul"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "mercosul",
+      "unit_name": "Mercosul"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "novas-geracoes",
+      "unit_name": "Novas Gerações"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "novas-geracoes",
+      "unit_name": "Novas Gerações"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "novas-geracoes",
+      "unit_name": "Novas Gerações"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "novas-geracoes",
+      "unit_name": "Novas Gerações"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "pecuaria",
+      "unit_name": "Pecuária"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "pecuaria",
+      "unit_name": "Pecuária"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "pecuaria",
+      "unit_name": "Pecuária"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "pecuaria",
+      "unit_name": "Pecuária"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "prevencao-e-combate-a-incendio",
+      "unit_name": "Prevenção e Combate a Incêndio"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "prevencao-e-combate-a-incendio",
+      "unit_name": "Prevenção e Combate a Incêndio"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "prevencao-e-combate-a-incendio",
+      "unit_name": "Prevenção e Combate a Incêndio"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "prevencao-e-combate-a-incendio",
+      "unit_name": "Prevenção e Combate a Incêndio"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "recepcao-e-cerimonial",
+      "unit_name": "Recepção e Eventos"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "recepcao-e-cerimonial",
+      "unit_name": "Recepção e Eventos"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "recepcao-e-cerimonial",
+      "unit_name": "Recepção e Eventos"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "recepcao-e-cerimonial",
+      "unit_name": "Recepção e Eventos"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "relacionamento-e-experiencia",
+      "unit_name": "Relacionamento e Experiência"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "relacionamento-e-experiencia",
+      "unit_name": "Relacionamento e Experiência"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "relacionamento-e-experiencia",
+      "unit_name": "Relacionamento e Experiência"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "relacionamento-e-experiencia",
+      "unit_name": "Relacionamento e Experiência"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "relacoes-estrategicas",
+      "unit_name": "Relações Estratégicas"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "relacoes-estrategicas",
+      "unit_name": "Relações Estratégicas"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "relacoes-estrategicas",
+      "unit_name": "Relações Estratégicas"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 2,
+      "slug": "relacoes-estrategicas",
+      "unit_name": "Relações Estratégicas"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "relacoes-institucionais",
+      "unit_name": "RELAÇÕES INSTITUCIONAIS"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "relacoes-institucionais",
+      "unit_name": "RELAÇÕES INSTITUCIONAIS"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "relacoes-institucionais",
+      "unit_name": "RELAÇÕES INSTITUCIONAIS"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "relacoes-institucionais",
+      "unit_name": "RELAÇÕES INSTITUCIONAIS"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "saude-bem-estar-e-acessibilidade",
+      "unit_name": "Saúde, Bem-Estar e Acessibilidade"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "saude-bem-estar-e-acessibilidade",
+      "unit_name": "Saúde, Bem-Estar e Acessibilidade"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "saude-bem-estar-e-acessibilidade",
+      "unit_name": "Saúde, Bem-Estar e Acessibilidade"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "saude-bem-estar-e-acessibilidade",
+      "unit_name": "Saúde, Bem-Estar e Acessibilidade"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "seguranca",
+      "unit_name": "Segurança"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "seguranca",
+      "unit_name": "Segurança"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "seguranca",
+      "unit_name": "Segurança"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "seguranca",
+      "unit_name": "Segurança"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "servicos",
+      "unit_name": "Serviços"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "servicos",
+      "unit_name": "Serviços"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "servicos",
+      "unit_name": "Serviços"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "servicos",
+      "unit_name": "Serviços"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "shows",
+      "unit_name": "Shows"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "shows",
+      "unit_name": "Shows"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "shows",
+      "unit_name": "Shows"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "shows",
+      "unit_name": "Shows"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 9,
+      "slug": "soja-store",
+      "unit_name": "Soja Store"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 9,
+      "slug": "soja-store",
+      "unit_name": "Soja Store"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 9,
+      "slug": "soja-store",
+      "unit_name": "Soja Store"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 9,
+      "slug": "soja-store",
+      "unit_name": "Soja Store"
+    },
+    {
+      "central_linked": false,
+      "location_code": "sala_voluntarios",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "soy-summit",
+      "unit_name": "Soy Summit"
+    },
+    {
+      "central_linked": true,
+      "location_code": "casa_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "soy-summit",
+      "unit_name": "Soy Summit"
+    },
+    {
+      "central_linked": true,
+      "location_code": "auditorio_centro_administrativo",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "soy-summit",
+      "unit_name": "Soy Summit"
+    },
+    {
+      "central_linked": true,
+      "location_code": "centro_eventos_fenasoja",
+      "passed": true,
+      "people_selected": 1,
+      "slug": "soy-summit",
+      "unit_name": "Soy Summit"
+    }
+  ],
+  "versions": [
+    "20261117120000",
+    "20261117124500"
+  ]
+}

@@ -162,7 +162,7 @@ export default function CommissionAgendaPreviewPage() {
             onAddDocument={() => record('onAddDocument')}
             onMonthChange={(month) => record(`onMonthChange(${month})`)}
             onYearChange={(year) => record(`onYearChange(${year})`)}
-            onSubmitEvent={(draft) => record(`onSubmitEvent(${draft.title || 'sem título'})`)}
+            onSubmitEvent={(draft) => { record(`onSubmitEvent(${draft.title || 'sem título'})`); return true; }}
             onRetry={() => record('onRetry')}
           />
         )}

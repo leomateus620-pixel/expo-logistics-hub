@@ -1,0 +1,63 @@
+{
+  "rows": [
+    {
+      "application": {
+        "applied_at": "2026-11-17T17:10:46.347946+00:00",
+        "preservation": [
+          {
+            "checksum": "c3a948913d7acf2ab98f73e187a04d25",
+            "relation": "commissions",
+            "rows": 39
+          },
+          {
+            "checksum": "e7c0d3128a74b4055d6182ecda884b1c",
+            "relation": "commission_people",
+            "rows": 60
+          },
+          {
+            "checksum": "a94f16119e96115bb1e6e1b5e1bc9a0c",
+            "relation": "commission_responsibles",
+            "rows": 64
+          },
+          {
+            "checksum": "e3ee623a07e42198c1f5828fd6ff1e65",
+            "relation": "cronograma_eventos",
+            "rows": 348
+          },
+          {
+            "checksum": "39ce1cb6c0c2073e0547847c00f5ad5f",
+            "relation": "cronograma_evento_comissoes",
+            "rows": 419
+          },
+          {
+            "checksum": "1323647634ed97c005b7ecc1e126690c",
+            "relation": "cronograma_evento_responsaveis",
+            "rows": 630
+          },
+          {
+            "checksum": "db2e864a0d4d79f34171fe33ee832a56",
+            "relation": "cronograma_evento_logs",
+            "rows": 505
+          },
+          {
+            "checksum": "fff6d317044d39e896931c216761f3fb",
+            "relation": "cronograma_evento_anexos",
+            "rows": 35
+          },
+          {
+            "checksum": "d41d8cd98f00b204e9800998ecf8427e",
+            "relation": "cronograma_unidade_anexos",
+            "rows": 0
+          },
+          {
+            "checksum": "8a628f50000553f94f8d4d45d13a6dac",
+            "relation": "cronograma_subeventos",
+            "rows": 6
+          }
+        ],
+        "sha256": "8fe4a8e9f18ab30f261fc6d6c515b8aa81e394cfc6fb0640ff67925ef4bd4355",
+        "version": "20261117120000"
+      }
+    }
+  ]
+}

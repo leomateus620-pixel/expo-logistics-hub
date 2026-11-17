@@ -13243,6 +13243,10 @@ export type Database = {
           units: Json
         }[]
       }
+      cronograma_agenda_permissions: {
+        Args: { _org_id: string }
+        Returns: Json
+      }
       cronograma_unit_can_manage: {
         Args: { _commission_id: string; _user_id: string }
         Returns: boolean

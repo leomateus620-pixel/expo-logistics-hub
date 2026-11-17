@@ -1,0 +1,11 @@
+{
+  "rows": [
+    {
+      "global_write": false,
+      "organization_role": "leitura",
+      "own_unit_creation_allowed": true,
+      "permission_rpc_global_write": false,
+      "unit": "acolhimento-e-bem-comum"
+    }
+  ]
+}

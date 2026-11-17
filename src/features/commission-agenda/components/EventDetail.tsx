@@ -45,7 +45,7 @@ export function EventDetail({ event, unitId, documents = [], history = [], today
         <div className="ua-fact">
           <span className="ua-fact__label ws-caption"><CalendarDays aria-hidden="true" />Data</span>
           <span className="ua-fact__value ws-meta" style={{ fontWeight: 600 }}>
-            {weekday}, {formatLongDate(event.date)}
+            {event.date ? `${weekday}, ${formatLongDate(event.date)}` : 'Data a definir'}
             {event.endDate && event.endDate !== event.date && <span className="block ws-caption" style={{ color: 'var(--text-muted)', fontWeight: 500 }}>até {formatLongDate(event.endDate)}</span>}
           </span>
         </div>

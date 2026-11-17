@@ -24,12 +24,12 @@ describe('cronograma-rpc wrappers', () => {
   });
 
   it('cronogramaSaveEvent injects request_id and forwards expected_lock_version', async () => {
-    rpcMock.mockResolvedValue({ data: { id: 'evt-1', lock_version: 2 }, error: null });
+    rpcMock.mockResolvedValue({ data: { id: '11111111-1111-4111-8111-111111111111', org_id: 'org-1', lock_version: 2 }, error: null });
     const data = await cronogramaSaveEvent(
       { org_id: 'org-1', title: 'X' },
       1,
     );
-    expect(data).toEqual({ id: 'evt-1', lock_version: 2 });
+    expect(data).toEqual({ id: '11111111-1111-4111-8111-111111111111', org_id: 'org-1', lock_version: 2 });
     expect(rpcMock).toHaveBeenCalledTimes(1);
     const [fn, args] = rpcMock.mock.calls[0];
     expect(fn).toBe('cronograma_save_event');
@@ -38,6 +38,14 @@ describe('cronograma-rpc wrappers', () => {
     expect(args.payload.request_id.length).toBeGreaterThan(6);
     expect(args.payload.title).toBe('X');
     expect(args.payload.org_id).toBe('org-1');
+  });
+
+  it.each([null, {}, { id: 'invalid', org_id: 'org-invalid', lock_version: 1 },
+    { id: '11111111-1111-4111-8111-111111111111', org_id: 'other-org', lock_version: 1 },
+    { id: '11111111-1111-4111-8111-111111111111', org_id: 'org-invalid', lock_version: 0 },
+  ])('never confirms an invalid canonical response: %j', async (data) => {
+    rpcMock.mockResolvedValue({ data, error: null });
+    await expect(cronogramaSaveEvent({ org_id: 'org-invalid', title: 'Response validation' })).rejects.toMatchObject({ code: 'CRONOGRAMA_UNKNOWN' });
   });
 
   it('cronogramaSaveSubevent forwards payload and lock_version', async () => {
@@ -119,8 +127,8 @@ describe('cronograma-rpc wrappers', () => {
   it('reuses a submission after an uncertain timeout without another source key', async () => {
     const payload = { org_id: 'org-retry', source_key: 'manual-stable-submission', title: 'Evento' };
     rpcMock.mockRejectedValueOnce(new Error('network timeout'));
-    await expect(cronogramaSaveEvent(payload)).rejects.toMatchObject({ code: 'CRONOGRAMA_UNKNOWN', details: 'network timeout' });
-    rpcMock.mockResolvedValueOnce({ data: { id: 'same-event' }, error: null });
+    await expect(cronogramaSaveEvent(payload)).rejects.toMatchObject({ code: 'CRONOGRAMA_CONNECTION_ERROR', details: 'network timeout' });
+    rpcMock.mockResolvedValueOnce({ data: { id: '11111111-1111-4111-8111-111111111111', org_id: 'org-retry', lock_version: 1 }, error: null });
     await cronogramaSaveEvent({ ...payload });
     expect(rpcMock.mock.calls[0][1].payload.request_id).toBe(rpcMock.mock.calls[1][1].payload.request_id);
     expect(rpcMock.mock.calls[1][1].payload.source_key).toBe(payload.source_key);
@@ -133,8 +141,8 @@ describe('cronograma-rpc wrappers', () => {
     const first = cronogramaSaveEvent(payload);
     const second = cronogramaSaveEvent({ ...payload });
     expect(rpcMock).toHaveBeenCalledTimes(1);
-    resolve({ data: { id: 'single-event' }, error: null });
-    expect(await Promise.all([first, second])).toEqual([{ id: 'single-event' }, { id: 'single-event' }]);
+    resolve({ data: { id: '11111111-1111-4111-8111-111111111111', org_id: 'org-click', lock_version: 1 }, error: null });
+    expect(await Promise.all([first, second])).toEqual([{ id: '11111111-1111-4111-8111-111111111111', org_id: 'org-click', lock_version: 1 }, { id: '11111111-1111-4111-8111-111111111111', org_id: 'org-click', lock_version: 1 }]);
   });
 
   it('rejects a different in-flight payload using an explicit submission identity', async () => {
@@ -143,7 +151,7 @@ describe('cronograma-rpc wrappers', () => {
     const payload = { org_id: 'org-mismatch', source_key: 'manual-mismatch', request_id: 'stable-request', title: 'Evento' };
     const first = cronogramaSaveEvent(payload);
     await expect(cronogramaSaveEvent({ ...payload, title: 'Outro evento' })).rejects.toMatchObject({ code: 'CRONOGRAMA_IDEMPOTENCY_KEY_REUSED' });
-    resolve({ data: { id: 'single-event' }, error: null });
+    resolve({ data: { id: '11111111-1111-4111-8111-111111111111', org_id: 'org-mismatch', lock_version: 1 }, error: null });
     await first;
   });
 

@@ -3,6 +3,7 @@ import { useOrgCommissions } from '@/hooks/useOrgCommissions';
 import { useAuth } from '@/hooks/useAuth';
 import { normalizeUnitKey, resolveOfficialUnit } from '@/modules/commissions/officialCommissionCatalog';
 import type { CommissionPerson } from '@/components/commissions/CommissionPeopleStack';
+import { resolveUnitDirectory } from '@/features/commission-agenda/lib/unit-identity';
 import { responsibleRoleLabel } from '@/lib/org-units';
 
 export interface CommissionUnitPeople {
@@ -21,9 +22,11 @@ export function useCommissionPeople() {
 
   const byUnit = useMemo(() => {
     const map = new Map<string, CommissionUnitPeople>();
+    const directory = resolveUnitDirectory(units);
     for (const unit of units) {
       const official = resolveOfficialUnit(unit.slug) ?? resolveOfficialUnit(unit.name);
       const key = official?.entry.id ?? unit.slug;
+      if (directory.byCanonicalId.get(key)?.commissionId !== unit.id) continue;
       const people: CommissionPerson[] = unit.responsibles.map((item) => ({
         id: item.personId ?? item.id,
         personId: item.personId,

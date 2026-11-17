@@ -27,7 +27,7 @@ export interface UnitRef {
 
 export interface DraftToPayloadOptions {
   orgId: string;
-  /** Unidade dona do evento (workspace atual). */
+  /** Unidade de criação; em edições a proprietária vem do evento persistido. */
   owner: UnitRef;
   editing?: AgendaEventViewModel | null;
   /** Resolve o id canônico do catálogo para a comissão real. */
@@ -40,7 +40,10 @@ export function draftToSaveEventPayload(
   draft: AgendaEventDraft,
   options: DraftToPayloadOptions,
 ): CronogramaSaveEventPayload {
-  const { orgId, owner, editing, resolveUnit, resolvePerson } = options;
+  const { orgId, editing, resolveUnit, resolvePerson } = options;
+  const owner = editing ? editing.ownerUnit : options.owner;
+  if (!owner) throw new Error('Unidade proprietária não identificada no evento. Reabra os detalhes ou solicite a revisão do vínculo principal.');
+  if (editing && editing.lockVersion == null) throw new Error('Versão do evento indisponível. Reabra o evento antes de editar.');
 
   const commissions: NonNullable<CronogramaSaveEventPayload['commissions']> = [
     {
@@ -52,27 +55,34 @@ export function draftToSaveEventPayload(
   ];
 
   for (const unitId of draft.unitIds) {
-    const resolved = resolveUnit(unitId);
-    if (!resolved || resolved.commissionId === owner.commissionId) continue;
+    const linked = editing?.units?.find(unit => unit.id === unitId);
+    const resolved = linked?.commissionId && linked.slug
+      ? { commissionId: linked.commissionId, slug: linked.slug, name: linked.name } : resolveUnit(unitId);
+    if (!resolved) throw new Error('Uma unidade selecionada não pôde ser identificada. Revise as unidades participantes.');
+    if (resolved.commissionId === owner.commissionId) continue;
     if (commissions.some((item) => item.commission_id === resolved.commissionId)) continue;
     commissions.push({
       commission_id: resolved.commissionId,
       commission_slug: resolved.slug,
       commission_name: resolved.name,
-      relation_role: 'participante',
+      relation_role: linked?.relationRole ?? 'participante',
     });
   }
 
   const responsibles: NonNullable<CronogramaSaveEventPayload['responsibles']> = [];
   draft.peopleIds.forEach((personId, index) => {
-    const person = resolvePerson(personId);
-    if (!person) return;
+    const existing = editing?.people?.find(person => person.id === personId);
+    const person: PersonSummary | undefined = resolvePerson(personId) ?? existing ?? draft.externalPeople?.find(person => person.id === personId);
+    if (!person) throw new Error('Uma pessoa selecionada não pôde ser identificada. Revise os convidados.');
+    if (responsibles.some(item => person.personId ? item.person_id === person.personId
+      : person.userId ? item.user_id === person.userId : false)) return;
     responsibles.push({
       person_id: person.personId ?? null,
       user_id: person.personId ? null : person.userId ?? null,
       name: person.name,
       role: person.role ?? null,
-      is_primary: index === 0,
+      is_primary: editing?.people?.some(item => item.isPrimary && draft.peopleIds.includes(item.id))
+        ? existing?.isPrimary ?? false : index === 0,
       responsible_type: person.userId ? 'member' : 'external',
     });
   });
@@ -87,13 +97,11 @@ export function draftToSaveEventPayload(
     org_id: orgId,
     title: draft.title.trim(),
     description: draft.description.trim() || null,
-    category: 'Agenda das comissões',
-    event_type: 'reuniao',
+    ...(!editing ? { category: 'Agenda das comissões', event_type: 'reuniao', priority: 'media' } : {}),
     source_year: year,
     start_date: startDate,
     end_date: endDate,
-    status: STATUS_TO_DB[draft.status] ?? 'planejado',
-    priority: 'media',
+    status: editing?.status === draft.status && editing.persistedStatus ? editing.persistedStatus : STATUS_TO_DB[draft.status] ?? 'planejado',
     location: draft.location.trim() || null,
     location_code: draft.locationCode ?? null,
     event_time: draft.startTime || null,
@@ -112,7 +120,7 @@ export function validateDraft(draft: AgendaEventDraft): string | null {
   if (!draft.title.trim()) return 'Informe o título do evento.';
   if (!draft.date) return 'Informe a data do evento.';
   if (draft.endDate && draft.endDate < draft.date) return 'A data final não pode ser anterior à inicial.';
-  if (draft.startTime && draft.endTime && !draft.endDate && draft.endTime < draft.startTime) {
+  if (draft.startTime && draft.endTime && (!draft.endDate || draft.endDate === draft.date) && draft.endTime < draft.startTime) {
     return 'O horário final não pode ser anterior ao inicial.';
   }
   return null;

@@ -13,7 +13,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, defaultShouldDehydrateQuery } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useParams, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
 import { MeetingCaptureProvider } from './features/agenda-meeting-intelligence/provider/MeetingCaptureProvider';
 import { useOptionalMeetingCapture } from './features/agenda-meeting-intelligence/provider/meetingCaptureContext';
@@ -270,6 +270,13 @@ function CommercialMapRoute() {
 
 function LogisticaModuleRoutes() {
   const logistica = getCommissionModule('logistica');
+  const location = useLocation();
+  const institutional = resolveOfficialUnit('logistica');
+  if (logistica && institutional && /\/agenda(?:\/|$)/.test(location.pathname)) {
+    return <AuthGuard><OrgGuard><ModuleAccessGuard module={logistica}><Suspended>
+      <CommissionWorkspacePage module={logistica} entry={institutional.entry} />
+    </Suspended></ModuleAccessGuard></OrgGuard></AuthGuard>;
+  }
 
   return (
     <AuthGuard>
@@ -284,7 +291,7 @@ function LogisticaModuleRoutes() {
                 <Route path="veiculos" element={<VehiclesPage />} />
                 <Route path="carrinhos-eletricos" element={<ElectricCartsPage />} />
                 <Route path="hospedes" element={<GuestsPage />} />
-                <Route path="agenda" element={<AgendaPage />} />
+                <Route path="agenda-operacional" element={<AgendaPage />} />
                 <Route path="checklist" element={<ChecklistPage />} />
                 <Route path="equipe" element={<TeamPage />} />
                 <Route path="despesas" element={<ExpensesPage />} />
@@ -312,6 +319,7 @@ function FullMapViewerRedirect({ children }: { children: import('react').ReactNo
 }
 
 function CommissionModuleRoutes() {
+  const location = useLocation();
   const { moduleSlug } = useParams();
   const module = resolveCommissionRouteModule(moduleSlug);
   const officialUnit = resolveOfficialUnit(moduleSlug);
@@ -324,6 +332,13 @@ function CommissionModuleRoutes() {
         <NotFound />
       </Suspended>
     );
+  }
+
+  // Institutional agenda has a canonical destination even in specialized/legacy portals.
+  if (officialUnit && /\/agenda(?:\/|$)/.test(location.pathname)) {
+    return <AuthGuard><OrgGuard><ModuleAccessGuard module={module}><Suspended>
+      <CommissionWorkspacePage module={module} entry={officialUnit.entry} />
+    </Suspended></ModuleAccessGuard></OrgGuard></AuthGuard>;
   }
 
   if (module.slug === 'logistica') {
@@ -517,10 +532,10 @@ const App = () => (
     persistOptions={{
       persister,
       maxAge: 1000 * 60 * 60 * 24,
-      buster: lastUserId,
+      buster: `${lastUserId}:institutional-agenda-v2`,
       dehydrateOptions: {
         shouldDehydrateQuery: (query) =>
-          !['commercial-map', 'financial-operational', 'soja-store'].includes(String(query.queryKey[0])) &&
+          !['commercial-map', 'financial-operational', 'soja-store', 'unit-agenda', 'unit-metrics', 'cronograma-eventos', 'cronograma-agenda-access', 'org-members', 'org-login-members'].includes(String(query.queryKey[0])) &&
           query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
       },
     }}

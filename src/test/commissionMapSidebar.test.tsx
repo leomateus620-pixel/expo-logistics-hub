@@ -38,14 +38,15 @@ describe('sidebar responsiva dos portais comerciais', () => {
     document.body.style.overflow = '';
   });
 
-  it('expõe somente Mapa Comercial como item funcional da comissão', () => {
+  it('expõe o mapa e a agenda institucional no portal especializado', () => {
     renderSidebar('industria-comercio-servicos');
 
     const navigation = screen.getByRole('navigation', {
       name: 'Menu Indústria, Comércio e Serviços',
     });
     const menuLinks = within(navigation).getAllByRole('link');
-    expect(menuLinks).toHaveLength(1);
+    expect(menuLinks).toHaveLength(2);
+    expect(menuLinks[1]).toHaveAttribute('href', '/comissoes/industria-comercio-servicos/agenda');
     expect(menuLinks[0]).toHaveTextContent('Mapa Comercial');
     expect(menuLinks[0]).toHaveAttribute(
       'href',

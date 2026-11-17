@@ -2,8 +2,7 @@ import type { CronogramaEvent } from '@/lib/cronograma-eventos';
 
 export const CRONOGRAMA_TIME_ZONE = 'America/Sao_Paulo';
 
-/** Weekly window used by the personal summary. Centralized so institutional
- *  weekend events can be included later by flipping `includeWeekend`. */
+/** The institutional summary includes weekends; callers can still request a business week. */
 export interface WeeklyWindowOptions {
   includeWeekend?: boolean;
   todayKey?: string;
@@ -176,7 +175,7 @@ export function buildWeeklySummary(
     seen.add(identity);
     entries.push({
       id: event.id,
-      identity: event.sourceKey || event.id,
+      identity: event.id || event.sourceKey,
       title: event.title,
       dateKey: event.startDate,
       weekdayLabel: getWeekdayLabel(event.startDate),

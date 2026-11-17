@@ -100,20 +100,12 @@ export function canManageDocuments(
   return (context.memberCommissionIds ?? []).includes(commissionId);
 }
 
-/**
- * O evento entra na timeline principal da Agenda Fenasoja quando:
- * - a Comissão Central está relacionada;
- * - alguma pessoa da Comissão Central está relacionada;
- * - ou o evento nasceu na própria Agenda Fenasoja.
- */
+/** Apply only to events already authorized by the server; participation is not authorization. */
 export function canViewInCentralAgenda(
-  subject: EventAccessSubject,
-  central: CentralAgendaContext = {},
+  _subject: EventAccessSubject,
+  _central: CentralAgendaContext = {},
 ): boolean {
-  if (subject.originSource !== 'unidade') return true;
-  if (central.centralCommissionId && isRelatedUnit(subject, central.centralCommissionId)) return true;
-  const centralPeople = new Set(central.centralMemberUserIds ?? []);
-  return subject.peopleUserIds.some((userId) => centralPeople.has(userId));
+  return true;
 }
 
 /**

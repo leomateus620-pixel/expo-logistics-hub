@@ -54,7 +54,7 @@ export interface AgendaTimelineSectionProps extends AgendaEventCardActions {
 }
 
 export function AgendaTimelineSection({ month, unitId, todayKey, startIndex = 0, ...actions }: AgendaTimelineSectionProps) {
-  const [monthName, year] = month.label.split(' ');
+  const [monthName, year] = month.monthKey ? month.label.split(' ') : [month.label, ''];
   let offset = startIndex;
   return (
     <section className="ua-month-section" aria-labelledby={`ua-month-${month.monthKey}`} data-month={month.monthKey}>

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { resolveOfficialUnit } from '@/modules/commissions/officialCommissionCatalog';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ChevronLeft, LogOut, Menu, X } from 'lucide-react';
+import { CalendarDays, ChevronLeft, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import {
@@ -29,7 +29,9 @@ export default function CommissionSidebar({ module, menuItems, mobileOpen, onMob
   const isFinancial = module.slug === 'financeiro-gerencial';
   const { edition, changeEdition } = useFinancialEditionSelection({ canonicalize: false, enabled: isFinancial });
   const ModuleIcon = module.icon;
-  const sourceItems = menuItems ?? module.menus;
+  const baseItems = menuItems ?? module.menus;
+  const sourceItems = resolveOfficialUnit(module.slug) && !baseItems.some(item => item.path === 'agenda')
+    ? [...baseItems, { label: 'Agenda institucional', path: 'agenda', description: 'Agenda da unidade e da Fenasoja.', icon: CalendarDays }] : baseItems;
   const items = isFinancial && edition === '2028'
     ? sourceItems.filter((item) => item.path !== 'receitas-confirmadas' && item.path !== 'despesas-realizadas').map((item) => (
       item.path === 'receitas-projetadas' ? { ...item, label: 'Receitas' }
