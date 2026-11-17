@@ -102,8 +102,8 @@ describe('EventRelationshipWorkspace', () => {
     render(<EventRelationshipWorkspace event={baseEvent} onBack={vi.fn()} onSaveEvent={vi.fn()}
       onCreateSubevent={vi.fn()} onUpdateSubevent={vi.fn()} onRemoveSubevent={vi.fn()}
       canManage={false} canEditMain canDeleteSubevents={false} />);
-    expect(screen.getByRole('button', { name: 'Editar evento', exact: true })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Adicionar subevento', exact: true })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Editar evento' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Adicionar subevento' })).toBeDisabled();
     expect(screen.queryByRole('button', { name: /Editar subevento/ })).not.toBeInTheDocument();
   });
 
