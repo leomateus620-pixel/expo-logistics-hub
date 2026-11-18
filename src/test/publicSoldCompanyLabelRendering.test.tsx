@@ -22,6 +22,7 @@ vi.mock('@react-three/fiber', () => ({
 const lots = OFFICIAL_REFERENCE_ENTITIES.filter(entity => ['Q-P-09', 'Q-P-10', 'Q-P-11', 'Q-P-12'].includes(entity.publicIdentifier));
 const groups = preparePublicSoldCompanyGeometry([{ key: 'p-grid', tradeName: 'FOROESTE VEICULOS', entityIds: lots.map(lot => lot.id) }], lots);
 const [centerX, centerZ] = groups[0].components[0].fitCandidates[0].anchor;
+const paintedCaptions: string[][] = [];
 
 function frame(pixelsPerUnit: number, cameraOffset = 0) {
   const { width, height } = runtime.state.size;
@@ -34,14 +35,16 @@ function frame(pixelsPerUnit: number, cameraOffset = 0) {
 }
 
 beforeEach(() => {
+  paintedCaptions.length = 0;
   const context = {
     measureText: (text: string) => {
       const width = Array.from(text).reduce((sum, character) => sum + (/[I. ]/.test(character) ? 16 : 35), 0);
       return { width, actualBoundingBoxLeft: width / 2, actualBoundingBoxRight: width / 2, actualBoundingBoxAscent: 36, actualBoundingBoxDescent: 3 };
     },
     createLinearGradient: () => ({ addColorStop: vi.fn() }),
-    beginPath: vi.fn(), rect: vi.fn(), fill: vi.fn(), stroke: vi.fn(), fillText: vi.fn(),
-    save: vi.fn(), translate: vi.fn(), scale: vi.fn(), restore: vi.fn(),
+    beginPath: vi.fn(), rect: vi.fn(), fill: vi.fn(), stroke: vi.fn(),
+    fillText: (text: string) => { paintedCaptions.at(-1)!.push(text); },
+    save: () => { paintedCaptions.push([]); }, translate: vi.fn(), scale: vi.fn(), restore: vi.fn(),
   };
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D);
 });
@@ -59,11 +62,12 @@ describe('projected public sold company captions', () => {
     frame(7.55);
     expect(visible().some(Boolean)).toBe(false);
 
-    // Approximately 45 CSS px across the four-parcel public phone capture.
-    frame(13.6);
+    // Keep both original words even when the four-parcel group spans only 41 CSS px.
+    frame(12.3);
     expect(visible()[0]).toBe(false);
     expect(visible()[1]).toBe(true);
     expect(visible().filter(Boolean)).toHaveLength(1);
+    expect(paintedCaptions[visible().indexOf(true)]).toEqual(['FOROESTE', 'VEICULOS']);
 
     frame(35);
     expect(visible()[0]).toBe(true);

@@ -14,6 +14,8 @@ const CELL_GAP = 4;
 const COMPACT_PAD_X = 7;
 const COMPACT_PAD_Y = 6;
 const COMPACT_TEXT_SCALE = .72;
+const COMPACT_STACKED_LINE_HEIGHT = 55;
+const COMPACT_STACKED_TEXT_SCALE = .69;
 const COMPACT_WORLD_MARGIN = .10;
 const EDGE = new THREE.Color('#204da1');
 const FOCUSED_EDGE = new THREE.Color('#7bc9ff');
@@ -27,6 +29,7 @@ type CaptionLayout = {
   lines: string[];
   width: number;
   height: number;
+  lineHeight: number;
   padY: number;
   textScaleX: number;
   capHeight: number;
@@ -73,7 +76,7 @@ function chooseLabel(group: PublicSoldCompanyGeometry, measure: (value: string) 
     if (width > maxWidth) return null;
     const height = LINE_HEIGHT * lines.length + 2 * PAD_Y;
     const fit = fitPublicCompanyFootprint(group, width / height);
-    return fit ? { group, fit, lines, width, height, padY: PAD_Y, textScaleX: 1, capHeight } : null;
+    return fit ? { group, fit, lines, width, height, lineHeight: LINE_HEIGHT, padY: PAD_Y, textScaleX: 1, capHeight } : null;
   };
 
   let choice = fitLines([name]);
@@ -103,12 +106,14 @@ function chooseCompactLabels(full: Label, context: CanvasRenderingContext2D, max
     const centeredExtent = 2 * Math.max(metrics.actualBoundingBoxLeft, metrics.actualBoundingBoxRight);
     return Math.max(metrics.width, Number.isFinite(centeredExtent) ? centeredExtent : 0);
   };
-  const fitLines = (lines: string[]): CaptionLayout | null => {
-    const width = Math.ceil(Math.max(...lines.map(measure)) * COMPACT_TEXT_SCALE) + COMPACT_PAD_X * 2;
+  const fitLines = (lines: string[], stacked = false): CaptionLayout | null => {
+    const lineHeight = stacked ? COMPACT_STACKED_LINE_HEIGHT : LINE_HEIGHT;
+    const textScaleX = stacked ? COMPACT_STACKED_TEXT_SCALE : COMPACT_TEXT_SCALE;
+    const width = Math.ceil(Math.max(...lines.map(measure)) * textScaleX) + COMPACT_PAD_X * 2;
     if (width > maxWidth) return null;
-    const height = LINE_HEIGHT * lines.length + COMPACT_PAD_Y * 2;
+    const height = lineHeight * lines.length + COMPACT_PAD_Y * 2;
     const fit = fitPublicCompanyFootprint(group, width / height, { fixedPlacement, maxMargin: COMPACT_WORLD_MARGIN });
-    return fit ? { group, fit, lines, width, height, padY: COMPACT_PAD_Y, textScaleX: COMPACT_TEXT_SCALE, capHeight } : null;
+    return fit ? { group, fit, lines, width, height, lineHeight, padY: COMPACT_PAD_Y, textScaleX, capHeight } : null;
   };
   const glyphSpan = (caption: CaptionLayout | null) => caption ? caption.fit.height / caption.height * caption.capHeight : 0;
   const fitName = (text: string) => {
@@ -118,10 +123,17 @@ function chooseCompactLabels(full: Label, context: CanvasRenderingContext2D, max
     return glyphSpan(twoLines) > glyphSpan(oneLine) * 1.03 ? twoLines : oneLine;
   };
 
-  const exact = fitName(name);
+  const words = name.split(/\s+/u);
+  // A short two-word name can read at overview scale when each original word
+  // gets its own line. On a shallower projection, try the intact one-line form
+  // before abbreviating; every form uses the same cadastral placement.
+  const exact = words.length === 2 && words.every(word => Array.from(word).length <= 12)
+    ? [fitLines(words, true), fitLines([name])]
+    : [fitName(name)];
+  const exactGlyphSpan = Math.max(...exact.map(glyphSpan));
   const abbreviated = compactCompanyCaptionAbbreviations(name).map(fitName)
-    .filter(caption => glyphSpan(caption) > glyphSpan(exact) * 1.025);
-  return [exact, ...abbreviated].flatMap(caption => caption ? [makeLabel(caption)] : []);
+    .filter(caption => glyphSpan(caption) > exactGlyphSpan * 1.025);
+  return [...exact, ...abbreviated].flatMap(caption => caption ? [makeLabel(caption)] : []);
 }
 
 function setLabelUvs(label: Label, uv: THREE.BufferAttribute, width: number, height: number) {
@@ -217,7 +229,7 @@ function createLabels(groups: PublicSoldCompanyGeometry[], maxTextureSize: numbe
     context.save();
     context.translate(label.x + label.width / 2, label.y + label.padY);
     context.scale(label.textScaleX, 1);
-    label.lines.forEach((line, index) => context.fillText(line, 0, (index + 0.5) * LINE_HEIGHT));
+    label.lines.forEach((line, index) => context.fillText(line, 0, (index + 0.5) * label.lineHeight));
     context.restore();
 
     for (const [worldX, worldZ] of label.fit.footprint) positions.push(worldX, label.fit.elevation, worldZ);

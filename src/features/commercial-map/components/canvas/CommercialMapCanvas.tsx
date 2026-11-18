@@ -2155,7 +2155,8 @@ const PUBLIC_FOCUS_FRAMING = {
 
 const PUBLIC_COMPANY_PORTRAIT_FRAMING: SegmentFraming = {
   ...PUBLIC_FOCUS_FRAMING,
-  camera: { ...PUBLIC_FOCUS_FRAMING.camera, padding: 1.12 },
+  // Keep nearby blocks square to the narrow screen and reduce ground-plane foreshortening.
+  camera: { ...PUBLIC_FOCUS_FRAMING.camera, direction: [0.025, 0.98, 0.19], padding: 1.07 },
 };
 
 function CameraRig({
