@@ -32,6 +32,8 @@
   color: oklch(var(--muted-foreground));
 }
 
+.public-map-title-compact { display: none; }
+
 .public-map-view-switch {
   display: inline-flex;
   gap: 6px;
@@ -296,6 +298,76 @@
 
 @media (max-width: 360px) {
   .public-map-details-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .public-map-shell[data-public-company-map] .public-map-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 5px 10px;
+  }
+
+  .public-map-shell[data-public-company-map] .public-map-header h1 {
+    line-height: 1.15;
+  }
+
+  .public-map-shell[data-public-company-map] .public-map-header p {
+    margin-top: 3px;
+    font-size: 0.69rem;
+    line-height: 1.2;
+  }
+
+  .public-map-shell[data-public-company-map] .public-map-title-full {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .public-map-shell[data-public-company-map] .public-map-title-compact { display: inline; }
+  .public-map-shell[data-public-company-map] .public-map-area-description { display: none; }
+
+  .public-map-shell[data-public-company-map] .public-map-view-switch {
+    flex-wrap: nowrap;
+    gap: 2px;
+    padding: 2px;
+  }
+
+  .public-map-shell[data-public-company-map] .public-map-view-switch button {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 3px;
+    font-size: 0.65rem;
+    line-height: 1;
+  }
+
+  .public-map-shell[data-public-company-map] .public-map-refit span { display: none; }
+
+  .public-map-shell[data-public-company-map] .public-map-legend {
+    padding: 4px 10px;
+    line-height: 1.25;
+  }
+
+  .public-map-shell[data-public-company-map] .public-map-segment { display: none; }
+  .public-map-shell[data-public-company-map] .public-map-legend__statuses { flex-wrap: wrap; }
+  .public-map-shell[data-public-company-map] .public-map-legend i.is-external-lot { width: 14px; height: 14px; }
+
+  .public-map-shell[data-public-company-map] .public-map-footer {
+    justify-content: center;
+    padding: 4px 10px max(4px, env(safe-area-inset-bottom));
+    font-size: 0.65rem;
+    line-height: 1.25;
+  }
+
+  .public-map-shell[data-public-company-map] .public-map-footer span:first-child { display: none; }
 }
 
 /* Faixa discreta no rodapé: informa sem cobrir o mapa nem a ficha do lote. */

@@ -2,6 +2,7 @@ import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { fitPublicCompanyFootprint, type PublicSoldCompanyGeometry } from '../../public/publicSoldCompanyGeometry';
+import { compactCompanyCaptionAbbreviations, isReadablePublicCompanyCaption, usesCompactPublicCompanyLabels } from '../../public/publicSoldCompanyLabelPolicy';
 import { commercialMapDiagnosticsEnabled, markCommercialMapStage, measureCommercialMapSync } from '../../utils/performanceDiagnostics';
 
 const FONT_SIZE = 54;
@@ -10,24 +11,41 @@ const LINE_HEIGHT = 61;
 const PAD_X = 17;
 const PAD_Y = 12;
 const CELL_GAP = 4;
+const COMPACT_PAD_X = 7;
+const COMPACT_PAD_Y = 6;
+const COMPACT_TEXT_SCALE = .72;
+const COMPACT_STACKED_LINE_HEIGHT = 55;
+const COMPACT_STACKED_TEXT_SCALE = .69;
+const COMPACT_WORLD_MARGIN = .10;
 const EDGE = new THREE.Color('#204da1');
 const FOCUSED_EDGE = new THREE.Color('#7bc9ff');
 const noRaycast = () => {};
 
 type Footprint = NonNullable<ReturnType<typeof fitPublicCompanyFootprint>>;
 type Rect = { x0: number; x1: number; y0: number; y1: number };
-type Label = {
+type CaptionLayout = {
   group: PublicSoldCompanyGeometry;
   fit: Footprint;
   lines: string[];
   width: number;
   height: number;
+  lineHeight: number;
+  padY: number;
+  textScaleX: number;
+  capHeight: number;
+};
+type Label = CaptionLayout & {
   x: number;
   y: number;
   index: number;
   flipped: boolean;
   rect: Rect;
   opacity: number;
+};
+type CompanyLabels = {
+  full: Label;
+  compact: Label[];
+  active: Label | null;
 };
 
 function splitLabel(name: string, measure: (value: string) => number): string[] | null {
@@ -45,7 +63,11 @@ function splitLabel(name: string, measure: (value: string) => number): string[] 
   return result;
 }
 
-function chooseLabel(group: PublicSoldCompanyGeometry, measure: (value: string) => number, maxWidth: number): Label | null {
+function makeLabel(caption: CaptionLayout): Label {
+  return { ...caption, x: 0, y: 0, index: -1, flipped: false, opacity: 0, rect: { x0: 0, x1: 0, y0: 0, y1: 0 } };
+}
+
+function chooseLabel(group: PublicSoldCompanyGeometry, measure: (value: string) => number, maxWidth: number, capHeight: number): Label | null {
   if (!group.tradeName) return null;
   const name = group.tradeName;
   const characters = Array.from(name);
@@ -54,7 +76,7 @@ function chooseLabel(group: PublicSoldCompanyGeometry, measure: (value: string) 
     if (width > maxWidth) return null;
     const height = LINE_HEIGHT * lines.length + 2 * PAD_Y;
     const fit = fitPublicCompanyFootprint(group, width / height);
-    return fit ? { group, fit, lines, width, height } : null;
+    return fit ? { group, fit, lines, width, height, lineHeight: LINE_HEIGHT, padY: PAD_Y, textScaleX: 1, capHeight } : null;
   };
 
   let choice = fitLines([name]);
@@ -73,9 +95,45 @@ function chooseLabel(group: PublicSoldCompanyGeometry, measure: (value: string) 
       if (glyphSize(choice) >= minimumFullSize) break;
     }
   }
-  return choice ? {
-    ...choice, x: 0, y: 0, index: 0, flipped: false, opacity: 0, rect: { x0: 0, x1: 0, y0: 0, y1: 0 },
-  } : null;
+  return choice ? makeLabel(choice) : null;
+}
+
+function chooseCompactLabels(full: Label, context: CanvasRenderingContext2D, maxWidth: number): Label[] {
+  const { group, fit: fixedPlacement, capHeight } = full;
+  const name = group.tradeName!;
+  const measure = (text: string) => {
+    const metrics = context.measureText(text);
+    const centeredExtent = 2 * Math.max(metrics.actualBoundingBoxLeft, metrics.actualBoundingBoxRight);
+    return Math.max(metrics.width, Number.isFinite(centeredExtent) ? centeredExtent : 0);
+  };
+  const fitLines = (lines: string[], stacked = false): CaptionLayout | null => {
+    const lineHeight = stacked ? COMPACT_STACKED_LINE_HEIGHT : LINE_HEIGHT;
+    const textScaleX = stacked ? COMPACT_STACKED_TEXT_SCALE : COMPACT_TEXT_SCALE;
+    const width = Math.ceil(Math.max(...lines.map(measure)) * textScaleX) + COMPACT_PAD_X * 2;
+    if (width > maxWidth) return null;
+    const height = lineHeight * lines.length + COMPACT_PAD_Y * 2;
+    const fit = fitPublicCompanyFootprint(group, width / height, { fixedPlacement, maxMargin: COMPACT_WORLD_MARGIN });
+    return fit ? { group, fit, lines, width, height, lineHeight, padY: COMPACT_PAD_Y, textScaleX, capHeight } : null;
+  };
+  const glyphSpan = (caption: CaptionLayout | null) => caption ? caption.fit.height / caption.height * caption.capHeight : 0;
+  const fitName = (text: string) => {
+    const oneLine = fitLines([text]);
+    const wrapped = splitLabel(text, measure);
+    const twoLines = wrapped ? fitLines(wrapped) : null;
+    return glyphSpan(twoLines) > glyphSpan(oneLine) * 1.03 ? twoLines : oneLine;
+  };
+
+  const words = name.split(/\s+/u);
+  // A short two-word name can read at overview scale when each original word
+  // gets its own line. On a shallower projection, try the intact one-line form
+  // before abbreviating; every form uses the same cadastral placement.
+  const exact = words.length === 2 && words.every(word => Array.from(word).length <= 12)
+    ? [fitLines(words, true), fitLines([name])]
+    : [fitName(name)];
+  const exactGlyphSpan = Math.max(...exact.map(glyphSpan));
+  const abbreviated = compactCompanyCaptionAbbreviations(name).map(fitName)
+    .filter(caption => glyphSpan(caption) > exactGlyphSpan * 1.025);
+  return [...exact, ...abbreviated].flatMap(caption => caption ? [makeLabel(caption)] : []);
 }
 
 function setLabelUvs(label: Label, uv: THREE.BufferAttribute, width: number, height: number) {
@@ -93,38 +151,56 @@ function setLabelUvs(label: Label, uv: THREE.BufferAttribute, width: number, hei
   uv.setXY(label.index + 3, left, bottom);
 }
 
-function createLabels(groups: PublicSoldCompanyGeometry[], maxTextureSize: number, maxAnisotropy: number) {
+function createLabels(groups: PublicSoldCompanyGeometry[], maxTextureSize: number, maxAnisotropy: number, compact: boolean) {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
   if (!context) return null;
   context.font = FONT;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
   const atlasWidth = Math.min(2048, maxTextureSize);
-  const candidates = groups.map(group => chooseLabel(group, text => context.measureText(text).width, atlasWidth - 2 * CELL_GAP))
+  const maxLabelWidth = atlasWidth - 2 * CELL_GAP;
+  const capitals = compact ? context.measureText('H') : null;
+  const capHeight = (capitals && capitals.actualBoundingBoxAscent + capitals.actualBoundingBoxDescent) || FONT_SIZE * .72;
+  const full = groups.map(group => chooseLabel(group, text => context.measureText(text).width, maxLabelWidth, capHeight))
     .filter((label): label is Label => Boolean(label));
 
   // Priority only changes for explicit selection or hover, so nearby names do not trade places during orbit.
-  candidates.sort((a, b) => b.fit.width * b.fit.height - a.fit.width * a.fit.height || a.group.key.localeCompare(b.group.key));
+  full.sort((a, b) => b.fit.width * b.fit.height - a.fit.width * a.fit.height || a.group.key.localeCompare(b.group.key));
+  const companyLabels: CompanyLabels[] = full.map(label => ({
+    full: label, compact: compact ? chooseCompactLabels(label, context, maxLabelWidth) : [], active: null,
+  }));
+  // Do not trade an ordinary caption for a compact one if a GPU has a small atlas limit.
+  const candidates = [...full, ...companyLabels.flatMap(company => company.compact)];
   const labels: Label[] = [];
   let x = CELL_GAP;
   let y = CELL_GAP;
   let rowHeight = 0;
-  for (const label of candidates) {
+  let occupiedHeight = 0;
+  let heightLimit = maxTextureSize;
+  for (const [index, label] of candidates.entries()) {
+    if (index === full.length) {
+      // Mobile variants can reuse a larger existing atlas without increasing its allocation.
+      heightLimit = Math.min(maxTextureSize, Math.max(4096, THREE.MathUtils.ceilPowerOfTwo(occupiedHeight)));
+    }
     if (x + label.width + CELL_GAP > atlasWidth) {
       x = CELL_GAP;
       y += rowHeight + CELL_GAP;
       rowHeight = 0;
     }
-    if (y + label.height + CELL_GAP > maxTextureSize) continue;
+    const cellBottom = y + label.height + CELL_GAP;
+    if (cellBottom > heightLimit) continue;
     label.x = x;
     label.y = y;
     label.index = labels.length * 4;
     labels.push(label);
     x += label.width + CELL_GAP;
     rowHeight = Math.max(rowHeight, label.height);
+    occupiedHeight = Math.max(occupiedHeight, cellBottom);
   }
   if (!labels.length) return null;
   canvas.width = atlasWidth;
-  canvas.height = Math.min(maxTextureSize, THREE.MathUtils.ceilPowerOfTwo(y + rowHeight + CELL_GAP));
+  canvas.height = Math.min(maxTextureSize, THREE.MathUtils.ceilPowerOfTwo(occupiedHeight));
   context.font = FONT;
   context.textBaseline = 'middle';
   context.textAlign = 'center';
@@ -150,8 +226,11 @@ function createLabels(groups: PublicSoldCompanyGeometry[], maxTextureSize: numbe
     context.lineWidth = 1.5;
     context.stroke();
     context.fillStyle = '#fff8e8';
-    label.lines.forEach((line, index) =>
-      context.fillText(line, label.x + label.width / 2, label.y + PAD_Y + (index + 0.5) * LINE_HEIGHT));
+    context.save();
+    context.translate(label.x + label.width / 2, label.y + label.padY);
+    context.scale(label.textScaleX, 1);
+    label.lines.forEach((line, index) => context.fillText(line, 0, (index + 0.5) * label.lineHeight));
+    context.restore();
 
     for (const [worldX, worldZ] of label.fit.footprint) positions.push(worldX, label.fit.elevation, worldZ);
     setLabelUvs(label, uv, canvas.width, canvas.height);
@@ -179,7 +258,9 @@ function createLabels(groups: PublicSoldCompanyGeometry[], maxTextureSize: numbe
       void main() {
         atlasUv = uv;
         opacity = labelOpacity;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+        gl_Position = labelOpacity > 0.
+          ? projectionMatrix * modelViewMatrix * vec4(position, 1.)
+          : vec4(2., 2., 2., 1.);
       }`,
     fragmentShader: `
       uniform sampler2D atlas;
@@ -196,8 +277,10 @@ function createLabels(groups: PublicSoldCompanyGeometry[], maxTextureSize: numbe
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = 'public-sold-company-labels';
   mesh.raycast = noRaycast;
-  mesh.userData = { presentationOnly: true, labelCount: labels.length };
-  return { mesh, labels, atlas, uv, opacity };
+  const packed = companyLabels.filter(company => company.full.index >= 0);
+  packed.forEach(company => { company.compact = company.compact.filter(label => label.index >= 0); });
+  mesh.userData = { presentationOnly: true, labelCount: packed.length };
+  return { mesh, labels: packed, atlas, uv, opacity };
 }
 
 function createContours(groups: PublicSoldCompanyGeometry[]) {
@@ -259,7 +342,7 @@ function projectLabel(label: Label, matrix: THREE.Matrix4, width: number, height
   if (Math.abs(dx) > Math.max(3, span * 0.1)) label.flipped = dx < 0;
   const crossDistance = (from: THREE.Vector4, to: THREE.Vector4) =>
     Math.abs(dx * (to.y - from.y) - dy * (to.x - from.x)) / span;
-  return Math.min(crossDistance(a, d), crossDistance(b, c)) * (FONT_SIZE * 0.72 / label.height);
+  return Math.min(crossDistance(a, d), crossDistance(b, c)) * (label.capHeight / label.height);
 }
 
 /** One atlas draw and one contour draw. Their raycasts are disabled so the cadastral lot receives input. */
@@ -270,8 +353,11 @@ export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ g
 }) {
   const gl = useThree(state => state.gl);
   const invalidate = useThree(state => state.invalidate);
+  // Wrapping page controls can make a phone's canvas shorter than it is wide.
+  const useCompact = useThree(({ size }) => usesCompactPublicCompanyLabels(size.width,
+    typeof window === 'undefined' ? size.height : window.innerHeight));
   const labels = useMemo(() => measureCommercialMapSync('public-company-label-layout', () =>
-    createLabels(groups, gl.capabilities.maxTextureSize, gl.capabilities.getMaxAnisotropy())), [gl, groups]);
+    createLabels(groups, gl.capabilities.maxTextureSize, gl.capabilities.getMaxAnisotropy(), useCompact)), [gl, groups, useCompact]);
   const contours = useMemo(() => createContours(groups), [groups]);
   const groupByEntity = useMemo(() => new Map(groups.flatMap(group => group.entityIds.map(id => [id, group.key] as const))), [groups]);
   const selected = selectedEntityId ? groupByEntity.get(selectedEntityId) : undefined;
@@ -279,11 +365,11 @@ export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ g
   const ordered = useMemo(() => {
     const list = labels?.labels ?? [];
     const priorities = [selected, hovered].filter((key, index, keys) => key && keys.indexOf(key) === index);
-    return priorities.flatMap(key => list.filter(label => label.group.key === key))
-      .concat(list.filter(label => !priorities.includes(label.group.key)));
+    return priorities.flatMap(key => list.filter(company => company.full.group.key === key))
+      .concat(list.filter(company => !priorities.includes(company.full.group.key)));
   }, [hovered, labels, selected]);
   const projection = useMemo(() => new THREE.Matrix4(), []);
-  const last = useRef<{ matrix: THREE.Matrix4; width: number; height: number; ordered: Label[] }>();
+  const last = useRef<{ matrix: THREE.Matrix4; width: number; height: number; ordered: CompanyLabels[] }>();
   const points = useMemo(() => Array.from({ length: 4 }, () => new THREE.Vector4()), []);
   const accepted = useMemo<Rect[]>(() => [], []);
   const layoutFrames = useRef(0);
@@ -321,25 +407,44 @@ export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ g
     let opacityChanged = false;
     let uvChanged = false;
     let anyVisible = false;
-    for (const label of ordered) {
+    const readVisibleHeight = (label: Label) => {
       const flipped = label.flipped;
       const glyphHeight = projectLabel(label, projection, size.width, size.height, points);
-      const focused = label.group.key === selected || label.group.key === hovered;
-      const fadeStart = focused ? 7.2 : 8.2;
-      const visibility = THREE.MathUtils.smoothstep(glyphHeight, fadeStart, fadeStart + 1.5);
-      const value = visibility >= 0.15 && fitsNextLabel(label.rect, accepted) ? 0.68 + 0.32 * visibility : 0;
-      if (value > 0) {
-        accepted.push(label.rect);
-        anyVisible = true;
+      if (flipped !== label.flipped) {
+        setLabelUvs(label, labels.uv, labels.atlas.image.width, labels.atlas.image.height);
+        uvChanged = true;
       }
+      return glyphHeight > 0 && fitsNextLabel(label.rect, accepted) ? glyphHeight : 0;
+    };
+    const setOpacity = (label: Label, value: number) => {
       if (Math.abs(value - label.opacity) >= 0.01 || (value === 0 && label.opacity > 0)) {
         label.opacity = value;
         for (let i = 0; i < 4; i++) labels.opacity.setX(label.index + i, value);
         opacityChanged = true;
       }
-      if (flipped !== label.flipped) {
-        setLabelUvs(label, labels.uv, labels.atlas.image.width, labels.atlas.image.height);
-        uvChanged = true;
+    };
+    for (const company of ordered) {
+      const { full } = company;
+      const fullHeight = readVisibleHeight(full);
+      let next: Label | null;
+      let alpha = 1;
+      if (useCompact) {
+        next = isReadablePublicCompanyCaption(fullHeight, 'full', company.active === full)
+          ? full
+          : company.compact.find(label => isReadablePublicCompanyCaption(readVisibleHeight(label), 'compact')) ?? null;
+      } else {
+        const focused = full.group.key === selected || full.group.key === hovered;
+        const fadeStart = focused ? 7.2 : 8.2;
+        const visibility = THREE.MathUtils.smoothstep(fullHeight, fadeStart, fadeStart + 1.5);
+        next = visibility >= 0.15 ? full : null;
+        alpha = 0.68 + 0.32 * visibility;
+      }
+      if (company.active && company.active !== next) setOpacity(company.active, 0);
+      company.active = next;
+      if (next) {
+        setOpacity(next, alpha);
+        accepted.push(next.rect);
+        anyVisible = true;
       }
     }
     labels.mesh.visible = anyVisible;

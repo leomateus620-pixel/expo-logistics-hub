@@ -111,6 +111,10 @@ describe('public sold company cadastral composition', () => {
       expect(fit.anchor[0]).toBeCloseTo((minX + maxX) / 2, 7);
       expect(fit.anchor[1]).toBeCloseTo((minZ + maxZ) / 2, 7);
     }
+    const full = fitPublicCompanyFootprint(geometry, 2.2)!;
+    const compact = fitPublicCompanyFootprint(geometry, 1.6, { fixedPlacement: full, maxMargin: .10 });
+    expect(compact).toMatchObject({ anchor: full.anchor, angle: full.angle, componentIndex: full.componentIndex });
+    expect(polygonClipping.difference([compact!.footprint], geometry.components[full.componentIndex].rings)).toEqual([]);
     expect(JSON.stringify(lots.map(lot => lot.geometry))).toBe(before);
   });
 

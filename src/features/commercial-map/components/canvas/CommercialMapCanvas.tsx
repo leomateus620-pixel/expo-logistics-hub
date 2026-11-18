@@ -22,6 +22,7 @@ import { publicLotOutlinePositions } from '../../public/publicLotOutline';
 import { PUBLIC_NAVIGATION_SAVE_EVENT, savePublicNavigation, type PublicNavigation } from '../../public/publicNavigation';
 import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { preparePublicSoldCompanyGeometry, type PublicSoldCompanyGroupInput } from '../../public/publicSoldCompanyGeometry';
+import { usesCompactPublicCompanyLabels } from '../../public/publicSoldCompanyLabelPolicy';
 import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { PublicSoldCompanyLabels } from './PublicSoldCompanyLabels';
@@ -2152,6 +2153,12 @@ const PUBLIC_FOCUS_FRAMING = {
   },
 } satisfies SegmentFraming;
 
+const PUBLIC_COMPANY_PORTRAIT_FRAMING: SegmentFraming = {
+  ...PUBLIC_FOCUS_FRAMING,
+  // Keep nearby blocks square to the narrow screen and reduce ground-plane foreshortening.
+  camera: { ...PUBLIC_FOCUS_FRAMING.camera, direction: [0.025, 0.98, 0.19], padding: 1.07 },
+};
+
 function CameraRig({
   christmasEnabled,
   selectedEntity,
@@ -2165,6 +2172,7 @@ function CameraRig({
   gastronomyStructureIds,
   segmentOverride,
   publicFocusEntityIds,
+  publicCompanyPresentation,
   publicCompanyFocus,
   initialPublicView,
   hydrologicalModeActive,
@@ -2181,6 +2189,7 @@ function CameraRig({
   gastronomyStructureIds: ReadonlySet<string>;
   segmentOverride?: CommercialMapSegmentDefinition | null;
   publicFocusEntityIds?: ReadonlySet<string> | null;
+  publicCompanyPresentation: boolean;
   publicCompanyFocus?: PublicCompanyFocus | null;
   initialPublicView?: PublicNavigation | null;
   hydrologicalModeActive: boolean;
@@ -2252,12 +2261,10 @@ function CameraRig({
       : []),
     [exteriorRenderedEntities, publicFocusEntityIds],
   );
-  const framingSegment = useMemo<SegmentFraming | null>(
-    () => (publicFocusEntities.length > 0
-      ? (activeSegment ?? PUBLIC_FOCUS_FRAMING)
-      : activeSegment),
-    [activeSegment, publicFocusEntities.length],
-  );
+  const publicAreaFraming = publicCompanyPresentation
+    && usesCompactPublicCompanyLabels(size.width, typeof window === 'undefined' ? size.height : window.innerHeight)
+    ? PUBLIC_COMPANY_PORTRAIT_FRAMING : PUBLIC_FOCUS_FRAMING;
+  const framingSegment = activeSegment ?? (publicFocusEntities.length > 0 ? publicAreaFraming : null);
   const framingSegmentEntities = publicFocusEntities.length > 0
     ? publicFocusEntities
     : activeSegmentEntities;
@@ -5927,6 +5934,7 @@ const Scene = memo(function Scene({
         gastronomyStructureIds={gastronomyStructureIds}
         segmentOverride={segmentOverride}
         publicFocusEntityIds={publicFocusEntityIds}
+        publicCompanyPresentation={publicCompanyGroups !== undefined}
         publicCompanyFocus={publicCompanyFocusCommand}
         initialPublicView={initialPublicView}
         hydrologicalModeActive={hydrologicalModeActive}

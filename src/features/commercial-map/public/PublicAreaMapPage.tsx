@@ -221,13 +221,22 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
     <strong>Não foi possível preparar o mapa.</strong><p>A consulta dos lotes continua disponível na lista.</p>
     <div className="public-map-stage__actions"><button onClick={retry}>Tentar novamente</button><button onClick={() => setViewMode('list')}>Ver lista de lotes</button></div>
   </div>;
-  return <main className="public-map-shell" data-area={slug} data-public-external={usesParkContext || undefined}>
+  const areaName = data?.scope.name ?? area.name;
+  const compactAreaName = showCompanies && area.shortName !== area.name ? area.shortName : null;
+  return <main className="public-map-shell" data-area={slug} data-public-external={usesParkContext || undefined}
+    data-public-company-map={showCompanies || undefined}>
     <header className="public-map-header">
-      <div><h1>{data?.scope.name ?? area.name}</h1><p>{data ? `${data.scope.lotCount} lotes · ${formatAreaSqmLabel(data.scope.officialAreaSqm) ?? '—'} de metragem comercial` : 'Carregando…'}</p></div>
+      <div>
+        <h1>{compactAreaName ? <>
+          <span className="public-map-title-full">{areaName}</span>
+          <span className="public-map-title-compact" aria-hidden="true">{compactAreaName}</span>
+        </> : areaName}</h1>
+        <p>{data ? <>{data.scope.lotCount} lotes · {formatAreaSqmLabel(data.scope.officialAreaSqm) ?? '—'}<span className="public-map-area-description"> de metragem comercial</span></> : 'Carregando…'}</p>
+      </div>
       <div className="public-map-view-switch" role="group" aria-label="Modo de visualização">
         <button type="button" aria-pressed={showMap} disabled={!webglAvailable} onClick={() => setViewMode('map')}><MapIcon aria-hidden="true" /><span>Mapa</span></button>
         <button type="button" aria-pressed={!showMap} onClick={() => setViewMode('list')}><LayoutList aria-hidden="true" /><span>Lista</span></button>
-        {usesParkContext && showMap && <button type="button" className="public-map-refit" onClick={refitArea}><Crosshair aria-hidden="true" /><span>Reenquadrar área</span></button>}
+        {usesParkContext && showMap && <button type="button" className="public-map-refit" aria-label="Reenquadrar área" title="Reenquadrar área" onClick={refitArea}><Crosshair aria-hidden="true" /><span>Reenquadrar área</span></button>}
       </div>
     </header>
     {data && showMap && <PublicMapLegend area={area} />}

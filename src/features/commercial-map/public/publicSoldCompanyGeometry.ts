@@ -250,15 +250,22 @@ export function preparePublicSoldCompanyGeometry(groups: readonly PublicSoldComp
 
 /** Choose one internal box whose padding also fits; the center alone cannot
  * prove containment in a concavity. All work is independent of camera pose. */
-export function fitPublicCompanyFootprint(group: PublicSoldCompanyGeometry, aspectRatio: number): PublicCompanyFootprint | null {
+export function fitPublicCompanyFootprint(group: PublicSoldCompanyGeometry, aspectRatio: number, options: {
+  fixedPlacement?: Pick<PublicCompanyFootprint, 'anchor' | 'angle' | 'componentIndex'>;
+  maxMargin?: number;
+} = {}): PublicCompanyFootprint | null {
   if (!group.tradeName || !Number.isFinite(aspectRatio) || aspectRatio <= 0) return null;
   let result: PublicCompanyFootprint | null = null;
   let bestScore = 0;
+  const { fixedPlacement, maxMargin = .22 } = options;
   for (const [componentIndex, component] of group.components.entries()) {
+    if (fixedPlacement && fixedPlacement.componentIndex !== componentIndex) continue;
     const preferredHeight = Math.min(5.5, Math.sqrt(component.area) * .56);
-    const margin = Math.min(.22, preferredHeight * .12);
+    const margin = Math.min(maxMargin, preferredHeight * .12);
     const turnedWeight = component.hasCartographicSeams ? .65 : .78;
     for (const candidate of component.fitCandidates) {
+      if (fixedPlacement && (candidate.anchor[0] !== fixedPlacement.anchor[0]
+        || candidate.anchor[1] !== fixedPlacement.anchor[1] || candidate.angle !== fixedPlacement.angle)) continue;
       const fits = (height: number) => !candidate.edges.some(edge => edgeEntersBox(edge, height * aspectRatio / 2 + margin, height / 2 + margin));
       let lower = 0, upper = preferredHeight;
       if (fits(upper)) lower = upper;
