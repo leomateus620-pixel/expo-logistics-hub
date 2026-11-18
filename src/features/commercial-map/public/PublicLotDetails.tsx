@@ -43,6 +43,8 @@ export const PublicLotDetails = memo(function PublicLotDetails({
 }) {
   const [expanded, setExpanded] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
+  const expandButton = useRef<HTMLButtonElement>(null);
+  const detailsPanel = useRef<HTMLElement>(null);
   useEffect(() => {
     setExpanded(false);
     closeButton.current?.focus({ preventScroll: true });
@@ -57,9 +59,17 @@ export const PublicLotDetails = memo(function PublicLotDetails({
   const segunda = stageValue(lot.pricing.segundaPricePerSqm, lot.pricing.segundaTotal, publishable);
   const area = formatAreaSqmLabel(lot.officialAreaSqm) ?? 'Metragem não informada';
   const identity = resolveLotIdentity(lot, null, null, areaName);
+  const focusCompany = () => {
+    if (expanded) {
+      setExpanded(false);
+      if (detailsPanel.current) detailsPanel.current.scrollTop = 0;
+      expandButton.current?.focus({ preventScroll: true });
+    }
+    onFocusCompany?.();
+  };
 
   return (
-     <aside className={`public-map-details${compact ? ' is-compact' : ''}${expanded ? ' is-expanded' : ''}`} aria-label={identity.full}>
+     <aside ref={detailsPanel} className={`public-map-details${compact ? ' is-compact' : ''}${expanded ? ' is-expanded' : ''}`} aria-label={identity.full}>
       <header>
         <div>
            <strong>{identity.title}</strong>
@@ -69,7 +79,7 @@ export const PublicLotDetails = memo(function PublicLotDetails({
           <X aria-hidden="true" />
         </button>
       </header>
-      {compact && <button type="button" className="public-map-details-expand" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'Recolher ficha' : 'Expandir ficha'}</button>}
+      {compact && <button ref={expandButton} type="button" className="public-map-details-expand" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'Recolher ficha' : 'Expandir ficha'}</button>}
 
       {company && <section className="public-map-details-company" aria-label="Empresa e lotes vinculados">
         <h3>{companyLogoUrl && <img src={companyLogoUrl} alt="" />}<span>{company.tradeName ?? 'Empresa não informada'}</span></h3>
@@ -79,7 +89,7 @@ export const PublicLotDetails = memo(function PublicLotDetails({
             return <li key={member.id}>{[linked.title, linked.location].filter(Boolean).join(' · ')}</li>;
           })}
         </ul>
-        {onFocusCompany && <button type="button" onClick={onFocusCompany}><Crosshair aria-hidden="true" />Enquadrar {company.lots.length === 1 ? 'lote' : 'lotes vinculados'}</button>}
+        {onFocusCompany && <button type="button" onClick={focusCompany}><Crosshair aria-hidden="true" />Enquadrar {company.lots.length === 1 ? 'lote' : 'lotes vinculados'}</button>}
       </section>}
 
       <dl className="public-map-details-grid">

@@ -68,7 +68,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   useEffect(() => { takePublicNavigation(); }, []);
   const [viewMode, setViewMode] = useState<'map' | 'list'>(restoredNavigation?.viewMode ?? 'map');
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null);
-  const [companyFocus, setCompanyFocus] = useState<{ requestId: number; entityIds: readonly string[] } | null>(null);
+  const [companyFocus, setCompanyFocus] = useState<{ requestId: number; groupKey: string } | null>(null);
   const companyFocusSequence = useRef(0);
   const [lotGoneNotice, setLotGoneNotice] = useState(false);
   const [initialized, setInitialized] = useState(false);
@@ -166,6 +166,9 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   }, [interactionScope, lotIdByModuleKey, lotsByEntity, selectedEntityId, selectedModuleId, track]);
   const selectedLot = useMemo(() => lots.find(lot => lot.id === selectedLotId) ?? null, [lots, selectedLotId]);
   const selectedCompany = selectedLot ? companies.byEntityId.get(selectedLot.entityId) : undefined;
+  const publicCompanyFocus = useMemo(() => companiesCurrent && selectedCompany && companyFocus?.groupKey === selectedCompany.key
+    ? { requestId: companyFocus.requestId, entityIds: selectedCompany.entityIds }
+    : null, [companiesCurrent, companyFocus, selectedCompany]);
   usePublicAutoRefresh(Boolean(selectedLot) || cameraNavigating);
   useEffect(() => {
     const save = () => savePublicNavigation({ selectedLotId, viewMode });
@@ -196,7 +199,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const focusSelectedCompany = () => {
     if (!selectedCompany || !webglAvailable) return;
     setViewMode('map');
-    setCompanyFocus({ requestId: ++companyFocusSequence.current, entityIds: selectedCompany.entityIds });
+    setCompanyFocus({ requestId: ++companyFocusSequence.current, groupKey: selectedCompany.key });
   };
   const refitArea = () => {
     closeDetails();
@@ -257,7 +260,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
             interactiveEntityIds={interactionScope.interactiveEntityIds} publicFocusEntityIds={usesParkContext ? publicScenePolicy?.interactiveEntityIds : null}
             publicScenePolicy={publicScenePolicy} initialPublicView={restoredNavigation} active={showMap}
             publicCompanyGroups={showCompanies ? companies.groups : undefined}
-            publicCompanyFocus={companiesCurrent ? companyFocus : null} /></Suspense>
+            publicCompanyFocus={publicCompanyFocus} /></Suspense>
           {renderState !== 'ready' && <div className="public-map-stage" role="status" aria-live="polite">
             {(renderState === 'preparing' || renderState === 'recovering') && <span className="public-map-stage__spinner" aria-hidden="true" />}<strong>{renderState === 'failed' ? 'Não foi possível desenhar o mapa neste dispositivo.' : renderState === 'slow' ? 'O mapa está demorando mais que o normal.' : renderState === 'recovering' ? 'Restaurando a visualização do mapa…' : 'Preparando o mapa da área…'}</strong>
             <div className="public-map-stage__actions">{renderState !== 'preparing' && <button onClick={retry}>Tentar novamente</button>}<button onClick={() => setViewMode('list')}>Ver lista de lotes</button></div>
