@@ -2261,6 +2261,12 @@ function CameraRig({
       : []),
     [exteriorRenderedEntities, publicFocusEntityIds],
   );
+  const publicCompanyFocusEntities = useMemo(() => {
+    if (!publicPolicy || !publicCompanyFocus || interiorEntity) return [];
+    const requestedIds = new Set(publicCompanyFocus.entityIds);
+    return exteriorRenderedEntities.filter(entity => requestedIds.has(entity.id)
+      && publicPolicy.interactiveEntityIds.has(entity.id));
+  }, [exteriorRenderedEntities, interiorEntity, publicCompanyFocus, publicPolicy]);
   const publicAreaFraming = publicCompanyPresentation
     && usesCompactPublicCompanyLabels(size.width, typeof window === 'undefined' ? size.height : window.innerHeight)
     ? PUBLIC_COMPANY_PORTRAIT_FRAMING : PUBLIC_FOCUS_FRAMING;
@@ -3430,6 +3436,7 @@ function CameraRig({
       const targets = exteriorRenderedEntities.filter(entity => saleFrameEntityIds.has(entity.id));
       if (targets.length) queueSegment(PUBLIC_FOCUS_FRAMING, targets);
     }
+    else if (publicCompanyFocusEntities.length) queueSegment(PUBLIC_FOCUS_FRAMING, publicCompanyFocusEntities);
     else if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
     else queuePreset(preset);
   };
@@ -4000,17 +4007,13 @@ function CameraRig({
   }, [cancelScheduledResizeRefit, exteriorRenderedEntities, interiorEntity, interiorFrame, publicPolicy, queueInterior, queueSegment, saleFrameEntityIds, saleFrameSequence]);
 
   useLayoutEffect(() => {
-    if (!publicPolicy || interiorEntity || !publicCompanyFocus
+    if (!publicCompanyFocusEntities.length || !publicCompanyFocus
       || publicCompanyFocus.requestId === consumedPublicCompanyFocus.current) return;
-    const requestedIds = new Set(publicCompanyFocus.entityIds);
-    const targets = exteriorRenderedEntities.filter(entity => requestedIds.has(entity.id)
-      && publicPolicy.interactiveEntityIds.has(entity.id));
-    if (!targets.length) return;
     consumedPublicCompanyFocus.current = publicCompanyFocus.requestId;
     cancelScheduledResizeRefit();
     pendingResizeRefit.current = false;
-    queueSegment(PUBLIC_FOCUS_FRAMING, targets);
-  }, [cancelScheduledResizeRefit, exteriorRenderedEntities, interiorEntity, publicCompanyFocus, publicPolicy, queueSegment]);
+    queueSegment(PUBLIC_FOCUS_FRAMING, publicCompanyFocusEntities);
+  }, [cancelScheduledResizeRefit, publicCompanyFocus, publicCompanyFocusEntities, queueSegment]);
 
   useLayoutEffect(() => {
     if (!interiorFrame?.pavilion || !interiorCommand
