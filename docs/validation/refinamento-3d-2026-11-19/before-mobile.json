@@ -1,0 +1,167 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "profile": "LOW",
+  "browser": "157.0.8103.79",
+  "errors": [],
+  "captures": {
+    "p5-quina": {
+      "filename": "before-mobile-p5-quina.jpg",
+      "target": [
+        -0.6027272727272722,
+        0.7,
+        -13.553636427710842
+      ],
+      "position": [
+        4.907727272727269,
+        0.9550000000000001,
+        -10.613636427710844
+      ],
+      "night": false,
+      "fov": 46
+    },
+    "exporural-baixa": {
+      "filename": "before-mobile-exporural-baixa.jpg",
+      "target": [
+        8.625689,
+        1.11,
+        -18.94
+      ],
+      "position": [
+        6.675689,
+        0.405,
+        -12.34
+      ],
+      "night": false
+    },
+    "arvoredo-esquina": {
+      "filename": "before-mobile-arvoredo-esquina.jpg",
+      "target": [
+        -14.492727272727278,
+        0.48,
+        6.6090909487951786
+      ],
+      "position": [
+        -6.992727272727278,
+        1.7850000000000001,
+        2.0340909487951793
+      ],
+      "night": false
+    },
+    "visao-geral": {
+      "filename": "before-mobile-visao-geral.jpg",
+      "target": [
+        9,
+        0,
+        0
+      ],
+      "position": [
+        -13.5,
+        63,
+        64.5
+      ],
+      "night": false
+    }
+  },
+  "measurements": {
+    "p5-quina": {
+      "calls": 176,
+      "triangles": 396802,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "dpr": 1,
+      "samples": 119,
+      "medianMs": 16.699999999999818,
+      "p95Ms": 16.700000000000728,
+      "camera": [
+        4.907727272727269,
+        0.9550000000000001,
+        -10.613636427710844
+      ]
+    },
+    "exporural-baixa": {
+      "calls": 93,
+      "triangles": 391225,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "dpr": 1,
+      "samples": 119,
+      "medianMs": 16.69999999999891,
+      "p95Ms": 16.700000000000728,
+      "camera": [
+        6.675689,
+        0.405,
+        -12.34
+      ]
+    },
+    "arvoredo-esquina": {
+      "calls": 141,
+      "triangles": 306619,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "dpr": 1,
+      "samples": 119,
+      "medianMs": 16.69999999999891,
+      "p95Ms": 16.80000000000109,
+      "camera": [
+        -6.992727272727278,
+        1.7850000000000001,
+        2.0340909487951793
+      ]
+    },
+    "visao-geral": {
+      "calls": 463,
+      "triangles": 735104,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "dpr": 1,
+      "samples": 120,
+      "medianMs": 16.69999999999891,
+      "p95Ms": 16.799999999999272,
+      "camera": [
+        -13.5,
+        63,
+        64.5
+      ]
+    }
+  },
+  "readyMs": 4664,
+  "map": {
+    "b8": {
+      "minX": -3.316363636363633,
+      "maxX": 1.3309090909090884,
+      "minZ": -16.843636448192772,
+      "maxZ": -12.763636427710843,
+      "width": 4.647272727272721,
+      "depth": 4.080000020481929,
+      "centerX": -0.9927272727272722,
+      "centerZ": -14.803636437951807,
+      "id": "reference:2026:b8"
+    },
+    "c2": {
+      "minX": -20.29090909090909,
+      "maxX": -16.36363636363636,
+      "minZ": 4.581818204819278,
+      "maxZ": 10.800000054216866,
+      "width": 3.9272727272727295,
+      "depth": 6.218181849397588,
+      "centerX": -18.327272727272724,
+      "centerZ": 7.690909129518072,
+      "id": "reference:2026:c2"
+    },
+    "tree": [
+      8.625689,
+      -18.94
+    ],
+    "walk": {
+      "minX": -15.70909090909091,
+      "maxX": -12.392727272727278,
+      "minZ": 2.945454560240961,
+      "maxZ": 12.872727337349396,
+      "width": 3.316363636363633,
+      "depth": 9.927272777108435,
+      "centerX": -14.050909090909094,
+      "centerZ": 7.909090948795178,
+      "side": 1,
+      "streetX": -12.392727272727278
+    }
+  }
+}

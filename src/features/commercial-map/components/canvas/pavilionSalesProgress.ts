@@ -38,7 +38,7 @@ export function countPavilionSalesProgress(entities: readonly MapEntity[], lots:
 }
 
 /** Centre of the authored roof, with the correct datum for each profile. */
-export function pavilionSalesProgressAnchor(entity: MapEntity, progress: { sold: number; total: number }): PavilionSalesProgressAnchor | null {
+export function pavilionSalesProgressAnchor(entity: MapEntity, progress: { sold: number; total: number }, exteriorLift = 0): PavilionSalesProgressAnchor | null {
   const definition = resolveCommercialPavilionDefinition(entity);
   if (!definition || !entity.geometry.coordinates[0]?.length) return null;
   const bounds = strategicLandmarkBounds(entity);
@@ -63,7 +63,7 @@ export function pavilionSalesProgressAnchor(entity: MapEntity, progress: { sold:
   return {
     id: entity.id,
     publicIdentifier: definition.publicIdentifier,
-    position: [bounds.centerX + Math.cos(yaw) * localX, entity.geometry.elevation + localY + 0.026,
+    position: [bounds.centerX + Math.cos(yaw) * localX, entity.geometry.elevation + exteriorLift + localY + 0.026,
       bounds.centerZ - Math.sin(yaw) * localX],
     nearDistance: Math.max(21, Math.min(38, span * 2.35)),
     farDistance: Math.max(57, Math.min(74, span * 4.1)),

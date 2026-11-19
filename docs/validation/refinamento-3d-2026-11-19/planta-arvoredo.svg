@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 637 516" role="img" aria-labelledby="title">
+<title id="title">Planta de montagem da Calçada do Arvoredo</title>
+<defs><marker id="seta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#435743"/></marker></defs>
+<rect width="637" height="516" fill="#fbf8ef"/>
+<g font-family="system-ui, sans-serif" fill="#2b352c">
+<text x="43" y="41" font-size="24" font-weight="700">Calçada do Arvoredo</text>
+<text x="43" y="65" font-size="14">Montagem 3D sobre a laje e as passagens do mapa</text>
+<rect x="177.8" y="95.0" width="348.2" height="53.8" fill="#d6d5cd" stroke="#85887f" rx="3"/>
+<text x="352.0" y="120" text-anchor="middle" font-size="14" font-weight="650">Restaurante · C2/C3</text>
+<rect x="66.5" y="372.3" width="461.1" height="49.3" fill="#c2a48d" stroke="#997b65" rx="0"/>
+<rect x="66.5" y="191.3" width="461.1" height="176.2" fill="#e3d4bc" stroke="#ab9c83" rx="0"/>
+<rect x="299.7" y="148.8" width="104.5" height="37.8" fill="#e7dfc9" stroke="#968a72" rx="3"/>
+<circle cx="479.4" cy="239.4" r="12" fill="#b2b984" stroke="#738659"/>
+<circle cx="424.9" cy="268.6" r="12" fill="#b2b984" stroke="#738659"/>
+<circle cx="430.5" cy="214.2" r="12" fill="#b2b984" stroke="#738659"/>
+<circle cx="270.6" cy="221.5" r="12" fill="#b2b984" stroke="#738659"/>
+<circle cx="495.5" cy="320.9" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="458.9" cy="333.2" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="419.8" cy="347.8" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="379.4" cy="340.5" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="340.3" cy="340.5" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="300.0" cy="340.5" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="260.9" cy="340.5" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="229.2" cy="340.5" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="177.8" cy="340.5" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="141.2" cy="340.5" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="104.5" cy="340.5" r="7" fill="#708460" stroke="#3d5438"/>
+<circle cx="85.0" cy="340.5" r="7" fill="#708460" stroke="#3d5438"/>
+<rect x="475.3" y="350.6" width="38.9" height="16.2" fill="#e3ad5e" stroke="#996828" rx="2"/>
+<rect x="433.3" y="350.6" width="38.9" height="16.2" fill="#e3ad5e" stroke="#996828" rx="2"/>
+<rect x="166.3" y="350.6" width="63.4" height="16.2" fill="#e3ad5e" stroke="#996828" rx="2"/>
+<rect x="99.8" y="350.6" width="63.4" height="16.2" fill="#e3ad5e" stroke="#996828" rx="2"/>
+<rect x="507.7" y="201.9" width="16.2" height="82.9" fill="#e3ad5e" stroke="#996828" rx="2"/>
+<rect x="238.7" y="350.4" width="73.9" height="16.8" fill="#813d39" stroke="#54302b" rx="2"/>
+<circle cx="340.3" cy="340.5" r="7" fill="#76593d" stroke="#3d5438"/>
+<path d="M340.3 340.5 L303.9 329.3" fill="none" stroke="#76593d" stroke-width="3" stroke-linecap="round"/>
+<path d="M352.0 359.5 L352.0 167.6" fill="none" stroke="#435743" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#seta)"/>
+<text x="268.4" y="381.8" text-anchor="middle" font-size="12" font-weight="700">Portal</text>
+<text x="43" y="420" font-size="13">Alameda Mercosul</text>
+<text x="505" y="420" text-anchor="end" font-size="13">Esquina da Rua Brasil →</text>
+<g font-size="12">
+<rect x="43" y="458" width="14" height="9" rx="2" fill="#e3ad5e"/><text x="64" y="467">Coberturas dos bancos</text>
+<circle cx="225" cy="463" r="5" fill="#708460"/><text x="238" y="467">Canteiros e árvores</text>
+<path d="M380 463H403" stroke="#435743" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#seta)"/><text x="411" y="467">Ligação ao Restaurante</text>
+</g></g></svg>

@@ -16,6 +16,7 @@ import {
   commercialPavilionInteriorViewRotationRadians,
 } from '@/features/commercial-map/utils/commercialPavilions';
 import { resolveCommercialPavilionWayfindingMarkers } from '@/features/commercial-map/utils/commercialPavilionWayfinding';
+import { resolveModuleVisualGeometry } from '@/features/commercial-map/components/canvas/CommercialPavilionModuleLayer';
 
 const read = (path: string) => readFileSync(path, 'utf8');
 
@@ -144,7 +145,11 @@ describe('planta comercial fixa do Pavilhão 5', () => {
     expect(layer).toContain('compactSupportLabelLines');
     expect(layer).toContain('SUPPORT_SPACE_COLORS');
     expect(layer).toContain('context.setLineDash');
-    expect(layer).toContain('const heightScale = flatModules ? 1');
+    const geometry = resolveModuleVisualGeometry(
+      { inCart: true, isSelected: true, isHovered: false },
+      COMMERCIAL_PAVILION_MODULE_PLANS.B8.interiorPresentation?.flatModules ?? false,
+    );
+    expect(geometry.heightScale).toBe(1);
     expect(layer).toContain('dispatchSalesModuleClick');
     expect(layer).toContain('THREE.InstancedMesh');
     expect(layer).toContain('new THREE.CanvasTexture(canvas)');

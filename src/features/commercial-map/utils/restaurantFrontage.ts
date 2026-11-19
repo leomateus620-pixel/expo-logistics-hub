@@ -1,5 +1,6 @@
 import type { MapEntity } from '../types';
 import { OPEN_GROUND_PRESENTATION_HEIGHT } from '../constants';
+import { ARVOREDO_LEANING_TREE_ID } from '../data/commercialTreeSpecimens';
 import { ROAD_INFRASTRUCTURE } from './roadInfrastructure';
 import {
   FENASOJA_RESTAURANT_FRONTAGE_IDENTIFIER,
@@ -28,9 +29,30 @@ export interface FrontageShrub {
 }
 
 export interface FrontageTree {
+  id?: string;
   position: FrontagePoint;
   canopyRadius?: number;
 }
+
+export interface ArvoredoFixture {
+  center: FrontagePoint;
+  yaw: number;
+  width: number;
+  depth: number;
+  bounds: FrontageRect;
+}
+
+export interface ArvoredoPlantBed {
+  center: FrontagePoint;
+  size: FrontagePoint;
+  kind: 'palm-clump' | 'broadleaf';
+}
+
+export const ARVOREDO_FIXTURE_DIMENSIONS = {
+  portal: { width: 1.32, depth: 0.30, height: 1.62, postDiameter: 0.096, openingWidth: 1.01 },
+  canopy: { depth: 0.29, height: 1.10 },
+  detailDistance: 13,
+} as const;
 
 /**
  * Presentation-only refinement of the official Calçada do Arvoredo
@@ -40,7 +62,7 @@ export interface FrontageTree {
  * real tree openings; soil sits below its top and above the cadastral base.
  */
 export const RESTAURANT_FRONTAGE_LAYOUT = Object.freeze({
-  revision: '2026.9-calcada-arvoredo-frontage.2',
+  revision: '2026.11-calcada-arvoredo-frontage.3',
   walkwayIdentifier: FENASOJA_RESTAURANT_FRONTAGE_IDENTIFIER,
   restaurantIdentifier: FENASOJA_RESTAURANT_PUBLIC_IDENTIFIER,
   slab: Object.freeze({
@@ -92,16 +114,16 @@ export const RESTAURANT_FRONTAGE_LAYOUT = Object.freeze({
   }),
   roadClearance: 0.06,
   renderBudget: Object.freeze({
-    maximumDrawCalls: 9,
+    maximumDrawCalls: 19,
     maximumJoints: 36,
     maximumShrubs: 26,
     maximumHedgeSegments: 18,
     maximumTreePits: 12,
   }),
   palette: Object.freeze({
-    concrete: '#d3cfc6',
-    joint: '#b3aea4',
-    connector: '#c7c3b9',
+    concrete: '#ac967f',
+    joint: '#91816f',
+    connector: '#b6a18a',
     lawn: '#5b7a49',
     hedge: '#3b6841',
     shrub: '#4b7b4c',
@@ -119,6 +141,9 @@ export interface RestaurantFrontagePlan {
   hedges: readonly FrontageBox[];
   shrubs: readonly FrontageShrub[];
   treePits: readonly FrontagePoint[];
+  portal: ArvoredoFixture | null;
+  benchCanopies: readonly ArvoredoFixture[];
+  plantBeds: readonly ArvoredoPlantBed[];
   diagnostics: {
     walkwayEntityId: string | null;
     restaurantEntityId: string | null;
@@ -141,6 +166,9 @@ const EMPTY_PLAN: RestaurantFrontagePlan = Object.freeze({
   hedges: [],
   shrubs: [],
   treePits: [],
+  portal: null,
+  benchCanopies: [],
+  plantBeds: [],
   diagnostics: {
     walkwayEntityId: null,
     restaurantEntityId: null,
@@ -393,6 +421,76 @@ function buildShrubs(
   return shrubs.slice(0, RESTAURANT_FRONTAGE_LAYOUT.renderBudget.maximumShrubs);
 }
 
+function buildArvoredoFixtures(
+  slab: FrontageRect,
+  connector: FrontageRect | null,
+  orientation: FrontageOrientation,
+  trees: readonly FrontageTree[],
+  treePits: readonly FrontagePoint[],
+  roads: readonly MapEntity[],
+): Pick<RestaurantFrontagePlan, 'portal' | 'benchCanopies' | 'plantBeds'> {
+  const roadBounds = roads.map(frontageBounds).filter((bounds): bounds is FrontageRect => bounds !== null);
+  const pitBounds = treePits.map(restaurantFrontageTreePitBounds);
+  const clear = (bounds: FrontageRect) => (
+    bounds.minX >= slab.minX && bounds.maxX <= slab.maxX
+    && bounds.minZ >= slab.minZ && bounds.maxZ <= slab.maxZ
+    && !roadBounds.some((road) => rectsIntersect(bounds, road))
+    && !pitBounds.some((pit) => rectsIntersect(bounds, pit))
+  );
+  const boundsAt = ([x, z]: FrontagePoint, sizeX: number, sizeZ: number): FrontageRect => ({
+    minX: x - sizeX / 2, maxX: x + sizeX / 2,
+    minZ: z - sizeZ / 2, maxZ: z + sizeZ / 2,
+  });
+  // Rua Brasil is the low-Z corner; +Z leads past the Pizzaria. Keep the
+  // uncovered interval at the door approach and the leaning specimen.
+  const centerZ = connector ? (connector.minZ + connector.maxZ) / 2 : (slab.minZ + slab.maxZ) / 2;
+  const specimenZ = trees.find(({ id }) => id === ARVOREDO_LEANING_TREE_ID)?.position[1] ?? centerZ;
+  const approachStart = connector?.minZ ?? centerZ - 0.8;
+  const approachEnd = connector?.maxZ ?? centerZ + 0.8;
+  const edgeX = orientation.side === 1 ? slab.maxX : slab.minX;
+  const roadAxisX = edgeX - orientation.side * 0.156;
+  const yaw = orientation.side * Math.PI / 2;
+  const portalSize = ARVOREDO_FIXTURE_DIMENSIONS.portal;
+  const portalZ = Math.max(approachEnd + 0.43, specimenZ + 1.13);
+  const portalCenter: FrontagePoint = [roadAxisX, portalZ];
+  const portalBounds = boundsAt(portalCenter, portalSize.depth, portalSize.width);
+  const portal = clear(portalBounds)
+    ? { center: portalCenter, yaw, width: portalSize.width, depth: portalSize.depth, bounds: portalBounds }
+    : null;
+  const benchCanopies: ArvoredoFixture[] = [];
+  const depth = ARVOREDO_FIXTURE_DIMENSIONS.canopy.depth;
+
+  const addBay = (center: FrontagePoint, width: number, rotation: number, followsMainAxis: boolean) => {
+    const bounds = boundsAt(center, followsMainAxis ? depth : width, followsMainAxis ? width : depth);
+    if (width < 0.65 || !clear(bounds)
+      || (portal && rectsIntersect(bounds, portal.bounds))
+      || benchCanopies.some((bench) => rectsIntersect(bounds, bench.bounds))) return;
+    benchCanopies.push({ center, yaw: rotation, width, depth, bounds });
+  };
+  const addRun = (start: number, end: number) => {
+    const width = (end - start - 0.055) / 2;
+    addBay([roadAxisX, start + width / 2], width, yaw, true);
+    addBay([roadAxisX, end - width / 2], width, yaw, true);
+  };
+  addRun(slab.minZ + 0.24, Math.min(approachStart - 0.52, specimenZ - 0.7));
+  addRun(portalBounds.maxZ + 0.16, Math.min(slab.maxZ - 0.16, portalBounds.maxZ + 2.48));
+  // The perpendicular row returns toward the restaurant at the corner.
+  // Its cover stays on the same clipped slab as the main row.
+  const innerX = orientation.side === 1 ? slab.minX : slab.maxX;
+  addBay([innerX + orientation.side * 0.93, slab.minZ + 0.21], 1.48, Math.PI, false);
+
+  const plantBeds = ([
+    { center: [innerX + orientation.side * 0.86, slab.minZ + 0.86], size: [0.45, 0.59], kind: 'palm-clump' },
+    { center: [innerX + orientation.side * 1.38, approachStart - 0.37], size: [0.37, 0.46], kind: 'palm-clump' },
+    { center: [innerX + orientation.side * 0.41, approachStart - 0.47], size: [0.45, 0.47], kind: 'broadleaf' },
+    { center: [innerX + orientation.side * 0.54, approachEnd + 0.52], size: [0.47, 0.58], kind: 'broadleaf' },
+  ] satisfies ArvoredoPlantBed[]).filter(({ center, size }) => {
+    const bounds = boundsAt(center, size[0], size[1]);
+    return clear(bounds) && !benchCanopies.some((bench) => rectsIntersect(bounds, bench.bounds));
+  });
+  return { portal, benchCanopies, plantBeds };
+}
+
 export interface RestaurantFrontagePlanInput {
   entities: readonly MapEntity[];
   trees?: readonly FrontageTree[];
@@ -429,8 +527,16 @@ export function buildRestaurantFrontagePlan({
   const { rect: lawn } = clipRectByRoads(buildLawn(restaurant, walkway, orientation), roads);
   const hedges = buildHedges(slab, connector, orientation);
   const shrubs = buildShrubs(slab, trees, orientation);
-  // slab, joints, connector, lawn, hedges, shrubs, pit soil, pit curbs
-  const drawCalls = 4 + (hedges.length ? 1 : 0) + (shrubs.length ? 1 : 0) + (treePits.length ? 2 : 0);
+  const fixtures = buildArvoredoFixtures(slab, connector, orientation, trees, treePits, roads);
+  // Primary batches at the nearest tier, including vegetation.
+  const drawCalls = 2 + Number(joints.length > 0) + Number(!!connector)
+    + Number(hedges.length > 0) + Number(shrubs.length > 0) + (treePits.length ? 2 : 0)
+    + (fixtures.portal || fixtures.benchCanopies.length ? 3 : 0) // timber, lamp mounts and globes
+    + (fixtures.portal ? 2 : 0) // sign face and backing
+    + (fixtures.benchCanopies.length ? 2 : 0) // covers and bench boards
+    + Number(fixtures.plantBeds.length > 0)
+    + (fixtures.plantBeds.some(({ kind }) => kind === 'palm-clump') ? 2 : 0)
+    + Number(fixtures.plantBeds.some(({ kind }) => kind === 'broadleaf'));
 
   return {
     available: true,
@@ -441,6 +547,7 @@ export function buildRestaurantFrontagePlan({
     hedges,
     shrubs,
     treePits,
+    ...fixtures,
     diagnostics: {
       walkwayEntityId: walkwayEntity.id,
       restaurantEntityId: restaurantEntity.id,

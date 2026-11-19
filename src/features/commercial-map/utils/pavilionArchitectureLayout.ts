@@ -1,8 +1,9 @@
 import { Euler, Quaternion, Vector3 } from 'three';
 import { resolvePavilionArchitecture2026, type PavilionArchitectureProfile } from '../data/pavilionArchitecture2026';
 import type { CommercialPavilionLayout } from './commercialPavilions';
+import { createPavilion5ArchitectureLayout, pavilion5ExteriorSection, pavilion5IdentityPose } from './pavilion5Architecture';
 
-export type PavilionArchitectureMaterial = 'wall' | 'trim' | 'roof' | 'dark' | 'glass' | 'white' | 'platform' | 'metal' | 'accent' | 'brick' | 'cladding';
+export type PavilionArchitectureMaterial = 'wall' | 'trim' | 'roof' | 'dark' | 'glass' | 'green' | 'white' | 'platform' | 'metal' | 'accent' | 'brick' | 'cladding';
 export type ArchitecturePoint = [number, number, number];
 export interface PavilionArchitectureInstance {
   position: ArchitecturePoint;
@@ -37,6 +38,7 @@ export function pavilionArchitectureEaveY(layout: CommercialPavilionLayout): num
   if (layout.publicIdentifier === 'B1') return height * 0.96;
   if (layout.publicIdentifier === 'B3') return height * layout.exterior.roof.eaveY / layout.height;
   if (layout.publicIdentifier === 'B6') return height * 0.82;
+  if (layout.publicIdentifier === 'B8') return pavilion5ExteriorSection(layout, height).eaveY;
   return height * 0.79;
 }
 
@@ -76,6 +78,7 @@ export interface PavilionArchitectureSignPose {
 export function pavilionArchitectureSignPose(layout: CommercialPavilionLayout): PavilionArchitectureSignPose {
   const width = layout.exterior.shell.width, depth = layout.exterior.shell.depth;
   const h = pavilionArchitectureHeight(layout), front = layout.exterior.shell.frontZ;
+  if (layout.publicIdentifier === 'B8') return pavilion5IdentityPose(layout, h);
   const thickness = clamp(Math.min(width, depth) * 0.018, 0.045, 0.095);
   const frame = clamp(Math.min(width, depth) * 0.028, 0.055, 0.15);
   const canopyFront = front + pavilionArchitectureCanopyProjection(layout);
@@ -109,13 +112,15 @@ export function pavilionArchitectureSignPose(layout: CommercialPavilionLayout): 
  * system. No lot, reference projection, official wall-access flag or selection
  * identifier is read or rewritten here.
  */
-export function createPavilionArchitectureLayout(layout: CommercialPavilionLayout, detail = true): PavilionArchitectureLayout | null {
+export function createPavilionArchitectureLayout(layout: CommercialPavilionLayout, detail = true, foundationDepth = 0): PavilionArchitectureLayout | null {
   const profile = resolvePavilionArchitecture2026(layout.publicIdentifier);
   if (!profile) return null;
+  const h = pavilionArchitectureHeight(layout);
+  if (profile.id === 'B8') return createPavilion5ArchitectureLayout(layout, profile, h, detail, foundationDepth);
   const batches: PavilionArchitectureLayout['batches'] = {};
   const triangles: PavilionArchitectureTriangle[] = [];
   const { shell, slab } = layout.exterior;
-  const w = shell.width, d = shell.depth, h = pavilionArchitectureHeight(layout);
+  const w = shell.width, d = shell.depth;
   const base = slab.height;
   const front = shell.frontZ;
   const thickness = clamp(Math.min(w, d) * 0.018, 0.045, 0.095);

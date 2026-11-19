@@ -6,6 +6,8 @@ import { createPavilionArchitectureLayout, pavilionArchitectureEaveY, pavilionAr
 import { COMMERCIAL_PAVILION_DEFINITIONS, commercialPavilionModelBounds, createCommercialPavilionLayout } from '@/features/commercial-map/utils/commercialPavilions';
 import { resolveCommercialPavilionModulePlan } from '@/features/commercial-map/utils/commercialPavilionModules';
 import { strategicLandmarkBounds } from '@/features/commercial-map/utils/landmarks';
+import { pavilion5ExteriorSection } from '@/features/commercial-map/utils/pavilion5Architecture';
+import { exporuralPavilion5ExteriorLift } from '@/features/commercial-map/utils/exporuralLandscape';
 
 function officialLayout(id: typeof PHOTOGRAPHED_PAVILION_IDS[number]) {
   const entity = OFFICIAL_REFERENCE_ENTITIES.find(candidate => candidate.publicIdentifier === id)!;
@@ -14,11 +16,11 @@ function officialLayout(id: typeof PHOTOGRAPHED_PAVILION_IDS[number]) {
   return createCommercialPavilionLayout(bounds, definition, undefined, resolveCommercialPavilionModulePlan(entity));
 }
 
-describe('arquitetura fotográfica dos cinco pavilhões', () => {
+describe('arquitetura fotográfica dos pavilhões', () => {
   it('identifica exatamente as placas e exclui os landmarks B12/B13 e os outros pavilhões', () => {
     expect(PHOTOGRAPHED_PAVILION_IDS.map(id => [id, resolvePavilionArchitecture2026(id)?.pavilionNumber]))
-      .toEqual([['B1', 1], ['B3', 12], ['B4', 8], ['B5', 13], ['B6', 3]]);
-    for (const id of ['B2', 'B8', 'B10', 'B12', 'B13', 'B1-extra']) expect(resolvePavilionArchitecture2026(id)).toBeNull();
+      .toEqual([['B1', 1], ['B3', 12], ['B4', 8], ['B5', 13], ['B6', 3], ['B8', 5]]);
+    for (const id of ['B2', 'B10', 'B12', 'B13', 'B1-extra']) expect(resolvePavilionArchitecture2026(id)).toBeNull();
     expect(Object.values(PHOTOGRAPHED_PAVILION_IDS).every(id => !resolvePavilionArchitecture2026(id)!.photos.includes('WhatsApp Image 2026-10-30 at 10.39.51 (1).jpeg'))).toBe(true);
   });
 
@@ -37,7 +39,9 @@ describe('arquitetura fotográfica dos cinco pavilhões', () => {
     expect(reduced.batches.roof).toEqual(detailed.batches.roof);
     expect(reduced.batches.wall).toEqual(detailed.batches.wall);
     expect(reduced.batches.cladding).toEqual(detailed.batches.cladding);
-    expect(reduced.triangles).toEqual(detailed.triangles);
+    const exteriorSilhouette = (profile: typeof reduced) => profile.triangles.filter(triangle => triangle.material !== 'metal');
+    expect(exteriorSilhouette(reduced)).toEqual(exteriorSilhouette(detailed));
+    if (id === 'B8') expect(reduced.triangles.length).toBeLessThan(detailed.triangles.length);
   });
 
   it.each(PHOTOGRAPHED_PAVILION_IDS)('%s usa lotes de desenho finitos e mantém estrutura fora do conteúdo comercial', id => {
@@ -87,7 +91,7 @@ describe('arquitetura fotográfica dos cinco pavilhões', () => {
     expect(pavilionArchitectureHeight(layout)).toBe(layout.exterior.shell.width * profile.facadeHeightToWidth);
     const sign = pavilionArchitectureSignPose(layout);
     expect(sign.width / layout.exterior.shell.width).toBeLessThan(0.23);
-    expect(sign.height).toBeLessThanOrEqual(pavilionArchitectureHeight(layout) * .12);
+    expect(sign.height).toBeLessThanOrEqual(pavilionArchitectureHeight(layout) * (id === 'B8' ? .17 : .12));
     expect(sign.width / sign.height).toBe(4);
     expect(sign.position[2] - sign.supportDepth).toBeCloseTo(sign.supportSurfaceZ, 12);
     expect(sign.supportDepth).toBeGreaterThan(sign.height * .085);
@@ -130,7 +134,7 @@ describe('arquitetura fotográfica dos cinco pavilhões', () => {
     }
   });
 
-  it.each(PHOTOGRAPHED_PAVILION_IDS)('%s mantém nervuras e travessas dos portões na família escura opaca', id => {
+  it.each(PHOTOGRAPHED_PAVILION_IDS.filter(id => id !== 'B8'))('%s mantém nervuras e travessas dos portões na família escura opaca', id => {
     const architecture = createPavilionArchitectureLayout(officialLayout(id))!;
     const gates = architecture.facadeOpenings.filter(opening => opening.kind === 'gate');
     const gateFacesAndRibs = architecture.batches.dark ?? [];
@@ -149,5 +153,76 @@ describe('arquitetura fotográfica dos cinco pavilhões', () => {
       expect(architecture.canopyFrontZ).toBeGreaterThan(architecture.frontZ);
       expect(architecture.facadeOpenings.filter(opening => opening.kind === 'gate')).toHaveLength(2);
     }
+  });
+
+  it('fecha a cobertura do P5 e apoia ambos os beirais e as duas empenas na mesma seção', () => {
+    const layout = officialLayout('B8');
+    const architecture = createPavilionArchitectureLayout(layout)!;
+    const section = pavilion5ExteriorSection(layout, pavilionArchitectureHeight(layout));
+    const roof = architecture.triangles.filter(triangle => triangle.material === 'roof');
+    const edgeCounts = new Map<string, number>();
+    for (const { vertices } of roof) {
+      for (let index = 0; index < vertices.length; index++) {
+        const key = [vertices[index], vertices[(index + 1) % vertices.length]].map(point => point.join(',')).sort().join('|');
+        edgeCounts.set(key, (edgeCounts.get(key) ?? 0) + 1);
+      }
+      for (const [x, , z] of vertices) {
+        expect(Math.abs(x)).toBeLessThanOrEqual(layout.width / 2);
+        expect(Math.abs(z)).toBeLessThanOrEqual(layout.depth / 2);
+      }
+    }
+    expect(architecture.profile.roof).toBe('longitudinal-low-gable');
+    expect(roof).toHaveLength(20);
+    expect([...edgeCounts.values()].every(count => count === 2)).toBe(true);
+    expect(architecture.batches.roof).toBeUndefined();
+    expect(section.ridgeY).toBeGreaterThan(section.eaveY);
+    expect(section.fascia.top).toBeGreaterThan(.8);
+    expect(section.fascia.top).toBeLessThan(.85);
+    expect((section.soffitAt(0) - section.eaveY) / section.wallHalfZ).toBeLessThan(.07);
+    for (const gable of architecture.triangles.filter(triangle => triangle.material === 'cladding')) {
+      for (const [, y, z] of gable.vertices) expect(y).toBeCloseTo(section.soffitAt(z), 12);
+    }
+    for (const direction of [-1, 1]) {
+      const wallPlane = direction * section.wallHalfZ;
+      const wall = architecture.batches.brick!.find(piece => Math.abs(piece.position[2] + direction * piece.scale[2] / 2 - wallPlane) < 1e-8);
+      expect(wall).toBeDefined();
+      expect(wall!.position[1] + wall!.scale[1] / 2).toBeCloseTo(section.soffitAt(wallPlane), 12);
+    }
+  });
+
+  it('fixa a fachada fotografada no acesso sul e mantém a faixa e os balizadores fora da passagem', () => {
+    const layout = officialLayout('B8');
+    const architecture = createPavilionArchitectureLayout(layout)!;
+    const plan = resolveCommercialPavilionModulePlan({ publicIdentifier: 'B8' })!;
+    const sign = pavilionArchitectureSignPose(layout);
+    const { fascia } = pavilion5ExteriorSection(layout, pavilionArchitectureHeight(layout));
+    const gate = architecture.facadeOpenings.find(opening => opening.kind === 'gate')!;
+    const sideDoor = architecture.batches.dark?.find(piece => Math.abs(piece.position[0]) > layout.exterior.shell.width * .45);
+    expect(gate.x).toBe(0);
+    expect(gate.y + gate.height / 2).toBeLessThan(fascia.bottom);
+    expect(sideDoor).toBeDefined();
+    expect(fascia.width).toBeLessThan(layout.exterior.shell.width / 2);
+    expect(sign.supportSurfaceZ).toBe(fascia.front);
+    expect(plan.cells).toHaveLength(81);
+    expect(plan.wallAccesses?.map(access => access.id)).toEqual(['north-central-exit', 'west-central-entrance', 'south-central-exit']);
+    const bollards = architecture.batches.metal!.filter(piece => piece.position[2] > architecture.frontZ && piece.scale[1] > .06);
+    expect(bollards).toHaveLength(6);
+    expect(bollards.every(piece => Math.abs(piece.position[0]) - piece.scale[0] / 2 > gate.width / 2)).toBe(true);
+  });
+
+  it('apoia a fachada no patamar Exporural e conserva a cota cadastral no corte', () => {
+    const layout = officialLayout('B8');
+    const lift = exporuralPavilion5ExteriorLift(OFFICIAL_REFERENCE_ENTITIES);
+    expect(lift).toBeCloseTo(.245, 12);
+    expect(exporuralPavilion5ExteriorLift(OFFICIAL_REFERENCE_ENTITIES.filter(entity => entity.publicIdentifier !== 'Q-R-14'))).toBe(0);
+    const architecture = createPavilionArchitectureLayout(layout, true, lift)!;
+    const foundation = architecture.batches.platform!.find(piece => piece.scale[0] === layout.exterior.shell.width)!;
+    expect(foundation.position[1] - foundation.scale[1] / 2 + lift).toBeCloseTo(0, 12);
+    const mainGate = architecture.facadeOpenings.find(opening => opening.kind === 'gate')!;
+    const frontApron = architecture.batches.platform!.find(piece => piece.position[2] > layout.exterior.shell.frontZ)!;
+    const sideApron = architecture.batches.platform!.find(piece => piece.position[0] > layout.exterior.shell.width / 2)!;
+    for (const platform of [frontApron, sideApron]) expect(platform.position[1] + platform.scale[1] / 2)
+      .toBeCloseTo(mainGate.y - mainGate.height / 2, 12);
+    expect(architecture.floorY).toBe(layout.interior.floorY);
   });
 });

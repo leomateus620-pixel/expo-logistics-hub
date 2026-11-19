@@ -97,10 +97,17 @@ function createIdentityTexture(pavilionNumber: number, activity: string, photogr
     context.font = '900 104px Arial, sans-serif';
     context.fillText(String(pavilionNumber).padStart(2, '0'), 18, 70);
     context.fillStyle = '#eceee6';
-    context.font = '700 25px Arial, sans-serif';
-    context.fillText('PAVILHÃO', 166, 35);
-    context.font = '800 39px Arial, sans-serif';
-    context.fillText('COMÉRCIO', 166, 84, 324);
+    if (pavilionNumber === 5) {
+      context.font = '800 43px Arial, sans-serif';
+      context.fillText(activity.toLocaleUpperCase('pt-BR'), 152, 59, 340);
+      context.font = '600 23px Arial, sans-serif';
+      context.fillText('FLORISTERÍAS', 154, 99, 336);
+    } else {
+      context.font = '700 25px Arial, sans-serif';
+      context.fillText('PAVILHÃO', 166, 35);
+      context.font = '800 39px Arial, sans-serif';
+      context.fillText('COMÉRCIO', 166, 84, 324);
+    }
   } else {
   context.fillStyle = '#173f2d';
   context.fillRect(0, 0, 18, canvas.height);
@@ -731,6 +738,7 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   showDetail,
   showFocusDetail,
   moduleStateById,
+  exteriorLift = 0,
 }: {
   publicIdentifier: string;
   bounds: StrategicLandmarkBounds;
@@ -739,6 +747,7 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   showDetail: boolean;
   showFocusDetail: boolean;
   moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
+  exteriorLift?: number;
 }) {
   const definition = resolveCommercialPavilionDefinition({ publicIdentifier });
   const architecture = resolvePavilionArchitecture2026(publicIdentifier);
@@ -755,7 +764,7 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   // layout effect. Installing them passively compiled five cold variants in
   // the first presented draw on the measured renderer.
   useLayoutEffect(() => {
-    // These five buildings have a single dedicated material/texture owner.
+    // Photographed buildings have a single dedicated material/texture owner.
     // Do not let the legacy shell install or clear maps owned by that library.
     if (architecture) return;
     materials.wall.bumpMap = textures.concrete;
@@ -795,14 +804,14 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   const architecturalSign = architecture ? pavilionArchitectureSignPose(layout) : null;
 
   return (
-    <group dispose={null}>
+    <group position={[0, showFocusDetail ? 0 : exteriorLift, 0]} dispose={null}>
       {(!architecture || showFocusDetail) && <PavilionShell
           layout={layout}
           materials={materials}
           showDetail={showDetail}
           cutaway={showFocusDetail}
         />}
-      {architecture && <PhotoReferencedPavilion layout={layout} materials={materials} showDetail={showDetail} cutaway={showFocusDetail} />}
+      {architecture && <PhotoReferencedPavilion layout={layout} materials={materials} showDetail={showDetail} cutaway={showFocusDetail} foundationDepth={exteriorLift} />}
       {!architecture && !showFocusDetail && <PavilionRoof layout={layout} materials={materials} showDetail={showDetail} />}
       {!architecture && showDetail && !showFocusDetail && <PavilionDetail layout={layout} materials={materials} />}
       {showFocusDetail && modulePlan && (

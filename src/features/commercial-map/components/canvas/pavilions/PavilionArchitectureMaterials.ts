@@ -139,8 +139,9 @@ export function usePavilionArchitectureMaterials<T extends CommercialPavilionMat
       if (colour) item.map = texture;
       item.bumpMap = texture;
       item.bumpScale = item === extras.brick ? 0.0012 : 0.0007;
-      // Roofing ribs run down the slope; facade/gate ribs stay vertical.
-      installPavilionMetricUV(item, item === fallback.roof);
+      // P5's gable runs across Z. Its roof ribs need X for the transverse
+      // texture coordinate. The other roofs use Z, and the facades stay vertical.
+      installPavilionMetricUV(item, item === fallback.roof && id !== 'B8');
       item.needsUpdate = true;
     });
     return () => {
