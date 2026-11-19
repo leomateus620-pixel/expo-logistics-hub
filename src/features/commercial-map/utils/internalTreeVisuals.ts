@@ -139,12 +139,12 @@ export function createInternalLeafAtlas() {
  * vertical ear. Seven authored lobes retain species/ID-specific silhouettes.
  * One shared 256² atlas, one instanced crown batch, no per-frame leaf work.
  */
-export function createInternalLeafLobe() {
+export function createInternalLeafLobe(sprayCount = 40, sprayScale = 1) {
   const random = pilotRandom(89231), p: number[] = [], n: number[] = [], uv: number[] = [];
   const center = new THREE.Vector3(), right = new THREE.Vector3(), up = new THREE.Vector3();
   const normal = new THREE.Vector3(), reference = new THREE.Vector3(), roll = new THREE.Quaternion();
-  for (let i = 0; i < 40; i++) {
-    const y = 1 - 2 * (i + .5) / 40, angle = i * 2.399963 + (random() - .5) * .4;
+  for (let i = 0; i < sprayCount; i++) {
+    const y = 1 - 2 * (i + .5) / sprayCount, angle = i * 2.399963 + (random() - .5) * .4;
     const radius = .25 + Math.cbrt(random()) * .56;
     center.set(Math.sqrt(1 - y * y) * Math.cos(angle), y, Math.sqrt(1 - y * y) * Math.sin(angle)).multiplyScalar(radius);
     normal.copy(center).normalize();
@@ -153,7 +153,7 @@ export function createInternalLeafLobe() {
     up.crossVectors(normal, right).normalize();
     roll.setFromAxisAngle(normal, random() * Math.PI * 2);
     right.applyQuaternion(roll); up.applyQuaternion(roll);
-    const length = .56 + random() * .2, width = length * (.8 + random() * .22);
+    const length = (.56 + random() * .2) * sprayScale, width = length * (.8 + random() * .22);
     const mirror = random() > .5;
     for (const [u,v] of [[0,0],[1,0],[0,1],[1,0],[1,1],[0,1]]) {
       const vertex = center.clone().addScaledVector(right, (u-.5)*width).addScaledVector(up, (v-.5)*length);

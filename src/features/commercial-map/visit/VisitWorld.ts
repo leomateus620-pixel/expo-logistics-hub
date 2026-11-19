@@ -1,5 +1,6 @@
 import type { MapEntity } from '../types';
 import type { CommercialMapTree } from '../data/commercialTrees';
+import { commercialArvoredoTreeVariation, commercialTreeSpecimenLimbColliders, commercialTreeSpecimenProfile } from '../data/commercialTreeSpecimens';
 import { COMMERCIAL_MAP_SPATIAL_BOUNDS } from '../data/commercialMapSpatialBounds';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../data/parkAccessSpatialPlan';
 import { PARK_ACCESS_INFRASTRUCTURE_INPUT } from '../utils/parkAccessSpatialPlanAdapter';
@@ -26,7 +27,7 @@ import { visitRingBounds } from './VisitSpatialIndex';
 import { VISIT_CHARACTER_RADIUS, VISIT_CHARACTER_HEIGHT, type VisitBounds, type VisitCollider, type VisitPoint2, type VisitRing, type VisitVector3 } from './visitTypes';
 import type { ResolvedElectricalNodePlacement } from '../utils/electricalInfrastructure';
 import { createGastronomicAlamedaLayout, fitRotatedStructureBounds } from '../utils/fenasojaReferenceStructures';
-import { EXPORURAL_WELL, isExporuralLandscapeLot } from '../utils/exporuralLandscape';
+import { EXPORURAL_WELL, exporuralPavilion5ExteriorLift, isExporuralLandscapeLot } from '../utils/exporuralLandscape';
 import { visitPointInRing } from './VisitSpatialIndex';
 import { SOY_RESTROOM_PRESENTATION } from '../utils/soyGateArchitecture';
 import { isInternalParkVegetationPoint, INTERNAL_TREE_TRUNK_RADIUS_FACTOR } from '../utils/internalTreeVisuals';
@@ -337,7 +338,8 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
         surfaces.push(visitGroundSurface(ramp.id, pavilionGroundRectPolygon(ramp).map(transform),
           (x, z) => base + pavilionGroundRampHeight(ramp, (x - bounds.centerX) * c - (z - bounds.centerZ) * s), undefined, base + Math.max(ramp.startY, ramp.endY)));
       }
-      const physicalHeight = pavilionArchitectureHeight(layout);
+      const lift = entity.publicIdentifier === 'B8' ? exporuralPavilion5ExteriorLift(entities) : 0;
+      const physicalHeight = pavilionArchitectureHeight(layout) + lift;
       if (entity.publicIdentifier === 'B6') {
         // Only the documented P3 inset access strip becomes walkable. Its
         // physical shell stays closed; entry remains explicit navigation.
@@ -364,9 +366,23 @@ export function buildVisitWorld({ entities, trees, electricalPlacements = [], si
   const treeSupportEntities = withPavilion12TreeGroundSupport(entities, pavilion12ConcretePresent);
   for (const tree of trees) {
     const base = commercialTreeGroundElevation(tree, treeSupportEntities);
-    trunk(tree.id, tree.position[0], tree.position[1], tree.trunkRadius
+    const [x, z] = tree.position;
+    const specimen = commercialTreeSpecimenProfile(tree.id);
+    if (specimen) {
+      commercialTreeSpecimenLimbColliders(specimen).forEach((part, index) => {
+        trunk(index === 0 ? tree.id : `${tree.id}:limb-${index}`, x + part.x, z + part.z,
+          part.radius, base + part.bottom, part.top - part.bottom);
+      });
+      specimen.foliage.forEach(([dx, y, dz, radiusX, radiusY, radiusZ], index) => {
+        crown(`${tree.id}:${index}`, x + dx, z + dz, Math.max(radiusX, radiusZ) * .9, base + y - radiusY, base + y + radiusY);
+      });
+      continue;
+    }
+    const variation = commercialArvoredoTreeVariation(tree.id);
+    trunk(tree.id, x, z, tree.trunkRadius * (variation?.trunk ?? 1)
       * (isInternalParkVegetationPoint(tree.position) ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1), base, commercialTreeWoodStructure(tree).trunkHeight);
-    crown(tree.id, tree.position[0], tree.position[1], tree.canopyRadius, base + tree.trunkHeight * 0.85, base + tree.trunkHeight + tree.crownHeight);
+    crown(tree.id, x, z, tree.canopyRadius * (variation?.crown ?? 1),
+      base + tree.trunkHeight * 0.85, base + tree.trunkHeight + tree.crownHeight);
   }
   const wellLot = entities.find(entity => entity.publicIdentifier === 'Q-R-02' && isExporuralLandscapeLot(entity) && visitPointInRing(...EXPORURAL_WELL.position, entity.geometry.coordinates[0]));
   if (wellLot) {

@@ -1,0 +1,170 @@
+{
+  "baselineCommit": "d07328bcae072f0ab1d1d3c8456a6992afd95e20",
+  "baseline": {
+    "numTotalTests": 4579,
+    "numPassedTests": 4468,
+    "numFailedTests": 111,
+    "numPendingTests": 0
+  },
+  "final": {
+    "numTotalTests": 4596,
+    "numPassedTests": 4489,
+    "numFailedTests": 107,
+    "numPendingTests": 0
+  },
+  "newCollectionFailures": [],
+  "targetedSuites": [
+    {
+      "file": "src/test/commercialMapFenasojaRestaurant.test.ts",
+      "tests": 16,
+      "status": "passed"
+    },
+    {
+      "file": "src/test/commercialMapPavilion5OfficialFrame.test.ts",
+      "tests": 4,
+      "status": "passed"
+    },
+    {
+      "file": "src/test/commercialMapPavilion5PlanPresentation.test.ts",
+      "tests": 8,
+      "status": "passed"
+    },
+    {
+      "file": "src/test/commercialMapPavilionArchitecture.test.ts",
+      "tests": 46,
+      "status": "passed"
+    },
+    {
+      "file": "src/test/commercialMapPavilionArchitectureMaterials.test.tsx",
+      "tests": 9,
+      "status": "passed"
+    },
+    {
+      "file": "src/test/commercialMapRestaurantGateVisit.test.ts",
+      "tests": 4,
+      "status": "passed"
+    },
+    {
+      "file": "src/test/commercialMapTreePresentation.test.ts",
+      "tests": 6,
+      "status": "passed"
+    },
+    {
+      "file": "src/test/commercialMapTreeSpecimens.test.ts",
+      "tests": 4,
+      "status": "passed"
+    },
+    {
+      "file": "src/test/commercialMapVegetationLod.test.ts",
+      "tests": 8,
+      "status": "passed"
+    },
+    {
+      "file": "src/test/exporuralSceneCorrections.test.ts",
+      "tests": 4,
+      "status": "passed"
+    }
+  ],
+  "typecheck": "passed",
+  "build": "passed",
+  "finalFullRunOnlyFailures": [
+    [
+      "src/test/alvoradaPortalIntegration.test.tsx",
+      "integração do portal: ecossistema direto e introdução embutida na contagem mostra o estado de carregamento do ecossistema dentro do diálogo"
+    ],
+    [
+      "src/test/alvoradaPortalIntegration.test.tsx",
+      "integração do portal: ecossistema direto e introdução embutida na contagem reproduz a introdução dentro do card da contagem no novo acesso e restaura a contagem"
+    ],
+    [
+      "src/test/commercialDashboardNavigationPerformance.test.tsx",
+      "Dashboard presentation across discarded navigation views discards spatial presentation when the organization identity changes"
+    ],
+    [
+      "src/test/commercialDashboardNavigationPerformance.test.tsx",
+      "Dashboard presentation across discarded navigation views discards spatial presentation when the project identity changes"
+    ],
+    [
+      "src/test/commercialMapHistory.test.tsx",
+      "história integrada ao painel comercial persistente abre a foto completa sob demanda e Escape fecha primeiro a ampliação, depois a história com foco recuperado"
+    ],
+    [
+      "src/test/commercialMapHistory.test.tsx",
+      "história integrada ao painel comercial persistente carrega o conteúdo apenas ao abrir e restaura informações, ações, seleção e foco ao fechar"
+    ],
+    [
+      "src/test/commercialMapHistory.test.tsx",
+      "história integrada ao painel comercial persistente recupera falha fotográfica sem perder texto, fontes ou navegação para outra foto"
+    ],
+    [
+      "src/test/commercialSalesOrdersSection.test.tsx",
+      "espaço dedicado de vendas e contratos restaura área, filtros, página, aba, rolagem e foco só depois do detalhe voltar do mapa"
+    ],
+    [
+      "src/test/pavilionOccupancyInteraction.test.tsx",
+      "company primary selection and secondary contract inspection selects the exact complete company for P12 AMERICAN FISIO"
+    ]
+  ],
+  "baselineFullRunOnlyFailures": [
+    [
+      "src/test/commercialDashboardPresentation.test.tsx",
+      "integrated Commercial Dashboard presentation changes only unsold official stage totals, retains scope/selection and rebuilds amounts on map refetch"
+    ],
+    [
+      "src/test/commercialDashboardPresentation.test.tsx",
+      "integrated Commercial Dashboard presentation distinguishes a registered zero price from absent prices in financial cards"
+    ],
+    [
+      "src/test/commercialDashboardWorkspace.test.tsx",
+      "Dashboard sales workspace composition returns from dedicated sales with the selected scope, metric, focus and overview scroll intact"
+    ],
+    [
+      "src/test/commercialMapPavilion5PlanPresentation.test.ts",
+      "planta comercial fixa do Pavilhão 5 preserva apoios legíveis, lotes planos, seleção, Vendas e renderização eficiente"
+    ],
+    [
+      "src/test/commercialMapTablePagination.test.tsx",
+      "tabela comercial com trabalho de DOM limitado abre a página do registro selecionado ao retornar à tabela"
+    ],
+    [
+      "src/test/commercialMapTablePagination.test.tsx",
+      "tabela comercial com trabalho de DOM limitado mantém no máximo 50 linhas e pesquisa o índice inteiro depois de mudar de página"
+    ],
+    [
+      "src/test/commercialSalesAnalytics.test.tsx",
+      "commercial analytics navigation and confidentiality opens cashflow from confirmed card and returns focus without changing the map or renegotiating totals"
+    ],
+    [
+      "src/test/cronogramaClassificationForm.test.tsx",
+      "EventForm — classificação automática classifica Categoria e Tipo a partir do título"
+    ],
+    [
+      "src/test/cronogramaClassificationForm.test.tsx",
+      "EventForm — classificação automática não toca em Status e Prioridade"
+    ],
+    [
+      "src/test/cronogramaPlanEditor.test.tsx",
+      "workspace de planejamento em tela inteira seleciona registros oficiais dentro de outro diálogo e mantém o planejamento aberto"
+    ],
+    [
+      "src/test/financialSponsorshipScenarioInteractions.test.tsx",
+      "interações da inteligência de patrocínios abre o mesmo drawer controlado pelo Pareto e pela carteira"
+    ],
+    [
+      "src/test/financialSponsorshipScenarioInteractions.test.tsx",
+      "interações da inteligência de patrocínios aplica filtros sobre os 100 registros, ordena a tabela e recupera o estado sem resultados"
+    ],
+    [
+      "src/test/financialSponsorshipScenarioInteractions.test.tsx",
+      "interações da inteligência de patrocínios sincroniza categoria entre ranking e carteira sem substituir o contexto global"
+    ]
+  ],
+  "commonFailures": 98,
+  "isolatedRetry": {
+    "total": 59,
+    "passed": 59,
+    "failed": 0,
+    "casesRetried": 9,
+    "stillFailing": []
+  }
+}

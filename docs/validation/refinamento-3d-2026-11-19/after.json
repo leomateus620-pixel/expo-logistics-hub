@@ -1,0 +1,595 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "profile": "HIGH",
+  "browser": "157.0.8103.79",
+  "errors": [],
+  "captures": {
+    "p5-frente": {
+      "filename": "after-p5-frente.jpg",
+      "target": [
+        -0.9927272727272722,
+        0.69,
+        -12.763636427710843
+      ],
+      "position": [
+        -1.2127272727272722,
+        0.66,
+        -10.063636427710843
+      ],
+      "night": false,
+      "fov": 56
+    },
+    "p5-quina": {
+      "filename": "after-p5-quina.jpg",
+      "target": [
+        -0.6027272727272722,
+        0.7,
+        -13.553636427710842
+      ],
+      "position": [
+        3.0709090909090886,
+        0.87,
+        -11.593636427710843
+      ],
+      "night": false,
+      "fov": 46
+    },
+    "p5-topo": {
+      "filename": "after-p5-topo.jpg",
+      "target": [
+        -0.9927272727272722,
+        0,
+        -14.803636437951807
+      ],
+      "position": [
+        -0.9927272727272722,
+        9.294545454545442,
+        -14.783636437951808
+      ],
+      "night": false
+    },
+    "exporural-baixa": {
+      "filename": "after-exporural-baixa.jpg",
+      "target": [
+        8.625689,
+        1.11,
+        -18.94
+      ],
+      "position": [
+        7.325689,
+        0.64,
+        -14.540000000000001
+      ],
+      "night": false,
+      "specimens": [
+        {
+          "id": "tree-exporural-r01-01",
+          "count": 1,
+          "lod": "near"
+        },
+        {
+          "id": "tree-j-05",
+          "count": 1,
+          "lod": "far"
+        }
+      ]
+    },
+    "exporural-obliqua": {
+      "filename": "after-exporural-obliqua.jpg",
+      "target": [
+        8.625689,
+        0.64,
+        -18.94
+      ],
+      "position": [
+        4.825689,
+        2.7,
+        -14.790000000000001
+      ],
+      "night": false
+    },
+    "exporural-topo": {
+      "filename": "after-exporural-topo.jpg",
+      "target": [
+        8.625689,
+        0,
+        -18.94
+      ],
+      "position": [
+        8.625689,
+        8,
+        -18.915000000000003
+      ],
+      "night": false
+    },
+    "arvoredo-esquina": {
+      "filename": "after-arvoredo-esquina.jpg",
+      "target": [
+        -14.492727272727278,
+        0.48,
+        6.6090909487951786
+      ],
+      "position": [
+        -9.492727272727278,
+        1.35,
+        3.5590909487951787
+      ],
+      "night": false,
+      "specimens": [
+        {
+          "id": "tree-exporural-r01-01",
+          "count": 1,
+          "lod": "far"
+        },
+        {
+          "id": "tree-j-05",
+          "count": 1,
+          "lod": "near"
+        }
+      ]
+    },
+    "arvoredo-frente": {
+      "filename": "after-arvoredo-frente.jpg",
+      "target": [
+        -12.942727272727279,
+        0.85,
+        9.099090948795178
+      ],
+      "position": [
+        -9.942727272727279,
+        0.76,
+        9.099090948795178
+      ],
+      "night": false,
+      "fov": 46
+    },
+    "arvoredo-tronco": {
+      "filename": "after-arvoredo-tronco.jpg",
+      "target": [
+        -13.012727272727277,
+        0.72,
+        7.759090948795178
+      ],
+      "position": [
+        -10.332727272727277,
+        0.72,
+        7.459090948795178
+      ],
+      "night": false,
+      "fov": 47
+    },
+    "arvoredo-topo": {
+      "filename": "after-arvoredo-topo.jpg",
+      "target": [
+        -14.792727272727278,
+        0,
+        7.909090948795178
+      ],
+      "position": [
+        -14.772727272727277,
+        16.380000082228918,
+        7.9890909487951784
+      ],
+      "night": false
+    },
+    "arvoredo-noite": {
+      "filename": "after-arvoredo-noite.jpg",
+      "target": [
+        -12.942727272727279,
+        0.85,
+        9.099090948795178
+      ],
+      "position": [
+        -9.942727272727279,
+        0.76,
+        9.099090948795178
+      ],
+      "night": true,
+      "fov": 46
+    },
+    "visao-geral": {
+      "filename": "after-visao-geral.jpg",
+      "target": [
+        9,
+        0,
+        0
+      ],
+      "position": [
+        -6,
+        42,
+        43
+      ],
+      "night": false,
+      "specimens": [
+        {
+          "id": "tree-exporural-r01-01",
+          "count": 1,
+          "lod": "far"
+        },
+        {
+          "id": "tree-j-05",
+          "count": 1,
+          "lod": "far"
+        }
+      ]
+    }
+  },
+  "measurements": {
+    "p5-quina": {
+      "calls": 276,
+      "triangles": 405911,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "dpr": 1,
+      "samples": 117,
+      "medianMs": 16.699999999999818,
+      "p95Ms": 16.700000000000728,
+      "camera": [
+        3.0709090909090886,
+        0.87,
+        -11.593636427710843
+      ]
+    },
+    "exporural-baixa": {
+      "calls": 110,
+      "triangles": 452259,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "dpr": 1,
+      "samples": 119,
+      "medianMs": 16.69999999999891,
+      "p95Ms": 16.700000000000728,
+      "camera": [
+        7.325689,
+        0.64,
+        -14.540000000000001
+      ]
+    },
+    "arvoredo-esquina": {
+      "calls": 229,
+      "triangles": 377371,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "dpr": 1,
+      "samples": 119,
+      "medianMs": 16.69999999999891,
+      "p95Ms": 16.700000000000728,
+      "camera": [
+        -9.492727272727278,
+        1.35,
+        3.5590909487951787
+      ]
+    },
+    "visao-geral": {
+      "calls": 578,
+      "triangles": 764644,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "dpr": 1,
+      "samples": 120,
+      "medianMs": 16.69999999999891,
+      "p95Ms": 16.700000000000728,
+      "camera": [
+        -6,
+        42,
+        43
+      ]
+    }
+  },
+  "readyMs": 5876,
+  "map": {
+    "b8": {
+      "minX": -3.316363636363633,
+      "maxX": 1.3309090909090884,
+      "minZ": -16.843636448192772,
+      "maxZ": -12.763636427710843,
+      "width": 4.647272727272721,
+      "depth": 4.080000020481929,
+      "centerX": -0.9927272727272722,
+      "centerZ": -14.803636437951807,
+      "id": "reference:2026:b8"
+    },
+    "c2": {
+      "minX": -20.29090909090909,
+      "maxX": -16.36363636363636,
+      "minZ": 4.581818204819278,
+      "maxZ": 10.800000054216866,
+      "width": 3.9272727272727295,
+      "depth": 6.218181849397588,
+      "centerX": -18.327272727272724,
+      "centerZ": 7.690909129518072,
+      "id": "reference:2026:c2"
+    },
+    "tree": [
+      8.625689,
+      -18.94
+    ],
+    "walk": {
+      "minX": -15.70909090909091,
+      "maxX": -12.392727272727278,
+      "minZ": 2.945454560240961,
+      "maxZ": 12.872727337349396,
+      "width": 3.316363636363633,
+      "depth": 9.927272777108435,
+      "centerX": -14.050909090909094,
+      "centerZ": 7.909090948795178,
+      "side": 1,
+      "streetX": -12.392727272727278
+    }
+  },
+  "approaches": {
+    "p5-quina": {
+      "startDistance": 15.002156830060093,
+      "endDistance": 8.788878056206686,
+      "samples": 178,
+      "medianMs": 16.69999999999891,
+      "p95Ms": 16.700000000000728
+    },
+    "exporural-baixa": {
+      "startDistance": 16.51700941453991,
+      "endDistance": 8.788878056206686,
+      "samples": 177,
+      "medianMs": 16.69999999999709,
+      "p95Ms": 16.700000000000728
+    },
+    "arvoredo-esquina": {
+      "startDistance": 21.315952336219933,
+      "endDistance": 8.788878056206686,
+      "samples": 133,
+      "medianMs": 16.69999999999709,
+      "p95Ms": 50.065999999998894
+    }
+  },
+  "functional": {
+    "pavilhao": {
+      "passed": true,
+      "lotModulesShown": 81,
+      "exteriorHiddenInInterior": true
+    },
+    "lote-e-vegetacao": {
+      "passed": true,
+      "near": [
+        {
+          "position": [
+            8.625689,
+            0.134,
+            -18.94
+          ],
+          "tier": "near"
+        }
+      ],
+      "far": [
+        {
+          "position": [
+            8.625689,
+            0.134,
+            -18.94
+          ],
+          "tier": "far"
+        }
+      ],
+      "selectorRestoredTree": true
+    },
+    "globos-do-arvoredo": {
+      "passed": true,
+      "day": {
+        "count": 12,
+        "emission": 0,
+        "lights": 0
+      },
+      "night": {
+        "count": 12,
+        "emission": 0.46,
+        "lights": 0
+      }
+    },
+    "restaurante-e-visita": {
+      "passed": true,
+      "displacement": 0.34398567451316353,
+      "key": "w",
+      "selectionRestored": true
+    }
+  },
+  "frontagePlan": {
+    "slab": {
+      "minX": -15.624290909090911,
+      "maxX": -12.477527272727277,
+      "minZ": 4.554545477108431,
+      "maxZ": 12.787927337349396
+    },
+    "connector": {
+      "minX": -16.38363636363636,
+      "maxX": -15.70909090909091,
+      "minZ": 6.758181852108434,
+      "maxZ": 8.62363640692771
+    },
+    "portal": {
+      "center": [
+        -12.633527272727278,
+        9.05363640692771
+      ],
+      "yaw": 1.5707963267948966,
+      "width": 1.32,
+      "depth": 0.3,
+      "bounds": {
+        "minX": -12.783527272727278,
+        "maxX": -12.483527272727278,
+        "minZ": 8.39363640692771,
+        "maxZ": 9.71363640692771
+      }
+    },
+    "benchCanopies": [
+      {
+        "center": [
+          -12.633527272727278,
+          5.141704570858432
+        ],
+        "yaw": 1.5707963267948966,
+        "width": 0.6943181875000016,
+        "depth": 0.29,
+        "bounds": {
+          "minX": -12.778527272727278,
+          "maxX": -12.488527272727278,
+          "minZ": 4.794545477108431,
+          "maxZ": 5.4888636646084334
+        }
+      },
+      {
+        "center": [
+          -12.633527272727278,
+          5.891022758358433
+        ],
+        "yaw": 1.5707963267948966,
+        "width": 0.6943181875000016,
+        "depth": 0.29,
+        "bounds": {
+          "minX": -12.778527272727278,
+          "maxX": -12.488527272727278,
+          "minZ": 5.543863664608432,
+          "maxZ": 6.2381818521084345
+        }
+      },
+      {
+        "center": [
+          -12.633527272727278,
+          10.43988640692771
+        ],
+        "yaw": 1.5707963267948966,
+        "width": 1.1325,
+        "depth": 0.29,
+        "bounds": {
+          "minX": -12.778527272727278,
+          "maxX": -12.488527272727278,
+          "minZ": 9.87363640692771,
+          "maxZ": 11.00613640692771
+        }
+      },
+      {
+        "center": [
+          -12.633527272727278,
+          11.62738640692771
+        ],
+        "yaw": 1.5707963267948966,
+        "width": 1.1325,
+        "depth": 0.29,
+        "bounds": {
+          "minX": -12.778527272727278,
+          "maxX": -12.488527272727278,
+          "minZ": 11.06113640692771,
+          "maxZ": 12.19363640692771
+        }
+      },
+      {
+        "center": [
+          -14.694290909090912,
+          4.764545477108431
+        ],
+        "yaw": 3.141592653589793,
+        "width": 1.48,
+        "depth": 0.29,
+        "bounds": {
+          "minX": -15.434290909090912,
+          "maxX": -13.954290909090911,
+          "minZ": 4.619545477108431,
+          "maxZ": 4.909545477108431
+        }
+      }
+    ],
+    "plantBeds": [
+      {
+        "center": [
+          -14.764290909090912,
+          5.414545477108431
+        ],
+        "size": [
+          0.45,
+          0.59
+        ],
+        "kind": "palm-clump"
+      },
+      {
+        "center": [
+          -14.24429090909091,
+          6.388181852108434
+        ],
+        "size": [
+          0.37,
+          0.46
+        ],
+        "kind": "palm-clump"
+      },
+      {
+        "center": [
+          -15.214290909090911,
+          6.288181852108434
+        ],
+        "size": [
+          0.45,
+          0.47
+        ],
+        "kind": "broadleaf"
+      },
+      {
+        "center": [
+          -15.08429090909091,
+          9.14363640692771
+        ],
+        "size": [
+          0.47,
+          0.58
+        ],
+        "kind": "broadleaf"
+      }
+    ],
+    "treePits": [
+      [
+        -13.3091,
+        5.1273
+      ],
+      [
+        -13.0909,
+        5.7818
+      ],
+      [
+        -12.8291,
+        6.48
+      ],
+      [
+        -12.96,
+        7.2
+      ],
+      [
+        -12.96,
+        7.8982
+      ],
+      [
+        -12.96,
+        8.6182
+      ],
+      [
+        -12.96,
+        9.3164
+      ],
+      [
+        -12.96,
+        9.8836
+      ],
+      [
+        -12.96,
+        10.8
+      ],
+      [
+        -12.96,
+        11.4545
+      ],
+      [
+        -12.96,
+        12.1091
+      ],
+      [
+        -12.96,
+        12.4582
+      ]
+    ]
+  },
+  "readyMsPavilionRecapture": 4907
+}

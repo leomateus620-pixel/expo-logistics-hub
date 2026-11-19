@@ -55,13 +55,14 @@ function triangleGeometry(triangles: PavilionArchitectureTriangle[]) {
 }
 
 /** Static architectural shell, reused by the real exterior renderer and QA. */
-export const PhotoReferencedPavilion = memo(function PhotoReferencedPavilion({ layout, materials, showDetail, cutaway }: {
+export const PhotoReferencedPavilion = memo(function PhotoReferencedPavilion({ layout, materials, showDetail, cutaway, foundationDepth = 0 }: {
   layout: CommercialPavilionLayout;
   materials: CommercialPavilionMaterials;
   showDetail: boolean;
   cutaway: boolean;
+  foundationDepth?: number;
 }) {
-  const architecture = useMemo(() => createPavilionArchitectureLayout(layout, showDetail), [layout, showDetail]);
+  const architecture = useMemo(() => createPavilionArchitectureLayout(layout, showDetail, foundationDepth), [layout, showDetail, foundationDepth]);
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const triangles = useMemo(() => {
     const groups = new Map<PavilionArchitectureMaterial, PavilionArchitectureTriangle[]>();

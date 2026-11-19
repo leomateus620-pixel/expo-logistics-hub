@@ -3,7 +3,7 @@
  * continue to belong to commercialPavilionReference and commercialPavilions.
  * Ratios below are perspective estimates, not a measured architectural survey.
  */
-export const PHOTOGRAPHED_PAVILION_IDS = ['B1', 'B3', 'B4', 'B5', 'B6'] as const;
+export const PHOTOGRAPHED_PAVILION_IDS = ['B1', 'B3', 'B4', 'B5', 'B6', 'B8'] as const;
 export type PhotographedPavilionId = typeof PHOTOGRAPHED_PAVILION_IDS[number];
 export type PavilionArchitectureConfidence = 'high' | 'medium' | 'low';
 export const PAVILION_ARCHITECTURE_RENDER_BUDGET = {
@@ -14,12 +14,12 @@ export const PAVILION_ARCHITECTURE_RENDER_BUDGET = {
 
 export interface PavilionArchitectureProfile {
   id: PhotographedPavilionId;
-  pavilionNumber: 1 | 12 | 8 | 13 | 3;
-  revision: 'photographs-2026-10-30';
+  pavilionNumber: 1 | 12 | 8 | 13 | 3 | 5;
+  revision: 'photographs-2026-10-30' | 'photographs-2026-11-19';
   photos: readonly string[];
   /** Public facade is model-local +Z; the persisted placement is never rotated. */
-  documentedFaces: readonly ('front' | 'left')[];
-  roof: 'concealed-low-gable' | 'retained-sawtooth' | 'gable' | 'retained-three-span';
+  documentedFaces: readonly ('front' | 'left' | 'right')[];
+  roof: 'concealed-low-gable' | 'retained-sawtooth' | 'gable' | 'retained-three-span' | 'longitudinal-low-gable';
   confirmed: readonly string[];
   estimated: readonly string[];
   occluded: readonly string[];
@@ -86,6 +86,17 @@ export const PAVILION_ARCHITECTURE_2026: Record<PhotographedPavilionId, Pavilion
     conservativeDecision: 'Keep inherited three roof spans behind one continuous front and variable fascia, without interpreting the front photograph as a roof survey. Institutional banners remain temporary communication and do not change commercial use.',
     confidence: 'medium', facadeHeightToWidth: 0.28,
     gates: [{ x: 0.04, width: 0.19, height: 0.66 }, { x: 0.27, width: 0.17, height: 0.66 }],
+  },
+  B8: {
+    id: 'B8', pavilionNumber: 5, revision: 'photographs-2026-11-19',
+    photos: ['IMG_1765.jpeg', 'IMG_1766.jpeg', 'IMG_1767.jpeg'],
+    documentedFaces: ['front', 'right'], roof: 'longitudinal-low-gable',
+    confirmed: ['shallow continuous eave and pale side gable', 'local raised ribbed fascia with its own return', 'pale painted brick and graphite piers', 'louvered bays, central gate, side door and small low vents', 'grass verge and bollards'],
+    estimated: ['vertical scale compared with the doors and adjacent buildings', 'roof pitch and overhang depth', 'window and pier intervals', 'width of the fascia return and vent spacing'],
+    occluded: ['back elevation', 'roof beyond the raised fascia'],
+    conservativeDecision: 'Carry the observed gable across the footprint and use restrained rear and west walls. The raised fascia is limited to the documented entrance bay.',
+    confidence: 'high', facadeHeightToWidth: 0.185,
+    gates: [{ x: 0, width: 0.108, height: 0.77 }],
   },
 };
 

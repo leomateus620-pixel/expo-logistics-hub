@@ -8,8 +8,8 @@ import {
   projectedCommercialMapShadowRotation,
 } from '../../data/commercialMapEnvironment';
 import type { CommercialMapTree, CommercialTreeSpeciesGroup } from '../../data/commercialTrees';
+import { commercialArvoredoTreeVariation, partitionCommercialTreeSpecimens } from '../../data/commercialTreeSpecimens';
 import type { MapEntity } from '../../types';
-import { EXPORURAL_SCENE_CORRECTIONS } from '../../data/exporuralSceneCorrections';
 import {
   COMMERCIAL_TREE_BRANCHES,
   COMMERCIAL_TREE_CANOPY_LOBES,
@@ -34,6 +34,7 @@ import { VegetationPilotGroundLayer } from './VegetationPilotGroundLayer';
 import { createInternalFoliageMaterial, createInternalLeafAtlas, createInternalLeafLobe, internalTreeCrownCastsShadow, isInternalParkVegetationPoint, INTERNAL_TREE_TRUNK_RADIUS_FACTOR } from '../../utils/internalTreeVisuals';
 import { createPilotBarkMaterial } from './vegetationPilotMaterial';
 import { commercialTreeWoodStructure } from '../../utils/commercialTreeWoodStructure';
+import { CommercialTreeSpecimens } from './CommercialTreeSpecimens';
 
 const NO_RAYCAST = () => undefined;
 const SHADOW_OPACITY = 0.105;
@@ -542,6 +543,7 @@ function CommercialTreeInstances({
   lodScene,
   referenceQuadras = false,
   internalPark = false,
+  leafAtlas = null,
 }: {
   trees: readonly CommercialMapTree[];
   surfaceEntities: readonly MapEntity[];
@@ -552,6 +554,7 @@ function CommercialTreeInstances({
   lodScene: CommercialTreeLodSceneMetrics;
   referenceQuadras?: boolean;
   internalPark?: boolean;
+  leafAtlas?: THREE.Texture | null;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const trunkRef = useRef<THREE.InstancedMesh>(null);
@@ -618,7 +621,6 @@ function CommercialTreeInstances({
     contactPatch: createIrregularContactPatchGeometry(),
   }), [effectiveReducedGraphics, referenceQuadras, internalPark]);
   const shadowTexture = useMemo(createSoftShadowTexture, []);
-  const leafAtlas = useMemo(() => internalPark ? createInternalLeafAtlas() : null, [internalPark]);
   const materials = useMemo(
     () => createTreeMaterials(shadowTexture, referenceQuadras, effectiveReducedGraphics, leafAtlas),
     [effectiveReducedGraphics, referenceQuadras, shadowTexture, leafAtlas],
@@ -658,13 +660,15 @@ function CommercialTreeInstances({
       const profile = commercialTreePresentationProfile(tree);
       const forecourt = eventCenterForecourtTreeProfile(tree);
       const wood = forecourt?.wood ?? commercialTreeWoodStructure(tree);
+      const variation = commercialArvoredoTreeVariation(tree.id);
+      const trunkScale = (variation?.trunk ?? 1) * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1);
 
       transform.position.set(x, groundY + wood.trunkHeight / 2, z);
       transform.rotation.set(0, profile.rotation, 0);
       transform.scale.set(
-        tree.trunkRadius * profile.trunkScaleX * (forecourt?.trunkRadiusScale ?? 1) * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
+        tree.trunkRadius * profile.trunkScaleX * (forecourt?.trunkRadiusScale ?? 1) * trunkScale,
         wood.trunkHeight,
-        tree.trunkRadius * profile.trunkScaleZ * (forecourt?.trunkRadiusScale ?? 1) * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1),
+        tree.trunkRadius * profile.trunkScaleZ * (forecourt?.trunkRadiusScale ?? 1) * trunkScale,
       );
       transform.updateMatrix();
       trunkMesh.setMatrixAt(treeIndex, transform.matrix);
@@ -685,7 +689,7 @@ function CommercialTreeInstances({
         quaternion.setFromUnitVectors(UNIT_Y, direction.clone().normalize());
         transform.position.copy(midpoint);
         transform.quaternion.copy(quaternion);
-        const branchRadius = tree.trunkRadius * 0.52 * (forecourt?.branchRadiusScale ?? 1) * (internalPark ? INTERNAL_TREE_TRUNK_RADIUS_FACTOR : 1);
+        const branchRadius = tree.trunkRadius * 0.52 * (forecourt?.branchRadiusScale ?? 1) * trunkScale;
         transform.scale.set(branchRadius, direction.length(), branchRadius);
         transform.updateMatrix();
         branchMesh.setMatrixAt(instanceIndex, transform.matrix);
@@ -702,15 +706,10 @@ function CommercialTreeInstances({
           z + lobe.offsetZ,
         );
         transform.rotation.set(referenceQuadras ? 0 : lobe.rotation * 0.08, lobe.rotation, referenceQuadras ? 0 : -lobe.rotation * 0.045);
-        // The photographed isolated R/01 tree has a wider, open silhouette;
-        // keep gaps between its leaf sprays without changing other inventories.
-        // Close-up QA: .99 replaces .86 (about +32% nominal scaled area),
-        // keeping the authored lobe centers and the existing shared leaf atlas.
-        const openCrown = tree.id === EXPORURAL_SCENE_CORRECTIONS.tree.id ? .99 : 1;
         transform.scale.set(
-          lobe.scaleX * openCrown * (forecourt?.crownScaleXZ ?? 1),
-          lobe.scaleY * openCrown * (forecourt?.crownScaleY ?? 1),
-          lobe.scaleZ * openCrown * (forecourt?.crownScaleXZ ?? 1),
+          lobe.scaleX * (forecourt?.crownScaleXZ ?? 1) * (variation?.crown ?? 1),
+          lobe.scaleY * (forecourt?.crownScaleY ?? 1),
+          lobe.scaleZ * (forecourt?.crownScaleXZ ?? 1) * (variation?.crown ?? 1),
         );
         transform.updateMatrix();
         crownMesh.setMatrixAt(instanceIndex, transform.matrix);
@@ -817,7 +816,6 @@ function CommercialTreeInstances({
     Object.values(materials).forEach((material) => material.dispose());
     shadowTexture.dispose();
   }, [materials, shadowTexture]);
-  useEffect(() => () => leafAtlas?.dispose(), [leafAtlas]);
 
   useFrame((state, delta) => {
     const group = groupRef.current;
@@ -972,14 +970,18 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
   qualityTier?: CommercialMapQualityTier;
 }) {
   const pilotEnabled = isVegetationPilotEnabled();
+  const { instances, specimens } = useMemo(() => partitionCommercialTreeSpecimens(props.trees), [props.trees]);
   const treeGroups = useMemo(() => ({
-    pilot: pilotEnabled ? props.trees.filter(isVegetationPilotTree) : [],
-    referenceQuadras: pilotEnabled ? [] : props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B'),
-    legacy: props.trees.filter((tree) => !isInternalParkVegetationPoint(tree.position)
+    pilot: pilotEnabled ? instances.filter(isVegetationPilotTree) : [],
+    referenceQuadras: pilotEnabled ? [] : instances.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B'),
+    legacy: instances.filter((tree) => !isInternalParkVegetationPoint(tree.position)
       && (pilotEnabled ? !isVegetationPilotTree(tree) : tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B')),
-    internal: props.trees.filter((tree) => isInternalParkVegetationPoint(tree.position)
+    internal: instances.filter((tree) => isInternalParkVegetationPoint(tree.position)
       && (pilotEnabled ? !isVegetationPilotTree(tree) : tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B')),
-  }), [props.trees, pilotEnabled]);
+  }), [instances, pilotEnabled]);
+  const usesLeafAtlas = treeGroups.internal.length > 0 || specimens.length > 0;
+  const leafAtlas = useMemo(() => usesLeafAtlas ? createInternalLeafAtlas() : null, [usesLeafAtlas]);
+  useEffect(() => () => leafAtlas?.dispose(), [leafAtlas]);
   const lodScene = useMemo(() => resolveCommercialTreeLodSceneMetrics(props.trees), [props.trees]);
   const qualityTier = props.qualityTier ?? 'HIGH';
   const content = resolveCommercialMapContentPolicy(qualityTier, props.reducedGraphics);
@@ -1003,7 +1005,11 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
       )}
       {treeGroups.internal.length > 0 && (
         <CommercialTreeInstances {...props} trees={treeGroups.internal}
-          qualityTier={qualityTier} lodScene={lodScene} surfaceResolver={surfaceResolver} internalPark />
+          qualityTier={qualityTier} lodScene={lodScene} surfaceResolver={surfaceResolver} internalPark leafAtlas={leafAtlas} />
+      )}
+      {leafAtlas && specimens.length > 0 && (
+        <CommercialTreeSpecimens specimens={specimens} qualityTier={qualityTier}
+          visible={props.visible} surfaceResolver={surfaceResolver} leafAtlas={leafAtlas} />
       )}
       {treeGroups.referenceQuadras.length > 0 && (
         <CommercialTreeInstances

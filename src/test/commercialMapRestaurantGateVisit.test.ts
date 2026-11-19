@@ -34,6 +34,22 @@ describe('physical access to restaurant, tree pits and A2', () => {
     expect(world.collisions.isFree({x:b.centerX+l.bodyCenterZ,y:p.y,z:b.centerZ})).toBe(false);
     expect(world.collisions.isFree({x:b.centerX+l.pillarZ,y:p.y,z:b.centerZ-l.pillarXs[0]})).toBe(false);
   });
+  it('keeps the portal opening and the road-to-restaurant approach walkable', () => {
+    const plan = buildRestaurantFrontagePlan({ entities, trees: COMMERCIAL_MAP_TREES });
+    const world = buildVisitWorld({
+      entities: entities.filter((entity) => ['ALAMEDA-MERCOSUL', 'CALCADA-ARVOREDO', 'C2'].includes(entity.publicIdentifier)),
+      trees: COMMERCIAL_MAP_TREES,
+      includeContext: false,
+    });
+    const portal = { x: -12.19, y: 0, z: plan.portal!.center[1] };
+    portal.y = world.ground.heightAt(portal.x, portal.z);
+    world.move(portal, -1.15, 0);
+    expect(portal.x).toBeCloseTo(-13.34, 3);
+    const porch = { x: -12.19, y: 0, z: (plan.connector!.minZ + plan.connector!.maxZ) / 2 - 0.16 };
+    porch.y = world.ground.heightAt(porch.x, porch.z);
+    world.move(porch, -4.25, 0);
+    expect(porch.x).toBeCloseTo(-16.44, 3);
+  });
   it('walks through both A2 passages and blocks the service core', () => {
     const gate=PARK_ACCESS_INFRASTRUCTURE_INPUT.gates.find(g=>g.key==='gate2')!;
     const world=buildVisitWorld({entities:[],trees:[],includeContext:true});

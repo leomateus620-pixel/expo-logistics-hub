@@ -10,6 +10,7 @@ export const PAVILION_ARCHITECTURE_PALETTES: Readonly<Record<PhotographedPavilio
   B4: { wall: '#ddded7', accent: '#4d5150', roof: '#a9aeab', trim: '#494e4e', dark: '#5b6061', glass: '#536362', green: '#354f42', white: '#c4c8c3', platform: '#96948a', metal: '#737b78', brick: '#ac6750', cladding: '#c9c3af' },
   B5: { wall: '#deded8', accent: '#555958', roof: '#a3aaa8', trim: '#4e5353', dark: '#696968', glass: '#4f5a59', green: '#354f42', white: '#d6d8d1', platform: '#93938b', metal: '#818784', brick: '#ac6750', cladding: '#aeb2ac' },
   B6: { wall: '#dbdcd4', accent: '#585d5e', roof: '#969e9c', trim: '#4d5253', dark: '#696c6b', glass: '#3d4b4b', green: '#354f42', white: '#dfdfd6', platform: '#8f908b', metal: '#8f9795', brick: '#ac6750', cladding: '#a4aaa8' },
+  B8: { wall: '#c8cbc7', accent: '#565957', roof: '#8e9494', trim: '#373e40', dark: '#555653', glass: '#454d4e', green: '#68774c', white: '#c5c3b6', platform: '#8d8a7d', metal: '#707875', brick: '#c6c9c6', cladding: '#c6ced0' },
 };
 
 export function resolvePavilionArchitecturePalette(id?: string): PavilionArchitecturePalette | null {

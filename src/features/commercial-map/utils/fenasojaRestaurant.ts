@@ -14,7 +14,7 @@ export const FENASOJA_RESTAURANT_PUBLIC_IDENTIFIER = 'C2';
 export const FENASOJA_RESTAURANT_ABSORBED_IDENTIFIER = 'C3';
 export const FENASOJA_RESTAURANT_PRESENTATION_NAME = 'Restaurante';
 export const FENASOJA_RESTAURANT_FRONTAGE_IDENTIFIER = 'CALCADA-ARVOREDO';
-export const FENASOJA_RESTAURANT_REVISION = '2026.9-c2-restaurante-unificado.3';
+export const FENASOJA_RESTAURANT_REVISION = '2026.11-c2-restaurante-unificado.4';
 
 /** Two adjacent cadastral rectangles may carry sub-point rounding after persistence. */
 const UNIFICATION_GAP_TOLERANCE = 0.12;
@@ -82,6 +82,24 @@ export interface FenasojaRestaurantBounds {
   depth: number;
 }
 
+type FrontageSpan = readonly [number, number];
+
+export interface RestaurantFrontBay {
+  x: number;
+  span: number;
+  kind: 'display' | 'pizzeria-entry' | 'pizzeria-screen';
+}
+
+/** The C3 portion on the local facade axis, retained only for a documented union. */
+export function fenasojaPizzeriaFrontSpan(entity: Pick<MapEntity, 'metadata'>): FrontageSpan | undefined {
+  const presentation = entity.metadata.restaurantPresentation;
+  if (!presentation || typeof presentation !== 'object' || !('pizzeriaFrontSpan' in presentation)) return;
+  const span = presentation.pizzeriaFrontSpan;
+  if (!Array.isArray(span) || span.length !== 2) return;
+  const [min, max] = span;
+  if (typeof min === 'number' && typeof max === 'number' && min >= -0.5 && max <= 0.5 && min < max) return [min, max];
+}
+
 /**
  * One-storey hall with a higher eave and a restrained pitched roof. Bounded so persisted
  * geometry cannot inflate the mass into a pavilion-sized silhouette.
@@ -129,8 +147,7 @@ export interface FenasojaRestaurantLayout {
   doorHeight: number;
   terraceFrontZ: number;
   stepDepth: number;
-  frontWindowXs: readonly number[];
-  porchWindowXs: readonly number[];
+  frontBays: readonly RestaurantFrontBay[];
   rearWindowXs: readonly number[];
   windowWidth: number;
   windowHeight: number;
@@ -144,6 +161,7 @@ export interface FenasojaRestaurantLayout {
 export function createFenasojaRestaurantLayout(
   bounds: FenasojaRestaurantBounds,
   requestedHeight = fenasojaRestaurantVisualHeight(bounds),
+  pizzeriaSpan?: FrontageSpan,
 ): FenasojaRestaurantLayout {
   const width = Math.max(2.4, finiteOr(bounds.width, 6.2));
   const depth = Math.max(1.6, finiteOr(bounds.depth, 3.9));
@@ -178,6 +196,24 @@ export function createFenasojaRestaurantLayout(
     { length: FENASOJA_RESTAURANT_LAYOUT.frontPillarCount },
     (_, index) => -pillarSpan / 2 + (pillarSpan * index) / (FENASOJA_RESTAURANT_LAYOUT.frontPillarCount - 1),
   );
+  let frontBays: RestaurantFrontBay[] = [-0.385, -0.24, -0.128, 0.128, 0.24, 0.385]
+    .map((x, index) => ({ x: x * width, span: width * (index === 2 || index === 3 ? 0.083 : 0.132), kind: 'display' }));
+  if (pizzeriaSpan) {
+    const [first, last] = pizzeriaSpan;
+    const onLeft = (first + last) / 2 < 0;
+    const wingStart = Math.max(first, onLeft ? -0.454 : 0.104);
+    const wingEnd = Math.min(last, onLeft ? -0.104 : 0.454);
+    const wing = wingEnd - wingStart;
+    if (wing >= 0.2) {
+      const entry = wingStart + wing * (onLeft ? 0.24 : 0.76);
+      const screen = wingStart + wing * (onLeft ? 0.76 : 0.24);
+      frontBays = frontBays.filter(({ x, span }) => x + span / 2 <= wingStart * width || x - span / 2 >= wingEnd * width);
+      frontBays.push(
+        { x: entry * width, span: wing * width * 0.45, kind: 'pizzeria-entry' },
+        { x: screen * width, span: wing * width * 0.39, kind: 'pizzeria-screen' },
+      );
+    }
+  }
   return {
     width,
     depth,
@@ -214,8 +250,7 @@ export function createFenasojaRestaurantLayout(
     doorHeight: Math.min(0.98, wallHeight * 0.72),
     terraceFrontZ: slabDepth / 2,
     stepDepth: depth * 0.045,
-    frontWindowXs: [-0.435, -0.365, 0.365, 0.435].map((ratio) => ratio * width),
-    porchWindowXs: [-0.235, -0.155, 0.155, 0.235].map((ratio) => ratio * width),
+    frontBays,
     rearWindowXs: [-0.4, -0.25, -0.1, 0.1, 0.25, 0.4].map((ratio) => ratio * width),
     windowWidth: width * 0.055,
     windowHeight: Math.min(0.54, wallHeight * 0.4),
@@ -326,6 +361,14 @@ export function unifyFenasojaRestaurantEntities(entities: readonly MapEntity[]):
     ]
     : null;
   const absorbedForPresentation = absorbed && mergedRing ? absorbed : null;
+  const pizzeriaFrontSpan = absorbedForPresentation && absorbedBounds && mergedBounds
+    && Math.abs(absorbedBounds.minX - mergedBounds.minX) <= UNIFICATION_GAP_TOLERANCE
+    && Math.abs(absorbedBounds.maxX - mergedBounds.maxX) <= UNIFICATION_GAP_TOLERANCE
+    ? [
+      0.5 - (absorbedBounds.maxZ - mergedBounds.minZ) / (mergedBounds.maxZ - mergedBounds.minZ),
+      0.5 - (absorbedBounds.minZ - mergedBounds.minZ) / (mergedBounds.maxZ - mergedBounds.minZ),
+    ] as const
+    : fenasojaPizzeriaFrontSpan(primary);
   const aliases = uniqueStrings([
     ...(Array.isArray(primary.metadata.aliases) ? primary.metadata.aliases : []),
     primary.name,
@@ -358,6 +401,7 @@ export function unifyFenasojaRestaurantEntities(entities: readonly MapEntity[]):
           : [FENASOJA_RESTAURANT_PUBLIC_IDENTIFIER],
         absorbedEntityId: absorbedForPresentation?.id ?? null,
         cadastralRowsUnchanged: true,
+        ...(pizzeriaFrontSpan ? { pizzeriaFrontSpan } : {}),
       },
     },
   };

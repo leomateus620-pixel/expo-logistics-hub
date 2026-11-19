@@ -13,6 +13,19 @@ export const isExporuralLandscapeLot = (entity: MapEntity) =>
   /^Q-[RS]-\d{2}$/.test(entity.publicIdentifier) &&
   entity.metadata.areaCode === "EXPORURAL";
 
+const TERRACE_TOE_Y = 0.025;
+const TERRACE_RISE = 0.22;
+
+/** The planted upper bank meets the display foundation, not the cadastral floor. */
+export function exporuralPavilion5ExteriorLift(entities: readonly MapEntity[]): number {
+  const active = (id: string) => entities.find(entity => entity.publicIdentifier === id && !entity.isArchived);
+  const pavilion = active('B8');
+  const parcels = ['Q-R-02', 'Q-R-13', 'Q-R-14'].map(active).filter((entity): entity is MapEntity => !!entity && isExporuralLandscapeLot(entity));
+  if (!pavilion || parcels.length !== 3) return 0;
+  const lowerBank = parcels[2].geometry.elevation + TERRACE_TOE_Y;
+  return Math.max(0, lowerBank + TERRACE_RISE - pavilion.geometry.elevation);
+}
+
 /** Ring start and junction count are not parcel identities. Find the southern
  * corners on each half of the footprint, including rings with extra T nodes. */
 export function exporuralSouthernCorners(ring: Coordinate[]): [Coordinate, Coordinate] {
@@ -135,7 +148,6 @@ export function buildExporuralLandscape(entities: readonly MapEntity[]) {
         ) > 0.001);
       const edge = sections.map(s => s.point);
       const widths = sections.map(s => s.width);
-      const heights = sections.map(() => 0.22);
       const lengths = edge
         .slice(1)
         .map((p, i) => Math.hypot(p[0] - edge[i][0], p[1] - edge[i][1]));
@@ -191,11 +203,6 @@ export function buildExporuralLandscape(entities: readonly MapEntity[]) {
             widths[segment + 1],
             t,
           );
-          const height = THREE.MathUtils.lerp(
-            heights[segment],
-            heights[segment + 1],
-            t,
-          );
           const outward = [
             THREE.MathUtils.lerp(miters[segment][0], miters[segment + 1][0], t),
             THREE.MathUtils.lerp(miters[segment][1], miters[segment + 1][1], t),
@@ -209,7 +216,7 @@ export function buildExporuralLandscape(entities: readonly MapEntity[]) {
           const crown = smooth(s / 0.86);
           ps.push(
             a[0] + (b[0] - a[0]) * t + outward[0] * offset,
-            entity.geometry.elevation + 0.025 + height * crown * end,
+            entity.geometry.elevation + TERRACE_TOE_Y + TERRACE_RISE * crown * end,
             a[1] + (b[1] - a[1]) * t + outward[1] * offset,
           );
           if (v === across) crest.push([ps[ps.length - 3], ps[ps.length - 2], ps[ps.length - 1]]);
@@ -252,7 +259,7 @@ export function buildExporuralLandscape(entities: readonly MapEntity[]) {
       ).map(e => [e.geometry.coordinates[0]] as polygonClipping.Polygon);
       const clipped = polygonClipping.difference([outline], ...exclusions);
       const heightAt = (x: number, z: number) => {
-        let best = Infinity, height = 0.245;
+        let best = Infinity, height = entity.geometry.elevation + TERRACE_TOE_Y + TERRACE_RISE;
         for (let i = 1; i < crest.length; i++) {
           const a = crest[i - 1], b = crest[i];
           const dx = b[0] - a[0], dz = b[2] - a[2];

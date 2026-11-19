@@ -19,6 +19,7 @@ import {
   FENASOJA_RESTAURANT_LAYOUT,
   FENASOJA_RESTAURANT_RENDER_BUDGET,
   createFenasojaRestaurantLayout,
+  fenasojaPizzeriaFrontSpan,
 } from '../../utils/fenasojaRestaurant';
 import { PAVILION_FOUR_SOY_KITCHEN_LAYOUT } from '../../utils/pavilionFourSoyKitchen';
 import { commercialPavilionModelBounds, createCommercialPavilionLayout, resolveCommercialPavilionDefinition } from '../../utils/commercialPavilions';
@@ -2084,11 +2085,11 @@ function FenasojaRestaurant({
   height,
   materials,
   showDetail,
-  showFocusDetail,
-}: LandmarkModelProps) {
+  pizzeriaSpan,
+}: LandmarkModelProps & { pizzeriaSpan?: ReturnType<typeof fenasojaPizzeriaFrontSpan> }) {
   const layout = useMemo(
-    () => createFenasojaRestaurantLayout(bounds, height),
-    [bounds, height],
+    () => createFenasojaRestaurantLayout(bounds, height, pizzeriaSpan),
+    [bounds, height, pizzeriaSpan],
   );
   const {
     width,
@@ -2123,8 +2124,7 @@ function FenasojaRestaurant({
     doorHeight,
     terraceFrontZ,
     stepDepth,
-    frontWindowXs,
-    porchWindowXs,
+    frontBays,
     rearWindowXs,
     windowWidth,
     windowHeight,
@@ -2151,8 +2151,6 @@ function FenasojaRestaurant({
   const paneThickness = 0.024;
   const frameMargin = 0.028;
   const windowOpenings = [
-    ...frontWindowXs.map((x) => ({ x, z: bodyFrontZ, normal: [0, 1] as const, span: windowWidth, height: windowHeight })),
-    ...porchWindowXs.map((x) => ({ x, z: bodyFrontZ, normal: [0, 1] as const, span: windowWidth * 1.25, height: windowHeight * 1.18 })),
     ...rearWindowXs.map((x) => ({ x, z: bodyBackZ, normal: [0, -1] as const, span: windowWidth, height: windowHeight })),
     { x: bodyWidth / 2, z: bodyCenterZ + bodyDepth * 0.12, normal: [1, 0] as const, span: depth * 0.09, height: windowHeight },
     { x: -bodyWidth / 2, z: bodyCenterZ + bodyDepth * 0.12, normal: [-1, 0] as const, span: depth * 0.09, height: windowHeight },
@@ -2174,8 +2172,78 @@ function FenasojaRestaurant({
         : [paneThickness, opening.height + extra, opening.span + extra],
     };
   };
-  const windowItems = windowOpenings.map((opening) => windowTransform(opening, 0.012, 0));
-  const windowFrameItems = windowOpenings.map((opening) => windowTransform(opening, 0.007, frameMargin));
+  const frontGlazing = [
+    { x: 0, span: doorWidth, height: doorHeight, door: true },
+    ...frontBays.filter((bay) => bay.kind !== 'pizzeria-screen').map(({ x, span, kind }) => ({
+      x,
+      span,
+      height: kind === 'pizzeria-entry' ? doorHeight * 0.92 : wallHeight * 0.55,
+      door: kind === 'pizzeria-entry',
+    })),
+  ].map((bay) => ({
+    ...bay,
+    centerY: bay.door ? slabHeight + bay.height / 2 + 0.014 : slabHeight + wallHeight * 0.56,
+  }));
+  const windowItems: InstanceTransform[] = [
+    ...windowOpenings.map((opening) => windowTransform(opening, 0.012, 0)),
+    ...frontGlazing.map(({ x, span, centerY, height: panelHeight }): InstanceTransform => ({
+      position: [x, centerY, bodyFrontZ + 0.018],
+      scale: [span - 0.034, panelHeight - 0.034, 0.018],
+    })),
+  ];
+  const windowFrameItems: InstanceTransform[] = [
+    ...windowOpenings.map((opening) => windowTransform(opening, 0.007, frameMargin)),
+    ...frontGlazing.map(({ x, span, centerY, height: panelHeight }): InstanceTransform => ({
+      position: [x, centerY, bodyFrontZ + 0.009],
+      scale: [span, panelHeight, 0.025],
+    })),
+  ];
+  const glazingBars: InstanceTransform[] = frontGlazing.flatMap(({ x, span, centerY, height: panelHeight, door }) => {
+    const frameDepth = bodyFrontZ + 0.031;
+    const bar = 0.01;
+    const bars: InstanceTransform[] = [
+      { position: [x, centerY, frameDepth], scale: [bar, panelHeight - 0.03, 0.014] },
+      { position: [x, centerY + panelHeight * 0.27, frameDepth], scale: [span - 0.03, bar, 0.014] },
+    ];
+    if (showDetail) {
+      bars.push(
+        { position: [x, centerY - panelHeight / 2 + 0.014, frameDepth], scale: [span, 0.013, 0.019] },
+        { position: [x, centerY + panelHeight / 2 - 0.014, frameDepth], scale: [span, 0.010, 0.010] },
+      );
+      if (door) for (const side of [-1, 1]) {
+        bars.push({ position: [x + side * 0.036, centerY - 0.04, frameDepth + 0.009], scale: [0.011, 0.088, 0.017] });
+      }
+    }
+    return bars;
+  });
+  const pizzaScreen = frontBays.find((bay) => bay.kind === 'pizzeria-screen');
+  const pizzaEntry = frontBays.find((bay) => bay.kind === 'pizzeria-entry');
+  const screenHeight = wallHeight * 0.69;
+  const screenY = slabHeight + screenHeight / 2 + 0.12;
+  if (pizzaScreen) {
+    windowFrameItems.push({
+      position: [pizzaScreen.x, screenY, bodyFrontZ + 0.019],
+      scale: [pizzaScreen.span, screenHeight, 0.039],
+    });
+  }
+  const lattice: InstanceTransform[] = [];
+  if (pizzaScreen && showDetail) {
+    const columns = 5;
+    const rows = 9;
+    const front = bodyFrontZ + 0.055;
+    for (let i = 0; i <= columns; i += 1) {
+      lattice.push({
+        position: [pizzaScreen.x + pizzaScreen.span * (i / columns - 0.5), screenY, front],
+        scale: [0.020, screenHeight + 0.03, 0.054],
+      });
+    }
+    for (let i = 0; i <= rows; i += 1) {
+      lattice.push({
+        position: [pizzaScreen.x, screenY + screenHeight * (i / rows - 0.5), front],
+        scale: [pizzaScreen.span, 0.022, 0.054],
+      });
+    }
+  }
   const pillarItems: InstanceTransform[] = pillarXs.map((x) => ({
     position: [x, slabHeight + pillarHeight / 2, pillarZ],
     scale: [pillarSize, pillarHeight, pillarSize],
@@ -2204,11 +2272,6 @@ function FenasojaRestaurant({
     position: [ratio * width, ridgeHeight + 0.035, bodyCenterZ] as Vector3Tuple,
     scale: [width * 0.055, 0.05, 0.075] as Vector3Tuple,
   }));
-  const umbrellaXs = [-width * 0.39, width * 0.39];
-  // The enlarged hall leaves a shallower terrace. Keep the table canopies on
-  // that terrace instead of carrying their rims beyond the official footprint.
-  const umbrellaZ = Math.min(bodyFrontZ + depth * 0.13, slabDepth / 2 - depth * 0.08);
-
   useEffect(() => () => {
     roof.dispose();
     gableEnd.dispose();
@@ -2247,17 +2310,27 @@ function FenasojaRestaurant({
         raycast={NO_RAYCAST}
         dispose={null}
       />
-      <mesh geometry={UNIT_BOX} material={materials.trim} position={[0, canopyFrontHeight - 0.012, canopyFrontZ + 0.006]} scale={[canopyWidth + 0.01, 0.058, 0.026]} castShadow raycast={NO_RAYCAST} dispose={null} />
+      <mesh geometry={UNIT_BOX} material={materials.dark} position={[0, canopyFrontHeight - 0.012, canopyFrontZ + 0.006]} scale={[canopyWidth + 0.01, 0.058, 0.026]} castShadow raycast={NO_RAYCAST} dispose={null} />
       <ScaledInstances material={materials.white} items={pillarItems} castShadow />
       <ScaledInstances material={materials.dark} items={pillarBaseItems} />
 
-      {/* Main entrance: framed glazed double door with two shallow steps. */}
-      <mesh geometry={UNIT_BOX} material={materials.dark} position={[0, slabHeight + doorHeight * 0.53, bodyFrontZ + 0.006]} scale={[doorWidth * 1.22, doorHeight * 1.08, 0.02]} raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={UNIT_BOX} material={materials.glass} position={[0, slabHeight + doorHeight / 2, bodyFrontZ + 0.014]} scale={[doorWidth, doorHeight, 0.02]} raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={UNIT_BOX} material={materials.metal} position={[0, slabHeight + doorHeight / 2, bodyFrontZ + 0.026]} scale={[0.012, doorHeight, 0.012]} raycast={NO_RAYCAST} dispose={null} />
+      {/* Glazed storefronts, framed transoms and a recessed C3 screen. */}
       <ScaledInstances material={materials.platform} items={stepItems} receiveShadow />
-      <ScaledInstances material={materials.trim} items={windowFrameItems} />
+      <ScaledInstances material={materials.dark} items={windowFrameItems} />
       <ScaledInstances material={materials.glass} items={windowItems} />
+      <ScaledInstances material={materials.metal} items={glazingBars} />
+      <ScaledInstances material={materials.accent} items={lattice} />
+      {pizzaEntry && (
+        <mesh
+          geometry={UNIT_BOX}
+          material={materials.dark}
+          position={[pizzaEntry.x, slabHeight + doorHeight * 1.10, bodyFrontZ + 0.135]}
+          rotation={[0.20, 0, 0]}
+          scale={[pizzaEntry.span * 1.25, 0.025, 0.26]}
+          raycast={NO_RAYCAST}
+          dispose={null}
+        />
+      )}
 
       {/* Rear service annex toward the Pavilhão 1/14 side. */}
       <mesh geometry={UNIT_BOX} material={materials.wall} position={[serviceCenterX, slabHeight + serviceHeight / 2, serviceCenterZ]} scale={[serviceWidth, serviceHeight, serviceDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
@@ -2269,30 +2342,14 @@ function FenasojaRestaurant({
 
       {showDetail && (
         <>
-          <SignagePanel title="RESTAURANTE" position={[0, canopyFrontHeight + 0.028, canopyFrontZ + 0.02]} size={[canopyWidth * 0.42, wallHeight * 0.16]} background="#2f3f3b" />
-          <ScaledInstances material={materials.metal} items={[
-            { position: [-doorWidth * 0.95, slabHeight + wallHeight * 0.34, canopyFrontZ + stepDepth * 0.5], scale: [0.014, wallHeight * 0.68, 0.014] },
-            { position: [doorWidth * 0.95, slabHeight + wallHeight * 0.34, canopyFrontZ + stepDepth * 0.5], scale: [0.014, wallHeight * 0.68, 0.014] },
-          ]} />
-          <ScaledInstances material={materials.dark} items={[
-            { position: [-width * 0.21, slabHeight + wallHeight * 0.42, bodyFrontZ + 0.03], scale: [0.02, 0.02, 0.03] },
-            { position: [width * 0.21, slabHeight + wallHeight * 0.42, bodyFrontZ + 0.03], scale: [0.02, 0.02, 0.03] },
-          ]} />
-        </>
-      )}
-      {showFocusDetail && (
-        <>
-          <ScaledInstances geometry={UNIT_CYLINDER} material={materials.metal} items={umbrellaXs.map((x) => ({
-            position: [x, slabHeight + wallHeight * 0.32, umbrellaZ] as Vector3Tuple,
-            scale: [0.022, wallHeight * 0.64, 0.022] as Vector3Tuple,
-          }))} />
-          <ScaledInstances geometry={UNIT_CONE} material={materials.white} items={umbrellaXs.map((x) => ({
-            position: [x, slabHeight + wallHeight * 0.68, umbrellaZ] as Vector3Tuple,
-            scale: [depth * 0.16, wallHeight * 0.16, depth * 0.16] as Vector3Tuple,
-          }))} />
-          <ScaledInstances geometry={UNIT_CYLINDER} material={materials.trim} items={umbrellaXs.map((x) => ({
-            position: [x, slabHeight + 0.09, umbrellaZ] as Vector3Tuple,
-            scale: [depth * 0.08, 0.018, depth * 0.08] as Vector3Tuple,
+          <SignagePanel title="RESTAURANTE" position={[0, canopyFrontHeight + 0.028, canopyFrontZ + 0.02]} size={[canopyWidth * 0.34, wallHeight * 0.117]} background="#394544" />
+          {pizzaEntry && (
+            <SignagePanel title="Pizzaria" position={[pizzaEntry.x, slabHeight + doorHeight * 1.19, bodyFrontZ + 0.036]} size={[pizzaEntry.span, wallHeight * 0.09]} background="#353532" />
+          )}
+          <ScaledInstances geometry={UNIT_CYLINDER} material={materials.dark} items={[0.16, 0.31, 0.43].map((ratio) => ({
+            position: [width * ratio, slabHeight + wallHeight * 0.91, bodyFrontZ + 0.007] as Vector3Tuple,
+            rotation: [Math.PI / 2, 0, 0] as Vector3Tuple,
+            scale: [0.064, 0.02, 0.064] as Vector3Tuple,
           }))} />
         </>
       )}
@@ -2770,6 +2827,8 @@ export interface StrategicLandmarkMeshProps {
   moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
   exporuralRestroomEntityId?: string;
   reducedTruckGraphics?: boolean;
+  pavilionExteriorLift?: number;
+  reducedPavilionGraphics?: boolean;
 }
 
 /**
@@ -2813,9 +2872,15 @@ export function StrategicLandmarkMesh({
   moduleStateById,
   exporuralRestroomEntityId,
   reducedTruckGraphics,
+  pavilionExteriorLift = 0,
+  reducedPavilionGraphics,
 }: StrategicLandmarkMeshProps) {
   const kind = resolveStrategicLandmarkKind(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
+  const pizzeriaSpan = useMemo(
+    () => kind === 'fenasoja-restaurant' ? fenasojaPizzeriaFrontSpan(entity) : undefined,
+    [entity, kind],
+  );
   const choppTruck = useMemo(
     () => kind === 'chopp-truck' ? resolveChoppTruckTransform(entity) : null,
     [entity, kind],
@@ -2861,8 +2926,8 @@ export function StrategicLandmarkMesh({
       ? resolveCommercialPavilionDefinition(entity) : null;
     return definition ? pavilionArchitectureHeight(createCommercialPavilionLayout(
       commercialPavilionModelBounds(bounds, facingRadians), definition, height,
-    )) : height;
-  }, [bounds, entity, facingRadians, height, kind]);
+    )) + pavilionExteriorLift : height;
+  }, [bounds, entity, facingRadians, height, kind, pavilionExteriorLift]);
   const hitVolume = useMemo(
     () => createLocalHitVolumeGeometry(
       interactionEntity,
@@ -2943,7 +3008,7 @@ export function StrategicLandmarkMesh({
   useEffect(() => {
     gl.shadowMap.needsUpdate = true;
     invalidate();
-  }, [gl, invalidate, reducedTruckGraphics, selected, showDetail, showFocusDetail]);
+  }, [gl, invalidate, pavilionExteriorLift, reducedPavilionGraphics, reducedTruckGraphics, selected, showDetail, showFocusDetail]);
 
   if (!kind) return null;
 
@@ -3052,6 +3117,8 @@ export function StrategicLandmarkMesh({
             publicIdentifier={entity.publicIdentifier}
             moduleStateById={moduleStateById}
             {...modelProps}
+            showDetail={modelProps.showDetail && !reducedPavilionGraphics}
+            exteriorLift={pavilionExteriorLift}
           />
         )}
         {kind === 'pavilion-four-soy-kitchen' && (
@@ -3095,7 +3162,7 @@ export function StrategicLandmarkMesh({
             {...modelProps}
           />
         )}
-        {kind === 'fenasoja-restaurant' && <FenasojaRestaurant {...modelProps} />}
+        {kind === 'fenasoja-restaurant' && <FenasojaRestaurant {...modelProps} pizzeriaSpan={pizzeriaSpan} />}
         {kind === 'sicredi-arena' && <SicrediArena {...modelProps} />}
         {kind === 'amusement-park' && (
           <NightAwareAmusementPark

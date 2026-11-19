@@ -140,6 +140,8 @@ import {
   strategicLandmarkSupportsInterior,
   strategicLandmarkVisualHeight,
 } from '../../utils/landmarks';
+import { createCommercialPavilionLayout, COMMERCIAL_PAVILION_DEFINITIONS } from '../../utils/commercialPavilions';
+import { pavilionArchitectureHeight } from '../../utils/pavilionArchitectureLayout';
 import {
   isExporuralSteakhousePresentationAvailable,
   isExporuralSteakhouseRestroomAnnex,
@@ -232,7 +234,7 @@ import { applyParkGroundDetail } from './terrainMaterial';
 import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { ExporuralLandscape } from './ExporuralLandscape';
 import { applyExporuralTurfMaterial } from './exporuralTurfMaterial';
-import { isExporuralLandscapeLot } from '../../utils/exporuralLandscape';
+import { exporuralPavilion5ExteriorLift, isExporuralLandscapeLot } from '../../utils/exporuralLandscape';
 import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
 import { RuntimeFrameDiagnostics } from './CommercialMapRuntimeFrameDiagnostics';
 import {
@@ -549,14 +551,20 @@ const OPEN_GROUND_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
 // it is not set imperatively in onCreated.
 const COMMERCIAL_MAP_SHADOW_MAP_CONFIG = Object.freeze({ type: THREE.PCFShadowMap });
 
-function entityLabelHeight(entity: MapEntity) {
+function entityExteriorHeight(entity: MapEntity, pavilion5ExteriorLift = 0) {
+  if (entity.publicIdentifier === 'B8') {
+    const layout = createCommercialPavilionLayout(strategicLandmarkBounds(entity), COMMERCIAL_PAVILION_DEFINITIONS.B8);
+    return pavilionArchitectureHeight(layout) + pavilion5ExteriorLift;
+  }
+  return strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight;
+}
+
+function entityLabelHeight(entity: MapEntity, pavilion5ExteriorLift: number) {
   const classification = entity.classification;
   if (classification === 'ROAD' || classification === 'PEDESTRIAN_PATH' || classification === 'QUADRA') return 0.16;
   return Math.max(
     0.22,
-    (strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight)
-      + resolveMarkerPresentationLift(classification)
-      + 0.32,
+    entityExteriorHeight(entity, pavilion5ExteriorLift) + resolveMarkerPresentationLift(classification) + 0.32,
   );
 }
 
@@ -583,9 +591,7 @@ function getSceneExtent(
     });
     maxHeight = Math.max(
       maxHeight,
-      entity.geometry.elevation
-        + (strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight)
-        + resolveMarkerPresentationLift(entity.classification),
+      entity.geometry.elevation + entityExteriorHeight(entity) + resolveMarkerPresentationLift(entity.classification),
     );
   });
 
@@ -620,7 +626,7 @@ function getSceneExtent(
   };
 }
 
-function getEntityExtent(entity: MapEntity): SceneExtent {
+function getEntityExtent(entity: MapEntity, pavilion5ExteriorLift = 0): SceneExtent {
   if (resolveStrategicLandmarkKind(entity) === 'exporural-restaurant') {
     const officialBounds = strategicLandmarkBounds(entity);
     const presentationExtent = resolveExporuralSteakhousePresentationExtent(officialBounds);
@@ -664,8 +670,7 @@ function getEntityExtent(entity: MapEntity): SceneExtent {
   const depth = Math.max(1.6, maxZ - minZ);
   const maxHeight = Math.max(
     0.5,
-    (strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight)
-      + resolveMarkerPresentationLift(entity.classification),
+    entityExteriorHeight(entity, pavilion5ExteriorLift) + resolveMarkerPresentationLift(entity.classification),
   );
   return {
     minX,
@@ -935,6 +940,8 @@ interface EntityMeshProps {
   visitorGatePresentation?: NonNullable<ReturnType<typeof visitorGateProfile>>;
   exporuralRestroomEntityId?: string;
   reducedTruckGraphics?: boolean;
+  pavilionExteriorLift?: number;
+  reducedPavilionGraphics?: boolean;
   isMatch: boolean;
   layerOpacity: number;
   sceneCenter: readonly [number, number];
@@ -1374,6 +1381,8 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
         moduleStateById={props.moduleStateById}
         exporuralRestroomEntityId={props.exporuralRestroomEntityId}
         reducedTruckGraphics={props.reducedTruckGraphics}
+        pavilionExteriorLift={props.pavilionExteriorLift}
+        reducedPavilionGraphics={props.reducedPavilionGraphics}
       />
     );
   }
@@ -1927,6 +1936,7 @@ const EntityLabel = memo(function EntityLabel({
   isMatch,
   cinematicHidden,
   gastronomyAnchor,
+  pavilion5ExteriorLift = 0,
 }: {
   entity: MapEntity;
   lot?: CommercialLot;
@@ -1936,6 +1946,7 @@ const EntityLabel = memo(function EntityLabel({
   isMatch: boolean;
   cinematicHidden: boolean;
   gastronomyAnchor?: GastronomyMarkerAnchor['position'];
+  pavilion5ExteriorLift?: number;
 }) {
   const metadata = useMemo(() => normalizeMapEntityMetadata(entity, lot), [entity, lot]);
   const classification = entity.classification;
@@ -1950,7 +1961,7 @@ const EntityLabel = memo(function EntityLabel({
   const dimmed = Boolean(lot && filtersActive && !isMatch && !selected);
   const status = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)] : null;
   const lotPresentation = lot ? resolveLotTooltipPresentation(lot) : null;
-  const labelHeight = entityLabelHeight(entity);
+  const labelHeight = entityLabelHeight(entity, pavilion5ExteriorLift);
 
   const mode = selected ? 'focus' : 'hover';
   const variant = `is-contextual ${selected ? 'is-selected' : hovered ? 'is-hovered' : 'is-transient'}`;
@@ -2176,6 +2187,7 @@ function CameraRig({
   publicCompanyFocus,
   initialPublicView,
   hydrologicalModeActive,
+  pavilion5ExteriorLift,
 }: {
   christmasEnabled: boolean;
   selectedEntity: MapEntity | null;
@@ -2193,6 +2205,7 @@ function CameraRig({
   publicCompanyFocus?: PublicCompanyFocus | null;
   initialPublicView?: PublicNavigation | null;
   hydrologicalModeActive: boolean;
+  pavilion5ExteriorLift: number;
 }) {
   const publicPolicy = usePublicScenePolicy();
   const controlsRef = useRef<OrbitControlsImpl>(null);
@@ -3166,7 +3179,7 @@ function CameraRig({
   const queueSelection = useCallback((entity: MapEntity) => {
     setParkingControlLimits(null);
     const perspective = camera as THREE.PerspectiveCamera;
-    const entityExtent = getEntityExtent(entity);
+    const entityExtent = getEntityExtent(entity, pavilion5ExteriorLift);
     const focusProfile = focusProfileForEntity(entity);
     const landmarkKind = resolveStrategicLandmarkKind(entity);
     const hasDetailsPanel = activePanel === 'details';
@@ -3259,6 +3272,7 @@ function CameraRig({
     controlsMinimumDistance,
     extent,
     gl,
+    pavilion5ExteriorLift,
     size.height,
     size.width,
     startCameraMove,
@@ -4822,6 +4836,11 @@ function NightAwareResidentialDistrict(props: ComponentProps<typeof LateralResid
   return <LateralResidentialDistrict {...props} nightMode={night || props.nightMode} />;
 }
 
+function NightAwareRestaurantFrontage(props: ComponentProps<typeof RestaurantFrontageLayer>) {
+  const globalNight = useCommercialMapStore((state) => state.nightModeActive);
+  return <RestaurantFrontageLayer {...props} night={globalNight || props.night} />;
+}
+
 function useExteriorMarkerPresentation(night: boolean, qualityTier: CommercialMapQualityTier) {
   const presentationVisible = useCommercialMapPresentationVisible();
   const globalNight = useCommercialMapStore((state) => state.nightModeActive);
@@ -4913,6 +4932,9 @@ const Scene = memo(function Scene({
   );
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
   const layerOpacity = useCommercialMapStore((state) => state.layerOpacity);
+  const pavilion5ExteriorLift = useMemo(() => publicPolicy || hydrologicalModeActive
+    ? 0 : exporuralPavilion5ExteriorLift(entities.filter(entity => layerVisibility[entity.layerId] !== false)),
+  [entities, hydrologicalModeActive, layerVisibility, publicPolicy]);
   const parkingInspectionOpen = useCommercialMapStore((state) => state.parkingInspectionOpen);
   const parkingPresentation = useMemo(
     () => rearParkingLayerPresentation(parkingOwnerEntities, layerVisibility, layerOpacity),
@@ -5261,11 +5283,11 @@ const Scene = memo(function Scene({
       if (!counts || !canInspectEntity(entity.id) || layerVisibility[entity.layerId] === false
         || (layerOpacity[entity.layerId] ?? 1) <= 0.015
         || (entityFiltersActive && !presentedMatchingEntityIds.has(entity.id))) return [];
-      const anchor = pavilionSalesProgressAnchor(entity, counts);
+      const anchor = pavilionSalesProgressAnchor(entity, counts, entity.publicIdentifier === 'B8' ? pavilion5ExteriorLift : 0);
       return anchor ? [anchor] : [];
     });
   }, [allowPavilionMarkers, canInspectEntity, entities, entityFiltersActive, layerOpacity, layerVisibility, lots,
-    presentedMatchingEntityIds, structuralEntities]);
+    pavilion5ExteriorLift, presentedMatchingEntityIds, structuralEntities]);
   const pavilionComplexEntities = useMemo(() => publicPolicy
     ? structuralEntities.filter(entity => publicPolicy.activeScope.has(entity.id))
     : structuralEntities, [publicPolicy, structuralEntities]);
@@ -5615,11 +5637,12 @@ const Scene = memo(function Scene({
             activeOwnerIdentifiers={activeSiteEnvironmentOwnerIdentifiers}
             reducedGraphics={reducedGraphics}
           />
-          <RestaurantFrontageLayer
+          <NightAwareRestaurantFrontage
             entities={nonLotEntities}
             trees={presentedSceneTrees}
-            reducedGraphics={reducedGraphics}
+            reducedGraphics={renderQualityTier === 'LOW'}
             vegetationVisible={treesVisible}
+            night={nightAtmosphereActive}
           />
         </group>
         </EssentialSceneLayer>
@@ -5777,6 +5800,8 @@ const Scene = memo(function Scene({
           visitorGatePresentation={visitorGateProfiles.get(entity.publicIdentifier)}
           exporuralRestroomEntityId={exporuralRestroomEntityId}
           reducedTruckGraphics={kind === 'chopp-truck' && renderQualityTier === 'LOW'}
+          pavilionExteriorLift={entity.publicIdentifier === 'B8' ? pavilion5ExteriorLift : undefined}
+          reducedPavilionGraphics={entity.publicIdentifier === 'B8' && renderQualityTier === 'LOW'}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           layerOpacity={layerOpacity[entity.layerId] ?? 1}
           sceneCenter={sceneCenter}
@@ -5886,6 +5911,7 @@ const Scene = memo(function Scene({
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           cinematicHidden={lunarCinematicActive}
           gastronomyAnchor={entity.id === selectedEntityId ? selectedGastronomyAnchor : undefined}
+          pavilion5ExteriorLift={entity.publicIdentifier === 'B8' ? pavilion5ExteriorLift : undefined}
         />
       ))}
       {technicalValidationAllowed
@@ -5941,6 +5967,7 @@ const Scene = memo(function Scene({
         publicCompanyFocus={publicCompanyFocusCommand}
         initialPublicView={initialPublicView}
         hydrologicalModeActive={hydrologicalModeActive}
+        pavilion5ExteriorLift={pavilion5ExteriorLift}
       />
       <RuntimeFrameDiagnostics />
       {publicPolicy && labelsVisible && !interiorEntity && <TerritorialOrientation entities={entities} lots={lots} roads={circulationEntities} policy={publicPolicy} />}

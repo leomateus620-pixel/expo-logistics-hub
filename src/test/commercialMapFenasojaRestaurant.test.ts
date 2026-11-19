@@ -8,12 +8,14 @@ import { COMMERCIAL_MAP_TREES } from '@/features/commercial-map/data/commercialT
 import {
   FENASOJA_RESTAURANT_LAYOUT,
   createFenasojaRestaurantLayout,
+  fenasojaPizzeriaFrontSpan,
   fenasojaRestaurantVisualHeight,
   unifyFenasojaRestaurantEntities,
   withUnifiedFenasojaRestaurant,
 } from '@/features/commercial-map/utils/fenasojaRestaurant';
 import {
   RESTAURANT_FRONTAGE_LAYOUT,
+  ARVOREDO_FIXTURE_DIMENSIONS,
   buildRestaurantFrontagePlan,
   frontageBounds,
   restaurantFrontageTreePitBounds,
@@ -181,6 +183,25 @@ describe('Restaurante unificado (C2 + C3) diante da Calçada do Arvoredo', () =>
     const [r, g, b] = [1, 3, 5].map((offset) => parseInt(roof.slice(offset, offset + 2), 16));
     expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThanOrEqual(12);
   });
+
+  it('posiciona o acesso envidraçado e o painel vazado no trecho documentado de C3', () => {
+    const span = fenasojaPizzeriaFrontSpan(restaurant)!;
+    expect(span[0]).toBeCloseTo(-0.5);
+    expect(span[1]).toBeLessThan(0);
+    const b = strategicLandmarkBounds(restaurant);
+    const bounds = { width: b.depth, depth: b.width };
+    const layout = createFenasojaRestaurantLayout(bounds, undefined, span);
+    const pizzaBays = layout.frontBays.filter((bay) => bay.kind.startsWith('pizzeria'));
+    expect(pizzaBays.map((bay) => bay.kind).sort()).toEqual(['pizzeria-entry', 'pizzeria-screen']);
+    for (const bay of pizzaBays) {
+      expect((bay.x - bay.span / 2) / layout.width).toBeGreaterThan(span[0]);
+      expect((bay.x + bay.span / 2) / layout.width).toBeLessThan(span[1]);
+    }
+    const presentedAgain = byIdentifier(unifyFenasojaRestaurantEntities(unification.entities).entities, 'C2')!;
+    expect(fenasojaPizzeriaFrontSpan(presentedAgain)).toEqual(span);
+    expect(fenasojaPizzeriaFrontSpan(officialC2)).toBeUndefined();
+    expect(createFenasojaRestaurantLayout(bounds).frontBays.every((bay) => bay.kind === 'display')).toBe(true);
+  });
 });
 
 describe('Calçada do Arvoredo refinada como frontal do Restaurante', () => {
@@ -279,6 +300,31 @@ describe('Calçada do Arvoredo refinada como frontal do Restaurante', () => {
       geometry.dispose();
       material.dispose();
     }
+  });
+
+  it('mantém portal e coberturas dentro da laje, com o retorno na esquina e o eixo de acesso aberto', () => {
+    const { portal, slab, connector, benchCanopies, plantBeds } = plan;
+    const specimen = COMMERCIAL_MAP_TREES.find((tree) => tree.id === 'tree-j-05')!;
+    expect(portal).not.toBeNull();
+    expect(portal!.center[1]).toBeGreaterThan(specimen.position[1]);
+    expect(Math.sin(portal!.yaw)).toBeCloseTo(1);
+    expect(ARVOREDO_FIXTURE_DIMENSIONS.portal.openingWidth).toBeGreaterThan(0.9);
+    expect(benchCanopies).toHaveLength(5);
+    expect(benchCanopies.filter(({ yaw }) => Math.abs(Math.sin(yaw)) < 1e-6)).toHaveLength(1);
+    expect(plantBeds.filter(({ kind }) => kind === 'palm-clump')).toHaveLength(2);
+    const keepClear = [...plan.treePits.map(restaurantFrontageTreePitBounds),
+      ...entities.filter((entity) => entity.classification === 'ROAD').map((entity) => frontageBounds(entity)!)];
+    for (const { bounds } of [portal!, ...benchCanopies]) {
+      expect(bounds.minX).toBeGreaterThan(slab!.minX);
+      expect(bounds.maxX).toBeLessThan(slab!.maxX);
+      expect(bounds.minZ).toBeGreaterThan(slab!.minZ);
+      expect(bounds.maxZ).toBeLessThan(slab!.maxZ);
+      for (const area of keepClear) {
+        expect(bounds.minX >= area.maxX || bounds.maxX <= area.minX
+          || bounds.minZ >= area.maxZ || bounds.maxZ <= area.minZ).toBe(true);
+      }
+    }
+    expect(benchCanopies.every(({ bounds }) => bounds.maxZ < connector!.minZ || bounds.minZ > connector!.maxZ)).toBe(true);
   });
 
   it('não abre um canteiro parcial quando o tronco não cabe integralmente na laje', () => {

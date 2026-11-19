@@ -92,7 +92,7 @@ export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
   TERCEIRA_IDADE_EDGE: 'Anexos 3 e 7 — árvores próximas ao Pavilhão Terceira Idade',
   GATE_FOUR_DISTRICT: 'Anexos 5 a 7 — árvores maduras e floração ornamental no entorno do Núcleo Crioulo e da Rua Buenos Aires',
   REAR_PARKING: 'Anexo 7 — satélite IMG_9816 (1).jpeg, 1179 × 861 pixels; copas das bordas do estacionamento posterior',
-  EXPORURAL: 'Anexos — capturas 25/10/2026 01.27.40 e 01.39.19 — árvore isolada do lote Q-R-01',
+  EXPORURAL: 'Anexos — capturas 25/10/2026 01.27.40 e 01.39.19 e IMG_1764 — árvore isolada do lote Q-R-01',
   NATIONS_DISTRICT: 'Anexos oficiais IMG_9670 (1).jpeg e IMG_9671.jpeg — massas periféricas da Praça das Nações',
 } as const satisfies Record<CommercialTreeArea, string>;
 
@@ -298,7 +298,7 @@ const QUADRA_J_TREES = buildTrees('J', recommendFieldReview([
   { sourcePosition: [2750, 3240], placement: 'SIDEWALK_EDGE', scale: 1.2, notes: 'Centro de copa do maciço superior direito do anexo.' },
   { sourcePosition: [2762, 3272], placement: 'SIDEWALK_EDGE', scale: 1.26, notes: 'Árvore externa à quadra no alinhamento arborizado.' },
   { sourcePosition: [2775, 3305], placement: 'SIDEWALK_EDGE', speciesGroup: 'OPEN_CANOPY', scale: 1.14, notes: 'Tronco atribuído à calçada, não ao lote.' },
-  { sourcePosition: [2785, 3337], placement: 'SIDEWALK_EDGE', scale: 1.25, notes: 'Copa madura sobreposta no maciço oeste.' },
+  { sourcePosition: [2785, 3337], placement: 'SIDEWALK_EDGE', scale: 1.25, notes: 'Copa madura sobreposta. Canteiro existente associado por proximidade ao exemplar inclinado nas fotos IMG_1769, IMG_1770 e IMG_1773; correspondência inferida.' },
   { sourcePosition: [2795, 3370], placement: 'SIDEWALK_EDGE', scale: 1.12, notes: 'Árvore do corredor de pedestres.' },
   { sourcePosition: [2810, 3402], placement: 'QUADRA_BORDER', speciesGroup: 'OPEN_CANOPY', scale: 1.08, notes: 'Copa de transição para a Rua Uruguai.' },
   { sourcePosition: [2825, 3428], placement: 'QUADRA_BORDER', scale: 1.08, notes: 'Árvore na esquina da Calçada do Arvoredo com a Rua Uruguai.' },

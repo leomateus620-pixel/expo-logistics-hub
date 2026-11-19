@@ -10,10 +10,10 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 const makeBase = () => Object.fromEntries(['wall', 'accent', 'roof', 'trim', 'dark', 'glass', 'white', 'platform', 'metal'].map(key => [key, new THREE.MeshStandardMaterial()])) as unknown as CommercialPavilionMaterials;
 
 describe('photographed pavilion materials', () => {
-  it('limits the exact registry to the five photographed technical IDs', () => {
-    expect(Object.keys(PAVILION_ARCHITECTURE_PALETTES)).toEqual(['B1', 'B3', 'B4', 'B5', 'B6']);
-    for (const id of ['B2', 'B8', 'B10', 'B12', 'B13', 'B30', 'b3']) expect(resolvePavilionArchitecturePalette(id)).toBeNull();
-    expect(new Set(Object.values(PAVILION_ARCHITECTURE_PALETTES).map(p => p.trim)).size).toBe(5);
+  it('limits the exact registry to the photographed technical IDs', () => {
+    expect(Object.keys(PAVILION_ARCHITECTURE_PALETTES)).toEqual(['B1', 'B3', 'B4', 'B5', 'B6', 'B8']);
+    for (const id of ['B2', 'B10', 'B12', 'B13', 'B30', 'b3']) expect(resolvePavilionArchitecturePalette(id)).toBeNull();
+    expect(new Set(Object.values(PAVILION_ARCHITECTURE_PALETTES).map(p => p.trim)).size).toBe(6);
   });
 
   it.each(Object.keys(PAVILION_ARCHITECTURE_PALETTES))('restores %s albedo after hover, selection and filter attenuation', id => {

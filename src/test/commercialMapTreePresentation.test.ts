@@ -201,8 +201,8 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
   });
 
   it('preserva a referência A/B para comparação e isola o piloto do inventário legado', () => {
-    expect(rendererSource).toContain('pilotEnabled ? props.trees.filter(isVegetationPilotTree) : []');
-    expect(rendererSource).toContain("referenceQuadras: pilotEnabled ? [] : props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B')");
+    expect(rendererSource).toContain('pilotEnabled ? instances.filter(isVegetationPilotTree) : []');
+    expect(rendererSource).toContain("referenceQuadras: pilotEnabled ? [] : instances.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B')");
     expect(rendererSource).toContain("pilotEnabled ? !isVegetationPilotTree(tree) : tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'");
     expect(rendererSource).toContain('trees={treeGroups.legacy}');
     expect(rendererSource).toContain('trees={treeGroups.referenceQuadras}');
