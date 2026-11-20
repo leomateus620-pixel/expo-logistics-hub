@@ -909,7 +909,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               </Profiler>
               <CommercialMapRendererStatus active={workspaceMode === '3d'} onOpenList={() => setWorkspaceMode('list')} />
               </Suspense>
-              <VisitOverlay />
+              <VisitOverlay headquartersInterior={interiorKind === 'fenasoja-headquarters'} />
               {soyHarvestAvailable && <SoyHarvestOverlay />}
               <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer"
                 style={{position:'absolute',right:8,bottom:8,zIndex:5,fontSize:10,padding:'2px 5px',borderRadius:3,background:'#f5f7efdd',color:'#384b42'}}>

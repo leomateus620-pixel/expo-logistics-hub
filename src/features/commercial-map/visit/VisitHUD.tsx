@@ -1,3 +1,4 @@
+import { HeadquartersFilm } from '../components/HeadquartersFilm';
 import { memo, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type PointerEvent, type ReactNode } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, CarFront, DoorOpen, Footprints, Moon, RotateCcw, RotateCw, Sun, X } from 'lucide-react';
 import { STATUS_CONFIG } from '../constants';
@@ -167,7 +168,7 @@ function VisitVehicleTouchControls({ kind }: { kind: 'cart' | 'helicopter' }) {
   </div>;
 }
 
-export function VisitHUD() {
+export function VisitHUD({ headquartersInterior = false }: { headquartersInterior?: boolean } = {}) {
   const enabled = useVisitStore(state => state.enabled);
   const cameraMode = useVisitStore(state => state.cameraMode);
   const mobilityMode = useVisitStore(state => state.mobilityMode);
@@ -221,6 +222,7 @@ export function VisitHUD() {
       {!interior && (cartDriving || mobilityPhase === 'helicopter-grounded') && <button type="button" className="visit-hud__vehicle-action" onClick={exitVehicle}>Sair do {cartDriving ? 'carrinho' : 'helicóptero'}</button>}
       {!interior && mobilityPhase === 'helicopter-landed' && canBoardHelicopter && <button type="button" className="visit-hud__vehicle-action" onClick={enterHelicopter}>Entrar no helicóptero</button>}
       {!interior && mobilityPhase === 'helicopter-flying' && <button type="button" className="visit-hud__vehicle-action" onClick={requestHelicopterLanding}>Pousar</button>}
+      {interior && headquartersInterior && <HeadquartersFilm />}
       {interior && <button type="button" onClick={leaveInterior} data-visit-leave-interior><ArrowLeft />Continuar visita</button>}
       <button className="visit-hud__exit" type="button" onClick={exit} aria-label="Sair do Modo Visita"><X /><span>Sair</span></button>
     </div>

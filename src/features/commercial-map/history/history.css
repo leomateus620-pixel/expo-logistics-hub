@@ -1,6 +1,7 @@
 .commercial-map-commercial-view { display: flex; flex: 1; min-height: 0; flex-direction: column; }
 .commercial-map-commercial-view[hidden] { display: none; }
 .fenasoja-history-sheet-controls { display: none; }
+.commercial-map-commercial-view > .commercial-map-film-trigger,
 .commercial-map-history-trigger { margin: 8px 16px; min-height: 44px; gap: 8px; border-color: oklch(var(--brand-gold-500) / .45); }
 .commercial-map-history-trigger > svg { width: 18px; height: 18px; }
 .fenasoja-history { display: flex; min-height: 0; flex: 1; flex-direction: column; color: var(--map-ink); background: #fcfbf8; }
@@ -55,7 +56,7 @@
 .fenasoja-history-viewer > h2 { padding-right: 40px; }
 @media (max-width: 950px) {
   .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-commercial-view { min-width: 0; flex-direction: row; align-items: center; }
-  .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-history-trigger { display: none; }
+  .commercial-map-details-panel[data-sheet-state="collapsed"] :is(.commercial-map-history-trigger, .commercial-map-film-trigger) { display: none; }
   .fenasoja-history-sheet-controls { display: block; flex: 0 0 auto; }
   .fenasoja-history-sheet-controls .commercial-map-compact-sheet-controls { justify-content: flex-end; }
   .commercial-map-viewport .commercial-map-panel.commercial-map-details-panel[data-history-open="true"][data-sheet-state="half"] { height: 50% !important; }

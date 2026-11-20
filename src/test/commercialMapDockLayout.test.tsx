@@ -16,7 +16,7 @@ function DockHarness() {
     <div className="commercial-map-body">
       <CommercialMapDock entities={OFFICIAL_REFERENCE_ENTITIES} lots={OFFICIAL_REFERENCE_LOTS}
         activeSegmentId={activeSegmentId} isCommissionScope={false}
-        interiorEntity={interiorEntityId ? pavilion : null}
+        interiorEntity={OFFICIAL_REFERENCE_ENTITIES.find((entity) => entity.id === interiorEntityId)}
         onSegmentSelect={useCommercialMapStore.getState().requestSegmentFocus}
         onSegmentClear={useCommercialMapStore.getState().clearSegmentFocus} />
       <div className="commercial-map-viewport"><canvas data-testid="persistent-canvas" /></div>
@@ -104,6 +104,20 @@ describe('dock flutuante e largura disponível do mapa comercial', () => {
     expect(dock).not.toHaveClass('is-mobile');
     expect(dock).toHaveClass('is-expanded');
     expect(screen.getByTestId('persistent-canvas')).toBe(canvas);
+  });
+
+  it('mantém a Casa B12 e o canvas ao fechar o filme dentro do interior no celular', () => {
+    shellWidth = 390;
+    const headquarters = OFFICIAL_REFERENCE_ENTITIES.find((entity) => entity.publicIdentifier === 'B12')!;
+    render(<DockHarness />);
+    const canvas = screen.getByTestId('persistent-canvas');
+    expect(screen.queryByRole('button', { name: 'Assistir ao filme FenaSoja 2028' })).not.toBeInTheDocument();
+    act(() => useCommercialMapStore.getState().enterInterior(headquarters.id));
+    fireEvent.click(screen.getByRole('button', { name: 'Assistir ao filme FenaSoja 2028' }));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Voltar ao mapa' }));
+    expect(useCommercialMapStore.getState().interiorEntityId).toBe(headquarters.id);
+    expect(screen.getByTestId('persistent-canvas')).toBe(canvas);
+    expect(document.querySelector('video')).toBeNull();
   });
 
   it('mantém Voltar ao mapa acessível no interior recolhido e restaura seu contexto', () => {

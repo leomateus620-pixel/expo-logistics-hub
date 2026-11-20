@@ -1,0 +1,19 @@
+{
+  "download": "FENASOJA-2028-Full-HD.mp4",
+  "width": 1920,
+  "height": 1080,
+  "fps": 24.0,
+  "frames": 1200,
+  "durationSeconds": 50.0,
+  "bytes": 84386449,
+  "sha256": "04abc613d0889e30592ff4df3dcd3fa3b8d71f88e9a1c5b08820f9f35d788477",
+  "fastStart": true,
+  "streams": [
+    "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709/unknown/unknown, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 13239 kb/s, 24 fps, 24 tbr, 12288 tbn (default)",
+    "Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 256 kb/s (default)",
+    "Stream #0:2[0x3](por): Subtitle: mov_text (tx3g / 0x67337874), 0 kb/s (default)"
+  ],
+  "loudnessLUFS": -21.0,
+  "truePeakDBFS": -3.4,
+  "completeDecode": true
+}
