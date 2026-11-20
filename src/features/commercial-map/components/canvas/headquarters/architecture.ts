@@ -123,38 +123,40 @@ export function buildShell(builder: GeometryBuilder) {
       0.11,
     );
   }
-  for (const x of [-1.08, 0, 1.08]) {
-    const yTop = top - (Math.abs(x) / tw) * (top - shoulder);
-    bevel(
+  const bandTop = 6.56;
+  for (const x of [-1.08, 1.08]) {
+    const upper = top - (Math.abs(x) / tw) * (top - shoulder);
+    beam(
       "frame",
-      [x, (base + yTop) / 2, front + 0.017],
-      [0.074, yTop - base, 0.11],
-      0.004,
+      [x, base, front + 0.017],
+      [x, upper, front + 0.017],
+      0.074,
+      0.11,
     );
   }
+  // The ridge post, dark crosspiece and white diagonal braces are inside the glass.
   beam(
-    "frame",
-    [-1.08, 6.45, front + 0.019],
-    [1.08, 6.45, front + 0.019],
-    0.075,
+    "soffit",
+    [0, bandTop, front - 0.42],
+    [0, top - 0.035, front - 0.42],
+    0.12,
     0.11,
   );
-  // The visible inverted V is behind the glass, and not another set of fa�ade mullions.
-  beam(
-    "soffit",
-    [0, base + 0.06, front - 0.42],
-    [-0.78, 6.24, front - 0.42],
-    0.14,
-    0.12,
+  for (const side of [-1, 1])
+    beam(
+      "soffit",
+      [side * 0.08, base + 0.075, front - 0.41],
+      [side * 0.66, 6.32, front - 0.41],
+      0.155,
+      0.12,
+    );
+  const bandBottom = 6.04;
+  bevel(
+    "contact",
+    [0, (bandBottom + bandTop) / 2, front - 0.24],
+    [2.13, bandTop - bandBottom, 0.13],
+    0.012,
   );
-  beam(
-    "soffit",
-    [0, base + 0.06, front - 0.42],
-    [0.78, 6.24, front - 0.42],
-    0.14,
-    0.12,
-  );
-  box("contact", [0, 6.12, front - 0.35], [1.73, 0.7, 0.06]);
   // Lower campaign row: inset wall opening, sill, separate prints behind glazing.
   const bottom = tri.lowerBottom - 0.05,
     height = tri.lowerHeight + 0.1;
@@ -174,15 +176,15 @@ export function buildShell(builder: GeometryBuilder) {
     put("graphics", pane, [
       x,
       tri.lowerBottom + tri.lowerHeight / 2,
-      front - 0.073,
+      front - 0.105,
     ]);
     put(
       "glass",
       new THREE.PlaneGeometry(
-        tri.lowerWidth / 4 - 0.08,
-        tri.lowerHeight - 0.04,
+        tri.lowerWidth / 4 - 0.066,
+        tri.lowerHeight - 0.035,
       ),
-      [x, tri.lowerBottom + tri.lowerHeight / 2, front - 0.084],
+      [x, tri.lowerBottom + tri.lowerHeight / 2, front - 0.059],
     );
   }
   for (const r of [-1, -0.5, 0, 0.5, 1])
@@ -220,7 +222,7 @@ export function buildShell(builder: GeometryBuilder) {
       r: V3 = [0, 0, -side * pitch];
     box("roof", p, [slope, 0.1, m.depth + 0.72], r);
     detail(2);
-    // Continuous ceramic field: shared grid, 8 samples across each channel. No per-tile objects.
+    // Continuous ceramic field. The verge and ridge carry the profiles in silhouette.
     const roofField = new THREE.PlaneGeometry(slope, m.depth + 0.72, 48, 96);
     const rf = roofField.getAttribute("position");
     for (let i = 0; i < rf.count; i++) {
@@ -296,13 +298,20 @@ export function buildShell(builder: GeometryBuilder) {
         );
     }
     detail(0);
-    // Two nested fascia profiles, and exposed rafter ends, read as constructed edges.
+    // The layered verge and exposed timber ends remain readable outside the close LOD.
     beam(
       "soffit",
       [side * 0.06, m.ridge - 0.24, front + 0.26],
       [side * (half - 0.1), m.eave - 0.13, front + 0.26],
       0.16,
       0.14,
+    );
+    beam(
+      "trim",
+      [side * 0.12, m.ridge - 0.31, front + 0.23],
+      [side * (half - 0.12), m.eave - 0.20, front + 0.23],
+      0.09,
+      0.18,
     );
     for (let i = 0; i < 12; i++) {
       const z = rearZ + 0.18 + (i * (m.depth - 0.3)) / 11;
@@ -333,8 +342,15 @@ export function buildShell(builder: GeometryBuilder) {
       [Math.PI / 2, 0, 0],
     );
   }
-  bevel("trim", [0, 7.57, front + 0.42], [0.2, 1.04, 0.31], 0.008);
-  // Roof volumes inferred only where visible from above; room shares its wall junction.
+  bevel("trim", [0, 7.82, front + 0.42], [0.23, 0.6, 0.28], 0.008);
+  beam(
+    "soffit",
+    [0, 7.8, front + 0.36],
+    [0, 6.99, front - 0.47],
+    0.24,
+    0.25,
+  );
+  // Roof volumes follow the registered plan and share their wall junctions.
   const hip = (
     cx: number,
     cz: number,
@@ -343,7 +359,6 @@ export function buildShell(builder: GeometryBuilder) {
     eave: number,
     ridge: number,
   ) => {
-    box("wall", [cx, eave / 2, cz], [w, eave, d]);
     const x0 = cx - w / 2 - 0.18,
       x1 = cx + w / 2 + 0.18,
       z0 = cz - d / 2 - 0.18,
@@ -383,24 +398,69 @@ export function buildShell(builder: GeometryBuilder) {
       beam("roof", corner, corner[2] < cz ? a : b, 0.09);
     beam("roof", a, b, 0.12);
   };
-  const rear = hq.volumes.rearLeft;
-  hip(...rear.center, rear.width, rear.depth, rear.eave, rear.ridge);
-  const back = hq.volumes.rearRight;
-  hip(...back.center, back.width, back.depth, back.eave, back.ridge);
+  for (const rear of [hq.volumes.rearLeft, hq.volumes.rearRight]) {
+    const { center: [x, z], width, depth, eave, ridge } = rear;
+    hip(x, z, width, depth, eave, ridge);
+    box("wall", [x, eave / 2, z], [width, eave, depth]);
+  }
   const room = hq.volumes.volunteers;
   hip(...room.center, room.width, room.depth, room.eave, room.ridge);
-  // Right side room: wall meets main side at x=3.225, conservative two panes.
-  box("glass", [4.75, 1.6, -0.285], [2.35, 1.12, 0.04]);
-  [-1, 0, 1].forEach((i) =>
-    box("trim", [4.75 + i * 1.18, 1.6, -0.24], [0.085, 1.23, 0.09]),
+  // The annex glazing sits in a real reveal within the same registered exterior walls.
+  const [roomX, roomZ] = room.center;
+  const revealDepth = 0.24;
+  const roomFront = roomZ + room.depth / 2;
+  const windowBase = 1.02;
+  const windowTop = 2.19;
+  const windowCenter = (windowBase + windowTop) / 2;
+  const windowWidth = 2.35;
+  const windowHeight = windowTop - windowBase;
+  const jambWidth = (room.width - windowWidth) / 2;
+  box(
+    "wall",
+    [roomX, room.eave / 2, roomZ - revealDepth / 2],
+    [room.width, room.eave, room.depth - revealDepth],
   );
-  [1.02, 2.19].forEach((y) =>
-    box("trim", [4.75, y, -0.24], [2.44, 0.08, 0.09]),
+  const revealZ = roomFront - revealDepth / 2;
+  for (const [low, high] of [[0, windowBase], [windowTop, room.eave]])
+    box(
+      "wall",
+      [roomX, (low + high) / 2, revealZ],
+      [room.width, high - low, revealDepth],
+    );
+  for (const side of [-1, 1])
+    box(
+      "wall",
+      [roomX + side * (windowWidth + jambWidth) / 2, windowCenter, revealZ],
+      [jambWidth, windowHeight, revealDepth],
+    );
+  box(
+    "interior",
+    [roomX, windowCenter, roomFront - 0.217],
+    [windowWidth, windowHeight, 0.025],
   );
+  put(
+    "glass",
+    new THREE.PlaneGeometry(windowWidth, windowHeight),
+    [roomX, windowCenter, roomFront - 0.066],
+  );
+  for (const i of [-1, 0, 1])
+    box(
+      "frame",
+      [roomX + (i * windowWidth) / 2, windowCenter, roomFront + 0.015],
+      [0.085, windowHeight + 0.06, 0.15],
+    );
+  for (const y of [windowBase, windowTop])
+    box(
+      "frame",
+      [roomX, y, roomFront + 0.015],
+      [windowWidth + 0.085, 0.08, 0.15],
+    );
   // Front-left wing adjoins the main volume, without an artificial alley.
   box("sideWall", [-3.48, 1.23, 5.55], [1.9, 2.46, 2.45]);
   box("roof", [-3.48, 2.77, 6.07], [2.04, 0.11, 3.7], [0.16, 0, 0]);
   box("trim", [-3.48, 2.5, 7.85], [2.04, 0.19, 0.12]);
+  for (const x of [-4.38, -3.94, -3.5, -3.06, -2.62])
+    beam("soffit", [x, 2.81, 5.45], [x, 2.43, 7.84], 0.1, 0.14);
   // Modest left wing; the projecting canopy never blocks the central doorway.
   box("sideWall", [-4.33, 1.17, 7.1], [0.18, 2.34, 1.0]);
   // A few conservative side/rear panes give depth without invented elevations.
@@ -419,12 +479,12 @@ export function buildShell(builder: GeometryBuilder) {
       [0.14, 2.54, 0.43],
       0.008,
     );
-    put("glass", new THREE.PlaneGeometry(1.1, 2.42), [x, 1.27, front - 0.12]);
+    put("glass", new THREE.PlaneGeometry(1.1, 2.42), [x, 1.27, front - 0.106]);
     const graphic = new THREE.PlaneGeometry(0.98, 2.2),
       uv = graphic.getAttribute("uv");
     for (let j = 0; j < uv.count; j++)
       uv.setX(j, (uv.getX(j) + (side > 0 ? 1 : 0)) / 2);
-    put("entry", graphic, [x, 1.3, front - 0.109]);
+    put("entry", graphic, [x, 1.3, front - 0.157]);
     for (const edge of [-0.56, 0.56])
       bevel(
         "frame",
@@ -462,53 +522,48 @@ export function buildShell(builder: GeometryBuilder) {
       0.022,
       0.012,
     );
-  // Bent architectural panel, 28 cm deep, with small radiused edge and concealed stand-offs.
+  // Bend both faces of the panel so the artwork and solid share the same profile.
   const sw = hq.sign.width,
     sh = hq.sign.height,
     ys = hq.sign.bottom,
     zs = front + 0.36;
-  const shape = new THREE.Shape(),
-    w = sw / 2,
-    r = 0.026;
-  shape.moveTo(-w + r, 0);
-  shape.lineTo(w - r, 0);
-  shape.quadraticCurveTo(w, 0, w, r);
-  shape.lineTo(w, sh - r);
-  shape.quadraticCurveTo(w, sh, w - r, sh);
-  shape.lineTo(-w + r, sh);
-  shape.quadraticCurveTo(-w, sh, -w, sh - r);
-  shape.lineTo(-w, r);
-  shape.quadraticCurveTo(-w, 0, -w + r, 0);
-  const solid = new THREE.ExtrudeGeometry(shape, {
-    depth: hq.sign.depth,
-    steps: 1,
-    bevelEnabled: true,
-    bevelSize: 0.012,
-    bevelThickness: 0.012,
-    bevelSegments: 1,
-    curveSegments: 3,
-  });
-  const ps = solid.getAttribute("position");
-  for (let i = 0; i < ps.count; i++) {
-    const x = ps.getX(i),
-      curve = hq.sign.bulge * (1 - (x / w) ** 2);
-    ps.setXYZ(i, x, ps.getY(i) + ys, ps.getZ(i) + zs - hq.sign.depth + curve);
-  }
-  solid.computeVertexNormals();
-  put("trim", solid);
-  const face = new THREE.PlaneGeometry(sw - 0.012, sh - 0.012, 48, 1),
-    fp = face.getAttribute("position");
-  for (let i = 0; i < fp.count; i++)
-    fp.setZ(i, zs + 0.014 + hq.sign.bulge * (1 - (fp.getX(i) / w) ** 2));
-  face.computeVertexNormals();
-  put("sign", face, [0, ys + sh / 2, 0]);
-  for (const x of [-2.35, 0, 2.35])
+  const panelBow = (x: number) => hq.sign.bulge * (1 - ((2 * x) / sw) ** 2);
+  const bendPanel = (geometry: THREE.BufferGeometry) => {
+    const vertices = geometry.getAttribute("position");
+    for (let i = 0; i < vertices.count; i++) {
+      const bow = panelBow(vertices.getX(i));
+      vertices.setZ(i, vertices.getZ(i) + bow);
+    }
+    geometry.computeVertexNormals();
+    return geometry;
+  };
+  const faceSegments = 40;
+  const casing = new THREE.BoxGeometry(sw, sh, hq.sign.depth, faceSegments);
+  // BoxGeometry group 4 faces +Z. The artwork mesh supplies that face.
+  const { start, count } = casing.groups[4];
+  const indices = Array.from(casing.index!.array);
+  indices.splice(start, count);
+  casing.setIndex(indices);
+  casing.clearGroups();
+  put(
+    "trim",
+    bendPanel(casing),
+    [0, ys + sh / 2, zs - hq.sign.depth / 2],
+  );
+  put(
+    "sign",
+    bendPanel(new THREE.PlaneGeometry(sw, sh, faceSegments)),
+    [0, ys + sh / 2, zs],
+  );
+  for (const x of [-2.35, 0, 2.35]) {
+    const back = zs - hq.sign.depth + panelBow(x);
     bevel(
       "metal",
-      [x, ys + sh * 0.55, front + 0.1],
-      [0.085, 0.32, 0.29],
+      [x, ys + sh * 0.55, (back + front) / 2],
+      [0.085, 0.32, back - front + 0.04],
       0.008,
     );
+  }
 
   // Downpipes, gutter returns and two modest wall fixtures visible at the entrance.
   for (const side of [-1, 1]) {

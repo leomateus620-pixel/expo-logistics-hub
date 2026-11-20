@@ -12,16 +12,16 @@ export function makeArtwork(invalidate: () => void) {
   sign.name = "B12:official-white-sign";
   let alive = true;
   const paint = (symbol?: HTMLImageElement) => {
-    ctx.fillStyle = "#f4f4f0";
+    ctx.fillStyle = "#f6f5f0";
     ctx.fillRect(0, 0, 1536, 384);
-    ctx.fillStyle = "#405a6c";
+    ctx.fillStyle = "#124d79";
     ctx.font = "bold 143px Arial";
     ctx.textBaseline = "middle";
     ctx.fillText("FENASOJA", 95, 190, 905);
     ctx.font = "26px Arial";
     ctx.fillText("®", 995, 135);
     if (symbol) ctx.drawImage(symbol, 1020, 64, 240, 240);
-    ctx.fillStyle = "#122638";
+    ctx.fillStyle = "#173750";
     ctx.font = "bold 45px Arial";
     ctx.fillText("Comissão", 1280, 265);
     ctx.fillText("Central", 1280, 315);
@@ -38,11 +38,6 @@ export function makeArtwork(invalidate: () => void) {
   gradient.addColorStop(1, "#087340");
   c.fillStyle = gradient;
   c.fillRect(0, 0, 1024, 256);
-  c.fillStyle = "#f1de72";
-  c.font = "bold 28px Arial";
-  ["NOSSO", "OURO VEM", "DO CAMPO"].forEach((s, i) =>
-    c.fillText(s, 28, 50 + i * 32),
-  );
   for (let i = 0; i < 5; i++) {
     const x = 310 + i * 143,
       y = 120 + Math.sin(i * 3.3) * 54,
@@ -72,20 +67,19 @@ export function makeArtwork(invalidate: () => void) {
   graphics.colorSpace = THREE.SRGBColorSpace;
   graphics.anisotropy = 8;
   graphics.name = "B12:green-window-artwork";
+  const campaignCopy = ["NOSSO", "OURO VEM", "DO CAMPO"];
+  const paintWindowCopy = () => {
+    c.fillStyle = "#f6df70";
+    c.font = "bold 28px Arial";
+    campaignCopy.forEach((line, i) => c.fillText(line, 28, 50 + i * 32));
+  };
+  paintWindowCopy();
   const entryCanvas = document.createElement("canvas");
   entryCanvas.width = 1024;
   entryCanvas.height = 1024;
   const e = entryCanvas.getContext("2d")!;
   e.fillStyle = "#124f36";
   e.fillRect(0, 0, 1024, 1024);
-  e.fillStyle = "#f0eaa5";
-  e.font = "bold 59px Arial";
-  ["NOSSO", "OURO VEM", "DO CAMPO"].forEach((s, i) =>
-    e.fillText(s, 549, 97 + i * 65),
-  );
-  e.fillStyle = "#eeeece";
-  e.font = "bold 56px Arial";
-  e.fillText("FENASOJA", 36, 240);
   for (let i = 0; i < 7; i++) {
     const x = 80 + ((i * 193) % 850),
       y = 430 + ((i * 117) % 520),
@@ -102,16 +96,45 @@ export function makeArtwork(invalidate: () => void) {
   const entry = new THREE.CanvasTexture(entryCanvas);
   entry.colorSpace = THREE.SRGBColorSpace;
   entry.anisotropy = 8;
+  entry.name = "B12:green-entry-artwork";
+  const paintEntryCopy = () => {
+    e.fillStyle = "#f6df70";
+    e.font = "bold 57px Arial";
+    campaignCopy.forEach((line, i) => e.fillText(line, 549, 97 + i * 62));
+    e.fillStyle = "#f2efe2";
+    e.font = "bold 54px Arial";
+    e.fillText("FENASOJA", 36, 234);
+  };
+  paintEntryCopy();
   const symbol = new Image();
+  const windowArtwork = new Image();
+  const entryArtwork = new Image();
+  let symbolLoaded = false;
   symbol.onload = () => {
     if (alive) {
+      symbolLoaded = true;
       paint(symbol);
       e.drawImage(symbol, 198, 40, 122, 122);
       entry.needsUpdate = true;
       invalidate();
     }
   };
+  windowArtwork.onload = () => {
+    c.drawImage(windowArtwork, 0, 0, art.width, art.height);
+    paintWindowCopy();
+    graphics.needsUpdate = true;
+    invalidate();
+  };
+  entryArtwork.onload = () => {
+    e.drawImage(entryArtwork, 0, 0, entryCanvas.width, entryCanvas.height);
+    paintEntryCopy();
+    if (symbolLoaded) e.drawImage(symbol, 198, 40, 122, 122);
+    entry.needsUpdate = true;
+    invalidate();
+  };
   symbol.src = hq.sign.symbolAsset;
+  windowArtwork.src = "/maps/headquarters-b12/campaign-windows.webp";
+  entryArtwork.src = "/maps/headquarters-b12/campaign-entry.webp";
   return {
     sign,
     graphics,
@@ -119,6 +142,8 @@ export function makeArtwork(invalidate: () => void) {
     dispose: () => {
       alive = false;
       symbol.onload = null;
+      windowArtwork.onload = null;
+      entryArtwork.onload = null;
       sign.dispose();
       graphics.dispose();
       entry.dispose();

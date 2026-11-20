@@ -334,9 +334,10 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
       'Sede Fenasoja',
       'Fenasoja Headquarters',
     ],
-    // Registered front gable faces Rua Brasília; photo-right is toward Argentina.
+    // A low, nearly frontal view from Brasília keeps the entrance and
+    // monument between the utility poles without hiding the side wing.
     facingRadians: FENASOJA_HEADQUARTERS_LAYOUT.facingRadians,
-    focusDirection: [-1, 0.30, 0.12],
+    focusDirection: [-1, 0.22, 0.025],
     visualHeight: () => 8.35 * FENASOJA_COMPLEX.registration.unitsPerMeter,
   },
   'E-07': { kind: 'soy-restroom', aliases: ['Sanitários Cozinha da Soja', 'Banheiro Cozinha da Soja', 'Masculino Feminino'], facingRadians: SOY_RESTROOM.facingRadians, focusDirection: [0.96, 0.40, 0.05], visualHeight: () => SOY_RESTROOM_PRESENTATION.visualHeight },

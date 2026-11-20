@@ -4,9 +4,15 @@ import { applyArchitecturalContact } from "./contact";
 import { makeArtwork } from "./artwork";
 
 type Finish = "masonry" | "roof" | "concrete" | "brick";
+const finishAssets: Partial<Record<Finish, string>> = {
+  masonry: "/maps/headquarters-b12/stucco.webp",
+  roof: "/maps/headquarters-b12/ceramic.webp",
+  concrete: "/maps/headquarters-b12/concrete.webp",
+};
+
 /** Deterministic, seamless surface data: colour contains no lighting/shadows.
  * Metre-scaled UVs are authored in the geometry builder, never placeholder-scaled. */
-function surfaceMaps(kind: Finish, anisotropy: number) {
+function surfaceMaps(kind: Finish, anisotropy: number, invalidate: () => void) {
   const size = kind === "roof" ? 512 : 256;
   const normal = new Uint8Array(size * size * 4),
     colour = new Uint8Array(size * size * 4),
@@ -82,10 +88,38 @@ function surfaceMaps(kind: Finish, anisotropy: number) {
     t.needsUpdate = true;
     return t;
   };
+  const albedo = map(colour, true);
+  const normalMap = map(normal);
+  const roughnessMap = map(rough);
+  const asset = finishAssets[kind];
+  const image = asset ? new Image() : undefined;
+  if (image && asset) {
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+      ctx.drawImage(image, 0, 0, size, size);
+      const pixels = ctx.getImageData(0, 0, size, size).data;
+      for (let i = 0; i < colour.length; i += 4) {
+        const profile = colour[i] / 247;
+        colour[i] = Math.min(255, pixels[i] * profile);
+        colour[i + 1] = Math.min(255, pixels[i + 1] * profile);
+        colour[i + 2] = Math.min(255, pixels[i + 2] * profile);
+      }
+      albedo.needsUpdate = true;
+      invalidate();
+    };
+    image.src = asset;
+  }
   return {
-    map: map(colour, true),
-    normalMap: map(normal),
-    roughnessMap: map(rough),
+    textures: { map: albedo, normalMap, roughnessMap },
+    dispose: () => {
+      if (image) image.onload = null;
+      albedo.dispose();
+      normalMap.dispose();
+      roughnessMap.dispose();
+    },
   };
 }
 
@@ -97,10 +131,10 @@ export function makeHeadquartersMaterials(
     art = makeArtwork(invalidate);
   for (const texture of [art.sign, art.graphics, art.entry])
     texture.anisotropy = anisotropy;
-  const masonry = surfaceMaps("masonry", anisotropy),
-    roof = surfaceMaps("roof", anisotropy),
-    concrete = surfaceMaps("concrete", anisotropy),
-    brick = surfaceMaps("brick", anisotropy);
+  const masonry = surfaceMaps("masonry", anisotropy, invalidate),
+    roof = surfaceMaps("roof", anisotropy, invalidate),
+    concrete = surfaceMaps("concrete", anisotropy, invalidate),
+    brick = surfaceMaps("brick", anisotropy, invalidate);
   const m = (params: THREE.MeshStandardMaterialParameters) =>
     new THREE.MeshStandardMaterial({
       vertexColors: true,
@@ -109,20 +143,20 @@ export function makeHeadquartersMaterials(
     });
   const materials: Record<Surface, THREE.MeshStandardMaterial> = {
     wall: m({
-      color: "#676e6e",
-      ...masonry,
+      color: "#65686b",
+      ...masonry.textures,
       roughness: 1,
       normalScale: new THREE.Vector2(0.27, 0.27),
     }),
     roof: m({
-      color: "#d0d1c8",
-      ...roof,
+      color: "#ddd9cd",
+      ...roof.textures,
       roughness: 0.86,
       metalness: 0,
       normalScale: new THREE.Vector2(0.55, 0.55),
       side: THREE.DoubleSide,
     }),
-    trim: m({ color: "#ecebe3", roughness: 0.59, side: THREE.DoubleSide }),
+    trim: m({ color: "#f1eee6", roughness: 0.57, side: THREE.DoubleSide }),
     frame: m({
       color: "#e8e9e4",
       roughness: 0.44,
@@ -132,21 +166,20 @@ export function makeHeadquartersMaterials(
     soffit: m({ color: "#d4d1c7", roughness: 0.78, side: THREE.DoubleSide }),
     sideWall: m({
       color: "#deddd6",
-      ...brick,
+      ...brick.textures,
       roughness: 0.91,
       normalScale: new THREE.Vector2(0.35, 0.35),
     }),
     glass: new THREE.MeshPhysicalMaterial({
-      color: "#829aab",
+      color: "#859caa",
       vertexColors: true,
-      roughness: 0.12,
+      roughness: 0.11,
       metalness: 0,
       transparent: true,
-      opacity: 0.22,
+      opacity: 0.24,
       depthWrite: false,
       ior: 1.5,
-      reflectivity: 0.65,
-      envMapIntensity: 1.8,
+      reflectivity: 0.8,
       side: THREE.FrontSide,
     }),
     interior: m({ color: "#343b3d", roughness: 1, side: THREE.DoubleSide }),
@@ -159,8 +192,8 @@ export function makeHeadquartersMaterials(
     }),
     wood: m({ color: "#786251", roughness: 0.87 }),
     concrete: m({
-      color: "#bfbcb1",
-      ...concrete,
+      color: "#cac4b5",
+      ...concrete.textures,
       roughness: 1,
       normalScale: new THREE.Vector2(0.17, 0.17),
     }),
@@ -175,31 +208,30 @@ export function makeHeadquartersMaterials(
     contact: m({ color: "#242b2e", roughness: 1 }),
     soil: m({
       color: "#4e4030",
-      ...masonry,
+      normalMap: masonry.textures.normalMap,
+      roughnessMap: masonry.textures.roughnessMap,
       roughness: 1,
       normalScale: new THREE.Vector2(0.9, 0.9),
     }),
-    foliage: m({ color: "#617d40", roughness: 0.88, side: THREE.DoubleSide }),
-    flower: m({ color: "#d8be2c", roughness: 0.79, vertexColors: false }),
-    whiteFlower: m({ color: "#ebe8d4", roughness: 0.83, vertexColors: false }),
+    foliage: m({ color: "#637e37", roughness: 0.72, side: THREE.DoubleSide }),
+    flower: m({ color: "#edbc25", roughness: 0.78 }),
+    whiteFlower: m({ color: "#f7f2df", roughness: 0.82 }),
     pot: m({
       color: "#a16b4c",
-      ...masonry,
+      normalMap: masonry.textures.normalMap,
+      roughnessMap: masonry.textures.roughnessMap,
       roughness: 0.57,
       normalScale: new THREE.Vector2(0.1, 0.1),
     }),
     bronze: m({
-      color: "#ab8c62",
-      roughness: 0.43,
-      metalness: 0.83,
-      normalMap: masonry.normalMap,
-      normalScale: new THREE.Vector2(0.06, 0.06),
-      envMapIntensity: 1.15,
+      color: "#d5a554",
+      roughness: 0.39,
+      metalness: 0.69,
       side: THREE.DoubleSide,
     }),
     pedestal: m({
       color: "#5b6465",
-      ...concrete,
+      ...concrete.textures,
       roughness: 0.83,
       normalScale: new THREE.Vector2(0.21, 0.21),
     }),
@@ -211,6 +243,16 @@ export function makeHeadquartersMaterials(
   // Instanced foliage uses shared vertex-free prototype geometry.
   for (const [key, material] of Object.entries(materials))
     applyArchitecturalContact(material, key as Surface);
+  // A front-on window stays legible. At oblique angles the existing
+  // environment reflection contributes more to the visible pane.
+  materials.glass.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <opaque_fragment>",
+      `float glazingAngle = clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0);
+       diffuseColor.a = mix(diffuseColor.a, 0.69, pow(1.0 - glazingAngle, 3.0));
+       #include <opaque_fragment>`,
+    );
+  };
   const base = Object.fromEntries(
     Object.entries(materials).map(([k, m]) => [k, m.color.clone()]),
   ) as Record<Surface, THREE.Color>;
@@ -219,8 +261,7 @@ export function makeHeadquartersMaterials(
     base,
     dispose: () => {
       Object.values(materials).forEach((m) => m.dispose());
-      for (const pack of [masonry, roof, concrete, brick])
-        Object.values(pack).forEach((t) => t.dispose());
+      for (const pack of [masonry, roof, concrete, brick]) pack.dispose();
       art.dispose();
     },
   };

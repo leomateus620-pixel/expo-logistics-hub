@@ -98,6 +98,11 @@ export function createHeadquartersGeometry() {
       const c =
         variation *
         (key === "foliage" ? 0.9 + 0.1 * Math.min(1, Math.max(0, y) / 2) : 1);
+      if (key === "bronze") {
+        const patina = 0.5 + 0.5 * Math.sin(x * 8.3 + z * 12.7) * Math.cos(y * 17.1 - z * 6.7);
+        colors.set([0.94 + 0.06 * patina, 0.88 + 0.12 * patina, 0.78 + 0.22 * patina], i * 3);
+        continue;
+      }
       colors.set(
         [
           c,

@@ -1,0 +1,2291 @@
+{
+  "browser": "157.0.8103.79",
+  "procedural": false,
+  "profiles": [
+    {
+      "profile": {
+        "id": "celular-retrato",
+        "width": 390,
+        "height": 844,
+        "tier": "LOW",
+        "touch": true
+      },
+      "pageErrors": [],
+      "shaderErrors": [],
+      "network": {
+        "campaign-windows.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "stucco.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "campaign-entry.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "ceramic.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "concrete.webp": {
+          "status": 200,
+          "type": "image/webp"
+        }
+      },
+      "assets": [
+        {
+          "key": "graphics",
+          "file": "campaign-windows.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            256
+          ],
+          "materialSize": [
+            1024,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 0.20833333333333334,
+          "matches": true
+        },
+        {
+          "key": "entry",
+          "file": "campaign-entry.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            1024
+          ],
+          "materialSize": [
+            1024,
+            1024
+          ],
+          "channels": 264,
+          "meanRgbError": 0.29545454545454547,
+          "matches": true
+        },
+        {
+          "key": "concrete",
+          "file": "concrete.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 7.613636363636363,
+          "matches": true
+        },
+        {
+          "key": "wall",
+          "file": "stucco.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 1.4204545454545454,
+          "matches": true
+        },
+        {
+          "key": "roof",
+          "file": "ceramic.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            512,
+            512
+          ],
+          "materialSize": [
+            512,
+            512
+          ],
+          "channels": 264,
+          "meanRgbError": 2.621212121212121,
+          "matches": true
+        }
+      ],
+      "cases": [
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "profile": {
+        "id": "celular-paisagem",
+        "width": 844,
+        "height": 390,
+        "tier": "LOW",
+        "touch": true
+      },
+      "pageErrors": [],
+      "shaderErrors": [],
+      "network": {
+        "campaign-windows.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "campaign-entry.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "stucco.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "ceramic.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "concrete.webp": {
+          "status": 200,
+          "type": "image/webp"
+        }
+      },
+      "assets": [
+        {
+          "key": "graphics",
+          "file": "campaign-windows.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            256
+          ],
+          "materialSize": [
+            1024,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 0.20833333333333334,
+          "matches": true
+        },
+        {
+          "key": "entry",
+          "file": "campaign-entry.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            1024
+          ],
+          "materialSize": [
+            1024,
+            1024
+          ],
+          "channels": 264,
+          "meanRgbError": 0.29545454545454547,
+          "matches": true
+        },
+        {
+          "key": "concrete",
+          "file": "concrete.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 7.613636363636363,
+          "matches": true
+        },
+        {
+          "key": "wall",
+          "file": "stucco.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 1.4204545454545454,
+          "matches": true
+        },
+        {
+          "key": "roof",
+          "file": "ceramic.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            512,
+            512
+          ],
+          "materialSize": [
+            512,
+            512
+          ],
+          "channels": 264,
+          "meanRgbError": 2.621212121212121,
+          "matches": true
+        }
+      ],
+      "cases": [
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 4,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "profile": {
+        "id": "tablet",
+        "width": 768,
+        "height": 1024,
+        "tier": "MEDIUM",
+        "touch": true
+      },
+      "pageErrors": [],
+      "shaderErrors": [],
+      "network": {
+        "campaign-windows.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "campaign-entry.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "stucco.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "ceramic.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "concrete.webp": {
+          "status": 200,
+          "type": "image/webp"
+        }
+      },
+      "assets": [
+        {
+          "key": "graphics",
+          "file": "campaign-windows.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            256
+          ],
+          "materialSize": [
+            1024,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 0.20833333333333334,
+          "matches": true
+        },
+        {
+          "key": "entry",
+          "file": "campaign-entry.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            1024
+          ],
+          "materialSize": [
+            1024,
+            1024
+          ],
+          "channels": 264,
+          "meanRgbError": 0.29545454545454547,
+          "matches": true
+        },
+        {
+          "key": "concrete",
+          "file": "concrete.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 7.613636363636363,
+          "matches": true
+        },
+        {
+          "key": "wall",
+          "file": "stucco.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 1.4204545454545454,
+          "matches": true
+        },
+        {
+          "key": "roof",
+          "file": "ceramic.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            512,
+            512
+          ],
+          "materialSize": [
+            512,
+            512
+          ],
+          "channels": 264,
+          "meanRgbError": 2.621212121212121,
+          "matches": true
+        }
+      ],
+      "cases": [
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "chuva",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "profile": {
+        "id": "escritorio",
+        "width": 1366,
+        "height": 768,
+        "tier": "HIGH",
+        "touch": false
+      },
+      "pageErrors": [],
+      "shaderErrors": [],
+      "network": {
+        "campaign-windows.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "campaign-entry.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "stucco.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "ceramic.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "concrete.webp": {
+          "status": 200,
+          "type": "image/webp"
+        }
+      },
+      "assets": [
+        {
+          "key": "graphics",
+          "file": "campaign-windows.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            256
+          ],
+          "materialSize": [
+            1024,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 0.20833333333333334,
+          "matches": true
+        },
+        {
+          "key": "entry",
+          "file": "campaign-entry.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            1024
+          ],
+          "materialSize": [
+            1024,
+            1024
+          ],
+          "channels": 264,
+          "meanRgbError": 0.29545454545454547,
+          "matches": true
+        },
+        {
+          "key": "concrete",
+          "file": "concrete.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 7.613636363636363,
+          "matches": true
+        },
+        {
+          "key": "wall",
+          "file": "stucco.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 1.4204545454545454,
+          "matches": true
+        },
+        {
+          "key": "roof",
+          "file": "ceramic.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            512,
+            512
+          ],
+          "materialSize": [
+            512,
+            512
+          ],
+          "channels": 264,
+          "meanRgbError": 2.621212121212121,
+          "matches": true
+        }
+      ],
+      "cases": [
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "noite",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "noite",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "noite",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "noite",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "noite",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "profile": {
+        "id": "tela-grande",
+        "width": 1920,
+        "height": 1080,
+        "tier": "HIGH",
+        "touch": false
+      },
+      "pageErrors": [],
+      "shaderErrors": [],
+      "network": {
+        "stucco.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "ceramic.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "concrete.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "campaign-windows.webp": {
+          "status": 200,
+          "type": "image/webp"
+        },
+        "campaign-entry.webp": {
+          "status": 200,
+          "type": "image/webp"
+        }
+      },
+      "assets": [
+        {
+          "key": "graphics",
+          "file": "campaign-windows.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            256
+          ],
+          "materialSize": [
+            1024,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 0.20833333333333334,
+          "matches": true
+        },
+        {
+          "key": "entry",
+          "file": "campaign-entry.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            1024,
+            1024
+          ],
+          "materialSize": [
+            1024,
+            1024
+          ],
+          "channels": 264,
+          "meanRgbError": 0.29545454545454547,
+          "matches": true
+        },
+        {
+          "key": "concrete",
+          "file": "concrete.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 7.613636363636363,
+          "matches": true
+        },
+        {
+          "key": "wall",
+          "file": "stucco.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            256,
+            256
+          ],
+          "materialSize": [
+            256,
+            256
+          ],
+          "channels": 264,
+          "meanRgbError": 1.4204545454545454,
+          "matches": true
+        },
+        {
+          "key": "roof",
+          "file": "ceramic.webp",
+          "type": "image/webp",
+          "sourceSize": [
+            512,
+            512
+          ],
+          "materialSize": [
+            512,
+            512
+          ],
+          "channels": 264,
+          "meanRgbError": 2.621212121212121,
+          "matches": true
+        }
+      ],
+      "cases": [
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "dia",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "noite",
+          "path": "direct",
+          "frameDelta": 4,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "noite",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "noite",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "noite",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "noite",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": true,
+            "rain": false,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 7,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "chuva",
+          "path": "post",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": true,
+            "reduced": false
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "fachada",
+          "key": "graphics",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "entrada",
+          "key": "entry",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "jardim",
+          "key": "concrete",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "lateral",
+          "key": "wall",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        },
+        {
+          "view": "cobertura",
+          "key": "roof",
+          "environment": "reduzida",
+          "path": "direct",
+          "frameDelta": 3,
+          "modeReached": true,
+          "flags": {
+            "night": false,
+            "rain": false,
+            "reduced": true
+          },
+          "ready": true,
+          "sameRenderer": true,
+          "sample": true,
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

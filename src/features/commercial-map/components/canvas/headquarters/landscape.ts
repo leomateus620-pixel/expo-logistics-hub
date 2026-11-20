@@ -3,7 +3,7 @@ import { FENASOJA_COMPLEX as SPEC } from "../../../data/fenasojaComplexReconstru
 import type { GeometryBuilder, V3 } from "./geometry";
 const hq = SPEC.headquarters;
 export function buildFrontage(builder: GeometryBuilder) {
-  const { box, bevel, lathe, sphere, put, beam, tube, detail } = builder;
+  const { box, bevel, lathe, sphere, put, beam, tube, polygon, detail } = builder;
   // Sidewalk/apron raised from the map surface; joints follow curved circulation.
   const walk = new THREE.Shape(
     hq.sidewalk.map(([x, z]) => new THREE.Vector2(x, -z)),
@@ -84,20 +84,21 @@ export function buildFrontage(builder: GeometryBuilder) {
   for (const x of [-5, -2.5, 0, 2.5, 5])
     box("joint", [x, 0.0905, 8.3], [0.014, 0.0008, 1.04]);
   detail(2);
-  for (let i = 0; i < 46; i++) {
-    const a = 0.22 + (i * Math.PI * 1.45) / 46,
-      rad = 2.07;
-    bevel(
-      "concrete",
-      [
-        hq.monument.position[0] + Math.cos(a) * rad,
-        0.096,
-        hq.monument.position[1] + Math.sin(a) * rad,
-      ],
-      [0.085, 0.012, 0.13],
-      0.004,
-      [0, -a, 0],
-    );
+  // Recessed-looking radial drainage slots between the sweep of paving bands.
+  const [monumentX, monumentZ] = hq.monument.position;
+  for (let i = 0; i < 42; i++) {
+    const angle = 0.26 + (i * 2.61) / 41;
+    const point = (radius: number, offset: number): V3 => [
+      monumentX + Math.cos(angle + offset) * radius,
+      0.0907,
+      monumentZ + Math.sin(angle + offset) * radius,
+    ];
+    polygon("joint", [
+      point(2.01, -0.009),
+      point(2.01, 0.009),
+      point(2.12, 0.009),
+      point(2.12, -0.009),
+    ]);
   }
   detail(0);
   // Beds are outside the entrance route; soil and opaque foliage are matte.
@@ -114,10 +115,10 @@ export function buildFrontage(builder: GeometryBuilder) {
     height: number,
     width: number,
     bend: number,
+    steps = 7,
   ) => {
     const positions: number[] = [],
-      indices: number[] = [],
-      steps = 7;
+      indices: number[] = [];
     for (let i = 0; i <= steps; i++) {
       const t = i / steps,
         dx = Math.cos(angle) * bend * t * t,
@@ -143,21 +144,24 @@ export function buildFrontage(builder: GeometryBuilder) {
     g.computeVertexNormals();
     put("foliage", g);
   };
-  for (const [x, z] of [
-    [-4.8, 8.1],
-    [-3.35, 8.0],
-    [5.25, 8.0],
-    [5.8, 6.1],
-    [5.3, 3.8],
+  for (const [x, z, mass] of [
+    [-4.8, 8.1, 0.67],
+    [-3.35, 8.0, 0.57],
+    [5.27, 8.0, 1.1],
+    [5.83, 6.1, 0.81],
+    [5.3, 3.8, 0.92],
   ]) {
-    for (let i = 0; i < 54; i++)
+    for (let i = 0; i < 54; i++) {
+      const angle = i * 2.399 + mass;
+      const growth = 0.5 + 0.5 * Math.sin(i * 6.28 * mass);
       blade(
-        [x + Math.cos(i * 2.4) * 0.12, 0.21, z + Math.sin(i * 2.4) * 0.12],
-        i * 2.399,
-        0.7 + (i % 5) * 0.15,
-        0.023,
-        0.4 + (i % 3) * 0.13,
+        [x + Math.cos(angle) * 0.13, 0.21, z + Math.sin(angle) * 0.13],
+        angle,
+        mass * (0.74 + growth * 0.69),
+        0.016 + growth * 0.012,
+        mass * (0.57 - growth * 0.28),
       );
+    }
   }
   // Arching areca fronds; crowns stay inside the Argentina edge and above the circulation.
   for (const [x, z, height] of [
@@ -176,22 +180,24 @@ export function buildFrontage(builder: GeometryBuilder) {
         0.031,
       );
     }
-    for (let j = 0; j < 12; j++) {
+    for (let j = 0; j < 14; j++) {
       detail(j % 2 === 0 ? 0 : 1);
-      const a = j * 2.399963,
-        L = 1.02 + 0.19 * Math.sin(j * 4.4);
+      const a = j * 2.399963 + x,
+        L = 1.15 + 0.19 * Math.sin(j * 4.4),
+        lift = 0.37 + 0.18 * Math.sin(j * 2.3);
       for (let k = 1; k < 17; k++) {
         const t = k / 17,
           px = x + 0.13 + Math.cos(a) * t * L,
           pz = z + Math.sin(a) * t * L,
-          py = height + 0.49 * Math.sin(t * Math.PI) - 0.48 * t * t;
+          py = height + lift * Math.sin(t * Math.PI) - 0.48 * t * t;
         for (const side of [-1, 1])
           blade(
             [px, py, pz],
             a + side * 1.08,
-            -0.19 * t,
-            0.018,
-            0.38 * Math.pow(Math.sin(Math.PI * t), 0.6) + 0.055,
+            -0.24 * t,
+            0.022,
+            0.42 * Math.pow(Math.sin(Math.PI * t), 0.6) + 0.055,
+            5,
           );
       }
       tube(
@@ -200,7 +206,7 @@ export function buildFrontage(builder: GeometryBuilder) {
           [x + 0.13, height, z],
           [
             x + 0.13 + Math.cos(a) * L * 0.5,
-            height + 0.4,
+            height + lift - 0.12,
             z + Math.sin(a) * L * 0.5,
           ],
           [x + 0.13 + Math.cos(a) * L, height - 0.48, z + Math.sin(a) * L],
@@ -234,22 +240,33 @@ export function buildFrontage(builder: GeometryBuilder) {
         0.44 + 0.1 * Math.sin(i * 1.2),
       );
   }
-  for (let i = 0; i < 130; i++) {
-    const right = i % 2 === 0,
-      x = right
-        ? 4.65 + (i % 7) * 0.23 + Math.sin(i * 9) * 0.08
-        : -5.15 + (i % 8) * 0.27 + Math.sin(i * 9) * 0.08,
-      z = 8.0 + (i % 3) * 0.22 + Math.cos(i * 13) * 0.06;
-    const y = 0.26 + (i % 4) * 0.038;
-    sphere("foliage", [x, y - 0.03, z], [0.1, 0.1, 0.11]);
-    for (let j = 0; j < 7; j++) {
-      const a = (j * Math.PI * 2) / 7;
-      sphere(
-        i % 3 ? "whiteFlower" : "flower",
-        [x + Math.cos(a) * 0.04, y + 0.15, z + Math.sin(a) * 0.04],
-        [0.039, 0.012, 0.022],
-        [0.16, a, 0.14],
-      );
+  for (const [cx, cz, radius, rise, white] of [
+    [-5, 8.23, 0.21, 0.19, 1],
+    [-4.36, 8.07, 0.24, 0.22, 0],
+    [-3.76, 8.34, 0.17, 0.16, 1],
+    [-3.05, 8.3, 0.19, 0.18, 1],
+    [4.72, 8.3, 0.2, 0.2, 0],
+    [5.14, 8.37, 0.22, 0.25, 1],
+    [5.62, 8.27, 0.24, 0.2, 0],
+    [6.12, 8.35, 0.24, 0.22, 1],
+    [6.31, 7.79, 0.16, 0.18, 0],
+  ]) {
+    for (let i = 0; i < 14; i++) {
+      const a = i * 2.399963 + cx;
+      const fraction = Math.sqrt(i / 14);
+      const x = cx + Math.cos(a) * fraction * radius;
+      const z = cz + Math.sin(a) * fraction * radius;
+      const y = 0.27 + rise * Math.sqrt(1 - fraction * fraction);
+      sphere("foliage", [x, y - 0.07, z], [0.105, 0.079, 0.092]);
+      for (let petal = 0; petal < 7; petal++) {
+        const angle = a + (petal * Math.PI * 2) / 7;
+        sphere(
+          white ? "whiteFlower" : "flower",
+          [x + Math.cos(angle) * 0.043, y + 0.017, z + Math.sin(angle) * 0.043],
+          [0.038, 0.012, 0.024],
+          [0.16, -angle, 0.14],
+        );
+      }
     }
   }
   // Ceramic profiles with rims, visible soil and individual upright shrubs.

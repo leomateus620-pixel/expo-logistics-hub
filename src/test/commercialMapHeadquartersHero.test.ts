@@ -117,6 +117,58 @@ describe("headquarters hero geometry", () => {
     expect(ray.intersectObjects(group.children).length).toBeGreaterThan(0);
     material.dispose();
   });
+  it("sets the window and entry graphics behind their glazing", () => {
+    const material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+    const glass = new THREE.Mesh(
+      model.geometry.find((part) => part.key === "glass")!.geometry,
+      material,
+    );
+    const front = S.headquarters.entrance[1];
+    for (const { key, x, y } of [
+      { key: "graphics", x: 0.5, y: 4.55 },
+      { key: "entry", x: 1.22, y: 1.6 },
+    ]) {
+      const graphics = new THREE.Mesh(
+        model.geometry.find((part) => part.key === key)!.geometry,
+        material,
+      );
+      const ray = new THREE.Raycaster(
+        new THREE.Vector3(x, y, front + 0.3),
+        new THREE.Vector3(0, 0, -1),
+        0,
+        0.7,
+      );
+      const [glassHit, graphicHit] = ray.intersectObjects([graphics, glass]);
+      expect(glassHit?.object).toBe(glass);
+      expect(graphicHit?.object).toBe(graphics);
+      expect(graphicHit.distance - glassHit.distance).toBeGreaterThan(0.03);
+    }
+    material.dispose();
+  });
+  it("follows the curved sign face with a continuous back of uniform depth", () => {
+    const material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+    const select = (key: "sign" | "trim") =>
+      new THREE.Mesh(
+        model.geometry.find((part) => part.key === key && part.lod === 0)!.geometry,
+        material,
+      );
+    const [face, casing] = [select("sign"), select("trim")];
+    const sign = S.headquarters.sign;
+    const front = S.headquarters.entrance[1];
+    const surfaces = [0, 2.5].map((x) => {
+      const ray = new THREE.Raycaster(
+        new THREE.Vector3(x, sign.bottom + sign.height / 2, front + 1),
+        new THREE.Vector3(0, 0, -1),
+      );
+      const [[signHit], [casingHit]] = [face, casing].map((mesh) =>
+        ray.intersectObject(mesh),
+      );
+      expect(signHit.point.z - casingHit.point.z).toBeCloseTo(sign.depth, 5);
+      return casingHit.point.z;
+    });
+    expect(surfaces[0] - surfaces[1]).toBeGreaterThan(0.1);
+    material.dispose();
+  });
   it("keeps a stable silhouette at each LOD and bounds the close geometry cost", () => {
     for (const key of ["wall", "roof", "sign", "bronze", "pedestal"]) {
       expect(

@@ -696,7 +696,7 @@ function focusProfileForEntity(entity: MapEntity) {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.08, minDistanceRatio: 0.052, maxDistanceRatio: 0.32, minimumDirectionY: 0.32 };
   }
   if (landmark === 'fenasoja-headquarters') {
-    return { ...profile, contextRatio: 0.012, fitPadding: 1.16, minDistanceRatio: 0.009, maxDistanceRatio: 0.3, minimumDirectionY: 0.30 };
+    return { ...profile, contextRatio: 0.012, fitPadding: 1.10, minDistanceRatio: 0.009, maxDistanceRatio: 0.3, minimumDirectionY: 0.2 };
   }
   if (landmark === 'lactalis-cultural-stage') {
     return { ...profile, contextRatio: 0.03, fitPadding: 1.22, minDistanceRatio: 0.02, maxDistanceRatio: 0.34, minimumDirectionY: LACTALIS_STAGE_LAYOUT.camera.focusMinimumDirectionY };
@@ -3201,16 +3201,18 @@ function CameraRig({
     const direction = camera.position.clone().sub(currentTarget);
     if (direction.lengthSq() < 0.01) direction.set(0.7, 0.75, 0.8);
     direction.normalize();
-    const landmarkFocusDirection = strategicLandmarkFocusDirection(entity);
-    if (landmarkFocusDirection) {
-      // Preserve a small amount of spatial continuity while making the public
-      // facade deterministic after rapid switches or a lateral manual view.
-      const deterministicDirection = new THREE.Vector3(...landmarkFocusDirection).normalize();
-      if (truck || landmarkKind === 'mirante-pavilion' || landmarkKind === 'lactalis-cultural-stage') direction.copy(deterministicDirection);
-      else direction.lerp(deterministicDirection, 0.92).normalize();
-    }
     const compactStage = landmarkKind === 'lactalis-cultural-stage';
     const compactHeadquarters = landmarkKind === 'fenasoja-headquarters';
+    const landmarkFocusDirection = strategicLandmarkFocusDirection(entity);
+    if (landmarkFocusDirection) {
+      const deterministicDirection = new THREE.Vector3(...landmarkFocusDirection).normalize();
+      if (truck || landmarkKind === 'mirante-pavilion' || compactStage || compactHeadquarters) {
+        direction.copy(deterministicDirection);
+      } else {
+        // Preserve some spatial continuity when selecting from a manual view.
+        direction.lerp(deterministicDirection, 0.92).normalize();
+      }
+    }
     const minimumFocusDistance = compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance
       : compactHeadquarters ? 1.5
       : truck ? CHOPP_TRUCK_SITE.minimumCameraDistance
