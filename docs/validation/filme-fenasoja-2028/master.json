@@ -1,19 +1,63 @@
 {
-  "download": "FENASOJA-2028-Full-HD.mp4",
-  "width": 1920,
-  "height": 1080,
+  "download": "FENASOJA-2028-4K.mp4",
+  "width": 3840,
+  "height": 2160,
   "fps": 24.0,
   "frames": 1200,
   "durationSeconds": 50.0,
-  "bytes": 84386449,
-  "sha256": "04abc613d0889e30592ff4df3dcd3fa3b8d71f88e9a1c5b08820f9f35d788477",
+  "bytes": 85426078,
+  "sha256": "467247ba5f4b7a4559d8c3f1603f1068966fee58d1238b11ff6cbf60d7607fc2",
   "fastStart": true,
   "streams": [
-    "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709/unknown/unknown, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 13239 kb/s, 24 fps, 24 tbr, 12288 tbn (default)",
-    "Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 256 kb/s (default)",
-    "Stream #0:2[0x3](por): Subtitle: mov_text (tx3g / 0x67337874), 0 kb/s (default)"
+    "Stream #0:0[0x1](und): Video: hevc (Main) (hvc1 / 0x31637668), yuv420p(tv, bt709, progressive), 3840x2160 [SAR 1:1 DAR 16:9], 13405 kb/s, 24 fps, 24 tbr, 24k tbn (default)",
+    "Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 256 kb/s (default)"
   ],
   "loudnessLUFS": -21.0,
   "truePeakDBFS": -3.4,
-  "completeDecode": true
+  "completeDecode": true,
+  "recordedCountdown": {
+    "reference": "2026-11-20T04:59:36-03:00",
+    "clock": {
+      "stamp": "20/11/2026, 04:59",
+      "ticks": [
+        [
+          526,
+          5,
+          0,
+          24
+        ],
+        [
+          526,
+          5,
+          0,
+          23
+        ],
+        [
+          526,
+          5,
+          0,
+          22
+        ],
+        [
+          526,
+          5,
+          0,
+          21
+        ],
+        [
+          526,
+          5,
+          0,
+          20
+        ],
+        [
+          526,
+          5,
+          0,
+          19
+        ]
+      ]
+    }
+  },
+  "subtitleTracks": 0
 }

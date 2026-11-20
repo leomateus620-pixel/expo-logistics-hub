@@ -1,4 +1,4 @@
-"""Light the beveled 3D wordmark inside the existing photographic sky at 1280×720."""
+"""Light the beveled 3D wordmark inside the existing photographic sky at the final delivery resolution."""
 
 import json
 import subprocess
@@ -26,13 +26,15 @@ class SkyTitle:
         self.size = np.ptp(mesh[:, :, 0])
         self.light = np.array([-0.53, 0.58, 0.62])
 
-    def render(self, frame, seconds, hd=False):
-        scale = 1.5 if hd else 1
+    def render(self, frame, seconds, width=3840):
+        scale = width / 1280
 
         def picture(frame):
             return (
-                cv2.resize(frame, (1920, 1080), interpolation=cv2.INTER_LANCZOS4)
-                if hd
+                cv2.resize(
+                    frame, (width, width * 9 // 16), interpolation=cv2.INTER_LANCZOS4
+                )
+                if width != 1280
                 else frame
             )
 
@@ -114,7 +116,7 @@ class SkyTitle:
         return frame
 
 
-def render_title(source, output, ffmpeg, hd=False):
+def render_title(source, output, ffmpeg, width=3840):
     capture = cv2.VideoCapture(str(source))
     try:
         if not capture.isOpened() or (int(capture.get(3)), int(capture.get(4))) != (
@@ -135,7 +137,7 @@ def render_title(source, output, ffmpeg, hd=False):
             "-pix_fmt",
             "bgr24",
             "-s",
-            "1920x1080" if hd else "1280x720",
+            f"{width}x{width * 9 // 16}",
             "-r",
             str(fps),
             "-i",
@@ -143,6 +145,8 @@ def render_title(source, output, ffmpeg, hd=False):
             "-an",
             "-c:v",
             "libx264",
+            "-threads",
+            "4",
             "-crf",
             "13",
             "-preset",
@@ -157,7 +161,7 @@ def render_title(source, output, ffmpeg, hd=False):
                 ok, frame = capture.read()
                 if not ok:
                     break
-                encoder.stdin.write(title.render(frame, i / fps, hd).tobytes())
+                encoder.stdin.write(title.render(frame, i / fps, width).tobytes())
                 i += 1
             encoder.stdin.close()
             if encoder.wait() or not i:

@@ -1,11 +1,12 @@
 import * as T from "three";
+import { passengerOnCable } from "./passageiro.mjs";
 import * as vehicleModule from "/src/features/commercial-map/visit/vehicles/VisitHelicopterModel.tsx?filme=09";
 import {
   getVisitVehicleMaterials,
   VISIT_VEHICLE_METRE,
 } from "/src/features/commercial-map/visit/vehicles/VisitVehicleVisuals.ts";
 
-export function prepareHelicopter(scene) {
+export async function prepareHelicopter(scene) {
   const materials = {};
   for (const [k, v] of Object.entries(getVisitVehicleMaterials())) materials[k] = v.clone();
   materials.green.color.set("#e8e5d1");
@@ -35,40 +36,15 @@ export function prepareHelicopter(scene) {
   build(tail, vehicleModule.buildHelicopterTailRotor());
   heli.add(tail);
   scene.add(heli);
-  const navy = new T.MeshStandardMaterial({ color: "#223041", roughness: 0.89 }),
-    pants = new T.MeshStandardMaterial({ color: "#35383a", roughness: 0.92 }),
-    skin = new T.MeshStandardMaterial({ color: "#b58266", roughness: 0.79 }),
-    ropeMat = new T.MeshStandardMaterial({ color: "#ba9759", roughness: 0.88 });
-  function segment(parent, a, b, r, m, rb = r) {
-    const axis = new T.Vector3().subVectors(b, a);
-    const o = new T.Mesh(new T.CylinderGeometry(r, rb, axis.length(), 8), m);
-    o.position.copy(a).addScaledVector(axis, 0.5);
-    o.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), axis.normalize());
-    parent.add(o);
-    return o;
-  }
-  function eq(th, sc, mat, parent, pos) {
-    const o = new T.Mesh(new T.SphereGeometry(th, 10, 8), mat);
-    o.scale.fromArray(sc);
-    o.position.fromArray(pos);
-    parent.add(o);
-    return o;
-  }
-  const person = new T.Group();
+  const posePassenger = await passengerOnCable(scene);
   const V = (x, y, z) => new T.Vector3(x, y, z);
-  eq(0.118, [0.82, 1, 0.87], skin, person, [0, 0.78, 0]);
-  eq(0.224, [0.83, 1.15, 0.59], navy, person, [0, 0.47, 0]);
-  for (const k of [-1, 1]) {
-    segment(person, V(k * 0.08, 0.34, 0), V(k * 0.09, 0.05, 0.07), 0.088, pants, 0.064);
-    segment(person, V(k * 0.09, 0.05, 0.07), V(k * 0.11, -0.16, 0.02), 0.06, pants, 0.048);
-    segment(person, V(k * 0.14, 0.63, 0), V(k * 0.21, 0.43, 0.06), 0.052, navy, 0.047);
-    segment(person, V(k * 0.21, 0.43, 0.06), V(k * 0.13, 0.54, 0.16), 0.047, skin, 0.04);
-  }
-  person.scale.setScalar(VISIT_VEHICLE_METRE * 1.56);
-  scene.add(person);
+  const ropeMat = new T.MeshStandardMaterial({ color: "#ba9759", roughness: 0.88 });
   const rope = new T.Mesh(new T.CylinderGeometry(0.006, 0.006, 1, 8), ropeMat);
   scene.add(rope);
-  const winch = eq(0.15, [1.1, 1, 0.86], materials.chrome, heli, [1.17, 1.76, -0.48]);
+  const winch = new T.Mesh(new T.SphereGeometry(.15, 10, 8), materials.chrome);
+  winch.scale.set(1.1, 1, .86);
+  winch.position.set(1.17, 1.76, -.48);
+  heli.add(winch);
   const foot = V(13.89, 0, 15.45);
   const anchor = V(0, 0, 0);
   const end = V(0, 0, 0);
@@ -79,10 +55,7 @@ export function prepareHelicopter(scene) {
     tail.rotation.x = s * 2 * Math.PI * 32.8;
     heli.updateMatrixWorld(true);
     winch.getWorldPosition(anchor);
-    person.position.set(anchor.x - 0.03, 0.46 + s * 0.19, anchor.z + 0.032 * Math.sin(s * 1.15));
-    person.rotation.y = -0.64 + 0.12 * Math.sin(s);
-    end.copy(person.position);
-    end.y += 0.14;
+    posePassenger(anchor, s, end);
     const axis = anchor.clone().sub(end);
     rope.scale.y = axis.length();
     rope.position.copy(anchor).add(end).multiplyScalar(0.5);

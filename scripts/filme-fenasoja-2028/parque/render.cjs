@@ -13,21 +13,23 @@ const { values } = parseArgs({
     url: { type: "string" },
     smoke: { type: "boolean" },
     "full-hd": { type: "boolean" },
+    "4k": { type: "boolean" },
     ffmpeg: { type: "string", default: "ffmpeg" },
     help: { type: "boolean", short: "h" },
   },
 });
 const usage =
-  "node scripts/filme-fenasoja-2028/parque/render.cjs --out PASTA [--shot 00|09|both] [--smoke] [--full-hd] [--ffmpeg CAMINHO] [--url URL_LOCAL_DO_VITE]";
+  "node scripts/filme-fenasoja-2028/parque/render.cjs --out PASTA [--shot 00|09|both] [--smoke] [--full-hd|--4k] [--ffmpeg CAMINHO] [--url URL_LOCAL_DO_VITE]";
 if (values.help) {
   console.log(usage);
   process.exit(0);
 }
-if (!values.out || !["00", "09", "both"].includes(values.shot)) {
+if (!values.out || !["00", "09", "both"].includes(values.shot) || (values["4k"] && values["full-hd"])) {
   console.error(usage);
   process.exit(2);
 }
-const viewport = values["full-hd"] ? { width: 1920, height: 1080 } : { width: 1280, height: 720 };
+const width = values["4k"] ? 3840 : values["full-hd"] ? 1920 : 1280;
+const viewport = { width, height: width * 9 / 16 };
 const output = path.resolve(values.out),
   project = path.resolve(__dirname, "../../..");
 
@@ -77,15 +79,16 @@ async function capture(browser, origin, shot, work) {
     await page.waitForFunction(
       ({ width, height }) => {
         const canvas = document.querySelector("canvas");
-        return canvas?.width === width && canvas.height === height;
+        const bounds = canvas?.getBoundingClientRect();
+        return bounds?.width === width && bounds.height === height;
       },
       viewport,
       { timeout: 30000 },
     );
-    await page.evaluate(async (shot) => {
+    await page.evaluate(async ({ shot, viewport }) => {
       const { prepare } = await import("/scripts/filme-fenasoja-2028/parque/cena.mjs");
-      window.renderParkFrame = await prepare(shot);
-    }, shot);
+      window.renderParkFrame = await prepare(shot, viewport);
+    }, { shot, viewport });
     for (const [ordinal, index] of indices.entries()) {
       const { jpg, matte, treeCount, anchor } = await page.evaluate(
         ([idx, total]) => window.renderParkFrame(idx, total),
@@ -96,6 +99,7 @@ async function capture(browser, origin, shot, work) {
       const stem = String(ordinal).padStart(4, "0");
       await writeFile(path.join(work, stem + ".jpg"), Buffer.from(jpg, "base64"));
       if (matte) await writeFile(path.join(work, "mask-" + stem + ".png"), Buffer.from(matte, "base64"));
+      if (ordinal && (ordinal + 1) % 12 === 0) console.log(shot + " · " + (ordinal + 1) + "/" + indices.length);
       if (!ordinal) console.log(shot + " · " + treeCount + " troncos nas posições do cadastro.");
     }
   } finally {
@@ -178,7 +182,7 @@ async function main() {
             "three/examples/jsm/utils/BufferGeometryUtils.js",
           ],
         },
-        server: { host: "127.0.0.1", port: 0, open: false },
+        server: { host: "127.0.0.1", port: 0, open: false, hmr: false },
         logLevel: "error",
       });
       await server.listen();

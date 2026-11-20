@@ -9,7 +9,7 @@ import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
 import './headquarters-film.css';
 
 const FILM = '/media/fenasoja-2028/amanhecer';
-const FULL_HD_FILENAME = 'FENASOJA-2028-Full-HD.mp4';
+const DOWNLOAD_FILENAME = 'FENASOJA-2028-4K.mp4';
 const CLOSING_CLOCK_SECONDS = 6;
 
 function FilmClosingClock() {
@@ -77,9 +77,9 @@ export function HeadquartersFilm() {
       viewportClassName="z-[1101]" overlayClassName="z-[1100]" aria-modal="true"
       data-viewport-expanded={viewportExpanded || undefined} data-commercial-map-escape-priority="true"
       onEscapeKeyDown={(event) => { if (expanded) { event.preventDefault(); leaveFullscreen(); } }}>
-      <DialogHeader className="space-y-1 pr-10 text-left">
+      <DialogHeader className="headquarters-film__header space-y-1 pr-10 text-left">
         <DialogTitle>FenaSoja 2028</DialogTitle>
-        <DialogDescription>O amanhecer no parque e o encontro da Comissão Central na Casa FenaSoja.</DialogDescription>
+        <DialogDescription className="headquarters-film__description">O amanhecer no parque e o encontro da Comissão Central na Casa FenaSoja.</DialogDescription>
       </DialogHeader>
       {open && !failed && <div className="headquarters-film__stage" ref={stage}>
         <div className="headquarters-film__picture">
@@ -88,9 +88,7 @@ export function HeadquartersFilm() {
             onLoadedMetadata={syncClosingClock} onDurationChange={syncClosingClock} onTimeUpdate={syncClosingClock}
             onSeeking={syncClosingClock} onSeeked={syncClosingClock} onPlay={syncClosingClock}
             onPause={syncClosingClock} onEnded={syncClosingClock}
-            onError={() => { leaveFullscreen(); setNativeFullscreen(false); setShowClock(false); setFailed(true); }}>
-            <track kind="captions" src={`${FILM}.vtt`} srcLang="pt-BR" label="Português (Brasil)" />
-          </video>
+            onError={() => { leaveFullscreen(); setNativeFullscreen(false); setShowClock(false); setFailed(true); }} />
           {showClock && <FilmClosingClock />}
         </div>
         <button type="button" className="headquarters-film__fullscreen" onClick={() => void toggleFullscreen()}
@@ -104,8 +102,8 @@ export function HeadquartersFilm() {
       </div>}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Button asChild variant="outline">
-          <a href={`/media/fenasoja-2028/${FULL_HD_FILENAME}`} download={FULL_HD_FILENAME}>
-            <Download aria-hidden="true" className="h-4 w-4" />Baixar em Full HD
+          <a href={`/media/fenasoja-2028/${DOWNLOAD_FILENAME}`} download={DOWNLOAD_FILENAME}>
+            <Download aria-hidden="true" className="h-4 w-4" />Baixar em 4K
           </a>
         </Button>
         <DialogClose asChild>

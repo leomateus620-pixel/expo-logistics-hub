@@ -182,13 +182,13 @@ describe('seleção no painel persistente do mapa comercial', () => {
     trigger.focus();
     fireEvent.click(trigger);
     const dialog = screen.getByRole('dialog', { name: 'FenaSoja 2028' });
-    const download = within(dialog).getByRole('link', { name: 'Baixar em Full HD' });
-    expect(download).toHaveAttribute('download', 'FENASOJA-2028-Full-HD.mp4');
-    expect(download).toHaveAttribute('href', '/media/fenasoja-2028/FENASOJA-2028-Full-HD.mp4');
+    const download = within(dialog).getByRole('link', { name: 'Baixar em 4K' });
+    expect(download).toHaveAttribute('download', 'FENASOJA-2028-4K.mp4');
+    expect(download).toHaveAttribute('href', '/media/fenasoja-2028/FENASOJA-2028-4K.mp4');
     const video = within(dialog).getByLabelText('Filme FenaSoja 2028, amanhecer no parque');
     expect(video).toHaveAttribute('src', '/media/fenasoja-2028/amanhecer.mp4');
     expect(video).toHaveAttribute('poster', '/media/fenasoja-2028/amanhecer.webp');
-    expect(video.querySelector('track[kind=captions][srclang=pt-BR]')).toHaveAttribute('src', '/media/fenasoja-2028/amanhecer.vtt');
+    expect(video.querySelector('track')).toBeNull();
     expect(video).toHaveAttribute('controls');
     expect(video).toHaveAttribute('playsinline');
     fireEvent.error(video);

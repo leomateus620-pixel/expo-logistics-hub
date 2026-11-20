@@ -1,4 +1,4 @@
-"""Finish the project from the Higgsfield shots listed in the edit decision list."""
+"""Build the uncaptioned web film and its independently playable 4K download."""
 
 import argparse
 import json
@@ -14,205 +14,254 @@ from titular import render_title
 
 HERE = Path(__file__).resolve().parent
 MEDIA = HERE.parents[1] / "public/media/fenasoja-2028"
+UHD = "FENASOJA-2028-4K.mp4"
 
 
-def caption_time(seconds):
-    millis = round(seconds * 1000)
-    return f"{millis // 3600000:02}:{millis // 60000 % 60:02}:{millis // 1000 % 60:02}.{millis % 1000:03}"
+def ff(ffmpeg, args, **kwargs):
+    subprocess.run(
+        [ffmpeg, "-hide_banner", "-nostdin", "-loglevel", "error", "-y", *args],
+        check=True,
+        **kwargs,
+    )
 
 
-def render(shots, output, ffmpeg, hd_shots=None, clock_reference=None):
-    hd = hd_shots is not None
-    dimensions = "1920:1080" if hd else "1280:720"
-    filename = "FENASOJA-2028-Full-HD.mp4" if hd else "amanhecer.mp4"
+def encode_cut(ffmpeg, path, cut, output, clock_folder=None):
+    # Cuts stay independent so decoding never holds every 4K input in memory.
+    crop = cut.get("crop")
+    filters = [f"crop={':'.join(map(str, crop))}"] if crop else []
+    filters += [
+        "scale=3840:2160:flags=lanczos:out_color_matrix=bt709",
+        "setsar=1",
+        "fps=24",
+        "format=yuv420p",
+    ]
+    inputs = ["-ss", str(cut.get("in", 0)), "-i", str(path)]
+    if clock_folder is None:
+        picture = ["-map", "0:v:0", "-vf", ",".join(filters)]
+    else:
+        inputs += ["-framerate", "1", "-i", str(clock_folder / "tick-%d.png")]
+        clock_start = cut["seconds"] - 6
+        # Overlay generated RGBA artwork only on the standalone closing shot.
+        graph = (
+            "[0:v]" + ",".join(filters) + "[sky];"
+            "[1:v]fps=24,format=rgba,fade=t=in:st=0:d=0.35:alpha=1,"
+            f"setpts=PTS+{clock_start}/TB[clock];"
+            "[sky][clock]overlay=x=(W-w)/2:y=H*0.68:eof_action=repeat[movie]"
+        )
+        picture = ["-filter_complex", graph, "-map", "[movie]"]
+    ff(
+        ffmpeg,
+        [
+            *inputs,
+            *picture,
+            "-frames:v",
+            str(round(cut["seconds"] * 24)),
+            "-an",
+            "-sn",
+            "-dn",
+            "-c:v",
+            "libx265",
+            "-preset",
+            "fast",
+            "-crf",
+            "18",
+            "-pix_fmt",
+            "yuv420p",
+            "-tag:v",
+            "hvc1",
+            "-maxrate",
+            "15800k",
+            "-bufsize",
+            "23000k",
+            "-x265-params",
+            "log-level=error:pools=4:frame-threads=2:keyint=48:colorprim=bt709:transfer=bt709:colormatrix=bt709",
+            "-color_primaries",
+            "bt709",
+            "-color_trc",
+            "bt709",
+            "-colorspace",
+            "bt709",
+            "-video_track_timescale",
+            "24000",
+            str(output),
+        ],
+    )
+
+
+def join(ffmpeg, pieces, audio, work, output, duration, reference=None):
+    # Internal file names are generated locally, so no source path needs concat escaping.
+    index = work / "concat.txt"
+    index.write_text("".join(f"file '{part.name}'\n" for part in pieces))
+    args = [
+        "-f",
+        "concat",
+        "-safe",
+        "1",
+        "-i",
+        str(index),
+        "-i",
+        str(audio),
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
+    ]
+    if reference:
+        args += [
+            "-c:v",
+            "copy",
+            "-tag:v",
+            "hvc1",
+            "-bsf:v",
+            "hevc_metadata=colour_primaries=1:transfer_characteristics=1:matrix_coefficients=1:video_full_range_flag=0",
+            "-metadata",
+            f"comment=Contagem oficial calculada em {reference}",
+        ]
+    else:
+        args += [
+            "-vf",
+            "scale=1280:720:flags=lanczos",
+            "-c:v",
+            "libx264",
+            "-threads",
+            "4",
+            "-preset",
+            "fast",
+            "-crf",
+            "17",
+            "-profile:v",
+            "high",
+            "-pix_fmt",
+            "yuv420p",
+        ]
+    progress = subprocess.run(
+        [
+            ffmpeg,
+            "-hide_banner",
+            "-nostdin",
+            "-loglevel",
+            "error",
+            "-y",
+            *args,
+            "-color_primaries",
+            "bt709",
+            "-color_trc",
+            "bt709",
+            "-colorspace",
+            "bt709",
+            "-color_range",
+            "tv",
+            "-sn",
+            "-dn",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "256k" if reference else "160k",
+            "-ar",
+            "48000",
+            "-t",
+            str(duration),
+            "-movflags",
+            "+faststart",
+            "-metadata",
+            "title=FENASOJA 2028",
+            "-progress",
+            "pipe:1",
+            "-nostats",
+            str(output),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if progress.returncode:
+        raise RuntimeError(progress.stderr)
+    frames = [
+        int(row[6:]) for row in progress.stdout.splitlines() if row.startswith("frame=")
+    ]
+    if not frames or frames[-1] != round(duration * 24):
+        raise RuntimeError(f"Unexpected length for {output.name}: {frames[-1:]!r}")
+
+
+def render(shots, output, ffmpeg, reference):
     edition = json.loads((HERE / "montagem.json").read_text())
     cuts = edition["shots"]
-    source = [shots / cut["file"] for cut in cuts]
-    if hd:
-        for i, cut in enumerate(cuts):
-            if cut.get("hdSource"):
-                source[i] = hd_shots / cut["file"]
-    for path in source:
-        if not path.is_file():
-            raise FileNotFoundError(path)
+    duration = sum(cut["seconds"] for cut in cuts)
+    sound_duration = (
+        sum(edition["soundShotSeconds"])
+        + edition["soundIntroSeconds"]
+        + edition["soundOutroSeconds"]
+    )
+    if duration != sound_duration or not cuts[-1].get("skyTitle"):
+        raise ValueError("The sound and closing shot must match the picture timeline")
     output.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory() as directory:
-        temp = Path(directory)
+    with tempfile.TemporaryDirectory(dir=output) as scratch:
+        work = Path(scratch)
+        title = work / "letreiro.mp4"
+        render_title(shots / cuts[-1]["file"], title, ffmpeg)
+        pieces = []
         for i, cut in enumerate(cuts):
-            if cut.get("skyTitle"):
-                title = temp / "letreiro.mp4"
-                render_title(source[i], title, ffmpeg, hd)
-                source[i] = title
-        sound = temp / "ambiente.wav"
-        subprocess.run(
-            [
-                sys.executable,
-                str(HERE / "gerar_ambiente.py"),
-                "--shots",
-                *map(str, edition["soundShotSeconds"]),
-                "--intro",
-                str(edition.get("soundIntroSeconds", 0)),
-                "--outro",
-                str(edition.get("soundOutroSeconds", 0)),
-                "--ffmpeg",
-                ffmpeg,
-                "--output",
-                str(sound),
-            ],
-            check=True,
+            path = title if cut.get("skyTitle") else shots / cut["file"]
+            segment = work / f"cut-{i:02}.mp4"
+            encode_cut(ffmpeg, path, cut, segment)
+            pieces.append(segment)
+        export(ffmpeg, edition, pieces, title, work, output, duration, reference)
+
+
+def export(ffmpeg, edition, pieces, title, work, output, duration, reference):
+    closing = edition["shots"][-1]
+    clock_folder = work / "clock"
+    clock = write_clock(clock_folder, reference)
+    dated = work / "dated.mp4"
+    encode_cut(ffmpeg, title, closing, dated, clock_folder)
+    audio = work / "ambiente.wav"
+    subprocess.run(
+        [
+            sys.executable,
+            str(HERE / "gerar_ambiente.py"),
+            "--shots",
+            *map(str, edition["soundShotSeconds"]),
+            "--intro",
+            str(edition["soundIntroSeconds"]),
+            "--outro",
+            str(edition["soundOutroSeconds"]),
+            "--ffmpeg",
+            ffmpeg,
+            "--output",
+            str(audio),
+        ],
+        check=True,
+    )
+    join(ffmpeg, pieces, audio, work, work / "amanhecer.mp4", duration)
+    join(ffmpeg, [*pieces[:-1], dated], audio, work, work / UHD, duration, reference)
+    output.mkdir(parents=True, exist_ok=True)
+    for name in ["amanhecer.mp4", UHD]:
+        shutil.move(work / name, output / name)
+    print(
+        json.dumps(
+            {"referencia": reference, "primeiroSegundo": clock["ticks"][0]},
+            ensure_ascii=False,
         )
-        args = [ffmpeg, "-hide_banner", "-loglevel", "error", "-nostdin", "-y"]
-        filters, labels, cues = [], [], ["WEBVTT", ""]
-        total = 0
-        for i, (cut, path) in enumerate(zip(cuts, source)):
-            args.extend(["-threads", "2", "-i", str(path)])
-            crop = cut.get("crop")
-            framing = f"crop={':'.join(map(str, crop))}," if crop else ""
-            filters.append(
-                f"[{i}:v]trim=start={cut.get('in', 0)}:duration={cut['seconds']},"
-                f"setpts=PTS-STARTPTS,fps=24,{framing}scale={dimensions}:flags=lanczos:out_color_matrix=bt709,setsar=1,format=yuv420p[v{i}]"
-            )
-            labels.append(f"[v{i}]")
-            end = total + cut["seconds"]
-            if desc := cut.get("caption"):
-                cues.extend(
-                    [
-                        f"{caption_time(total + 0.15)} --> {caption_time(end - 0.2)}"
-                        + (" line:10%" if cut.get("skyTitle") else ""),
-                        desc,
-                        "",
-                    ]
-                )
-            total = end
-        sound_total = (
-            edition.get("soundIntroSeconds", 0)
-            + sum(edition["soundShotSeconds"])
-            + edition.get("soundOutroSeconds", 0)
-        )
-        if abs(total - sound_total) > 1 / 24:
-            raise ValueError(
-                "The picture and sound timelines must have the same duration"
-            )
-        filters.append("".join(labels) + f"concat=n={len(cuts)}:v=1:a=0[picture]")
-        captions = temp / "captions.vtt"
-        captions.write_text("\n".join(cues).rstrip() + "\n")
-        streams = ["-i", str(sound)]
-        maps = ["-map", "[picture]", "-map", f"{len(cuts)}:a"]
-        if hd:
-            # Relative asset names keep the filtergraph portable, including paths with spaces.
-            shutil.copytree(HERE.parents[1] / "src/assets/fonts", temp / "fonts")
-            reference = (
-                clock_reference
-                or datetime.now(UTC).replace(microsecond=0).isoformat()
-            )
-            write_clock(temp / "clock.ass", reference, total)
-            filters.append("[picture]ass=clock.ass:fontsdir=fonts[dated]")
-            streams += ["-i", str(captions)]
-            maps = [
-                "-map",
-                "[dated]",
-                "-map",
-                f"{len(cuts)}:a",
-                "-map",
-                f"{len(cuts) + 1}:s:0",
-                "-c:s",
-                "mov_text",
-                "-metadata:s:s:0",
-                "language=por",
-                "-disposition:s:0",
-                "0",
-            ]
-        # Verify the complete encoded picture before publishing either deliverable.
-        master = temp / "amanhecer.mp4"
-        args.extend(
-            [
-                *streams,
-                "-filter_complex_threads",
-                "3",
-                "-filter_complex",
-                ";".join(filters),
-                *maps,
-                "-t",
-                str(total),
-                "-c:v",
-                "libx264",
-                "-threads",
-                "5",
-                "-preset",
-                "slow",
-                "-crf",
-                "16" if hd else "18",
-                "-profile:v",
-                "high",
-                "-pix_fmt",
-                "yuv420p",
-                "-color_primaries",
-                "bt709",
-                "-color_trc",
-                "bt709",
-                "-colorspace",
-                "bt709",
-                "-c:a",
-                "aac",
-                "-b:a",
-                "256k" if hd else "160k",
-                "-ar",
-                "48000",
-                "-movflags",
-                "+faststart",
-                "-metadata",
-                "title=FENASOJA 2028",
-                "-progress",
-                "pipe:1",
-                "-nostats",
-                str(master),
-            ]
-        )
-        progress = subprocess.run(
-            args, check=True, stdout=subprocess.PIPE, text=True, cwd=temp
-        )
-        frames = [
-            int(line.split("=")[1])
-            for line in progress.stdout.splitlines()
-            if line.startswith("frame=")
-        ]
-        if not frames or frames[-1] != round(total * 24):
-            raise RuntimeError(f"Picture length differs from the {total:g}-second edit")
-        # temp and output may be on different file systems.
-        with tempfile.NamedTemporaryFile(
-            dir=output, suffix=".mp4", delete=False
-        ) as staged:
-            try:
-                with master.open("rb") as src:
-                    shutil.copyfileobj(src, staged)
-            except BaseException:
-                Path(staged.name).unlink(missing_ok=True)
-                raise
-        Path(staged.name).chmod(0o644)
-        Path(staged.name).replace(output / filename)
-        if not hd:
-            shutil.copyfile(captions, output / "amanhecer.vtt")
+    )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("shots", type=Path)
+    parser.add_argument(
+        "shots",
+        type=Path,
+        help="Folder with the revised sources, including native UHD park shots.",
+    )
     parser.add_argument("--output", type=Path, default=MEDIA)
     parser.add_argument("--ffmpeg", default="ffmpeg")
     parser.add_argument(
-        "--full-hd-shots",
-        type=Path,
-        help="Export the full-HD download with native map shots from this folder.",
-    )
-    parser.add_argument(
         "--clock-reference",
-        help="ISO 8601 instant with UTC offset for the first dated closing cue; defaults to export time.",
+        help="ISO 8601 instant with UTC offset for the first recorded closing tick.",
     )
     args = parser.parse_args()
     render(
         args.shots.resolve(),
         args.output.resolve(),
         args.ffmpeg,
-        args.full_hd_shots.resolve() if args.full_hd_shots else None,
-        args.clock_reference,
+        args.clock_reference or datetime.now(UTC).replace(microsecond=0).isoformat(),
     )

@@ -1,19 +1,87 @@
 {
   "soundIntroSeconds": 4.75,
-  "soundShotSeconds": [3.25, 8.25, 12.5, 7.25, 6],
+  "soundShotSeconds": [
+    3.25,
+    8.25,
+    12.5,
+    7.25,
+    6
+  ],
   "soundOutroSeconds": 8,
   "shots": [
-    { "file": "00-parque.mp4", "hdSource": true, "seconds": 4.75, "caption": "O amanhecer revela o Parque de Exposições de Santa Rosa. A câmera desce até a Casa FenaSoja, ao lado do palco." },
-    { "file": "01-chegada.mp4", "in": 1.375, "seconds": 3.25, "crop": [992, 558, 0, 6], "caption": "O som das pás cresce. Um helicóptero com a marca da FenaSoja se aproxima." },
-    { "file": "cabine-final.mp4", "in": 0.75, "seconds": 4.25, "caption": "Leonardo Strochein pilota a aeronave. Os pavilhões passam pela janela da cabine." },
-    { "file": "02-bosque-corda.mp4", "seconds": 4, "caption": "Diante da Casa, o helicóptero paira e baixa o cabo. Atrás do palco e da sede, a luz atravessa o bosque." },
-    { "file": "02-bosque-corda.mp4", "in": 4, "seconds": 3, "caption": "Começa o embarque da Comissão Central." },
-    { "file": "03-comissao.mp4", "in": 2.5, "seconds": 1.5, "crop": [1040, 584, 112, 15], "caption": "Cléo, Zélia e Roque sobem pela corda." },
-    { "file": "09-embarque-parque.mp4", "hdSource": true, "seconds": 3, "caption": "Em plano aberto, vê-se a subida pela corda junto à Casa, com as vias, os pavilhões e a arena ao redor." },
-    { "file": "06-comissao-detalhe-verde.mp4", "in": 0.5, "seconds": 5, "caption": "Cléo Antonio Rockenbach, Zélia Savoldi e Roque Vanderlei Lugoch chegam à porta do helicóptero." },
-    { "file": "04-diretoria.mp4", "in": 1.25, "seconds": 4.75, "crop": [1120, 630, 70, 6], "caption": "O presidente Fabiano Soltis e o vice-presidente Djeison Drey sobem em seguida." },
-    { "file": "10-diretoria-cabine.mp4", "hdSource": true, "seconds": 2.5, "caption": "Dentro da cabine, Fabiano e Djeison se olham." },
-    { "file": "05-voo.mp4", "in": 0.5, "seconds": 6, "caption": "O helicóptero parte em direção ao sol nascente. O som das pás se afasta." },
-    { "file": "08-ceu-azul.mp4", "seconds": 8, "skyTitle": true, "caption": "O símbolo da feira surge no céu azul. A luz revela FENASOJA em azul e 2028 em dourado." }
+    {
+      "file": "00-parque.mp4",
+      "seconds": 4.75,
+      "description": "O amanhecer revela o Parque de Exposições de Santa Rosa. A câmera desce até a Casa FenaSoja, ao lado do palco."
+    },
+    {
+      "file": "01-chegada.mp4",
+      "in": 3.75,
+      "seconds": 3.25,
+      "description": "A aeronave desce diante da Casa FenaSoja. Os patins tocam a grama e o rotor continua em movimento."
+    },
+    {
+      "file": "cabine-final.mp4",
+      "in": 0.75,
+      "seconds": 4.25,
+      "description": "Leonardo Strochein pilota a aeronave. Os pavilhões passam pela janela da cabine."
+    },
+    {
+      "file": "02-bosque-corda.mp4",
+      "seconds": 7,
+      "description": "Diante da Casa, o helicóptero paira e baixa o cabo. Atrás do palco e da sede, a luz atravessa o bosque."
+    },
+    {
+      "file": "03-comissao.mp4",
+      "in": 2.5,
+      "seconds": 1.5,
+      "crop": [
+        1040,
+        584,
+        112,
+        15
+      ],
+      "description": "Cléo, Zélia e Roque sobem pela corda."
+    },
+    {
+      "file": "09-embarque-parque.mp4",
+      "seconds": 3,
+      "description": "Em plano aberto, vê-se a subida pela corda junto à Casa, com as vias, os pavilhões e a arena ao redor."
+    },
+    {
+      "file": "06-comissao-detalhe-verde.mp4",
+      "in": 0.5,
+      "seconds": 5,
+      "description": "Cléo Antonio Rockenbach, Zélia Savoldi e Roque Vanderlei Lugoch chegam à porta do helicóptero."
+    },
+    {
+      "file": "04-diretoria.mp4",
+      "in": 1.25,
+      "seconds": 4.75,
+      "crop": [
+        1120,
+        630,
+        70,
+        6
+      ],
+      "description": "O presidente Fabiano Soltis e o vice-presidente Djeison Drey sobem em seguida."
+    },
+    {
+      "file": "10-diretoria-cabine.mp4",
+      "seconds": 2.5,
+      "description": "Dentro da cabine, Fabiano e Djeison se olham."
+    },
+    {
+      "file": "05-voo.mp4",
+      "in": 0.5,
+      "seconds": 6,
+      "description": "O helicóptero parte em direção ao sol nascente. O som das pás se afasta."
+    },
+    {
+      "file": "08-ceu-azul.mp4",
+      "seconds": 8,
+      "skyTitle": true,
+      "description": "O símbolo da feira surge no céu azul. A luz revela FENASOJA em azul e 2028 em dourado."
+    }
   ]
 }

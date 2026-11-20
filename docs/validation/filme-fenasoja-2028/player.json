@@ -9,29 +9,29 @@
     "finalWindowSeconds": 6
   },
   "files": {
-    "FENASOJA-2028-Full-HD.mp4": {
-      "sha256": "04abc613d0889e30592ff4df3dcd3fa3b8d71f88e9a1c5b08820f9f35d788477",
-      "bytes": 84386449,
-      "width": 1920,
-      "height": 1080,
-      "seconds": 50.0,
-      "fps": 24.0
+    "amanhecer.webp": {
+      "sha256": "946be7475a9b7f728622252e897162a7f7d54f3277640b8a6658a0381eebf153",
+      "bytes": 118482,
+      "servedSha256": "946be7475a9b7f728622252e897162a7f7d54f3277640b8a6658a0381eebf153"
     },
     "amanhecer.mp4": {
-      "sha256": "f1ed9a8d65529d479dc489f8f23bcb2a2f781b693bad3fd395575a9a9ed2ece0",
-      "bytes": 32688956,
+      "sha256": "a5f348f8d70ac232b57ea5abfd2b1be931a7ff795479aa5b907ec534e00d6108",
+      "bytes": 30707326,
+      "servedSha256": "a5f348f8d70ac232b57ea5abfd2b1be931a7ff795479aa5b907ec534e00d6108",
       "width": 1280,
       "height": 720,
       "seconds": 50.0,
-      "fps": 24.0
+      "fps": 24.0,
+      "subtitleStreams": 0
     },
-    "amanhecer.vtt": {
-      "sha256": "bbbf654820a5b2d6b656fe19565789138aa5083116fcaace30f00f4a8a63e4b0",
-      "bytes": 1344
-    },
-    "amanhecer.webp": {
-      "sha256": "b3dfbfe2068c711064ba641e82df7530e209ea44d35301c91ca395250d1c43f7",
-      "bytes": 184500
+    "FENASOJA-2028-4K.mp4": {
+      "sha256": "467247ba5f4b7a4559d8c3f1603f1068966fee58d1238b11ff6cbf60d7607fc2",
+      "bytes": 85426078,
+      "width": 3840,
+      "height": 2160,
+      "seconds": 50.0,
+      "fps": 24.0,
+      "subtitleStreams": 0
     }
   },
   "checks": {
@@ -49,10 +49,10 @@
           "range": "bytes=32768-"
         },
         {
-          "range": "bytes=19202048-"
+          "range": "bytes=11796480-"
         },
         {
-          "range": "bytes=29130752-"
+          "range": "bytes=27230208-"
         },
         {
           "range": "bytes=32768-"
@@ -71,20 +71,24 @@
           "status": 206
         },
         {
-          "file": "amanhecer.vtt",
+          "file": "amanhecer.mp4",
+          "status": 206
+        },
+        {
+          "file": "amanhecer.mp4",
+          "status": 206
+        },
+        {
+          "file": "amanhecer.mp4",
+          "status": 206
+        },
+        {
+          "file": "amanhecer.mp4",
+          "status": 206
+        },
+        {
+          "file": "amanhecer.webp",
           "status": 200
-        },
-        {
-          "file": "amanhecer.mp4",
-          "status": 206
-        },
-        {
-          "file": "amanhecer.mp4",
-          "status": 206
-        },
-        {
-          "file": "amanhecer.mp4",
-          "status": 206
         },
         {
           "file": "amanhecer.mp4",
@@ -97,61 +101,66 @@
         "duration": 50,
         "controls": true,
         "playsInline": true,
-        "currentTime": 2.560841
+        "currentTime": 0.359376
       },
       "downloaded": {
-        "filename": "FENASOJA-2028-Full-HD.mp4",
-        "bytes": 84386449,
-        "sha256": "04abc613d0889e30592ff4df3dcd3fa3b8d71f88e9a1c5b08820f9f35d788477",
+        "filename": "FENASOJA-2028-4K.mp4",
+        "bytes": 85426078,
+        "sha256": "467247ba5f4b7a4559d8c3f1603f1068966fee58d1238b11ff6cbf60d7607fc2",
         "preClickRequests": 0
       },
       "captions": {
-        "locale": "pt-BR",
-        "cues": 12,
-        "firstStart": 0.15,
-        "lastEnd": 49.8
+        "tracks": 0,
+        "elements": 0,
+        "networkRequests": 0
       },
       "closingClock": {
         "officialOpening": "2028-04-29T10:00:00-03:00",
         "timezone": "America/Sao_Paulo",
         "first": {
-          "at": "2026-11-20T07:48:13.157Z",
-          "remaining": 45465107,
-          "expected": 45465107,
+          "at": "2026-11-20T08:23:54.087Z",
+          "remaining": 45462966,
+          "expected": 45462966,
           "day": 526,
-          "hour": 5,
-          "minute": 11,
-          "second": 47,
+          "hour": 4,
+          "minute": 36,
+          "second": 6,
+          "cardWidthFraction": 0.5499883768753464,
+          "unitColor": "rgb(255, 248, 233)",
+          "labelColor": "rgb(248, 206, 119)",
           "reservedControlsArea": 0,
-          "clockTopFraction": 0.6899796541200407,
-          "clockBottomFraction": 0.7734295523906409,
+          "clockTopFraction": 0.6799974567650051,
+          "clockBottomFraction": 0.7898334181078331,
           "video": {
             "width": 873.796875,
             "height": 491.5
           },
           "clock": {
-            "width": 454.359375,
-            "height": 41.015625
+            "width": 480.578125,
+            "height": 53.984375
           }
         },
         "fullscreen": {
-          "at": "2026-11-20T07:48:20.502Z",
-          "remaining": 45465100,
-          "expected": 45465100,
+          "at": "2026-11-20T08:23:56.860Z",
+          "remaining": 45462964,
+          "expected": 45462964,
           "day": 526,
-          "hour": 5,
-          "minute": 11,
-          "second": 40,
+          "hour": 4,
+          "minute": 36,
+          "second": 4,
+          "cardWidthFraction": 0.549993705725501,
+          "unitColor": "rgb(255, 248, 233)",
+          "labelColor": "rgb(248, 206, 119)",
           "reservedControlsArea": 0,
-          "clockTopFraction": 0.6899961343614576,
-          "clockBottomFraction": 0.7734939268783951,
+          "clockTopFraction": 0.6799861650831113,
+          "clockBottomFraction": 0.7883868079998373,
           "video": {
             "width": 1365.328125,
             "height": 767.984375
           },
           "clock": {
-            "width": 709.96875,
-            "height": 64.125
+            "width": 750.921875,
+            "height": 83.25
           }
         },
         "landscape": null,
@@ -182,16 +191,13 @@
           "range": "bytes=0-"
         },
         {
-          "range": "bytes=32768-"
-        },
-        {
-          "range": "bytes=8749056-"
-        },
-        {
-          "range": "bytes=29130752-"
+          "range": "bytes=27230208-"
         },
         {
           "range": "bytes=32768-"
+        },
+        {
+          "range": "bytes=10682368-"
         },
         {
           "range": "bytes=0-"
@@ -200,14 +206,6 @@
       "responses": [
         {
           "file": "amanhecer.webp",
-          "status": 200
-        },
-        {
-          "file": "amanhecer.mp4",
-          "status": 206
-        },
-        {
-          "file": "amanhecer.vtt",
           "status": 200
         },
         {
@@ -241,81 +239,89 @@
         "duration": 50,
         "controls": true,
         "playsInline": true,
-        "currentTime": 2.707866
+        "currentTime": 0.004382
       },
       "downloaded": {
-        "filename": "FENASOJA-2028-Full-HD.mp4",
-        "bytes": 84386449,
-        "sha256": "04abc613d0889e30592ff4df3dcd3fa3b8d71f88e9a1c5b08820f9f35d788477",
+        "filename": "FENASOJA-2028-4K.mp4",
+        "bytes": 85426078,
+        "sha256": "467247ba5f4b7a4559d8c3f1603f1068966fee58d1238b11ff6cbf60d7607fc2",
         "preClickRequests": 0
       },
       "captions": {
-        "locale": "pt-BR",
-        "cues": 12,
-        "firstStart": 0.15,
-        "lastEnd": 49.8
+        "tracks": 0,
+        "elements": 0,
+        "networkRequests": 0
       },
       "closingClock": {
         "officialOpening": "2028-04-29T10:00:00-03:00",
         "timezone": "Asia/Tokyo",
         "first": {
-          "at": "2026-11-20T07:48:12.090Z",
-          "remaining": 45465108,
-          "expected": 45465108,
+          "at": "2026-11-20T08:23:50.293Z",
+          "remaining": 45462970,
+          "expected": 45462970,
           "day": 526,
-          "hour": 5,
-          "minute": 11,
-          "second": 48,
+          "hour": 4,
+          "minute": 36,
+          "second": 10,
+          "cardWidthFraction": 0.6799944913698127,
+          "unitColor": "rgb(255, 248, 233)",
+          "labelColor": "rgb(248, 206, 119)",
           "reservedControlsArea": 50,
-          "clockTopFraction": 0.6899534807802171,
-          "clockBottomFraction": 0.8051905655757774,
+          "clockTopFraction": 0.6799967354933486,
+          "clockBottomFraction": 0.8330204847792377,
           "video": {
             "width": 340.375,
             "height": 191.453125
           },
           "clock": {
             "width": 231.453125,
-            "height": 22.0625
+            "height": 29.296875
           }
         },
         "fullscreen": {
-          "at": "2026-11-20T07:48:17.718Z",
-          "remaining": 45465103,
-          "expected": 45465103,
+          "at": "2026-11-20T08:23:53.509Z",
+          "remaining": 45462967,
+          "expected": 45462967,
           "day": 526,
-          "hour": 5,
-          "minute": 11,
-          "second": 43,
+          "hour": 4,
+          "minute": 36,
+          "second": 7,
+          "cardWidthFraction": 0.6799679487179487,
+          "unitColor": "rgb(255, 248, 233)",
+          "labelColor": "rgb(248, 206, 119)",
           "reservedControlsArea": 50,
-          "clockTopFraction": 0.689957264957265,
-          "clockBottomFraction": 0.7963675213675213,
+          "clockTopFraction": 0.679985754985755,
+          "clockBottomFraction": 0.8217236467236467,
           "video": {
             "width": 390,
             "height": 219.375
           },
           "clock": {
             "width": 265.1875,
-            "height": 23.34375
+            "height": 31.09375
           }
         },
         "landscape": {
-          "at": "2026-11-20T07:48:20.136Z",
-          "remaining": 45465100,
-          "expected": 45465100,
+          "at": "2026-11-20T08:23:55.955Z",
+          "remaining": 45462965,
+          "expected": 45462965,
           "day": 526,
-          "hour": 5,
-          "minute": 11,
-          "second": 40,
-          "reservedControlsArea": 50,
-          "clockTopFraction": 0.6899035797406627,
-          "clockBottomFraction": 0.8463925523661753,
+          "hour": 4,
+          "minute": 36,
+          "second": 5,
+          "cardWidthFraction": 0.6799731501224039,
+          "unitColor": "rgb(255, 248, 233)",
+          "labelColor": "rgb(248, 206, 119)",
+          "reservedControlsArea": 44,
+          "clockTopFraction": 0.6799578799578799,
+          "clockBottomFraction": 0.8206388206388207,
           "video": {
-            "width": 250.65625,
-            "height": 140.984375
+            "width": 395.71875,
+            "height": 222.578125
           },
           "clock": {
-            "width": 170.4375,
-            "height": 22.0625
+            "width": 269.078125,
+            "height": 31.3125
           }
         },
         "tickedWhilePaused": true,

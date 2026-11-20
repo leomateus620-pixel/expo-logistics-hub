@@ -70,14 +70,44 @@
 }
 .headquarters-film__clock {
   position: absolute;
-  top: 69%;
+  top: 68%;
   left: 50%;
   transform: translateX(-50%);
-  width: 52%;
+  box-sizing: border-box;
+  width: 55%;
+  padding: clamp(2px, .46cqw, 8px) clamp(4px, 1cqw, 16px) clamp(3px, .56cqw, 10px);
+  border: 1px solid rgb(132 184 213 / .53);
+  border-top-color: #edbf65;
+  border-radius: clamp(4px, .57cqw, 10px);
+  background: linear-gradient(110deg, rgb(6 30 55 / .96), rgb(10 55 89 / .94) 57%, rgb(7 36 65 / .96));
+  box-shadow: 0 2px 8px rgb(2 17 35 / .3);
+  isolation: isolate;
   pointer-events: none;
-  color: white;
+  color: #fff8e9;
   text-align: center;
-  text-shadow: 0 1px 3px #16283b, 0 0 .6em #102136;
+}
+/* Three arcs pick up the field lines in the FenaSoja symbol. */
+.headquarters-film__clock::before {
+  --furrows: transparent 0 29%, rgb(249 205 117 / .25) 30% 31.5%, transparent 33% 52%,
+    rgb(249 205 117 / .21) 53% 54.5%, transparent 56% 74%, rgb(249 205 117 / .17) 75% 76.5%, transparent 78%;
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 110% 125% at 0% 110%, var(--furrows)) left bottom / 12% 100% no-repeat,
+    radial-gradient(ellipse 110% 125% at 100% -10%, var(--furrows)) right top / 12% 100% no-repeat;
+}
+.headquarters-film__clock::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 39%;
+  right: 39%;
+  height: clamp(1px, .12cqw, 2px);
+  border-radius: 100%;
+  background: linear-gradient(90deg, transparent, #f8d58b 30%, #fff3c1 50%, #f8d58b 70%, transparent);
 }
 .headquarters-film__clock .fenasoja-countdown-grid { gap: 0; }
 .headquarters-film__clock .fenasoja-countdown-unit {
@@ -89,26 +119,53 @@
   background: none;
   box-shadow: none;
 }
+.headquarters-film__clock .fenasoja-countdown-unit + .fenasoja-countdown-unit {
+  border-inline-start: 1px solid rgb(236 185 87 / .46);
+}
 .headquarters-film__clock .fenasoja-countdown-unit::before,
 .headquarters-film__clock .fenasoja-countdown-unit::after { display: none; }
 .headquarters-film__clock .fenasoja-countdown-value {
-  color: white;
-  font: 650 clamp(12px, 3.4cqw, 64px)/1 system-ui, sans-serif;
+  color: #fff8e9;
+  font: 680 clamp(12px, 3.55cqw, 68px)/1 system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
   letter-spacing: -.045em;
   text-indent: 0;
-  text-shadow: inherit;
+  text-shadow: 0 1px 2px #091c30;
 }
 .headquarters-film__clock .fenasoja-countdown-unit-label {
-  margin-top: .18em;
-  color: white;
-  font-size: clamp(8px, 1cqw, 18px);
-  font-weight: 650;
-  letter-spacing: .065em;
+  margin-top: .2em;
+  color: #f8ce77;
+  font-size: clamp(8px, 1.05cqw, 18px);
+  font-weight: 700;
+  letter-spacing: .075em;
   line-height: 1.05;
 }
 .headquarters-film__clock > p { font-size: clamp(10px, 2cqw, 27px); font-weight: 650; }
 
 @container (max-width: 500px) {
   .headquarters-film__clock { width: 68%; }
+}
+
+@container (max-width: 300px) {
+  .headquarters-film__clock { width: 80%; }
+}
+@media (orientation: landscape) and (max-height: 480px) {
+  .headquarters-film:not([data-viewport-expanded]) {
+    max-height: 94dvh;
+    padding: .65rem .8rem;
+    gap: .4rem;
+  }
+  .headquarters-film__header { padding-bottom: 0; }
+  .headquarters-film__description {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .headquarters-film:not([data-viewport-expanded]) .headquarters-film__stage:not(:fullscreen) {
+    --controls-room: 44px;
+    height: min(calc(56.25cqw + var(--controls-room)), calc(94dvh - 6.25rem));
+    max-height: none;
+  }
 }
