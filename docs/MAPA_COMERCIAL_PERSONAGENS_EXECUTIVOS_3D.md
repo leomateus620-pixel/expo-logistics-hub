@@ -2,9 +2,9 @@
 
 ## Objetivo e limite desta entrega
 
-Esta experiência apresenta Fabiano Soltis e Djeison Drey como dois personagens 3D independentes, sentados lado a lado no sofá do interior da **B12 — Sede Fenasoja / Comissão Central**, contexto de apresentação da Casa da Soja. Cada personagem preserva identidade visual, proporção, roupa, acessórios, postura e movimento próprios.
+Fabiano Soltis e Djeison Drey aparecem como dois personagens 3D independentes no interior da **B12 — Sede Fenasoja / Comissão Central**. Estão sentados lado a lado no sofá. Cada personagem conserva identidade visual, proporção, roupa, acessórios e gestos próprios.
 
-Os personagens aparecem **exclusivamente dentro desse interior**. O card/menu executivo, o circuito externo, o acompanhamento de câmera, a reação por proximidade e todo o estado global associado a caminhada ou aceno foram removidos. Eles não são renderizados nas vias, no mapa geral, nos segmentos isolados ou nos demais interiores.
+Zélia Savoldi e Cléo Rockenbach conversam no pátio. Roque Lugoch e Débora Bamberg percorrem dois trajetos distintos no passeio. Um visitante genérico circula na recepção.
 
 A implementação pertence à camada de apresentação 3D. Ela **não cria nem renomeia `MapEntity`**, não altera lotes, geometrias oficiais, segmentos, permissões, persistência ou inventários do parque. A revisão cartográfica vigente continua sendo a fonte de verdade para o mapa.
 
@@ -133,15 +133,15 @@ Uma versão não pode ser aprovada como “premium final” se apresentar qualqu
 - quadris flutuando ou afundados, coxas fora da almofada, pés sem contato com o piso ou joelhos anatomicamente impossíveis;
 - corpos sobrepostos, microgestos mecanicamente idênticos ou chimarrão atravessando o sofá;
 - escala incompatível com o sofá, a sala ou a câmera;
-- personagens visíveis fora do interior da B12.
+- presença dos dirigentes fora da cena do sofá da B12.
 
-## Escopo exclusivo da Casa da Soja
+## Presença na Casa da Soja
 
 O cadastro oficial do mapa preserva o identificador **B12 — Sede Fenasoja / Comissão Central**. “Casa da Soja” continua sendo um alias exclusivamente de apresentação; nenhuma entidade, tabela, migração, consulta ou inventário é renomeado.
 
-A camada dos personagens é montada somente quando o interior resolve para `fenasoja-headquarters`. Ela fica dentro do grupo local já posicionado e rotacionado pela B12, herdando corretamente orientação, elevação, luz e oclusão da sala. Os outros interiores — pavilhões comerciais, pavilhão de gado e Mirante — mantêm suas cenas próprias e não carregam esses ativos.
+A camada sentada é montada quando o interior resolve para `fenasoja-headquarters`. Ela usa o referencial local da B12 e herda a orientação, elevação, luz e oclusão da sala. Os outros interiores mantêm suas cenas próprias.
 
-O mapa externo não possui marcador, trajeto, card, botão de acompanhamento ou reação por zoom/proximidade. Entrar na B12 pelo fluxo normal do Mapa Comercial é a única forma de ver a dupla; sair do interior desmonta a camada e devolve a navegação ao mapa.
+Na fachada, os quatro GLBs em `public/models/commission` são carregados pela camada do pátio ao se aproximar da B12. A conversa alterna o movimento dos braços e da cabeça. A caminhada sincroniza a passada com o deslocamento no passeio. A navegação permanece sob os controles normais do mapa.
 
 ## Layout do sofá e contato físico
 
@@ -179,7 +179,7 @@ Qualquer ajuste futuro no sofá, nas raízes ou na altura aparente deve revisar 
 
 O runtime da B12 consome exclusivamente o clip contínuo `SeatedIdle`. O clip começa em uma pose sentada válida, mantém a raiz sem deslocamento pelo ambiente e aplica apenas respiração, pequenos movimentos de cabeça e variações discretas de postura. As fases individuais impedem que os dois corpos se movam como cópias sincronizadas.
 
-Não existe máquina de estados de proximidade, caminhada, parada ou aceno. A câmera do visitante não altera o comportamento dos personagens.
+A camada interna mantém a pose sentada durante a navegação. Cada cena tem seus próprios personagens e animações.
 
 Quando `prefers-reduced-motion: reduce` está ativo, cada ação é pausada em um quadro já sentado e estável. O resultado não pode retornar à pose em pé, saltar de posição ou perder o contato com sofá e piso. Ao mudar a preferência durante a sessão, a ação pausa ou retoma sem recriar a sala ou descartar os bindings do rig.
 
@@ -187,7 +187,7 @@ O canvas mantém `frameloop="demand"`. Enquanto a B12 está visível e movimento
 
 ## Carregamento, fallback e sombras
 
-Os dois GLBs são carregados de forma lazy sob `Suspense`, apenas dentro da B12. Cada ativo possui seu próprio `SeatedExecutiveErrorBoundary`: a falha de Fabiano não remove Djeison, a falha de Djeison não remove Fabiano, e nenhuma das duas falhas desmonta o interior, a câmera ou o fluxo de saída.
+Na visita interna, os dois GLBs são carregados sob `Suspense`. Cada ativo possui seu próprio `SeatedExecutiveErrorBoundary`, que isola falhas e preserva a sala. No pátio, cada GLB possui um visitante genérico como alternativa individual se o ativo falhar.
 
 Cada instância clona o esqueleto do GLB e reaproveita os recursos carregados sem descartar prematuramente geometrias ou materiais compartilhados pelo cache. Ao desmontar, a ação é interrompida e o mixer libera apenas os bindings da instância.
 
@@ -208,25 +208,13 @@ O conjunto de chimarrão é tratado como objeto físico: cuia escura com boca e 
 
 ## Pipeline de geração e refinamento
 
-O pipeline preserva uma separação clara entre referência, autoria e runtime:
+Os retratos institucionais orientam o volume do rosto, a posição dos olhos, o nariz, o queixo, o cabelo e os acessórios. A revisão da B12 usa escultura no 3D Jutsu do Higgsfield, com pele opaca colorida por vértice, olhos modelados com mapas de íris e barba geométrica. Os retratos permanecem como referências de autoria.
 
-1. fotografias oficiais são interpretadas no perfil correto;
-2. referências sentadas auxiliares orientam apenas pose, roupa e silhueta;
-3. `tools/blender/build_executive_characters.py` gera deterministicamente malhas, materiais, rig, chimarrão e `SeatedIdle`;
-4. o gerador exporta um GLB por pessoa e atualiza o manifesto com hashes e métricas;
-5. a validação do asset confere skin, clips, origem, ausência de deslocamento da raiz, nomes do chimarrão e orçamento do arquivo;
-6. o runtime clona os rigs, aplica escala métrica, posiciona as raízes no layout da B12 e defasa os clips;
-7. a validação em sistema revisa contato, câmera, materiais, fallback, desempenho e movimento reduzido;
-8. o Visual Character Refinement Agent compara novamente os renders às fotografias e registra correções remanescentes.
+A base de Fabiano e Djeison foi criada por `tools/blender/build_executive_characters.py`. A revisão 12 do projeto de avatares do Higgsfield substitui as cabeças e encaixa a gola, aproveitando o rig e os clips originais. Os hashes e os limites de cada GLB estão no manifesto. O cenário de validação mantém a altura dos assentos e a posição original dos acessórios.
 
-Uma geração tecnicamente válida não encerra o refinamento. Os previews sentados devem ser comparados às referências e depois confirmados dentro da sala, porque câmera, luz, sofá e oclusão alteram a leitura final. As evidências versionadas desta rodada são:
+Os personagens externos têm malhas MakeHuman CC0 individualizadas no Higgsfield. Eles usam os esqueletos dos próprios GLBs e a animação procedural do mapa. Os retratos dos ícones da Comissão Central orientam roupa, cabelo, óculos e expressões. [Licença dos ativos MakeHuman](https://www.makehumancommunity.org/about/license.html)
 
-- `docs/character-reference/fabiano-soltis-seated-preview.png`;
-- `docs/character-reference/fabiano-soltis-face-closeup.png`;
-- `docs/character-reference/djeison-drey-seated-preview.png`;
-- `docs/character-reference/djeison-drey-face-closeup.png`.
-
-Os previews sentados comprovam pose, contato, roupa e prop na câmera de autoria. Os close-ups são deliberadamente mantidos como evidência de limite: tornam visível que a camada facial procedural ainda não equivale a scan, fotogrametria ou escultura cinematográfica aprovada.
+As imagens antigas de `docs/character-reference` registram as referências e a versão anterior. O novo comparativo e as capturas dentro do mapa estão no [relatório da Casa FenaSoja](validation/casa-fenasoja-b12/README.md).
 
 ## Estratégia de desempenho
 
@@ -236,7 +224,7 @@ O Mapa Comercial já possui uma carga 3D relevante; por isso, a camada respeita 
 - um `ErrorBoundary` por personagem, com degradação independente;
 - `frameloop="demand"` preservado e atualização somente enquanto a animação sentada está visível;
 - pausa quando a aba está invisível;
-- nenhuma atualização de rota, navegação, proximidade ou câmera de acompanhamento;
+- a distância de apresentação controla a camada externa. A câmera e a navegação permanecem sob os controles do mapa;
 - frequência reduzida em modo gráfico econômico e animação pausada em movimento reduzido;
 - contato local barato, sem reativar atualização contínua do shadow map global;
 - GLBs separados, hashes reproduzíveis e orçamento verificado antes da integração.
@@ -249,8 +237,8 @@ A meta não é maximizar polígonos, e sim maximizar semelhança perceptiva por 
 
 - perfis diferentes, referências corretamente atribuídas, alturas e roupas distintas;
 - presença dos dois GLBs, skins, hashes, orçamento e clip `SeatedIdle` no manifesto e nos arquivos;
-- escopo limitado ao kind `fenasoja-headquarters` e ausência da experiência nos demais interiores;
-- ausência de card/menu, circuito, foco executivo e estado de acompanhamento no mapa e no store;
+- cena sentada limitada ao kind `fenasoja-headquarters`;
+- quatro pessoas no pátio, com gestos alternados na conversa e dois percursos independentes. A falha de um GLB afeta apenas seu personagem;
 - raízes dentro da largura útil do sofá, separação mínima, topo do assento e direção visual válidos;
 - câmera desktop e compacta centralizadas no par e posicionadas à frente dos personagens;
 - fallback independente: falha de um GLB preserva o outro personagem e a sala;
@@ -267,8 +255,8 @@ npm.cmd run build
 
 ### Inspeção visual obrigatória
 
-1. abrir o mapa completo e confirmar que não existe card/menu executivo nem personagens no exterior;
-2. entrar na B12 pelo fluxo normal e confirmar que a dupla aparece somente após a cena interna carregar;
+1. abrir o mapa completo, aproximar da B12 e conferir Zélia e Cléo conversando e Roque e Débora caminhando no pátio;
+2. entrar na B12 pelo fluxo normal e confirmar a dupla sentada após a cena interna carregar;
 3. validar enquadramento completo de Fabiano, Djeison, sofá e chimarrão em desktop e viewport até 640 px;
 4. orbitar dentro dos limites e inspecionar rostos, cabelo, barba, óculos e alfaiataria em frente e três-quartos;
 5. confirmar quadris apoiados, coxas sobre as almofadas, sapatos no piso, mãos naturais e ausência de interseções com o sofá;
@@ -297,12 +285,12 @@ Para atingir o último nível de reconhecibilidade, o pipeline deve manter os me
 5. retarget da pose sentada e correções de cloth/IK no contato com sofá e chimarrão;
 6. nova rodada do Visual Character Refinement Agent e QA em cena.
 
-Essa separação torna a implementação honesta e evolutiva: a experiência interna pode receber ativos finais sem reintroduzir circuito externo, menu, acompanhamento ou contratos cadastrais paralelos.
+O GLB de cada dirigente sustenta sua pose sentada e preserva o encaixe no sofá.
 
 ## Resumo operacional
 
 - **Modelagem:** dois perfis separados; a foto 3 corrige e fortalece Fabiano, enquanto as fotos 4–5 definem Djeison. Roupa, cabelo, barba, óculos, corpo e chimarrão têm especificações individuais.
-- **Presença:** os personagens existem exclusivamente no sofá da B12, sem card/menu, rota, marcador ou comportamento externo.
+- **Presença:** Fabiano e Djeison aparecem no sofá da B12. O pátio tem seus próprios quatro personagens.
 - **Animação:** `SeatedIdle` mantém pose fisicamente integrada, microgestos fora de fase e fallback estável para movimento reduzido.
 - **Câmera:** presets locais distintos para desktop e telas compactas centralizam a dupla sem alterar os demais interiores.
 - **Confiabilidade:** carregamento lazy, fallback por personagem, cleanup do mixer, frame sob demanda e contato local preservam a sala e o mapa.

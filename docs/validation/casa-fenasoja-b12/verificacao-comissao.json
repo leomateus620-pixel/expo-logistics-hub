@@ -1,0 +1,667 @@
+{
+  "browser": "157.0.8103.79",
+  "buildingSha256": "bd2e2ac8381c2d556764b0cd3df0cb506bf20a1380dbfab508a841545b784339",
+  "assets": [
+    {
+      "identity": "zelia-savoldi",
+      "file": "zelia-savoldi.glb",
+      "sha256": "401c71c6b9879fdacb556b75ea1f47e4299bcf9e7e9a434a16b9f9f4c4e8e5c0",
+      "bytes": 3412432,
+      "skinCount": 1,
+      "jointCount": 52,
+      "bounds": [
+        [
+          -1.8425310727358086,
+          -1.3868671044914294e-08,
+          -0.0973806157708168
+        ],
+        [
+          -0.8574681159258111,
+          1.6093112971714025,
+          0.3178762197494507
+        ]
+      ],
+      "draws": 9,
+      "triangles": 38632,
+      "embeddedImageCount": 8,
+      "materialNames": [
+        "zelia-savoldi-teeth",
+        "zelia-savoldi-shoes-fabric",
+        "zelia-savoldi-lashes",
+        "zelia-savoldi-institutional-scarf",
+        "zelia-savoldi · cabelo",
+        "zelia-savoldi · tecido da camisa 0",
+        "zelia-savoldi · íris e esclera",
+        "zelia-savoldi-brows",
+        "zelia-savoldi · pele anatômica"
+      ],
+      "sourceNames": [
+        "mixamorig:Head",
+        "zelia-savoldi-hair",
+        "zelia-savoldi-eyes"
+      ],
+      "errors": []
+    },
+    {
+      "identity": "cleo-rockenbach",
+      "file": "cleo-rockenbach.glb",
+      "sha256": "5d62ee1a8b4ed712840b75874939884df141525b9f48966a6c48044104fd2f9d",
+      "bytes": 3383396,
+      "skinCount": 1,
+      "jointCount": 52,
+      "bounds": [
+        [
+          -0.9941148751697911,
+          -5.039693902605599e-08,
+          -0.13558568060398102
+        ],
+        [
+          0.09411484065433606,
+          1.7502916293560515,
+          0.3527843952178955
+        ]
+      ],
+      "draws": 10,
+      "triangles": 38946,
+      "embeddedImageCount": 7,
+      "materialNames": [
+        "cleo-rockenbach-teeth",
+        "cleo-rockenbach-shoes-fabric",
+        "cleo-rockenbach-moustache",
+        "cleo-rockenbach-lashes",
+        "cleo-rockenbach · cabelo",
+        "cleo-rockenbach · tecido da camisa 0",
+        "cleo-rockenbach · íris e esclera",
+        "cleo-rockenbach-eyeglass-frames",
+        "cleo-rockenbach-brows",
+        "cleo-rockenbach · pele anatômica"
+      ],
+      "sourceNames": [
+        "mixamorig:Head",
+        "cleo-rockenbach-hair",
+        "cleo-rockenbach-eyes",
+        "cleo-rockenbach-eyeglass-frames"
+      ],
+      "errors": []
+    },
+    {
+      "identity": "roque-lugoch",
+      "file": "roque-lugoch.glb",
+      "sha256": "01a87672f345c1184ba08683822e246a50c12f8bf8beace394986ec5c2c818fa",
+      "bytes": 3946300,
+      "skinCount": 1,
+      "jointCount": 52,
+      "bounds": [
+        [
+          -0.10603391688892838,
+          1.2316152218916354e-07,
+          -0.13144882023334503
+        ],
+        [
+          1.006034199775958,
+          1.7746936278358822,
+          0.36315926909446716
+        ]
+      ],
+      "draws": 9,
+      "triangles": 50234,
+      "embeddedImageCount": 7,
+      "materialNames": [
+        "roque-lugoch-teeth",
+        "roque-lugoch-shoes-fabric",
+        "roque-lugoch-lashes",
+        "roque-lugoch · cabelo",
+        "roque-lugoch · tecido da camisa 0",
+        "roque-lugoch · íris e esclera",
+        "roque-lugoch-eyeglass-frames",
+        "roque-lugoch-brows",
+        "roque-lugoch · pele anatômica"
+      ],
+      "sourceNames": [
+        "mixamorig:Head",
+        "roque-lugoch-hair",
+        "roque-lugoch-eyes",
+        "roque-lugoch-eyeglass-frames"
+      ],
+      "errors": []
+    },
+    {
+      "identity": "debora-bamberg",
+      "file": "debora-bamberg.glb",
+      "sha256": "7a03ee02592c77fda15eb0f327070f3a9cbc412c451e4be68132fe0d6dbdd514",
+      "bytes": 3256080,
+      "skinCount": 1,
+      "jointCount": 52,
+      "bounds": [
+        [
+          0.9044329009627967,
+          5.053692689804476e-08,
+          -0.09868372976779938
+        ],
+        [
+          1.7955692492103248,
+          1.4736344446554892,
+          0.27419477701187134
+        ]
+      ],
+      "draws": 9,
+      "triangles": 38470,
+      "embeddedImageCount": 8,
+      "materialNames": [
+        "debora-bamberg-teeth",
+        "debora-bamberg-shoes-fabric",
+        "debora-bamberg-lashes",
+        "debora-bamberg-institutional-scarf",
+        "debora-bamberg · cabelo",
+        "debora-bamberg · tecido da camisa 0",
+        "debora-bamberg · íris e esclera",
+        "debora-bamberg-brows",
+        "debora-bamberg · pele anatômica"
+      ],
+      "sourceNames": [
+        "mixamorig:Head",
+        "debora-bamberg-hair",
+        "debora-bamberg-eyes"
+      ],
+      "errors": []
+    }
+  ],
+  "matrix": [
+    {
+      "profile": {
+        "id": "celular-retrato",
+        "width": 390,
+        "height": 844,
+        "tier": "LOW",
+        "touch": true
+      },
+      "passed": 20,
+      "scenarios": {
+        "dia": 5,
+        "noite": 5,
+        "chuva": 5,
+        "reduzida": 5
+      },
+      "verifiedNetworkFiles": 35,
+      "verifiedMaterialSlots": 5,
+      "pageErrors": [],
+      "shaderErrors": []
+    },
+    {
+      "profile": {
+        "id": "celular-paisagem",
+        "width": 844,
+        "height": 390,
+        "tier": "LOW",
+        "touch": true
+      },
+      "passed": 20,
+      "scenarios": {
+        "dia": 5,
+        "noite": 5,
+        "chuva": 5,
+        "reduzida": 5
+      },
+      "verifiedNetworkFiles": 35,
+      "verifiedMaterialSlots": 5,
+      "pageErrors": [],
+      "shaderErrors": []
+    },
+    {
+      "profile": {
+        "id": "tablet",
+        "width": 768,
+        "height": 1024,
+        "tier": "MEDIUM",
+        "touch": true
+      },
+      "passed": 20,
+      "scenarios": {
+        "dia": 5,
+        "noite": 5,
+        "chuva": 5,
+        "reduzida": 5
+      },
+      "verifiedNetworkFiles": 35,
+      "verifiedMaterialSlots": 5,
+      "pageErrors": [],
+      "shaderErrors": []
+    },
+    {
+      "profile": {
+        "id": "escritorio",
+        "width": 1366,
+        "height": 768,
+        "tier": "HIGH",
+        "touch": false
+      },
+      "passed": 20,
+      "scenarios": {
+        "dia": 5,
+        "noite": 5,
+        "chuva": 5,
+        "reduzida": 5
+      },
+      "verifiedNetworkFiles": 35,
+      "verifiedMaterialSlots": 5,
+      "pageErrors": [],
+      "shaderErrors": []
+    },
+    {
+      "profile": {
+        "id": "tela-grande",
+        "width": 1920,
+        "height": 1080,
+        "tier": "HIGH",
+        "touch": false
+      },
+      "passed": 20,
+      "scenarios": {
+        "dia": 5,
+        "noite": 5,
+        "chuva": 5,
+        "reduzida": 5
+      },
+      "verifiedNetworkFiles": 35,
+      "verifiedMaterialSlots": 5,
+      "pageErrors": [],
+      "shaderErrors": []
+    }
+  ],
+  "normalRoute": {
+    "desktop": {
+      "checks": {
+        "overviewVisitorsHidden": true,
+        "noInitialVisitorAsset": true,
+        "visitorsReceiveExteriorLighting": true,
+        "namedRolesBoundToValidatedAssets": true,
+        "allFourNamedFilesRequested": true,
+        "seatedFilesWaitForInterior": true,
+        "genericAssetsLoadOnlyOnFallback": true,
+        "visitorCountMatchesView": true,
+        "walkersMove": true,
+        "conversationGestures": true,
+        "reducedMotionMediaApplied": true,
+        "reducedMotionFreezesVisibleActors": true,
+        "restoringMotionResumes": true,
+        "searchAndFocus": true,
+        "expectedAssetOnSelect": true,
+        "expectedLighting": true,
+        "noInitialGltfRequest": true,
+        "receptionWalkerMoves": true,
+        "frontageLayerHiddenInside": true,
+        "seatedFeatureStillRenders": true,
+        "receptionWalkerRemainsGeneric": true,
+        "interior": true,
+        "interiorExit": true,
+        "visitLayersSwitchBack": true,
+        "neighbour": true,
+        "picking": true,
+        "expectedAssetOnDirectPick": true,
+        "singleHealthyCanvas": true,
+        "noBackendWrites": true,
+        "noPageErrors": true,
+        "noShaderErrors": true
+      },
+      "roles": {
+        "forecourt-walker": {
+          "identity": "roque-lugoch",
+          "source": "/models/commission/roque-lugoch.glb"
+        },
+        "forecourt-conversation-left": {
+          "identity": "zelia-savoldi",
+          "source": "/models/commission/zelia-savoldi.glb"
+        },
+        "forecourt-conversation-right": {
+          "identity": "cleo-rockenbach",
+          "source": "/models/commission/cleo-rockenbach.glb"
+        },
+        "forecourt-walker-side": {
+          "identity": "debora-bamberg",
+          "source": "/models/commission/debora-bamberg.glb"
+        }
+      },
+      "exteriorMotion": {
+        "forecourt-conversation-left": {
+          "translation": 0,
+          "articulated": 0.470344518739529
+        },
+        "forecourt-conversation-right": {
+          "translation": 0,
+          "articulated": 1.9851026447667217
+        },
+        "forecourt-walker": {
+          "translation": 2.6185188921016427,
+          "articulated": 0.29918958320400824
+        },
+        "forecourt-walker-side": {
+          "translation": 1.0027237102513402,
+          "articulated": 1.9811981278928954
+        }
+      },
+      "seated": {
+        "fabiano-soltis": true,
+        "djeison-drey": true
+      },
+      "errors": [],
+      "shaderErrors": []
+    },
+    "mobile": {
+      "checks": {
+        "overviewVisitorsHidden": true,
+        "noInitialVisitorAsset": true,
+        "visitorsReceiveExteriorLighting": true,
+        "namedRolesBoundToValidatedAssets": true,
+        "allFourNamedFilesRequested": true,
+        "seatedFilesWaitForInterior": true,
+        "genericAssetsLoadOnlyOnFallback": true,
+        "visitorCountMatchesView": true,
+        "walkersMove": true,
+        "conversationGestures": true,
+        "reducedMotionMediaApplied": true,
+        "reducedMotionFreezesVisibleActors": true,
+        "restoringMotionResumes": true,
+        "searchAndFocus": true,
+        "expectedAssetOnSelect": true,
+        "expectedLighting": true,
+        "noInitialGltfRequest": true,
+        "receptionWalkerMoves": true,
+        "frontageLayerHiddenInside": true,
+        "seatedFeatureStillRenders": true,
+        "receptionWalkerRemainsGeneric": true,
+        "interior": true,
+        "interiorExit": true,
+        "visitLayersSwitchBack": true,
+        "neighbour": true,
+        "picking": true,
+        "expectedAssetOnDirectPick": true,
+        "singleHealthyCanvas": true,
+        "noBackendWrites": true,
+        "noPageErrors": true,
+        "noShaderErrors": true
+      },
+      "roles": {
+        "forecourt-walker": {
+          "identity": "roque-lugoch",
+          "source": "/models/commission/roque-lugoch.glb"
+        },
+        "forecourt-conversation-left": {
+          "identity": "zelia-savoldi",
+          "source": "/models/commission/zelia-savoldi.glb"
+        },
+        "forecourt-conversation-right": {
+          "identity": "cleo-rockenbach",
+          "source": "/models/commission/cleo-rockenbach.glb"
+        },
+        "forecourt-walker-side": {
+          "identity": "debora-bamberg",
+          "source": "/models/commission/debora-bamberg.glb"
+        }
+      },
+      "exteriorMotion": {
+        "forecourt-conversation-left": {
+          "translation": 0,
+          "articulated": 0.45958912127003215
+        },
+        "forecourt-conversation-right": {
+          "translation": 0,
+          "articulated": 1.9554509391855883
+        },
+        "forecourt-walker": {
+          "translation": 2.128511999999286,
+          "articulated": 0.2846857085169193
+        },
+        "forecourt-walker-side": {
+          "translation": 1.2332005470914331,
+          "articulated": 1.9813051174718481
+        }
+      },
+      "seated": {
+        "fabiano-soltis": true,
+        "djeison-drey": true
+      },
+      "errors": [],
+      "shaderErrors": []
+    }
+  },
+  "individualMalformedAsset": {
+    "cleo-rockenbach": {
+      "checks": {
+        "overviewVisitorsHidden": true,
+        "noInitialVisitorAsset": true,
+        "visitorsReceiveExteriorLighting": true,
+        "namedRolesBoundToValidatedAssets": true,
+        "allFourNamedFilesRequested": true,
+        "seatedFilesWaitForInterior": true,
+        "genericAssetsLoadOnlyOnFallback": true,
+        "visitorCountMatchesView": true,
+        "walkersMove": true,
+        "conversationGestures": true,
+        "reducedMotionMediaApplied": true,
+        "reducedMotionFreezesVisibleActors": true,
+        "restoringMotionResumes": true,
+        "searchAndFocus": true,
+        "expectedAssetOnSelect": true,
+        "expectedLighting": true,
+        "noInitialGltfRequest": true,
+        "receptionWalkerMoves": true,
+        "frontageLayerHiddenInside": true,
+        "seatedFeatureStillRenders": true,
+        "receptionWalkerRemainsGeneric": true,
+        "interior": true,
+        "interiorExit": true,
+        "visitLayersSwitchBack": true,
+        "neighbour": true,
+        "picking": true,
+        "expectedAssetOnDirectPick": true,
+        "singleHealthyCanvas": true,
+        "noBackendWrites": true,
+        "noPageErrors": true,
+        "noShaderErrors": true
+      },
+      "roles": {
+        "forecourt-walker": {
+          "identity": "roque-lugoch",
+          "source": "/models/commission/roque-lugoch.glb"
+        },
+        "forecourt-conversation-left": {
+          "identity": "zelia-savoldi",
+          "source": "/models/commission/zelia-savoldi.glb"
+        },
+        "forecourt-conversation-right": {
+          "identity": null,
+          "source": "/soy-summit/people/usher-right.glb"
+        },
+        "forecourt-walker-side": {
+          "identity": "debora-bamberg",
+          "source": "/models/commission/debora-bamberg.glb"
+        }
+      },
+      "errors": [],
+      "shaderErrors": []
+    },
+    "debora-bamberg": {
+      "checks": {
+        "overviewVisitorsHidden": true,
+        "noInitialVisitorAsset": true,
+        "visitorsReceiveExteriorLighting": true,
+        "namedRolesBoundToValidatedAssets": true,
+        "allFourNamedFilesRequested": true,
+        "seatedFilesWaitForInterior": true,
+        "genericAssetsLoadOnlyOnFallback": true,
+        "visitorCountMatchesView": true,
+        "walkersMove": true,
+        "conversationGestures": true,
+        "reducedMotionMediaApplied": true,
+        "reducedMotionFreezesVisibleActors": true,
+        "restoringMotionResumes": true,
+        "searchAndFocus": true,
+        "expectedAssetOnSelect": true,
+        "expectedLighting": true,
+        "noInitialGltfRequest": true,
+        "receptionWalkerMoves": true,
+        "frontageLayerHiddenInside": true,
+        "seatedFeatureStillRenders": true,
+        "receptionWalkerRemainsGeneric": true,
+        "interior": true,
+        "interiorExit": true,
+        "visitLayersSwitchBack": true,
+        "neighbour": true,
+        "picking": true,
+        "expectedAssetOnDirectPick": true,
+        "singleHealthyCanvas": true,
+        "noBackendWrites": true,
+        "noPageErrors": true,
+        "noShaderErrors": true
+      },
+      "roles": {
+        "forecourt-walker": {
+          "identity": "roque-lugoch",
+          "source": "/models/commission/roque-lugoch.glb"
+        },
+        "forecourt-conversation-left": {
+          "identity": "zelia-savoldi",
+          "source": "/models/commission/zelia-savoldi.glb"
+        },
+        "forecourt-conversation-right": {
+          "identity": "cleo-rockenbach",
+          "source": "/models/commission/cleo-rockenbach.glb"
+        },
+        "forecourt-walker-side": {
+          "identity": null,
+          "source": "/soy-summit/people/usher-right.glb"
+        }
+      },
+      "errors": [],
+      "shaderErrors": []
+    },
+    "roque-lugoch": {
+      "checks": {
+        "overviewVisitorsHidden": true,
+        "noInitialVisitorAsset": true,
+        "visitorsReceiveExteriorLighting": true,
+        "namedRolesBoundToValidatedAssets": true,
+        "allFourNamedFilesRequested": true,
+        "seatedFilesWaitForInterior": true,
+        "genericAssetsLoadOnlyOnFallback": true,
+        "visitorCountMatchesView": true,
+        "walkersMove": true,
+        "conversationGestures": true,
+        "reducedMotionMediaApplied": true,
+        "reducedMotionFreezesVisibleActors": true,
+        "restoringMotionResumes": true,
+        "searchAndFocus": true,
+        "expectedAssetOnSelect": true,
+        "expectedLighting": true,
+        "noInitialGltfRequest": true,
+        "receptionWalkerMoves": true,
+        "frontageLayerHiddenInside": true,
+        "seatedFeatureStillRenders": true,
+        "receptionWalkerRemainsGeneric": true,
+        "interior": true,
+        "interiorExit": true,
+        "visitLayersSwitchBack": true,
+        "neighbour": true,
+        "picking": true,
+        "expectedAssetOnDirectPick": true,
+        "singleHealthyCanvas": true,
+        "noBackendWrites": true,
+        "noPageErrors": true,
+        "noShaderErrors": true
+      },
+      "roles": {
+        "forecourt-walker": {
+          "identity": null,
+          "source": "/soy-summit/people/usher-left.glb"
+        },
+        "forecourt-conversation-left": {
+          "identity": "zelia-savoldi",
+          "source": "/models/commission/zelia-savoldi.glb"
+        },
+        "forecourt-conversation-right": {
+          "identity": "cleo-rockenbach",
+          "source": "/models/commission/cleo-rockenbach.glb"
+        },
+        "forecourt-walker-side": {
+          "identity": "debora-bamberg",
+          "source": "/models/commission/debora-bamberg.glb"
+        }
+      },
+      "errors": [],
+      "shaderErrors": []
+    },
+    "zelia-savoldi": {
+      "checks": {
+        "overviewVisitorsHidden": true,
+        "noInitialVisitorAsset": true,
+        "visitorsReceiveExteriorLighting": true,
+        "namedRolesBoundToValidatedAssets": true,
+        "allFourNamedFilesRequested": true,
+        "seatedFilesWaitForInterior": true,
+        "genericAssetsLoadOnlyOnFallback": true,
+        "visitorCountMatchesView": true,
+        "walkersMove": true,
+        "conversationGestures": true,
+        "reducedMotionMediaApplied": true,
+        "reducedMotionFreezesVisibleActors": true,
+        "restoringMotionResumes": true,
+        "searchAndFocus": true,
+        "expectedAssetOnSelect": true,
+        "expectedLighting": true,
+        "noInitialGltfRequest": true,
+        "receptionWalkerMoves": true,
+        "frontageLayerHiddenInside": true,
+        "seatedFeatureStillRenders": true,
+        "receptionWalkerRemainsGeneric": true,
+        "interior": true,
+        "interiorExit": true,
+        "visitLayersSwitchBack": true,
+        "neighbour": true,
+        "picking": true,
+        "expectedAssetOnDirectPick": true,
+        "singleHealthyCanvas": true,
+        "noBackendWrites": true,
+        "noPageErrors": true,
+        "noShaderErrors": true
+      },
+      "roles": {
+        "forecourt-walker": {
+          "identity": "roque-lugoch",
+          "source": "/models/commission/roque-lugoch.glb"
+        },
+        "forecourt-conversation-left": {
+          "identity": null,
+          "source": "/soy-summit/people/usher-left.glb"
+        },
+        "forecourt-conversation-right": {
+          "identity": "cleo-rockenbach",
+          "source": "/models/commission/cleo-rockenbach.glb"
+        },
+        "forecourt-walker-side": {
+          "identity": "debora-bamberg",
+          "source": "/models/commission/debora-bamberg.glb"
+        }
+      },
+      "errors": [],
+      "shaderErrors": []
+    }
+  },
+  "captures": [
+    {
+      "file": "comissao-rota-desktop-visitantes-fachada.png",
+      "sizePixels": [
+        2208,
+        1436
+      ],
+      "sha256": "fabeece9d6731f59ba6cf7438c7c4c0b6f8fa3ab54d0e12dc4395ceee90cbccc"
+    },
+    {
+      "file": "comissao-rota-desktop-visitantes-interior.png",
+      "sizePixels": [
+        2208,
+        1436
+      ],
+      "sha256": "581f0e8aa9e928ecd545473e63deb5f789eea475a7e2ab13826ed08e45b15755"
+    }
+  ]
+}

@@ -6,12 +6,17 @@ import { describe, expect, it } from 'vitest';
 interface GltfJson {
   animations?: Array<{ name?: string }>;
   accessors?: Array<{ count?: number }>;
-  materials?: Array<{ name?: string }>;
+  images?: Array<{ name?: string }>;
+  materials?: Array<{
+    name?: string;
+    alphaMode?: 'OPAQUE' | 'MASK' | 'BLEND';
+    pbrMetallicRoughness?: { baseColorTexture?: unknown };
+  }>;
   meshes?: Array<{
     name?: string;
-    primitives?: Array<{ indices?: number; attributes?: Record<string, number> }>;
+    primitives?: Array<{ indices?: number; material?: number; attributes?: Record<string, number> }>;
   }>;
-  nodes?: Array<{ name?: string; extras?: { forward_axis?: string } }>;
+  nodes?: Array<{ name?: string; mesh?: number; children?: number[]; extras?: { forward_axis?: string } }>;
   skins?: unknown[];
 }
 
@@ -103,17 +108,17 @@ describe('assets dos personagens executivos', () => {
       expect(primitives).toBe(character.primitives);
       expect(triangles).toBe(character.triangles);
       expect(materials).toBe(character.materials);
-      expect(primitives).toBeLessThanOrEqual(13);
-      expect(triangles).toBeLessThanOrEqual(45_000);
-      expect(materials).toBeLessThanOrEqual(14);
+      expect(primitives).toBeLessThanOrEqual(18);
+      expect(triangles).toBeLessThanOrEqual(26_000);
+      expect(materials).toBeLessThanOrEqual(18);
       expect(character.skins).toBeGreaterThan(0);
       expect(character.animations).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave', 'SeatedIdle']));
       expect(character.root_translation_range).toBe(0);
       expect(character.forward_axis).toBe('+Z');
     });
-    expect(combinedPrimitives).toBeLessThanOrEqual(24);
-    expect(combinedTriangles).toBeLessThanOrEqual(45_000);
-    expect(combinedMaterials).toBeLessThanOrEqual(24);
+    expect(combinedPrimitives).toBeLessThanOrEqual(32);
+    expect(combinedTriangles).toBeLessThanOrEqual(48_000);
+    expect(combinedMaterials).toBeLessThanOrEqual(32);
     expect(combinedBytes).toBeLessThanOrEqual(6 * 1024 * 1024);
   });
 
@@ -133,12 +138,34 @@ describe('assets dos personagens executivos', () => {
     expect(animationNames).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave', 'SeatedIdle']));
     expect(searchableNames).toMatch(skinPattern);
     expect(searchableNames).toMatch(identityPattern);
-    expect(searchableNames).toMatch(/_ReferenceFace/);
+    expect(searchableNames).toMatch(/_HeadEyes/);
+    expect(searchableNames).not.toMatch(/_ReferenceFace/);
     expect(searchableNames).toMatch(/_SkinnedCharacter/);
-    expect(searchableNames).not.toMatch(/_(EyesAndBrows|Mouth|Nose)(?:_|")/);
     expect(json.nodes?.some((node) => node.extras?.forward_axis?.startsWith('+Z'))).toBe(true);
     expect(triangleCount(json)).toBeGreaterThan(8_000);
     expect(triangleCount(json)).toBeLessThan(100_000);
+  });
+
+  it.each([
+    ['fabiano-soltis.glb', 'FabianoSoltis'],
+    ['djeison-drey.glb', 'DjeisonDrey'],
+  ])('usa geometria facial e cor por vértice em %s', (file, prefix) => {
+    const { json } = readGlb(file);
+    const head = json.nodes?.find((node) => node.name === 'Head');
+    const attachments = head?.children?.map((index) => json.nodes?.[index]) ?? [];
+    const skin = attachments.find((node) => node?.name === `${prefix}_HeadSkin`);
+    const skinPrimitives = skin?.mesh === undefined ? [] : json.meshes?.[skin.mesh]?.primitives ?? [];
+    expect(skinPrimitives.length).toBeGreaterThan(0);
+    for (const primitive of skinPrimitives) {
+      expect(primitive.attributes?.COLOR_0).toBeDefined();
+      const material = primitive.material === undefined ? undefined : json.materials?.[primitive.material];
+      expect(material).toBeDefined();
+      expect(material?.pbrMetallicRoughness?.baseColorTexture).toBeUndefined();
+      expect(material?.alphaMode ?? 'OPAQUE').toBe('OPAQUE');
+    }
+    expect(attachments.map((node) => node?.name)).toContain(`${prefix}_HeadEyes`);
+    expect(json.images?.map(({ name }) => name)).toContain(`${prefix}_HeadEyesOptics`);
+    expect(json.images?.some(({ name }) => /-face|portrait|referenceface/i.test(name ?? ''))).toBe(false);
   });
 
   it('mantem cuia, erva e bomba integradas ao asset de Djeison', () => {

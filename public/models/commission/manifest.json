@@ -1,0 +1,584 @@
+{
+  "schema_version": 1,
+  "authoring": {
+    "provider": "Higgsfield 3D Jutsu",
+    "revision": 3,
+    "combined_file": "higgsfield-comissao-r3.glb",
+    "combined_bytes": 11520540,
+    "combined_sha256": "88f8d579fcc68223fde152cbcc99af70fdf74bca1317912a52c2d7b6aba4c8f5"
+  },
+  "units": "meters",
+  "forward_axis": "+Z",
+  "up_axis": "+Y",
+  "origin": "true skin-deformed sole midpoint at x=0 and minimum y=0",
+  "characters": [
+    {
+      "id": "zelia-savoldi",
+      "display_name": "Zélia Savoldi",
+      "role": "B12:visitor:forecourt-conversation-left",
+      "file": "zelia-savoldi.glb",
+      "bytes": 3412432,
+      "sha256": "401c71c6b9879fdacb556b75ea1f47e4299bcf9e7e9a434a16b9f9f4c4e8e5c0",
+      "triangles": 38632,
+      "meshes": 9,
+      "joints": 52,
+      "rest_bounds_m": {
+        "min": [
+          -0.492530653455326,
+          -5.5502952578978807e-17,
+          -0.09738065160036681
+        ],
+        "max": [
+          0.4925320640385352,
+          1.609311418473072,
+          0.3178764146645726
+        ]
+      },
+      "sole_bounds_m": {
+        "min": [
+          -0.22952561784034278,
+          -5.5502952578978807e-17,
+          -0.031193438663401647
+        ],
+        "max": [
+          0.22952561784034273,
+          0.21512479688277525,
+          0.20197612028585124
+        ]
+      },
+      "materials": [
+        "zelia-savoldi-teeth",
+        "zelia-savoldi-shoes-fabric",
+        "zelia-savoldi-lashes",
+        "zelia-savoldi-institutional-scarf",
+        "zelia-savoldi · cabelo",
+        "zelia-savoldi · tecido da camisa 0",
+        "zelia-savoldi · íris e esclera",
+        "zelia-savoldi-brows",
+        "zelia-savoldi · pele anatômica"
+      ],
+      "alpha_materials": [
+        {
+          "name": "zelia-savoldi-teeth",
+          "mode": "BLEND"
+        },
+        {
+          "name": "zelia-savoldi-shoes-fabric",
+          "mode": "BLEND"
+        },
+        {
+          "name": "zelia-savoldi-lashes",
+          "mode": "BLEND"
+        },
+        {
+          "name": "zelia-savoldi · cabelo",
+          "mode": "BLEND"
+        },
+        {
+          "name": "zelia-savoldi · tecido da camisa 0",
+          "mode": "BLEND"
+        },
+        {
+          "name": "zelia-savoldi-brows",
+          "mode": "BLEND"
+        }
+      ],
+      "textures": [
+        "teeth",
+        "shoes01_diffuse",
+        "eyelashes01",
+        "zelia-savoldi-institutional-scarf-weave",
+        "zelia-savoldi-hair-fibreszelia-savoldi-hair",
+        "female_elegantsuit01_diffuse",
+        "zelia-savoldi-optics",
+        "eyebrow008"
+      ],
+      "accessories": [
+        {
+          "name": "zelia-savoldi-institutional-scarf",
+          "triangles": 74
+        }
+      ],
+      "skin_color": "Vertex color COLOR_0 on anatomical geometry",
+      "validation_errors": 0,
+      "validation_warnings": 9,
+      "split_bytes": 4573880,
+      "split_sha256": "cb792ce8cce37a2f0717be77d17718535fabbd493fdc3aee022dfd2c38c7be7b",
+      "texture_pixels": [
+        {
+          "name": "teeth",
+          "before": 837272,
+          "after": 407684,
+          "pixelSha256": "7975df58207474158bcc40511991c67a6930fbe9fb1cf6e0ea251caa7df40f83"
+        },
+        {
+          "name": "shoes01_diffuse",
+          "before": 1335772,
+          "after": 1005424,
+          "pixelSha256": "a07171468e28485f03e5d7af8bc44a2c68ac8ca15a08edc1aa3d8b421d38369a"
+        },
+        {
+          "name": "eyelashes01",
+          "before": 91600,
+          "after": 26318,
+          "pixelSha256": "9e0f49c43ff09dac71404fccf40fea3d4062504878c71bd74f1303b10c2eb914"
+        },
+        {
+          "name": "zelia-savoldi-institutional-scarf-weave",
+          "before": 15316,
+          "after": 4440,
+          "pixelSha256": "bd997ea27bc57deab54a658eee61bec081b8ab2ba9fe99b5ef6b8084c87e0d2d"
+        },
+        {
+          "name": "zelia-savoldi-hair-fibreszelia-savoldi-hair",
+          "before": 518486,
+          "after": 258818,
+          "pixelSha256": "78b717d2f679fd0c5ca98ebda69f20c3953d63fce2375145846d0707547e53c4"
+        },
+        {
+          "name": "female_elegantsuit01_diffuse",
+          "before": 20719,
+          "after": 88,
+          "pixelSha256": "cd3517473707d59c3d915b52a3e16213cadce80d9ffb2b4371958fb7acb51a08"
+        },
+        {
+          "name": "zelia-savoldi-optics",
+          "before": 24679,
+          "after": 10824,
+          "pixelSha256": "6f25d9dbbac49ff418ead65cf03e74867e338710b87efcab5e7cdde1d0c3f03b"
+        },
+        {
+          "name": "eyebrow008",
+          "before": 100364,
+          "after": 68722,
+          "pixelSha256": "c6c8c10617d967709711af6deb6acb92022c3dc4165c0f77707984f36da637d7"
+        }
+      ]
+    },
+    {
+      "id": "cleo-rockenbach",
+      "display_name": "Cléo Rockenbach",
+      "role": "B12:visitor:forecourt-conversation-right",
+      "file": "cleo-rockenbach.glb",
+      "bytes": 3383396,
+      "sha256": "5d62ee1a8b4ed712840b75874939884df141525b9f48966a6c48044104fd2f9d",
+      "triangles": 38946,
+      "meshes": 10,
+      "joints": 52,
+      "rest_bounds_m": {
+        "min": [
+          -0.5441153065576321,
+          -4.069532396878735e-17,
+          -0.13558567794551069
+        ],
+        "max": [
+          0.5441146832147528,
+          1.7502917662422097,
+          0.35278440443826087
+        ]
+      },
+      "sole_bounds_m": {
+        "min": [
+          -0.2446724686861078,
+          -4.069532396878735e-17,
+          -0.06251598685770753
+        ],
+        "max": [
+          0.24467246868610792,
+          0.21849210413112768,
+          0.21150720010575402
+        ]
+      },
+      "materials": [
+        "cleo-rockenbach-teeth",
+        "cleo-rockenbach-shoes-fabric",
+        "cleo-rockenbach-moustache",
+        "cleo-rockenbach-lashes",
+        "cleo-rockenbach · cabelo",
+        "cleo-rockenbach · tecido da camisa 0",
+        "cleo-rockenbach · íris e esclera",
+        "cleo-rockenbach-eyeglass-frames",
+        "cleo-rockenbach-brows",
+        "cleo-rockenbach · pele anatômica"
+      ],
+      "alpha_materials": [
+        {
+          "name": "cleo-rockenbach-teeth",
+          "mode": "BLEND"
+        },
+        {
+          "name": "cleo-rockenbach-shoes-fabric",
+          "mode": "BLEND"
+        },
+        {
+          "name": "cleo-rockenbach-lashes",
+          "mode": "BLEND"
+        },
+        {
+          "name": "cleo-rockenbach · cabelo",
+          "mode": "BLEND"
+        },
+        {
+          "name": "cleo-rockenbach · tecido da camisa 0",
+          "mode": "BLEND"
+        },
+        {
+          "name": "cleo-rockenbach-brows",
+          "mode": "BLEND"
+        }
+      ],
+      "textures": [
+        "teeth",
+        "shoes01_diffuse",
+        "eyelashes01",
+        "cleo-rockenbach-hair-fibrescleo-rockenbach-hair",
+        "male_casualsuit03_diffuse",
+        "cleo-rockenbach-optics",
+        "eyebrow003"
+      ],
+      "accessories": [
+        {
+          "name": "cleo-rockenbach-eyeglass-frames",
+          "triangles": 1344
+        },
+        {
+          "name": "cleo-rockenbach-moustache",
+          "triangles": 602
+        }
+      ],
+      "skin_color": "Vertex color COLOR_0 on anatomical geometry",
+      "validation_errors": 0,
+      "validation_warnings": 10,
+      "split_bytes": 4497404,
+      "split_sha256": "3d1fc60b7f25c1f334e6e4c9b94b76341bb29db37f5c424056143b32c60ab491",
+      "texture_pixels": [
+        {
+          "name": "teeth",
+          "before": 837272,
+          "after": 407684,
+          "pixelSha256": "7975df58207474158bcc40511991c67a6930fbe9fb1cf6e0ea251caa7df40f83"
+        },
+        {
+          "name": "shoes01_diffuse",
+          "before": 1335772,
+          "after": 1005424,
+          "pixelSha256": "a07171468e28485f03e5d7af8bc44a2c68ac8ca15a08edc1aa3d8b421d38369a"
+        },
+        {
+          "name": "eyelashes01",
+          "before": 91600,
+          "after": 26318,
+          "pixelSha256": "9e0f49c43ff09dac71404fccf40fea3d4062504878c71bd74f1303b10c2eb914"
+        },
+        {
+          "name": "cleo-rockenbach-hair-fibrescleo-rockenbach-hair",
+          "before": 449279,
+          "after": 221524,
+          "pixelSha256": "676ba8126bc1e76d1d066a9dcc2eb3f4c221ebfd1598a530061893e3748e4a93"
+        },
+        {
+          "name": "male_casualsuit03_diffuse",
+          "before": 20719,
+          "after": 88,
+          "pixelSha256": "cd3517473707d59c3d915b52a3e16213cadce80d9ffb2b4371958fb7acb51a08"
+        },
+        {
+          "name": "cleo-rockenbach-optics",
+          "before": 24886,
+          "after": 10936,
+          "pixelSha256": "161567edb38e0b702308ecc71f0e0eea9d8844d499b185392bdc49bc4415e8cc"
+        },
+        {
+          "name": "eyebrow003",
+          "before": 92174,
+          "after": 65306,
+          "pixelSha256": "cc75acdf105789ad98a532129388a7c1fc2b99ba3a69ba94c23c33e5c07c3e10"
+        }
+      ]
+    },
+    {
+      "id": "roque-lugoch",
+      "display_name": "Roque Lugoch",
+      "role": "B12:visitor:forecourt-walker",
+      "file": "roque-lugoch.glb",
+      "bytes": 3946300,
+      "sha256": "01a87672f345c1184ba08683822e246a50c12f8bf8beace394986ec5c2c818fa",
+      "triangles": 50234,
+      "meshes": 9,
+      "joints": 52,
+      "rest_bounds_m": {
+        "min": [
+          -0.5560338160407479,
+          -9.738405541031803e-17,
+          -0.13144884605924143
+        ],
+        "max": [
+          0.556034346448196,
+          1.774693743370115,
+          0.36315928850731494
+        ]
+      },
+      "sole_bounds_m": {
+        "min": [
+          -0.2489609548955495,
+          -9.738405541031803e-17,
+          -0.06201761542489636
+        ],
+        "max": [
+          0.24896095489554948,
+          0.22083046499303324,
+          0.21549595885584508
+        ]
+      },
+      "materials": [
+        "roque-lugoch-teeth",
+        "roque-lugoch-shoes-fabric",
+        "roque-lugoch-lashes",
+        "roque-lugoch · cabelo",
+        "roque-lugoch · tecido da camisa 0",
+        "roque-lugoch · íris e esclera",
+        "roque-lugoch-eyeglass-frames",
+        "roque-lugoch-brows",
+        "roque-lugoch · pele anatômica"
+      ],
+      "alpha_materials": [
+        {
+          "name": "roque-lugoch-teeth",
+          "mode": "BLEND"
+        },
+        {
+          "name": "roque-lugoch-shoes-fabric",
+          "mode": "BLEND"
+        },
+        {
+          "name": "roque-lugoch-lashes",
+          "mode": "BLEND"
+        },
+        {
+          "name": "roque-lugoch · cabelo",
+          "mode": "BLEND"
+        },
+        {
+          "name": "roque-lugoch · tecido da camisa 0",
+          "mode": "BLEND"
+        },
+        {
+          "name": "roque-lugoch-brows",
+          "mode": "BLEND"
+        }
+      ],
+      "textures": [
+        "teeth",
+        "shoes01_diffuse",
+        "eyelashes01",
+        "roque-lugoch-hair-fibresroque-lugoch-hair",
+        "male_casualsuit01_diffuse",
+        "roque-lugoch-optics",
+        "eyebrow001"
+      ],
+      "accessories": [
+        {
+          "name": "roque-lugoch-eyeglass-frames",
+          "triangles": 1344
+        }
+      ],
+      "skin_color": "Vertex color COLOR_0 on anatomical geometry",
+      "validation_errors": 0,
+      "validation_warnings": 9,
+      "split_bytes": 5150868,
+      "split_sha256": "6eaa2a1b9182330e5189cdf9d6eb7bc854be0cd50d1a2101645598eb31c9daf0",
+      "texture_pixels": [
+        {
+          "name": "teeth",
+          "before": 837272,
+          "after": 407684,
+          "pixelSha256": "7975df58207474158bcc40511991c67a6930fbe9fb1cf6e0ea251caa7df40f83"
+        },
+        {
+          "name": "shoes01_diffuse",
+          "before": 1335772,
+          "after": 1005424,
+          "pixelSha256": "a07171468e28485f03e5d7af8bc44a2c68ac8ca15a08edc1aa3d8b421d38369a"
+        },
+        {
+          "name": "eyelashes01",
+          "before": 91600,
+          "after": 26318,
+          "pixelSha256": "9e0f49c43ff09dac71404fccf40fea3d4062504878c71bd74f1303b10c2eb914"
+        },
+        {
+          "name": "roque-lugoch-hair-fibresroque-lugoch-hair",
+          "before": 677316,
+          "after": 360104,
+          "pixelSha256": "441488f6ed394f772ce5f85364bb7171d4c7230a68729092e1d040f103d365f3"
+        },
+        {
+          "name": "male_casualsuit01_diffuse",
+          "before": 20719,
+          "after": 88,
+          "pixelSha256": "cd3517473707d59c3d915b52a3e16213cadce80d9ffb2b4371958fb7acb51a08"
+        },
+        {
+          "name": "roque-lugoch-optics",
+          "before": 24327,
+          "after": 10504,
+          "pixelSha256": "d5f5fc1963c3a9b08a967166f9507fe1bcefb7d9f3a47944d9916f60611adbeb"
+        },
+        {
+          "name": "eyebrow001",
+          "before": 89619,
+          "after": 61532,
+          "pixelSha256": "08358a65166d7adf58fbcca43a7da11c3260feb8f7a92ef69fa23c7774e86186"
+        }
+      ]
+    },
+    {
+      "id": "debora-bamberg",
+      "display_name": "Débora Bamberg",
+      "role": "B12:visitor:forecourt-walker-side",
+      "file": "debora-bamberg.glb",
+      "bytes": 3256080,
+      "sha256": "7a03ee02592c77fda15eb0f327070f3a9cbc412c451e4be68132fe0d6dbdd514",
+      "triangles": 38470,
+      "meshes": 9,
+      "joints": 52,
+      "rest_bounds_m": {
+        "min": [
+          -0.4455669056033823,
+          -3.2473612340848e-17,
+          -0.09868372891573414
+        ],
+        "max": [
+          0.4455690908786989,
+          1.4736345109216276,
+          0.27419482295823144
+        ]
+      },
+      "sole_bounds_m": {
+        "min": [
+          -0.21002387275389836,
+          -3.2473612340848e-17,
+          -0.03277905922111732
+        ],
+        "max": [
+          0.21002387275389844,
+          0.1995944846106177,
+          0.18032342227046355
+        ]
+      },
+      "materials": [
+        "debora-bamberg-teeth",
+        "debora-bamberg-shoes-fabric",
+        "debora-bamberg-lashes",
+        "debora-bamberg-institutional-scarf",
+        "debora-bamberg · cabelo",
+        "debora-bamberg · tecido da camisa 0",
+        "debora-bamberg · íris e esclera",
+        "debora-bamberg-brows",
+        "debora-bamberg · pele anatômica"
+      ],
+      "alpha_materials": [
+        {
+          "name": "debora-bamberg-teeth",
+          "mode": "BLEND"
+        },
+        {
+          "name": "debora-bamberg-shoes-fabric",
+          "mode": "BLEND"
+        },
+        {
+          "name": "debora-bamberg-lashes",
+          "mode": "BLEND"
+        },
+        {
+          "name": "debora-bamberg · cabelo",
+          "mode": "BLEND"
+        },
+        {
+          "name": "debora-bamberg · tecido da camisa 0",
+          "mode": "BLEND"
+        },
+        {
+          "name": "debora-bamberg-brows",
+          "mode": "BLEND"
+        }
+      ],
+      "textures": [
+        "teeth",
+        "shoes01_diffuse",
+        "eyelashes01",
+        "debora-bamberg-institutional-scarf-weave",
+        "debora-bamberg-hair-fibresdebora-bamberg-hair",
+        "female_casualsuit01_diffuse",
+        "debora-bamberg-optics",
+        "eyebrow007"
+      ],
+      "accessories": [
+        {
+          "name": "debora-bamberg-institutional-scarf",
+          "triangles": 74
+        }
+      ],
+      "skin_color": "Vertex color COLOR_0 on anatomical geometry",
+      "validation_errors": 0,
+      "validation_warnings": 9,
+      "split_bytes": 4332256,
+      "split_sha256": "0644c19b485b118d446550a9cb52a000c4c091af8d3becc155c635fc5a4447f1",
+      "texture_pixels": [
+        {
+          "name": "teeth",
+          "before": 837272,
+          "after": 407684,
+          "pixelSha256": "7975df58207474158bcc40511991c67a6930fbe9fb1cf6e0ea251caa7df40f83"
+        },
+        {
+          "name": "shoes01_diffuse",
+          "before": 1335772,
+          "after": 1005424,
+          "pixelSha256": "a07171468e28485f03e5d7af8bc44a2c68ac8ca15a08edc1aa3d8b421d38369a"
+        },
+        {
+          "name": "eyelashes01",
+          "before": 91600,
+          "after": 26318,
+          "pixelSha256": "9e0f49c43ff09dac71404fccf40fea3d4062504878c71bd74f1303b10c2eb914"
+        },
+        {
+          "name": "debora-bamberg-institutional-scarf-weave",
+          "before": 15316,
+          "after": 4440,
+          "pixelSha256": "bd997ea27bc57deab54a658eee61bec081b8ab2ba9fe99b5ef6b8084c87e0d2d"
+        },
+        {
+          "name": "debora-bamberg-hair-fibresdebora-bamberg-hair",
+          "before": 371713,
+          "after": 174144,
+          "pixelSha256": "2869c35eb686b1b371b1298c4212a7b81bdbd88bef3ae28faa0feb594f28f16f"
+        },
+        {
+          "name": "female_casualsuit01_diffuse",
+          "before": 20719,
+          "after": 88,
+          "pixelSha256": "cd3517473707d59c3d915b52a3e16213cadce80d9ffb2b4371958fb7acb51a08"
+        },
+        {
+          "name": "debora-bamberg-optics",
+          "before": 24988,
+          "after": 10952,
+          "pixelSha256": "1342bc186c6102929cb09f7ea42fe70a0a2007ebd98c0d2a9809686243d9abcc"
+        },
+        {
+          "name": "eyebrow007",
+          "before": 18685,
+          "after": 10402,
+          "pixelSha256": "cd0b54f19b9cc43373aa39ae1be68a0fd11d673c015f06544653b0f7a19aae47"
+        }
+      ]
+    }
+  ],
+  "packaging": {
+    "texture_format": "WebP lossless",
+    "geometry": "Original r3 shape, UV, normal, color and skin buffer bytes",
+    "combined_packed_bytes": 13998208
+  }
+}

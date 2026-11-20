@@ -696,7 +696,7 @@ function focusProfileForEntity(entity: MapEntity) {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.08, minDistanceRatio: 0.052, maxDistanceRatio: 0.32, minimumDirectionY: 0.32 };
   }
   if (landmark === 'fenasoja-headquarters') {
-    return { ...profile, contextRatio: 0.012, fitPadding: 1.16, minDistanceRatio: 0.009, maxDistanceRatio: 0.3, minimumDirectionY: 0.30 };
+    return { ...profile, contextRatio: 0.012, fitPadding: 1.1, minDistanceRatio: 0.009, maxDistanceRatio: 0.3, minimumDirectionY: 0.09 };
   }
   if (landmark === 'lactalis-cultural-stage') {
     return { ...profile, contextRatio: 0.03, fitPadding: 1.22, minDistanceRatio: 0.02, maxDistanceRatio: 0.34, minimumDirectionY: LACTALIS_STAGE_LAYOUT.camera.focusMinimumDirectionY };
@@ -763,6 +763,7 @@ function fitDistanceForDirection(
   direction: THREE.Vector3,
   padding = 1.1,
   minimumDistance?: number,
+  aimHeightAboveGround = 0,
 ) {
   const verticalFov = THREE.MathUtils.degToRad(fov);
   const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(aspect, 0.35));
@@ -777,7 +778,7 @@ function fitDistanceForDirection(
   for (const x of [-extent.width / 2, extent.width / 2]) {
     for (const y of [0, extent.maxHeight]) {
       for (const z of [-extent.depth / 2, extent.depth / 2]) {
-        const point = new THREE.Vector3(x, y, z);
+        const point = new THREE.Vector3(x, y - aimHeightAboveGround, z);
         const depthOffset = point.dot(cameraDirection);
         const horizontalDistance = depthOffset + Math.abs(point.dot(right)) / Math.tan(horizontalFov / 2);
         const verticalDistance = depthOffset + Math.abs(point.dot(up)) / Math.tan(verticalFov / 2);
@@ -3182,35 +3183,47 @@ function CameraRig({
     const entityExtent = getEntityExtent(entity, pavilion5ExteriorLift);
     const focusProfile = focusProfileForEntity(entity);
     const landmarkKind = resolveStrategicLandmarkKind(entity);
+    const compactHeadquarters = landmarkKind === 'fenasoja-headquarters';
     const hasDetailsPanel = activePanel === 'details';
     const sidePanelLayout = hasDetailsPanel && size.width > 900;
     const panelWidth = sidePanelLayout ? Math.min(380, size.width * 0.54) : 0;
     const usableWidth = Math.max(size.width - panelWidth, size.width * 0.48);
-    const usableHeight = size.height;
-    const aspect = usableWidth / Math.max(usableHeight, 1);
+    const contextualInsets = { ...readContextualViewportInsets(gl.domElement), left: 0, right: 0 };
+    // Fit B12 against the visible height and width independently. Expanding the
+    // whole pose for the phone sheet makes an already width-limited house smaller.
+    const heightRatio = compactHeadquarters
+      ? Math.max(0.22, 1 - (contextualInsets.top + contextualInsets.bottom) / Math.max(size.height, 1))
+      : 1;
+    const aspect = usableWidth / Math.max(size.height * heightRatio, 1);
+    const fov = perspective.fov || 38;
+    const visibleFov = THREE.MathUtils.radToDeg(2 * Math.atan(
+      Math.tan(THREE.MathUtils.degToRad(fov) / 2) * heightRatio,
+    ));
     const compactSidePanelMirante = landmarkKind === 'mirante-pavilion'
       && panelWidth > 0
       && usableWidth < 420;
     const truck = landmarkKind === 'chopp-truck' ? resolveChoppTruckTransform(entity) : null;
+    const aimHeight = entityExtent.maxHeight * (truck ? 0.48 : compactHeadquarters ? 0.45 : 0.28);
     const entityCenter = new THREE.Vector3(
       truck?.center[0] ?? entityExtent.centerX,
-      (truck?.ground ?? entity.geometry.elevation) + entityExtent.maxHeight * (truck ? 0.48 : 0.28),
+      (truck?.ground ?? entity.geometry.elevation) + aimHeight,
       truck?.center[1] ?? entityExtent.centerZ,
     );
     const currentTarget = controlsRef.current?.target ?? targetLookAt.current;
     const direction = camera.position.clone().sub(currentTarget);
     if (direction.lengthSq() < 0.01) direction.set(0.7, 0.75, 0.8);
     direction.normalize();
+    const compactStage = landmarkKind === 'lactalis-cultural-stage';
     const landmarkFocusDirection = strategicLandmarkFocusDirection(entity);
     if (landmarkFocusDirection) {
-      // Preserve a small amount of spatial continuity while making the public
-      // facade deterministic after rapid switches or a lateral manual view.
       const deterministicDirection = new THREE.Vector3(...landmarkFocusDirection).normalize();
-      if (truck || landmarkKind === 'mirante-pavilion' || landmarkKind === 'lactalis-cultural-stage') direction.copy(deterministicDirection);
-      else direction.lerp(deterministicDirection, 0.92).normalize();
+      if (truck || landmarkKind === 'mirante-pavilion' || compactStage || compactHeadquarters) {
+        direction.copy(deterministicDirection);
+      } else {
+        // Preserve some spatial continuity when selecting from a manual view.
+        direction.lerp(deterministicDirection, 0.92).normalize();
+      }
     }
-    const compactStage = landmarkKind === 'lactalis-cultural-stage';
-    const compactHeadquarters = landmarkKind === 'fenasoja-headquarters';
     const minimumFocusDistance = compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance
       : compactHeadquarters ? 1.5
       : truck ? CHOPP_TRUCK_SITE.minimumCameraDistance
@@ -3222,11 +3235,12 @@ function CameraRig({
     direction.normalize();
     const fittedDistance = fitDistanceForDirection(
       entityExtent,
-      perspective.fov || 38,
+      visibleFov,
       aspect,
       direction,
       focusProfile.fitPadding,
       minimumFocusDistance,
+      compactHeadquarters ? aimHeight : undefined,
     );
     const minimumSelectionDistance = truck ? CHOPP_TRUCK_SITE.minimumCameraDistance
       : compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : compactHeadquarters ? 1.5 : Math.max(10, extent.diagonal * focusProfile.minDistanceRatio);
@@ -3250,13 +3264,13 @@ function CameraRig({
     }
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
-    const contextualInsets = readContextualViewportInsets(gl.domElement);
-    // The desktop fit already reserves the details column. Mobile sheets
-    // overlay the persistent drawing buffer and need a vertical correction.
-    const contextualLens = fitCameraAboveContextualPanel(
-      targetPosition.current, targetLookAt.current, size.width, size.height,
-      { ...contextualInsets, left: 0, right: 0 }, controlsMaximumDistance,
-    );
+    // B12 already includes vertical panel space in the frustum fit above.
+    const contextualLens = compactHeadquarters
+      ? { zoom: 1, viewOffset: contextualCameraViewOffset(size.width, size.height, contextualInsets) }
+      : fitCameraAboveContextualPanel(
+        targetPosition.current, targetLookAt.current, size.width, size.height,
+        contextualInsets, controlsMaximumDistance,
+      );
     startCameraMove(
       controlsMinimumDistance,
       controlsMaximumDistance,
