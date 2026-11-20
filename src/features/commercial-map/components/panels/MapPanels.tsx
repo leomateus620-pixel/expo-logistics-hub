@@ -63,6 +63,7 @@ import { SaleExhibitorIdentity } from '../../sales/components/SaleExhibitorEditD
 import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 import { foodPointsByStructure } from '../../data/commercialMapSegments';
 import { GastronomyStructurePanel } from './GastronomyStructurePanel';
+import { HeadquartersFilm } from '../HeadquartersFilm';
 
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const areaNumber = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -416,6 +417,7 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
         </>}
         <div className="commercial-map-commercial-view" hidden={historyOpen}>
         <PanelHeader eyebrow={lot && !lotIdentity?.number ? CLASSIFICATION_LABELS[entity.classification] : `${entity.publicIdentifier} · ${CLASSIFICATION_LABELS[entity.classification]}`} title={lotIdentity?.full ?? metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
+        {landmarkKind === 'fenasoja-headquarters' && <HeadquartersFilm key={entity.id} />}
         {historyId && <Button ref={historyTriggerRef} variant="outline" className="commercial-map-history-trigger" onClick={() => setHistoryEntityId(entity.id)}><BookOpen aria-hidden="true" />Conhecer a história</Button>}
         <div className="commercial-map-selection-summary" aria-label="Resumo da seleção">
           {status ? (

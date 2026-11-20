@@ -1,0 +1,70 @@
+{
+  "perfil": "Higgsfield Unlimited",
+  "correspondenciaGeografica": {
+    "quadroLiteral": "0599bd43-244d-4852-8c46-cf349a4df140",
+    "bosque": "a4c3ed38-4398-4184-b529-d424f5c50c31",
+    "registro": "scripts/filme-fenasoja-2028/bosque/registro-parque.webp",
+    "placaComAlfa": "scripts/filme-fenasoja-2028/bosque/placa-bosque.webp",
+    "arenaNaVistaAmpla": [
+      0.74233,
+      0.30441
+    ],
+    "casaNaVistaAmpla": [
+      0.64594,
+      0.56564
+    ],
+    "palcoNaVistaAmpla": [
+      0.62064,
+      0.5229
+    ]
+  },
+  "atores": "Retratos oficiais da comissão e da diretoria e referência fornecida para o piloto; performances sintéticas.",
+  "shots": {
+    "chegada": "8e668a45-eb25-47dd-96d5-2fcbebaeef56",
+    "comissao": "3fd3b5cc-5aeb-46eb-90e3-555c2c3f36bd",
+    "diretoria": "b548d3b3-578f-4556-b801-33b5ebdfbaec",
+    "piloto": "3b15d4e1-ba05-4a94-8d38-493ba1f5a1a2",
+    "corda": "751a7ce1-37bb-4559-82c0-1ee213bc89bd",
+    "voo": "ef349caf-e00d-4a7b-8b63-66ff024aa7b2",
+    "comissaoNaPorta": "f8a7dd03-db6c-41b2-852b-eb31d74eb8cf",
+    "ceu": "5202af98-7905-4220-8733-80c6dc2265e1",
+    "diretoriaNaCabine": "ae45913f-a694-43c3-8579-47e61fb665ab"
+  },
+  "quadros": {
+    "aeronave": "c1e7d277-5011-4ca6-b070-b39503e45b46",
+    "piloto": "cdc0eefd-fbc2-4b72-8f0e-4bb6edf49c7f",
+    "diretoriaNaCabine": "711218a3-a69b-46f9-b33f-4ce447ad1244",
+    "comissaoCorrigida": "3aecc77e-952d-471e-91f4-d8134ef6f64a",
+    "voo": "e218a3a4-025d-42c5-b1d2-259b1d83241f",
+    "ceuAzulComEmblema": "8bbe2550-e9da-41dc-a079-36a81a0a9de1"
+  },
+  "modelos": {
+    "planosDeEmbarque": "Seedance 2.5",
+    "revelacaoNoCeu": "Seedance 2.0",
+    "quadros": "Higgsfield com referências do projeto"
+  },
+  "revisaoUHD": {
+    "chegadaEEmbarque": [
+      {
+        "file": "01-chegada.mp4",
+        "generation": "8e668a45-eb25-47dd-96d5-2fcbebaeef56",
+        "nativeWidth": 1280,
+        "nativeHeight": 720,
+        "timelineSeconds": 3.25,
+        "fps": 24,
+        "sha256": "50b3da5729f86b4afb066cc743caa3d2cb197f150edf98d92f1fe646d3cccf9b"
+      },
+      {
+        "file": "02-bosque-corda.mp4",
+        "generation": "751a7ce1-37bb-4559-82c0-1ee213bc89bd",
+        "nativeWidth": 1280,
+        "nativeHeight": 720,
+        "timelineSeconds": 7,
+        "fps": 24,
+        "sha256": "bb4fc7a854e2208c6c9aeef953385793d06e62379c66194b2a49e53e90f1632e"
+      }
+    ],
+    "mapa": "Renders WebGL independentes em 3840 × 2160",
+    "relogio": "Seis quadros gráficos independentes, alimentados pelo contador oficial."
+  }
+}

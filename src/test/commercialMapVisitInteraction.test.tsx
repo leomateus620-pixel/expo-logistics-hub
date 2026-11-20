@@ -188,6 +188,18 @@ describe('Visit HUD official values and independent touch controls', () => {
     render(<VisitHUD />);
     expect(screen.queryByRole('button', { name: 'Acessar interior' })).not.toBeInTheDocument();
   });
+  it('opens the film during a visit only inside the headquarters and stays there on close', () => {
+    useVisitStore.setState({ phase: 'interior', activeInterior: 'B12' });
+    const view = render(<VisitHUD />);
+    expect(screen.queryByRole('button', { name: 'Assistir ao filme FenaSoja 2028' })).not.toBeInTheDocument();
+    view.rerender(<VisitHUD headquartersInterior />);
+    fireEvent.click(screen.getByRole('button', { name: 'Assistir ao filme FenaSoja 2028' }));
+    expect(screen.getByRole('dialog', { name: 'FenaSoja 2028' })).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(useVisitStore.getState()).toMatchObject({ enabled: true, phase: 'interior', activeInterior: 'B12' });
+  });
+
   it('latches running so two pointers can walk and look, and clears movement cancellation and unmount', () => {
     const pointer = (element: HTMLElement, name: string, id: number) => {
       const event = new Event(name, { bubbles: true });

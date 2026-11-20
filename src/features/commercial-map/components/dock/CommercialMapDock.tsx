@@ -1,3 +1,5 @@
+import { HeadquartersFilm } from '../HeadquartersFilm';
+import { resolveStrategicLandmarkKind } from '../../utils/landmarks';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft, CarFront, Check, ChevronDown, ChevronRight, ChevronUp, Factory, FilterX, Layers3, PanelLeftClose, PanelLeftOpen, RotateCcw, Tractor, Utensils } from 'lucide-react';
 import { STATUS_CONFIG } from '../../constants';
@@ -117,6 +119,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
     return () => { observer?.disconnect(); shell.style.removeProperty('--commercial-map-context-sheet-height'); };
   }, [compact, sheet, interiorEntity?.id, selectedModuleId, selectedEntityId, activePanel, mode]);
 
+  const headquarters = interiorEntity && resolveStrategicLandmarkKind(interiorEntity) === 'fenasoja-headquarters';
   const showContent = compact ? sheet !== 'collapsed' : expanded;
   const isModule = Boolean(interiorEntity && selectedModuleId && moduleCard);
   const returnButton = interiorEntity && <button type="button" className="commercial-map-dock__back"
@@ -157,6 +160,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
         if (Math.abs(delta) > 24) setSheet(delta < 0 ? 'expanded' : sheet === 'expanded' ? 'summary' : 'collapsed');
       }}><i /></div>}
     {showContent && <div className="commercial-map-dock__scroll">
+      {headquarters && <HeadquartersFilm />}
       {!interiorEntity && !isCommissionScope && <section className="commercial-map-dock__segment-section" aria-label="Segmentos comerciais do parque">
           <div className="commercial-map-dock__segment-heading"><strong>Segmentos</strong><small>Selecione para explorar</small></div>
         <div className="commercial-map-dock__segments" role="group" aria-label="Filtrar mapa por segmento">

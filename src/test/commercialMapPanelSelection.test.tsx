@@ -1,5 +1,5 @@
 vi.mock('@/features/commercial-map/sales/components/SaleExhibitorEditDialog', () => ({ SaleExhibitorIdentity: () => null }));
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EntityDetailsPanel } from '@/features/commercial-map/components/panels/MapPanels';
 import type { CommercialLot, MapEntity, MapPermissions } from '@/features/commercial-map/types';
@@ -171,6 +171,38 @@ describe('seleção no painel persistente do mapa comercial', () => {
     expect(mocks.store.enterInterior).toHaveBeenCalledWith(pavilion.id);
     expect(aside.querySelectorAll('[data-commercial-map-interior-trigger]')).toHaveLength(1);
     expect(within(aside).getByText('Planta e áreas oficiais').closest('details')).not.toHaveAttribute('open');
+  });
+
+  it('abre o filme da Casa B12 sob demanda, permite repetir e devolve o foco à mesma ficha', async () => {
+    const headquarters = OFFICIAL_REFERENCE_ENTITIES.find((candidate) => candidate.publicIdentifier === 'B12')!;
+    const view = render(<EntityDetailsPanel entity={headquarters} entities={OFFICIAL_REFERENCE_ENTITIES}
+      lots={OFFICIAL_REFERENCE_LOTS} permissions={permissions} />);
+    const trigger = screen.getByRole('button', { name: 'Assistir ao filme FenaSoja 2028' });
+    expect(document.querySelector('video')).toBeNull();
+    trigger.focus();
+    fireEvent.click(trigger);
+    const dialog = screen.getByRole('dialog', { name: 'FenaSoja 2028' });
+    const download = within(dialog).getByRole('link', { name: 'Baixar em 4K' });
+    expect(download).toHaveAttribute('download', 'FENASOJA-2028-4K.mp4');
+    expect(download).toHaveAttribute('href', '/media/fenasoja-2028/FENASOJA-2028-4K.mp4');
+    const video = within(dialog).getByLabelText('Filme FenaSoja 2028, amanhecer no parque');
+    expect(video).toHaveAttribute('src', '/media/fenasoja-2028/amanhecer.mp4');
+    expect(video).toHaveAttribute('poster', '/media/fenasoja-2028/amanhecer.webp');
+    expect(video.querySelector('track')).toBeNull();
+    expect(video).toHaveAttribute('controls');
+    expect(video).toHaveAttribute('playsinline');
+    fireEvent.error(video);
+    expect(within(dialog).getByRole('status')).toHaveTextContent('Não foi possível carregar o filme.');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Tentar novamente' }));
+    expect(dialog.querySelector('video')).not.toBe(video);
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Voltar ao mapa' }));
+    await waitFor(() => expect(trigger).toHaveFocus());
+    expect(document.querySelector('video')).toBeNull();
+    expect(screen.getByRole('complementary')).toHaveTextContent('B12');
+    expect(mocks.store.setSelectedEntityId).not.toHaveBeenCalled();
+    expect(mocks.store.enterInterior).not.toHaveBeenCalled();
+    view.rerender(panel(first));
+    expect(screen.queryByRole('button', { name: 'Assistir ao filme FenaSoja 2028' })).not.toBeInTheDocument();
   });
 
   it('recolhe e restaura o resumo sem apagar a seleção nem entrar no interior', () => {

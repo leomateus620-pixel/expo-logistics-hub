@@ -40,6 +40,6 @@ export function VisitOverlayFrame({ children }: { children: ReactNode }) {
   </VisitOverlayBoundary>;
 }
 
-export function VisitOverlay() {
-  return <VisitOverlayFrame><VisitHUD /></VisitOverlayFrame>;
+export function VisitOverlay({ headquartersInterior = false }: { headquartersInterior?: boolean } = {}) {
+  return <VisitOverlayFrame><VisitHUD headquartersInterior={headquartersInterior} /></VisitOverlayFrame>;
 }

@@ -1,0 +1,16 @@
+FenaSoja em Santa Rosa • trilha de ambiente e helicóptero
+
+A aproximação e a partida utilizam trechos da mesma passagem real de um Airbus H135 gravada por Garuda1982 com Sony PCM-D100. O voo pairado é uma gravação binaural de dwareing. Ambos os autores publicaram as gravações em CC0 1.0.
+
+“helicopter flies past. Airbus Helicopters H135” — Garuda1982
+https://freesound.org/people/Garuda1982/sounds/524249/
+https://cdn.freesound.org/previews/524/524249_2061858-hq.mp3
+
+“helicopter1.wav” — dwareing
+https://freesound.org/people/dwareing/sounds/181071/
+https://cdn.freesound.org/previews/181/181071_2945960-hq.mp3
+
+CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Fontes públicas de áudio de alta qualidade obtidas em 20/11/2026; decodificadas para PCM estéreo a 48 kHz. A mixagem combinou recortes, transições sobrepostas, filtragem abaixo de 30 Hz, ajuste de perspectiva estéreo e automação de nível segundo a montagem. Aves, folhagem, brisa e trânsito distante são sintetizados pelo gerador. As gravações de helicóptero vieram de outros locais e compõem a ambientação da cena em Santa Rosa.
