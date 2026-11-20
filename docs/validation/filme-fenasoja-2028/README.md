@@ -32,3 +32,11 @@ node scripts/filme-fenasoja-2028/parque/render.cjs --full-hd --out ./tomadas-hd
 python3 scripts/filme-fenasoja-2028/montar.py ./tomadas
 python3 scripts/filme-fenasoja-2028/montar.py ./tomadas --full-hd-shots ./tomadas-hd --clock-reference '2026-11-20T04:44:01-03:00'
 ```
+
+## Verificação da entrega
+
+O MP4 Full HD tem 84.386.449 bytes. A decodificação integral conferiu os 1.200 quadros e o som estéreo. A medição da trilha final foi de −21 LUFS integrados e −3,4 dB de pico verdadeiro. [Metadados, tamanho e SHA-256](master.json) · [Sequência do filme](sequencia.webp) · [Referências de produção](producao.json)
+
+No Chrome de desktop e no perfil móvel de 390 px, a abertura do mapa gerou zero pedidos de mídia do filme. O player carregou o corte de reprodução sob demanda. O clique em **Baixar em Full HD** obteve os mesmos 84.386.449 bytes, com SHA-256 idêntico ao master. O ensaio conferiu as 12 legendas, o relógio na pausa, a tela cheia e o retorno à B12. [Relatório do player](player.json) · [Desktop](encerramento-desktop.webp) · [Celular emulado](encerramento-celular.webp)
+
+O build de produção, a checagem de tipos e os 33 testes focados passaram. A execução da suíte completa registrou 87 falhas que também ocorreram na base e cinco timeouts adicionais. Os grupos desses timeouts passaram quando executados isoladamente (28/28).
