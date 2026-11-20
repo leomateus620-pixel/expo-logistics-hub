@@ -3100,7 +3100,14 @@ export function StrategicLandmarkMesh({
         {kind === 'soy-restroom' && <SoyRestroom materials={materials} />}
         {kind === 'gate-nine-tanks' && <GateNineTanks bounds={bounds} materials={materials} />}
         {kind === 'administrative-center' && <AdministrativeCenter {...modelProps} />}
-        {kind === 'fenasoja-headquarters' && <FenasojaHeadquarters bounds={bounds} toneDown={toneDown} showDetail={showDetail} />}
+        {kind === 'fenasoja-headquarters' && (
+          <FenasojaHeadquarters
+            bounds={bounds}
+            toneDown={toneDown}
+            showDetail={showDetail}
+            reducedGraphics={reducedGraphics}
+          />
+        )}
         {kind === 'lactalis-cultural-stage' && (
           <LactalisCulturalStage
             bounds={modelProps.bounds}

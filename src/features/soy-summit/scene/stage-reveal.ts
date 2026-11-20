@@ -1,42 +1,15 @@
 import * as THREE from 'three';
+import { TwoBoneLimb } from '@/lib/three/twoBoneLimb';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { REVEAL_DURATION, revealPose } from '../reveal-timeline';
 
 const FLOOR = .65, CLOTH_Z = -32.84, TOP = 6.58, BOTTOM = .70, WIDTH = 9.6;
 type Pose = ReturnType<typeof revealPose>;
 
-/** Analytic two-bone IK: hands follow the actual cloth edge, not a guessed pose. */
-class Limb {
-  private a = new THREE.Vector3(); private b = new THREE.Vector3(); private c = new THREE.Vector3();
-  private axis = new THREE.Vector3(); private bend = new THREE.Vector3(); private elbow = new THREE.Vector3();
-  private from = new THREE.Vector3(); private to = new THREE.Vector3();
-  private delta = new THREE.Quaternion(); private world = new THREE.Quaternion(); private parent = new THREE.Quaternion();
-  readonly restEnd = new THREE.Quaternion();
-  constructor(readonly upper: THREE.Bone, readonly lower: THREE.Bone, readonly end: THREE.Bone) { end.getWorldQuaternion(this.restEnd); }
-  private aim(bone: THREE.Bone, child: THREE.Bone, target: THREE.Vector3) {
-    bone.getWorldPosition(this.a); child.getWorldPosition(this.b);
-    this.from.subVectors(this.b, this.a).normalize(); this.to.subVectors(target, this.a).normalize();
-    this.delta.setFromUnitVectors(this.from, this.to); bone.getWorldQuaternion(this.world); this.world.premultiply(this.delta);
-    bone.parent!.getWorldQuaternion(this.parent).invert(); bone.quaternion.copy(this.parent).multiply(this.world);
-    bone.updateWorldMatrix(false, true);
-  }
-  solve(target: THREE.Vector3, pole: THREE.Vector3) {
-    this.upper.getWorldPosition(this.a); this.lower.getWorldPosition(this.b); this.end.getWorldPosition(this.c);
-    const first = this.a.distanceTo(this.b), second = this.b.distanceTo(this.c);
-    const distance = THREE.MathUtils.clamp(this.a.distanceTo(target), .01, first + second - .002);
-    this.axis.subVectors(target, this.a).normalize(); this.bend.subVectors(pole, this.a);
-    this.bend.addScaledVector(this.axis, -this.bend.dot(this.axis)).normalize();
-    const along = (first * first - second * second + distance * distance) / (2 * distance);
-    this.elbow.copy(this.a).addScaledVector(this.axis, along).addScaledVector(this.bend, Math.sqrt(Math.max(0, first * first - along * along)));
-    this.aim(this.upper, this.lower, this.elbow); this.aim(this.lower, this.end, target);
-  }
-  orientEnd(world: THREE.Quaternion) { this.end.parent!.getWorldQuaternion(this.parent).invert(); this.end.quaternion.copy(this.parent).multiply(world); this.end.updateWorldMatrix(false, true); }
-}
-
 class Attendant {
   readonly group = new THREE.Group();
   private bones: { bone: THREE.Bone; rest: THREE.Quaternion }[] = [];
-  private arms: Limb[]; private legs: Limb[];
+  private arms: TwoBoneLimb[]; private legs: TwoBoneLimb[];
   private grips: THREE.Quaternion[];
   private target = new THREE.Vector3(); private idle = new THREE.Vector3(); private pole = new THREE.Vector3();
   private orientation = new THREE.Quaternion(); private joint = new THREE.Vector3();
@@ -60,8 +33,8 @@ class Attendant {
       }
     });
     const bone = (name: string) => { const result = lookup.get(name); if (!result) throw new Error(`Personagem incompleto: ${name}`); return result; };
-    this.arms = ['Left', 'Right'].map(s => new Limb(bone(s + 'Arm'), bone(s + 'ForeArm'), bone(s + 'Hand')));
-    this.legs = ['Left', 'Right'].map(s => new Limb(bone(s + 'UpLeg'), bone(s + 'Leg'), bone(s + 'Foot')));
+    this.arms = ['Left', 'Right'].map(s => new TwoBoneLimb(bone(s + 'Arm'), bone(s + 'ForeArm'), bone(s + 'Hand')));
+    this.legs = ['Left', 'Right'].map(s => new TwoBoneLimb(bone(s + 'UpLeg'), bone(s + 'Leg'), bone(s + 'Foot')));
     this.grips = ['Left', 'Right'].map((s, index) => {
       const wrist = bone(s + 'Hand').getWorldPosition(new THREE.Vector3());
       const direction = bone(s + 'HandMiddle1').getWorldPosition(new THREE.Vector3()).sub(wrist).normalize();

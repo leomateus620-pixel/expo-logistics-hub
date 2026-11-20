@@ -4,6 +4,7 @@ import { useInteriorCameraRequest, type InteriorCameraRequest } from '../../hook
 import * as THREE from 'three';
 import type { MapEntity } from '../../types';
 import { strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../../utils/landmarks';
+import { HeadquartersVisitors } from './headquarters/HeadquartersVisitors';
 import {
   HEADQUARTERS_EXECUTIVE_CAMERA,
   HEADQUARTERS_SOFA_LAYOUT,
@@ -426,6 +427,9 @@ export const HeadquartersInteriorScene = memo(function HeadquartersInteriorScene
         )}
         <InteriorPlant position={[-2.34, 0, 2.38]} scale={0.9} />
         <InteriorPlant position={[2.32, 0, -2.65]} scale={0.78} />
+        {entity.publicIdentifier === 'B12' && (
+          <HeadquartersVisitors scope="interior" reducedGraphics={reducedGraphics} />
+        )}
         <TrackLighting />
 
         <group position={[0, 0, 3.15]} raycast={NO_RAYCAST}>

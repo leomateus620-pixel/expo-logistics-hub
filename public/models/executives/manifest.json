@@ -5,8 +5,8 @@
   "units": "meters",
   "origin": "grounded between the feet",
   "animation_fps": 30,
-  "geometry_strategy": "Pre-export Blender consolidation joins the rigged body into one skinned mesh while keeping the curved reference face and semantic chimarrao prop nodes separate.",
-  "post_export": "glTF-Transform 4.2.1 hierarchy flatten plus unused attribute pruning; no post-export mesh join, simplification, texture recompression, or geometry compression",
+  "geometry_strategy": "Original skinned bodies, wardrobe and rig. Opaque continuous 3D Jutsu head, fitted neck and collar, rigidly attached to the original Head joint. Separate eye optics, real glasses when authored, and masked hair, eyebrow and lash meshes.",
+  "post_export": "Selected opaque Blender meshes were remounted in original rest metres under Head from the 3D Jutsu GLB. Old photo surfaces and original opaque head/rigid neck index ranges were removed; original skin joints, animation data, body and accessory primitives were retained.",
   "clips": {
     "Idle": {
       "duration_seconds": 4.0,
@@ -28,13 +28,13 @@
   "characters": [
     {
       "file": "djeison-drey.glb",
-      "bytes": 1040452,
-      "sha256": "6367adc180c7ddd0da55b617835cc0b6ff8b599d7634b7687d71a831442a2df8",
-      "nodes": 23,
-      "meshes": 5,
-      "primitives": 13,
-      "triangles": 20200,
-      "materials": 13,
+      "bytes": 1842096,
+      "sha256": "60882d9752afaa0b15475771e48f86a5c072e6fa4e605d6937f99ee77afb1c85",
+      "nodes": 30,
+      "meshes": 11,
+      "primitives": 18,
+      "triangles": 25609,
+      "materials": 18,
       "skins": 1,
       "animations": [
         "Idle",
@@ -51,7 +51,7 @@
         ],
         "max": [
           0.2796514332294464,
-          1.7972913980484009,
+          1.7982606887817383,
           0.39311113953590393
         ]
       },
@@ -94,17 +94,36 @@
             0.2561
           ]
         }
+      },
+      "avatar": {
+        "head_meshes": 7,
+        "triangles": 9865,
+        "facial_hair_fibers": 326,
+        "rest_bounds": {
+          "min": [
+            -0.09082771837711334,
+            1.4480001702904701,
+            -0.1119111105799675
+          ],
+          "max": [
+            0.09082774817943573,
+            1.7982606887817383,
+            0.15082190930843353
+          ]
+        },
+        "neck_skin_min_y_m": 1.4480001702904701,
+        "removed_original_neck_triangles": 260
       }
     },
     {
       "file": "fabiano-soltis.glb",
-      "bytes": 959596,
-      "sha256": "f4d27f4354e7a9b35add09698eb457d4a48da38ed7644c96cd1d28d7ea3b710c",
-      "nodes": 20,
-      "meshes": 2,
-      "primitives": 9,
-      "triangles": 18440,
-      "materials": 9,
+      "bytes": 1422412,
+      "sha256": "8402bbbda8aec83ae3a92449050e82d08d749c0b034752fb64370ca3884b63f5",
+      "nodes": 26,
+      "meshes": 7,
+      "primitives": 13,
+      "triangles": 21586,
+      "materials": 13,
       "skins": 1,
       "animations": [
         "Idle",
@@ -121,7 +140,7 @@
         ],
         "max": [
           0.22588662803173065,
-          1.7371511459350586,
+          1.747738629579544,
           0.3803155720233917
         ]
       },
@@ -164,6 +183,25 @@
             0.2479
           ]
         }
+      },
+      "avatar": {
+        "head_meshes": 6,
+        "triangles": 7986,
+        "facial_hair_fibers": 101,
+        "rest_bounds": {
+          "min": [
+            -0.08900432288646698,
+            1.398000493645668,
+            -0.09712141752243042
+          ],
+          "max": [
+            0.08456830680370331,
+            1.747738629579544,
+            0.1447140872478485
+          ]
+        },
+        "neck_skin_min_y_m": 1.398000493645668,
+        "removed_original_neck_triangles": 260
       }
     }
   ],
@@ -173,5 +211,16 @@
     "Garments are layered rigid-weight meshes with modeled thickness and tailoring; real-time cloth simulation is intentionally omitted.",
     "Hair and beard use lightweight geometric clumps rather than strand-hair simulation.",
     "Visual QA is calibrated for the Commercial Map camera; the assets are not scan-grade cinematic close-up humans."
-  ]
+  ],
+  "accessor_bounds_space": "Active indexed POSITION values in the assembled character rest frame, glTF Y-up metres, including original joint-mounted head components.",
+  "seat_fixture_scope": "The seated fixture references the original rig/body pose and shoe contact. The recorded deformed full-body AABB predates the head graft.",
+  "avatar_provenance": {
+    "service": "Higgsfield",
+    "editor": "3D Jutsu",
+    "revision": 12,
+    "source_glb_sha256": "a5093615accdaf7f64015fd82d43400510a0391dfbb544ceee56731234dbcbc5",
+    "source_glb_generator": "Khronos glTF Blender I/O v5.2.39",
+    "facial_surface": "Individually fitted physical geometry with vertex complexion color and geometric facial-hair fibers. No portrait color map, projection or alpha face surface.",
+    "reference_basis": "Institutional source photographs for Fabiano Soltis and Djeison Drey. Identifying features are independently sculpted."
+  }
 }

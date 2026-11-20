@@ -1,0 +1,250 @@
+{
+  "browser": "157.0.8103.79",
+  "comparisons": {
+    "fachada": {
+      "files": [
+        {
+          "filename": "antes-fachada-2208x1436.png",
+          "imageSHA256": "ec19856610b5686e99e954d5ac24db6a1cb4b0a05d5c88e5e8b0a7b0a8b063b0",
+          "pngBytes": 2768120
+        },
+        {
+          "filename": "depois-fachada-2208x1436.png",
+          "imageSHA256": "9f0e1839b6906748d70f1f092cec34d7ed69d8329f38bd2d8f11f5ddda7b53f1",
+          "pngBytes": 3019095
+        }
+      ],
+      "nativePixels": [
+        2208,
+        1436
+      ],
+      "camera": {
+        "position": [
+          12.04,
+          0.88,
+          15.12
+        ],
+        "target": [
+          15.24,
+          0.65,
+          15.16
+        ],
+        "fov": 44,
+        "aspect": 1.5376044568245126,
+        "zoom": 1
+      },
+      "renderPath": "direct",
+      "lights": "higgsfield-key"
+    },
+    "quina": {
+      "files": [
+        {
+          "filename": "antes-quina-2208x1436.png",
+          "imageSHA256": "805fb83f0fe0edc12cb0292e8b26f04dba1199b1eae861bc14f984898a37bf70",
+          "pngBytes": 2717779
+        },
+        {
+          "filename": "depois-quina-2208x1436.png",
+          "imageSHA256": "4cf535b29215129ed29fd162396fa2492d1ba3f2a8b9b10bff34cb739afcf971",
+          "pngBytes": 2984088
+        }
+      ],
+      "nativePixels": [
+        2208,
+        1436
+      ],
+      "camera": {
+        "position": [
+          11.85,
+          1.5,
+          17.8
+        ],
+        "target": [
+          15.22,
+          0.56,
+          15.25
+        ],
+        "fov": 47,
+        "aspect": 1.5376044568245126,
+        "zoom": 1
+      },
+      "renderPath": "direct",
+      "lights": "higgsfield-key"
+    },
+    "reboco": {
+      "files": [
+        {
+          "filename": "antes-reboco-2208x1436.png",
+          "imageSHA256": "bbbd8ff19b49e761264efff100c308f41638ce64b418e279211ccc7552eb818b",
+          "pngBytes": 2141377
+        },
+        {
+          "filename": "depois-reboco-2208x1436.png",
+          "imageSHA256": "c899120cc9120b14d96c91c5575f9f99a7dd06220adf4a8e4a4c56bdc40be6d1",
+          "pngBytes": 2432779
+        }
+      ],
+      "nativePixels": [
+        2208,
+        1436
+      ],
+      "camera": {
+        "position": [
+          13.02,
+          0.86,
+          14.67
+        ],
+        "target": [
+          14.73,
+          0.69,
+          14.79
+        ],
+        "fov": 35,
+        "aspect": 1.5376044568245126,
+        "zoom": 1
+      },
+      "renderPath": "direct",
+      "lights": "higgsfield-key"
+    },
+    "telhas": {
+      "files": [
+        {
+          "filename": "antes-telhas-2208x1436.png",
+          "imageSHA256": "809f2a2bf543b1d109c297a023771a83d78116d18c45e09f790bcb64788edb25",
+          "pngBytes": 2147248
+        },
+        {
+          "filename": "depois-telhas-2208x1436.png",
+          "imageSHA256": "e94200122666c57f4a962d73d6812e9d0846da643286ccfed73b589ed3f2392b",
+          "pngBytes": 2790278
+        }
+      ],
+      "nativePixels": [
+        2208,
+        1436
+      ],
+      "camera": {
+        "position": [
+          16.8,
+          3.35,
+          17.41
+        ],
+        "target": [
+          15.58,
+          0.84,
+          15.18
+        ],
+        "fov": 38,
+        "aspect": 1.5376044568245126,
+        "zoom": 1
+      },
+      "renderPath": "direct",
+      "lights": "higgsfield-key"
+    },
+    "entrada": {
+      "files": [
+        {
+          "filename": "antes-entrada-2208x1436.png",
+          "imageSHA256": "780c987c4038dfaceffd4bd06a6adad744bf4eb26a67cc79ff82d37924f1a3cf",
+          "pngBytes": 1747933
+        },
+        {
+          "filename": "depois-entrada-2208x1436.png",
+          "imageSHA256": "db578935d093b93a0e9d38a47b82dfbf1cbbfa3de85c22c1e34e12e8ab736aa6",
+          "pngBytes": 2352152
+        }
+      ],
+      "nativePixels": [
+        2208,
+        1436
+      ],
+      "camera": {
+        "position": [
+          13.19,
+          0.42,
+          15.18
+        ],
+        "target": [
+          14.7,
+          0.31,
+          15.16
+        ],
+        "fov": 32,
+        "aspect": 1.5376044568245126,
+        "zoom": 1
+      },
+      "renderPath": "direct",
+      "lights": "higgsfield-key"
+    },
+    "escultura": {
+      "files": [
+        {
+          "filename": "antes-escultura-2208x1436.png",
+          "imageSHA256": "fc3250983a073cedee6b20d9763bd5be4471f3c86aa611f1863c4e60dba2033e",
+          "pngBytes": 2563280
+        },
+        {
+          "filename": "depois-escultura-2208x1436.png",
+          "imageSHA256": "1fdc2cd2f8a19f557290bce17329403af820130913e086ffdd342f8cdd52e3bd",
+          "pngBytes": 3086568
+        }
+      ],
+      "nativePixels": [
+        2208,
+        1436
+      ],
+      "camera": {
+        "position": [
+          13.02,
+          0.52,
+          15.9
+        ],
+        "target": [
+          14.3,
+          0.3,
+          15.73
+        ],
+        "fov": 34,
+        "aspect": 1.5376044568245126,
+        "zoom": 1
+      },
+      "renderPath": "direct",
+      "lights": "higgsfield-key"
+    },
+    "noite": {
+      "files": [
+        {
+          "filename": "antes-noite-2208x1436.png",
+          "imageSHA256": "4cbdc45d364b40340a924442067c34edb3c76383168cc982dbec714fef3b377a",
+          "pngBytes": 2137519
+        },
+        {
+          "filename": "depois-noite-2208x1436.png",
+          "imageSHA256": "79c0d28af9bdc3835e9e726fde19d7665e22d492936f7cc0bc67f3ce1bcc9571",
+          "pngBytes": 2302512
+        }
+      ],
+      "nativePixels": [
+        2208,
+        1436
+      ],
+      "camera": {
+        "position": [
+          12.04,
+          0.88,
+          15.12
+        ],
+        "target": [
+          15.24,
+          0.65,
+          15.16
+        ],
+        "fov": 44,
+        "aspect": 1.5376044568245126,
+        "zoom": 1
+      },
+      "renderPath": "direct",
+      "lights": "higgsfield-key"
+    }
+  }
+}

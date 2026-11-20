@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import {
@@ -8,6 +8,7 @@ import {
 import type { StrategicLandmarkBounds } from "../../utils/landmarks";
 import { disposeInstancedMesh } from "../../utils/instancedMeshDisposal";
 import { measureCommercialMapSync } from "../../utils/performanceDiagnostics";
+import { commercialRainRuntime } from "../../utils/rainRuntime";
 
 const NO_RAYCAST = () => undefined;
 const PETAL_GEOMETRY = new THREE.SphereGeometry(1, 6, 3);
@@ -26,8 +27,16 @@ import { makeHeadquartersMaterials } from "./headquarters/materials";
 import { useCommercialMapStore } from "../../state/useCommercialMapStore";
 import { readPreparedHeadquartersGeometry } from "./headquarters/headquartersPreparationResource";
 import { unpackHeadquartersGeometry } from "./headquarters/headquartersGeometryPacking";
+import { HeadquartersVisitors } from "./headquarters/HeadquartersVisitors";
+import {
+  loadRefinedHeadquarters,
+  REFINED_HEADQUARTERS_URL,
+  type RefinedHeadquartersAsset,
+} from "./headquarters/refinedAsset";
 const hq = SPEC.headquarters;
 const u = SPEC.registration.unitsPerMeter;
+const refinedEnterDistance = 11;
+const refinedExitDistance = 13;
 const sitePolygon = complexWorldPolygon("headquarters", "site");
 const siteCenter = [
   (Math.min(...sitePolygon.map((p) => p[0])) +
@@ -85,14 +94,21 @@ export function FenasojaHeadquarters({
   bounds,
   toneDown = 0,
   showDetail = true,
+  reducedGraphics = false,
 }: {
   bounds: StrategicLandmarkBounds;
   toneDown?: number;
   showDetail?: boolean;
+  reducedGraphics?: boolean;
 }) {
   const invalidate = useThree((s) => s.invalidate);
   const gl = useThree((s) => s.gl);
+  const scene = useThree((s) => s.scene);
+  const atmosphere = useMemo(() => commercialRainRuntime(scene), [scene]);
   const night = useCommercialMapStore((s) => s.nightModeActive);
+  const neutral =
+    import.meta.env.DEV &&
+    new URLSearchParams(window.location.search).has("complexNeutral");
   const renderCount = useRef(0);
   renderCount.current++;
   const prepared = readPreparedHeadquartersGeometry();
@@ -152,6 +168,24 @@ export function FenasojaHeadquarters({
     };
   }, [gl, invalidate, prepared]);
   const group = useRef<THREE.Group>(null);
+  const appearance = useRef({ night, toneDown });
+  const refined = useRef<{
+    asset: RefinedHeadquartersAsset | null;
+    controller: AbortController | null;
+    metadata: {
+      source: "native" | "higgsfield";
+      status: "idle" | "loading" | "ready" | "failed";
+      lighting: "higgsfield-key" | "park";
+      url: string;
+    };
+  }>({
+    asset: null,
+    controller: null,
+    metadata: {
+      source: "native", status: "idle", lighting: "park", url: REFINED_HEADQUARTERS_URL,
+    },
+  });
+  const getVisitorKeyReceiver = useCallback(() => refined.current.asset?.applyVisitorKey, []);
   const lod = useRef({
     tier: -1,
     origin: new THREE.Vector3(),
@@ -159,20 +193,62 @@ export function FenasojaHeadquarters({
   });
   useFrame(({ camera }) => {
     const state = lod.current;
-    if (!group.current) return;
-    group.current.getWorldPosition(state.origin);
+    const root = group.current;
+    if (!root) return;
+    root.getWorldPosition(state.origin);
     const distance = camera.position.distanceTo(state.origin);
-    // Hysteresis only changes visibility/counts. No React setState or allocation in navigation.
+    const local = refined.current;
+    if (!neutral && distance < refinedEnterDistance && local.metadata.status === "idle") {
+      const controller = new AbortController();
+      local.controller = controller;
+      local.metadata.status = "loading";
+      void loadRefinedHeadquarters(controller.signal, atmosphere).then((asset) => {
+        if (controller.signal.aborted || group.current !== root) {
+          asset.dispose();
+          return;
+        }
+        asset.applyToneDown(appearance.current.toneDown);
+        asset.applyNight(appearance.current.night);
+        asset.root.visible = false;
+        root.add(asset.root);
+        local.asset = asset;
+        local.controller = null;
+        local.metadata.status = "ready";
+        local.metadata.lighting = asset.lighting;
+        state.needsApply = true;
+        invalidate();
+      }, () => {
+        if (controller.signal.aborted) return;
+        controller.abort();
+        local.controller = null;
+        local.metadata.status = "failed";
+        invalidate();
+      });
+    }
+    // After the one lazy load, hysteresis only changes visibility and counts.
+    const wasRefined = local.metadata.source === "higgsfield";
+    const showRefined = Boolean(
+      local.asset && !neutral &&
+      distance < (wasRefined ? refinedExitDistance : refinedEnterDistance),
+    );
+    if (showRefined) local.asset?.placeLighting(root.matrixWorld);
     let tier = state.tier;
     if (distance < 5.8) tier = 2;
     else if (distance > 7.1 && distance < 16) tier = 1;
     else if (distance > 19) tier = 0;
     else if (tier < 0) tier = distance < 7.1 ? 2 : 1;
-    if (tier === state.tier && !state.needsApply) return;
+    if (tier === state.tier && showRefined === wasRefined && !state.needsApply) return;
     state.needsApply = false;
     state.tier = tier;
-    for (const object of group.current.children) {
-      if (object instanceof THREE.InstancedMesh)
+    local.metadata.source = showRefined ? "higgsfield" : "native";
+    if (local.asset) {
+      local.asset.root.visible = showRefined;
+      if (showRefined) local.asset.applyTier(tier, showDetail);
+    }
+    for (const object of root.children) {
+      if (object === local.asset?.root || object.userData.b12VisitorLayer) continue;
+      if (object instanceof THREE.InstancedMesh) {
+        object.visible = !showRefined && showDetail;
         object.count = Math.max(
           1,
           Math.floor(
@@ -180,31 +256,48 @@ export function FenasojaHeadquarters({
               (tier === 2 ? 1 : tier === 1 ? 0.62 : 0.18),
           ),
         );
-      else object.visible = (object.userData.detailTier ?? 0) <= tier;
+      } else {
+        object.visible = !showRefined && (object.userData.detailTier ?? 0) <= tier;
+      }
     }
-    group.current.userData.lod = tier;
+    root.userData.lod = tier;
+    if (showRefined || wasRefined) gl.shadowMap.needsUpdate = true;
     invalidate();
   });
+  useLayoutEffect(() => {
+    const local = refined.current;
+    return () => {
+      local.controller?.abort();
+      local.asset?.dispose();
+      local.controller = null;
+      local.asset = null;
+      local.metadata.source = "native";
+      local.metadata.status = "idle";
+      local.metadata.lighting = "park";
+      lod.current.needsApply = true;
+    };
+  }, []);
   // React may reapply visibility props after filters/night/selection change.
   useLayoutEffect(() => {
     lod.current.needsApply = true;
     invalidate();
   }, [night, showDetail, toneDown, bounds, resources, invalidate]);
   useEffect(() => {
+    appearance.current.night = night;
+    refined.current.asset?.applyNight(night);
     resources.materials.warmInterior.emissiveIntensity = night ? 0.25 : 0.08;
     invalidate();
   }, [resources, night, invalidate]);
   useEffect(() => () => resources.dispose(), [resources]);
   useEffect(() => {
+    appearance.current.toneDown = toneDown;
+    refined.current.asset?.applyToneDown(toneDown);
     for (const key of Object.keys(resources.materials) as Surface[])
       resources.materials[key].color
         .copy(resources.base[key])
         .lerp(new THREE.Color("#9fa8a2"), toneDown * 0.7);
     invalidate();
   }, [resources, toneDown, invalidate]);
-  const neutral =
-    import.meta.env.DEV &&
-    new URLSearchParams(window.location.search).has("complexNeutral");
   return (
     <group
       ref={group}
@@ -217,8 +310,18 @@ export function FenasojaHeadquarters({
         contactBake: resources.contact,
         resources: resources.statistics,
         renderCount: renderCount.current,
+        b12Asset: refined.current.metadata,
       }}
     >
+      {!neutral && (
+        <group userData={{ b12VisitorLayer: true }}>
+          <HeadquartersVisitors
+            scope="frontage"
+            reducedGraphics={reducedGraphics}
+            getKeyReceiver={getVisitorKeyReceiver}
+          />
+        </group>
+      )}
       {resources.geometry.map(({ key, geometry, lod: detailTier }) => (
         <mesh
           key={`${key}:${detailTier}`}
