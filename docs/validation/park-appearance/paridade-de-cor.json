@@ -1,0 +1,442 @@
+{
+  "base": {
+    "browser": "157.0.8103.79",
+    "errors": [],
+    "views": {
+      "LOW": {
+        "medianCorePixels": {
+          "sold": {
+            "pixels": 3499,
+            "median": [
+              22.0,
+              119.0,
+              255.0
+            ]
+          },
+          "open": {
+            "pixels": 2806,
+            "median": [
+              255.0,
+              212.0,
+              0.0
+            ]
+          }
+        },
+        "position": [
+          9,
+          8.8,
+          31
+        ],
+        "target": [
+          -9,
+          0.8,
+          12
+        ],
+        "exposure": 0.93,
+        "path": "direct",
+        "phaseAndHatch": {
+          "BLOCKED/0": 1,
+          "SALE_OPEN/1": 59,
+          "SOLD/2": 69,
+          "AVAILABLE/0": 148
+        },
+        "roofTextures": [
+          "pavilion-2026-shared-zinc",
+          "pavilion-2026-shared-brick",
+          "pavilion-2026-shared-siding"
+        ],
+        "roofMedian": [
+          126.0,
+          126.0,
+          119.0
+        ],
+        "facadeMedian": [
+          132.0,
+          134.0,
+          123.0
+        ]
+      },
+      "MEDIUM": {
+        "medianCorePixels": {
+          "sold": {
+            "pixels": 3499,
+            "median": [
+              22.0,
+              119.0,
+              255.0
+            ]
+          },
+          "open": {
+            "pixels": 2806,
+            "median": [
+              255.0,
+              212.0,
+              0.0
+            ]
+          }
+        },
+        "position": [
+          9,
+          8.8,
+          31
+        ],
+        "target": [
+          -9,
+          0.8,
+          12
+        ],
+        "exposure": 0.93,
+        "path": "direct",
+        "phaseAndHatch": {
+          "BLOCKED/0": 1,
+          "SALE_OPEN/1": 59,
+          "SOLD/2": 69,
+          "AVAILABLE/0": 148
+        },
+        "roofTextures": [
+          "pavilion-2026-shared-zinc",
+          "pavilion-2026-shared-brick",
+          "pavilion-2026-shared-siding"
+        ],
+        "roofMedian": [
+          127.0,
+          127.0,
+          119.0
+        ],
+        "facadeMedian": [
+          132.0,
+          135.0,
+          123.0
+        ]
+      },
+      "HIGH": {
+        "medianCorePixels": {
+          "sold": {
+            "pixels": 3499,
+            "median": [
+              32.0,
+              125.0,
+              225.0
+            ]
+          },
+          "open": {
+            "pixels": 2806,
+            "median": [
+              230.0,
+              209.0,
+              73.0
+            ]
+          }
+        },
+        "position": [
+          9,
+          8.8,
+          31
+        ],
+        "target": [
+          -9,
+          0.8,
+          12
+        ],
+        "exposure": 0.93,
+        "path": "post",
+        "phaseAndHatch": {
+          "BLOCKED/0": 1,
+          "SALE_OPEN/1": 59,
+          "SOLD/2": 69,
+          "AVAILABLE/0": 148
+        },
+        "roofTextures": [
+          "pavilion-2026-shared-zinc",
+          "pavilion-2026-shared-brick",
+          "pavilion-2026-shared-siding"
+        ],
+        "roofMedian": [
+          128.0,
+          127.0,
+          119.0
+        ],
+        "facadeMedian": [
+          132.0,
+          134.5,
+          123.0
+        ]
+      },
+      "ULTRA": {
+        "medianCorePixels": {
+          "sold": {
+            "pixels": 3499,
+            "median": [
+              32.0,
+              125.0,
+              225.0
+            ]
+          },
+          "open": {
+            "pixels": 2806,
+            "median": [
+              230.0,
+              209.0,
+              73.0
+            ]
+          }
+        },
+        "position": [
+          9,
+          8.8,
+          31
+        ],
+        "target": [
+          -9,
+          0.8,
+          12
+        ],
+        "exposure": 0.93,
+        "path": "post",
+        "phaseAndHatch": {
+          "BLOCKED/0": 1,
+          "SALE_OPEN/1": 59,
+          "SOLD/2": 69,
+          "AVAILABLE/0": 148
+        },
+        "roofTextures": [
+          "pavilion-2026-shared-zinc",
+          "pavilion-2026-shared-brick",
+          "pavilion-2026-shared-siding"
+        ],
+        "roofMedian": [
+          124.0,
+          124.0,
+          118.0
+        ],
+        "facadeMedian": [
+          132.0,
+          134.0,
+          123.0
+        ]
+      }
+    }
+  },
+  "natural": {
+    "browser": "157.0.8103.79",
+    "errors": [],
+    "views": {
+      "LOW": {
+        "medianCorePixels": {
+          "sold": {
+            "pixels": 3510,
+            "median": [
+              22.0,
+              119.0,
+              255.0
+            ]
+          },
+          "open": {
+            "pixels": 2735,
+            "median": [
+              255.0,
+              212.0,
+              0.0
+            ]
+          }
+        },
+        "position": [
+          9,
+          8.8,
+          31
+        ],
+        "target": [
+          -9,
+          0.8,
+          12
+        ],
+        "exposure": 0.93,
+        "path": "direct",
+        "phaseAndHatch": {
+          "BLOCKED/0": 1,
+          "SALE_OPEN/1": 59,
+          "SOLD/2": 69,
+          "AVAILABLE/0": 148
+        },
+        "roofTextures": [
+          "park-natural-metal",
+          "pavilion-2026-shared-brick",
+          "pavilion-2026-shared-zinc",
+          "pavilion-2026-shared-siding"
+        ],
+        "roofMedian": [
+          105.0,
+          125.0,
+          129.0
+        ],
+        "facadeMedian": [
+          127.0,
+          141.0,
+          137.0
+        ]
+      },
+      "MEDIUM": {
+        "medianCorePixels": {
+          "sold": {
+            "pixels": 3510,
+            "median": [
+              22.0,
+              119.0,
+              255.0
+            ]
+          },
+          "open": {
+            "pixels": 2735,
+            "median": [
+              255.0,
+              212.0,
+              0.0
+            ]
+          }
+        },
+        "position": [
+          9,
+          8.8,
+          31
+        ],
+        "target": [
+          -9,
+          0.8,
+          12
+        ],
+        "exposure": 0.93,
+        "path": "direct",
+        "phaseAndHatch": {
+          "BLOCKED/0": 1,
+          "SALE_OPEN/1": 59,
+          "SOLD/2": 69,
+          "AVAILABLE/0": 148
+        },
+        "roofTextures": [
+          "park-natural-metal",
+          "pavilion-2026-shared-brick",
+          "pavilion-2026-shared-zinc",
+          "pavilion-2026-shared-siding"
+        ],
+        "roofMedian": [
+          106.0,
+          126.0,
+          130.0
+        ],
+        "facadeMedian": [
+          127.0,
+          141.0,
+          137.0
+        ]
+      },
+      "HIGH": {
+        "medianCorePixels": {
+          "sold": {
+            "pixels": 3510,
+            "median": [
+              18.0,
+              119.0,
+              255.0
+            ]
+          },
+          "open": {
+            "pixels": 2735,
+            "median": [
+              255.0,
+              214.0,
+              0.0
+            ]
+          }
+        },
+        "position": [
+          9,
+          8.8,
+          31
+        ],
+        "target": [
+          -9,
+          0.8,
+          12
+        ],
+        "exposure": 0.93,
+        "path": "post",
+        "phaseAndHatch": {
+          "BLOCKED/0": 1,
+          "SALE_OPEN/1": 59,
+          "SOLD/2": 69,
+          "AVAILABLE/0": 148
+        },
+        "roofTextures": [
+          "park-natural-metal",
+          "pavilion-2026-shared-brick",
+          "pavilion-2026-shared-zinc",
+          "pavilion-2026-shared-siding"
+        ],
+        "roofMedian": [
+          106.0,
+          126.0,
+          130.0
+        ],
+        "facadeMedian": [
+          127.0,
+          141.0,
+          137.0
+        ]
+      },
+      "ULTRA": {
+        "medianCorePixels": {
+          "sold": {
+            "pixels": 3510,
+            "median": [
+              18.0,
+              119.0,
+              255.0
+            ]
+          },
+          "open": {
+            "pixels": 2735,
+            "median": [
+              255.0,
+              214.0,
+              0.0
+            ]
+          }
+        },
+        "position": [
+          9,
+          8.8,
+          31
+        ],
+        "target": [
+          -9,
+          0.8,
+          12
+        ],
+        "exposure": 0.93,
+        "path": "post",
+        "phaseAndHatch": {
+          "BLOCKED/0": 1,
+          "SALE_OPEN/1": 59,
+          "SOLD/2": 69,
+          "AVAILABLE/0": 148
+        },
+        "roofTextures": [
+          "park-natural-metal",
+          "pavilion-2026-shared-brick",
+          "pavilion-2026-shared-zinc",
+          "pavilion-2026-shared-siding"
+        ],
+        "roofMedian": [
+          103.0,
+          123.0,
+          128.0
+        ],
+        "facadeMedian": [
+          127.0,
+          141.0,
+          137.0
+        ]
+      }
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { useThree } from '@react-three/fiber';
 import { useInteriorCameraRequest, type InteriorCameraRequest } from '../../hooks/useInteriorCameraRequest';
 import * as THREE from 'three';
 import type { MapEntity } from '../../types';
+import { useParkAppearance } from '../../state/parkAppearance';
 import {
   createLivestockCattlePlan,
   createLivestockPavilionLayout,
@@ -236,6 +237,8 @@ export const LivestockPavilionInteriorScene = memo(function LivestockPavilionInt
 }) {
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const height = Math.max(entity.geometry.extrusionHeight, livestockPavilionVisualHeight(bounds));
+  const warm = useParkAppearance() === 'warm-natural';
+  const invalidate = useThree(state => state.invalidate);
   const layout = useMemo(() => createLivestockPavilionLayout(bounds, height), [bounds, height]);
   const facing = strategicLandmarkFacingRadians(entity);
   const cattle = useMemo(
@@ -308,6 +311,15 @@ export const LivestockPavilionInteriorScene = memo(function LivestockPavilionInt
       toneMapped: false,
     }),
   }), [surfaceTextures]);
+
+  useLayoutEffect(() => {
+    materials.bedding.color.set(warm ? '#d5b27a' : '#c59a64');
+    materials.aisle.color.set(warm ? '#a19d90' : '#8d8b84');
+    materials.platform.color.set(warm ? '#95958d' : '#85847e');
+    materials.steel.roughness = warm ? .43 : .54;
+    materials.roof.roughness = warm ? .55 : .62;
+    invalidate();
+  }, [invalidate, materials, warm]);
 
   useEffect(() => () => {
     Object.values(materials).forEach((material) => material.dispose());
@@ -640,12 +652,12 @@ export const LivestockPavilionInteriorScene = memo(function LivestockPavilionInt
     <>
       <color attach="background" args={['#cfd5cf']} />
       <fog attach="fog" args={['#cfd5cf', layout.width * 1.6, layout.width * 3.8]} />
-      <ambientLight intensity={0.54} />
-      <hemisphereLight args={['#fff7e5', '#67584c', 0.78]} />
+      <ambientLight intensity={warm ? .47 : .54} />
+      <hemisphereLight color={warm ? '#dce7ea' : '#fff7e5'} groundColor={warm ? '#8c775e' : '#67584c'} intensity={warm ? .94 : .78} />
       <directionalLight
         position={[bounds.centerX - layout.width * 0.26, 11, bounds.centerZ + 7]}
         intensity={1.82}
-        color="#fff0ce"
+        color={warm ? '#ffe4ba' : '#fff0ce'}
         castShadow={!reducedGraphics}
         shadow-mapSize-width={reducedGraphics ? 256 : 1024}
         shadow-mapSize-height={reducedGraphics ? 256 : 1024}

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
 import { applyInteriorGroundMaterial, acquireInteriorGroundMaterial, releaseInteriorGroundMaterial } from '../features/commercial-map/components/canvas/interiorGroundMaterial';
+import { setParkGroundAppearance } from '../features/commercial-map/components/canvas/parkGroundAppearance';
 import { INTERNAL_NATURAL_PARKING_RINGS, INTERNAL_PARKING_GROUND_ENVELOPE, isInternalGroundPoint } from '../features/commercial-map/data/internalGroundCoverage';
 import { officialPdfPointToLocal } from '../features/commercial-map/data/officialReference2026';
 import { etniasAdjacentSitePointToWorld } from '../features/commercial-map/data/etniasAdjacentSite';
@@ -8,9 +9,9 @@ import { parkingContainsPoint } from '../features/commercial-map/utils/parkingGe
 import { applyTerrainMultiscaleDetail } from '../features/commercial-map/components/canvas/terrainMaterial';
 import { createParkingMaterialSet } from '../features/commercial-map/components/canvas/parkingMaterials';
 
-const compile = (material: THREE.MeshStandardMaterial) => {
+const compile = (material: THREE.MeshStandardMaterial, renderer = {} as THREE.WebGLRenderer) => {
   const shader = { uniforms: {} as Record<string, THREE.IUniform>, vertexShader: THREE.ShaderLib.standard.vertexShader, fragmentShader: THREE.ShaderLib.standard.fragmentShader };
-  material.onBeforeCompile(shader as THREE.WebGLProgramParametersWithUniforms, {} as THREE.WebGLRenderer);
+  material.onBeforeCompile(shader as THREE.WebGLProgramParametersWithUniforms, renderer);
   return shader;
 };
 
@@ -65,6 +66,24 @@ describe('canonical interior ground ownership and resources', () => {
     expect(second.vertexShader).not.toContain('position.y +=');
     material.dispose();
   });
+  it('switches already-linked grass uniforms only in their map renderer', () => {
+    const management = {} as THREE.WebGLRenderer;
+    const material = applyInteriorGroundMaterial(new THREE.MeshStandardMaterial());
+    const warm = { warm: true, grass: null, woodland: null, cover: null };
+    setParkGroundAppearance(management, warm);
+    const managed = compile(material, management);
+    const publicView = compile(material);
+    expect(managed.uniforms.interiorAlbedo.value).toBeNull();
+    const grass = new THREE.Texture();
+    setParkGroundAppearance(management, { ...warm, grass });
+    expect(managed.uniforms.interiorAlbedo.value).toBe(grass);
+    expect(managed.uniforms.parkGroundMapsReady.value.x).toBe(1);
+    expect(publicView.uniforms.parkWarmGround.value).toBe(0);
+    setParkGroundAppearance(management, { ...warm, warm: false });
+    expect(managed.uniforms.interiorAlbedo.value).toBe(publicView.uniforms.interiorAlbedo.value);
+    grass.dispose(); material.dispose();
+  });
+
   it('shares canonical parking grass across qualities while retaining its edge transparency', () => {
     const full = createParkingMaterialSet(8, false);
     const reduced = createParkingMaterialSet(1, true);

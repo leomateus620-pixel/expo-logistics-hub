@@ -4,6 +4,7 @@ import {
   commercialMapQualitySceneRebuildsOnTierChange,
   createCommercialMapAdaptiveQualityState,
   type CommercialMapAdaptiveQualityState,
+  type CommercialMapQualityCapabilitiesInput,
   type CommercialMapQualityTier,
 } from './viewport';
 import { visitRuntime } from '../visit/visitRuntime';
@@ -188,7 +189,7 @@ export function createInitialCommercialMapQualityState({
   viewportWidth: number;
   viewportHeight: number;
   devicePixelRatio: number;
-  capabilityHints: CommercialMapDeviceCapabilityHints;
+  capabilityHints: CommercialMapDeviceCapabilityHints & Pick<CommercialMapQualityCapabilitiesInput, 'qualityPreference'>;
 }): CommercialMapAdaptiveQualityState {
   return createCommercialMapAdaptiveQualityState({
     viewportWidth,

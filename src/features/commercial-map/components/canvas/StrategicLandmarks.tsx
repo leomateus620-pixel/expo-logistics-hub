@@ -1,4 +1,5 @@
-import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
+import { usePublicScenePolicy } from './PublicScenePolicyContext';
+import { useParkAppearance } from '../../state/parkAppearance';
 import { COMMERCIAL_MAP_CANONICAL_CONTENT } from '../../utils/executionPolicy';
 import { FenasojaEventCenter } from './FenasojaEventCenter';
 import { SicrediArena } from './SicrediArena';
@@ -2581,6 +2582,8 @@ function ApolloXIVReplica({
   const signGeometry = useMemo(() => createApolloSignGeometry(), []);
   const atlasMaterial = useMemo(() => {
     const result = new THREE.MeshStandardMaterial({
+      // The curb owns this shared tint. The wet-surface registry must apply rain to it once.
+      name: 'ApolloXIVSignArtwork',
       map: atlas,
       roughness: 0.76,
       metalness: 0.035,
@@ -2689,7 +2692,19 @@ function LunarTree({
   sceneDiagonal,
   onRocketSelect,
 }: LandmarkModelProps) {
-  const vegetationEnabled = useSceneVegetationEnabled();
+  const publicPolicy = usePublicScenePolicy();
+  const vegetationEnabled = publicPolicy?.vegetationEnabled !== false;
+  const treesVisible = useCommercialMapStore(state => publicPolicy ? vegetationEnabled : state.treesVisible);
+  const previousVisibility = useRef(treesVisible);
+  const gl = useThree(state => state.gl);
+  const invalidate = useThree(state => state.invalidate);
+  useLayoutEffect(() => {
+    if (treesVisible === previousVisibility.current) return;
+    previousVisibility.current = treesVisible;
+    gl.shadowMap.needsUpdate = true;
+    invalidate();
+  }, [gl, invalidate, treesVisible]);
+  const warm = useParkAppearance() === 'warm-natural';
   const foliage = useMemo(() => {
     if (!vegetationEnabled) return null;
     const geometry = createInternalLeafLobe();
@@ -2703,6 +2718,13 @@ function LunarTree({
     bark.color.set('#82705c');
     return { geometry, atlas, crown, bark };
   }, [vegetationEnabled]);
+  useLayoutEffect(() => {
+    if (!foliage) return;
+    // The memorial photo shows a full green crown and a warm grey trunk above the pale curb.
+    foliage.crown.color.set(warm ? '#829b68' : '#789660');
+    foliage.bark.color.set(warm ? '#837866' : '#82705c');
+    foliage.bark.roughness = warm ? .91 : .96;
+  }, [foliage, warm]);
   useEffect(() => () => {
     if (!foliage) return;
     foliage.geometry.dispose(); foliage.atlas.dispose();
@@ -2747,7 +2769,7 @@ function LunarTree({
         raycast={NO_RAYCAST}
         dispose={null}
       />
-      {foliage && <><mesh
+      {foliage && <group name="vegetacao-arvore-lunar" visible={treesVisible}><mesh
         name="tronco-arvore-lunar"
         geometry={UNIT_CYLINDER}
         material={foliage.bark}
@@ -2786,7 +2808,7 @@ function LunarTree({
           />
         </>
       )}
-      </>}
+      </group>}
       <ApolloXIVReplica
         height={height}
         materials={materials}

@@ -83,19 +83,21 @@ export function pointInPolygon(
   polygon: readonly SpatialPoint[],
   epsilon = SPATIAL_EPSILON,
 ) {
-  const onBoundary = polygon.some((start, index) => (
-    distanceToSegment(point, start, polygon[(index + 1) % polygon.length]) <= epsilon
-  ));
-  if (onBoundary) return true;
-
+  const [x, z] = point;
   let inside = false;
-  polygon.forEach((start, index) => {
-    const end = polygon[(index + 1) % polygon.length];
-    if (
-      (start[1] > point[1]) !== (end[1] > point[1])
-      && point[0] < ((end[0] - start[0]) * (point[1] - start[1])) / (end[1] - start[1]) + start[0]
-    ) inside = !inside;
-  });
+  for (let i = 0; i < polygon.length; i++) {
+    const start = polygon[i];
+    const end = polygon[(i + 1) % polygon.length];
+    // Most support points are far from this edge. Preserve inclusive epsilon
+    // semantics for vertices, degenerate edges and both polygon windings.
+    if (x >= Math.min(start[0], end[0]) - epsilon && x <= Math.max(start[0], end[0]) + epsilon
+      && z >= Math.min(start[1], end[1]) - epsilon && z <= Math.max(start[1], end[1]) + epsilon
+      && distanceToSegment(point, start, end) <= epsilon) return true;
+    if ((start[1] > z) !== (end[1] > z)
+      && x < ((end[0] - start[0]) * (z - start[1])) / (end[1] - start[1]) + start[0]) {
+      inside = !inside;
+    }
+  }
   return inside;
 }
 

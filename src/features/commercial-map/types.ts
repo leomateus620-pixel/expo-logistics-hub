@@ -60,7 +60,7 @@ export type AreaValidationStatus = 'UNVALIDATED' | 'CALCULATED' | 'VALIDATED' | 
 export type PricingMode = 'FIXED_TOTAL' | 'PRICE_PER_SQUARE_METER' | 'NEGOTIABLE' | 'NOT_FOR_SALE';
 export type CommercialUnit = 'SQUARE_METER' | 'FOOD_POINT';
 export type MapSource = 'database' | 'official-reference';
-export type MapPanel = 'layers' | 'results' | 'details' | 'calibration' | null;
+export type MapPanel = 'layers' | 'details-layers' | 'results' | 'details' | 'calibration' | null;
 export type MapWorkspaceMode = '3d' | 'list' | 'edit' | 'create';
 export type CameraPreset =
   | 'overview'

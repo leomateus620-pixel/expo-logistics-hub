@@ -995,7 +995,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
               )}
             </div>
 
-            {!visitEnabled && workspaceMode === '3d' && !interiorEntityId && activePanel === 'layers' && (
+            {!visitEnabled && workspaceMode === '3d' && !interiorEntityId && (activePanel === 'layers' || activePanel === 'details-layers') && (
               <MapFeatureBoundary id="layers">
               <LayersPanel
                 layers={data.layers}
@@ -1008,11 +1008,12 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
             {!visitEnabled && workspaceMode === '3d' && !interiorEntityId && activePanel === 'results' && <MapFeatureBoundary id="results"><ResultsPanel explorer={mapFilter} /></MapFeatureBoundary>}
             {workspaceMode === '3d' && !interiorEntityId
               && selectedEntity
-              && (activePanel === 'details' || lunarLaunchPreviousPanel === 'details')
+              && (activePanel === 'details' || activePanel === 'details-layers' || lunarLaunchPreviousPanel === 'details')
               && (
                 <div
                   className="commercial-map-details-panel-presence"
-                  hidden={visitEnabled || activePanel !== 'details' || lunarCinematicUiActive || christmasPlaying}
+                  data-covered={activePanel === 'details-layers' || undefined}
+                  hidden={visitEnabled || (activePanel !== 'details' && activePanel !== 'details-layers') || lunarCinematicUiActive || christmasPlaying}
                 >
                   <MapPanelBoundary resetKey={selectedEntity.id}>
                     <Suspense fallback={<EntityDetailsPanelSkeleton />}>

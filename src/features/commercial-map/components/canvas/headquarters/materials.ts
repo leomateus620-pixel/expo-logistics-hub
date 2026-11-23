@@ -15,12 +15,18 @@ function surfaceMaps(kind: Finish, anisotropy: number) {
     const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
     return n - Math.floor(n);
   };
+  // The tile profile is a sum of a U rib and a V overlap. Sample each
+  // one-dimensional term once per column/row, including the wrapped edges.
+  const sampleAxis = (sample: (t: number) => number) =>
+    Float64Array.from({ length: size }, (_, index) => sample(index / size));
+  const rib = (u: number) => 0.04 * Math.sin(u * Math.PI * 2);
+  const overlap = (v: number) => 0.008 * Math.exp(-(((v - Math.floor(v) - 0.04) / 0.025) ** 2));
+  const roof = kind === "roof" ? {
+    rib: sampleAxis(rib), left: sampleAxis(u => rib(u - .002)), right: sampleAxis(u => rib(u + .002)),
+    overlap: sampleAxis(overlap), above: sampleAxis(v => overlap(v - .002)), below: sampleAxis(v => overlap(v + .002)),
+    seam: sampleAxis(v => 5 * Math.exp(-(((v - .04) / .024) ** 2))),
+  } : null;
   const height = (u: number, v: number) => {
-    if (kind === "roof") {
-      const row = v - Math.floor(v),
-        overlap = Math.exp(-(((row - 0.04) / 0.025) ** 2));
-      return 0.04 * Math.sin(u * Math.PI * 2) + 0.008 * overlap;
-    }
     if (kind === "brick") {
       const row = Math.floor(v * 13),
         x = (u * 4.2 + (row % 2) * 0.5) % 1,
@@ -37,38 +43,35 @@ function surfaceMaps(kind: Finish, anisotropy: number) {
         u = x / size,
         v = y / size,
         n = noise(x, y) - 0.5;
-      const nx =
-        -(height(u + 0.002, v) - height(u - 0.002, v)) *
-          (kind === "roof" ? 780 : 110) +
-        n * 0.026;
-      const ny =
-        -(height(u, v + 0.002) - height(u, v - 0.002)) *
-          (kind === "roof" ? 580 : 110) +
-        n * 0.025;
+      const dx = roof
+        ? (roof.right[x] + roof.overlap[y] - (roof.left[x] + roof.overlap[y])) * 780
+        : (height(u + .002, v) - height(u - .002, v)) * 110;
+      const dy = roof
+        ? (roof.rib[x] + roof.below[y] - (roof.rib[x] + roof.above[y])) * 580
+        : (height(u, v + .002) - height(u, v - .002)) * 110;
+      const nx = -dx + n * 0.026;
+      const ny = -dy + n * 0.025;
       const scale = 1 / Math.hypot(nx, ny, 1);
-      normal.set(
-        [
-          (nx * scale * 0.5 + 0.5) * 255,
-          (ny * scale * 0.5 + 0.5) * 255,
-          (scale * 0.5 + 0.5) * 255,
-          255,
-        ],
-        i,
-      );
+      normal[i] = (nx * scale * 0.5 + 0.5) * 255;
+      normal[i + 1] = (ny * scale * 0.5 + 0.5) * 255;
+      normal[i + 2] = (scale * 0.5 + 0.5) * 255;
+      normal[i + 3] = 255;
       const value =
         kind === "concrete"
           ? 240 + n * 12
-          : kind === "roof"
-            ? 245 + n * 5 - 5 * Math.exp(-(((v - 0.04) / 0.024) ** 2))
+          : roof
+            ? 245 + n * 5 - roof.seam[y]
             : 247 + n * 7;
-      colour.set([value, value, value, 255], i);
+      colour[i] = colour[i + 1] = colour[i + 2] = value;
+      colour[i + 3] = 255;
       const r =
         kind === "roof"
           ? 193 + n * 16
           : kind === "masonry"
             ? 238 + n * 8
             : 249 + n * 5;
-      rough.set([r, r, r, 255], i);
+      rough[i] = rough[i + 1] = rough[i + 2] = r;
+      rough[i + 3] = 255;
     }
   const map = (data: Uint8Array, srgb = false) => {
     const t = new THREE.DataTexture(data, size, size);

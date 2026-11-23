@@ -1,0 +1,3721 @@
+{
+  "browser": "157.0.8103.79",
+  "interiors": [
+    {
+      "code": "B1",
+      "entityId": "reference:2026:b1",
+      "name": "Pavilhão 1 — Indústria, Comércio e Serviços",
+      "modules": 189,
+      "registeredGeometryAndNumbersSha256": "5a7715d410156404ce43be40afed7dd48e692950e949c910c7d44d1fa4eec773",
+      "original": {
+        "BLOCKED": 189
+      },
+      "fixture": {
+        "AVAILABLE": 118,
+        "SOLD": 24,
+        "SALE_OPEN": 24,
+        "BLOCKED": 23
+      },
+      "fixtureSha256": "39699af68a88d037b0d3a9e382212633338169bf0a3481d8cb850f7c0f009164"
+    },
+    {
+      "code": "B2",
+      "entityId": "reference:2026:b2",
+      "name": "Pavilhão 14 — Artesanato e Comércio",
+      "modules": 186,
+      "registeredGeometryAndNumbersSha256": "ce44fce09c02f2929d1d9de5d370cf024e1e4b15289dae3b94c2d1e010033cb4",
+      "original": {
+        "BLOCKED": 186
+      },
+      "fixture": {
+        "AVAILABLE": 117,
+        "SOLD": 23,
+        "SALE_OPEN": 23,
+        "BLOCKED": 23
+      },
+      "fixtureSha256": "79f5e7512d431ca40ad47c575c2ed506a9beb36b5e84255b05329b30fb742928"
+    },
+    {
+      "code": "B3",
+      "entityId": "reference:2026:b3",
+      "name": "Pavilhão 12 — Indústria, Comércio e Serviços",
+      "modules": 257,
+      "registeredGeometryAndNumbersSha256": "9dc3332de81b6670defe93db06259fa19fadf3fa2c37fb7dca6a05d0c4ce17d8",
+      "original": {
+        "BLOCKED": 257
+      },
+      "fixture": {
+        "AVAILABLE": 161,
+        "SOLD": 32,
+        "SALE_OPEN": 32,
+        "BLOCKED": 32
+      },
+      "fixtureSha256": "9816a43518f5c6578bb9dd5b115c7e4c467a23d7bc9e98040a6362e29e7bced0"
+    },
+    {
+      "code": "B4",
+      "entityId": "reference:2026:b4",
+      "name": "Pavilhão 8 — Indústria, Comércio e Serviços",
+      "modules": 114,
+      "registeredGeometryAndNumbersSha256": "00bf2e218780cbf88ac2f8b1f0349e53588787b16c1705be4b78ad722ad468e6",
+      "original": {
+        "BLOCKED": 114
+      },
+      "fixture": {
+        "AVAILABLE": 72,
+        "SOLD": 14,
+        "SALE_OPEN": 14,
+        "BLOCKED": 14
+      },
+      "fixtureSha256": "00ca727ef61c7704a3e349fd38e0089f4239889a72fb03e8568976ef38339275"
+    },
+    {
+      "code": "B5",
+      "entityId": "reference:2026:b5",
+      "name": "Pavilhão 13 — Indústria e Comércio",
+      "modules": 104,
+      "registeredGeometryAndNumbersSha256": "bb7921a672841e9ea5ec4c942024302aa079cc43e0b2f0be509ef3c15ef5037e",
+      "original": {
+        "BLOCKED": 104
+      },
+      "fixture": {
+        "AVAILABLE": 65,
+        "SOLD": 13,
+        "SALE_OPEN": 13,
+        "BLOCKED": 13
+      },
+      "fixtureSha256": "b20daed0e53d5a96e5079c0737dcf267f10d8f9def315a6118428e9558dcf135"
+    },
+    {
+      "code": "B6",
+      "entityId": "reference:2026:b6",
+      "name": "Pavilhão 3 — Indústria e Comércio",
+      "modules": 214,
+      "registeredGeometryAndNumbersSha256": "ba42afb884bde828373ea8cdf41718583cf971d46107dc16f89775ee6878c0b0",
+      "original": {
+        "BLOCKED": 214
+      },
+      "fixture": {
+        "AVAILABLE": 134,
+        "SOLD": 27,
+        "SALE_OPEN": 27,
+        "BLOCKED": 26
+      },
+      "fixtureSha256": "4c053a00448ac8d6b38068d835beaef57e13e364bba8a72006b88eec072d3832"
+    },
+    {
+      "code": "B8",
+      "entityId": "reference:2026:b8",
+      "name": "Pavilhão 5: Floriculturas",
+      "modules": 81,
+      "registeredGeometryAndNumbersSha256": "884fa0b169a61a6415100706c223c3f029f726bfb9cb733dd86913b94dd2c479",
+      "original": {
+        "BLOCKED": 81
+      },
+      "fixture": {
+        "AVAILABLE": 51,
+        "SOLD": 10,
+        "SALE_OPEN": 10,
+        "BLOCKED": 10
+      },
+      "fixtureSha256": "7a3d34052a325d25a8325169b857f52d9b389bb2c3ca86b4e10c49779fb7d7d5"
+    },
+    {
+      "code": "B10",
+      "entityId": "reference:2026:b10",
+      "name": "Pavilhão 7 — Agricultura Familiar / Agroindústrias",
+      "modules": 57,
+      "registeredGeometryAndNumbersSha256": "3a0091366dc3692751da7a68a41be6ce03edd91bc3191d06e53fba9d603003c9",
+      "original": {
+        "BLOCKED": 57
+      },
+      "fixture": {
+        "AVAILABLE": 36,
+        "SOLD": 7,
+        "SALE_OPEN": 7,
+        "BLOCKED": 7
+      },
+      "fixtureSha256": "97495e46d5879a3d4e894bed4c2d7a4d0b37050004b80d94d0566ca4330c1b89"
+    },
+    {
+      "code": "B9",
+      "entityId": "reference:2026:b9",
+      "name": "Pavilhões 6, 10 e 11 — Pecuária",
+      "modules": 0,
+      "registeredGeometryAndNumbersSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "original": {},
+      "fixture": {},
+      "fixtureSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "code": "D3",
+      "entityId": "reference:2026:d3",
+      "name": "Espaço Mirante",
+      "modules": 0,
+      "registeredGeometryAndNumbersSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "original": {},
+      "fixture": {},
+      "fixtureSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "code": "B12",
+      "entityId": "reference:2026:b12",
+      "name": "Sede Fenasoja / Comissão Central",
+      "modules": 0,
+      "registeredGeometryAndNumbersSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "original": {},
+      "fixture": {},
+      "fixtureSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "views": [
+    {
+      "name": "B1-planta",
+      "position": [
+        -19.48669340974217,
+        14.614032302364329,
+        15.370909168072291
+      ],
+      "target": [
+        -19.05818181818182,
+        0.10697852319133176,
+        15.370909168072291
+      ],
+      "quaternion": [
+        -0.4925633775029058,
+        -0.5073276250539981,
+        -0.4925633775029058,
+        0.507327625053998
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b1",
+      "interior": "reference:2026:b1",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 268,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 323,
+      "budget": {
+        "calls": 20,
+        "triangles": 9338,
+        "textures": 119,
+        "geometries": 641,
+        "programs": 277
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 158.21755527910548
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 240,
+          "vertices": 80
+        }
+      ]
+    },
+    {
+      "name": "B1-aproximacao",
+      "position": [
+        -20.532516733049082,
+        3.4699345251542213,
+        15.550256916146648
+      ],
+      "target": [
+        -20.433181220085228,
+        0.10697852319133176,
+        15.550256916146648
+      ],
+      "quaternion": [
+        -0.49256337750290663,
+        -0.5073276250539971,
+        -0.49256337750290663,
+        0.5073276250539971
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b1",
+      "interior": "reference:2026:b1",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 283,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 339,
+      "budget": {
+        "calls": 9,
+        "triangles": 9190,
+        "textures": 119,
+        "geometries": 640,
+        "programs": 277
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 158.21755527910548
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 240,
+          "vertices": 80
+        }
+      ],
+      "focus": {
+        "number": 95,
+        "identifier": "B1-M095",
+        "key": "B1:module:095"
+      }
+    },
+    {
+      "name": "B2-planta",
+      "position": [
+        -17.71636363636364,
+        9.896858190273713,
+        21.63836634983495
+      ],
+      "target": [
+        -17.71636363636364,
+        0.1035809400442903,
+        21.349091016265067
+      ],
+      "quaternion": [
+        -0.6965898087929107,
+        0,
+        0,
+        0.7174696079178937
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b2",
+      "interior": "reference:2026:b2",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 314,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 369,
+      "budget": {
+        "calls": 22,
+        "triangles": 9220,
+        "textures": 117,
+        "geometries": 607,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 192,
+          "vertices": 64
+        }
+      ]
+    },
+    {
+      "name": "B2-aproximacao",
+      "position": [
+        -15.998836363636366,
+        1.8633768293799822,
+        20.87967993081784
+      ],
+      "target": [
+        -15.998836363636366,
+        0.1035809400442903,
+        20.82769880847286
+      ],
+      "quaternion": [
+        -0.6965898087929108,
+        0,
+        0,
+        0.7174696079178935
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b2",
+      "interior": "reference:2026:b2",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 332,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 386,
+      "budget": {
+        "calls": 14,
+        "triangles": 9124,
+        "textures": 117,
+        "geometries": 591,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 192,
+          "vertices": 64
+        }
+      ],
+      "focus": {
+        "number": 94,
+        "identifier": "B2-M094",
+        "key": "B2:module:094"
+      }
+    },
+    {
+      "name": "B3-planta",
+      "position": [
+        -8.30181818181818,
+        10.765073359170557,
+        21.87338380133724
+      ],
+      "target": [
+        -8.30181818181818,
+        0.11843999999999999,
+        21.447272834939767
+      ],
+      "quaternion": [
+        -0.692823550988974,
+        0,
+        0,
+        0.7211071537538847
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b3",
+      "interior": "reference:2026:b3",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 363,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 419,
+      "budget": {
+        "calls": 15,
+        "triangles": 12374,
+        "textures": 116,
+        "geometries": 589,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 240,
+          "vertices": 80
+        }
+      ]
+    },
+    {
+      "name": "B3-aproximacao",
+      "position": [
+        -6.174028103454577,
+        3.744234388659577,
+        21.04694323486672
+      ],
+      "target": [
+        -6.174028103454577,
+        0.11843999999999999,
+        20.9018278074082
+      ],
+      "quaternion": [
+        -0.6928235509889746,
+        0,
+        0,
+        0.7211071537538839
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b3",
+      "interior": "reference:2026:b3",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 379,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 435,
+      "budget": {
+        "calls": 11,
+        "triangles": 12326,
+        "textures": 116,
+        "geometries": 589,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 240,
+          "vertices": 80
+        }
+      ],
+      "focus": {
+        "number": 129,
+        "identifier": "B3-M129",
+        "key": "B3:module:129"
+      }
+    },
+    {
+      "name": "B4-planta",
+      "position": [
+        -2.530909090909091,
+        9.075853153422674,
+        20.87655606639111
+      ],
+      "target": [
+        -2.530909090909091,
+        0.0955282577726348,
+        21.141818287951814
+      ],
+      "quaternion": [
+        0,
+        0.7174696079178964,
+        0.696589808792908,
+        0
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b4",
+      "interior": "reference:2026:b4",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 406,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 461,
+      "budget": {
+        "calls": 23,
+        "triangles": 5786,
+        "textures": 115,
+        "geometries": 588,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 264,
+          "vertices": 88
+        }
+      ]
+    },
+    {
+      "name": "B4-aproximacao",
+      "position": [
+        -2.7098181818181817,
+        2.9710117370793205,
+        19.758512982363058
+      ],
+      "target": [
+        -2.7098181818181817,
+        0.0955282577726348,
+        19.843449456782984
+      ],
+      "quaternion": [
+        0,
+        0.7174696079178965,
+        0.6965898087929077,
+        0
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b4",
+      "interior": "reference:2026:b4",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 422,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 477,
+      "budget": {
+        "calls": 16,
+        "triangles": 5662,
+        "textures": 115,
+        "geometries": 588,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 264,
+          "vertices": 88
+        }
+      ],
+      "focus": {
+        "number": 58,
+        "identifier": "B4-M058",
+        "key": "B4:module:058"
+      }
+    },
+    {
+      "name": "B5-planta",
+      "position": [
+        0.5672727272727229,
+        9.875465345886587,
+        20.31815026566098
+      ],
+      "target": [
+        0.5672727272727229,
+        0.08736,
+        20.6072728307229
+      ],
+      "quaternion": [
+        0,
+        0.717469607917895,
+        0.6965898087929093,
+        0
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b5",
+      "interior": "reference:2026:b5",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 448,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 503,
+      "budget": {
+        "calls": 29,
+        "triangles": 5356,
+        "textures": 114,
+        "geometries": 589,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 288,
+          "vertices": 96
+        }
+      ]
+    },
+    {
+      "name": "B5-aproximacao",
+      "position": [
+        0.7543140495867721,
+        3.5945784861240533,
+        18.57091573967769
+      ],
+      "target": [
+        0.7543140495867721,
+        0.08736,
+        18.67451250014439
+      ],
+      "quaternion": [
+        0,
+        0.7174696079178938,
+        0.6965898087929105,
+        0
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b5",
+      "interior": "reference:2026:b5",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 463,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 519,
+      "budget": {
+        "calls": 15,
+        "triangles": 5188,
+        "textures": 114,
+        "geometries": 589,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 288,
+          "vertices": 96
+        }
+      ],
+      "focus": {
+        "number": 53,
+        "identifier": "B5-M053",
+        "key": "B5:module:053"
+      }
+    },
+    {
+      "name": "B6-planta",
+      "position": [
+        4.690909090909095,
+        12.788677031645754,
+        21.47267945137363
+      ],
+      "target": [
+        4.690909090909095,
+        0.11024341309150103,
+        21.098181924096387
+      ],
+      "quaternion": [
+        -0.6965898087929093,
+        0,
+        0,
+        0.717469607917895
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b6",
+      "interior": "reference:2026:b6",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 494,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 549,
+      "budget": {
+        "calls": 24,
+        "triangles": 10692,
+        "textures": 113,
+        "geometries": 584,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 138.27416665235734
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 504,
+          "vertices": 168
+        }
+      ]
+    },
+    {
+      "name": "B6-aproximacao",
+      "position": [
+        6.1843527272727306,
+        2.930541095447688,
+        18.991172834184173
+      ],
+      "target": [
+        6.1843527272727306,
+        0.11024341309150103,
+        18.907866446344386
+      ],
+      "quaternion": [
+        -0.6965898087929077,
+        0,
+        0,
+        0.7174696079178966
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b6",
+      "interior": "reference:2026:b6",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 510,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 566,
+      "budget": {
+        "calls": 16,
+        "triangles": 10596,
+        "textures": 113,
+        "geometries": 584,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 138.27416665235734
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 504,
+          "vertices": 168
+        }
+      ],
+      "focus": {
+        "number": 36,
+        "identifier": "B6-M036",
+        "key": "B6:module:036"
+      }
+    },
+    {
+      "name": "B8-planta",
+      "position": [
+        -0.9927272727272722,
+        7.125343479908628,
+        -14.595896268941345
+      ],
+      "target": [
+        -0.9927272727272722,
+        0.09240000000000001,
+        -14.803636437951807
+      ],
+      "quaternion": [
+        -0.6965898087929092,
+        0,
+        0,
+        0.717469607917895
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b8",
+      "interior": "reference:2026:b8",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 542,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 597,
+      "budget": {
+        "calls": 16,
+        "triangles": 4090,
+        "textures": 112,
+        "geometries": 563,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 144,
+          "vertices": 48
+        }
+      ]
+    },
+    {
+      "name": "B8-aproximacao",
+      "position": [
+        -1.1888486530221622,
+        2.255622927188549,
+        -16.22026297091645
+      ],
+      "target": [
+        -1.1888486530221622,
+        0.09240000000000001,
+        -16.28416058331519
+      ],
+      "quaternion": [
+        -0.6965898087929094,
+        0,
+        0,
+        0.7174696079178949
+      ],
+      "fov": 36,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b8",
+      "interior": "reference:2026:b8",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 559,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 613,
+      "budget": {
+        "calls": 11,
+        "triangles": 4018,
+        "textures": 112,
+        "geometries": 563,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 36,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.025,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 144,
+          "vertices": 48
+        }
+      ],
+      "focus": {
+        "number": 41,
+        "identifier": "B8-M041",
+        "key": "B8:module:041"
+      }
+    },
+    {
+      "name": "B10-planta",
+      "position": [
+        -26.378181818181815,
+        12.089800104193802,
+        -12.453226850041117
+      ],
+      "target": [
+        -26.378181818181815,
+        0.09324,
+        -14.389090981325301
+      ],
+      "quaternion": [
+        -0.6483411765008883,
+        0,
+        0,
+        0.7613499319323829
+      ],
+      "fov": 40,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b10",
+      "interior": "reference:2026:b10",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 587,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 642,
+      "budget": {
+        "calls": 11,
+        "triangles": 3072,
+        "textures": 112,
+        "geometries": 562,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 40,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.035,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 240,
+          "vertices": 80
+        }
+      ]
+    },
+    {
+      "name": "B10-aproximacao",
+      "position": [
+        -23.95704320692169,
+        5.344057433872945,
+        -13.696976857141257
+      ],
+      "target": [
+        -23.95704320692169,
+        0.09324,
+        -14.544292174354796
+      ],
+      "quaternion": [
+        -0.6483411765008885,
+        0,
+        0,
+        0.7613499319323825
+      ],
+      "fov": 40,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b10",
+      "interior": "reference:2026:b10",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 603,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 658,
+      "budget": {
+        "calls": 11,
+        "triangles": 3072,
+        "textures": 112,
+        "geometries": 562,
+        "programs": 276
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-interiorFloor",
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 40,
+        "view": {
+          "enabled": true,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -35,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.035,
+        "far": 120
+      },
+      "floor": [
+        "Mesh / pavilion-circulation-concrete"
+      ],
+      "trims": [
+        {
+          "indices": 240,
+          "vertices": 80
+        }
+      ],
+      "focus": {
+        "number": 29,
+        "identifier": "B10-M029",
+        "key": "B10:module:029"
+      }
+    },
+    {
+      "name": "B9-interior",
+      "position": [
+        -20.242909090909087,
+        2.998158560505543,
+        -2.3389091026505966
+      ],
+      "target": [
+        -16.11490909090909,
+        0.9993861868351802,
+        -14.352436435686748
+      ],
+      "quaternion": [
+        -0.07688953060496904,
+        -0.16423102766460174,
+        -0.012841629264937097,
+        0.9833367999792332
+      ],
+      "fov": 44,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b9",
+      "interior": "reference:2026:b9",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 635,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 704,
+      "budget": {
+        "calls": 30,
+        "triangles": 32006,
+        "textures": 115,
+        "geometries": 567,
+        "programs": 289
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 44,
+        "view": {
+          "enabled": false,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -0.03257477786952567,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.04,
+        "far": 150.10909090909087
+      },
+      "floor": [],
+      "trims": []
+    },
+    {
+      "name": "B9-aproximacao",
+      "position": [
+        -17.02306909090909,
+        1.4391161090426599,
+        -11.709460422418795
+      ],
+      "target": [
+        -16.11490909090909,
+        0.9993861868351802,
+        -14.352436435686748
+      ],
+      "quaternion": [
+        -0.07688953060496903,
+        -0.16423102766460168,
+        -0.012841629264937086,
+        0.9833367999792332
+      ],
+      "fov": 44,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b9",
+      "interior": "reference:2026:b9",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 652,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 719,
+      "budget": {
+        "calls": 30,
+        "triangles": 32006,
+        "textures": 115,
+        "geometries": 567,
+        "programs": 289
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 44,
+        "view": {
+          "enabled": false,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -0.03257477786952567,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.04,
+        "far": 150.10909090909087
+      },
+      "floor": [],
+      "trims": []
+    },
+    {
+      "name": "D3-interior",
+      "position": [
+        10.9309090909091,
+        1.1367999999999996,
+        -4.549527295566269
+      ],
+      "target": [
+        15.188945454545467,
+        0.3636,
+        -8.648727316144578
+      ],
+      "quaternion": [
+        -0.05980718105826904,
+        -0.39061688671054157,
+        -0.025441371515159676,
+        0.9182561110746037
+      ],
+      "fov": 44,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:d3",
+      "interior": "reference:2026:d3",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 691,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 747,
+      "budget": {
+        "calls": 22,
+        "triangles": 3890,
+        "textures": 111,
+        "geometries": 568,
+        "programs": 281
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 44,
+        "view": {
+          "enabled": false,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -0.03257477786952567,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.04,
+        "far": 150
+      },
+      "floor": [],
+      "trims": []
+    },
+    {
+      "name": "D3-aproximacao",
+      "position": [
+        14.252177454545466,
+        0.5337039999999998,
+        -7.74690331161735
+      ],
+      "target": [
+        15.188945454545467,
+        0.3636,
+        -8.648727316144578
+      ],
+      "quaternion": [
+        -0.05980718105826903,
+        -0.3906168867105416,
+        -0.025441371515159676,
+        0.9182561110746037
+      ],
+      "fov": 44,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:d3",
+      "interior": "reference:2026:d3",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 697,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 751,
+      "budget": {
+        "calls": 19,
+        "triangles": 3865,
+        "textures": 111,
+        "geometries": 568,
+        "programs": 281
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 44,
+        "view": {
+          "enabled": false,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -0.03257477786952567,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.04,
+        "far": 150
+      },
+      "floor": [],
+      "trims": []
+    },
+    {
+      "name": "B12-interior",
+      "position": [
+        13.722727272727269,
+        1.4600000000000002,
+        16.653636440963854
+      ],
+      "target": [
+        18.00272727272727,
+        0.78,
+        16.673636440963854
+      ],
+      "quaternion": [
+        -0.05551805582813434,
+        -0.706558721923904,
+        -0.05577809213749761,
+        0.7032647598080145
+      ],
+      "fov": 38,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b12",
+      "interior": "reference:2026:b12",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 753,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 821,
+      "budget": {
+        "calls": 76,
+        "triangles": 94963,
+        "textures": 165,
+        "geometries": 650,
+        "programs": 295
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 38,
+        "view": {
+          "enabled": false,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -0.03257477786952567,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.045,
+        "far": 1200
+      },
+      "floor": [],
+      "trims": []
+    },
+    {
+      "name": "B12-aproximacao",
+      "position": [
+        14.70712727272727,
+        1.3036,
+        16.658236440963854
+      ],
+      "target": [
+        18.00272727272727,
+        0.78,
+        16.673636440963854
+      ],
+      "quaternion": [
+        -0.055518055828134356,
+        -0.706558721923904,
+        -0.05577809213749761,
+        0.7032647598080145
+      ],
+      "fov": 38,
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "renderDpr": 1,
+      "buffer": [
+        1366,
+        768
+      ],
+      "quality": {
+        "initialTier": "MEDIUM",
+        "tier": "MEDIUM",
+        "sceneTier": "MEDIUM",
+        "effectTier": "MEDIUM",
+        "policy": {
+          "shadowMapSize": 1536,
+          "effectUpdateHz": 30,
+          "lodUpdateHz": 15,
+          "taskBudgetMs": 3
+        },
+        "dpr": 1,
+        "shadowResolution": 1536,
+        "lastFrameWindow": null,
+        "inventory": {
+          "entities": 1595,
+          "presentedEntities": 393,
+          "lots": 1479,
+          "commercialTrees": 274,
+          "presentedCommercialTrees": 274
+        },
+        "hardwareRestrictedActions": []
+      },
+      "profile": "warm-natural",
+      "mode": "3d",
+      "cameraPreset": "overview",
+      "selected": "reference:2026:b12",
+      "interior": "reference:2026:b12",
+      "layers": {
+        "reference:quadras": true,
+        "reference:commercial": true,
+        "reference:pavilions": true,
+        "reference:structures": true,
+        "reference:food": true,
+        "reference:restrooms": true,
+        "reference:safety": true,
+        "reference:gates": true,
+        "reference:parking": true,
+        "reference:circulation": true,
+        "reference:green": true,
+        "reference:exporural": true,
+        "reference:reference": true
+      },
+      "reference": false,
+      "labels": true,
+      "trees": true,
+      "sunrise": {
+        "phase": "complete",
+        "progress": 1,
+        "sequence": 1
+      },
+      "rain": 0,
+      "night": 0,
+      "hydrology": false,
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 782,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "frame": 846,
+      "budget": {
+        "calls": 69,
+        "triangles": 94837,
+        "textures": 165,
+        "geometries": 650,
+        "programs": 295
+      },
+      "bindings": {
+        "bound": [
+          "park-natural-metal"
+        ],
+        "samples": {
+          "CommercialMapOuterGroundMaterial": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-a": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          },
+          "quadras-ab-ground:quadra-b": {
+            "material": "MeshStandardMaterial",
+            "warm": 1,
+            "ready": [
+              0,
+              0,
+              0
+            ],
+            "textures": []
+          }
+        }
+      },
+      "optics": {
+        "zoom": 1,
+        "fov": 38,
+        "view": {
+          "enabled": false,
+          "fullWidth": 1366,
+          "fullHeight": 768,
+          "offsetX": 0,
+          "offsetY": -0.03257477786952567,
+          "width": 1366,
+          "height": 768
+        },
+        "near": 0.045,
+        "far": 1200
+      },
+      "floor": [],
+      "trims": []
+    }
+  ],
+  "errors": [],
+  "revision": "ff8f8360934034909ab82b491949ec82579d0ea9",
+  "exteriorFloorRequests": 0,
+  "floorRequests": [
+    {
+      "path": "/maps/materials/warm-interior-floor-v1.webp",
+      "transfer": 0,
+      "duration": 7.199999999254942
+    }
+  ],
+  "complete": true,
+  "blockedOrigins": [
+    "https://fonts.googleapis.com"
+  ]
+}

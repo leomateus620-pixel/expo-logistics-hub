@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { CommercialMapTopBar } from '@/features/commercial-map/components/controls/CommercialMapTopBar';
 import { MapToolbar } from '@/features/commercial-map/components/controls/MapToolbar';
 import { LayersPanel } from '@/features/commercial-map/components/panels/MapPanels';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
+import { readParkPreferences } from '@/features/commercial-map/state/parkAppearance';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
 import type { CommercialMapAreaScope } from '@/features/commercial-map/utils/areaScope';
 import type { MapPermissions } from '@/features/commercial-map/types';
@@ -111,6 +112,32 @@ describe('controle de visibilidade do ambiente e da rede elétrica', () => {
 
     expect(useCommercialMapStore.getState().treesVisible).toBe(false);
     expect(toggle).not.toBeChecked();
+  });
+
+  it('troca apresentação e orçamento sem emitir navegação ou descartar a ficha selecionada', () => {
+    const store = useCommercialMapStore.getState();
+    store.setQualityPreference('auto');
+    store.setAppearance('warm-natural');
+    store.setSelectedEntityId('lote-inspecionado');
+    store.setActivePanel('layers');
+    const { cameraSequence, sunriseSequence } = useCommercialMapStore.getState();
+    render(<LayersPanel layers={[]} lots={[]} entities={[]} permissions={permissions} />);
+    const appearance = screen.getByRole('combobox', { name: 'Aparência' });
+    const quality = screen.getByRole('combobox', { name: 'Qualidade' });
+    expect(appearance).toHaveValue('warm-natural');
+    expect(quality).toHaveValue('auto');
+    fireEvent.change(quality, { target: { value: 'fluidity' } });
+    fireEvent.change(appearance, { target: { value: 'classic' } });
+    expect(readParkPreferences()).toEqual({ appearance: 'classic', qualityPreference: 'fluidity' });
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'lote-inspecionado', activePanel: 'details-layers',
+      reducedGraphics: true, cameraSequence, sunriseSequence,
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Fechar painel' }));
+    expect(useCommercialMapStore.getState().activePanel).toBe('details');
+    act(() => store.setReducedGraphics(false));
+    expect(readParkPreferences().qualityPreference).toBe('auto');
+    act(() => store.setSelectedEntityId(null));
   });
 
   it('oferece o controle nos segmentos em que a rede elétrica está presente', () => {

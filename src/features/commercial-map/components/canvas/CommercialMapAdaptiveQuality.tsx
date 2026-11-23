@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { commercialMapFrameActivity } from '../../utils/frameActivity';
 import { sampleCommercialMapDisplayCadence } from '../../utils/displayCadence';
+import type { ParkQualityPreference } from '../../state/parkAppearance';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { recordCommercialMapQualityDecision } from '../../utils/runtimeDiagnostics';
 import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
@@ -12,6 +13,7 @@ import {
   readVisitQuality, resolveVisitQualityDecision, subscribeVisitQuality,
 } from '../../visit/VisitQualityManager';
 import {
+  createCommercialMapAdaptiveQualityState,
   resolveCommercialMapAdaptiveQuality,
   resolveCommercialMapPixelRatio,
   resolveCommercialMapQualityPixelRatio,
@@ -37,6 +39,7 @@ import {
 interface CommercialMapAdaptiveQualityControllerProps {
   active: boolean;
   reducedGraphics: boolean;
+  qualityPreference?: ParkQualityPreference;
   initialState: CommercialMapAdaptiveQualityState;
   capabilityHints: CommercialMapDeviceCapabilityHints;
   onQualityChange?: (quality: {
@@ -62,6 +65,7 @@ function copyQualityState(
 export function CommercialMapAdaptiveQualityController({
   active,
   reducedGraphics,
+  qualityPreference = 'auto',
   initialState,
   capabilityHints,
   onQualityChange,
@@ -105,12 +109,14 @@ export function CommercialMapAdaptiveQualityController({
       || (import.meta.env.DEV && new URLSearchParams(window.location.search).has('groundQa')))
     && new URLSearchParams(window.location.search).get('quality') === 'fixed'));
 
+  const previousPreference = useRef(qualityPreference);
   const resolveCapabilities = useCallback((): CommercialMapQualityCapabilitiesInput => ({
     devicePixelRatio: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
     viewportWidth: size.width,
     viewportHeight: size.height,
     ...capabilityHints,
-  }), [capabilityHints, size.height, size.width]);
+    qualityPreference,
+  }), [capabilityHints, qualityPreference, size.height, size.width]);
 
   const resolveTierPixelRatio = useCallback((tier: CommercialMapQualityTier) => {
     const capabilities = resolveCapabilities();
@@ -291,6 +297,10 @@ export function CommercialMapAdaptiveQualityController({
     displayCadence.current = null;
     samplingSignature.current = '';
     const capabilities = resolveCapabilities();
+    if (previousPreference.current !== qualityPreference) {
+      previousPreference.current = qualityPreference;
+      qualityState.current = createCommercialMapAdaptiveQualityState(capabilities);
+    }
     const decision = resolveQuality({
       ...capabilities,
       averageFrameTimeMs: Number.NaN,
@@ -302,7 +312,7 @@ export function CommercialMapAdaptiveQualityController({
       decision,
       decision.reason === 'hardware-cap' ? decision.reason : 'viewport-sync',
     );
-  }, [applyQualityDecision, resolveCapabilities, resolveQuality]);
+  }, [applyQualityDecision, qualityPreference, resolveCapabilities, resolveQuality]);
 
   useEffect(() => {
     cancelIdleCommit();

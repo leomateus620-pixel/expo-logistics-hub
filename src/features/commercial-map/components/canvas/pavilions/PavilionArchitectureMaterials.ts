@@ -5,11 +5,12 @@ import type { CommercialPavilionMaterials } from '../CommercialPavilion';
 
 const BACKGROUND = new THREE.Color('#dfe8de');
 export const PAVILION_SURFACE_TILE_SIZE = 0.6; // 4 metres in the map's 0.15 unit/m scale.
-export const PAVILION_SURFACE_PROGRAM_KEY = 'pavilion-architecture-local-uv-r170-v1';
+export const PAVILION_SURFACE_PROGRAM_KEY = 'pavilion-architecture-local-uv-r170-v2';
 type Surface = 'paint' | 'brick' | 'zinc' | 'siding';
 type Textures = Record<Surface, THREE.CanvasTexture | null>;
 let sharedTextures: Textures | null = null;
 let textureOwners = 0;
+const colorTileScales = new WeakMap<THREE.Material, THREE.Uniform<number>>();
 
 function noise(x: number, y: number) {
   const n = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
@@ -71,10 +72,14 @@ export function releasePavilionArchitectureTextures() {
 export function installPavilionMetricUV(material: THREE.MeshStandardMaterial, roof = false) {
   if (material.userData.pavilionMetricUV) return;
   material.userData.pavilionMetricUV = true;
+  const colorTileScale = new THREE.Uniform(1);
+  colorTileScales.set(material, colorTileScale);
   const upstream = material.onBeforeCompile;
   const upstreamKey = material.customProgramCacheKey();
   material.onBeforeCompile = function(shader, renderer) {
     upstream.call(this, shader, renderer);
+    shader.uniforms.pavilionColorTileScale = colorTileScale;
+    shader.vertexShader = 'uniform float pavilionColorTileScale;\n' + shader.vertexShader;
     shader.vertexShader = shader.vertexShader.replace('#include <uv_vertex>', `
       #include <uv_vertex>
       vec3 pavilionPosition = position;
@@ -88,7 +93,7 @@ export function installPavilionMetricUV(material: THREE.MeshStandardMaterial, ro
         ? pavilionPosition.${roof ? 'zx' : 'xz'} : (pavilionAxis.x > pavilionAxis.z ? pavilionPosition.zy : pavilionPosition.xy);
       pavilionUv /= ${PAVILION_SURFACE_TILE_SIZE.toFixed(3)};
       #ifdef USE_MAP
-        vMapUv = pavilionUv;
+        vMapUv = pavilionUv * pavilionColorTileScale;
       #endif
       #ifdef USE_BUMPMAP
         vBumpMapUv = pavilionUv;
@@ -97,6 +102,12 @@ export function installPavilionMetricUV(material: THREE.MeshStandardMaterial, ro
   };
   material.customProgramCacheKey = () => `${upstreamKey}|${PAVILION_SURFACE_PROGRAM_KEY}|${roof ? 'roof' : 'facade'}`;
   material.needsUpdate = true;
+}
+
+/** The prepared cover sheet and the original 4 m bump tile share a ridge axis. */
+export function setPavilionColorTileWidth(material: THREE.Material, metres: number) {
+  const scale = colorTileScales.get(material);
+  if (scale) scale.value = PAVILION_SURFACE_TILE_SIZE / (metres * 0.15);
 }
 
 /** Commercial state lives on the existing outline/emissive; it does not recolour brick or graphite. */

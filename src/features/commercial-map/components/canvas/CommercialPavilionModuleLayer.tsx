@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from '
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
+import { PavilionIslandEdging } from './pavilions/PavilionInteriorFinishes';
 import { STATUS_CONFIG } from '../../constants';
 import { pavilionCirculationInfill } from '../../utils/pavilionCirculationInfill';
 import {
@@ -35,6 +36,7 @@ const NO_RAYCAST = () => undefined;
 type ModuleLayerMode = 'cutaway' | 'interior';
 
 interface CommercialPavilionModuleLayerProps {
+  circulationFloor?: THREE.MeshStandardMaterial | null;
   layout: CommercialPavilionLayout;
   plan: CommercialPavilionModulePlan;
   mode: ModuleLayerMode;
@@ -512,6 +514,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   plan,
   mode,
   reducedGraphics = false,
+  circulationFloor = null,
   moduleStateById = EMPTY_MODULE_STATE,
   matchingEntityIds,
   filtersActive = false,
@@ -925,10 +928,13 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   return (
     <group raycast={NO_RAYCAST} dispose={null}>
       <SoldLotLocks surfaces={lockSurfaces} />
+      {circulationFloor && <PavilionIslandEdging plan={plan} frame={projectionFrame} floorY={floorY}
+        width={THREE.MathUtils.clamp(shortSide * .009, .035, .075)} />}
       {projectedCorridors.length > 0 && (
         <instancedMesh
           ref={setCorridorMesh}
           args={[unitBoxGeometry, corridorMaterial, projectedCorridors.length]}
+          material={circulationFloor ?? corridorMaterial}
           receiveShadow
           raycast={NO_RAYCAST}
           dispose={null}

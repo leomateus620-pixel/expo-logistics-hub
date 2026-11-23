@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { ROAD_MATERIAL_COLORS, ROAD_SURFACE_PROFILE } from '../../constants';
+import { NATURAL_ROAD_SURFACES, ROAD_MATERIAL_COLORS, ROAD_SURFACE_PROFILE } from '../../constants';
 import type { MapEntity } from '../../types';
 import {
   buildRoadNetworkGeometries,
@@ -15,6 +15,7 @@ import {
   type OpenGroundTextureBundle,
 } from './openGroundTextures';
 import { bindParkSurfaceMaterial } from './parkSurfaceMaterial';
+import { useParkAppearance } from '../../state/parkAppearance';
 import type { UbiretamaRoadPresentation } from '../../utils/ubiretamaRoadPresentation';
 
 // ANALYST 2026.9-annex-road-precision.1 — this component only extrudes official
@@ -76,6 +77,9 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
   surfaceTextures,
 }: RoadLayerNetworkProps) {
   const { invalidate } = useThree();
+  const warm = useParkAppearance() === 'warm-natural';
+  const asphaltColor = warm ? NATURAL_ROAD_SURFACES.asphalt : ROAD_MATERIAL_COLORS.asphalt;
+  const asphaltRoughness = warm ? NATURAL_ROAD_SURFACES.asphaltRoughness : ROAD_SURFACE_PROFILE.asphaltRoughness;
   const network = useMemo(
     () => buildRoadNetworkGeometries(entities, { reducedGraphics, suppressedSurfaceIdentifiers, ubiretamaPresentation }),
     [entities, reducedGraphics, suppressedSurfaceIdentifiers, ubiretamaPresentation],
@@ -128,12 +132,12 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
       {network.asphalt && contextOpacity > 0.015 && (
         <mesh geometry={network.asphalt} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
-            color={ROAD_MATERIAL_COLORS.asphalt}
+            color={asphaltColor}
             map={surfaceTextures?.asphalt?.map}
             normalMap={surfaceTextures?.asphalt?.normalMap}
             normalScale={surfaceTextures?.asphalt ? ASPHALT_NORMAL_SCALE : undefined}
             roughnessMap={surfaceTextures?.asphalt?.roughnessMap}
-            roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
+            roughness={asphaltRoughness}
             metalness={0}
             transparent={transparent}
             opacity={contextOpacity}
@@ -146,12 +150,12 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
       {network.intersections && contextOpacity > 0.015 && (
         <mesh geometry={network.intersections} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
-            color={ROAD_MATERIAL_COLORS.asphalt}
+            color={asphaltColor}
             map={surfaceTextures?.asphalt?.map}
             normalMap={surfaceTextures?.asphalt?.normalMap}
             normalScale={surfaceTextures?.asphalt ? ASPHALT_NORMAL_SCALE : undefined}
             roughnessMap={surfaceTextures?.asphalt?.roughnessMap}
-            roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
+            roughness={asphaltRoughness}
             metalness={0}
             transparent={transparent}
             opacity={contextOpacity}
@@ -167,7 +171,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
       {network.pedestrian && contextOpacity > 0.015 && (
         <mesh geometry={network.pedestrian} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
-            color={ROAD_MATERIAL_COLORS.pedestrian}
+            color={warm ? NATURAL_ROAD_SURFACES.pedestrian : ROAD_MATERIAL_COLORS.pedestrian}
             map={surfaceTextures?.pedestrian?.map}
             normalMap={surfaceTextures?.pedestrian?.normalMap}
             normalScale={surfaceTextures?.pedestrian ? PEDESTRIAN_NORMAL_SCALE : undefined}

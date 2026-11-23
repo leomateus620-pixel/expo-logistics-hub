@@ -5,6 +5,7 @@ import type { CommercialLot, MapEntity } from '../../types';
 import { createExternalLotFrameGeometry } from '../../utils/externalLotFrameGeometry';
 import { externalLotFrameColor, isExternalPresentationLot, lotPresentationLift, lotPresentationTop } from '../../utils/externalLotPresentation';
 import { disposeBatchedMesh } from '../../utils/instancedMeshDisposal';
+import { preserveStatusMarkerColor } from './commercialStatusInk';
 
 const NO_RAYCAST = () => undefined;
 // The existing rural mown shoulder reaches top + .014; keep a minimal .004 clearance.
@@ -56,6 +57,9 @@ export function ExternalLotFrames({ entries, selectedId, hoveredId, cartIds, mat
     mesh.computeBoundingBox(); mesh.computeBoundingSphere();
     return { mesh, material, ids };
   }, [entities]);
+  useLayoutEffect(() => {
+    if (resources && !publicScene) return preserveStatusMarkerColor(resources.material);
+  }, [resources, publicScene]);
   useLayoutEffect(() => {
     if (!resources) return;
     const matrix = new THREE.Matrix4(), color = new THREE.Color(), muted = new THREE.Color('#c7d1c9');

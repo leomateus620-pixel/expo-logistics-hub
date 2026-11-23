@@ -1,0 +1,29 @@
+{
+  "revision": "32b68d600df60d0e4ae17d4311ea04a28d8512e5",
+  "totalFiles": 744,
+  "identicalFiles": 743,
+  "differentFiles": [
+    "qa-build-manifest.json"
+  ],
+  "checked": "SHA-256 de cada arquivo das duas builds locais de fixture",
+  "manifest": {
+    "revision": "32b68d600df60d0e4ae17d4311ea04a28d8512e5",
+    "hashes": {
+      "utils/externalLotPresentation.ts": "2e5b4555fb10b868b426a3ad5cc280bf6b58a4c2695ea2910bb0e881112cb88a",
+      "utils/externalLotStatus.ts": "bc1cc7005e965a2a106174c8f6048ae2ff098dc7e718b2ca76d2c79b861543c1",
+      "utils/soldCheckGeometry.ts": "91b4e958cb25a6d4173d4c60499b21eb77f35f9b9f26dd5bede4b72a78a85cdf",
+      "utils/soldLotPresentation.ts": "14690c300b7435b2ad65f2c0a88096513a274f08869a8b3f860a75cb23ce68f7",
+      "components/canvas/CommercialMapCanvas.tsx": "b9b431429fad55f32658aaab0a5cfdc72611d50da89c5651e23d4cc5ad33656f",
+      "components/canvas/SoldLotLocks.tsx": "109231813b2771a0f0b95940e278a1660d1f412952fd439e1bea8b5b29cf2e3d",
+      "components/canvas/ExternalLotFrames.tsx": "00e379c29e4971ec46cc87719a937c02e9ab5b9497ccfe5ed67d243c44c10eea",
+      "components/canvas/exporuralTurfMaterial.ts": "a8e21b875f96f06554915a876372ac685e4181e9d7207f1de7cce665c75f4018",
+      "utils/externalLotFrameGeometry.ts": "59b47744c558ff95f8f722705b747b81eb2b0fef8c6fe4c872d1d24d0afad821",
+      "public/publicMapService.ts": "0cbc3482ecdce3ff2d2fdda6a611ab74ddb4e27b94796a2eb7ed7633a5b0825d"
+    },
+    "fixtureHash": "76e8e1249ab9a103f65cd393cfa2a048b0c8e179acb95aa9b0f30eb2fe997972",
+    "inventoryHash": "4c4028f2b69bbfd9ee1b6762c17a83bc0d2208f1973b355d9abea06822c7c73e",
+    "mode": "production",
+    "backend": "qa.invalid",
+    "fixture": "authorized sanitized rural inventory and current geometry; reference non-rural controls"
+  }
+}

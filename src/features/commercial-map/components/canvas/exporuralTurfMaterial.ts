@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { EXTERNAL_LOT_PALETTE } from '../../utils/externalLotPresentation';
+import { statusInkUniforms, statusInkExposure } from './commercialStatusInk';
 
 type TurfMaterial = THREE.MeshStandardMaterial | THREE.MeshBasicMaterial;
 const installations = new WeakMap<TurfMaterial, { detail: THREE.IUniform<number>; pixelRatio: THREE.IUniform<number> }>();
@@ -15,12 +15,14 @@ export function applyExporuralTurfMaterial(material: TurfMaterial, reduced = fal
   const statusPixelRatio = { value: pixelRatio };
   const upstream = material.onBeforeCompile;
   const upstreamKey = material.customProgramCacheKey();
+  const managed = material instanceof THREE.MeshStandardMaterial;
+  const inverseExposure = managed ? statusInkExposure(material) : { value: 0 };
   material.onBeforeCompile = (shader, renderer) => {
     upstream.call(material, shader, renderer);
     shader.uniforms.uExternalTurfDetail = detail;
     shader.uniforms.uExternalStatusPixelRatio = statusPixelRatio;
-    shader.uniforms.uExternalStatusOpen = { value: new THREE.Color(EXTERNAL_LOT_PALETTE.open) };
-    shader.uniforms.uExternalStatusSold = { value: new THREE.Color(EXTERNAL_LOT_PALETTE.sold) };
+    Object.assign(shader.uniforms, statusInkUniforms);
+    shader.uniforms.uExternalInverseExposure = inverseExposure;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>
       attribute float exporuralTurf;
@@ -47,6 +49,9 @@ export function applyExporuralTurfMaterial(material: TurfMaterial, reduced = fal
       uniform float uExternalStatusPixelRatio;
       uniform vec3 uExternalStatusOpen;
       uniform vec3 uExternalStatusSold;
+      uniform vec3 uExternalHdrOpen;
+      uniform vec3 uExternalHdrSold;
+      uniform float uExternalInverseExposure;
       varying vec2 vExternalLotStatus;
       varying float vExternalLotPitch;
       varying float vExporuralTurf;
@@ -98,12 +103,16 @@ export function applyExporuralTurfMaterial(material: TurfMaterial, reduced = fal
           -externalStripeIntegral(stripePhase-externalStripePixel*.5,duty))/externalStripePixel;
         coverage=mix(clamp(coverage,0.,1.),duty,smoothstep(.2,.8,externalStripePixel));
         vec3 statusColor=vExternalLotStatus.x>1.5 ? uExternalStatusSold : uExternalStatusOpen;
+        ${managed ? `
+        #ifndef TONE_MAPPING
+          if (uExternalInverseExposure > 0.) statusColor=(vExternalLotStatus.x>1.5 ? uExternalHdrSold : uExternalHdrOpen)*uExternalInverseExposure;
+        #endif` : ''}
         // Status alone bypasses lighting/tone mapping; the grass keeps all its
         // existing light, texture and shadows. Depth, fog and opacity still apply.
         gl_FragColor.rgb=mix(gl_FragColor.rgb,statusColor,coverage*vExternalLotStatus.y);
       }`);
   };
-  material.customProgramCacheKey = () => `${upstreamKey}|external-turf-r170-v5-status-lines:${reuseExistingSurfaceDetail ? 'surface' : 'procedural'}`;
+  material.customProgramCacheKey = () => `${upstreamKey}|external-turf-r170-v6-status-lines:${reuseExistingSurfaceDetail ? 'surface' : 'procedural'}`;
   material.needsUpdate = true;
   installations.set(material, { detail, pixelRatio: statusPixelRatio });
 }

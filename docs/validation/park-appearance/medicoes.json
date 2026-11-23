@@ -1,0 +1,842 @@
+{
+  "revisions": {
+    "base": "c99436b37d91971ef86b8a76f0177d0d0427e4d9",
+    "candidate": "ff8f8360934034909ab82b491949ec82579d0ea9"
+  },
+  "same-revision-classic": [
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 8114,
+      "ready": 8170,
+      "visibleResponse": 8516,
+      "gestureLatency": 113.8,
+      "scene": 5509,
+      "worker": 1093,
+      "geometry": 23.7,
+      "canvasTextures": 460.8,
+      "shader": 1046,
+      "upload": 313,
+      "programs": 129,
+      "textures": 115,
+      "calls": 873,
+      "geometries": 625,
+      "triangles": 763961,
+      "bytesObserved": 1569663,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 7884,
+      "ready": 7938,
+      "visibleResponse": 8319,
+      "gestureLatency": 108.3,
+      "scene": 5372,
+      "worker": 1108,
+      "geometry": 27.0,
+      "canvasTextures": 449.9,
+      "shader": 962,
+      "upload": 292,
+      "programs": 129,
+      "textures": 115,
+      "calls": 873,
+      "geometries": 625,
+      "triangles": 763961,
+      "bytesObserved": 1569663,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "same-revision-warm-natural": [
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 7574,
+      "ready": 7628,
+      "visibleResponse": 8012,
+      "gestureLatency": 110.1,
+      "scene": 5281,
+      "worker": 1026,
+      "geometry": 22.7,
+      "canvasTextures": 365.1,
+      "shader": 813,
+      "upload": 306,
+      "programs": 129,
+      "textures": 111,
+      "calls": 873,
+      "geometries": 626,
+      "triangles": 763961,
+      "bytesObserved": 1569663,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 7383,
+      "ready": 7437,
+      "visibleResponse": 7754,
+      "gestureLatency": 61,
+      "scene": 5329,
+      "worker": 821,
+      "geometry": 27.4,
+      "canvasTextures": 365.7,
+      "shader": 796,
+      "upload": 291,
+      "programs": 129,
+      "textures": 111,
+      "calls": 873,
+      "geometries": 626,
+      "triangles": 763961,
+      "bytesObserved": 1569663,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "base-desktop": [
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        1440,
+        900
+      ],
+      "deviceDpr": 1,
+      "effectiveDpr": 1,
+      "tier": "HIGH",
+      "cpuRate": 1,
+      "useful": 7451,
+      "ready": 7510,
+      "visibleResponse": 7716,
+      "gestureLatency": 59.5,
+      "scene": 3114,
+      "worker": 1249,
+      "geometry": 9.8,
+      "canvasTextures": 254.4,
+      "shader": 1096,
+      "upload": 1892,
+      "programs": 129,
+      "textures": 115,
+      "calls": 881,
+      "geometries": 634,
+      "triangles": 810009,
+      "bytesObserved": 1622069,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        1440,
+        900
+      ],
+      "deviceDpr": 1,
+      "effectiveDpr": 1,
+      "tier": "HIGH",
+      "cpuRate": 1,
+      "useful": 5556,
+      "ready": 5625,
+      "visibleResponse": 5830,
+      "gestureLatency": 61,
+      "scene": 2247,
+      "worker": 630,
+      "geometry": 8.5,
+      "canvasTextures": 163.3,
+      "shader": 683,
+      "upload": 1920,
+      "programs": 129,
+      "textures": 115,
+      "calls": 881,
+      "geometries": 634,
+      "triangles": 810009,
+      "bytesObserved": 1622069,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        1440,
+        900
+      ],
+      "deviceDpr": 1,
+      "effectiveDpr": 1,
+      "tier": "HIGH",
+      "cpuRate": 1,
+      "useful": 4890,
+      "ready": 4956,
+      "visibleResponse": 5128,
+      "gestureLatency": 64.4,
+      "scene": 1690,
+      "worker": 516,
+      "geometry": 7.8,
+      "canvasTextures": 109.1,
+      "shader": 709,
+      "upload": 1888,
+      "programs": 129,
+      "textures": 115,
+      "calls": 881,
+      "geometries": 634,
+      "triangles": 810009,
+      "bytesObserved": 1622069,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "base-mobile": [
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 10400,
+      "ready": 10451,
+      "visibleResponse": 10804,
+      "gestureLatency": 91.6,
+      "scene": 6500,
+      "worker": 1054,
+      "geometry": 23.5,
+      "canvasTextures": 471.5,
+      "shader": 824,
+      "upload": 1869,
+      "programs": 129,
+      "textures": 114,
+      "calls": 873,
+      "geometries": 625,
+      "triangles": 763961,
+      "bytesObserved": 1561886,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 10487,
+      "ready": 10540,
+      "visibleResponse": 10889,
+      "gestureLatency": 113,
+      "scene": 6369,
+      "worker": 1332,
+      "geometry": 21.4,
+      "canvasTextures": 449.5,
+      "shader": 782,
+      "upload": 1852,
+      "programs": 129,
+      "textures": 114,
+      "calls": 873,
+      "geometries": 625,
+      "triangles": 763961,
+      "bytesObserved": 1561813,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 10120,
+      "ready": 10174,
+      "visibleResponse": 10550,
+      "gestureLatency": 90.2,
+      "scene": 6373,
+      "worker": 944,
+      "geometry": 22.6,
+      "canvasTextures": 459.5,
+      "shader": 776,
+      "upload": 1873,
+      "programs": 129,
+      "textures": 114,
+      "calls": 873,
+      "geometries": 625,
+      "triangles": 763961,
+      "bytesObserved": 1561813,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "candidate-desktop": [
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        1440,
+        900
+      ],
+      "deviceDpr": 1,
+      "effectiveDpr": 1,
+      "tier": "HIGH",
+      "cpuRate": 1,
+      "useful": 4569,
+      "ready": 4640,
+      "visibleResponse": 4847,
+      "gestureLatency": 61.6,
+      "scene": 2713,
+      "worker": 746,
+      "geometry": 14.0,
+      "canvasTextures": 182.2,
+      "shader": 727,
+      "upload": 309,
+      "programs": 129,
+      "textures": 111,
+      "calls": 881,
+      "geometries": 635,
+      "triangles": 810009,
+      "bytesObserved": 1629919,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        1440,
+        900
+      ],
+      "deviceDpr": 1,
+      "effectiveDpr": 1,
+      "tier": "HIGH",
+      "cpuRate": 1,
+      "useful": 3626,
+      "ready": 3682,
+      "visibleResponse": 3854,
+      "gestureLatency": 63.1,
+      "scene": 1727,
+      "worker": 808,
+      "geometry": 11.1,
+      "canvasTextures": 121,
+      "shader": 691,
+      "upload": 306,
+      "programs": 129,
+      "textures": 111,
+      "calls": 881,
+      "geometries": 635,
+      "triangles": 810009,
+      "bytesObserved": 1629992,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        1440,
+        900
+      ],
+      "deviceDpr": 1,
+      "effectiveDpr": 1,
+      "tier": "HIGH",
+      "cpuRate": 1,
+      "useful": 2923,
+      "ready": 2979,
+      "visibleResponse": 3185,
+      "gestureLatency": 60.4,
+      "scene": 1355,
+      "worker": 516,
+      "geometry": 8.2,
+      "canvasTextures": 88.7,
+      "shader": 669,
+      "upload": 291,
+      "programs": 129,
+      "textures": 111,
+      "calls": 881,
+      "geometries": 635,
+      "triangles": 810009,
+      "bytesObserved": 1629919,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "candidate-mobile": [
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 8135,
+      "ready": 8191,
+      "visibleResponse": 8746,
+      "gestureLatency": 126.7,
+      "scene": 6017,
+      "worker": 821,
+      "geometry": 27.5,
+      "canvasTextures": 404.8,
+      "shader": 856,
+      "upload": 290,
+      "programs": 129,
+      "textures": 111,
+      "calls": 873,
+      "geometries": 626,
+      "triangles": 763961,
+      "bytesObserved": 1569663,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 7920,
+      "ready": 7976,
+      "visibleResponse": 8361,
+      "gestureLatency": 93.8,
+      "scene": 5519,
+      "worker": 1098,
+      "geometry": 27.3,
+      "canvasTextures": 379.1,
+      "shader": 864,
+      "upload": 284,
+      "programs": 129,
+      "textures": 111,
+      "calls": 873,
+      "geometries": 626,
+      "triangles": 763961,
+      "bytesObserved": 1569663,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    {
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "viewport": [
+        390,
+        844
+      ],
+      "deviceDpr": 3,
+      "effectiveDpr": 1,
+      "tier": "LOW",
+      "cpuRate": 4,
+      "useful": 7925,
+      "ready": 7981,
+      "visibleResponse": 8333,
+      "gestureLatency": 61.1,
+      "scene": 5555,
+      "worker": 1100,
+      "geometry": 24.6,
+      "canvasTextures": 376.5,
+      "shader": 832,
+      "upload": 291,
+      "programs": 129,
+      "textures": 111,
+      "calls": 873,
+      "geometries": 626,
+      "triangles": 763961,
+      "bytesObserved": 1569663,
+      "errors": [],
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  ],
+  "navigation-base-desktop": [
+    {
+      "name": "baseline-HIGH-dpr1-overview-continuous-1",
+      "frames": {
+        "samples": 213,
+        "medianMs": 33.3,
+        "p95Ms": 34.1,
+        "stallsOver50Ms": 0,
+        "maxMs": 34.3
+      },
+      "dprValues": [
+        1
+      ],
+      "effectiveResizes": 0,
+      "physicalSizes": [
+        "1440x900"
+      ],
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 973,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "invalidFocus": false
+    },
+    {
+      "name": "baseline-HIGH-dpr1-overview-continuous-2",
+      "frames": {
+        "samples": 213,
+        "medianMs": 33.3,
+        "p95Ms": 45.1,
+        "stallsOver50Ms": 10,
+        "maxMs": 295
+      },
+      "dprValues": [
+        1
+      ],
+      "effectiveResizes": 0,
+      "physicalSizes": [
+        "1440x900"
+      ],
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 1018,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "invalidFocus": false
+    }
+  ],
+  "navigation-base-mobile": [
+    {
+      "name": "baseline-LOW-dpr3-overview-continuous-1",
+      "frames": {
+        "samples": 213,
+        "medianMs": 33.3,
+        "p95Ms": 34.3,
+        "stallsOver50Ms": 0,
+        "maxMs": 34.8
+      },
+      "dprValues": [
+        1
+      ],
+      "effectiveResizes": 0,
+      "physicalSizes": [
+        "390x844"
+      ],
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 742,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "invalidFocus": false
+    },
+    {
+      "name": "baseline-LOW-dpr3-overview-continuous-2",
+      "frames": {
+        "samples": 213,
+        "medianMs": 33.3,
+        "p95Ms": 34.2,
+        "stallsOver50Ms": 0,
+        "maxMs": 34.6
+      },
+      "dprValues": [
+        1
+      ],
+      "effectiveResizes": 0,
+      "physicalSizes": [
+        "390x844"
+      ],
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 744,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "invalidFocus": false
+    }
+  ],
+  "navigation-candidate-desktop": [
+    {
+      "name": "candidate-HIGH-dpr1-overview-continuous-1",
+      "frames": {
+        "samples": 213,
+        "medianMs": 33.3,
+        "p95Ms": 34,
+        "stallsOver50Ms": 0,
+        "maxMs": 34.4
+      },
+      "dprValues": [
+        1
+      ],
+      "effectiveResizes": 0,
+      "physicalSizes": [
+        "1440x900"
+      ],
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 971,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "invalidFocus": false
+    },
+    {
+      "name": "candidate-HIGH-dpr1-overview-continuous-2",
+      "frames": {
+        "samples": 213,
+        "medianMs": 33.3,
+        "p95Ms": 34.1,
+        "stallsOver50Ms": 0,
+        "maxMs": 35
+      },
+      "dprValues": [
+        1
+      ],
+      "effectiveResizes": 0,
+      "physicalSizes": [
+        "1440x900"
+      ],
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "post",
+        "presentedFrames": 976,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "invalidFocus": false
+    }
+  ],
+  "navigation-candidate-mobile": [
+    {
+      "name": "candidate-LOW-dpr3-overview-continuous-1",
+      "frames": {
+        "samples": 213,
+        "medianMs": 33.3,
+        "p95Ms": 34.3,
+        "stallsOver50Ms": 0,
+        "maxMs": 34.7
+      },
+      "dprValues": [
+        1
+      ],
+      "effectiveResizes": 0,
+      "physicalSizes": [
+        "390x844"
+      ],
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 759,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "invalidFocus": false
+    },
+    {
+      "name": "candidate-LOW-dpr3-overview-continuous-2",
+      "frames": {
+        "samples": 214,
+        "medianMs": 33.3,
+        "p95Ms": 34.3,
+        "stallsOver50Ms": 0,
+        "maxMs": 34.7
+      },
+      "dprValues": [
+        1
+      ],
+      "effectiveResizes": 0,
+      "physicalSizes": [
+        "390x844"
+      ],
+      "invariants": {
+        "identityUnchanged": true,
+        "selectionUnchanged": true,
+        "inventoryUnchanged": true
+      },
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 763,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      },
+      "invalidFocus": false
+    }
+  ]
+}

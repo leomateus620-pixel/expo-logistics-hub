@@ -3,6 +3,7 @@ import { useThree } from '@react-three/fiber';
 import { useInteriorCameraRequest, type InteriorCameraRequest } from '../../hooks/useInteriorCameraRequest';
 import * as THREE from 'three';
 import type { MapEntity } from '../../types';
+import { useParkAppearance } from '../../state/parkAppearance';
 import { strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../../utils/landmarks';
 import { HeadquartersVisitors } from './headquarters/HeadquartersVisitors';
 import {
@@ -361,20 +362,21 @@ export const HeadquartersInteriorScene = memo(function HeadquartersInteriorScene
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
   const floorTexture = useMemo(() => createWoodFloorTexture(), []);
+  const warm = useParkAppearance() === 'warm-natural';
   useEffect(() => () => floorTexture?.dispose(), [floorTexture]);
 
   return (
     <>
       <color attach="background" args={['#ddd8ca']} />
       <fog attach="fog" args={['#ddd8ca', 12, 25]} />
-      <ambientLight intensity={0.62} />
-      <hemisphereLight args={['#fff7e6', '#624c37', 0.78]} />
-      <directionalLight position={[bounds.centerX - 5, 8, bounds.centerZ + 6]} intensity={1.25} color="#fff2d1" castShadow={!reducedGraphics} shadow-mapSize-width={reducedGraphics ? 256 : 1024} shadow-mapSize-height={reducedGraphics ? 256 : 1024} shadow-bias={-0.00015} shadow-normalBias={0.035} />
+      <ambientLight intensity={warm ? .48 : .62} />
+      <hemisphereLight color={warm ? '#dce6e9' : '#fff7e6'} groundColor={warm ? '#8c7965' : '#624c37'} intensity={warm ? .92 : .78} />
+      <directionalLight position={[bounds.centerX - 5, 8, bounds.centerZ + 6]} intensity={1.25} color={warm ? '#ffe5bf' : '#fff2d1'} castShadow={!reducedGraphics} shadow-mapSize-width={reducedGraphics ? 256 : 1024} shadow-mapSize-height={reducedGraphics ? 256 : 1024} shadow-bias={-0.00015} shadow-normalBias={0.035} />
       <pointLight position={[bounds.centerX, 2.62, bounds.centerZ - 0.5]} intensity={1.25} distance={8} decay={1.7} color="#ffe8b4" />
       <group position={[bounds.centerX, entity.geometry.elevation, bounds.centerZ]} rotation={[0, facing, 0]}>
         <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow raycast={NO_RAYCAST}>
           <planeGeometry args={[5.8, 7.1]} />
-          <meshStandardMaterial color={floorTexture ? '#ffffff' : '#8b5738'} map={floorTexture} roughness={0.78} />
+          <meshStandardMaterial color={floorTexture ? '#ffffff' : '#8b5738'} map={floorTexture} roughness={warm ? 0.61 : 0.78} />
         </mesh>
         <mesh position={[0, 1.52, -3.48]} receiveShadow raycast={NO_RAYCAST}>
           <boxGeometry args={[5.8, 3.04, 0.12]} />

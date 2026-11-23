@@ -206,6 +206,7 @@ export function buildExteriorArchitectureScene(vegetationEnabled = true) {
     group,
     meshes,
     farCells,
+    foliage,
     assignments,
     dispose: () => {
       farCells.forEach((cell) => cell.mesh.geometry.dispose());

@@ -136,6 +136,8 @@ export interface CommercialPavilionCorridor
 
 export interface CommercialPavilionModulePlan {
   publicIdentifier: CommercialPavilionPublicIdentifier;
+  /** Normalized drafting gap between consecutive module edges of one reference run. */
+  moduleGap?: number;
   topology: CommercialPavilionModuleTopology;
   colorCue: string;
   stats: CommercialPavilionModuleStats;
@@ -164,6 +166,7 @@ const OFFICIAL_BOUNDARY: NormalizedCommercialPavilionRect = {
 };
 
 interface OfficialCommercialPavilionReference {
+  moduleGap?: number;
   publicIdentifier: CommercialPavilionPublicIdentifier;
   pavilionNumber: CommercialPavilionModuleStats['pavilionNumber'];
   category: string;
@@ -281,6 +284,7 @@ function buildOfficialCommercialPavilionPlan(
 
   return {
     publicIdentifier: reference.publicIdentifier,
+    moduleGap: reference.moduleGap,
     topology,
     colorCue,
     stats: {

@@ -14,6 +14,8 @@ import {
 } from './openGroundTextures';
 import { bindParkSurfaceMaterial } from './parkSurfaceMaterial';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { useParkAppearance } from '../../state/parkAppearance';
+import { NATURAL_ROAD_SURFACES } from '../../constants';
 
 interface RearParkRoadNetworkProps {
   reducedGraphics: boolean;
@@ -74,6 +76,7 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
   onFocus,
   onCursor,
 }: RearParkRoadNetworkProps) {
+  const warm = useParkAppearance() === 'warm-natural';
   const maximumAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
   const network = useMemo(
     () => buildRearRoadNetworkGeometries(undefined, { reducedGraphics }),
@@ -191,8 +194,8 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
             normalMap={parkTextures?.normalMap}
             normalScale={parkTextures ? ASPHALT_NORMAL_SCALE : undefined}
             roughnessMap={parkTextures?.roughnessMap}
-            color={REAR_ROAD_SURFACE_PROFILES.park.baseColor}
-            roughness={REAR_ROAD_SURFACE_PROFILES.park.roughness}
+            color={warm ? NATURAL_ROAD_SURFACES.asphalt : REAR_ROAD_SURFACE_PROFILES.park.baseColor}
+            roughness={warm ? NATURAL_ROAD_SURFACES.asphaltRoughness : REAR_ROAD_SURFACE_PROFILES.park.roughness}
             metalness={0}
             side={THREE.FrontSide}
             transparent={transparent}

@@ -10,15 +10,6 @@ export interface PlanarSurfaceCut extends Bounds {
 const EPSILON = 1e-8;
 const SEAM_BLEND = 0.35;
 
-function boundsOf(points: readonly LocalPoint[]): Bounds {
-  return {
-    minX: Math.min(...points.map(([x]) => x)),
-    maxX: Math.max(...points.map(([x]) => x)),
-    minZ: Math.min(...points.map(([, z]) => z)),
-    maxZ: Math.max(...points.map(([, z]) => z)),
-  };
-}
-
 function overlaps(a: Bounds, b: Bounds, margin = 0) {
   return a.minX <= b.maxX + margin && a.maxX >= b.minX - margin
     && a.minZ <= b.maxZ + margin && a.maxZ >= b.minZ - margin;
@@ -103,13 +94,25 @@ export function clipPlanarSurfaceGeometry(
   const outputs = attributes.map(() => [] as number[]);
   const sourceIndex = geometry.getIndex();
   const count = sourceIndex?.count ?? sourcePosition.count;
-  const readVertex = (index: number): Vertex => attributes.flatMap((attribute) => (
-    Array.from({ length: attribute.itemSize }, (_, component) => attribute.getComponent(index, component))
-  ));
+  const readVertex = (index: number): Vertex => {
+    const vertex: Vertex = [];
+    for (const attribute of attributes) {
+      for (let component = 0; component < attribute.itemSize; component++) {
+        vertex.push(attribute.getComponent(index, component));
+      }
+    }
+    return vertex;
+  };
 
   for (let index = 0; index < count; index += 3) {
-    const triangle = [0, 1, 2].map((offset) => readVertex(sourceIndex?.getX(index + offset) ?? index + offset));
-    const triangleBounds = boundsOf(triangle.map((vertex) => [vertex[0], vertex[2]]));
+    const a = readVertex(sourceIndex?.getX(index) ?? index);
+    const b = readVertex(sourceIndex?.getX(index + 1) ?? index + 1);
+    const c = readVertex(sourceIndex?.getX(index + 2) ?? index + 2);
+    const triangle = [a, b, c];
+    const triangleBounds = {
+      minX: Math.min(a[0], b[0], c[0]), maxX: Math.max(a[0], b[0], c[0]),
+      minZ: Math.min(a[2], b[2], c[2]), maxZ: Math.max(a[2], b[2], c[2]),
+    };
     const nearbyCuts = cuts.filter((cut) => overlaps(triangleBounds, cut, SEAM_BLEND));
     let pieces = [triangle];
     nearbyCuts.filter((cut) => overlaps(triangleBounds, cut)).forEach((cut) => {

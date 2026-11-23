@@ -1,3 +1,4 @@
+import { useParkAppearance } from '../../state/parkAppearance';
 import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
 import { memo, useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -288,12 +289,28 @@ export const TerritorialEnvironment = memo(function TerritorialEnvironment({
 }) {
   const vegetationEnabled = useSceneVegetationEnabled();
   const treesVisible = useCommercialMapStore((s) => s.treesVisible);
+  const warm = useParkAppearance() === 'warm-natural';
+  const invalidate = useThree(state => state.invalidate);
   const lastDiagnostic = useRef(-1);
   const renderer = useThree((state) => state.gl);
   const viewportHeight = useThree((state) => state.size.height);
   const architecture = useMemo(() => buildExteriorArchitectureScene(vegetationEnabled), [vegetationEnabled]);
+  useEffect(() => {
+    // The three distance meshes share this opaque material. Lift the shaded
+    // perimeter foliage without an additional cutout or transparent pass.
+    if (architecture.foliage) {
+      architecture.foliage.color.setRGB(warm ? 1.18 : 1, warm ? 1.14 : 1, warm ? 1.09 : 1);
+      architecture.foliage.roughness = warm ? .88 : .97;
+      invalidate();
+    }
+  }, [architecture, warm, invalidate]);
   const fishing = useMemo(buildExteriorFishingScene, []);
-  const groundMaterial = useMemo(() => createExteriorGroundMaterial(), []);
+  const fieldAppearance = useMemo(() => new THREE.Uniform(0), []);
+  const groundMaterial = useMemo(() => createExteriorGroundMaterial(false, fieldAppearance), [fieldAppearance]);
+  useEffect(() => {
+    fieldAppearance.value = Number(warm);
+    invalidate();
+  }, [fieldAppearance, warm, invalidate]);
   const water = useMemo(
     () => {
       const ponds = TERRITORY_PATCHES.filter((p) => p.kind === "water");

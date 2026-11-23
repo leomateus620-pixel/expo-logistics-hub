@@ -9,10 +9,11 @@ import {
   pickRearParkingBlock, pickRearParkingSpace,
 } from '../../data/rearParking';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { useParkAppearance } from '../../state/parkAppearance';
 import { isMapSelectionClick } from '../../utils/interaction';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { type ParkingPolygon } from '../../utils/parkingGeometry';
-import { createParkingMaterialSet, type ParkingSurfaceKind } from './parkingMaterials';
+import { createParkingMaterialSet, PARKING_SURFACE_PROFILES, type ParkingSurfaceKind } from './parkingMaterials';
 import {
   createParkingArrowGeometry, createParkingFeatherGeometry,
   createParkingLineBatch, createParkingSurfaceGeometry,
@@ -185,6 +186,18 @@ export const RearParkingLayer = memo(function RearParkingLayer({
   const [hovered, setHovered] = useState(false);
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
   const materials = useMemo(() => createParkingMaterialSet(gl.capabilities.getMaxAnisotropy(), reducedGraphics), [gl, reducedGraphics]);
+  const warm = useParkAppearance() === 'warm-natural';
+  useEffect(() => {
+    for (const surfaces of [materials.solid, materials.feather]) {
+      surfaces.soil.color.set(warm ? '#f2dac9' : '#ffffff');
+      surfaces.soil.roughness = warm ? .93 : PARKING_SURFACE_PROFILES.soil.roughness;
+      surfaces.soil.normalScale.setScalar(warm ? .10 : PARKING_SURFACE_PROFILES.soil.normalScale);
+      surfaces.gravel.color.set(warm ? '#e7edef' : '#ffffff');
+      surfaces.gravel.roughness = warm ? .99 : PARKING_SURFACE_PROFILES.gravel.roughness;
+      surfaces.gravel.normalScale.setScalar(warm ? .39 : PARKING_SURFACE_PROFILES.gravel.normalScale);
+    }
+    invalidate();
+  }, [materials, warm, invalidate]);
   const resources = useMemo(() => {
     const surfaces = SECTOR_CODES.flatMap((group) => MATERIAL_KINDS.flatMap((kind) => {
       const polygons = REAR_PARKING_SURFACES.filter((surface) => surface.group === group && surface.kind === kind).map((surface) => surface.polygon);

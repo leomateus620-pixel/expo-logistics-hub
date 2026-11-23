@@ -1,5 +1,6 @@
 import type { InteriorViewAction, InteriorViewCommand } from '../hooks/useInteriorCameraRequest';
 import { create } from 'zustand';
+import { persistParkPreference, readParkPreferences, type ParkAppearance, type ParkQualityPreference } from './parkAppearance';
 import { toCommercialPhase } from '../types';
 import type {
   CameraPreset,
@@ -124,6 +125,8 @@ interface CommercialMapState {
   parkingCameraView: ParkingCameraView;
   parkingCameraSequence: number;
   technicalValidationVisible: boolean;
+  appearance: ParkAppearance;
+  qualityPreference: ParkQualityPreference;
   reducedGraphics: boolean;
   /**
    * Preset visual do modo Vendas: oculta apenas ambientação decorativa
@@ -196,6 +199,8 @@ interface CommercialMapState {
   closeParkingInspection: () => void;
   setParkingInspectionOpen: (open: boolean) => void;
   setTechnicalValidationVisible: (visible: boolean) => void;
+  setAppearance: (appearance: ParkAppearance) => void;
+  setQualityPreference: (quality: ParkQualityPreference) => void;
   setReducedGraphics: (reduced: boolean) => void;
   setSalesPresentationActive: (active: boolean) => void;
   setCameraNavigating: (navigating: boolean) => void;
@@ -219,6 +224,8 @@ interface CommercialMapState {
 function monotonicNow() {
   return typeof performance === 'undefined' ? Date.now() : performance.now();
 }
+
+const initialPreferences = readParkPreferences();
 
 export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   activeScopeKey: null,
@@ -258,7 +265,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   parkingCameraView: 'overview',
   parkingCameraSequence: 0,
   technicalValidationVisible: false,
-  reducedGraphics: false,
+  ...initialPreferences,
+  reducedGraphics: initialPreferences.qualityPreference === 'fluidity',
   salesPresentationActive: false,
   cameraNavigating: false,
   sunrisePhase: 'idle',
@@ -489,7 +497,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       ? state
       : {
           ...(activePanel ? CLEARED_PARKING_INSPECTION : {}),
-          activePanel,
+          activePanel: activePanel === 'layers' && state.activePanel === 'details' ? 'details-layers'
+            : activePanel === null && state.activePanel === 'details-layers' ? 'details' : activePanel,
         }
   )),
   setWorkspaceMode: (workspaceMode) => set((state) => ({
@@ -640,7 +649,15 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     ) get().inspectParkingBlock(get().selectedParkingBlockId);
   },
   setTechnicalValidationVisible: (technicalValidationVisible) => set({ technicalValidationVisible }),
-  setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
+  setAppearance: (appearance) => {
+    persistParkPreference('appearance', appearance);
+    set({ appearance });
+  },
+  setQualityPreference: (qualityPreference) => {
+    persistParkPreference('quality', qualityPreference);
+    set({ qualityPreference, reducedGraphics: qualityPreference === 'fluidity' });
+  },
+  setReducedGraphics: (reduced) => get().setQualityPreference(reduced ? 'fluidity' : 'auto'),
   setSalesPresentationActive: (salesPresentationActive) => set({ salesPresentationActive }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),
   // The sunrise is the natural way out of the night: replaying it always

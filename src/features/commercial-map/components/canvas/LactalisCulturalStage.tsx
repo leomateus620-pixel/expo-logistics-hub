@@ -6,6 +6,7 @@ import {
 } from '../../utils/lactalisStage';
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { useParkAppearance } from '../../state/parkAppearance';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
@@ -247,6 +248,30 @@ export function LactalisCulturalStage({
   const signHeight = signWidth / LACTALIS_STAGE_LAYOUT.signage.aspectRatio;
   const signSupportZ = frontZ + LACTALIS_STAGE_LAYOUT.architecture.claddingThickness / 2 + 0.035;
   const corrugatedNormal = useMemo(createCorrugatedNormalTexture, []);
+  const warm = useParkAppearance() === 'warm-natural';
+  const roofGeometry = useMemo(() => {
+    // This zinc sheet falls across local X. The existing normal tile contains
+    // eight folds, so 0.12 scene units cover eight 10 cm ribs along the ridge.
+    const geometry = UNIT_BOX.clone();
+    const { position, normal, uv } = geometry.attributes;
+    for (let index = 0; index < uv.count; index++) {
+      if (normal.getY(index) < .99) continue;
+      uv.setXY(index,
+        (position.getZ(index) + .5) * (depth + 2 * overhang) / (.12 * corrugatedNormal.repeat.x),
+        (position.getX(index) + .5) * roofSlope / (.12 * corrugatedNormal.repeat.y));
+    }
+    return geometry;
+  }, [corrugatedNormal, depth, overhang, roofSlope]);
+  useEffect(() => () => roofGeometry.dispose(), [roofGeometry]);
+  useLayoutEffect(() => {
+    if (!warm) return;
+    const { roof, wall } = materials;
+    const previous = [roof.roughness, roof.metalness, wall.roughness];
+    roof.roughness = .55;
+    roof.metalness = .25;
+    wall.roughness = .88;
+    return () => { [roof.roughness, roof.metalness, wall.roughness] = previous; };
+  }, [materials, warm]);
   const gableGeometry = useMemo(() => createGableGeometry(width, rise), [rise, width]);
   const lightingMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: LACTALIS_STAGE_LAYOUT.palette.light,
@@ -368,7 +393,7 @@ export function LactalisCulturalStage({
     <group name="palco-cultural-lactalis-architecture" dispose={null} raycast={NO_RAYCAST}>
       <ScaledInstances material={materials.accent} items={floorPanels} receiveShadow />
       <ScaledInstances material={materials.wall} items={shellPanels} castShadow receiveShadow />
-      <ScaledInstances material={materials.roof} items={roofPanels} castShadow receiveShadow />
+      <ScaledInstances geometry={warm ? roofGeometry : UNIT_BOX} material={materials.roof} items={roofPanels} castShadow receiveShadow />
       <ScaledInstances material={materials.metal} items={frameBeams} castShadow receiveShadow />
       <ScaledInstances material={materials.platform} items={stagePlatform} castShadow receiveShadow />
       <mesh

@@ -1,0 +1,280 @@
+{
+  "baseRevision": "c99436b3",
+  "diagnosticCandidateRevision": "cf37bf01",
+  "fixedRevision": "287c96b7",
+  "description": "Na base e no primeiro build candidato, o nível LOW trocava os materiais da calçada da alimentação. O build 287c96b7 mantém os mesmos materiais em 20 trocas de tier.",
+  "base": {
+    "removed": [
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:lawn/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly",
+          "interiorGround"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "tex": "",
+        "path": "restaurant-frontage:concrete-slab/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:slab-joints/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:entrance-path/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:tree-pit-curbs/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:tree-pit-soil/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:hedges/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:shrubs/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      }
+    ],
+    "added": [
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:lawn/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly",
+          "interiorGround"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:concrete-slab/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:entrance-path/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:slab-joints/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:tree-pit-curbs/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:tree-pit-soil/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:hedges/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:shrubs/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      }
+    ]
+  },
+  "diagnosticCandidate": {
+    "removed": [
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:lawn/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly",
+          "interiorGround"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "tex": "",
+        "path": "restaurant-frontage:concrete-slab/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:slab-joints/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:entrance-path/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:tree-pit-curbs/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:tree-pit-soil/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:hedges/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:shrubs/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      }
+    ],
+    "added": [
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:lawn/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly",
+          "interiorGround"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:concrete-slab/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:entrance-path/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:slab-joints/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:tree-pit-curbs/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:tree-pit-soil/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:hedges/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      },
+      {
+        "name": "",
+        "type": "MeshStandardMaterial",
+        "path": "restaurant-frontage:shrubs/restaurant-frontage:calcada-do-arvoredo/essential-site-context",
+        "userData": [
+          "presentationOnly"
+        ]
+      }
+    ]
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { QUADRAS_AB_SPATIAL_REFERENCE } from '../../data/quadrasABEnvironment';
 import { createInteriorGroundReferenceAtlas } from './interiorGroundReference';
+import { bindParkGroundAppearance } from './parkGroundAppearance';
 import { groundNoiseForMaterial } from './groundNoiseTexture';
 import { INTERNAL_GROUND_COVERAGE } from '../../data/internalGroundCoverage';
 
@@ -60,6 +61,8 @@ const ownershipMask = INTERNAL_GROUND_COVERAGE.map(({ ring, featherEdges }) => {
 }).join('\n');
 
 const sample = `
+uniform float parkWarmGround;
+uniform vec3 parkGroundMapsReady;
 uniform sampler2D interiorAlbedo;
 uniform sampler2D interiorNormal;
 uniform sampler2D interiorRoughness;
@@ -93,16 +96,48 @@ float interiorOwned(vec2 p) { float weight=0.; ${ownershipMask} return weight; }
  */
 export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial, scope: Scope = 'all') {
   if (installed.has(material) || (material.onBeforeCompile as GroundHook)[HOOK_MARKER]) return material;
-  const atlas = acquireAtlas(material);
+  // Lazily acquire the classic A/B atlas only when a classic renderer draws it.
+  // Its former three mip chains and CPU generation are unnecessary in Natural.
+  let atlas: Atlas | undefined;
+  const bindings = new WeakMap<THREE.WebGLRenderer, Record<string, THREE.IUniform>>();
+  const releases = new Set<() => void>();
+  material.addEventListener('dispose', () => {
+    releases.forEach(release => release());
+    releases.clear();
+  });
   const noise = groundNoiseForMaterial(material);
   const upstream = material.onBeforeCompile;
   const upstreamKey = material.customProgramCacheKey();
   material.userData.interiorGround = { reference: 'quadras-ab-pilot', scope };
   material.onBeforeCompile = (shader, renderer) => {
     upstream.call(material, shader, renderer);
-    Object.assign(shader.uniforms, {
-      interiorAlbedo: { value: atlas.map }, interiorNormal: { value: atlas.normalMap },
-      interiorRoughness: { value: atlas.roughnessMap }, interiorNoise: { value: noise },
+    let binding = bindings.get(renderer);
+    if (!binding) {
+      const color = new THREE.Uniform<THREE.Texture | null>(null);
+      const normal = new THREE.Uniform<THREE.Texture | null>(null);
+      const roughness = new THREE.Uniform<THREE.Texture | null>(null);
+      const warm = new THREE.Uniform(0);
+      const ready = new THREE.Uniform(new THREE.Vector3());
+      releases.add(bindParkGroundAppearance(renderer, state => {
+        warm.value = Number(state.warm);
+        ready.value.set(Number(!!state.grass), Number(!!state.woodland), Number(!!state.cover));
+        if (state.warm) {
+          color.value = state.grass;
+          normal.value = state.woodland;
+          roughness.value = state.cover;
+        } else {
+          atlas ??= acquireAtlas(material);
+          color.value = atlas.map;
+          normal.value = atlas.normalMap;
+          roughness.value = atlas.roughnessMap;
+        }
+      }));
+      binding = { interiorAlbedo: color, interiorNormal: normal, interiorRoughness: roughness,
+        parkWarmGround: warm, parkGroundMapsReady: ready };
+      bindings.set(renderer, binding);
+    }
+    Object.assign(shader.uniforms, binding, {
+      interiorNoise: { value: noise },
       interiorQuadraA: { value: quadraA }, interiorQuadraB: { value: quadraB },
     });
     const attribute = scope === 'access-grass';
@@ -111,7 +146,7 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>\n${sample}\n${attribute ? 'varying float vInteriorGrass;' : ''}`);
     const mask = scope === 'all' ? '1.' : attribute ? 'clamp(vInteriorGrass,0.,1.)' : 'interiorOwned(vInteriorGround.xz)';
     shader.fragmentShader = shader.fragmentShader.replace('#include <logdepthbuf_fragment>', `#include <logdepthbuf_fragment>
-      float interiorWeight = ${mask};`);
+      float interiorWeight = ${scope === 'internal-base' ? `parkWarmGround > .5 ? 1. : ${mask}` : mask};`);
     if (scope === 'internal-base') {
       // Fully internal fragments never need the old regional fBm, three map
       // samples and roughness variation that the reference would overwrite.
@@ -132,7 +167,57 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
       vec2 interiorP = vInteriorGround.xz;
       float interiorFootprint = length(fwidth(interiorP));
       float interiorBlade = 0.;
-      if (usesInteriorGround) {
+      if (usesInteriorGround && parkWarmGround > .5) {
+        // Both ground owners sample the same physical coordinates. Broad cover
+        // comes from the surveyed footprint and registered canopy density.
+        // Unequal correlation lengths break up the regional pasture softly.
+        // Its mapped road verges and field transitions share the dry channel.
+        vec2 pasture = vec2(dot(interiorP, vec2(.93,.37)), dot(interiorP, vec2(-.37,.93)));
+        float meadow = interiorRandom(pasture * vec2(.084,.17));
+        float tufts = interiorRandom(interiorP * .63);
+        vec2 coverUv = interiorP / 128. + .5;
+        vec3 land = vec3(0.);
+        float maintained = ${scope === 'internal-base' ? '0.' : '1.'};
+        if (parkGroundMapsReady.z > .5 && all(greaterThan(coverUv, vec2(0.))) && all(lessThan(coverUv, vec2(1.)))) {
+          vec4 survey = texture2D(interiorRoughness, coverUv);
+          land = survey.rgb;
+          maintained = max(maintained, smoothstep(.25, 1., survey.a));
+        }
+        float cover = smoothstep(.06, .98, land.r * (.59 + .48 * tufts) + (meadow - .5) * .22);
+        float bare = smoothstep(.035, .85, land.g);
+        vec2 tileUv = interiorP / .24; // 1.60 m at 0.15 map units / m
+        vec3 lawn = vec3(.23,.30,.133);
+        vec3 floorColor = vec3(.238,.153,.084);
+        // RGB describes 1.6 m of blades. Alpha stores the independent aerial
+        // density sample at 48 m. Both travel in one mipmapped texture.
+        float sward = tufts;
+        if (parkGroundMapsReady.x > .5) {
+          lawn = texture2D(interiorAlbedo, tileUv).rgb;
+          vec2 aerialUv = pasture / 7.2 + .22 * vec2(meadow, tufts);
+          sward = texture2D(interiorAlbedo, aerialUv).a;
+        }
+        if (cover + bare > .001 && parkGroundMapsReady.y > .5) floorColor = texture2D(interiorNormal, tileUv).rgb;
+        // Preserve the satellite-mapped bare clearing and dry edge of A/B.
+        // Around canopy masses the same leaf texture blends into worn grass.
+        // Larger wet/dry patches stay visible above the park. Local changes
+        // in blade density break their edges at pedestrian distance.
+        float dryGrass = smoothstep(.29,.71, .43 * meadow + .40 * sward + .17 * tufts + land.b * .34);
+        lawn *= mix(vec3(.62,.81,.59), vec3(1.59,1.22,.89), dryGrass);
+        // Inside registered lawn polygons the grass is maintained and denser.
+        // Field, track, parking gravel and commercial ink have separate owners.
+        lawn *= mix(vec3(1.), vec3(.79,1.07,.84) * (.96 + .08 * tufts), maintained);
+        vec3 soil = floorColor * vec3(1.05,.86,.72);
+        // The grove beside the entrance roundabout is a green park lawn even
+        // under its crowns. Leaf litter is local to the densest canopy gaps.
+        vec3 shadeGrass = lawn * vec3(.69,1.14,.73);
+        float litter = smoothstep(.63,.93, land.r) * smoothstep(.49,.78, tufts) * .45;
+        vec3 woodlandLawn = mix(shadeGrass, floorColor, litter);
+        vec3 warmColor = mix(mix(lawn, soil, bare), woodlandLawn, cover);
+        warmColor *= .84 + .20 * sward + .14 * tufts;
+        interiorBlade = dot(lawn, vec3(.22,.68,.10)) * .0025 * (1.-cover);
+        diffuseColor.rgb = mix(diffuseColor.rgb, warmColor, interiorWeight);
+        roughnessFactor = mix(roughnessFactor, .94 + cover * .045, interiorWeight);
+      } else if (usesInteriorGround) {
         vec3 priorColor=diffuseColor.rgb;
         float priorRoughness=roughnessFactor;
         float meadow=interiorRandom(interiorP*.66+vec2(interiorRandom(interiorP*.21)*2.));
@@ -149,7 +234,14 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
       if (interiorWeight < 1.) {
         #include <normal_fragment_maps>
       }
-      if (usesInteriorGround) {
+      if (usesInteriorGround && parkWarmGround > .5 && interiorFootprint < .07) {
+        vec3 dx = dFdx(-vViewPosition), dy = dFdy(-vViewPosition);
+        vec3 across = cross(dy, normal), along = cross(normal, dx);
+        float determinant = dot(dx, across);
+        vec3 gradient = across * dFdx(interiorBlade) + along * dFdy(interiorBlade);
+        normal = normalize(normal - gradient * sign(determinant) / max(abs(determinant), 1.e-9));
+      }
+      if (usesInteriorGround && parkWarmGround < .5) {
         vec3 priorNormal=normal;
         vec3 detailNormal=interiorSample(interiorNormal,interiorP).xyz*2.-1.;
         detailNormal.xy*=.22;
@@ -165,7 +257,7 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
         normal=normalize(mix(priorNormal,normal,interiorWeight));
       }`);
   };
-  material.customProgramCacheKey = () => `${upstreamKey}:park-interior-quadras-ab-v2:${scope}`;
+  material.customProgramCacheKey = () => `${upstreamKey}:park-interior-quadras-ab-v3:${scope}`;
   (material.onBeforeCompile as GroundHook)[HOOK_MARKER] = true;
   installed.add(material);
   material.needsUpdate = true;

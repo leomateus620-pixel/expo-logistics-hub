@@ -1,0 +1,430 @@
+{
+  "candidate": "32b68d600df60d0e4ae17d4311ea04a28d8512e5",
+  "boot": {
+    "fixture": true,
+    "ready": "true",
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    },
+    "readiness": {
+      "essentialPrepared": true,
+      "preparing": false,
+      "healthyScreen": true,
+      "presentedFrames": 3,
+      "controlsInstalled": true,
+      "frameIntervalMs": 13.699999999254942,
+      "responsive": true,
+      "status": "ready",
+      "path": "direct",
+      "lastErrorCode": null
+    },
+    "errors": []
+  },
+  "cycles": [
+    {
+      "cycle": 1,
+      "requested": "HIGH",
+      "path": "post",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 903,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810740
+      }
+    },
+    {
+      "cycle": 2,
+      "requested": "MEDIUM",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 3,
+      "requested": "LOW",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 4,
+      "requested": "HIGH",
+      "path": "post",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 903,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810740
+      }
+    },
+    {
+      "cycle": 5,
+      "requested": "MEDIUM",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 6,
+      "requested": "LOW",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 7,
+      "requested": "HIGH",
+      "path": "post",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 903,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810740
+      }
+    },
+    {
+      "cycle": 8,
+      "requested": "MEDIUM",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 9,
+      "requested": "LOW",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 10,
+      "requested": "HIGH",
+      "path": "post",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 903,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810740
+      }
+    },
+    {
+      "cycle": 11,
+      "requested": "MEDIUM",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 12,
+      "requested": "LOW",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 13,
+      "requested": "HIGH",
+      "path": "post",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 903,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810740
+      }
+    },
+    {
+      "cycle": 14,
+      "requested": "MEDIUM",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 15,
+      "requested": "LOW",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 16,
+      "requested": "HIGH",
+      "path": "post",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 903,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810740
+      }
+    },
+    {
+      "cycle": 17,
+      "requested": "MEDIUM",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 18,
+      "requested": "LOW",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    },
+    {
+      "cycle": 19,
+      "requested": "HIGH",
+      "path": "post",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 903,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810740
+      }
+    },
+    {
+      "cycle": 20,
+      "requested": "MEDIUM",
+      "path": "direct",
+      "state": "ready",
+      "parity": {
+        "inventory": true,
+        "materials": true,
+        "lifecycle": true,
+        "tierApplied": true,
+        "effects": true
+      },
+      "renderer": {
+        "calls": 884,
+        "textures": 145,
+        "geometries": 639,
+        "programs": 283,
+        "triangles": 810721
+      }
+    }
+  ],
+  "errors": []
+}

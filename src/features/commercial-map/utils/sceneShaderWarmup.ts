@@ -1,5 +1,7 @@
 import { captureCommercialMapStageRecorder, commercialMapDiagnosticsEnabled, measureCommercialMapStage, markCommercialMapStage, type CommercialMapStageRecorder } from './performanceDiagnostics';
 import * as THREE from 'three';
+import { resolveCommercialMapExecutionPolicy } from './executionPolicy';
+import type { CommercialMapQualityTier } from './viewport';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 
 const pending = new WeakMap<THREE.WebGLRenderer, object>();
@@ -31,8 +33,8 @@ export const isCommercialMapPostReady = (renderer: THREE.WebGLRenderer) => criti
 
 /** Use the admitted map renderer, never a speculative context. Call after
  * program linking to keep upload admission separate from the link barrier.
- * Two uploads per task bound
- * admission; compiled custom uniforms use the same deduplicated texture set. */
+ * Small uploads share a bounded slice; after a large upload the next texture
+ * always waits for another slot. Compiled samplers share the same set. */
 export async function prepareCommercialMapTextures(renderer: THREE.WebGLRenderer, objects: THREE.Object3D[], signal?: AbortSignal,
   record: CommercialMapStageRecorder = captureCommercialMapStageRecorder()) {
   if (!renderer.initTexture) return; // minimal diagnostic renderer fixtures
@@ -66,14 +68,28 @@ export async function prepareCommercialMapTextures(renderer: THREE.WebGLRenderer
     additionalCompiledUniformTextures += textures.size - before;
   }
   record('texture-upload:start', { count: textures.size, additionalCompiledUniformTextures });
+  const tier = JSON.parse(renderer.domElement?.dataset.commercialMapQuality || '{}').sceneTier as CommercialMapQualityTier | undefined;
+  const sliceBudget = resolveCommercialMapExecutionPolicy(tier ?? 'LOW').taskBudgetMs;
   let uploads = 0;
+  let slices = 0;
+  let submittedMs = 0;
+  let sliceCount = 0;
+  let sliceStart = 0;
   for (const texture of textures) {
-    if (uploads % 2 === 0) await nextPreparationSlot(signal);
+    if (!sliceCount || sliceCount >= 12 || performance.now() - sliceStart >= sliceBudget) {
+      if (sliceCount) submittedMs += performance.now() - sliceStart;
+      await nextPreparationSlot(signal);
+      sliceStart = performance.now();
+      sliceCount = 0;
+      slices++;
+    }
     if (signal?.aborted) throw new DOMException('Texture preparation cancelled', 'AbortError');
     renderer.initTexture(texture);
     uploads++;
+    sliceCount++;
   }
-  record('texture-upload:end', { count: uploads });
+  if (sliceCount) submittedMs += performance.now() - sliceStart;
+  record('texture-upload:end', { count: uploads, slices, submittedMs });
 }
 
 export function commercialMapShaderRepresentatives(root: THREE.Object3D) {

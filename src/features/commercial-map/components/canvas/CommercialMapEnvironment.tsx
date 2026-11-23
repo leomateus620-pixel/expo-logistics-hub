@@ -24,6 +24,8 @@ import {
 } from 'postprocessing';
 import * as THREE from 'three';
 import { COMMERCIAL_MAP_GROUND_ELEVATION } from '../../constants';
+import { useWarmParkTexture } from './warmParkTextures';
+import { setParkGroundAppearance } from './parkGroundAppearance';
 import { applyInteriorGroundMaterial } from './interiorGroundMaterial';
 import { publishContinuousGround } from '../../utils/continuousGroundMaterial';
 import {
@@ -58,6 +60,7 @@ import {
   disposeCommercialMapRenderTiming,
 } from '../../utils/renderingTiming';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { useParkAppearance } from '../../state/parkAppearance';
 import {
   openGroundTextureBundleForEntity,
   type OpenGroundSurfaceProfile,
@@ -91,6 +94,19 @@ interface CommercialMapEnvironmentProps {
 }
 
 const DAY_AMBIENT_COLOR = '#dbeaf2';
+const SUNRISE_COLORS = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.colors;
+const CLASSIC_DAYLIGHT = {
+  sun: new THREE.Color(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.color),
+  horizon: new THREE.Color(SUNRISE_COLORS.finalHorizon),
+  upper: new THREE.Color(SUNRISE_COLORS.finalUpper),
+};
+const NATURAL_DAYLIGHT = {
+  sun: new THREE.Color('#ffe6be'),
+  horizon: new THREE.Color('#adc7ce'),
+  upper: new THREE.Color('#80afc9'),
+  skyFill: new THREE.Color('#cbdde8'),
+  groundFill: new THREE.Color('#788169'),
+};
 
 type EnvironmentPalette = typeof COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.normal
   | typeof COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.hydrological;
@@ -1217,6 +1233,14 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   const rain = useMemo(() => commercialRainRuntime(scene), [scene]);
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const mode: CommercialMapEnvironmentMode = hydrologicalModeActive ? 'hydrological' : 'normal';
+  const warmDaylight = useParkAppearance() === 'warm-natural' && mode === 'normal';
+  const grass = useWarmParkTexture('grass', active && warmDaylight);
+  const woodland = useWarmParkTexture('woodland', active && warmDaylight);
+  const cover = useWarmParkTexture('cover', active && warmDaylight);
+  useLayoutEffect(() => {
+    setParkGroundAppearance(gl, { warm: warmDaylight, grass, woodland, cover });
+    invalidate();
+  }, [gl, invalidate, warmDaylight, grass, woodland, cover]);
   const palette = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes[mode];
   const qualityTier: CommercialMapSunriseQualityTier = reducedGraphics
     ? 'reduced'
@@ -1291,18 +1315,32 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     invalidate();
   }, [gl, invalidate, shadowMapSize, sunLight]);
   const activeGroundTextures = useMemo(() => {
-    markCommercialMapStage('environment:textures:start');
-    const repeatX = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
-    const repeatY = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
-    // PlaneGeometry has normalized UVs. Include its final transform in the
-    // pool key so no later mutation can affect another PBR surface handle.
-    const textures = openGroundTextureBundleForEntity(ACTIVE_GROUND_PROFILE, maximumAnisotropy, {
-      wrapS: THREE.MirroredRepeatWrapping,
-      wrapT: THREE.MirroredRepeatWrapping,
-      repeat: [repeatX, repeatY],
-    });
-    markCommercialMapStage('environment:textures:end');
-    return textures;
+    // Keep the same map slots (and shader key) across profiles. Only Classic
+    // ever needs to paint and upload the three regional 256-square textures.
+    const solid = (rgba: number[]) => {
+      const texture = new THREE.DataTexture(new Uint8Array(rgba), 1, 1);
+      texture.needsUpdate = true;
+      return texture;
+    };
+    const white = solid([255, 255, 255, 255]);
+    const flatNormal = solid([128, 128, 255, 255]);
+    let classic: ReturnType<typeof openGroundTextureBundleForEntity> = null;
+    return {
+      map: white, roughnessMap: white, normalMap: flatNormal,
+      classic() {
+        if (!classic) {
+          markCommercialMapStage('environment:textures:start');
+          const repeat = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
+          classic = openGroundTextureBundleForEntity(ACTIVE_GROUND_PROFILE, maximumAnisotropy, {
+            wrapS: THREE.MirroredRepeatWrapping, wrapT: THREE.MirroredRepeatWrapping,
+            repeat: [repeat, repeat],
+          });
+          markCommercialMapStage('environment:textures:end');
+        }
+        return classic;
+      },
+      dispose() { white.dispose(); flatNormal.dispose(); classic?.dispose(); },
+    };
   }, [layout.outerGroundSize, maximumAnisotropy]);
   const normalGroundMaterial = useMemo(() => {
     markCommercialMapStage('environment:materials:start');
@@ -1346,6 +1384,15 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     extent.centerZ,
     gl,
   ]);
+  useLayoutEffect(() => {
+    if (warmDaylight) return;
+    const classic = activeGroundTextures.classic();
+    if (!classic) return;
+    normalGroundMaterial.map = classic.map;
+    normalGroundMaterial.normalMap = classic.normalMap;
+    normalGroundMaterial.roughnessMap = classic.roughnessMap;
+    invalidate();
+  }, [activeGroundTextures, normalGroundMaterial, warmDaylight, invalidate]);
   const hydrologicalGroundMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     name: 'CommercialMapHydrologicalOuterGroundMaterial',
     color: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.hydrological.activeGround,
@@ -1471,6 +1518,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     qualityTier,
     sky,
     sunLight,
+    warmDaylight,
     sunrisePhase,
     sunriseSequence,
     sunriseStartedAt,
@@ -1595,8 +1643,15 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       sunLight.position.copy(shadowAnchor).addScaledVector(frameDirection, shadowFrustum.distance);
       const daylight = 1 - nightBlend;
       const night = COMMERCIAL_MAP_NIGHT_ATMOSPHERE;
-      updateSolarShadow(sunLight, gl, frame.sunlightIntensity * daylight * (1 - rainBlend * .7),
+      const warm = warmDaylight ? frame.easedProgress * daylight * (1 - rainBlend) : 0;
+      // Set scene-referred illumination before the one ACES transform in each
+      // render path. Changing camera exposure would also grade the sales marks.
+      sunLight.color.lerpColors(CLASSIC_DAYLIGHT.sun, NATURAL_DAYLIGHT.sun, warm);
+      const solarExposure = 1 - warm * 0.08;
+      updateSolarShadow(sunLight, gl, frame.sunlightIntensity * solarExposure * daylight * (1 - rainBlend * .7),
         previousSunX !== sunLight.position.x || previousSunY !== sunLight.position.y || previousSunZ !== sunLight.position.z);
+      sky.material.uniforms.finalSunriseHorizon.value.lerpColors(CLASSIC_DAYLIGHT.horizon, NATURAL_DAYLIGHT.horizon, warm);
+      sky.material.uniforms.finalSunriseUpper.value.lerpColors(CLASSIC_DAYLIGHT.upper, NATURAL_DAYLIGHT.upper, warm);
       celestialSun.material.uniforms.uNightBlend.value = nightBlend;
       celestialSun.material.uniforms.uRainBlend.value = rainBlend;
       sky.material.uniforms.nightBlend.value = nightBlend;
@@ -1612,7 +1667,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         );
         ambientRef.current.color.lerpColors(dayColors.ambient, nightColors.ambient, nightBlend);
         ambientRef.current.color.lerp(rainColors.ambient, rainBlend * .2 * daylight);
-        ambientRef.current.intensity *= 1 + rainBlend * .08;
+        ambientRef.current.intensity *= (1 + rainBlend * .08) * (1 - warm * .12);
       }
       if (hemisphereRef.current) {
         hemisphereRef.current.intensity = THREE.MathUtils.lerp(
@@ -1630,11 +1685,14 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
           nightColors.hemisphereGround,
           nightBlend,
         );
+        hemisphereRef.current.color.lerp(NATURAL_DAYLIGHT.skyFill, warm);
+        hemisphereRef.current.groundColor.lerp(NATURAL_DAYLIGHT.groundFill, warm);
         hemisphereRef.current.color.lerp(rainColors.ambient, rainBlend * .25 * daylight);
         hemisphereRef.current.groundColor.lerp(rainColors.ground, rainBlend * .12 * daylight);
         hemisphereRef.current.intensity *= 1 - rainBlend * .18;
       }
       dayFogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
+      dayFogColor.lerp(NATURAL_DAYLIGHT.horizon, warm);
       fogColor.lerpColors(dayFogColor, nightColors.fog, nightBlend);
       fog.color.copy(fogColor);
       background.lerpColors(dayBackground, nightColors.background, nightBlend);
@@ -1645,6 +1703,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       // beyond the park without obscuring lots at the maximum zoom distance.
       fog.near = layout.fogNear * (1 - rainBlend * .1);
       fog.far = layout.fogFar * (1 - rainBlend * .22);
+      fog.far -= (fog.far - fog.near) * warm * .22;
       scene.environmentIntensity = THREE.MathUtils.lerp(
         frame.environmentIntensity,
         night.environmentIntensity,
@@ -1683,8 +1742,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         sunViewDot: Number(cameraForward.dot(frameDirection).toFixed(5)),
         cameraFar: camera instanceof THREE.PerspectiveCamera ? camera.far : null,
         safeCameraMaxDistance: Number(cameraDistanceBounds.maxDistance.toFixed(3)),
-        fogNear: Number(layout.fogNear.toFixed(3)),
-        fogFar: Number(layout.fogFar.toFixed(3)),
+        fogNear: Number(fog.near.toFixed(3)),
+        fogFar: Number(fog.far.toFixed(3)),
         azimuthMapDegrees: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.azimuthMapDegrees,
         elevationDegrees: Number(frame.elevationDegrees.toFixed(3)),
         renderer: {
