@@ -56,4 +56,4 @@ A alternativa gratuita de bosque (`af72dbb5-c775-457b-8097-289551622ddd`) conclu
 
 ![Mosaicos das duas amostras e o mesmo recorte de bosque em cada renderização](alternativas-bosque.webp)
 
-A referência aérea dedicada de pastagem, a 48 × 48 m, entrou na fila gratuita após a conclusão da alternativa de bosque. O job `ba0c2608-2feb-4004-afad-c295f1e72a2b` aguardava processamento às 22h44. A alternativa gratuita de concreto aguarda a liberação dessa única vaga. A versão distribuída usa a grama Higgsfield já selecionada e o campo multiescala de densidade preparado offline.
+A referência aérea dedicada de pastagem, a 48 × 48 m, entrou na fila gratuita após a conclusão da alternativa de bosque. O job `ba0c2608-2feb-4004-afad-c295f1e72a2b` continuava em `waiting` na consulta de fechamento da PR, às 22h59 de 22/11/2026, horário de Brasília. A alternativa gratuita de concreto aguarda a liberação dessa única vaga. A versão distribuída usa a grama Higgsfield já selecionada e o campo multiescala de densidade preparado offline.

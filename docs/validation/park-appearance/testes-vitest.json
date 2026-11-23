@@ -1,6 +1,6 @@
 {
   "base": "c99436b3",
-  "candidata": "1db33c82",
+  "candidata": "32b68d60",
   "comando": "npm test -- --maxWorkers=4 --testTimeout=30000",
   "candidataCompleta": {
     "numTotalTests": 4614,
