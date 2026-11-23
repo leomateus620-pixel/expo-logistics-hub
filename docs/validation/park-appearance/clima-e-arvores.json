@@ -1,0 +1,595 @@
+{
+  "browser": "157.0.8103.79",
+  "views": {
+    "memorial-antes": {
+      "position": [
+        -29.438181818181814,
+        1.5,
+        11.532727312048191
+      ],
+      "target": [
+        -26.138181818181813,
+        0,
+        7.832727312048192
+      ],
+      "trees": true,
+      "treeGroups": 2,
+      "power": true,
+      "lunar": true,
+      "apollo": true,
+      "marker": {
+        "color": "f3f1e9",
+        "uniformColor": "f3f1e9",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      },
+      "treeCasterBatches": 5,
+      "hydrology": false,
+      "profile": "warm-natural",
+      "phase": "complete",
+      "sequence": 1,
+      "startedAt": null,
+      "progress": 1,
+      "rain": 0,
+      "night": 0,
+      "sun": 2.2632,
+      "sunColor": "ffe6be",
+      "positionSun": [
+        -3.089995454545452,
+        84.99529937767083,
+        -191.28574982984622
+      ],
+      "fog": "adc7ce",
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 659,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "dia": {
+      "position": [
+        9,
+        8.8,
+        31
+      ],
+      "target": [
+        -9,
+        0.8,
+        12
+      ],
+      "trees": true,
+      "treeGroups": 2,
+      "power": true,
+      "lunar": true,
+      "apollo": true,
+      "marker": {
+        "color": "f3f1e9",
+        "uniformColor": "f3f1e9",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      },
+      "treeCasterBatches": 5,
+      "hydrology": false,
+      "profile": "warm-natural",
+      "phase": "complete",
+      "sequence": 1,
+      "startedAt": null,
+      "progress": 1,
+      "rain": 0,
+      "night": 0,
+      "sun": 2.2632,
+      "sunColor": "ffe6be",
+      "positionSun": [
+        -3.089995454545452,
+        84.99529937767083,
+        -191.28574982984622
+      ],
+      "fog": "adc7ce",
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 716,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "chuva": {
+      "position": [
+        9,
+        8.8,
+        31
+      ],
+      "target": [
+        -9,
+        0.8,
+        12
+      ],
+      "trees": true,
+      "treeGroups": 2,
+      "power": true,
+      "lunar": true,
+      "apollo": true,
+      "marker": {
+        "color": "e1dfd8",
+        "uniformColor": "e1dfd8",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      },
+      "treeCasterBatches": 5,
+      "hydrology": false,
+      "profile": "warm-natural",
+      "phase": "complete",
+      "sequence": 1,
+      "startedAt": null,
+      "progress": 1,
+      "rain": 1,
+      "night": 0,
+      "sun": 0.7380000000000001,
+      "sunColor": "ffd7a0",
+      "positionSun": [
+        -3.089995454545452,
+        84.99529937767083,
+        -191.28574982984622
+      ],
+      "fog": "96adb7",
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 761,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "arvore-lunar": {
+      "position": [
+        -29.438181818181814,
+        1.5,
+        11.532727312048191
+      ],
+      "target": [
+        -26.138181818181813,
+        0,
+        7.832727312048192
+      ],
+      "trees": true,
+      "treeGroups": 2,
+      "power": true,
+      "lunar": true,
+      "apollo": true,
+      "marker": {
+        "color": "f3f1e9",
+        "uniformColor": "f3f1e9",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      },
+      "treeCasterBatches": 5,
+      "hydrology": false,
+      "profile": "warm-natural",
+      "phase": "complete",
+      "sequence": 1,
+      "startedAt": null,
+      "progress": 1,
+      "rain": 0,
+      "night": 0,
+      "sun": 2.2632,
+      "sunColor": "ffe6be",
+      "positionSun": [
+        -3.089995454545452,
+        84.99529937767083,
+        -191.28574982984622
+      ],
+      "fog": "adc7ce",
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 940,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "arvores-ocultas": {
+      "position": [
+        -29.438181818181814,
+        1.5,
+        11.532727312048191
+      ],
+      "target": [
+        -26.138181818181813,
+        0,
+        7.832727312048192
+      ],
+      "trees": false,
+      "treeGroups": 0,
+      "power": false,
+      "lunar": false,
+      "apollo": true,
+      "marker": {
+        "color": "f3f1e9",
+        "uniformColor": "f3f1e9",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      },
+      "treeCasterBatches": 0,
+      "hydrology": false,
+      "profile": "warm-natural",
+      "phase": "complete",
+      "sequence": 1,
+      "startedAt": null,
+      "progress": 1,
+      "rain": 0,
+      "night": 0,
+      "sun": 2.2632,
+      "sunColor": "ffe6be",
+      "positionSun": [
+        -3.089995454545452,
+        84.99529937767083,
+        -191.28574982984622
+      ],
+      "fog": "adc7ce",
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1181,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "hidrologia": {
+      "position": [
+        9,
+        8.8,
+        31
+      ],
+      "target": [
+        -9,
+        0.8,
+        12
+      ],
+      "trees": true,
+      "treeGroups": 0,
+      "power": false,
+      "lunar": true,
+      "apollo": true,
+      "marker": {
+        "color": "eaede4",
+        "uniformColor": "eaede4",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      },
+      "treeCasterBatches": 0,
+      "hydrology": true,
+      "profile": "warm-natural",
+      "phase": "complete",
+      "sequence": 1,
+      "startedAt": null,
+      "progress": 1,
+      "rain": 0,
+      "night": 0,
+      "sun": 2.08,
+      "sunColor": "ffd7a0",
+      "positionSun": [
+        -3.089995454545452,
+        84.99529937767083,
+        -191.28574982984622
+      ],
+      "fog": "b2d1d6",
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1234,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    },
+    "amanhecer": {
+      "position": [
+        -49,
+        10.1,
+        -32
+      ],
+      "target": [
+        1,
+        1.4,
+        0
+      ],
+      "trees": true,
+      "treeGroups": 2,
+      "power": true,
+      "lunar": true,
+      "apollo": true,
+      "marker": {
+        "color": "f3f1e9",
+        "uniformColor": "f3f1e9",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      },
+      "treeCasterBatches": 5,
+      "hydrology": false,
+      "profile": "warm-natural",
+      "phase": "running",
+      "sequence": 2,
+      "startedAt": 36639.199999999255,
+      "progress": 0.07223751644233925,
+      "rain": 0,
+      "night": 0,
+      "sun": 0.06239803893344329,
+      "sunColor": "ffd8a2",
+      "positionSun": [
+        -3.089995454545452,
+        4.292602968115327,
+        -209.30796481321386
+      ],
+      "fog": "bbccd1",
+      "health": {
+        "status": "ready",
+        "path": "direct",
+        "presentedFrames": 1346,
+        "contextLosses": 0,
+        "lastErrorCode": null
+      }
+    }
+  },
+  "errors": [],
+  "revision": "working-tree",
+  "secondRainCycle": {
+    "wet": {
+      "color": "e1dfd8",
+      "uniformColor": "e1dfd8",
+      "map": "",
+      "width": 512,
+      "height": 1024,
+      "textureUploaded": true,
+      "probe": [
+        215,
+        217,
+        212,
+        255
+      ],
+      "receivesShadows": false
+    },
+    "dry": {
+      "color": "f3f1e9",
+      "uniformColor": "f3f1e9",
+      "map": "",
+      "width": 512,
+      "height": 1024,
+      "textureUploaded": true,
+      "probe": [
+        215,
+        217,
+        212,
+        255
+      ],
+      "receivesShadows": false
+    }
+  },
+  "classicDuringSunrise": {
+    "position": [
+      -49,
+      10.1,
+      -32
+    ],
+    "target": [
+      1,
+      1.4,
+      0
+    ],
+    "trees": true,
+    "treeGroups": 2,
+    "power": true,
+    "lunar": true,
+    "apollo": true,
+    "marker": {
+      "color": "f3f1e9",
+      "uniformColor": "f3f1e9",
+      "map": "",
+      "width": 512,
+      "height": 1024,
+      "textureUploaded": true,
+      "probe": [
+        215,
+        217,
+        212,
+        255
+      ],
+      "receivesShadows": false
+    },
+    "treeCasterBatches": 5,
+    "hydrology": false,
+    "profile": "classic",
+    "phase": "running",
+    "sequence": 2,
+    "startedAt": 36639.199999999255,
+    "progress": 0.10656214504763548,
+    "rain": 0,
+    "night": 0,
+    "sun": 0.14497629130825773,
+    "sunColor": "ffd7a0",
+    "positionSun": [
+      -3.089995454545452,
+      7.371015392927659,
+      -209.2220180576137
+    ],
+    "fog": "bccdd1",
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1403,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  "afterAppearanceSwitch": {
+    "position": [
+      -49,
+      10.1,
+      -32
+    ],
+    "target": [
+      1,
+      1.4,
+      0
+    ],
+    "trees": true,
+    "treeGroups": 2,
+    "power": true,
+    "lunar": true,
+    "apollo": true,
+    "marker": {
+      "color": "f3f1e9",
+      "uniformColor": "f3f1e9",
+      "map": "",
+      "width": 512,
+      "height": 1024,
+      "textureUploaded": true,
+      "probe": [
+        215,
+        217,
+        212,
+        255
+      ],
+      "receivesShadows": false
+    },
+    "treeCasterBatches": 5,
+    "hydrology": false,
+    "profile": "warm-natural",
+    "phase": "running",
+    "sequence": 2,
+    "startedAt": 36639.199999999255,
+    "progress": 0.11901007494821722,
+    "rain": 0,
+    "night": 0,
+    "sun": 0.17798944946802867,
+    "sunColor": "ffd9a4",
+    "positionSun": [
+      -3.089995454545452,
+      8.487050462039264,
+      -209.17964099366156
+    ],
+    "fog": "baccd1",
+    "health": {
+      "status": "ready",
+      "path": "direct",
+      "presentedFrames": 1403,
+      "contextLosses": 0,
+      "lastErrorCode": null
+    }
+  },
+  "candidateAppCommit": "32b68d60",
+  "baseComparison": {
+    "appCommit": "c99436b3",
+    "browser": "157.0.8103.79",
+    "marker": {
+      "memorial-antes": {
+        "color": "f3f1e9",
+        "uniformColor": "f3f1e9",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      },
+      "chuva": {
+        "color": "000000",
+        "uniformColor": "000000",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      },
+      "arvore-lunar": {
+        "color": "000000",
+        "uniformColor": "000000",
+        "map": "",
+        "width": 512,
+        "height": 1024,
+        "textureUploaded": true,
+        "probe": [
+          215,
+          217,
+          212,
+          255
+        ],
+        "receivesShadows": false
+      }
+    }
+  }
+}

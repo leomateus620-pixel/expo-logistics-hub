@@ -1,0 +1,104 @@
+{
+  "baseline": "c99436b3",
+  "runtime": "v24.13.0",
+  "rows": [
+    {
+      "id": "masonry/map",
+      "bytes": 262144,
+      "hash": "98bf7181f09896b644fe175a4de98003e8d5d04cb04a8ac5632e2a1ae7ebceea",
+      "equal": true
+    },
+    {
+      "id": "masonry/normalMap",
+      "bytes": 262144,
+      "hash": "9ccdd72bbeb8ab449b1c938b2adbe9bb7ae6b3c7d51141ab36a68374445a1544",
+      "equal": true
+    },
+    {
+      "id": "masonry/roughnessMap",
+      "bytes": 262144,
+      "hash": "a9f3c8022164e11a85dc2f3ec41403f2a27257b3df2aa97d25a139d126feeccc",
+      "equal": true
+    },
+    {
+      "id": "roof/map",
+      "bytes": 1048576,
+      "hash": "dbeb8720234a09068ebc22d515293ce28c721b7e40e015e513493a40d159e76b",
+      "equal": true
+    },
+    {
+      "id": "roof/normalMap",
+      "bytes": 1048576,
+      "hash": "99a74985741a82d268f792d9320b76a371026d49520098d739b5e7260a582ed2",
+      "equal": true
+    },
+    {
+      "id": "roof/roughnessMap",
+      "bytes": 1048576,
+      "hash": "151f0614647254d6876ffb7011743418e2742640189168c7bd7670aecdbce4de",
+      "equal": true
+    },
+    {
+      "id": "concrete/map",
+      "bytes": 262144,
+      "hash": "73c436868f812ce84707efc6b938f2bd0d00b4e9cf6173b3b5cda7f4906a3aa6",
+      "equal": true
+    },
+    {
+      "id": "concrete/normalMap",
+      "bytes": 262144,
+      "hash": "9ccdd72bbeb8ab449b1c938b2adbe9bb7ae6b3c7d51141ab36a68374445a1544",
+      "equal": true
+    },
+    {
+      "id": "concrete/roughnessMap",
+      "bytes": 262144,
+      "hash": "0f468508dd7d59040430320e67cd4e80be2b273645476a34d33c5af54abcf081",
+      "equal": true
+    },
+    {
+      "id": "brick/map",
+      "bytes": 262144,
+      "hash": "98bf7181f09896b644fe175a4de98003e8d5d04cb04a8ac5632e2a1ae7ebceea",
+      "equal": true
+    },
+    {
+      "id": "brick/normalMap",
+      "bytes": 262144,
+      "hash": "3810d079edfcdb8adb588903d48b9d058569a56df02bdcf617a82557ff854f34",
+      "equal": true
+    },
+    {
+      "id": "brick/roughnessMap",
+      "bytes": 262144,
+      "hash": "0f468508dd7d59040430320e67cd4e80be2b273645476a34d33c5af54abcf081",
+      "equal": true
+    }
+  ],
+  "timers": [
+    [
+      110.78,
+      104.95,
+      94.17,
+      108.31,
+      104.75,
+      109.87,
+      111.05,
+      144.57,
+      161.78,
+      134.96
+    ],
+    [
+      31.48,
+      29.22,
+      25.89,
+      25.78,
+      29.13,
+      30.58,
+      30.93,
+      33.74,
+      42.38,
+      34.84
+    ]
+  ]
+}

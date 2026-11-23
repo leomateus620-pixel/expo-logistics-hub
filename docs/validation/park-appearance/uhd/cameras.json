@@ -1,0 +1,190 @@
+{
+  "base": {
+    "browser": "157.0.8103.79",
+    "profile": "classic",
+    "initialBuffer": [
+      3264,
+      1836
+    ],
+    "views": [
+      {
+        "id": "geral",
+        "position": [
+          2,
+          123,
+          108
+        ],
+        "target": [
+          0,
+          0,
+          -13
+        ],
+        "buffer": [
+          3840,
+          2160
+        ],
+        "dpr": 1,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 419,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "images": []
+      },
+      {
+        "id": "contracampo",
+        "position": [
+          -103,
+          96,
+          7
+        ],
+        "target": [
+          3,
+          0,
+          -2
+        ],
+        "buffer": [
+          3840,
+          2160
+        ],
+        "dpr": 1,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 465,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "images": []
+      },
+      {
+        "id": "horizonte",
+        "position": [
+          -49,
+          10.1,
+          -32
+        ],
+        "target": [
+          1,
+          1.4,
+          0
+        ],
+        "buffer": [
+          3840,
+          2160
+        ],
+        "dpr": 1,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 546,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "images": []
+      }
+    ]
+  },
+  "natural": {
+    "browser": "157.0.8103.79",
+    "profile": "warm-natural",
+    "initialBuffer": [
+      3840,
+      2160
+    ],
+    "views": [
+      {
+        "id": "geral",
+        "position": [
+          2,
+          123,
+          108
+        ],
+        "target": [
+          0,
+          0,
+          -13
+        ],
+        "buffer": [
+          3840,
+          2160
+        ],
+        "dpr": 1,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 300,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "images": [
+          "/maps/materials/warm-grass-v2.webp",
+          "/maps/materials/warm-woodland-v1.webp",
+          "/maps/materials/woodland-cover-v2.png"
+        ]
+      },
+      {
+        "id": "contracampo",
+        "position": [
+          -103,
+          96,
+          7
+        ],
+        "target": [
+          3,
+          0,
+          -2
+        ],
+        "buffer": [
+          3840,
+          2160
+        ],
+        "dpr": 1,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 330,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "images": [
+          "/maps/materials/warm-grass-v2.webp",
+          "/maps/materials/warm-woodland-v1.webp",
+          "/maps/materials/woodland-cover-v2.png"
+        ]
+      },
+      {
+        "id": "horizonte",
+        "position": [
+          -49,
+          10.1,
+          -32
+        ],
+        "target": [
+          1,
+          1.4,
+          0
+        ],
+        "buffer": [
+          3840,
+          2160
+        ],
+        "dpr": 1,
+        "health": {
+          "status": "ready",
+          "path": "post",
+          "presentedFrames": 360,
+          "contextLosses": 0,
+          "lastErrorCode": null
+        },
+        "images": [
+          "/maps/materials/warm-grass-v2.webp",
+          "/maps/materials/warm-woodland-v1.webp",
+          "/maps/materials/woodland-cover-v2.png"
+        ]
+      }
+    ]
+  }
+}

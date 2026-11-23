@@ -1,0 +1,2562 @@
+{
+  "abertura/outros": {
+    "frames": 3,
+    "calls": 1728,
+    "cpuMs": 14.400000005960464,
+    "cpuPerFrame": 4.800000001986821,
+    "callsPerFrame": 576,
+    "materials": 467,
+    "meshes": 576,
+    "examples": [
+      {
+        "family": "outros",
+        "object": [
+          "CommercialMapPhysicalSunriseSky"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "ShaderMaterial",
+        "maps": []
+      },
+      {
+        "family": "outros",
+        "object": [],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "outros",
+        "object": [],
+        "geometry": "ConeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "outros",
+        "object": [],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "outros",
+        "object": [],
+        "geometry": "ShapeGeometry",
+        "material": "MeshBasicMaterial",
+        "maps": []
+      }
+    ]
+  },
+  "abertura/solo": {
+    "frames": 3,
+    "calls": 99,
+    "cpuMs": 1.3999999947845936,
+    "cpuPerFrame": 0.46666666492819786,
+    "callsPerFrame": 33,
+    "materials": 19,
+    "meshes": 33,
+    "examples": [
+      {
+        "family": "solo",
+        "object": [
+          "quadras-ab-restrained-ground-detail",
+          "quadras-ab-environment",
+          "essential-quadras-context"
+        ],
+        "geometry": "CircleGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "solo",
+        "object": [
+          "terreno-natural-entorno-arena",
+          "estruturas-publicas-frente-arena",
+          "infraestrutura-publica-frente-arena"
+        ],
+        "geometry": "PlaneGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "pilot-ground-noise-256",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "solo",
+        "object": [],
+        "geometry": "PlaneGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "pilot-ground-noise-256",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "solo",
+        "object": [
+          "rear-park-environment",
+          "essential-rear-environment"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "pilot-ground-noise-256",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "solo",
+        "object": [
+          "territorial-environment-layer",
+          "essential-territorial-context"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      }
+    ]
+  },
+  "abertura/arvores": {
+    "frames": 3,
+    "calls": 252,
+    "cpuMs": 2.299999989569187,
+    "cpuPerFrame": 0.7666666631897291,
+    "callsPerFrame": 84,
+    "materials": 47,
+    "meshes": 84,
+    "examples": [
+      {
+        "family": "arvores",
+        "object": [
+          "exterior-cell:-1:0:H06",
+          "exterior-architecture-and-vegetation",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "arvores",
+        "object": [
+          "exterior-cell:-1:0:H02",
+          "exterior-architecture-and-vegetation",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "arvores",
+        "object": [
+          "exterior-cell:0:0:R04",
+          "exterior-architecture-and-vegetation",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "arvores",
+        "object": [
+          "exterior-cell:-1:0:H03",
+          "exterior-architecture-and-vegetation",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "arvores",
+        "object": [
+          "exterior-cell:-1:0:H08",
+          "exterior-architecture-and-vegetation",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "abertura/entorno": {
+    "frames": 3,
+    "calls": 42,
+    "cpuMs": 0.4000000059604645,
+    "cpuPerFrame": 0.13333333532015482,
+    "callsPerFrame": 14,
+    "materials": 1,
+    "meshes": 14,
+    "examples": [
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--1:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--1:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--2:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--2:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--2:0",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "abertura/soja": {
+    "frames": 3,
+    "calls": 6,
+    "cpuMs": 0.10000000149011612,
+    "cpuPerFrame": 0.033333333830038704,
+    "callsPerFrame": 2,
+    "materials": 2,
+    "meshes": 2,
+    "examples": [
+      {
+        "family": "soja",
+        "object": [
+          "soy-trifoliate-leaves",
+          "exporural-soy-field"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "soja",
+        "object": [
+          "exporural-soy-field"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      }
+    ]
+  },
+  "abertura/coberturas": {
+    "frames": 3,
+    "calls": 93,
+    "cpuMs": 2.6000000052154064,
+    "cpuPerFrame": 0.8666666684051355,
+    "callsPerFrame": 31,
+    "materials": 20,
+    "meshes": 31,
+    "examples": [
+      {
+        "family": "coberturas",
+        "object": [
+          "Q5-hipRoof",
+          "residential-Q5",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "coberturas",
+        "object": [
+          "Q4-hipRoof",
+          "residential-Q4",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "coberturas",
+        "object": [
+          "Q3-hipRoof",
+          "residential-Q3",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "coberturas",
+        "object": [
+          "Q2-hipRoof",
+          "residential-Q2",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "coberturas",
+        "object": [
+          "Q1-hipRoof",
+          "residential-Q1",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "abertura/estacionamento": {
+    "frames": 3,
+    "calls": 81,
+    "cpuMs": 1.0000000037252903,
+    "cpuPerFrame": 0.3333333345750968,
+    "callsPerFrame": 27,
+    "materials": 16,
+    "meshes": 27,
+    "examples": [
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-gravel-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-gravel-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-gravel-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-gravel-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-gravel-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-gravel-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-soil-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-soil-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-soil-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-soil-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "abertura/lotes": {
+    "frames": 3,
+    "calls": 6,
+    "cpuMs": 0.20000000298023224,
+    "cpuPerFrame": 0.06666666766007741,
+    "callsPerFrame": 2,
+    "materials": 2,
+    "meshes": 2,
+    "examples": [
+      {
+        "family": "lotes",
+        "object": [
+          "sold-lot-confirmations"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshBasicMaterial",
+        "maps": []
+      },
+      {
+        "family": "lotes",
+        "object": [
+          "external-lot-status-frames"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshBasicMaterial",
+        "maps": []
+      }
+    ]
+  },
+  "abertura/pavilhoes": {
+    "frames": 3,
+    "calls": 273,
+    "cpuMs": 3.099999997764826,
+    "cpuPerFrame": 1.0333333325882752,
+    "callsPerFrame": 91,
+    "materials": 77,
+    "meshes": 91,
+    "examples": [
+      {
+        "family": "pavilhoes",
+        "object": [
+          "pavilion-complex:p8-p13",
+          "pavilions-3-13-8-construction-joins"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "pavilhoes",
+        "object": [
+          "pavilion-complex:p8-p13",
+          "pavilions-3-13-8-construction-joins"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "pavilhoes",
+        "object": [
+          "pavilion-complex:p13-p3",
+          "pavilions-3-13-8-construction-joins"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "pavilhoes",
+        "object": [
+          "pavilion-complex:p13-p3",
+          "pavilions-3-13-8-construction-joins"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "pavilhoes",
+        "object": [
+          "brigada-military-wing:wall",
+          "brigada-military-wing:B19"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "pavilion-2026-shared-paint",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          }
+        ]
+      }
+    ]
+  },
+  "abertura/casa": {
+    "frames": 3,
+    "calls": 60,
+    "cpuMs": 0.5999999977648258,
+    "cpuPerFrame": 0.19999999925494194,
+    "callsPerFrame": 20,
+    "materials": 20,
+    "meshes": 20,
+    "examples": [
+      {
+        "family": "casa",
+        "object": [
+          "B12:wall",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "B12:masonry:albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "B12:masonry:surface",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "B12:masonry:surface",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "casa",
+        "object": [
+          "B12:trim",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "casa",
+        "object": [
+          "B12:frame",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "casa",
+        "object": [
+          "B12:soffit",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "casa",
+        "object": [
+          "B12:sideWall",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "B12:brick:albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "B12:brick:surface",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "B12:brick:surface",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      }
+    ]
+  },
+  "abertura/vias": {
+    "frames": 3,
+    "calls": 24,
+    "cpuMs": 0.30000000074505806,
+    "cpuPerFrame": 0.10000000024835269,
+    "callsPerFrame": 8,
+    "materials": 8,
+    "meshes": 8,
+    "examples": [
+      {
+        "family": "vias",
+        "object": [
+          "park-access-asphalt",
+          "infraestrutura-acessos-parque"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "vias",
+        "object": [
+          "regional-highway-network"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      },
+      {
+        "family": "vias",
+        "object": [
+          "regional-highway-network"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "vias",
+        "object": [
+          "regional-highway-network"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "vias",
+        "object": [
+          "regional-highway-network"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": []
+      }
+    ]
+  },
+  "movimento/outros": {
+    "frames": 64,
+    "calls": 36855,
+    "cpuMs": 193.8999999575317,
+    "cpuPerFrame": 3.0296874993364327,
+    "callsPerFrame": 575.859375,
+    "materials": 467,
+    "meshes": 576,
+    "examples": [
+      {
+        "family": "outros",
+        "object": [
+          "CommercialMapPhysicalSunriseSky"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "ShaderMaterial",
+        "maps": []
+      },
+      {
+        "family": "outros",
+        "object": [],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "outros",
+        "object": [],
+        "geometry": "ConeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "outros",
+        "object": [],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "outros",
+        "object": [],
+        "geometry": "ShapeGeometry",
+        "material": "MeshBasicMaterial",
+        "maps": []
+      }
+    ]
+  },
+  "movimento/solo": {
+    "frames": 64,
+    "calls": 1172,
+    "cpuMs": 7.199999999254942,
+    "cpuPerFrame": 0.11249999998835847,
+    "callsPerFrame": 18.3125,
+    "materials": 11,
+    "meshes": 21,
+    "examples": [
+      {
+        "family": "solo",
+        "object": [
+          "quadras-ab-restrained-ground-detail",
+          "quadras-ab-environment",
+          "essential-quadras-context"
+        ],
+        "geometry": "CircleGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "solo",
+        "object": [
+          "territorial-environment-layer",
+          "essential-territorial-context"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "solo",
+        "object": [
+          "territory-cell--1:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "solo",
+        "object": [
+          "territory-cell--2:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "solo",
+        "object": [
+          "territory-cell--1:0",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "movimento/arvores": {
+    "frames": 64,
+    "calls": 5886,
+    "cpuMs": 35.700000025331974,
+    "cpuPerFrame": 0.5578125003958121,
+    "callsPerFrame": 91.96875,
+    "materials": 57,
+    "meshes": 99,
+    "examples": [
+      {
+        "family": "arvores",
+        "object": [
+          "terreno-natural-entorno-arena",
+          "estruturas-publicas-frente-arena",
+          "infraestrutura-publica-frente-arena"
+        ],
+        "geometry": "PlaneGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "park-natural-grass",
+            "size": [
+              512,
+              512
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "park-natural-woodland",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "park-natural-cover",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "pilot-ground-noise-256",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "arvores",
+        "object": [],
+        "geometry": "PlaneGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "park-natural-grass",
+            "size": [
+              512,
+              512
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "park-natural-woodland",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "park-natural-cover",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "pilot-ground-noise-256",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "arvores",
+        "object": [
+          "rear-park-environment",
+          "essential-rear-environment"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": null,
+            "size": [
+              1,
+              1
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          },
+          {
+            "name": "park-natural-grass",
+            "size": [
+              512,
+              512
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "park-natural-woodland",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "park-natural-cover",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "pilot-ground-noise-256",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          }
+        ]
+      },
+      {
+        "family": "arvores",
+        "object": [
+          "exterior-cell:-1:0:H02",
+          "exterior-architecture-and-vegetation",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "arvores",
+        "object": [
+          "exterior-cell:-1:0:H03",
+          "exterior-architecture-and-vegetation",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "movimento/entorno": {
+    "frames": 64,
+    "calls": 608,
+    "cpuMs": 2.2999999970197678,
+    "cpuPerFrame": 0.03593749995343387,
+    "callsPerFrame": 9.5,
+    "materials": 1,
+    "meshes": 14,
+    "examples": [
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--1:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--1:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--2:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--2:1",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "entorno",
+        "object": [
+          "territory-cell--2:0",
+          "territorial-environment",
+          "territorial-environment-layer"
+        ],
+        "geometry": "BoxGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "movimento/soja": {
+    "frames": 64,
+    "calls": 128,
+    "cpuMs": 1.0999999977648258,
+    "cpuPerFrame": 0.017187499965075403,
+    "callsPerFrame": 2,
+    "materials": 2,
+    "meshes": 2,
+    "examples": [
+      {
+        "family": "soja",
+        "object": [
+          "soy-trifoliate-leaves",
+          "exporural-soy-field"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "soja",
+        "object": [
+          "exporural-soy-field"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "movimento/coberturas": {
+    "frames": 64,
+    "calls": 1984,
+    "cpuMs": 10.199999995529652,
+    "cpuPerFrame": 0.1593749999301508,
+    "callsPerFrame": 31,
+    "materials": 20,
+    "meshes": 31,
+    "examples": [
+      {
+        "family": "coberturas",
+        "object": [
+          "Q5-hipRoof",
+          "residential-Q5",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "coberturas",
+        "object": [
+          "Q4-hipRoof",
+          "residential-Q4",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "coberturas",
+        "object": [
+          "Q3-hipRoof",
+          "residential-Q3",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "coberturas",
+        "object": [
+          "Q2-hipRoof",
+          "residential-Q2",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "coberturas",
+        "object": [
+          "Q1-hipRoof",
+          "residential-Q1",
+          "lateral-residential-district"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "movimento/estacionamento": {
+    "frames": 64,
+    "calls": 1600,
+    "cpuMs": 6.300000004470348,
+    "cpuPerFrame": 0.0984375000698492,
+    "callsPerFrame": 25,
+    "materials": 14,
+    "meshes": 25,
+    "examples": [
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-gravel-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-gravel-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-gravel-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-gravel-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-gravel-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-gravel-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-soil-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-soil-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "estacionamento",
+        "object": [
+          "rear-parking-reference-layer",
+          "essential-parking-context"
+        ],
+        "geometry": "ShapeGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "rear-parking-soil-albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "rear-parking-soil-normal",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "movimento/lotes": {
+    "frames": 64,
+    "calls": 128,
+    "cpuMs": 2.600000001490116,
+    "cpuPerFrame": 0.040625000023283064,
+    "callsPerFrame": 2,
+    "materials": 2,
+    "meshes": 2,
+    "examples": [
+      {
+        "family": "lotes",
+        "object": [
+          "sold-lot-confirmations"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshBasicMaterial",
+        "maps": []
+      },
+      {
+        "family": "lotes",
+        "object": [
+          "external-lot-status-frames"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshBasicMaterial",
+        "maps": []
+      }
+    ]
+  },
+  "movimento/pavilhoes": {
+    "frames": 64,
+    "calls": 5824,
+    "cpuMs": 44.900000013411045,
+    "cpuPerFrame": 0.7015625002095476,
+    "callsPerFrame": 91,
+    "materials": 77,
+    "meshes": 91,
+    "examples": [
+      {
+        "family": "pavilhoes",
+        "object": [
+          "pavilion-complex:p8-p13",
+          "pavilions-3-13-8-construction-joins"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "pavilhoes",
+        "object": [
+          "pavilion-complex:p8-p13",
+          "pavilions-3-13-8-construction-joins"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "pavilhoes",
+        "object": [
+          "pavilion-complex:p13-p3",
+          "pavilions-3-13-8-construction-joins"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "pavilhoes",
+        "object": [
+          "pavilion-complex:p13-p3",
+          "pavilions-3-13-8-construction-joins"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "pavilhoes",
+        "object": [
+          "brigada-military-wing:wall",
+          "brigada-military-wing:B19"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "pavilion-2026-shared-paint",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "movimento/casa": {
+    "frames": 64,
+    "calls": 1280,
+    "cpuMs": 9.799999997019768,
+    "cpuPerFrame": 0.15312499995343387,
+    "callsPerFrame": 20,
+    "materials": 20,
+    "meshes": 20,
+    "examples": [
+      {
+        "family": "casa",
+        "object": [
+          "B12:wall",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "B12:masonry:albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "B12:masonry:surface",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "B12:masonry:surface",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "casa",
+        "object": [
+          "B12:trim",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "casa",
+        "object": [
+          "B12:frame",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "casa",
+        "object": [
+          "B12:soffit",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "casa",
+        "object": [
+          "B12:sideWall",
+          "sede-fenasoja-reference-reconstruction"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "B12:brick:albedo",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "B12:brick:surface",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "B12:brick:surface",
+            "size": [
+              256,
+              256
+            ],
+            "srgb": false,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  },
+  "movimento/vias": {
+    "frames": 64,
+    "calls": 533,
+    "cpuMs": 2.999999985098839,
+    "cpuPerFrame": 0.046874999767169356,
+    "callsPerFrame": 8.328125,
+    "materials": 9,
+    "meshes": 9,
+    "examples": [
+      {
+        "family": "vias",
+        "object": [
+          "park-access-asphalt",
+          "infraestrutura-acessos-parque"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "vias",
+        "object": [
+          "regional-highway-network"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "vias",
+        "object": [
+          "regional-highway-network"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "vias",
+        "object": [
+          "regional-highway-network"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": null,
+            "size": [
+              256,
+              256
+            ],
+            "srgb": true,
+            "mipmaps": true
+          },
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      },
+      {
+        "family": "vias",
+        "object": [
+          "regional-highway-network"
+        ],
+        "geometry": "BufferGeometry",
+        "material": "MeshStandardMaterial",
+        "maps": [
+          {
+            "name": "PMREM.cubeUv",
+            "size": [
+              336,
+              128
+            ],
+            "srgb": false,
+            "mipmaps": false
+          }
+        ]
+      }
+    ]
+  }
+}

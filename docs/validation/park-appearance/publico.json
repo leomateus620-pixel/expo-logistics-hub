@@ -1,0 +1,46 @@
+{
+  "public": true,
+  "store": "warm-natural",
+  "health": {
+    "status": "ready",
+    "path": "direct",
+    "presentedFrames": 294,
+    "contextLosses": 0,
+    "lastErrorCode": null
+  },
+  "warmRequests": 0,
+  "bindings": {
+    "bound": [],
+    "samples": {
+      "quadras-ab-ground:quadra-a": {
+        "material": "MeshStandardMaterial",
+        "warm": 0,
+        "ready": [
+          0,
+          0,
+          0
+        ],
+        "textures": []
+      },
+      "quadras-ab-ground:quadra-b": {
+        "material": "MeshStandardMaterial",
+        "warm": 0,
+        "ready": [
+          0,
+          0,
+          0
+        ],
+        "textures": []
+      }
+    }
+  },
+  "browser": "157.0.8103.79",
+  "manifest": {
+    "revision": "32b68d600df60d0e4ae17d4311ea04a28d8512e5",
+    "inventoryHash": "4c4028f2b69bbfd9ee1b6762c17a83bc0d2208f1973b355d9abea06822c7c73e"
+  },
+  "blockedOrigins": [
+    "https://fonts.googleapis.com"
+  ],
+  "errors": []
+}
