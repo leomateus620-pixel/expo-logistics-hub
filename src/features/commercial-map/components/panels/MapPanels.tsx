@@ -16,6 +16,8 @@ import {
   Layers3,
   LockKeyhole,
   Ruler,
+  Palette,
+  Gauge,
   Scissors,
   ShieldAlert,
   ShoppingBag,
@@ -36,6 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CLASSIFICATION_LABELS, COMMERCIAL_PHASES, STATUS_CONFIG } from '../../constants';
 import { useLotActivity, useLotContractVersions, useLotSaleHistory, useMapMutations } from '../../hooks/useCommercialMap';
+import { PARK_APPEARANCES, PARK_QUALITY_CHOICES, type ParkAppearance, type ParkQualityPreference } from '../../state/parkAppearance';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
@@ -220,8 +223,10 @@ export function LayersPanel({
   const referenceOpacity = useCommercialMapStore((state) => state.referenceOpacity);
   const setReferenceVisible = useCommercialMapStore((state) => state.setReferenceVisible);
   const setReferenceOpacity = useCommercialMapStore((state) => state.setReferenceOpacity);
-  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
-  const setReducedGraphics = useCommercialMapStore((state) => state.setReducedGraphics);
+  const appearance = useCommercialMapStore((state) => state.appearance);
+  const setAppearance = useCommercialMapStore((state) => state.setAppearance);
+  const quality = useCommercialMapStore((state) => state.qualityPreference);
+  const setQuality = useCommercialMapStore((state) => state.setQualityPreference);
   const counts = useMemo(() => entities.reduce<Record<string, number>>((acc, entity) => {
     acc[entity.layerId] = (acc[entity.layerId] ?? 0) + 1;
     return acc;
@@ -248,6 +253,22 @@ export function LayersPanel({
     <aside className="commercial-map-panel commercial-map-layer-panel">
       <PanelHeader eyebrow="Composição visual" title="Camadas do parque" onClose={() => setActivePanel(null)} />
       <ScrollArea className="commercial-map-panel-scroll">
+        <div className="commercial-map-park-preferences">
+          <label>
+            <Palette aria-hidden="true" />
+            <span>Aparência</span>
+            <select value={appearance} onChange={(event) => setAppearance(event.target.value as ParkAppearance)}>
+              {Object.entries(PARK_APPEARANCES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label>
+          <label>
+            <Gauge aria-hidden="true" />
+            <span>Qualidade</span>
+            <select value={quality} onChange={(event) => setQuality(event.target.value as ParkQualityPreference)}>
+              {Object.entries(PARK_QUALITY_CHOICES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label>
+        </div>
         <div className="commercial-map-panel-section">
           {layers.filter((layer) => layer.key !== 'reference' && (counts[layer.id] ?? 0) > 0).map((layer) => (
             <div className="commercial-map-layer-row" key={layer.id}>
@@ -276,7 +297,7 @@ export function LayersPanel({
           ))}
         </div>
         <div className="commercial-map-panel-section is-separated">
-          <h3>Ambiente, referência e desempenho</h3>
+          <h3>Ambiente e referência</h3>
           {environmentAssetSummary && (
             <label className="commercial-map-setting-row">
               <span>
@@ -308,10 +329,6 @@ export function LayersPanel({
           <label className="commercial-map-setting-row">
             <span><strong>Rótulos adaptativos</strong><small>Prioriza estruturas relevantes</small></span>
             <Switch checked={labelsVisible} onCheckedChange={setLabelsVisible} />
-          </label>
-          <label className="commercial-map-setting-row">
-            <span><strong>Gráficos reduzidos</strong><small>Melhora o desempenho em celulares</small></span>
-            <Switch checked={reducedGraphics} onCheckedChange={setReducedGraphics} />
           </label>
         </div>
       </ScrollArea>

@@ -1,3 +1,4 @@
+import { useParkAppearance } from '../../state/parkAppearance';
 import { eventCenterForecourtTreeProfile } from '../../utils/eventCenterForecourtTrees';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
@@ -556,6 +557,7 @@ function CommercialTreeInstances({
   internalPark?: boolean;
   leafAtlas?: THREE.Texture | null;
 }) {
+  const warm = useParkAppearance() === 'warm-natural';
   const groupRef = useRef<THREE.Group>(null);
   const trunkRef = useRef<THREE.InstancedMesh>(null);
   const branchRef = useRef<THREE.InstancedMesh>(null);
@@ -625,6 +627,15 @@ function CommercialTreeInstances({
     () => createTreeMaterials(shadowTexture, referenceQuadras, effectiveReducedGraphics, leafAtlas),
     [effectiveReducedGraphics, referenceQuadras, shadowTexture, leafAtlas],
   );
+
+  useLayoutEffect(() => {
+    materials.crown.color.setRGB(warm ? 1.04 : 1, 1, warm ? 1.09 : 1);
+    if (materials.crown instanceof THREE.MeshStandardMaterial) {
+      materials.crown.roughness = warm ? .85 : .94;
+      materials.crown.emissiveIntensity = referenceQuadras ? .075 : warm ? .18 : .3;
+    }
+    invalidate();
+  }, [materials, referenceQuadras, warm, invalidate]);
 
   useLayoutEffect(() => {
     const trunkMesh = trunkRef.current;
@@ -873,7 +884,9 @@ function CommercialTreeInstances({
     materials.trunk.opacity = progress;
     materials.crown.opacity = progress * (referenceQuadras ? 1 : 0.95);
     materials.shadow.opacity = SHADOW_OPACITY * progress;
-    materials.contactPatch.opacity = CONTACT_PATCH_OPACITY * progress;
+    // The warm ground already contains registered litter and exposed soil.
+    // Keep only a small trunk contact and let the actual sun cast the canopy.
+    materials.contactPatch.opacity = (warm ? .095 : CONTACT_PATCH_OPACITY) * progress;
     if (settled) {
       group.visible = visible;
       if (transitionPending.current && lodCountsSettled) {

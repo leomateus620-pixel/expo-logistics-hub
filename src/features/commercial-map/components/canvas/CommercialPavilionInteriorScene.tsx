@@ -5,6 +5,8 @@ import { useInteriorCameraRequest, type InteriorCameraRequest } from '../../hook
 import * as THREE from 'three';
 import type { CommercialLot, MapEntity } from '../../types';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { useParkAppearance } from '../../state/parkAppearance';
+import { resolvePavilionArchitecturePalette } from '../../data/pavilionArchitecturePalettes';
 import {
   createCommercialPavilionLayout,
   commercialPavilionInteriorPresentationBounds,
@@ -334,6 +336,8 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   filtersActive?: boolean;
 }) {
   const definition = resolveCommercialPavilionDefinition(entity);
+  const warm = useParkAppearance() === 'warm-natural';
+  const invalidate = useThree(state => state.invalidate);
   const modulePlan = resolveCommercialPavilionModulePlan(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
@@ -395,6 +399,23 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
     }),
     threshold: new THREE.MeshStandardMaterial({ color: '#d6b347', roughness: 0.76 }),
   }), [clearCirculationFloor, floorTexture]);
+  useLayoutEffect(() => {
+    const paint = resolvePavilionArchitecturePalette(entity.publicIdentifier);
+    materials.floor.color.set(clearCirculationFloor
+      ? warm ? '#c6c9bd' : '#bcc5b8'
+      : warm ? '#cccbc0' : '#a8aaa5');
+    materials.floor.roughness = warm ? .83 : .96;
+    materials.floor.bumpScale = warm ? .004 : .012;
+    if (floorTexture && layout) {
+      // Four saw-cut panels per tile. About 3 m per panel at 0.15 units/m.
+      floorTexture.repeat.set(warm ? layout.width / 1.8 : 2.2, warm ? layout.depth / 1.8 : 2.2);
+    }
+    materials.wall.color.set(warm ? paint?.wall ?? '#d4d2c7' : '#c7c5bd');
+    materials.structure.color.set(warm ? paint?.trim ?? '#485150' : '#485556');
+    materials.structure.roughness = warm ? .49 : .56;
+    materials.structure.metalness = warm ? .31 : .25;
+    invalidate();
+  }, [clearCirculationFloor, entity.publicIdentifier, floorTexture, invalidate, layout, materials, warm]);
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const floorGeometry = useMemo(() => layout
     ? new THREE.BoxGeometry(layout.width, layout.interior.floorY, layout.depth)
@@ -483,14 +504,14 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
 
   return (
     <>
-      <color attach="background" args={['#e5e5de']} />
-      <fog attach="fog" args={['#e5e5de', Math.max(layout.width, layout.depth) * 4.5, Math.max(layout.width, layout.depth) * 9]} />
-      <ambientLight intensity={0.72} />
-      <hemisphereLight args={['#fffdf5', '#5a685e', 0.94]} />
+      <color attach="background" args={[warm ? '#c8d4d5' : '#e5e5de']} />
+      <fog attach="fog" args={[warm ? '#c8d4d5' : '#e5e5de', Math.max(layout.width, layout.depth) * 4.5, Math.max(layout.width, layout.depth) * 9]} />
+      <ambientLight intensity={warm ? .59 : .72} />
+      <hemisphereLight color={warm ? '#d9e5eb' : '#fffdf5'} groundColor={warm ? '#8e8676' : '#5a685e'} intensity={warm ? 1.04 : .94} />
       <directionalLight
         position={[bounds.centerX - layout.width, layout.height * 5, bounds.centerZ + layout.depth]}
         intensity={1.72}
-        color="#fff4d9"
+        color={warm ? '#ffe7c7' : '#fff4d9'}
         castShadow={!reducedGraphics}
         shadow-mapSize-width={reducedGraphics ? 256 : 1024}
         shadow-mapSize-height={reducedGraphics ? 256 : 1024}

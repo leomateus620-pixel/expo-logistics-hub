@@ -4,6 +4,25 @@ import { EXTERNAL_LOT_PALETTE } from '../../utils/externalLotPresentation';
 type TurfMaterial = THREE.MeshStandardMaterial | THREE.MeshBasicMaterial;
 const installations = new WeakMap<TurfMaterial, { detail: THREE.IUniform<number>; pixelRatio: THREE.IUniform<number> }>();
 
+// Invert the Three r170 ACES fit once for the two unlit status inks. The HDR
+// composer grades its entire input; these scene-linear values yield the same
+// display colour as the direct material after its tone-mapping chunk.
+function statusBeforeAces(hex: string) {
+  const color = new THREE.Color(hex);
+  const input = new THREE.Matrix3().set(.59719,.35458,.04823, .076,.90834,.01566, .0284,.13383,.83777);
+  const output = new THREE.Matrix3().set(1.60475,-.53108,-.07367, -.10208,1.10813,-.00605, -.00327,-.07276,1.07602);
+  const fit = new THREE.Vector3(color.r, color.g, color.b).applyMatrix3(output.invert());
+  const inverse = (v: number) => {
+    const a = .983729 * v - 1;
+    const b = .432951 * v - .0245786;
+    const c = .238081 * v + .000090537;
+    return (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+  };
+  return fit.set(inverse(fit.x), inverse(fit.y), inverse(fit.z)).applyMatrix3(input.invert()).multiplyScalar(.6);
+}
+const HDR_OPEN = statusBeforeAces(EXTERNAL_LOT_PALETTE.open);
+const HDR_SOLD = statusBeforeAces(EXTERNAL_LOT_PALETTE.sold);
+
 /** World-space, derivative-filtered turf. The vertex mask is updated with status,
  * so blocked/legacy surfaces and every internal module retain their material.
  * Both public Basic and private Standard compose with existing shader hooks. */
@@ -15,12 +34,24 @@ export function applyExporuralTurfMaterial(material: TurfMaterial, reduced = fal
   const statusPixelRatio = { value: pixelRatio };
   const upstream = material.onBeforeCompile;
   const upstreamKey = material.customProgramCacheKey();
+  const managed = material instanceof THREE.MeshStandardMaterial;
+  const inverseExposure = { value: 1 };
+  if (managed) {
+    const previous = material.onBeforeRender;
+    material.onBeforeRender = function(...args) {
+      previous.apply(this, args);
+      inverseExposure.value = 1 / Math.max(.001, args[0].toneMappingExposure);
+    };
+  }
   material.onBeforeCompile = (shader, renderer) => {
     upstream.call(material, shader, renderer);
     shader.uniforms.uExternalTurfDetail = detail;
     shader.uniforms.uExternalStatusPixelRatio = statusPixelRatio;
     shader.uniforms.uExternalStatusOpen = { value: new THREE.Color(EXTERNAL_LOT_PALETTE.open) };
     shader.uniforms.uExternalStatusSold = { value: new THREE.Color(EXTERNAL_LOT_PALETTE.sold) };
+    shader.uniforms.uExternalHdrOpen = { value: HDR_OPEN };
+    shader.uniforms.uExternalHdrSold = { value: HDR_SOLD };
+    shader.uniforms.uExternalInverseExposure = inverseExposure;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>
       attribute float exporuralTurf;
@@ -47,6 +78,9 @@ export function applyExporuralTurfMaterial(material: TurfMaterial, reduced = fal
       uniform float uExternalStatusPixelRatio;
       uniform vec3 uExternalStatusOpen;
       uniform vec3 uExternalStatusSold;
+      uniform vec3 uExternalHdrOpen;
+      uniform vec3 uExternalHdrSold;
+      uniform float uExternalInverseExposure;
       varying vec2 vExternalLotStatus;
       varying float vExternalLotPitch;
       varying float vExporuralTurf;
@@ -98,12 +132,16 @@ export function applyExporuralTurfMaterial(material: TurfMaterial, reduced = fal
           -externalStripeIntegral(stripePhase-externalStripePixel*.5,duty))/externalStripePixel;
         coverage=mix(clamp(coverage,0.,1.),duty,smoothstep(.2,.8,externalStripePixel));
         vec3 statusColor=vExternalLotStatus.x>1.5 ? uExternalStatusSold : uExternalStatusOpen;
+        ${managed ? `
+        #ifndef TONE_MAPPING
+          statusColor=(vExternalLotStatus.x>1.5 ? uExternalHdrSold : uExternalHdrOpen)*uExternalInverseExposure;
+        #endif` : ''}
         // Status alone bypasses lighting/tone mapping; the grass keeps all its
         // existing light, texture and shadows. Depth, fog and opacity still apply.
         gl_FragColor.rgb=mix(gl_FragColor.rgb,statusColor,coverage*vExternalLotStatus.y);
       }`);
   };
-  material.customProgramCacheKey = () => `${upstreamKey}|external-turf-r170-v5-status-lines:${reuseExistingSurfaceDetail ? 'surface' : 'procedural'}`;
+  material.customProgramCacheKey = () => `${upstreamKey}|external-turf-r170-v6-status-lines:${reuseExistingSurfaceDetail ? 'surface' : 'procedural'}`;
   material.needsUpdate = true;
   installations.set(material, { detail, pixelRatio: statusPixelRatio });
 }

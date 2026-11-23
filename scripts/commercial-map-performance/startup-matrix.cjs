@@ -11,7 +11,9 @@ const mobile = process.env.STARTUP_MOBILE === '1';
 const observeComplete = process.env.STARTUP_COMPLETE !== '0';
 const tier = process.env.STARTUP_TIER || '';
 const label = process.env.STARTUP_LABEL || `startup-after-${mobile ? 'mobile-emulation' : 'desktop'}${tier ? `-${tier}` : ''}`;
-const query = `persistedStage=1${tier ? `&qualityQa=${tier}` : ''}`;
+const observeGesture = process.env.STARTUP_PRESENTED_GESTURE === '1';
+const cpuThrottle = Number(process.env.STARTUP_CPU_THROTTLE || 1);
+const query = `persistedStage=1${tier ? `&qualityQa=${tier}` : ''}${observeGesture ? '&benvenutoQa=1' : ''}`;
 async function ready(page) {
   await page.waitForFunction(() => window.__commercialMapPerformance?.summary?.interactiveMs != null
     && JSON.parse(document.querySelector('canvas')?.dataset.commercialMapRenderHealth || '{}').status === 'ready', null, { timeout: 180000 });
@@ -61,6 +63,10 @@ async function capture(page) {
       });
       const page = await context.newPage(); const errors = [];
       page.on('pageerror', e => errors.push(e.message));
+      if (cpuThrottle !== 1) {
+        const device = await context.newCDPSession(page);
+        await device.send('Emulation.setCPUThrottlingRate', { rate: cpuThrottle });
+      }
       const profiler = process.env.STARTUP_PROFILE === '1' ? await context.newCDPSession(page) : null;
       if (profiler) { await profiler.send('Profiler.enable'); await profiler.send('Profiler.start'); }
       let beforeClick;
@@ -98,9 +104,28 @@ async function capture(page) {
         await profiler.detach();
       }
       const box = await page.locator('canvas').first().boundingBox();
-      await page.mouse.move(box.x + box.width * .45, box.y + box.height * .55); await page.mouse.down();
+      await page.mouse.move(box.x + box.width * .45, box.y + box.height * .55);
+      if (observeGesture) await page.evaluate(() => {
+        const state = window.__benvenutoQa.root.getState();
+        state.gl.domElement.addEventListener('pointerdown', () => {
+          const started = performance.now(), origin = state.camera.position.clone();
+          const frame = state.gl.info.render.frame;
+          function inspect() {
+            if (state.camera.position.distanceToSquared(origin) > 1e-8 && state.gl.info.render.frame > frame) {
+              requestAnimationFrame(() => {
+                const presented = performance.now();
+                window.__startupPresentedGesture = { started, presented, latencyMs: presented - started };
+              });
+            } else if (performance.now() - started < 10000) requestAnimationFrame(inspect);
+          }
+          requestAnimationFrame(inspect);
+        }, { once: true });
+      });
+      await page.mouse.down();
       await page.mouse.move(box.x + box.width * .5, box.y + box.height * .58, { steps: 8 }); await page.mouse.up();
       await page.waitForTimeout(600); const afterGesture = await capture(page);
+      const visibleGesture = observeGesture ? await page.evaluate(() => window.__startupPresentedGesture) : null;
+      if (observeGesture && !visibleGesture) throw Error('No rendered camera response to drag');
       const gestureCameraChanged = presentation.camera && afterGesture.camera ?
         JSON.stringify(presentation.camera) !== JSON.stringify(afterGesture.camera) : null;
       // Keep the existing real first-interactive barrier distinct from the
@@ -122,7 +147,7 @@ async function capture(page) {
       const clickToInteractiveMs = presentation.activationAt == null ? null : presentation.boot.summary.documentToInteractiveMs - presentation.activationAt;
       const row = { round, scenario, mobileEmulation: mobile, physicalMobile: false, tierRequested: tier || 'automatic',
         condition: 'local fixture; new browser/context per case except SPA reopen; OS/driver caches not cleared; no private query',
-        beforeClick, clickToInteractiveMs, presentation, afterGesture, gestureCameraChanged, completePresentation, diagnosticCpuProfiling: Boolean(profiler),
+        beforeClick, clickToInteractiveMs, presentation, afterGesture, gestureCameraChanged, visibleGesture, cpuThrottle, completePresentation, diagnosticCpuProfiling: Boolean(profiler),
         fullyPresentedObservedMs: completePresentation ? completePresentation.at - (presentation.activationAt ?? presentation.boot.summary.routeStartedAt) : null,
         completeObservationRequested: observeComplete, diagnosticGlProbe: process.env.STARTUP_GL_PROBE === '1', errors };
       rows.push(row); fs.writeFileSync(path.join(out, `${label}.json`), JSON.stringify(rows, null, 2));

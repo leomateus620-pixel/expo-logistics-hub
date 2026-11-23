@@ -267,6 +267,8 @@
 }
 .commercial-map-details-panel-presence { display: contents; }
 .commercial-map-details-panel-presence[hidden] { display: none; }
+/* Keep the mobile sheet's measured height while its preferences are open. */
+.commercial-map-details-panel-presence[data-covered] { visibility: hidden; }
 .is-webgl-fallback .commercial-map-panel { z-index: 42; }
 .is-webgl-fallback .commercial-map-webgl-note { z-index: 41; pointer-events: none; }
 .commercial-map-canvas { display: block; width: 100%; height: 100%; outline: none; cursor: grab; touch-action: none; }
@@ -925,6 +927,11 @@
 .commercial-map-layer-lock svg { width: 12px; height: 12px; }
 .commercial-map-layer-opacity { grid-column: 3 / 5; padding: 1px 2px 0; opacity: 0; transition: opacity .16s; }
 .commercial-map-layer-row:hover .commercial-map-layer-opacity, .commercial-map-layer-row:focus-within .commercial-map-layer-opacity { opacity: 1; }
+.commercial-map-park-preferences { display: grid; gap: 4px; padding: 10px 15px; border-bottom: 1px solid rgba(26,62,36,.1); }
+.commercial-map-park-preferences label { display: grid; grid-template-columns: 18px 1fr minmax(120px, 46%); align-items: center; gap: 8px; color: var(--map-ink); font-size: 13px; font-weight: 650; }
+.commercial-map-park-preferences label > svg { width: 16px; height: 16px; color: #39647a; }
+.commercial-map-park-preferences select { min-height: 44px; min-width: 0; padding: 0 8px; border: 1px solid #b7cbd4; border-radius: 8px; background: #f6fafb; color: #173d51; font: inherit; cursor: pointer; }
+.commercial-map-park-preferences select:focus-visible { outline: 2px solid #1474a7; outline-offset: 2px; }
 .commercial-map-setting-row { display: flex; min-height: 48px; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
 .commercial-map-setting-row > span { display: flex; flex-direction: column; }
 .commercial-map-setting-row strong { color: #294334; font-size: 10px; }

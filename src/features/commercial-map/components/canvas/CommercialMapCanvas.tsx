@@ -1,3 +1,4 @@
+import { ParkAppearanceContext, type ParkQualityPreference } from '../../state/parkAppearance';
 import { EventCenterForecourt } from './EventCenterForecourt';
 import { VisitorGateGrille, VisitorGateFences } from './VisitorGateGrilles';
 import { isVisitorGrilleGate, visitorGateProfile } from '../../utils/visitorGateArchitecture';
@@ -203,7 +204,6 @@ import {
   COMMERCIAL_MAP_TOP_DIRECTION,
   isCommercialMapHydrologicalPortraitViewport,
   resolveCommercialMapHydrologicalPortraitTargetShift,
-  resolveCommercialMapPixelRatio,
   resolveCommercialMapQualityPixelRatio,
   clampCommercialMapCameraPosition,
   resolveCommercialMapCameraDistanceBounds,
@@ -340,6 +340,7 @@ interface CommercialMapCanvasProps {
   /** Consulta pública: entidades que definem o enquadramento inicial. */
   publicFocusEntityIds?: ReadonlySet<string> | null;
   publicScenePolicy?: PublicExternalScenePolicy | null;
+  publicViewer?: boolean;
   publicCompanyGroups?: readonly PublicSoldCompanyGroupInput[];
   publicCompanyFocus?: PublicCompanyFocus | null;
   initialPublicView?: PublicNavigation | null;
@@ -2293,7 +2294,7 @@ function CameraRig({
   const parkingCameraView = useCommercialMapStore((state) => state.parkingCameraView);
   const selectedParkingBlockId = useCommercialMapStore((state) => state.selectedParkingBlockId);
   const selectedParkingSpaceId = useCommercialMapStore((state) => state.selectedParkingSpaceId);
-  const activePanel = useCommercialMapStore((state) => state.activePanel);
+  const activePanel = useCommercialMapStore((state) => state.activePanel === 'details-layers' ? 'details' : state.activePanel);
   const setCameraNavigating = useCommercialMapStore((state) => state.setCameraNavigating);
   const parkingActive = parkingInspectionOpen
     && rearParkingVisibleInArea(isolatedArea)
@@ -4091,6 +4092,7 @@ function CameraRig({
     // coalesces drag frames and retains manual pan/zoom ownership.
     const onPanelResize = () => {
       if (!initialized.current || navigation.current.active) return;
+      if (useCommercialMapStore.getState().activePanel === 'details-layers') return;
       // Restoring the same dock can notify after camera ownership is released.
       // Drop that notification before the debounce outlives the handoff guard;
       // it must not start a new panel flight over the restored snapshot.
@@ -6020,13 +6022,13 @@ const Scene = memo(function Scene({
 function AdaptiveCommercialMapScene({
   sceneProps,
   active,
-  reducedGraphics,
+  qualityPreference,
   initialQualityState,
   capabilityHints,
 }: {
   sceneProps: CommercialMapCanvasProps;
   active: boolean;
-  reducedGraphics: boolean;
+  qualityPreference: ParkQualityPreference;
   initialQualityState: ReturnType<typeof createInitialCommercialMapQualityState>;
   capabilityHints: ReturnType<typeof readCommercialMapDeviceCapabilityHints>;
 }) {
@@ -6043,7 +6045,8 @@ function AdaptiveCommercialMapScene({
     <>
       <CommercialMapAdaptiveQualityController
         active={active}
-        reducedGraphics={reducedGraphics}
+        reducedGraphics={qualityPreference === 'fluidity'}
+        qualityPreference={qualityPreference}
         initialState={initialQualityState}
         capabilityHints={capabilityHints}
         onQualityChange={handleQualityChange}
@@ -6077,7 +6080,9 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   const setSelectedHydrologicalElementId = useCommercialMapStore(
     (state) => state.setSelectedHydrologicalElementId,
   );
-  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const management = !props.publicViewer && !props.publicScenePolicy;
+  const appearance = useCommercialMapStore((state) => management ? state.appearance : 'classic');
+  const qualityPreference = useCommercialMapStore((state) => management ? state.qualityPreference : 'auto');
   const canvasCleanup = useRef<(() => void) | null>(null);
   const canvasState = useRef<(() => RootState) | null>(null);
   const capabilityHints = useRef(readCommercialMapDeviceCapabilityHints()).current;
@@ -6085,28 +6090,20 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     width: typeof window === 'undefined' ? 1366 : window.innerWidth,
     height: typeof window === 'undefined' ? 768 : window.innerHeight,
     dpr: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
-    reducedGraphics,
   });
   const initialQaTier = useRef(readCommercialMapQaQualityTier(commercialMapDiagnosticsEnabled, typeof window === 'undefined' ? '' : window.location.search)).current;
   const initialQualityState = useRef({ ...createInitialCommercialMapQualityState({
     viewportWidth: initialViewport.current.width,
     viewportHeight: initialViewport.current.height,
     devicePixelRatio: initialViewport.current.dpr,
-    capabilityHints,
+    capabilityHints: { ...capabilityHints, qualityPreference },
   }), ...(initialQaTier ? { tier: initialQaTier } : {}) }).current;
-  const initialPixelRatio = useRef(initialViewport.current.reducedGraphics
-    ? resolveCommercialMapPixelRatio({
-        devicePixelRatio: initialViewport.current.dpr,
-        viewportWidth: initialViewport.current.width,
-        viewportHeight: initialViewport.current.height,
-        reducedGraphics: true,
-      })
-    : resolveCommercialMapQualityPixelRatio({
-        devicePixelRatio: initialViewport.current.dpr,
-        viewportWidth: initialViewport.current.width,
-        viewportHeight: initialViewport.current.height,
-        qualityTier: initialQualityState.tier,
-      })).current;
+  const initialPixelRatio = useRef(resolveCommercialMapQualityPixelRatio({
+    devicePixelRatio: initialViewport.current.dpr,
+    viewportWidth: initialViewport.current.width,
+    viewportHeight: initialViewport.current.height,
+    qualityTier: initialQualityState.tier,
+  })).current;
   const extent = useMemo(
     () => getSceneExtent(
       entities,
@@ -6248,13 +6245,15 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           reconfigure Canvas, so its prop echoes the current canonical R3F
           DPR instead of restoring the obsolete initial value. */}
       <CommercialMapPresentation visible={presentationVisible}>
+      <ParkAppearanceContext.Provider value={appearance}>
       <PublicScenePolicyContext.Provider value={props.publicScenePolicy ?? null}><PublicMaterialPool><AdaptiveCommercialMapScene
         sceneProps={sceneProps}
         active={active && presentationVisible}
-        reducedGraphics={reducedGraphics}
+        qualityPreference={qualityPreference}
         initialQualityState={initialQualityState}
         capabilityHints={capabilityHints}
       /></PublicMaterialPool></PublicScenePolicyContext.Provider>
+      </ParkAppearanceContext.Provider>
       </CommercialMapPresentation>
     </Canvas>
     <InteriorViewControls entities={entities} active={active} />

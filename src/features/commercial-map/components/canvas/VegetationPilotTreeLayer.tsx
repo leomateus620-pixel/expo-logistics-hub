@@ -1,3 +1,4 @@
+import { useParkAppearance } from '../../state/parkAppearance';
 import { memo, useMemo, useEffect, useLayoutEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -148,6 +149,8 @@ export const VegetationPilotTreeLayer = memo(
     visible: boolean;
     surfaceResolver?: CommercialTreeSurfaceResolver;
   }) {
+    const warm = useParkAppearance() === 'warm-natural';
+    const invalidateScene = useThree(state => state.invalidate);
     const surfaceResolver = useMemo(() => props.surfaceResolver
       ?? createCommercialTreeSurfaceResolver(props.surfaceEntities), [props.surfaceResolver, props.surfaceEntities]);
     const atlas = useMemo(createPilotLeafAtlas, []);
@@ -159,6 +162,13 @@ export const VegetationPilotTreeLayer = memo(
       }),
       [atlas],
     );
+    useLayoutEffect(() => {
+      materials.core.color.setRGB(warm ? 1.03 : 1, 1, warm ? 1.06 : 1);
+      materials.detail.color.setRGB(warm ? 1.11 : 1, warm ? 1.03 : 1, 1);
+      materials.core.roughness = warm ? .84 : .72;
+      materials.detail.roughness = warm ? .76 : .72;
+      invalidateScene();
+    }, [materials, warm, invalidateScene]);
     useEffect(
       () => () => {
         Object.values(materials).forEach((m) => m.dispose());

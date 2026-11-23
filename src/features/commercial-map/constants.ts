@@ -29,6 +29,12 @@ export const ROAD_SURFACE_PROFILE = {
   asphaltBumpScale: 0.008,
 } as const;
 
+export const NATURAL_ROAD_SURFACES = {
+  asphalt: '#616669',
+  asphaltRoughness: 0.89,
+  pedestrian: '#b9b5a9',
+} as const;
+
 export const CLASSIFICATION_LABELS: Record<MapClassification, string> = {
   FOOD_POINT: 'Ponto de alimentação',
   SELLABLE_LOT: 'Lote comercial',

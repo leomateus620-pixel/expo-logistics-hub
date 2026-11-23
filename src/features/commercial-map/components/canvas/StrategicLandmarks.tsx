@@ -1,4 +1,5 @@
 import { useSceneVegetationEnabled } from './PublicScenePolicyContext';
+import { useParkAppearance } from '../../state/parkAppearance';
 import { COMMERCIAL_MAP_CANONICAL_CONTENT } from '../../utils/executionPolicy';
 import { FenasojaEventCenter } from './FenasojaEventCenter';
 import { SicrediArena } from './SicrediArena';
@@ -2690,6 +2691,7 @@ function LunarTree({
   onRocketSelect,
 }: LandmarkModelProps) {
   const vegetationEnabled = useSceneVegetationEnabled();
+  const warm = useParkAppearance() === 'warm-natural';
   const foliage = useMemo(() => {
     if (!vegetationEnabled) return null;
     const geometry = createInternalLeafLobe();
@@ -2703,6 +2705,13 @@ function LunarTree({
     bark.color.set('#82705c');
     return { geometry, atlas, crown, bark };
   }, [vegetationEnabled]);
+  useLayoutEffect(() => {
+    if (!foliage) return;
+    // The memorial photo shows a full green crown and a warm grey trunk above the pale curb.
+    foliage.crown.color.set(warm ? '#829b68' : '#789660');
+    foliage.bark.color.set(warm ? '#837866' : '#82705c');
+    foliage.bark.roughness = warm ? .91 : .96;
+  }, [foliage, warm]);
   useEffect(() => () => {
     if (!foliage) return;
     foliage.geometry.dispose(); foliage.atlas.dispose();

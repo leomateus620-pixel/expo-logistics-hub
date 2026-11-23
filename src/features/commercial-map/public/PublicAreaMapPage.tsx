@@ -258,7 +258,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
           <Suspense fallback={null}><CommercialMapCanvas entities={sceneEntities} lots={canvasLots} calibration={null} matchingEntityIds={EMPTY_MATCHES} filtersActive={false}
             sceneSegmentId={null} sceneInteriorEntityId={pavilionEntity?.id ?? null} isolatedArea={null}
             interactiveEntityIds={interactionScope.interactiveEntityIds} publicFocusEntityIds={usesParkContext ? publicScenePolicy?.interactiveEntityIds : null}
-            publicScenePolicy={publicScenePolicy} initialPublicView={restoredNavigation} active={showMap}
+            publicViewer publicScenePolicy={publicScenePolicy} initialPublicView={restoredNavigation} active={showMap}
             publicCompanyGroups={showCompanies ? companies.groups : undefined}
             publicCompanyFocus={publicCompanyFocus} /></Suspense>
           {renderState !== 'ready' && <div className="public-map-stage" role="status" aria-live="polite">

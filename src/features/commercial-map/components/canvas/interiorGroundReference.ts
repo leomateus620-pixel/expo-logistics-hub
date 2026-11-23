@@ -50,7 +50,7 @@ function groundNoise(x: number, y: number, seed: number) {
     + valueNoise(x, y, 23.4, seed + 2) * 0.16;
 }
 
-function groundWeights(quadra: QuadraId, x: number, y: number, noise: number) {
+export function quadraGroundWeights(quadra: QuadraId, x: number, y: number, noise = groundNoise(x, y, quadra === 'A' ? 41 : 83)) {
   if (quadra === 'A') {
     const clearing = ellipseDistance(x, y, 0.52, 0.49, 0.24, 0.22);
     const shadeDistance = Math.min(
@@ -99,7 +99,7 @@ function createQuadraGroundTextures(quadra: QuadraId, maxAnisotropy: number): Qu
       const y = pixelY / (size - 1);
       const lowNoise = groundNoise(x, y, seed);
       const fineNoise = valueNoise(x, y, 56, seed + 7);
-      const weights = groundWeights(quadra, x, y, lowNoise);
+      const weights = quadraGroundWeights(quadra, x, y, lowNoise);
       const color = maintained.clone()
         .lerp(dry, THREE.MathUtils.clamp(weights.dry, 0, 0.82))
         .lerp(soil, THREE.MathUtils.clamp(weights.soil, 0, 0.9))

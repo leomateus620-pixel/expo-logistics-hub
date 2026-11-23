@@ -1,11 +1,9 @@
 import CommercialMapPage from '../CommercialMapPage';
 import { CommercialMapShell } from '../components/shell/CommercialMapShell';
-import { OFFICIAL_REFERENCE_DATA } from '../data/officialReference2026';
-import { presentCommercialMapData } from '../hooks/useCommercialMap';
+import { DIAGNOSTICS_MAP_DATA } from './commercialMapDiagnosticsData';
 
 // DEV-only route: same UI, official reference fixture, read-only permissions.
-const PREVIEW_DATA = presentCommercialMapData(OFFICIAL_REFERENCE_DATA);
 export default function CommercialMapInterfaceDiagnosticsPage() {
-  return <CommercialMapShell><CommercialMapPage previewData={PREVIEW_DATA}
+  return <CommercialMapShell><CommercialMapPage previewData={DIAGNOSTICS_MAP_DATA}
     previewWebGLUnavailable={new URLSearchParams(window.location.search).get('webgl') === 'unavailable'} /></CommercialMapShell>;
 }

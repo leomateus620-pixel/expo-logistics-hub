@@ -79,7 +79,7 @@ export function MapToolbar({
   const compactSearchTriggerRef = useRef<HTMLButtonElement>(null);
   const search = useCommercialMapStore((state) => state.search);
   const setSearch = useCommercialMapStore((state) => state.setSearch);
-  const activePanel = useCommercialMapStore((state) => state.activePanel);
+  const layersOpen = useCommercialMapStore((state) => state.activePanel === 'layers' || state.activePanel === 'details-layers');
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
   const workspaceMode = useCommercialMapStore((state) => state.workspaceMode);
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
@@ -229,7 +229,7 @@ export function MapToolbar({
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
-            <button type="button" className={activePanel === 'layers' ? 'is-active' : ''} onClick={() => setActivePanel(activePanel === 'layers' ? null : 'layers')} aria-label="Camadas do mapa">
+            <button type="button" className={layersOpen ? 'is-active' : ''} onClick={() => setActivePanel(layersOpen ? null : 'layers')} aria-label="Camadas do mapa">
               <Layers3 className="h-4 w-4" />
             </button>
           </TooltipTrigger>
@@ -402,9 +402,9 @@ export function MapToolbar({
               <Maximize2 aria-hidden="true" />
               <span>Centralizar seleção</span>
             </DropdownMenuItem>
-            <DropdownMenuItem data-active={activePanel === 'layers'} data-commercial-map-control="layers" onSelect={() => setActivePanel(activePanel === 'layers' ? null : 'layers')}>
+            <DropdownMenuItem data-active={layersOpen} data-commercial-map-control="layers" onSelect={() => setActivePanel(layersOpen ? null : 'layers')}>
               <Layers3 aria-hidden="true" />
-              <span>{activePanel === 'layers' ? 'Fechar camadas' : 'Camadas do mapa'}</span>
+              <span>{layersOpen ? 'Fechar camadas' : 'Camadas do mapa'}</span>
             </DropdownMenuItem>
             {canUseTechnicalValidation && (
               <DropdownMenuItem data-active={technicalValidationVisible} data-commercial-map-control="validation" onSelect={() => setTechnicalValidationVisible(!technicalValidationVisible)}>

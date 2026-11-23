@@ -132,7 +132,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
     else setDockExpanded(!expanded);
   };
   const obscuredByDetails = compact && !interiorEntity && mode === '3d'
-    && (activePanel === 'results' || (Boolean(selectedEntityId) && activePanel === 'details'));
+    && (activePanel === 'results' || (Boolean(selectedEntityId) && (activePanel === 'details' || activePanel === 'details-layers')));
 
   return <aside ref={panelRef} className={`commercial-map-dock ${compact ? 'is-mobile' : ''} ${expanded ? 'is-expanded' : 'is-compact'} ${interiorEntity ? 'is-context-interior' : ''}`}
     data-sheet-state={sheet} data-commercial-map-camera-obstruction hidden={Boolean(obscuredByDetails)} aria-label="Controles e resumo do mapa comercial"

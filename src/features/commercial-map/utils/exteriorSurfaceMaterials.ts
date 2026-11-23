@@ -10,13 +10,14 @@ float exteriorNoise(vec2 p) {
 }`;
 
 /** Surface mixing only; it never displaces a road, patch boundary or foundation. */
-export function createExteriorGroundMaterial(instanced = false) {
+export function createExteriorGroundMaterial(instanced = false, warm = new THREE.Uniform(0)) {
   const material = new THREE.MeshStandardMaterial({
     vertexColors: !instanced,
     roughness: 0.98,
   });
   material.name = `ExteriorGround:${instanced ? "yards" : "patches"}`;
   material.onBeforeCompile = (shader) => {
+    shader.uniforms.uWarmLandUse = warm;
     shader.vertexShader =
       `varying vec2 vExteriorGround; varying vec3 vLandUse;
       ${instanced ? "" : "attribute vec3 landUse;"}\n` + shader.vertexShader;
@@ -28,7 +29,7 @@ export function createExteriorGroundMaterial(instanced = false) {
       vExteriorGround=(modelMatrix*groundPoint).xz;`,
     );
     shader.fragmentShader =
-      `varying vec2 vExteriorGround; varying vec3 vLandUse;\n${noise}\n` +
+      `uniform float uWarmLandUse; varying vec2 vExteriorGround; varying vec3 vLandUse;\n${noise}\n` +
       shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <color_fragment>",
@@ -56,11 +57,20 @@ export function createExteriorGroundMaterial(instanced = false) {
       }
       surface *= .96 + middle*.075 + (fine-.5*filterDetail)*.06;
       float edge=smoothstep(.0,1.6,vLandUse.y);
-      diffuseColor.rgb=mix(mix(dryGrass,grass,broad)*1.1,surface,edge);
+      vec3 perimeter=mix(dryGrass,grass,broad)*1.1;
+      if(uWarmLandUse>.5) {
+        // The outer pasture, tillage and headland are already distinct
+        // polygons. Soften their grass shoulders and retain the crop rows.
+        perimeter=mix(vec3(.225,.292,.126),vec3(.272,.301,.116),middle);
+        if(vLandUse.x<1.5) surface *= vec3(1.07,.96,.90);
+        else if(vLandUse.x>2.5) surface=mix(vec3(.257,.278,.133),vec3(.303,.310,.153),natural);
+        edge=smoothstep(.12,2.25,vLandUse.y+(middle-.5)*.42);
+      }
+      diffuseColor.rgb=mix(perimeter,surface,edge);
     `,
     );
   };
-  material.customProgramCacheKey = () => `exterior-ground-v2-${instanced}`;
+  material.customProgramCacheKey = () => `exterior-ground-v3-${instanced}`;
   return material;
 }
 

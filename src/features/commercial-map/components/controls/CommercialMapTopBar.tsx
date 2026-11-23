@@ -53,7 +53,7 @@ export function CommercialMapTopBar({
   isCommissionScope,
   soyHarvestAvailable = false,
 }: CommercialMapTopBarProps) {
-  const activePanel = useCommercialMapStore((state) => state.activePanel);
+  const layersOpen = useCommercialMapStore((state) => state.activePanel === 'layers' || state.activePanel === 'details-layers');
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
   const requestCameraPreset = useCommercialMapStore((state) => state.requestCameraPreset);
   const cameraPreset = useCommercialMapStore((state) => state.cameraPreset);
@@ -163,8 +163,8 @@ export function CommercialMapTopBar({
         'layers',
         Layers3,
         'Camadas do mapa',
-        () => setActivePanel(activePanel === 'layers' ? null : 'layers'),
-        { active: activePanel === 'layers' },
+        () => setActivePanel(layersOpen ? null : 'layers'),
+        { active: layersOpen },
       )}
 
       <span className="commercial-map-topbar__divider" aria-hidden="true" />

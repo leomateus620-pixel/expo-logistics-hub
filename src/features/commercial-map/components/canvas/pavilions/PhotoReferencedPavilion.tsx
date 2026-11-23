@@ -10,6 +10,10 @@ import {
   type PavilionArchitectureTriangle,
 } from '../../../utils/pavilionArchitectureLayout';
 import { PavilionGroundInterfaces } from './PavilionGroundInterfaces';
+import { useThree } from '@react-three/fiber';
+import { useParkAppearance } from '../../../state/parkAppearance';
+import { useWarmParkTexture } from '../warmParkTextures';
+import { setPavilionColorTileWidth } from './PavilionArchitectureMaterials';
 
 const NO_RAYCAST = () => undefined;
 const SHADOW_MATERIALS = new Set<PavilionArchitectureMaterial>(['wall', 'trim', 'roof', 'brick', 'cladding']);
@@ -63,6 +67,32 @@ export const PhotoReferencedPavilion = memo(function PhotoReferencedPavilion({ l
   foundationDepth?: number;
 }) {
   const architecture = useMemo(() => createPavilionArchitectureLayout(layout, showDetail, foundationDepth), [layout, showDetail, foundationDepth]);
+  const warm = useParkAppearance() === 'warm-natural';
+  const metal = useWarmParkTexture('metal', warm && showDetail && !cutaway);
+  const invalidate = useThree(state => state.invalidate);
+  useEffect(() => {
+    if (!warm || cutaway) return;
+    const { roof, wall } = materials;
+    const original = { map: roof.map, roughness: roof.roughness, metalness: roof.metalness, wallRoughness: wall.roughness };
+    roof.roughness = 0.57;
+    roof.metalness = 0.25;
+    wall.roughness = 0.94;
+    if (metal && original.map) {
+      roof.map = metal;
+      setPavilionColorTileWidth(roof, 1.6);
+    }
+    invalidate();
+    return () => {
+      roof.roughness = original.roughness;
+      roof.metalness = original.metalness;
+      wall.roughness = original.wallRoughness;
+      if (metal && roof.map === metal) {
+        roof.map = original.map;
+        setPavilionColorTileWidth(roof, 4);
+      }
+      invalidate();
+    };
+  }, [warm, cutaway, materials, metal, invalidate]);
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const triangles = useMemo(() => {
     const groups = new Map<PavilionArchitectureMaterial, PavilionArchitectureTriangle[]>();
