@@ -39,7 +39,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
   const setDockExpanded = useCommercialMapStore((s) => s.setDockExpanded);
   const selectedModuleId = useCommercialMapStore((s) => s.selectedModuleId);
   const selectedEntityId = useCommercialMapStore((s) => s.selectedEntityId);
-  const activePanel = useCommercialMapStore((s) => s.activePanel);
+  const activePanel = useCommercialMapStore((s) => s.activePanel === 'details-layers' ? 'details' : s.activePanel);
   const selectStructure = useCommercialMapStore((s) => s.selectEntityFromExplorer);
   const mode = useCommercialMapStore((s) => s.workspaceMode);
   const exitInterior = useCommercialMapStore((s) => s.exitInterior);
@@ -132,7 +132,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
     else setDockExpanded(!expanded);
   };
   const obscuredByDetails = compact && !interiorEntity && mode === '3d'
-    && (activePanel === 'results' || (Boolean(selectedEntityId) && (activePanel === 'details' || activePanel === 'details-layers')));
+    && (activePanel === 'results' || (Boolean(selectedEntityId) && activePanel === 'details'));
 
   return <aside ref={panelRef} className={`commercial-map-dock ${compact ? 'is-mobile' : ''} ${expanded ? 'is-expanded' : 'is-compact'} ${interiorEntity ? 'is-context-interior' : ''}`}
     data-sheet-state={sheet} data-commercial-map-camera-obstruction hidden={Boolean(obscuredByDetails)} aria-label="Controles e resumo do mapa comercial"
