@@ -36,6 +36,7 @@ export interface CommercialMapQualityCapabilitiesInput {
 }
 
 export interface CommercialMapQualityPixelRatioInput {
+  qualityPreference?: ParkQualityPreference;
   devicePixelRatio: number;
   viewportWidth: number;
   viewportHeight: number;
@@ -410,7 +411,7 @@ export function resolveCommercialMapQualityCeiling({
     && cores !== undefined
     && memory >= 8
     && cores >= 8;
-  if (hasUltraHardware && cssPixelCount <= 2_500_000 && nativePixelDemand <= 8_500_000) {
+  if (hasUltraHardware && (cssPixelCount <= 2_500_000 || qualityPreference === 'detail') && nativePixelDemand <= 8_500_000) {
     return 'ULTRA';
   }
 
@@ -668,12 +669,16 @@ function resolveBudgetedCommercialMapPixelRatio({
 
 export function resolveCommercialMapQualityPixelRatio({
   qualityTier,
+  qualityPreference,
   ...viewport
 }: CommercialMapQualityPixelRatioInput) {
   const preset = COMMERCIAL_MAP_QUALITY_PRESETS[qualityTier];
   const budgeted = resolveBudgetedCommercialMapPixelRatio({
     ...viewport,
-    pixelBudget: preset.pixelBudget,
+    // The user can request native UHD on a capable display. Sustained load
+    // still drops the tier, so LOW/MEDIUM keep their original pixel budgets.
+    pixelBudget: qualityPreference === 'detail' && (qualityTier === 'HIGH' || qualityTier === 'ULTRA')
+      ? Math.max(preset.pixelBudget, 3840 * 2160) : preset.pixelBudget,
     maximumPixelRatio: preset.maximumPixelRatio,
   });
   return Math.max(Math.min(finitePositive(viewport.devicePixelRatio, 1), COMMERCIAL_MAP_MIN_PRESENTATION_DPR), budgeted);

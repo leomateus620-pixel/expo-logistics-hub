@@ -7,6 +7,7 @@ import { lotPresentationLift } from '../../utils/externalLotPresentation';
 import type { Coordinate } from '../../types';
 import { isSoldLot, placeSoldLock, type SoldLotSurface, type SoldLockPlacement } from '../../utils/soldLotPresentation';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { preserveStatusMarkerColor } from './commercialStatusInk';
 
 const NO_RAYCAST = () => undefined;
 const NO_OBSTACLES: readonly Coordinate[][] = [];
@@ -57,7 +58,7 @@ function placementFor(surface: SoldLotSurface, placements: PlacementCache, obsta
   return placements.get(surface.geometry);
 }
 
-function SoldMarkerBatch({ surfaces, confirmation, obstacles, placements, selectedId, hoveredId, opacity = 1, infrastructureMode = false, matchingIds, filtersActive }: Presentation & {
+function SoldMarkerBatch({ surfaces, confirmation, obstacles, placements, selectedId, hoveredId, opacity = 1, infrastructureMode = false, matchingIds, filtersActive, publicScene }: Presentation & {
   surfaces: readonly SoldLotSurface[]; confirmation: boolean;
   obstacles: readonly Coordinate[][]; placements: PlacementCache;
 }) {
@@ -75,6 +76,9 @@ function SoldMarkerBatch({ surfaces, confirmation, obstacles, placements, select
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     return { mesh, geometry, material };
   }, [surfaces.length, confirmation]);
+  useLayoutEffect(() => {
+    if (!publicScene && resources.material instanceof THREE.MeshBasicMaterial) return preserveStatusMarkerColor(resources.material);
+  }, [publicScene, resources]);
   useLayoutEffect(() => {
     const matrix = new THREE.Matrix4(), quaternion = new THREE.Quaternion();
     const position = new THREE.Vector3(), scale = new THREE.Vector3(), color = new THREE.Color();

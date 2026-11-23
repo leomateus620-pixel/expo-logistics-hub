@@ -173,27 +173,42 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
         // Unequal correlation lengths break up the regional pasture softly.
         // Its mapped road verges and field transitions share the dry channel.
         vec2 pasture = vec2(dot(interiorP, vec2(.93,.37)), dot(interiorP, vec2(-.37,.93)));
-        float meadow = interiorRandom(pasture * vec2(.031,.093));
-        float tufts = interiorRandom(interiorP * .37);
+        float meadow = interiorRandom(pasture * vec2(.084,.17));
+        float tufts = interiorRandom(interiorP * .63);
         vec2 coverUv = interiorP / 128. + .5;
         vec3 land = vec3(0.);
         if (parkGroundMapsReady.z > .5 && all(greaterThan(coverUv, vec2(0.))) && all(lessThan(coverUv, vec2(1.)))) {
           land = texture2D(interiorRoughness, coverUv).rgb;
         }
-        float cover = smoothstep(.045, .84, land.r + (tufts - .5) * .18);
+        float cover = smoothstep(.06, .98, land.r * (.59 + .48 * tufts) + (meadow - .5) * .22);
         float bare = smoothstep(.035, .85, land.g);
         vec2 tileUv = interiorP / .24; // 1.60 m at 0.15 map units / m
         vec3 lawn = vec3(.23,.30,.133);
         vec3 floorColor = vec3(.238,.153,.084);
-        if (parkGroundMapsReady.x > .5) lawn = texture2D(interiorAlbedo, tileUv).rgb;
+        // RGB describes 1.6 m of blades. Alpha stores the independent aerial
+        // density sample at 48 m. Both travel in one mipmapped texture.
+        float sward = tufts;
+        if (parkGroundMapsReady.x > .5) {
+          lawn = texture2D(interiorAlbedo, tileUv).rgb;
+          vec2 aerialUv = pasture / 7.2 + .22 * vec2(meadow, tufts);
+          sward = texture2D(interiorAlbedo, aerialUv).a;
+        }
         if (cover + bare > .001 && parkGroundMapsReady.y > .5) floorColor = texture2D(interiorNormal, tileUv).rgb;
         // Preserve the satellite-mapped bare clearing and dry edge of A/B.
         // Around canopy masses the same leaf texture blends into worn grass.
-        float dryGrass = clamp(land.b + .35 * smoothstep(.20,.82, meadow), 0., 1.);
-        lawn *= mix(vec3(.92,1.01,.95), vec3(1.34,1.02,.74), dryGrass);
+        // Larger wet/dry patches stay visible above the park. Local changes
+        // in blade density break their edges at pedestrian distance.
+        float dryGrass = smoothstep(.29,.71, .43 * meadow + .40 * sward + .17 * tufts + land.b * .34);
+        lawn *= mix(vec3(.62,.81,.59), vec3(1.59,1.22,.89), dryGrass);
         vec3 soil = floorColor * vec3(1.05,.86,.72);
-        vec3 warmColor = mix(mix(lawn, soil, bare), floorColor, cover);
-        warmColor *= .90 + meadow * .12 + tufts * .08;
+        // The grove beside the entrance roundabout is a green park lawn even
+        // under its crowns. Leaf litter is local to the densest canopy gaps.
+        vec3 shadeGrass = lawn * vec3(.69,1.14,.73);
+        float litter = smoothstep(.63,.93, land.r) * smoothstep(.49,.78, tufts) * .45;
+        vec3 woodlandLawn = mix(shadeGrass, floorColor, litter);
+        vec3 warmColor = mix(mix(lawn, soil, bare), woodlandLawn, cover);
+        warmColor *= .84 + .20 * sward + .14 * tufts;
+        interiorBlade = dot(lawn, vec3(.22,.68,.10)) * .0025 * (1.-cover);
         diffuseColor.rgb = mix(diffuseColor.rgb, warmColor, interiorWeight);
         roughnessFactor = mix(roughnessFactor, .94 + cover * .045, interiorWeight);
       } else if (usesInteriorGround) {
@@ -212,6 +227,13 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
     shader.fragmentShader = shader.fragmentShader.replace('#include <normal_fragment_maps>', `
       if (interiorWeight < 1.) {
         #include <normal_fragment_maps>
+      }
+      if (usesInteriorGround && parkWarmGround > .5 && interiorFootprint < .07) {
+        vec3 dx = dFdx(-vViewPosition), dy = dFdy(-vViewPosition);
+        vec3 across = cross(dy, normal), along = cross(normal, dx);
+        float determinant = dot(dx, across);
+        vec3 gradient = across * dFdx(interiorBlade) + along * dFdy(interiorBlade);
+        normal = normalize(normal - gradient * sign(determinant) / max(abs(determinant), 1.e-9));
       }
       if (usesInteriorGround && parkWarmGround < .5) {
         vec3 priorNormal=normal;

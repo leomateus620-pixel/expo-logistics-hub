@@ -300,6 +300,13 @@ describe('viewport mobile do Mapa Comercial', () => {
     }
   });
 
+  it('apresenta UHD nativo em Detalhe e reduz o buffer quando a medição baixa o nível', () => {
+    const monitor = { devicePixelRatio: 1, viewportWidth: 3840, viewportHeight: 2160 };
+    expect(resolveCommercialMapQualityPixelRatio({ ...monitor, qualityTier: 'HIGH', qualityPreference: 'detail' })).toBe(1);
+    expect(resolveCommercialMapQualityPixelRatio({ ...monitor, qualityTier: 'MEDIUM', qualityPreference: 'detail' })).toBeLessThan(1);
+    expect(resolveCommercialMapQualityPixelRatio({ ...monitor, qualityTier: 'LOW', qualityPreference: 'fluidity' })).toBeLessThan(1);
+  });
+
   it('expõe presets monotônicos e aplica o orçamento específico de cada tier', () => {
     const budgets = COMMERCIAL_MAP_QUALITY_TIER_ORDER.map(
       (tier) => COMMERCIAL_MAP_QUALITY_PRESETS[tier].pixelBudget,

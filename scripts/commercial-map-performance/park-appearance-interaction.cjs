@@ -21,6 +21,20 @@ async function settle(page) {
     return canvas?.dataset.commercialMapReady === 'true' && !['active', 'running'].includes(transition.status);
   }, null, { timeout: 90000 });
   await page.waitForTimeout(1100);
+  // The focus flight may finish before the sheet observer's debounced refit
+  // and damping. Measure the settled camera on a loaded device as well.
+  let prior = await snapshot(page);
+  let stable = 0;
+  for (let sample = 0; sample < 80; sample++) {
+    await page.waitForTimeout(200);
+    const next = await snapshot(page);
+    const unmoved = ['position', 'target', 'quaternion'].every(key =>
+      next[key].every((v, i) => Math.abs(v - prior[key][i]) < .00001));
+    stable = unmoved ? stable + 1 : 0;
+    if (stable >= 3) return;
+    prior = next;
+  }
+  throw Error('Camera did not settle after navigation');
 }
 
 function snapshot(page) {

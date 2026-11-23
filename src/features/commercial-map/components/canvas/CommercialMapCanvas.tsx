@@ -6099,6 +6099,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     capabilityHints: { ...capabilityHints, qualityPreference },
   }), ...(initialQaTier ? { tier: initialQaTier } : {}) }).current;
   const initialPixelRatio = useRef(resolveCommercialMapQualityPixelRatio({
+    qualityPreference,
     devicePixelRatio: initialViewport.current.dpr,
     viewportWidth: initialViewport.current.width,
     viewportHeight: initialViewport.current.height,

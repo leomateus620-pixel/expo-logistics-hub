@@ -7,6 +7,7 @@ import type { CommercialLot, MapEntity } from '../../types';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { useParkAppearance } from '../../state/parkAppearance';
 import { resolvePavilionArchitecturePalette } from '../../data/pavilionArchitecturePalettes';
+import { usePavilionCirculationFloor } from './pavilions/PavilionInteriorFinishes';
 import {
   createCommercialPavilionLayout,
   commercialPavilionInteriorPresentationBounds,
@@ -337,6 +338,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
 }) {
   const definition = resolveCommercialPavilionDefinition(entity);
   const warm = useParkAppearance() === 'warm-natural';
+  const circulationFloor = usePavilionCirculationFloor(warm);
   const invalidate = useThree(state => state.invalidate);
   const modulePlan = resolveCommercialPavilionModulePlan(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
@@ -401,21 +403,12 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   }), [clearCirculationFloor, floorTexture]);
   useLayoutEffect(() => {
     const paint = resolvePavilionArchitecturePalette(entity.publicIdentifier);
-    materials.floor.color.set(clearCirculationFloor
-      ? warm ? '#c6c9bd' : '#bcc5b8'
-      : warm ? '#cccbc0' : '#a8aaa5');
-    materials.floor.roughness = warm ? .83 : .96;
-    materials.floor.bumpScale = warm ? .004 : .012;
-    if (floorTexture && layout) {
-      // Four saw-cut panels per tile. About 3 m per panel at 0.15 units/m.
-      floorTexture.repeat.set(warm ? layout.width / 1.8 : 2.2, warm ? layout.depth / 1.8 : 2.2);
-    }
     materials.wall.color.set(warm ? paint?.wall ?? '#d4d2c7' : '#c7c5bd');
     materials.structure.color.set(warm ? paint?.trim ?? '#485150' : '#485556');
     materials.structure.roughness = warm ? .49 : .56;
     materials.structure.metalness = warm ? .31 : .25;
     invalidate();
-  }, [clearCirculationFloor, entity.publicIdentifier, floorTexture, invalidate, layout, materials, warm]);
+  }, [entity.publicIdentifier, invalidate, materials, warm]);
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const floorGeometry = useMemo(() => layout
     ? new THREE.BoxGeometry(layout.width, layout.interior.floorY, layout.depth)
@@ -526,7 +519,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
         <mesh
           position={[0, layout.interior.floorY / 2, 0]}
           geometry={floorGeometry}
-          material={materials.floor}
+          material={circulationFloor ?? materials.floor}
           receiveShadow
           raycast={NO_RAYCAST}
           dispose={null}
@@ -536,6 +529,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
           layout={layout}
           plan={modulePlan}
           mode="interior"
+          circulationFloor={circulationFloor}
           reducedGraphics={reducedGraphics}
           moduleStateById={moduleStateById}
           matchingEntityIds={matchingEntityIds}

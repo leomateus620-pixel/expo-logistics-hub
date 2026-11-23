@@ -5,9 +5,10 @@ import { captureCommercialMapStageRecorder } from '../../utils/performanceDiagno
 import { scheduleCommercialMapSceneTask } from './DeferredSceneLayer';
 
 const paths = {
-  grass: '/maps/materials/warm-grass-v1.webp',
+  grass: '/maps/materials/warm-grass-v2.webp',
   woodland: '/maps/materials/warm-woodland-v1.webp',
   metal: '/maps/materials/warm-metal-v1.webp',
+  interiorFloor: '/maps/materials/warm-interior-floor-v1.webp',
   cover: '/maps/materials/woodland-cover-v1.png',
 } as const;
 type Kind = keyof typeof paths;

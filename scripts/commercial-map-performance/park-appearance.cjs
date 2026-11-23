@@ -83,9 +83,42 @@ async function record(page, name, action) {
   finally { if (captureVideo) await page.screencast.stop(); }
 }
 
+async function verifyPublic(browser) {
+  const page = await browser.newPage({ viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1 });
+  const blockedOrigins = new Set(), errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  const origin = new URL(url).origin;
+  await page.route(/^https?:/, route => {
+    const requestOrigin = new URL(route.request().url()).origin;
+    if (requestOrigin === origin) return route.continue();
+    blockedOrigins.add(requestOrigin);
+    return route.abort();
+  });
+  await page.addInitScript(() => localStorage.setItem('commercial-map:appearance', 'warm-natural'));
+  try {
+    await page.goto(url + '/__dev/commercial-map-rendering?exporural2028=1&persistedStage=1&externalLotsQa=1&externalPublicQa=1&externalLotPresentationQa=1&benvenutoQa=1&qualityQa=MEDIUM');
+    await page.waitForFunction(() => window.__benvenutoQa && document.querySelector('canvas')?.dataset.commercialMapHydration === 'complete', null, { timeout: 180000 });
+    await pose(page, views[4]);
+    const result = await page.evaluate(() => {
+      const canvas = document.querySelector('canvas');
+      const status = window.__externalLotPresentationDiagnostics.capture();
+      return { public: status.publicScene, store: window.__benvenutoQa.map.getState().appearance,
+        health: JSON.parse(canvas.dataset.commercialMapRenderHealth),
+        warmRequests: performance.getEntriesByType('resource').filter(r => /maps\/materials\//.test(r.name)).length };
+    });
+    result.bindings = await page.evaluate(surfaceBindings);
+    result.blockedOrigins = [...blockedOrigins]; result.errors = errors;
+    fs.writeFileSync(path.join(out, 'publico.json'), JSON.stringify(result, null, 2));
+    if (!result.public || result.health.status !== 'ready' || result.bindings.bound.length || errors.length) throw Error('Public scope appearance mismatch: ' + JSON.stringify(result));
+  } finally { await page.close(); }
+}
 async function main() {
   fs.mkdirSync(out, { recursive: true });
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
+  if (process.env.PARK_PUBLIC_ONLY === '1') {
+    try { await verifyPublic(browser); } finally { await browser.close(); }
+    return;
+  }
   const page = await browser.newPage({ viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1 });
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));

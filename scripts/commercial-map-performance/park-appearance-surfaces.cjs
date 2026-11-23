@@ -14,7 +14,8 @@ if (!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(url)) throw Error('Loopback 
     await page.evaluate(() => {
       const q = window.__benvenutoQa, { gl, scene, camera } = q.root.getState();
       const original = gl.renderBufferDirect;
-      const groups = {}, frames = { abertura: new Set(), movimento: new Set() }, cached = new WeakMap();
+      const groups = {}, frames = { abertura: new Set(), movimento: new Set() };
+      const cache = { abertura: new WeakMap(), movimento: new WeakMap() };
       function describe(mesh, material, geometry) {
         let parent = mesh;
         const names = [];
@@ -28,6 +29,7 @@ if (!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(url)) throw Error('Loopback 
         let family = 'outros';
         if (/external-lot-|sold-lot-/i.test(hint)) family = 'lotes';
         else if (/exporural-soy-field|soy-trifoliate|soy-branched|soy-pods/.test(hint)) family = 'soja';
+        else if (/woodland-floor|chao-de-bosque|ground:woodland/i.test(hint)) family = 'solo-bosque';
         else if (/tree|woodland|arvore|copas-|troncos-|canop|foliage|vegetation/i.test(hint)) family = 'arvores';
         else if (/regional-highway|rear-road|road-surface|asphalt|road-infrastructure/i.test(hint)) family = 'vias';
         else if (/rear-parking|estacionamento|parking-surface/i.test(hint)) family = 'estacionamento';
@@ -39,17 +41,16 @@ if (!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(url)) throw Error('Loopback 
         else if (/territorial-environment|territory-cell/i.test(hint)) family = 'entorno';
         return { family, object: names.slice(0, 3), geometry: geometry.type, material: material.type, maps };
       }
-      const previous = new Map();
       gl.renderBufferDirect = function(...args) {
         const [view,, geometry, material, mesh] = args;
         const stage = gl.domElement.dataset.commercialMapReady !== 'true' ? 'abertura' : window.__parkSurfaceMotion ? 'movimento' : null;
         if (!stage || view !== camera || !mesh) return original.apply(this, args);
-        let sample = cached.get(mesh);
-        if (!sample || previous.get(mesh) !== material) {
-          sample = describe(mesh, material, geometry);
-          cached.set(mesh, sample);
-          previous.set(mesh, material);
+        let entry = cache[stage].get(mesh);
+        if (!entry || entry.material !== material) {
+          entry = { material, sample: describe(mesh, material, geometry) };
+          cache[stage].set(mesh, entry);
         }
+        const sample = entry.sample;
         const key = stage + '/' + sample.family;
         const row = groups[key] ??= { calls: 0, cpuMs: 0, materials: new Set(), meshes: new Set(), examples: [] };
         if (!row.meshes.has(mesh) && row.examples.length < 5) row.examples.push(sample);

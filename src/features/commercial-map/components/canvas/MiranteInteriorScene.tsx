@@ -1,8 +1,9 @@
-import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import { useInteriorCameraRequest, type InteriorCameraRequest } from '../../hooks/useInteriorCameraRequest';
 import * as THREE from 'three';
 import type { MapEntity } from '../../types';
+import { useParkAppearance } from '../../state/parkAppearance';
 import {
   createMiranteLayout,
   miranteVisualHeight,
@@ -80,6 +81,8 @@ export const MiranteInteriorScene = memo(function MiranteInteriorScene({
   entity: MapEntity;
   reducedGraphics: boolean;
 }) {
+  const warm = useParkAppearance() === 'warm-natural';
+  const invalidate = useThree(state => state.invalidate);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const height = Math.max(entity.geometry.extrusionHeight, miranteVisualHeight(bounds));
   const layout = useMemo(
@@ -129,6 +132,14 @@ export const MiranteInteriorScene = memo(function MiranteInteriorScene({
     };
     return result;
   }, []);
+  useLayoutEffect(() => {
+    materials.platform.color.set(warm ? '#bbafa0' : '#99968e');
+    materials.platform.roughness = warm ? .84 : .98;
+    materials.roof.roughness = warm ? .55 : .67;
+    materials.roof.emissiveIntensity = warm ? .12 : .24;
+    materials.metal.roughness = warm ? .43 : .5;
+    invalidate();
+  }, [materials, warm, invalidate]);
 
   useEffect(() => () => {
     Object.values(materials).forEach((material) => material.dispose());
@@ -138,8 +149,8 @@ export const MiranteInteriorScene = memo(function MiranteInteriorScene({
     <>
       <color attach="background" args={['#dfe5df']} />
       <fog attach="fog" args={['#dfe5df', 24, 92]} />
-      <ambientLight intensity={0.72} />
-      <hemisphereLight args={['#eef5f1', '#817b68', 1.15]} />
+      <ambientLight intensity={warm ? .61 : .72} />
+      <hemisphereLight color={warm ? '#d5e4eb' : '#eef5f1'} groundColor={warm ? '#94836f' : '#817b68'} intensity={1.15} />
       <directionalLight
         position={[
           bounds.centerX - layout.width * 2.2,
@@ -147,6 +158,7 @@ export const MiranteInteriorScene = memo(function MiranteInteriorScene({
           bounds.centerZ + layout.depth * 0.8,
         ]}
         intensity={1.22}
+        color={warm ? '#ffe7c9' : '#ffffff'}
         castShadow={!reducedGraphics}
         shadow-mapSize-width={reducedGraphics ? 256 : 1024}
         shadow-mapSize-height={reducedGraphics ? 256 : 1024}
