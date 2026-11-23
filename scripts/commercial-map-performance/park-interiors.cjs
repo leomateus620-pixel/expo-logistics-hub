@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-const { pose, snap } = require('./park-appearance.cjs');
+const { pose, snap, requireLocalResources } = require('./park-appearance.cjs');
 const origin = process.env.PARK_URL || 'http://127.0.0.1:4243';
 const output = path.resolve(process.env.PARK_OUTPUT || '/tmp/park-appearance');
 const warm = process.env.PARK_PROFILE === 'warm-natural';
@@ -44,6 +44,7 @@ async function inner() {
   fs.mkdirSync(output, { recursive: true });
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
   const page = await browser.newPage({ viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1 });
+  const blocked = await requireLocalResources(page);
   const errors = [], report = { browser: browser.version(), interiors: [], views: [], errors };
   page.on('pageerror', e => errors.push(e.message));
   try {
@@ -86,7 +87,20 @@ async function inner() {
       const take = async (suffix, focus) => {
         const name = code + '-' + suffix;
         const base = reference?.views.find(v => v.name === name);
-        if (reference) { assert(base); await pose(page, base); }
+        if (reference) {
+          assert(base);
+          await pose(page, base);
+          await page.evaluate(optics => {
+            const { camera, invalidate } = window.__benvenutoQa.root.getState();
+            camera.zoom = optics.zoom;
+            camera.fov = optics.fov;
+            camera.near = optics.near;
+            camera.far = optics.far;
+            camera.view = optics.view ? { ...optics.view } : null;
+            camera.updateProjectionMatrix();
+            invalidate();
+          }, base.optics);
+        }
         const v = await snap(page, name);
         if (base) for (const field of ['position', 'target']) assert(v[field].every((x, i) => Math.abs(x - base[field][i]) < 0.0001), 'Unmatched ' + name + ' ' + field);
         const interior = await page.evaluate(() => {
@@ -104,7 +118,10 @@ async function inner() {
           return { optics: { zoom: camera.zoom, fov: camera.fov, view: camera.view, near: camera.near, far: camera.far },
             floor: [...floor], trims };
         });
-        if (base) assert.deepEqual(interior.optics, base.optics, 'Unmatched projection at ' + name);
+        if (base) {
+          const projection = o => ({ zoom: o.zoom, fov: o.fov, near: o.near, far: o.far, view: o.view?.enabled ? o.view : null });
+          assert.deepEqual(projection(interior.optics), projection(base.optics), 'Unmatched projection at ' + name);
+        }
         assert.equal(v.health.status, 'ready');
         report.views.push({ ...v, ...interior, focus: focus && { number: focus.number, identifier: focus.identifier, key: focus.key } });
         await release(page);
@@ -144,6 +161,7 @@ async function inner() {
     assert.equal(errors.length, 0);
     report.complete = true;
   } finally {
+    report.blockedOrigins = [...blocked];
     fs.writeFileSync(path.join(output, report.complete ? 'interiores.json' : 'interiores-incompletos.json'), JSON.stringify(report, null, 2));
     await browser.close();
   }

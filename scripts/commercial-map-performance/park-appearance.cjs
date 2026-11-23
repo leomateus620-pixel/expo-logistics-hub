@@ -83,17 +83,21 @@ async function record(page, name, action) {
   finally { if (captureVideo) await page.screencast.stop(); }
 }
 
-async function verifyPublic(browser) {
-  const page = await browser.newPage({ viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1 });
-  const blockedOrigins = new Set(), errors = [];
-  page.on('pageerror', e => errors.push(e.message));
-  const origin = new URL(url).origin;
+async function requireLocalResources(page) {
+  const blocked = new Set();
   await page.route(/^https?:/, route => {
-    const requestOrigin = new URL(route.request().url()).origin;
-    if (requestOrigin === origin) return route.continue();
-    blockedOrigins.add(requestOrigin);
+    const origin = new URL(route.request().url()).origin;
+    if (origin === new URL(url).origin) return route.continue();
+    blocked.add(origin);
     return route.abort();
   });
+  return blocked;
+}
+
+async function verifyPublic(browser) {
+  const page = await browser.newPage({ viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1 });
+  const blockedOrigins = await requireLocalResources(page), errors = [];
+  page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => localStorage.setItem('commercial-map:appearance', 'warm-natural'));
   try {
     await page.goto(url + '/__dev/commercial-map-rendering?exporural2028=1&persistedStage=1&externalLotsQa=1&externalPublicQa=1&externalLotPresentationQa=1&benvenutoQa=1&qualityQa=MEDIUM');
@@ -107,6 +111,9 @@ async function verifyPublic(browser) {
         warmRequests: performance.getEntriesByType('resource').filter(r => /maps\/materials\//.test(r.name)).length };
     });
     result.bindings = await page.evaluate(surfaceBindings);
+    result.browser = browser.version();
+    result.manifest = await page.evaluate(() => fetch('/qa-build-manifest.json').then(r => r.json())
+      .then(({ revision, inventoryHash }) => ({ revision, inventoryHash })));
     result.blockedOrigins = [...blockedOrigins]; result.errors = errors;
     fs.writeFileSync(path.join(out, 'publico.json'), JSON.stringify(result, null, 2));
     if (!result.public || result.health.status !== 'ready' || result.bindings.bound.length || errors.length) throw Error('Public scope appearance mismatch: ' + JSON.stringify(result));
@@ -120,6 +127,7 @@ async function main() {
     return;
   }
   const page = await browser.newPage({ viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1 });
+  const blockedOrigins = await requireLocalResources(page);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const report = { url, browser: browser.version(), profile, errors, views: [] };
@@ -225,9 +233,10 @@ async function main() {
     if (report.picking.actual !== target.id) throw Error('Unexpected picked lot ' + JSON.stringify(report.picking));
     if (report.views.some(v => v.health.status !== 'ready' || v.health.contextLosses) || errors.length) throw Error('Unhealthy replay');
   } finally {
+    report.blockedOrigins = [...blockedOrigins];
     fs.writeFileSync(path.join(out, 'camera.json'), JSON.stringify(report, null, 2));
     await browser.close();
   }
 }
-module.exports = { views, pose, snap };
+module.exports = { views, pose, snap, requireLocalResources };
 if (require.main === module) main().catch(error => { console.error(error); process.exitCode = 1; });

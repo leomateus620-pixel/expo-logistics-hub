@@ -10,6 +10,8 @@ const scenarios = (process.env.STARTUP_CASES || 'direct,immediate,prewarmed,inte
 const mobile = process.env.STARTUP_MOBILE === '1';
 const observeComplete = process.env.STARTUP_COMPLETE !== '0';
 const tier = process.env.STARTUP_TIER || '';
+const appearance = process.env.STARTUP_APPEARANCE || '';
+if (appearance && !['classic', 'warm-natural'].includes(appearance)) throw Error('Unknown appearance');
 const label = process.env.STARTUP_LABEL || `startup-after-${mobile ? 'mobile-emulation' : 'desktop'}${tier ? `-${tier}` : ''}`;
 const observeGesture = process.env.STARTUP_PRESENTED_GESTURE === '1';
 const cpuThrottle = Number(process.env.STARTUP_CPU_THROTTLE || 1);
@@ -43,6 +45,7 @@ async function capture(page) {
     try {
       const context = await browser.newContext(mobile ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true }
         : { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+      if (appearance) await context.addInitScript(value => localStorage.setItem('commercial-map:appearance', value), appearance);
       if (process.env.STARTUP_GL_PROBE === '1') await context.addInitScript(installCommercialMapGlProgramProbe);
       await context.addInitScript(() => {
         window.__startupProbe = { contexts: 0, contextRequests: 0, longTasks: [] };
