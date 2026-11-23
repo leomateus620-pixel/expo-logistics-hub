@@ -177,8 +177,11 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
         float tufts = interiorRandom(interiorP * .63);
         vec2 coverUv = interiorP / 128. + .5;
         vec3 land = vec3(0.);
+        float maintained = ${scope === 'internal-base' ? '0.' : '1.'};
         if (parkGroundMapsReady.z > .5 && all(greaterThan(coverUv, vec2(0.))) && all(lessThan(coverUv, vec2(1.)))) {
-          land = texture2D(interiorRoughness, coverUv).rgb;
+          vec4 survey = texture2D(interiorRoughness, coverUv);
+          land = survey.rgb;
+          maintained = max(maintained, smoothstep(.25, 1., survey.a));
         }
         float cover = smoothstep(.06, .98, land.r * (.59 + .48 * tufts) + (meadow - .5) * .22);
         float bare = smoothstep(.035, .85, land.g);
@@ -200,6 +203,9 @@ export function applyInteriorGroundMaterial(material: THREE.MeshStandardMaterial
         // in blade density break their edges at pedestrian distance.
         float dryGrass = smoothstep(.29,.71, .43 * meadow + .40 * sward + .17 * tufts + land.b * .34);
         lawn *= mix(vec3(.62,.81,.59), vec3(1.59,1.22,.89), dryGrass);
+        // Inside registered lawn polygons the grass is maintained and denser.
+        // Field, track, parking gravel and commercial ink have separate owners.
+        lawn *= mix(vec3(1.), vec3(.79,1.07,.84) * (.96 + .08 * tufts), maintained);
         vec3 soil = floorColor * vec3(1.05,.86,.72);
         // The grove beside the entrance roundabout is a green park lawn even
         // under its crowns. Leaf litter is local to the densest canopy gaps.

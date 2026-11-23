@@ -9,7 +9,7 @@ const paths = {
   woodland: '/maps/materials/warm-woodland-v1.webp',
   metal: '/maps/materials/warm-metal-v1.webp',
   interiorFloor: '/maps/materials/warm-interior-floor-v1.webp',
-  cover: '/maps/materials/woodland-cover-v1.png',
+  cover: '/maps/materials/woodland-cover-v2.png',
 } as const;
 type Kind = keyof typeof paths;
 type Resource = {

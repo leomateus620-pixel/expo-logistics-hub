@@ -17,7 +17,11 @@ import { OFFICIAL_REFERENCE_DATA } from './src/features/commercial-map/data/offi
 import { QUADRAS_AB_SPATIAL_REFERENCE as ab } from './src/features/commercial-map/data/quadrasABEnvironment';
 import { quadraGroundWeights } from './src/features/commercial-map/components/canvas/interiorGroundReference';
 import { PARK_ACCESS_SPATIAL_PLAN as plan } from './src/features/commercial-map/data/parkAccessSpatialPlan';
+import { INTERNAL_GROUND_COVERAGE } from './src/features/commercial-map/data/internalGroundCoverage';
 console.log(JSON.stringify({
+  lawns: [...INTERNAL_GROUND_COVERAGE.map(owner => owner.ring),
+    ...OFFICIAL_REFERENCE_DATA.entities.filter(e => e.classification === 'QUADRA' || e.classification === 'GREEN_AREA')
+      .map(e => e.geometry.coordinates[0])],
   fields: TERRITORY_PATCHES.filter(p => p.kind === 'field').map(p => p.ring),
   roads: TERRITORY_ROADS.map(r => ({points: r.points, width: r.width + 2 * r.shoulder})),
   anchors: trees.map(({position, canopyRadius}) => [...position, canopyRadius]),
@@ -90,8 +94,10 @@ verges = np.asarray(roads.filter(ImageFilter.GaussianBlur(1.5))) / 255.
 field_margins = np.maximum.reduce([polygon(ring, 4) for ring in data["fields"]])
 interior = np.clip((SPAN / 2 - np.maximum(np.abs(x), np.abs(z))) / 2, 0, 1)
 dry = np.maximum(dry, np.maximum(verges * .7, field_margins * .85) * interior)
-# R = canopy/litter, G = bare soil, B = drier grass. No shadow.
-cover = np.stack((weight, soil, dry), axis=-1)
-path = Path("public/maps/materials/woodland-cover-v1.png")
+# R = canopy, G = bare soil, B = dry verge, A = maintained park lawn.
+# A nonzero alpha retains the RGB data of land outside the management areas.
+park_lawn = np.maximum.reduce([polygon(ring, .65) for ring in data["lawns"]])
+cover = np.stack((weight, soil, dry, .25 + .75 * park_lawn), axis=-1)
+path = Path("public/maps/materials/woodland-cover-v2.png")
 path.parent.mkdir(exist_ok=True, parents=True)
 Image.fromarray(np.rint(cover.clip(0, 1) * 255).astype("uint8")).save(path, optimize=True)
