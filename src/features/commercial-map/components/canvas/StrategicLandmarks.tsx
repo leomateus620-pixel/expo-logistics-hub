@@ -2582,6 +2582,8 @@ function ApolloXIVReplica({
   const signGeometry = useMemo(() => createApolloSignGeometry(), []);
   const atlasMaterial = useMemo(() => {
     const result = new THREE.MeshStandardMaterial({
+      // The curb owns this shared tint. The wet-surface registry must apply rain to it once.
+      name: 'ApolloXIVSignArtwork',
       map: atlas,
       roughness: 0.76,
       metalness: 0.035,
