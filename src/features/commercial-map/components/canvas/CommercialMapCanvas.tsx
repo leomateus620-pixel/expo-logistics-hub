@@ -5656,7 +5656,7 @@ const Scene = memo(function Scene({
           <NightAwareRestaurantFrontage
             entities={nonLotEntities}
             trees={presentedSceneTrees}
-            reducedGraphics={renderQualityTier === 'LOW'}
+            reducedGraphics={reducedGraphics}
             vegetationVisible={treesVisible}
             night={nightAtmosphereActive}
           />
