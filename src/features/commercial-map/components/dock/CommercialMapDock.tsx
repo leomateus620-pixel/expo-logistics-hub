@@ -5,6 +5,7 @@ import { ArrowLeft, CarFront, Check, ChevronDown, ChevronRight, ChevronUp, Facto
 import { STATUS_CONFIG } from '../../constants';
 import { toCommercialPhase } from '../../types';
 import { commercialMapSegmentInventory, foodPointsByStructure, type CommercialMapSegmentId } from '../../data/commercialMapSegments';
+import { gastronomyStructureSelectionId } from '../../utils/gastronomyPointPlacement';
 import { TERRITORY_SYMBOLS } from '../../utils/territorialOrientation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CommercialLot, MapEntity } from '../../types';
@@ -188,7 +189,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
           const available = points.filter(({ lot }) => lot.status === 'AVAILABLE').length;
           const selected = selectedEntityId === entity.id || points.some(({ entity: point }) => selectedEntityId === point.id);
           return <button key={entity.id} type="button" aria-current={selected || undefined}
-            onClick={() => selectStructure(entity.id)}>
+            onClick={() => selectStructure(gastronomyStructureSelectionId(entity.id, points))}>
             <span>{entity.publicIdentifier}</span>
             <span><strong>{entity.publicIdentifier === 'C2' ? FENASOJA_RESTAURANT_PRESENTATION_NAME : entity.name}</strong>
               <small>{points.length} {points.length === 1 ? 'ponto' : 'pontos'} · {available} {available === 1 ? 'disponível' : 'disponíveis'}</small></span>

@@ -1,17 +1,54 @@
 import { events } from '@react-three/fiber';
+import { isMapSelectionClick } from '../../utils/interaction';
 
-/** Coalesce hover raycasts only. Pointer down/up, click, wheel and controls keep
- * their native timing; a click always performs its own fresh R3F raycast. */
+interface GastronomyMarkerPicking {
+  hit(clientX: number, clientY: number): string | null;
+  select(id: string): void;
+}
+
+const pickingByCanvas = new WeakMap<HTMLCanvasElement, GastronomyMarkerPicking>();
+
+export function registerGastronomyMarkerPicking(canvas: HTMLCanvasElement, picking: GastronomyMarkerPicking) {
+  pickingByCanvas.set(canvas, picking);
+  return () => {
+    if (pickingByCanvas.get(canvas) === picking) pickingByCanvas.delete(canvas);
+  };
+}
+
+/** Give a visible food emblem first claim on selection before dispatching any
+ * scene event. The separate native OrbitControls listeners still see the gesture. */
 export const createCommercialMapEvents: typeof events = (store) => {
   const manager = events(store);
   const handlers = manager.handlers;
+  const canvas = () => store.getState().gl.domElement;
+  const picking = () => pickingByCanvas.get(canvas());
+  const hit = (event: Event) => event instanceof MouseEvent
+    ? picking()?.hit(event.clientX, event.clientY) ?? null : null;
+  let press: { id: string; pointerId: number; x: number; y: number; releasedOnMarker: boolean } | null = null;
+  let markerClick = false;
+  let markerHover = false;
   let frame: number | null = null;
   let pending: Parameters<NonNullable<typeof handlers>['onPointerMove']>[0] | null = null;
+  const clearMarkerHover = () => {
+    if (!markerHover) return;
+    markerHover = false;
+    if (canvas().style.cursor === 'pointer') canvas().style.cursor = 'grab';
+  };
   const flush = () => {
     frame = null;
     const event = pending;
     pending = null;
-    if (event) handlers?.onPointerMove(event);
+    if (!event || (press && event instanceof MouseEvent && event.buttons)) return;
+    if (event instanceof MouseEvent && !event.buttons && hit(event)) {
+      if (!markerHover) {
+        handlers?.onPointerLeave(event);
+        markerHover = true;
+        canvas().style.cursor = 'pointer';
+      }
+      return;
+    }
+    clearMarkerHover();
+    handlers?.onPointerMove(event);
   };
   const cancel = () => {
     if (frame !== null) cancelAnimationFrame(frame);
@@ -22,16 +59,53 @@ export const createCommercialMapEvents: typeof events = (store) => {
     ...manager,
     handlers: handlers && {
       ...handlers,
+      onPointerDown: (event) => {
+        if (event instanceof PointerEvent && event.button === 0 && event.isPrimary) {
+          const id = hit(event);
+          press = id
+            ? { id, pointerId: event.pointerId, x: event.clientX, y: event.clientY, releasedOnMarker: false }
+            : null;
+        }
+        if (!press) handlers.onPointerDown(event);
+        else cancel();
+      },
+      onPointerUp: (event) => {
+        if (!press) {
+          handlers.onPointerUp(event);
+        } else if (event instanceof PointerEvent && event.pointerId === press.pointerId) {
+          press.releasedOnMarker = hit(event) === press.id;
+        }
+      },
+      onClick: (event) => {
+        const completed = press;
+        press = null;
+        markerClick = Boolean(completed || hit(event));
+        if (!markerClick) {
+          handlers.onClick(event);
+        } else if (completed?.releasedOnMarker && event instanceof MouseEvent
+          && isMapSelectionClick(Math.hypot(event.clientX - completed.x, event.clientY - completed.y), event)) {
+          picking()?.select(completed.id);
+        }
+      },
+      onDoubleClick: (event) => {
+        if (!markerClick && !hit(event)) handlers.onDoubleClick(event);
+      },
+      onContextMenu: (event) => {
+        if (!press && !hit(event)) handlers.onContextMenu(event);
+      },
       onPointerMove: (event) => {
         pending = event;
         if (frame === null) frame = requestAnimationFrame(flush);
       },
       onPointerLeave: (event) => {
         cancel();
+        clearMarkerHover();
         handlers.onPointerLeave(event);
       },
       onPointerCancel: (event) => {
         cancel();
+        clearMarkerHover();
+        if (press) press.releasedOnMarker = false;
         handlers.onPointerCancel(event);
       },
     },
@@ -45,6 +119,9 @@ export const createCommercialMapEvents: typeof events = (store) => {
     }),
     disconnect: () => {
       cancel();
+      clearMarkerHover();
+      press = null;
+      markerClick = false;
       manager.disconnect?.();
     },
   };

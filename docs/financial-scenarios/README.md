@@ -32,6 +32,7 @@ Projeto confirmado: **Fenasoja Log**, `756eeb64-0d44-4171-b445-f8a60f0492c0`; co
 | `20261022090000_financial_live_scenarios.sql` | `e3ae06784b0815d8d2d4eef3d60fdcdcd16e939df2c03c9ea6a568eba2c72a29` |
 | `20261022093000_financial_scenario_projection_hardening.sql` | `cbc311a55a61f6b866553f7d934686f18aed621def6ead276374b64ee2d1a4b1` |
 | `20261022100000_financial_scenario_cash_contract.sql` | `c5f120fa09c8ccd793f5c3d5dfd143b02152af557f730c082dac60ffc1b62ffe` |
+| `20261124191500_financial_scenario_food_points.sql` | `76dec131d3fbc025908d42b8b4d3349311e8ca3359fd1d3f279e46bdb2e8b5d2` |
 
 O conector expõe `query_database`, sem ferramenta dedicada de migrations. Foi utilizado o mecanismo rastreável do projeto: SQL exato em transação, advisory lock, precondições de escopo, entrada em `supabase_migrations.schema_migrations`, hash no registro e releitura após COMMIT. `migration-envelope.mjs` reproduz o envelope. Replay de versão exige fonte idêntica; não reexecuta a migração.
 
@@ -42,6 +43,20 @@ A terceira migração garante centavos textuais na composição de patrocínios 
 RLS, quatro contas do roster e `financial_can` preservados (definição conferida por checksum). Cliente não recebe execução das funções internas nem poder comercial. Leitor não edita metas. Referências v2 são imutáveis; edição administrativa exige versão esperada e chave idempotente, gera nova versão auditada e rejeita concorrência desatualizada.
 
 Evidência sanitizada: [lovable-application.json](evidence/lovable-application.json). As releituras conectadas usaram `SET LOCAL ROLE authenticated` e claim da conta leitora autorizada pelo conector. Isso valida capacidades e contratos no banco; **não constitui login interativo na aplicação de produção**. O frontend ainda depende de revisão/merge e publicação pelo fluxo normal do projeto.
+
+## Pontos de Alimentação
+
+A classificação usa a unidade comercial `FOOD_POINT` e o segmento Gastronomia persistido. O pavilhão, calçada ou outra estrutura serve para localizar o ponto. A mesma venda entra uma vez na carteira e passa a integrar a base confirmada pela assinatura dos itens. O inventário usa o preço vigente de Renovação do Mapa Comercial e aparece no cartão e no detalhamento dos três cenários.
+
+| Cenário | Meta oficial dos Pontos de Alimentação |
+| --- | ---: |
+| Pessimista | R$ 360.000,00 |
+| Realista | R$ 450.000,00 |
+| Otimista | R$ 500.000,00 |
+
+O caixa usa os movimentos financeiros líquidos alocados à parcela comercial. O recebimento de um pedido misto usa a proporção comprovada de principal e taxas dos pontos, com arredondamento para baixo em centavos. A parcela residual e os pedidos com origem ambígua permanecem na cobertura de caixa. O cálculo `2028.2` inicia uma nova série comparável. As observações anteriores permanecem no histórico gravado.
+
+O ensaio com reversão e a aplicação definitiva de `20261124191500` ocorreram no Fenasoja Log. O mesmo projeto recebeu a carga dos oito pontos. As três bases e as respectivas metas foram relidas após a aplicação. A prévia local conferiu a alternância de cenários, o valor da carteira, a tabela do mapa e o detalhamento em um banco descartável. [Captura do Realista com dados fictícios](../evidence/gastronomia/site-points/financeiro-cenario-realista.jpg)
 
 ## Validação reproduzível
 

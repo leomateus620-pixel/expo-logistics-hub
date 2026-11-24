@@ -10,11 +10,17 @@ import { createCommercialMapEvents } from '@/features/commercial-map/components/
 
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
+function eventsWithoutMarkers() {
+  const domElement = document.createElement('canvas');
+  const store = { getState: () => ({ gl: { domElement } }) };
+  return createCommercialMapEvents(store as unknown as Parameters<typeof createCommercialMapEvents>[0]);
+}
+
 describe('agendamento dos eventos do mapa', () => {
   it('faz um raycast de hover por frame, mas entrega o clique imediatamente', () => {
     let callback: FrameRequestCallback | undefined;
     vi.stubGlobal('requestAnimationFrame', vi.fn((next) => { callback = next; return 1; }));
-    const manager = createCommercialMapEvents({} as Parameters<typeof createCommercialMapEvents>[0]);
+    const manager = eventsWithoutMarkers();
     const first = new MouseEvent('pointermove', { clientX: 1 });
     const last = new MouseEvent('pointermove', { clientX: 10 });
     manager.handlers?.onPointerMove(first);
@@ -30,7 +36,7 @@ describe('agendamento dos eventos do mapa', () => {
   it('cancela hover pendente no teardown e não seleciona a cena invisível', () => {
     vi.stubGlobal('requestAnimationFrame', vi.fn(() => 3));
     vi.stubGlobal('cancelAnimationFrame', vi.fn());
-    const manager = createCommercialMapEvents({} as Parameters<typeof createCommercialMapEvents>[0]);
+    const manager = eventsWithoutMarkers();
     manager.handlers?.onPointerMove(new MouseEvent('pointermove'));
     manager.disconnect?.();
     expect(cancelAnimationFrame).toHaveBeenCalledWith(3);

@@ -138,7 +138,10 @@ SELECT l.project_id,l.id,v.code,v.name,v.kind,jsonb_strip_nulls(jsonb_build_obje
  ('C4','Churrascaria Exporural','RESTAURANT','exporural'),('D1','Alameda Gastronômica','FOOD_AREA','industria-comercio-servicos'),
  ('D2','Via Expressa','ATTRACTION','industria-comercio-servicos'),
  ('D3','Espaço Mirante','ATTRACTION','industria-comercio-servicos'),('D4','Tenda da Pecuária','LIVESTOCK_AREA',NULL),
- ('B1','Pavilhão 1','PAVILION','industria-comercio-servicos')) v(code,name,kind,segment);
+ ('D5','Núcleo dos Criadores de Cavalos Crioulos','LIVESTOCK_AREA',NULL),
+ ('J','Parque de Diversões','ATTRACTION',NULL),('CALCADA-ARVOREDO','Calçada do Arvoredo','PEDESTRIAN_PATH','industria-comercio-servicos'),
+ ('B1','Pavilhão 1','PAVILION','industria-comercio-servicos'),
+ ('B3','Pavilhão 12','PAVILION','industria-comercio-servicos')) v(code,name,kind,segment);
 INSERT INTO map_entity_geometries(project_id,entity_id,geometry,change_reason)
 SELECT project_id,id,'{"type":"Polygon","coordinates":[[[0,0],[1,0],[1,1],[0,0]]]}','QA' FROM map_entities;
 INSERT INTO map_entities(project_id,layer_id,public_identifier,name,classification,is_sellable,metadata,parent_entity_id)
@@ -170,6 +173,10 @@ INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000013',org_
   if (process.argv.includes('--via-expressa-chopp')) {
     const expansion = await buildMigrationEnvelope({ viaExpressaChopp: true });
     await db.unsafe(expansion.sql);
+  }
+  if (process.argv.includes('--site-points')) {
+    const sitePoints = await buildMigrationEnvelope({ sitePoints: true });
+    await db.unsafe(sitePoints.sql);
   }
   console.log('Banco descartável gastronomy_qa preparado em 127.0.0.1:55438.');
 } catch(e) {

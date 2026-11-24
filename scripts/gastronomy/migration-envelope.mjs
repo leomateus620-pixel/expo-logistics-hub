@@ -2,9 +2,10 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
-export async function buildMigrationEnvelope({ viaExpressaChopp = false } = {}) {
-  const version = viaExpressaChopp ? '20261116180000' : '20261111190000';
-  const name = viaExpressaChopp ? 'commercial_gastronomy_via_expressa_chopp' : 'commercial_gastronomy';
+export async function buildMigrationEnvelope({ viaExpressaChopp = false, sitePoints = false } = {}) {
+  const [version, name] = sitePoints ? ['20261124190000', 'commercial_gastronomy_site_points']
+    : viaExpressaChopp ? ['20261116180000', 'commercial_gastronomy_via_expressa_chopp']
+      : ['20261111190000', 'commercial_gastronomy'];
   const file = new URL(`../../supabase/migrations/${version}_${name}.sql`, import.meta.url);
   const source = await readFile(file, 'utf8');
   const prefix = 'BEGIN;';
@@ -14,7 +15,7 @@ export async function buildMigrationEnvelope({ viaExpressaChopp = false } = {}) 
     throw new Error('Unexpected migration transaction format');
   }
   const hash = createHash('sha256').update(source).digest('hex');
-  const initialInventoryCheck = viaExpressaChopp ? '' : `
+  const initialInventoryCheck = viaExpressaChopp || sitePoints ? '' : `
   IF NOT EXISTS (
     SELECT 1 FROM public.commercial_lot_pricing_2028 p
     JOIN public.map_entities e ON e.id=p.entity_id AND e.project_id=p.project_id
@@ -43,5 +44,8 @@ END $gastronomy_deploy$;`;
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
-  process.stdout.write((await buildMigrationEnvelope({ viaExpressaChopp: process.argv.includes('--via-expressa-chopp') })).sql);
+  process.stdout.write((await buildMigrationEnvelope({
+    viaExpressaChopp: process.argv.includes('--via-expressa-chopp'),
+    sitePoints: process.argv.includes('--site-points'),
+  })).sql);
 }

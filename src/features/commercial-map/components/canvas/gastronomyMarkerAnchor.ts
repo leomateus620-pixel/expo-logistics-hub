@@ -1,4 +1,5 @@
 import type { MapEntity } from '../../types';
+import { GATE_FOUR_DISTRICT_LAYOUT, resolveCrioulosArchitectureEnvelope } from '../../data/gateFourDistrict';
 import { choppTruckRoofAnchor } from '../../utils/choppTruck';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
 import { eventCenterModelBounds } from '../../utils/eventCenter';
@@ -6,6 +7,7 @@ import { eventCenterArchitectureDimensions } from '../../utils/eventCenterArchit
 import { EXPORURAL_STEAKHOUSE_LAYOUT, resolveExporuralSteakhouseDimensions } from '../../utils/exporuralSteakhouse';
 import { createFenasojaRestaurantLayout } from '../../utils/fenasojaRestaurant';
 import { createGastronomicAlamedaLayout, fitRotatedStructureBounds } from '../../utils/fenasojaReferenceStructures';
+import { gastronomyPointPosition, isGastronomyRoofPoint } from '../../utils/gastronomyPointPlacement';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
@@ -21,8 +23,12 @@ import { MIRANTE_SITE_PROFILE } from './MirantePavilion';
 
 const ROOF_CLEARANCE = 0.025;
 
-/** Place the foot of the beam above the visible roof in the exterior scene. */
-export function resolveGastronomyMarkerAnchor(entity: MapEntity): [number, number, number] | null {
+/** Use the point's position or place the structure's beam above its visible roof. */
+export function resolveGastronomyMarkerAnchor(entity: MapEntity, structure?: MapEntity): [number, number, number] | null {
+  if (isGastronomyRoofPoint(entity) && structure && structure.classification !== 'FOOD_POINT') {
+    return resolveGastronomyMarkerAnchor(structure);
+  }
+  if (entity.classification === 'FOOD_POINT') return gastronomyPointPosition(entity);
   const { coordinates, elevation, extrusionHeight } = entity.geometry;
   if (!coordinates[0] || coordinates[0].length < 3 || !Number.isFinite(elevation)
     || !Number.isFinite(extrusionHeight) || coordinates.some(ring => ring.some(point => !point.every(Number.isFinite)))) return null;
@@ -65,6 +71,11 @@ export function resolveGastronomyMarkerAnchor(entity: MapEntity): [number, numbe
     }
     case 'livestock-tent':
       return onRoof(0, height + 0.0225, 0);
+    case 'crioulos-center': {
+      const { roof } = resolveCrioulosArchitectureEnvelope();
+      const [offsetX, offsetZ] = GATE_FOUR_DISTRICT_LAYOUT.crioulos.visualOffset;
+      return onRoof(roof.center[0] + offsetX, roof.ridgeY, roof.center[1] + offsetZ);
+    }
     case 'via-expressa': {
       const layout = createViaExpressaLayout(viaExpressaModelBounds(bounds, yaw), height, false);
       return onRoof(0, layout.height + layout.roofThickness * 0.68, layout.centerZ);

@@ -17,6 +17,8 @@ const migration = await fs.readFile(new URL('../../supabase/migrations/202611111
 const contractMigration = await fs.readFile(new URL('../../supabase/migrations/20261112190000_commercial_contract_history.sql', import.meta.url), 'utf8');
 const expansionMigration = await fs.readFile(new URL('../../supabase/migrations/20261116180000_commercial_gastronomy_via_expressa_chopp.sql', import.meta.url), 'utf8');
 const expansionSeed = expansionMigration.replace(/^BEGIN;\s*/, '').replace(/COMMIT;\s*$/, '');
+const sitePointsMigration = await fs.readFile(new URL('../../supabase/migrations/20261124190000_commercial_gastronomy_site_points.sql', import.meta.url), 'utf8');
+const sitePointsSeed = sitePointsMigration.replace(/^BEGIN;\s*/, '').replace(/COMMIT;\s*$/, '');
 const asUser = (user, operation) => db.begin(async (tx) => {
   await tx.unsafe('SET LOCAL ROLE authenticated');
   await tx`SELECT set_config('request.jwt.claim.sub',${user},true)`;
@@ -294,6 +296,18 @@ try {
   assert.equal((await detail(ordinaryOrder)).contracts[0].versions[0].storagePath,ordinaryPath);
   console.log('Gastronomia PostgreSQL QA: 12 pontos, 6 estruturas, R$ 386.541,00, carga idempotente, RLS, três pagamentos, checkout misto, concorrência, revisão, documentos, exportação e relatório OK');
 
+  const foodSourceTotal = async (conn) => (await conn`
+    SELECT count(*)::int AS points, sum((price_source->>'initialTotal')::numeric)::int AS value
+      FROM commercial_lots WHERE project_id=${project} AND commercial_unit='FOOD_POINT'
+  `)[0];
+  const undoSitePoints = new Error('Reverter cenário com a base inicial');
+  await assert.rejects(db.begin(async (tx) => {
+    await tx.unsafe(sitePointsSeed);
+    assert.deepEqual(await foodSourceTotal(tx), { points: 20, value: 507838 });
+    throw undoSitePoints;
+  }), (error) => error === undoSitePoints);
+  assert.deepEqual(await foodSourceTotal(db), { points: 12, value: 386541 });
+
   // A collision on the last item also rolls back the truck and all of D2.
   await assert.rejects(db.begin(async (tx) => {
     await tx`INSERT INTO map_entities(project_id,layer_id,parent_entity_id,public_identifier,name,classification,is_sellable)
@@ -387,6 +401,132 @@ try {
   assert.equal(await getStatus(via[0].id),'SOLD');
   assert.equal(await getStatus(truck.id),'SOLD');
   console.log('Expansão PostgreSQL QA: 11 pontos D2 e 1 caminhão, R$ 180.180,00, colisão atômica, RLS e reaplicação após vendas e contratos OK');
+
+  const originalOrders = await db`SELECT id,negotiated_total FROM lot_sale_orders ORDER BY id`;
+  const originalArea = await db`SELECT id,official_area_sqm FROM commercial_lots WHERE commercial_unit='SQUARE_METER' ORDER BY id`;
+  await assert.rejects(db.begin(async (tx) => {
+    await tx`INSERT INTO map_entities(project_id,layer_id,parent_entity_id,public_identifier,name,classification,is_sellable)
+      SELECT project_id,layer_id,id,'GAST-D5-01','Identidade de outra origem','FOOD_POINT',true FROM map_entities WHERE public_identifier='D5'`;
+    await tx.unsafe(sitePointsSeed);
+  }), /GASTRONOMY_POINT_IDENTITY_CONFLICT:J31 candidates=/);
+  assert.deepEqual(await foodSourceTotal(db), { points: 24, value: 566721 });
+
+  await db.begin((tx) => tx.unsafe(sitePointsSeed));
+  const sitePoints = () => db`
+    SELECT l.id,l.entity_id,l.public_identifier,l.status,l.food_type,l.unit_quantity,l.price_source,
+      a.public_identifier AS anchor, e.metadata->'gastronomyMarkerPosition' AS marker,
+      fp.id AS price_id,fp.pricing_mode,fp.price_per_sqm,p.renovacao_total,p.segunda_total,
+      p.official_area_sqm,q.is_sellable
+    FROM commercial_lots l JOIN map_entities e ON e.id=l.entity_id JOIN map_entities a ON a.id=e.parent_entity_id
+    JOIN commercial_lot_pricing_2028 p ON p.lot_id=l.id JOIN lot_prices fp ON fp.lot_id=l.id AND fp.is_active
+    JOIN commercial_sale_eligibility q ON q.lot_id=l.id
+    WHERE l.project_id=${project} AND l.price_source->>'cell' IN ('J10','J12','J13','J25','J31','J35','J36','J37')
+    ORDER BY (l.price_source->>'sourceNumber')::int
+  `;
+  assert.deepEqual(await foodSourceTotal(db), { points: 32, value: 688018 });
+  const deployed = await sitePoints();
+  assert.deepEqual(deployed.map((r) => [r.public_identifier,r.anchor,r.price_source.cell,r.price_source.sourceNumber,Number(r.renovacao_total)]), [
+    ['GAST-B3-01','B3','J10',8,14915], ['GAST-ARVOREDO-02','CALCADA-ARVOREDO','J12',10,10680],
+    ['GAST-D1-03','D1','J13',11,2815], ['GAST-B1-01','B1','J25',23,17500],
+    ['GAST-D5-01','D5','J31',29,23107], ['GAST-J-01','J','J35',33,19040],
+    ['GAST-J-02','J','J36',34,22560], ['GAST-J-03','J','J37',35,10680],
+  ]);
+  assert.ok(deployed.every(r => r.status === 'AVAILABLE' && r.is_sellable && r.unit_quantity === 1
+    && r.pricing_mode === 'FIXED_TOTAL' && r.official_area_sqm === null && r.price_per_sqm === null
+    && r.renovacao_total === r.segunda_total));
+  assert.equal(deployed[2].food_type, null);
+  assert.equal(deployed[2].price_source.originalCategory, null);
+  assert.equal(deployed[4].marker, 'structure-roof');
+  assert.equal(deployed[4].price_source.originalLabel, 'PRIMUS / NCCCrioulos');
+  assert.equal(deployed[4].food_type, 'Hamburger, Bifê');
+  assert.equal((await db`SELECT count(*)::int n FROM commercial_lots WHERE price_source->>'cell'='J11'`)[0].n, 0);
+  assert.deepEqual(await db`SELECT id,negotiated_total FROM lot_sale_orders ORDER BY id`, originalOrders);
+  assert.deepEqual(await db`SELECT id,official_area_sqm FROM commercial_lots WHERE commercial_unit='SQUARE_METER' ORDER BY id`, originalArea);
+  assert.deepEqual(await visible(gastronomyMember), [['FOOD_POINT', 32]]);
+  assert.deepEqual(await visible(ruralMember), [['SQUARE_METER', 1]]);
+  assert.equal((await db`SELECT map_segment_is_complete(${segmentId}) AS valid`)[0].valid, true);
+  assert.equal((await db`SELECT count(*)::int AS n FROM map_entity_geometries WHERE entity_id=ANY(${db.array(deployed.map(r => r.entity_id))}::uuid[])`)[0].n, 0);
+
+  const [, , balloon, , crioulos, popcorn, snacks, iceCream] = deployed;
+  const parkOrder = await runSale('parque-e-balao', [snacks.id, balloon.id], 2537500);
+  const parkItems = await getItems(parkOrder);
+  assert.equal(parkItems.length, 2);
+  assert.equal(Number((await detail(parkOrder)).header.negotiatedTotal), 25375);
+  assert.deepEqual(await Promise.all([snacks,balloon,popcorn,iceCream].map(r => getStatus(r.id))),
+    ['SALE_OPEN','SALE_OPEN','AVAILABLE','AVAILABLE']);
+  const parkDoc = org + '/orders/' + parkOrder + '/points.pdf';
+  const balloonDoc = org + '/' + balloon.id + '/balloon.pdf';
+  await db`INSERT INTO storage.objects (bucket_id,name,owner_id) VALUES ('map-contracts',${parkDoc},${seller}),('map-contracts',${balloonDoc},${seller})`;
+  await asUser(seller, tx => tx`SELECT attach_order_contract(${parkOrder},${tx.array([snacks.id,balloon.id])}::uuid[],
+    ${parkDoc},'points.pdf','application/pdf',1024,'PARQUE-BALAO-QA')`);
+  assert.equal(await getStatus(snacks.id), 'SALE_OPEN');
+  await confirm(parkOrder, parkItems.map(r => r.id));
+  await confirm(parkOrder, parkItems.map(r => r.id));
+  const balloonSaleId = parkItems.find(r => r.lot_id === balloon.id).sale_id;
+  await asUser(seller, tx => tx`SELECT register_lot_contract_version(${balloon.id},${balloonDoc},
+    'balloon.pdf','application/pdf',1024,'BALAO-QA',${balloonSaleId})`);
+  assert.deepEqual(await Promise.all([snacks,balloon,popcorn,iceCream].map(r => getStatus(r.id))),
+    ['SOLD','SOLD','AVAILABLE','AVAILABLE']);
+  const beforeParkReplay = await getItems(parkOrder);
+  const beforeBalloonHistory = await pointHistory(balloon.id);
+  assert.equal(beforeBalloonHistory.contracts.length, 2);
+  assert.equal((await pointHistory(snacks.id)).contracts.length, 1);
+  await db`UPDATE lot_prices SET base_price=22900 WHERE id=${snacks.price_id}`;
+  const beforeSiteReplay = await sitePoints();
+  await db.begin((tx) => tx.unsafe(sitePointsSeed));
+  assert.deepEqual(await sitePoints(), beforeSiteReplay);
+  assert.deepEqual(await getItems(parkOrder), beforeParkReplay);
+  assert.deepEqual(await pointHistory(balloon.id), beforeBalloonHistory);
+  const sandwich = deployed[0];
+  const cancellationOrder = await runSale('cancelar-sanduiche', [sandwich.id], 1491500);
+  const cancellationItems = await getItems(cancellationOrder);
+  assert.equal(await getStatus(sandwich.id), 'SALE_OPEN');
+  await cancel(cancellationOrder, cancellationItems.map(r => r.id));
+  assert.equal(await getStatus(sandwich.id), 'AVAILABLE');
+  assert.equal((await getItems(cancellationOrder))[0].contract_state, 'CANCELLED');
+  assert.deepEqual(await Promise.all([snacks,balloon,popcorn,iceCream].map(r => getStatus(r.id))),
+    ['SOLD','SOLD','AVAILABLE','AVAILABLE']);
+
+  // A prior workbook copy and a signed sale travel with the UUID when an
+  // incorrect visual/commercial parent is corrected.
+  const priorWorkbook = 'Sugestão COMERCIALIZAÇÃO PONTOS ALIMENTAÇÃO fenasoja 2028 - resumido (7).xlsx'.normalize('NFD');
+  const [viaSorbetEntity] = await db`INSERT INTO map_entities
+    (project_id,layer_id,parent_entity_id,public_identifier,name,classification,is_sellable,metadata)
+    SELECT project_id,layer_id,id,'GAST-LEGADO-J11','VIA EXPRESSA - ponto 1 - SORVETE','FOOD_POINT',true,
+      '{"gastronomyMarkerPosition":[-13.85,0.064,5.4]}' FROM map_entities WHERE public_identifier='CALCADA-ARVOREDO' RETURNING id`;
+  const [viaSorbet] = await db`INSERT INTO commercial_lots
+    (project_id,entity_id,public_identifier,display_name,commercial_unit,unit_quantity,display_order,food_type,price_source)
+    VALUES (${project},${viaSorbetEntity.id},'GAST-LEGADO-J11','VIA EXPRESSA - ponto 1 - SORVETE','FOOD_POINT',1,1,'Sorvete',${db.json({
+      workbook: priorWorkbook, sheet: 'Plan1', cell: 'J11', sourceNumber: 9, originalLabel: 'VIA EXPRESSA - ponto 1 - SORVETE',
+      originalCategory: 'SORVETE', exercise: 2028, initialTotal: 10680,
+    })}) RETURNING id`;
+  await db`INSERT INTO lot_prices(lot_id,pricing_mode,base_price,is_active) VALUES (${viaSorbet.id},'FIXED_TOTAL',10999,true)`;
+  await db`UPDATE map_entities SET parent_entity_id=(SELECT id FROM map_entities WHERE public_identifier='D3')
+    WHERE id=${crioulos.entity_id}`;
+  await db`UPDATE commercial_lots SET price_source=jsonb_set(price_source,'{workbook}',to_jsonb(${priorWorkbook}::text)) WHERE id=${crioulos.id}`;
+  const correctionOrder = await runSale('origens-a-corrigir', [viaSorbet.id,crioulos.id], 3410600);
+  const correctionItems = await getItems(correctionOrder);
+  await confirm(correctionOrder, correctionItems.map(r => r.id));
+  const correctionDoc = org + '/orders/' + correctionOrder + '/origens.pdf';
+  await db`INSERT INTO storage.objects (bucket_id,name,owner_id) VALUES ('map-contracts',${correctionDoc},${seller})`;
+  await asUser(seller, tx => tx`SELECT attach_order_contract(${correctionOrder},${tx.array([viaSorbet.id,crioulos.id])}::uuid[],
+    ${correctionDoc},'origens.pdf','application/pdf',1024,'ORIGENS-QA')`);
+  const beforeCorrection = await getItems(correctionOrder);
+  const beforeCorrectionHistory = await pointHistory(viaSorbet.id);
+  await db.begin((tx) => tx.unsafe(sitePointsSeed));
+  assert.deepEqual(await getItems(correctionOrder), beforeCorrection);
+  assert.deepEqual(await pointHistory(viaSorbet.id), beforeCorrectionHistory);
+  assert.equal(Number((await detail(correctionOrder)).header.negotiatedTotal), 34106);
+  const [corrected] = await db`SELECT a.public_identifier AS anchor,e.metadata ? 'gastronomyMarkerPosition' AS marker,p.base_price
+    FROM map_entities e JOIN map_entities a ON a.id=e.parent_entity_id JOIN commercial_lots l ON l.entity_id=e.id
+    JOIN lot_prices p ON p.lot_id=l.id AND p.is_active WHERE l.id=${viaSorbet.id}`;
+  assert.deepEqual(corrected, { anchor: 'D2', marker: false, base_price: '10999.00' });
+  assert.equal((await sitePoints()).find(r => r.id === crioulos.id).anchor, 'D5');
+  assert.equal((await db`SELECT count(*)::int AS n FROM commercial_lots l JOIN map_entities e ON e.id=l.entity_id
+    JOIN map_entities a ON a.id=e.parent_entity_id WHERE a.public_identifier='CALCADA-ARVOREDO'`)[0].n, 1);
+  await db.begin((tx) => tx.unsafe(sitePointsSeed));
+  assert.equal((await db`SELECT count(*)::int AS n FROM lot_prices WHERE lot_id=${crioulos.id} AND is_active`)[0].n, 1);
+  console.log('Implantação PostgreSQL QA: 8 pontos, R$ 121.297,00, J12 único no Arvoredo, J11 e J31 reconciliados com histórico, pedido conjunto de R$ 25.375,00 e reaplicação OK');
 } finally {
   await db.end();
 }

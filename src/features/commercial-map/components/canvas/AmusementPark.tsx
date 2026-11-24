@@ -345,7 +345,7 @@ function FerrisWheel({ parkActive, reducedGraphics }: { parkActive: boolean; red
         <boxGeometry args={[0.11, 1.55, 0.13]} />
         <meshStandardMaterial color="#d8d6c9" metalness={0.65} roughness={0.32} />
       </mesh>
-      <group ref={wheel} position={[0, 1.51, 0]}>
+      <group ref={wheel} name="amusement-park-ferris-wheel" position={[0, 1.51, 0]}>
         <mesh castShadow>
           <torusGeometry args={[1.05, 0.055, 8, reducedGraphics ? 24 : 48]} />
           <meshStandardMaterial color="#f0eee3" metalness={0.56} roughness={0.35} />

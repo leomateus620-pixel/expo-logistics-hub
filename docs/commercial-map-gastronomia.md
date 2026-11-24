@@ -50,6 +50,63 @@ Depois da publicação, abra o mapa com `map.view`, confirme a ficha de C2 e abr
 
 A [migration da ampliação](../supabase/migrations/20261116180000_commercial_gastronomy_via_expressa_chopp.sql) reutiliza D2 e cria a geometria vigente do caminhão antes dos pontos. Gere o SQL para registrar a versão e seu SHA-256 pelo `query_database` do mesmo projeto Lovable com `node scripts/gastronomy/migration-envelope.mjs --via-expressa-chopp`. O ensaio pelo conector conferiu os preços nas duas etapas e a elegibilidade dos 12 pontos e reverteu a transação. O inventário comercial continuou com 12 pontos em 6 estruturas. Com a carga aplicada a esse inventário, a tabela inicial passa a R$ 566.721,00 em 24 pontos de 8 estruturas.
 
+## Pontos individuais no parque e no entorno
+
+A carga de 24/11/2026 acrescentou oito unidades com preço fixo nas duas etapas da comercialização de 2028. A coluna A identifica a origem e a coluna J fornece o preço fechado. O rótulo e a categoria originais permanecem em `price_source`. A categoria de Balão está vazia em B13. Os nomes da coluna Empresa são referências da planilha. O comprador exibido vem dos dados do fluxo comercial.
+
+No filtro **Gastronomia**, a borda dourada identifica os emblemas de ponto individual. Clique ou toque no emblema para abrir a ficha com a unidade correspondente expandida. No modo **Vendas**, a inclusão no carrinho é feita pela ficha. O clique direto no brinquedo continua iniciando a atração. As fichas do parque mantêm os brinquedos parados durante a consulta diurna. Na Dashboard, cada linha possui **Localizar no mapa**.
+
+Os três emblemas do Parque de Diversões ficam do lado interno da divisa com a Rua Buenos Aires. O morango fica na calçada junto à face externa de B1, o sanduíche na entrada do corredor entre B3 e B4, Balão na faixa ao lado da Alameda, e J12 na faixa livre da Calçada do Arvoredo. O emblema de J31 acompanha a cumeeira do Núcleo D5. A busca encontra J31 por **Cavalo Crioulo** e **Primus**.
+
+### Ativação e conferência
+
+A versão `20261124190000` foi aplicada ao projeto **Fenasoja Log** pelo Lovable após ensaio com reversão. O histórico registra o SHA-256 `bfe3bc889f92cef96911afff5646978cea604640c2fd7f0fbe48e8ccb65cb66a`. O inventário de tabela passou de 24 pontos e R$ 566.721,00 para 32 pontos e R$ 688.018,00. [Projeto no Lovable](https://lovable.dev/projects/756eeb64-0d44-4171-b445-f8a60f0492c0)
+
+| Nº · célula | Código | Estrutura | Preço fechado 2028 |
+| --- | --- | --- | ---: |
+| 8 · J10 | `GAST-B3-01` | Corredor P12/P8 | R$ 14.915,00 |
+| 10 · J12 | `GAST-ARVOREDO-02` | Calçada do Arvoredo | R$ 10.680,00 |
+| 11 · J13 | `GAST-D1-03` | Lateral da Alameda Gastronômica | R$ 2.815,00 |
+| 23 · J25 | `GAST-B1-01` | Lateral do Pavilhão 1 | R$ 17.500,00 |
+| 29 · J31 | `GAST-D5-01` | Núcleo dos Criadores de Cavalos Crioulos | R$ 23.107,00 |
+| 33 · J35 | `GAST-J-01` | Parque de Diversões | R$ 19.040,00 |
+| 34 · J36 | `GAST-J-02` | Parque de Diversões | R$ 22.560,00 |
+| 35 · J37 | `GAST-J-03` | Parque de Diversões | R$ 10.680,00 |
+| **8 pontos** | | | **R$ 121.297,00** |
+
+J12 é a única unidade do Arvoredo. J11 pertence à Via Expressa e pode ser reconciliado para D2 quando a origem comprovar um vínculo prévio incorreto. J14 é o Crepes de D2 e tem origem e UUID próprios. A consulta de auditoria retorna o inventário por estrutura e situação, os preços e os vínculos comerciais por unidade. [Migration](../supabase/migrations/20261124190000_commercial_gastronomy_site_points.sql) · [Consulta de auditoria](../scripts/gastronomy/site-points-audit.sql)
+
+O Financeiro 2028 recebe a mesma classificação de Gastronomia e a tabela vigente. As Simulações comparam vendas em carteira, confirmadas ou recebimentos alocados com as três metas oficiais. [Simulações financeiras](financial-scenarios/README.md)
+
+### Evidências da implantação
+
+Prévia local em Chromium com cartografia oficial e PostgreSQL descartável `gastronomy_qa`. A regressão usa eventos reais de mouse e toque no Canvas e confere o UUID expandido, o preço e a situação da roda-gigante, além da preservação da câmera ao fechar a ficha, orbitagem, zoom e pinça. O mapa publicado recebe a interface pelo fluxo de merge e publicação da Fenasoja.
+
+| Local | Planta | Oblíqua |
+| --- | --- | --- |
+| Parque de Diversões | [Planta](evidence/gastronomia/site-points/parque-planta.jpg) | [Oblíqua](evidence/gastronomia/site-points/parque-obliqua.jpg) |
+| Pavilhão 1 | [Planta](evidence/gastronomia/site-points/pavilhao-1-planta.jpg) | [Oblíqua](evidence/gastronomia/site-points/pavilhao-1-obliqua.jpg) |
+| Corredor P12/P8 | [Planta](evidence/gastronomia/site-points/corredor-p12-p8-planta.jpg) | [Oblíqua](evidence/gastronomia/site-points/corredor-p12-p8-obliqua.jpg) |
+| Lateral da Alameda | [Planta](evidence/gastronomia/site-points/alameda-planta.jpg) | [Oblíqua](evidence/gastronomia/site-points/alameda-obliqua.jpg) |
+| Calçada do Arvoredo | [Planta](evidence/gastronomia/site-points/arvoredo-planta.jpg) | [Oblíqua](evidence/gastronomia/site-points/arvoredo-obliqua.jpg) |
+| Cavalo Crioulo | [Planta](evidence/gastronomia/site-points/cavalo-crioulo-planta.jpg) | [Oblíqua](evidence/gastronomia/site-points/cavalo-crioulo-obliqua.jpg) |
+
+[Visão geral com Gastronomia em destaque](evidence/gastronomia/site-points/gastronomia-destaque.jpg) · [Parque no celular](evidence/gastronomia/site-points/parque-ficha-celular.jpg) · [Parque à noite com gráficos reduzidos](evidence/gastronomia/site-points/parque-noturno-reduzido-celular.jpg) · [Ficha do Cavalo Crioulo no celular](evidence/gastronomia/site-points/cavalo-crioulo-ficha-celular.jpg) · [Arvoredo na Dashboard](evidence/gastronomia/site-points/dashboard-arvoredo.jpg)
+
+Para reproduzir as capturas e a regressão no mapa, prepare o banco e abra o servidor da prévia. `PLAYWRIGHT_PATH` permite indicar uma instalação de Playwright fora do repositório.
+
+```sh
+node scripts/gastronomy/setup-database.mjs --via-expressa-chopp --site-points
+npx vite --config scripts/gastronomy/review.vite.config.ts
+node scripts/gastronomy/site-points-browser-qa.mjs
+```
+
+No PostgreSQL descartável, `database-qa.mjs` também confirmou 20 pontos e R$ 507.838,00 na base com a carga inicial. Testou colisão com reversão integral, preços reajustados, correção de J11 e J31 com venda e documento, reaplicação após assinatura, contrato por ponto e por cobertura explícita e cancelamento de venda em aberto. O pedido conjunto de Lanches/Bebidas e Balão totalizou R$ 25.375,00 em duas unidades. Os outros dois pontos do Parque permaneceram disponíveis.
+
+Execute `node scripts/gastronomy/site-points-browser-qa.mjs --venda` na prévia com um banco recém-preparado para reproduzir o checkout, assinatura, anexação e abertura do PDF após recarregar. [Pedido de teste confirmado](evidence/gastronomia/site-points/contratos-do-pedido.jpg) · [Ficha após recarga](evidence/gastronomia/site-points/contratos-balao-apos-recarga.jpg)
+
+A suíte integral retornou 87 falhas que também ocorrem em `main` no commit `4069966b`, com a mesma lista de testes. As suítes de Gastronomia, seleção, precificação de pontos, indicadores, vendas e contratos relacionadas à carga passaram.
+
 ## Validação reproduzível
 
 O cenário local usa um PostgreSQL descartável em `127.0.0.1:55438` com usuário `postgres` e permissão de criar bancos. A preparação recria `gastronomy_qa`, com identidades e pedidos sintéticos.

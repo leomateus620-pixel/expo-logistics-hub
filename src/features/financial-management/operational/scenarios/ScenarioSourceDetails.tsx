@@ -18,6 +18,7 @@ export const sourceLabels: Record<string, string> = {
   commercial: "Itens comerciais",
   commercial_fees: "Taxas a conciliar",
   commercial_legacy: "Legado sem comprovação",
+  commercial_cash: "Recebimentos de parcelas comerciais",
   manual: "Receitas manuais",
   sponsorship: "Patrocínios",
   expense: "Despesas",
@@ -36,6 +37,7 @@ export const issueLabels: Record<string, string> = {
   INTERIOR_WITHOUT_PARENT: "Interior sem vínculo de pavilhão",
   BLOCK_CONFLICT: "Quadra divergente",
   SEGMENT_MISSING: "Segmento ausente",
+  FOOD_POINT_SCOPE_INVALID: "Vínculo do ponto com Gastronomia pendente",
   UNCLASSIFIED: "Categoria não comprovada",
 };
 const stageLabels: Record<string, string> = {
@@ -58,6 +60,7 @@ export function ScenarioSourceDetails({
   onClose: () => void;
 }) {
   const row = category ? data.currentByCategory[category] : null;
+  const food = category === "food_points" ? data.foodPointInventory : undefined;
   const hasCommercial =
     Boolean(row?.composition.some((c) => c.source.startsWith("commercial"))) ||
     BigInt(row?.commercialPortfolioCents ?? "0") !== 0n;
@@ -95,6 +98,11 @@ export function ScenarioSourceDetails({
                 <dd>{money(row.amountCents)}</dd>
               </div>
             </dl>
+            {food && <dl className="fsc-detail-totals" aria-label="Inventário de alimentação no mapa">
+              <div><dt>Pontos com preço de tabela</dt><dd>{food.pricedUnits} de {food.units}</dd></div>
+              <div><dt>Tabela de Renovação</dt><dd>{money(food.tableCents)}</dd></div>
+              <div><dt>{food.availableUnits} disponíveis em tabela</dt><dd>{money(food.availableTableCents)}</dd></div>
+            </dl>}
             {row.composition.length === 0 ? (
               <p>Fonte preparada, sem registros elegíveis nesta base.</p>
             ) : (

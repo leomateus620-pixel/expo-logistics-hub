@@ -635,6 +635,90 @@ try {
       before.totals.revenueCents,
     );
   });
+  await test("food units keep the scenario targets, contribute live sales once and cash only from allocated movements", async () => {
+    await db.unsafe(`
+      ALTER TABLE public.commercial_lots ADD COLUMN commercial_unit text DEFAULT 'SQUARE_METER' NOT NULL;
+      CREATE TABLE public.commercial_lot_pricing_2028 (
+        lot_id uuid PRIMARY KEY, entity_id uuid NOT NULL, renovacao_total numeric, resolution_status text NOT NULL
+      );
+    `);
+    const [segment] = await db`INSERT INTO map_segments(project_id,slug) VALUES(${project},'gastronomia') RETURNING id`;
+    const makeFood = async (item, listPrice) => {
+      await db`UPDATE map_entities SET classification='FOOD_POINT',segment_id=${segment.id} WHERE id=${item.ent}`;
+      await db`UPDATE commercial_lots SET commercial_unit='FOOD_POINT',official_area_sqm=NULL WHERE id=${item.lot}`;
+      await db`INSERT INTO commercial_lot_pricing_2028 VALUES(${item.lot},${item.ent},${listPrice},'OK')`;
+    };
+    const source = (await fs.readFile("supabase/migrations/20261124191500_financial_scenario_food_points.sql", "utf8"))
+      .replace(/^BEGIN;\s*/, "").replace(/COMMIT;\s*$/, "");
+    const oldSnapshots = await db`SELECT count(*) AS n FROM financial_scenario_observations`;
+    await db.begin(tx => tx.unsafe(source));
+    assert.deepEqual(await db`SELECT count(*) AS n FROM financial_scenario_observations`, oldSnapshots);
+    const before = await overview(), confirmedBefore = await overview("confirmed"), cashBefore = await overview("cash");
+    assert.equal(before.calculationVersion, "2028.2");
+    assert.deepEqual(before.history, []);
+    assert.deepEqual(before.scenarios.map(s => s.targets.food_points), ["36000000", "45000000", "50000000"]);
+    const food = row => BigInt(row.currentByCategory.food_points.amountCents);
+    const [availableEntity] = await db`INSERT INTO map_entities(project_id,public_identifier,classification,segment_id)
+      VALUES(${project},'QA-ARVOREDO','FOOD_POINT',${segment.id}) RETURNING id AS ent`;
+    const [availableLot] = await db`INSERT INTO commercial_lots(project_id,entity_id,public_identifier,display_name)
+      VALUES(${project},${availableEntity.ent},'QA-ARVOREDO','Arvoredo sintético') RETURNING id AS lot`;
+    await makeFood({ ...availableEntity, ...availableLot }, 10680);
+    assert.equal(food(await overview()), food(before));
+
+    const sale = await order([2256000, 281500], 0, { signed: [false, false] });
+    await makeFood(sale.items[0], 22560);
+    await makeFood(sale.items[1], 2815);
+    const pending = await overview();
+    assert.equal(food(pending) - food(before), 2537500n);
+    assert.equal(pending.currentByCategory.pavilion_ics.amountCents, before.currentByCategory.pavilion_ics.amountCents);
+    assert.equal(food(await overview("confirmed")), food(confirmedBefore));
+    assert.deepEqual(pending.foodPointInventory, {
+      units: 3, pricedUnits: 3, availableUnits: 1, tableCents: "3605500", availableTableCents: "1068000",
+    });
+    await db.begin(async (tx) => {
+      await tx`UPDATE lot_sale_order_items SET contract_state='SIGNED' WHERE order_id=${sale.id}`;
+      await tx`UPDATE lot_sales SET status='CONFIRMED' WHERE id=ANY(${tx.array(sale.items.map(item => item.sale))}::uuid[])`;
+      await tx`UPDATE commercial_lots SET status='SOLD' WHERE id=ANY(${tx.array(sale.items.map(item => item.lot))}::uuid[])`;
+    });
+    assert.equal(food(await overview("confirmed")) - food(confirmedBefore), 2537500n);
+    assert.equal(food(await overview()), food(pending));
+
+    const [installment] = await db`INSERT INTO lot_sale_installments(order_id,installment_number,due_date,amount,payment_status)
+      VALUES(${sale.id},1,'2028-01-01',25375,'PAID') RETURNING id`;
+    assert.equal(food(await overview("cash")), food(cashBefore));
+    const receive = async (installmentId, obligationCents, receiptCents) => {
+      await db`SELECT financial_sync_source_obligation(${org},${edition},'receber','parcela_comercial',
+        ${installmentId},'Parcela de teste',${obligationCents},'2028-01-01',true,${actor})`;
+      const [obligation] = await db`SELECT id FROM financial_obligations WHERE source_type='parcela_comercial' AND source_id=${installmentId}`;
+      return rpc("financial_record_movement", [
+        org, { edition_id: edition, kind: "recebimento", direction: "entrada", amount_cents: receiptCents,
+          occurred_on: "2026-10-22", method: "pix" },
+        [{ obligation_id: obligation.id, amount_cents: receiptCents }], crypto.randomUUID(),
+      ]);
+    };
+    const paid = await receive(installment.id, 2537500, 150001);
+    const allocated = await overview("cash");
+    assert.equal(food(allocated) - food(cashBefore), 150001n);
+    assert.equal(allocated.totals.otherRevenueCents, cashBefore.totals.otherRevenueCents);
+    await rpc("financial_reverse_movement", [org, paid.id, "Estorno fictício de Gastronomia", "2026-10-22", crypto.randomUUID()]);
+    assert.equal(food(await overview("cash")), food(cashBefore));
+
+    const mixed = await order([200,100]);
+    await makeFood(mixed.items[0], 2);
+    const [mixedInstallment] = await db`INSERT INTO lot_sale_installments(order_id,installment_number,due_date,amount)
+      VALUES(${mixed.id},1,'2028-01-01',3) RETURNING id`;
+    await receive(mixedInstallment.id, 300, 101);
+    const mixedCash = await overview("cash");
+    assert.equal(food(mixedCash) - food(cashBefore), 67n);
+    assert.equal(BigInt(mixedCash.totals.otherRevenueCents) - BigInt(cashBefore.totals.otherRevenueCents), 34n);
+    assert.equal(BigInt(mixedCash.totals.revenueCents) - BigInt(cashBefore.totals.revenueCents), 101n);
+
+    await db`UPDATE map_entities SET parent_entity_id=NULL WHERE id=${sale.items[0].ent}`;
+    assert.equal(food(await overview("confirmed")) - food(confirmedBefore), 2537700n);
+    assert.equal((await db`SELECT has_function_privilege('authenticated','public._financial_scenario_food_inventory(uuid)','EXECUTE') AS p`)[0].p, false);
+    await db.begin(tx => tx.unsafe(source));
+    assert.deepEqual((await overview()).scenarios, before.scenarios);
+  });
   // Richer synthetic-only review state: above-target revenue and over-budget spending are distinct.
   await order([200000000, 20000000, 90000000, 85000000, 19000000], 12345, {
     signed: [true, false, true, true, true],

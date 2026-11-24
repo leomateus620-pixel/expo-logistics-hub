@@ -4,11 +4,13 @@ import * as THREE from 'three';
 import { COMMERCIAL_MAP_OBSTRUCTION_SELECTOR } from '../../utils/contextualViewport';
 import { isCommercialMapPresentationVisible } from '../../utils/frameActivity';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { registerGastronomyMarkerPicking } from './commercialMapEvents';
 
 export interface GastronomyMarkerAnchor {
   id: string;
-  /** Rendered roof position in map world coordinates. */
+  /** Beam base in map world coordinates. */
   position: [number, number, number];
+  point?: boolean;
 }
 
 interface GastronomyStructureMarkersProps {
@@ -19,11 +21,13 @@ interface GastronomyStructureMarkersProps {
   reducedGraphics: boolean;
   limitedAnimation?: boolean;
   night: boolean;
+  onSelectPoint: (id: string) => void;
 }
 
 const FACE_URL = `${import.meta.env.BASE_URL}maps/gastronomy-marker.webp`;
 const FACE_DIAMETER = 220 / 256;
 const BOB_PERIOD_SECONDS = 4.2;
+const FOCUSED_POINT_RADIUS = 0.58;
 const NO_RAYCAST = () => undefined;
 const OBSTRUCTIONS = `${COMMERCIAL_MAP_OBSTRUCTION_SELECTOR}, .commercial-map-toolbar--desktop, .commercial-map-toolbar-mobile`;
 const { clamp, lerp, smoothstep } = THREE.MathUtils;
@@ -67,6 +71,9 @@ function createMarkerResources() {
   const face = new THREE.PlaneGeometry(1 / FACE_DIAMETER, 1 / FACE_DIAMETER);
   face.translate(0, 0, 0.108);
   const faceMaterial = new THREE.MeshBasicMaterial({ alphaTest: 0.32, toneMapped: false, fog: false });
+  const rim = new THREE.RingGeometry(0.49, FOCUSED_POINT_RADIUS, 32);
+  rim.translate(0, 0, 0.109);
+  const rimMaterial = new THREE.MeshBasicMaterial({ color: '#ffd78a', toneMapped: false, fog: false });
   const beam = new THREE.PlaneGeometry(1, 1);
   beam.translate(0, 0.5, 0);
   const beamMaterial = new THREE.ShaderMaterial({
@@ -106,7 +113,7 @@ function createMarkerResources() {
       }
     `,
   });
-  return { body, bodyMaterial, face, faceMaterial, beam, beamMaterial };
+  return { body, bodyMaterial, face, faceMaterial, rim, rimMaterial, beam, beamMaterial };
 }
 
 function markerBatch(geometry: THREE.BufferGeometry, material: THREE.Material, count: number, name: string) {
@@ -140,6 +147,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
   reducedGraphics,
   limitedAnimation = false,
   night,
+  onSelectPoint,
 }: GastronomyStructureMarkersProps) {
   const gl = useThree(state => state.gl);
   const size = useThree(state => state.size);
@@ -150,13 +158,15 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
   const batches = useMemo(() => {
     const body = markerBatch(resources.body, resources.bodyMaterial, capacity, 'gastronomy-emblem-body');
     const face = markerBatch(resources.face, resources.faceMaterial, capacity, 'gastronomy-emblem-face');
+    const rim = markerBatch(resources.rim, resources.rimMaterial, capacity, 'gastronomy-emblem-highlight');
     const beam = markerBatch(resources.beam, resources.beamMaterial, capacity, 'gastronomy-marker-beam');
     beam.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(capacity * 3), 3);
     beam.instanceColor.setUsage(THREE.DynamicDrawUsage);
-    return { body, face, beam };
+    return { body, face, rim, beam };
   }, [capacity, resources]);
-  const markers = useMemo(() => anchors.map(({ id, position }) => ({
+  const markers = useMemo(() => anchors.map(({ id, position, point }) => ({
     id,
+    point,
     roof: new THREE.Vector3(...position),
     center: new THREE.Vector3(),
     phase: markerPhase(id),
@@ -169,7 +179,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
     animated: false,
     visible: false,
   })), [anchors]);
-  const diagnostics = useMemo(() => ({ presentationOnly: true, anchors, visibleIds: [] as string[] }), [anchors]);
+  const diagnostics = useMemo(() => ({ anchors, visibleIds: [] as string[] }), [anchors]);
   const textureReady = useRef(false);
   const obstructions = useRef<ScreenRect[] | null>(null);
   const motion = useRef({ time: 0, lastAt: 0, timer: 0, active: false });
@@ -226,6 +236,29 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
     window.addEventListener('commercial-map-panel-resize', refresh);
     return () => window.removeEventListener('commercial-map-panel-resize', refresh);
   }, [capacity, invalidate, size.width, size.height, selectedId]);
+
+  useLayoutEffect(() => {
+    if (!markers.some(({ point }) => point)) return;
+    return registerGastronomyMarkerPicking(gl.domElement, {
+      hit(clientX, clientY) {
+        const rect = gl.domElement.getBoundingClientRect();
+        if (!rect.width || !rect.height) return null;
+        const x = (clientX - rect.left) * size.width / rect.width;
+        const y = (clientY - rect.top) * size.height / rect.height;
+        let nearest: string | null = null;
+        let distance = Infinity;
+        for (const marker of markers) {
+          if (!marker.point || !marker.visible) continue;
+          const separation = Math.hypot(x - marker.screenX, y - marker.screenY);
+          if (separation > Math.max(11, marker.radiusPx * marker.scale) || separation >= distance) continue;
+          nearest = marker.id;
+          distance = separation;
+        }
+        return nearest;
+      },
+      select: onSelectPoint,
+    });
+  }, [gl, markers, onSelectPoint, size.width, size.height]);
 
   useLayoutEffect(() => {
     resources.beamMaterial.uniforms.intensity.value = reducedGraphics
@@ -293,7 +326,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
       projected.copy(marker.center).project(camera);
       const x = (projected.x + 1) * size.width * 0.5;
       const y = (1 - projected.y) * size.height * 0.5;
-      const radius = diameter * pxPerUnit * 0.5;
+      const radius = diameter * pxPerUnit * (focused && marker.point ? FOCUSED_POINT_RADIUS : 0.5);
       if (projected.z < -1 || projected.z > 1 || x + radius < 0 || y + radius < 0
         || x - radius > size.width || y - radius > size.height) continue;
       if (panels.some(rect => x + radius > rect.left && x - radius < rect.right
@@ -308,7 +341,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
     }
 
     // Shrink converging icons in place. At an almost identical projection the
-    // foreground (or selected) building has priority until the camera separates them.
+    // foreground (or selected) emblem has priority until the camera separates them.
     for (let index = 0; index < markers.length; index++) {
       const marker = markers[index];
       if (!marker.visible) continue;
@@ -319,7 +352,9 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
         const scale = (separation - 2) / (marker.radiusPx + other.radiusPx);
         if (scale >= 1) continue;
         if (scale < 0.42) {
-          const keepMarker = marker.id === selectedId || (other.id !== selectedId && marker.depth <= other.depth);
+          const emphasizePoint = focused && Boolean(marker.point) !== Boolean(other.point);
+          const keepMarker = marker.id === selectedId || (other.id !== selectedId
+            && (emphasizePoint ? Boolean(marker.point) : marker.depth <= other.depth));
           if (keepMarker) other.visible = false;
           else { marker.visible = false; break; }
         } else {
@@ -330,6 +365,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
     }
 
     let emblemCount = 0;
+    let rimCount = 0;
     let beamCount = 0;
     let animateNext = false;
     for (const marker of markers) {
@@ -349,10 +385,12 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
       transform.updateMatrix();
       batches.body.setMatrixAt(emblemCount, transform.matrix);
       batches.face.setMatrixAt(emblemCount, transform.matrix);
+      if (focused && marker.point) batches.rim.setMatrixAt(rimCount++, transform.matrix);
       diagnostics.visibleIds[emblemCount++] = marker.id;
       animateNext ||= marker.animated;
 
-      const strength = (selectedId === marker.id ? 0.55 : 1) * (1 - smoothstep(cameraTop, 0.89, 0.99));
+      const strength = (selectedId === marker.id ? 0.55 : focused && marker.point ? 1.18 : 1)
+        * (1 - smoothstep(cameraTop, 0.89, 0.99));
       if (strength < 0.03) continue;
       transform.position.copy(marker.roof);
       transform.rotation.set(0, yaw, 0);
@@ -368,13 +406,16 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
     diagnostics.visibleIds.length = emblemCount;
     batches.body.count = emblemCount;
     batches.face.count = emblemCount;
+    batches.rim.count = rimCount;
     batches.beam.count = beamCount;
     batches.body.visible = batches.face.visible = emblemCount > 0;
+    batches.rim.visible = rimCount > 0;
     batches.beam.visible = beamCount > 0;
     if (emblemCount > 0) {
       batches.body.instanceMatrix.needsUpdate = true;
       batches.face.instanceMatrix.needsUpdate = true;
     }
+    if (rimCount > 0) batches.rim.instanceMatrix.needsUpdate = true;
     if (beamCount > 0) {
       batches.beam.instanceMatrix.needsUpdate = true;
       batches.beam.instanceColor!.needsUpdate = true;
@@ -398,6 +439,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
     <group name="gastronomy-structure-markers" userData={diagnostics}>
       <primitive object={batches.body} />
       <primitive object={batches.face} />
+      <primitive object={batches.rim} />
       <primitive object={batches.beam} />
     </group>
   );

@@ -20,6 +20,7 @@ try {
     ["20261022090000", "financial_live_scenarios"],
     ["20261022093000", "financial_scenario_projection_hardening"],
     ["20261022100000", "financial_scenario_cash_contract"],
+    ["20261124191500", "financial_scenario_food_points"],
   ]) {
     const source = await fs.readFile(
       `supabase/migrations/${version}_${name}.sql`,

@@ -12,6 +12,8 @@ import { CHOPP_TRUCK_IDENTIFIER, choppTruckRoofAnchor, withChoppTruckReference }
 import { strategicLandmarkBounds, strategicLandmarkFacingRadians, strategicLandmarkVisualHeight } from '@/features/commercial-map/utils/landmarks';
 import type { LotPricing2028 } from '@/features/commercial-map/utils/lotPricing2028';
 import { createViaExpressaLayout, viaExpressaModelBounds } from '@/features/commercial-map/utils/viaExpressa';
+import { buildEntityExplorerIndex, filterAndSortEntityExplorerItems } from '@/features/commercial-map/utils/entityExplorer';
+import { resolveSaleInspection } from '@/features/commercial-map/utils/saleInspectionGroups';
 import { withDashboardValue } from './helpers/dashboardFinancialFixture';
 
 function selection(id: string): SalesSelectionEntry {
@@ -103,6 +105,34 @@ describe('Gastronomia no Mapa Comercial', () => {
     expect(snapshot.unclassifiedLots).toBe(0);
     expect(snapshot.gastronomyStructures.map(({ structure, totalKnownValue }) => [structure.publicIdentifier, totalKnownValue]))
       .toEqual([['C1', 85107], ['C2', 32357]]);
+  });
+
+  it('localiza J31 pelo nome e pela origem, e enquadra o mesmo UUID sobre o telhado de D5', () => {
+    const d5 = OFFICIAL_REFERENCE_ENTITIES.find(({ publicIdentifier }) => publicIdentifier === 'D5')!;
+    const entity: MapEntity = {
+      ...d5, id: 'food-entity-d5', publicIdentifier: 'GAST-D5-01',
+      name: 'Cavalo Crioulo – Ponto de Alimentação', classification: 'FOOD_POINT',
+      geometry: { ...d5.geometry, coordinates: [] }, parentEntityId: d5.id, isSellable: true,
+      segmentSource: 'database', segmentId: 'gastronomia',
+      metadata: { gastronomyMarkerPosition: 'structure-roof', searchKeywords: ['PRIMUS / NCCCrioulos'] },
+    };
+    const lot: CommercialLot = {
+      ...OFFICIAL_REFERENCE_LOTS[0], id: 'food-lot-d5', entityId: entity.id,
+      publicIdentifier: entity.publicIdentifier, displayName: entity.name, status: 'AVAILABLE',
+      officialAreaSqm: null, commercialUnit: 'FOOD_POINT', unitQuantity: 1, foodType: 'Hamburger, Bifê',
+    };
+    const entities = [d5, entity];
+    const index = buildEntityExplorerIndex(entities, [lot]);
+    for (const query of ['Cavalo Crioulo', 'Primus']) {
+      expect(filterAndSortEntityExplorerItems(index, {
+        query, statusFilters: [], classificationFilters: [], locationFilter: null, verificationFilters: [], sortOrder: 'relevance',
+      }).map(row => row.entity.id)).toContain(entity.id);
+    }
+    expect(resolveGastronomyMarkerAnchor(entity, d5)).toEqual(resolveGastronomyMarkerAnchor(d5));
+    expect(resolveGastronomyMarkerAnchor(entity)).toBeNull();
+    expect(resolveSaleInspection([lot.id], [lot], entities).groups[0].spaces[0]).toMatchObject({
+      lotId: lot.id, entityId: entity.id,
+    });
   });
 
   it('apresenta o pedido aguardando assinatura como venda em aberto', () => {

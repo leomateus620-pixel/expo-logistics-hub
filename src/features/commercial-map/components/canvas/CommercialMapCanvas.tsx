@@ -69,6 +69,7 @@ import { CommercialMapPresentation } from './CommercialMapPresentation';
 import { useCommercialMapPresentationVisible } from './CommercialMapPresentationContext';
 import { GastronomyStructureMarkers, type GastronomyMarkerAnchor } from './GastronomyStructureMarkers';
 import { resolveGastronomyMarkerAnchor } from './gastronomyMarkerAnchor';
+import { gastronomyPointPosition, isGastronomyRoofPoint } from '../../utils/gastronomyPointPlacement';
 import { PavilionSalesProgressMarkers } from './PavilionSalesProgressMarkers';
 import { countPavilionSalesProgress, pavilionSalesProgressAnchor } from './pavilionSalesProgress';
 import { COMMERCIAL_MAP_PRESENTATION_EVENT, isCommercialMapPresentationVisible } from '../../utils/frameActivity';
@@ -581,6 +582,16 @@ function getSceneExtent(
   let maxHeight = 1;
 
   entities.forEach((entity) => {
+    const foodPosition = gastronomyPointPosition(entity);
+    if (foodPosition) {
+      const [x, y, z] = foodPosition;
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x);
+      minZ = Math.min(minZ, z);
+      maxZ = Math.max(maxZ, z);
+      maxHeight = Math.max(maxHeight, y + 1);
+      return;
+    }
     entity.geometry.coordinates.forEach((ring) => {
       ring.forEach(([x, z]) => {
         if (!Number.isFinite(x) || !Number.isFinite(z)) return;
@@ -3181,7 +3192,8 @@ function CameraRig({
   const queueSelection = useCallback((entity: MapEntity) => {
     setParkingControlLimits(null);
     const perspective = camera as THREE.PerspectiveCamera;
-    const entityExtent = getEntityExtent(entity, pavilion5ExteriorLift);
+    const foodPosition = gastronomyPointPosition(entity);
+    const entityExtent = foodPosition ? getSceneExtent([entity]) : getEntityExtent(entity, pavilion5ExteriorLift);
     const focusProfile = focusProfileForEntity(entity);
     const landmarkKind = resolveStrategicLandmarkKind(entity);
     const compactHeadquarters = landmarkKind === 'fenasoja-headquarters';
@@ -3205,7 +3217,7 @@ function CameraRig({
       && usableWidth < 420;
     const truck = landmarkKind === 'chopp-truck' ? resolveChoppTruckTransform(entity) : null;
     const aimHeight = entityExtent.maxHeight * (truck ? 0.48 : compactHeadquarters ? 0.45 : 0.28);
-    const entityCenter = new THREE.Vector3(
+    const entityCenter = foodPosition ? new THREE.Vector3(foodPosition[0], foodPosition[1] + 0.68, foodPosition[2]) : new THREE.Vector3(
       truck?.center[0] ?? entityExtent.centerX,
       (truck?.ground ?? entity.geometry.elevation) + aimHeight,
       truck?.center[1] ?? entityExtent.centerZ,
@@ -3243,11 +3255,12 @@ function CameraRig({
       minimumFocusDistance,
       compactHeadquarters ? aimHeight : undefined,
     );
-    const minimumSelectionDistance = truck ? CHOPP_TRUCK_SITE.minimumCameraDistance
+    const structureMinimumDistance = truck ? CHOPP_TRUCK_SITE.minimumCameraDistance
       : compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : compactHeadquarters ? 1.5 : Math.max(10, extent.diagonal * focusProfile.minDistanceRatio);
+    const structureDistance = Math.max(fittedDistance, compactStage ? LACTALIS_STAGE_LAYOUT.camera.focusedDistance : extent.diagonal * focusProfile.contextRatio);
     const fittedSelectionDistance = THREE.MathUtils.clamp(
-      Math.max(fittedDistance, compactStage ? LACTALIS_STAGE_LAYOUT.camera.focusedDistance : extent.diagonal * focusProfile.contextRatio),
-      minimumSelectionDistance,
+      foodPosition ? fittedDistance : structureDistance,
+      foodPosition ? Math.max(8, controlsMinimumDistance) : structureMinimumDistance,
       controlsMaximumDistance,
     );
     const distance = compactSidePanelMirante
@@ -3906,6 +3919,9 @@ function CameraRig({
         pendingResizeRefit.current = false;
         queueParking();
       }
+    } else if (sequenceChanged && selectedEntity && gastronomyPointPosition(selectedEntity)) {
+      // Dashboard location can clear the segment and focus a point in one update.
+      queueSelection(selectedEntity);
     } else if (presetChanged) {
       if (framingSegment) queueSegment(framingSegment, framingSegmentEntities);
       else queuePreset(preset);
@@ -5088,7 +5104,21 @@ const Scene = memo(function Scene({
       ? new Set(entities.map((entity) => entity.publicIdentifier))
       : null
   ), [entities, isolatedArea]);
-  const gastronomyStructureIds = useMemo(() => new Set(foodPointsByStructure(entities, lots).keys()), [entities, lots]);
+  const gastronomyStructures = useMemo(() => foodPointsByStructure(entities, lots), [entities, lots]);
+  const gastronomyStructureIds = useMemo(() => new Set(gastronomyStructures.keys()), [gastronomyStructures]);
+  const positionedGastronomyEntities = useMemo(() => {
+    const byId = new Map(entities.map(entity => [entity.id, entity]));
+    const positioned = new Map<string, MapEntity>();
+    for (const [id, points] of gastronomyStructures) {
+      const structure = byId.get(id);
+      for (const { entity } of points) {
+        const position = resolveGastronomyMarkerAnchor(entity, structure);
+        if (position) positioned.set(entity.id, isGastronomyRoofPoint(entity)
+          ? { ...entity, metadata: { ...entity.metadata, gastronomyMarkerPosition: position } } : entity);
+      }
+    }
+    return positioned;
+  }, [entities, gastronomyStructures]);
   // Consulta pública: o entorno é apenas contexto cartográfico. A verificação
   // acontece aqui, no único ponto por onde passam clique, toque e hover.
   const canInspectEntity = useCallback(
@@ -5107,6 +5137,12 @@ const Scene = memo(function Scene({
       && dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId), null, entities.find(entity => entity.id === entityId))) return;
     setSelectedEntityId(entityId);
   }, [canInspectEntity, entities, gastronomyStructureIds, hydrologicalModeActive, interactiveEntityIds, lots, setSelectedEntityId]);
+  const handleGastronomyPointSelect = useCallback((entityId: string) => {
+    if (isSoyHarvestCameraOwned() || isChristmasCameraOwned() || useVisitStore.getState().enabled
+      || hydrologicalModeActive || !canInspectEntity(entityId)) return;
+    // The food point sheet owns the explicit choice of what goes into a sale.
+    if (useCommercialMapStore.getState().selectedEntityId !== entityId) setSelectedEntityId(entityId);
+  }, [canInspectEntity, hydrologicalModeActive, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
     if (isSoyHarvestCameraOwned() || isChristmasCameraOwned()) return;
     if (useVisitStore.getState().enabled) return;
@@ -5161,8 +5197,9 @@ const Scene = memo(function Scene({
     );
   }, [activeSegmentId, resolvedSegmentByEntity]);
   const selectedRecord = entities.find((entity) => entity.id === selectedRecordId);
-  // Food point selection is kept in the detail panel; the scene frames its physical parent.
-  const selectedEntity = (selectedRecord?.classification === 'FOOD_POINT'
+  const positionedFoodPoint = selectedRecordId ? positionedGastronomyEntities.get(selectedRecordId) ?? null : null;
+  // A point with its own emblem does not select the landmark it belongs to.
+  const selectedEntity = positionedFoodPoint ? null : (selectedRecord?.classification === 'FOOD_POINT'
     ? entities.find((entity) => entity.id === selectedRecord.parentEntityId && gastronomyStructureIds.has(entity.id))
     : selectedRecord) ?? null;
   const selectedEntityId = selectedEntity?.id ?? null;
@@ -5269,16 +5306,32 @@ const Scene = memo(function Scene({
     || segmentOverride?.id === COMMERCIAL_MAP_SEGMENT_IDS.gastronomy;
   const gastronomyMarkerAnchors = useMemo(() => {
     const anchors: GastronomyMarkerAnchor[] = [];
-    for (const entity of structuralEntities) {
-      if (!gastronomyStructureIds.has(entity.id) || !canInspectEntity(entity.id)
-        || layerVisibility[entity.layerId] === false || (layerOpacity[entity.layerId] ?? 1) <= 0.015
-        || (entityFiltersActive && !presentedMatchingEntityIds.has(entity.id))) continue;
-      const position = resolveGastronomyMarkerAnchor(entity);
-      if (position) anchors.push({ id: entity.id, position });
+    const byId = new Map([...structuralEntities, ...circulationEntities].map(entity => [entity.id, entity]));
+    const isVisible = (entity: MapEntity) => canInspectEntity(entity.id)
+      && layerVisibility[entity.layerId] !== false && (layerOpacity[entity.layerId] ?? 1) > 0.015
+      && (!entityFiltersActive || presentedMatchingEntityIds.has(entity.id));
+    for (const [id, points] of gastronomyStructures) {
+      const structure = byId.get(id);
+      if (!structure || !isVisible(structure)) continue;
+      let needsStructureMarker = false;
+      for (const { entity } of points) {
+        const positioned = positionedGastronomyEntities.get(entity.id);
+        const position = positioned && gastronomyPointPosition(positioned);
+        if (!position) needsStructureMarker = true;
+        else if (isVisible(entity)) anchors.push({ id: entity.id, position, point: true });
+      }
+      if (needsStructureMarker) {
+        const position = resolveGastronomyMarkerAnchor(structure);
+        if (position) anchors.push({ id: structure.id, position });
+      }
     }
     return anchors;
-  }, [canInspectEntity, entityFiltersActive, gastronomyStructureIds, layerOpacity, layerVisibility,
-    presentedMatchingEntityIds, structuralEntities]);
+  }, [canInspectEntity, circulationEntities, entityFiltersActive, gastronomyStructures, layerOpacity,
+    layerVisibility, positionedGastronomyEntities, presentedMatchingEntityIds, structuralEntities]);
+  const cameraFramingEntities = useMemo(() => [
+    ...exteriorRenderedEntities,
+    ...[...positionedGastronomyEntities.values()].filter(entity => layerVisibility[entity.layerId] !== false),
+  ], [exteriorRenderedEntities, layerVisibility, positionedGastronomyEntities]);
   const showGastronomyMarkers = !publicPolicy && !interiorEntity && !visitEnabled && !hydrologicalModeActive
     && !lunarCinematicActive && !soyCinematicActive && !christmasActive && !sunriseRunning && !parkingInspectionOpen
     && (!activeSegmentId || activeSegmentId === COMMERCIAL_MAP_SEGMENT_IDS.gastronomy)
@@ -5954,9 +6007,10 @@ const Scene = memo(function Scene({
           <ExteriorGastronomyMarkers
             anchors={gastronomyMarkerAnchors}
             focused={gastronomyFocused}
-            selectedId={selectedEntityId}
+            selectedId={positionedFoodPoint?.id ?? selectedEntityId}
             night={nightAtmosphereActive}
             qualityTier={renderQualityTier}
+            onSelectPoint={handleGastronomyPointSelect}
           />
         )}
       {pavilionMarkerAnchors.length > 0 && <ExteriorPavilionMarkers
@@ -5968,13 +6022,13 @@ const Scene = memo(function Scene({
       </InteriorCameraRequestContext.Provider>
       <CameraRig
         christmasEnabled={christmasEnabled}
-        selectedEntity={selectedEntity}
+        selectedEntity={positionedFoodPoint ?? selectedEntity}
         interiorEntity={interiorEntity}
         interiorRequest={interiorCameraRequest}
         extent={extent}
         lunarTreeEntity={lunarTreeEntity}
         isolatedArea={isolatedArea}
-        exteriorRenderedEntities={exteriorRenderedEntities}
+        exteriorRenderedEntities={cameraFramingEntities}
         resolvedSegmentByEntity={resolvedSegmentByEntity}
         gastronomyStructureIds={gastronomyStructureIds}
         segmentOverride={segmentOverride}

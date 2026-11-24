@@ -257,6 +257,26 @@ describe("conditional forecasts use economic elapsed days", () => {
 });
 
 describe("focused scenario experience", () => {
+  it("shows the live food inventory alongside the same sales and the three distinct targets", () => {
+    const data = overviewSchema.parse({
+      ...fixture(),
+      foodPointInventory: {
+        units: 32, pricedUnits: 32, availableUnits: 28, tableCents: "68801800", availableTableCents: "49524700",
+      },
+    });
+    data.currentByCategory.food_points.amountCents = "19277100";
+    const props = { data, onSelect: vi.fn(), onCategory: vi.fn() };
+    const { rerender } = render(<ScenarioComparison {...props} selected="realistic" />);
+    for (const selected of ["realistic", "optimistic", "pessimistic"] as const) {
+      rerender(<ScenarioComparison {...props} selected={selected} />);
+      expect(screen.getByText("Tabela do mapa · 32 pontos")).toBeVisible();
+      expect(screen.getByText(money("68801800"))).toBeVisible();
+      expect(screen.getByRole("meter", { name: "Pontos de Alimentação" })).toHaveAttribute(
+        "aria-valuetext",
+        expect.stringContaining(`${money("19277100")} de ${money(data.scenarios.find(s => s.key === selected)!.targets.food_points)}`),
+      );
+    }
+  });
   it("renders only the selected scenario while retaining the same current money across references", () => {
     const data = fixture(),
       props = { data, onSelect: vi.fn(), onCategory: vi.fn() };
