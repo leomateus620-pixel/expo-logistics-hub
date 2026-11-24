@@ -1,5 +1,6 @@
 import type { CommercialLot, MapEntity } from '../types';
 import { resolveCommercialPavilionModuleNavigationTarget } from './pavilionModuleCommercial';
+import { hasIndividualGastronomyMarker } from './gastronomyPointPlacement';
 
 export interface SaleInspectionSpace {
   lotId: string;
@@ -55,7 +56,10 @@ export function resolveSaleInspection(
         key: `food:${structure.id}`, kind: 'gastronomy' as const, pavilionEntityId: null,
         title: `Gastronomia · ${structure.name} (${structure.publicIdentifier})`, spaces: [],
       };
-      group.spaces.push({ lotId, entityId: structure.id, label: labelFor(lot, entity), moduleId: null });
+      group.spaces.push({
+        lotId, entityId: hasIndividualGastronomyMarker(entity) ? entity.id : structure.id,
+        label: labelFor(lot, entity), moduleId: null,
+      });
       foodStructures.set(structure.id, group);
       return;
     }

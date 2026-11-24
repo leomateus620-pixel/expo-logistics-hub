@@ -6,12 +6,16 @@ export function migrationEnvelope(
   name = "financial_live_scenarios",
 ) {
   if (
-    !/^20261022(090000|093000|100000)$/.test(version) ||
+    !/^(20261022(090000|093000|100000)|20261124191500)$/.test(version) ||
     !/^financial_[a-z_]+$/.test(name)
   )
     throw Error("Unexpected migration identity");
   const delimiter = `$financial_scenarios_source_${version}$`;
   if (source.includes(delimiter)) throw Error("Unexpected migration delimiter");
+  const transactionEnd = source.startsWith("BEGIN;") && source.match(/\nCOMMIT;\s*$/)?.[0];
+  const statement = transactionEnd
+    ? `left(substr(migration_source,7),-${transactionEnd.length})`
+    : "migration_source";
   const hash = createHash("sha256").update(source).digest("hex");
   return `BEGIN;
 SET LOCAL statement_timeout='120s';
@@ -23,7 +27,7 @@ BEGIN
  IF FOUND THEN
   IF existing IS DISTINCT FROM ARRAY[migration_source] THEN RAISE EXCEPTION 'MIGRATION_SOURCE_CONFLICT'; END IF;
  ELSE
-  EXECUTE migration_source;
+  EXECUTE ${statement};
   INSERT INTO supabase_migrations.schema_migrations(version,name,statements,created_by,idempotency_key)
   VALUES('${version}','${name}',ARRAY[migration_source],
    'Codex via Lovable connector; sha256=${hash}','${version === "20261022090000" ? "financial-scenarios-2028-v1" : "financial-scenarios-" + version}');
@@ -40,6 +44,7 @@ if (
     20261022090000: "financial_live_scenarios",
     20261022093000: "financial_scenario_projection_hardening",
     20261022100000: "financial_scenario_cash_contract",
+    20261124191500: "financial_scenario_food_points",
   }[version];
   if (!name) throw Error("Unexpected migration identity");
   process.stdout.write(

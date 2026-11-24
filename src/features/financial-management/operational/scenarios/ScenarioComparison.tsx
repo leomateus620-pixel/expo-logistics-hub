@@ -37,6 +37,7 @@ export function ScenarioComparison({
   onCategory: (key: CategoryKey) => void;
 }) {
   const current = currentLabels[data.basis];
+  const food = data.foodPointInventory;
   return (
     <div className="fsc-columns">
       {data.scenarios
@@ -111,6 +112,10 @@ export function ScenarioComparison({
                       currentLabel={current}
                       status={data.currentByCategory[k].status}
                       onDetails={() => onCategory(k)}
+                      reference={k === "food_points" && food ? <>
+                        <span>Tabela do mapa · {food.units} {food.units === 1 ? "ponto" : "pontos"}</span>
+                        <b>{money(food.tableCents)}</b>
+                      </> : undefined}
                       info={
                         <>
                           <p>
@@ -120,6 +125,8 @@ export function ScenarioComparison({
                                 ? "Pavilhão físico 7, entidade B10, pelo vínculo pai persistido."
                                 : k.startsWith("sponsorship")
                                   ? "Confirmado substitui projetado. Declarado e contrapartida em bens/serviços não entram no dinheiro."
+                                  : k === "food_points"
+                                    ? "O inventário usa a tabela vigente do Mapa Comercial. A comparação da meta usa as vendas ou os recebimentos da base selecionada."
                                   : k === "parking"
                                     ? "Estrutura de classificação pronta. Antes do início da operação, sem previsão de arrecadação."
                                     : "Fonte explicitamente classificada, sem inferência pelo nome do cadastro."}

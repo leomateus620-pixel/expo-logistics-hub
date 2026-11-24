@@ -97,6 +97,7 @@ export function ScenarioMetricRow({
   status,
   onDetails,
   info,
+  reference,
   budget = false,
   Icon: CategoryIcon,
 }: {
@@ -107,6 +108,7 @@ export function ScenarioMetricRow({
   status?: "ready" | "empty" | "future" | "incomplete";
   onDetails?: () => void;
   info: ReactNode;
+  reference?: ReactNode;
   budget?: boolean;
   Icon?: LucideIcon;
 }) {
@@ -175,6 +177,7 @@ export function ScenarioMetricRow({
         <span>{currentLabel}</span>
         <strong>{money(current)}</strong>
       </div>
+      {reference && <div className="fsc-metric__reference">{reference}</div>}
       <ScenarioProgress
         label={label}
         current={current}

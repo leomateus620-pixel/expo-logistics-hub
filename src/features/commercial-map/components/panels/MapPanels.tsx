@@ -65,6 +65,7 @@ import { LotSaleHistoryCard } from '../../sales/components/LotSaleHistoryCard';
 import { SaleExhibitorIdentity } from '../../sales/components/SaleExhibitorEditDialog';
 import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 import { foodPointsByStructure } from '../../data/commercialMapSegments';
+import { gastronomyStructureSelectionId } from '../../utils/gastronomyPointPlacement';
 import { GastronomyStructurePanel } from './GastronomyStructurePanel';
 import { HeadquartersFilm } from '../HeadquartersFilm';
 
@@ -362,7 +363,8 @@ export function EntityDetailsPanel(props: EntityDetailsPanelProps) {
   const structure = entity.classification === 'FOOD_POINT'
     ? entities.find((item) => item.id === entity.parentEntityId) : entity;
   const points = structure && groups.get(structure.id);
-  if (structure && points?.length) return <GastronomyStructurePanel key={structure.id} structure={structure} points={points}
+  if (structure && points?.length && (entity.classification === 'FOOD_POINT'
+    || gastronomyStructureSelectionId(structure.id, points) === structure.id)) return <GastronomyStructurePanel key={structure.id} structure={structure} points={points}
     selectedPointId={points.find((point) => point.entity.id === entity.id)?.lot.id}
     mapData={{ entities, lots }} onEnterInterior={sceneAvailable && strategicLandmarkSupportsInterior(structure)
       ? () => enterInterior(structure.id) : undefined}
