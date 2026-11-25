@@ -269,7 +269,7 @@ function buildTerritorialScene(vegetationEnabled = true, ubiretamaPresentation?:
     ponds,
     dispose: () => {
       meshes.forEach(disposeInstancedMesh);
-      Object.values(geometries).forEach((g) => g.dispose());
+      Object.values(geometries).forEach((g) => g?.dispose());
       material.dispose();
       yardMaterial.dispose();
       ground?.dispose();

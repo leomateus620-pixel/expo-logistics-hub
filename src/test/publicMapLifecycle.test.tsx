@@ -83,6 +83,7 @@ describe('public page lifecycle', () => {
     expect(screen.getByTestId('scene')).toBe(canvas);
     expect(mocks.mount).toHaveBeenCalledTimes(1);
     expect(mocks.props.mock.calls.at(-1)?.[0].publicScenePolicy).toBe(policy);
+    expect(mocks.props.mock.calls.at(-1)?.[0].publicLotNumberInventory.lots[0]).toMatchObject({ lotNumber: '1', availability: 'SOLD' });
     expect(screen.getByRole('complementary')).toHaveTextContent('Vendido');
     expect(selectionEvents()).toBe(1);
     expect(useCommercialMapStore.getState().selectedEntityId).toBe('e-1');
@@ -184,6 +185,7 @@ describe('public page lifecycle', () => {
   });
   it('cannot show the previous link inventory while another authorized request is pending', async () => {
     page(); await screen.findByTestId('scene');
+    expect(mocks.props.mock.calls.at(-1)?.[0].publicLotNumberInventory.lots).toEqual([lot]);
     mocks.inventory.mockImplementation(() => new Promise(() => undefined));
     mocks.context.mockImplementation(() => new Promise(() => undefined));
     fireEvent.click(screen.getByRole('button', { name:'Outro link' }));
@@ -237,6 +239,7 @@ describe('direct pavilion inspection without leaving the interior', () => {
     mocks.inventory.mockResolvedValue(data);
     page(area.slug);await screen.findByTestId('scene');
     expect(mocks.props.mock.calls.at(-1)?.[0].publicCompanyGroups).toBeUndefined();
+    expect(mocks.props.mock.calls.at(-1)?.[0].publicLotNumberInventory).toBeUndefined();
     expect(mocks.context).not.toHaveBeenCalled();
     expect(useCommercialMapStore.getState().interiorEntityId).toBe(parent.id);
     act(()=>useCommercialMapStore.getState().requestInteriorView(parent.id,'horizontal'));

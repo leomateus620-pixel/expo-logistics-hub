@@ -3,6 +3,7 @@ import type { RootState } from '@react-three/fiber';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PublicSoldCompanyLabels } from '@/features/commercial-map/components/canvas/PublicSoldCompanyLabels';
+import { PublicMapLabelLayout } from '@/features/commercial-map/components/canvas/publicMapLabelLayout';
 import { OFFICIAL_REFERENCE_ENTITIES } from '@/features/commercial-map/data/officialReference2026';
 import { preparePublicSoldCompanyGeometry } from '@/features/commercial-map/public/publicSoldCompanyGeometry';
 
@@ -24,14 +25,15 @@ const groups = preparePublicSoldCompanyGeometry([{ key: 'p-grid', tradeName: 'FO
 const [centerX, centerZ] = groups[0].components[0].fitCandidates[0].anchor;
 const paintedCaptions: string[][] = [];
 
-function frame(pixelsPerUnit: number, cameraOffset = 0) {
+function frame(pixelsPerUnit: number, cameraOffset = 0, layout?: PublicMapLabelLayout) {
   const { width, height } = runtime.state.size;
   const halfWidth = width / (2 * pixelsPerUnit), halfHeight = height / (2 * pixelsPerUnit);
   const camera = new THREE.OrthographicCamera(-halfWidth, halfWidth, halfHeight, -halfHeight, .1, 100);
   camera.position.set(centerX + cameraOffset, 40, centerZ);
   camera.up.set(0, 0, -1);
   camera.lookAt(centerX + cameraOffset, 0, centerZ);
-  runtime.renderFrame?.({ camera, size: { width, height, left: 0, top: 0 } });
+  if (layout) layout.update(camera, width, height);
+  else runtime.renderFrame?.({ camera, size: { width, height, left: 0, top: 0 } });
 }
 
 beforeEach(() => {
@@ -79,5 +81,23 @@ describe('projected public sold company captions', () => {
 
     frame(13.6, 75);
     expect(visible().some(Boolean)).toBe(false);
+  });
+
+  it('keeps the group contour when its caption yields to an overlapping selected number', () => {
+    const attributes = vi.spyOn(THREE.BufferGeometry.prototype, 'setAttribute');
+    const layout = new PublicMapLabelLayout();
+    render(<PublicSoldCompanyLabels groups={groups} hoveredEntityId={null} selectedEntityId={lots[0].id} layout={layout} />);
+    const opacity = attributes.mock.calls.find(([name]) => name === 'labelOpacity')?.[1] as THREE.BufferAttribute;
+    const contour = attributes.mock.calls.find(([name]) => name === 'color')?.[1] as THREE.BufferAttribute;
+    const colors = Array.from(contour.array);
+    frame(20, 0, layout);
+    expect(Array.from(opacity.array).filter(value => value > 0)).toHaveLength(4);
+    const unregister = layout.register('selectedLot', current => current.reserve({ x0: 0, x1: 375, y0: 0, y1: 363 }));
+    frame(20, 0, layout);
+    expect(Array.from(opacity.array).every(value => value === 0)).toBe(true);
+    expect(Array.from(contour.array)).toEqual(colors);
+    unregister();
+    frame(20, 0, layout);
+    expect(Array.from(opacity.array).filter(value => value > 0)).toHaveLength(4);
   });
 });

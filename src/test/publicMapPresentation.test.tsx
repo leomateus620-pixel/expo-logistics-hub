@@ -22,6 +22,8 @@ describe('public-only three-condition presentation',()=>{
     expect(screen.queryByText('Venda em aberto')).toBeNull();
     const swatches=screen.getByLabelText('Legenda de disponibilidade').querySelectorAll('.is-external-lot');
     expect(swatches).toHaveLength(['exporural','industria-comercio-servicos-externo','espaco-automovel'].includes(area.slug)?2:0);
+    const plates = screen.getByLabelText('Legenda de disponibilidade').querySelectorAll('.is-number-plate');
+    expect(Array.from(plates, plate => plate.getAttribute('data-mark'))).toEqual(area.lotNumbers ? ['dot', null, 'bar'] : []);
     // The public contract intentionally combines pending and confirmed sales.
     // A seal would incorrectly assert a signature that this payload cannot prove.
     expect(screen.getByLabelText('Legenda de disponibilidade').querySelector('svg')).toBeNull();

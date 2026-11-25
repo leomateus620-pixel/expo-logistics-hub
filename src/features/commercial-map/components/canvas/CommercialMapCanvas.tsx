@@ -27,6 +27,9 @@ import { usesCompactPublicCompanyLabels } from '../../public/publicSoldCompanyLa
 import { PublicScenePolicyContext, usePublicScenePolicy } from './PublicScenePolicyContext';
 import { PublicContextGroup, PublicMaterialPool } from './PublicContextGroup';
 import { PublicSoldCompanyLabels } from './PublicSoldCompanyLabels';
+import { PublicLotNumbers, PublicMapLabelLayoutFrame } from './PublicLotNumbers';
+import { PublicMapLabelLayout } from './publicMapLabelLayout';
+import type { PublicMapInventory } from '../../public/publicMapTypes';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { SoldLotLocks } from './SoldLotLocks';
 import { ExternalLotFrames } from './ExternalLotFrames';
@@ -343,6 +346,7 @@ interface CommercialMapCanvasProps {
   publicScenePolicy?: PublicExternalScenePolicy | null;
   publicViewer?: boolean;
   publicCompanyGroups?: readonly PublicSoldCompanyGroupInput[];
+  publicLotNumberInventory?: Pick<PublicMapInventory, 'entities' | 'lots'>;
   publicCompanyFocus?: PublicCompanyFocus | null;
   initialPublicView?: PublicNavigation | null;
   technicalValidationAllowed?: boolean;
@@ -4929,6 +4933,7 @@ const Scene = memo(function Scene({
   interactiveEntityIds = null,
   publicFocusEntityIds = null,
   publicCompanyGroups,
+  publicLotNumberInventory,
   publicCompanyFocus,
   initialPublicView,
   technicalValidationAllowed = false,
@@ -5256,15 +5261,18 @@ const Scene = memo(function Scene({
     .map((entity) => ({ entity, lot: lotByEntity.get(entity.id) }))
     .filter((entry): entry is LotEntry => Boolean(entry.lot)), [exteriorRenderedEntities, lotByEntity]);
   const publicCompanyLayerActive = Boolean(publicPolicy && publicCompanyGroups?.length && !interiorEntity && !hydrologicalModeActive);
-  const publicCompanyEntities = useMemo(() => publicCompanyLayerActive && publicPolicy && interactiveEntityIds
+  const publicLotNumbersActive = Boolean(publicPolicy && publicLotNumberInventory && !interiorEntity && !hydrologicalModeActive);
+  const publicLabelLayout = useMemo(() => publicLotNumbersActive ? new PublicMapLabelLayout() : undefined, [publicLotNumbersActive]);
+  const publicLabelsActive = publicCompanyLayerActive || publicLotNumbersActive;
+  const publicDisplayedLotEntities = useMemo(() => publicLabelsActive && publicPolicy && interactiveEntityIds
     ? exteriorRenderedEntities.filter(entity => interactiveEntityIds.has(entity.id)
       && publicPolicy.interactiveEntityIds.has(entity.id)
       && layerVisibility[entity.layerId] !== false
       && (layerOpacity[entity.layerId] ?? 1) > 0.015)
-    : [], [exteriorRenderedEntities, interactiveEntityIds, layerOpacity, layerVisibility, publicCompanyLayerActive, publicPolicy]);
-  const publicCompanyGeometry = useMemo(() => publicCompanyGroups?.length && publicCompanyEntities.length
-    ? measureCommercialMapSync('public-company-geometry', () => preparePublicSoldCompanyGeometry(publicCompanyGroups, publicCompanyEntities))
-    : [], [publicCompanyEntities, publicCompanyGroups]);
+    : [], [exteriorRenderedEntities, interactiveEntityIds, layerOpacity, layerVisibility, publicLabelsActive, publicPolicy]);
+  const publicCompanyGeometry = useMemo(() => publicCompanyLayerActive && publicCompanyGroups?.length && publicDisplayedLotEntities.length
+    ? measureCommercialMapSync('public-company-geometry', () => preparePublicSoldCompanyGeometry(publicCompanyGroups, publicDisplayedLotEntities))
+    : [], [publicCompanyLayerActive, publicCompanyGroups, publicDisplayedLotEntities]);
   const groupedPublicEntityIds = useMemo(() => publicCompanyGeometry.length
     ? new Set(publicCompanyGeometry.flatMap(group => group.entityIds))
     : EMPTY_GROUPED_PUBLIC_ENTITIES, [publicCompanyGeometry]);
@@ -5824,7 +5832,10 @@ const Scene = memo(function Scene({
         groups={publicCompanyGeometry}
         selectedEntityId={selectedEntityId}
         hoveredEntityId={hoveredEntityId}
+        layout={publicLabelLayout}
       />}
+      {publicLabelLayout && publicLotNumberInventory && <PublicLotNumbers inventory={publicLotNumberInventory}
+        renderedEntities={publicDisplayedLotEntities} selectedEntityId={selectedEntityId} layout={publicLabelLayout} />}
       </group>
       <PavilionConnectedComplex
         entities={pavilionComplexEntities}
@@ -6039,8 +6050,9 @@ const Scene = memo(function Scene({
         hydrologicalModeActive={hydrologicalModeActive}
         pavilion5ExteriorLift={pavilion5ExteriorLift}
       />
+      {publicLabelLayout && <PublicMapLabelLayoutFrame layout={publicLabelLayout} />}
       <RuntimeFrameDiagnostics />
-      {publicPolicy && labelsVisible && !interiorEntity && <TerritorialOrientation entities={entities} lots={lots} roads={circulationEntities} policy={publicPolicy} />}
+      {publicPolicy && labelsVisible && !interiorEntity && <TerritorialOrientation entities={entities} lots={lots} roads={circulationEntities} policy={publicPolicy} publicLabelLayout={publicLabelLayout} />}
       {!publicPolicy && !publicPavilion && labelsVisible && !interiorEntity && !visitEnabled && !soyCinematicActive && !christmasActive && !hydrologicalModeActive && !lunarCinematicActive && (
         <TerritorialOrientation
           entities={territorialLabelEntities}

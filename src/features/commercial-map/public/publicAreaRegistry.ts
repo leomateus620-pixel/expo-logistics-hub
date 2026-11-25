@@ -16,6 +16,8 @@ export interface PublicAreaDefinition {
   name: string;
   shortName: string;
   kind: PublicAreaKind;
+  /** Identificação cadastral adaptada à projeção da câmera pública. */
+  lotNumbers?: 'projected';
   /** Identificador canônico da edificação do pavilhão (B1, B6, …). */
   pavilionIdentifier?: string;
   /** Slug do segmento canônico persistido em `map_segments`. */
@@ -31,15 +33,16 @@ export const PUBLIC_MAP_AREAS: readonly PublicAreaDefinition[] = [
   { slug: 'pavilhao-12', name: 'Pavilhão 12', shortName: 'Pavilhão 12', kind: 'PAVILION', pavilionIdentifier: 'B3' },
   { slug: 'pavilhao-13', name: 'Pavilhão 13', shortName: 'Pavilhão 13', kind: 'PAVILION', pavilionIdentifier: 'B5' },
   { slug: 'pavilhao-14', name: 'Pavilhão 14', shortName: 'Pavilhão 14', kind: 'PAVILION', pavilionIdentifier: 'B2' },
-  { slug: 'exporural', name: 'Exporural', shortName: 'Exporural', kind: 'SEGMENT', segmentSlug: 'exporural' },
+  { slug: 'exporural', name: 'Exporural', shortName: 'Exporural', kind: 'SEGMENT', segmentSlug: 'exporural', lotNumbers: 'projected' },
   {
     slug: 'industria-comercio-servicos-externo',
     name: 'Indústria, Comércio e Serviços — área externa',
     shortName: 'ICS — área externa',
     kind: 'SEGMENT_EXTERNAL',
     segmentSlug: 'industria-comercio-servicos',
+    lotNumbers: 'projected',
   },
-  { slug: 'espaco-automovel', name: 'Espaço do Automóvel', shortName: 'Espaço do Automóvel', kind: 'ENTITY_SET' },
+  { slug: 'espaco-automovel', name: 'Espaço do Automóvel', shortName: 'Espaço do Automóvel', kind: 'ENTITY_SET', lotNumbers: 'projected' },
 ] as const;
 
 const BY_SLUG = new Map(PUBLIC_MAP_AREAS.map((area) => [area.slug, area]));

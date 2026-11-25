@@ -3,6 +3,7 @@ import { COMMERCIAL_MAP_SEGMENTS } from '../data/commercialMapSegments';
 import { STATUS_CONFIG } from '../constants';
 import type { PublicAreaDefinition } from './publicAreaRegistry';
 import { EXTERNAL_LOT_PALETTE, externalLotFrameColor } from '../utils/externalLotPresentation';
+import { PUBLIC_NUMBER_STYLES } from './publicLotNumberStyle';
 
 export function PublicMapLegend({ area }: { area: PublicAreaDefinition }) {
   const segment = COMMERCIAL_MAP_SEGMENTS.find(item => item.id === (area.segmentSlug ?? area.slug));
@@ -13,12 +14,17 @@ export function PublicMapLegend({ area }: { area: PublicAreaDefinition }) {
     style={{ '--segment-color': segment?.palette.edge, '--segment-accent': segment?.palette.accent } as CSSProperties}>
     {segment && <strong className="public-map-segment" key={segment.id}>{segment.name}</strong>}
     <div className="public-map-legend__statuses">
-      {(['AVAILABLE', 'SOLD', 'BLOCKED'] as const).map(status =>
-        <span key={status}><i className={external && status !== 'BLOCKED' ? 'is-external-lot' : undefined}
+      {(['AVAILABLE', 'SOLD', 'BLOCKED'] as const).map(status => {
+        const plate = PUBLIC_NUMBER_STYLES[status === 'BLOCKED' ? 'UNAVAILABLE' : status];
+        return <span key={status}><i aria-hidden="true" className={external && status !== 'BLOCKED' ? 'is-external-lot' : undefined}
           style={external && status !== 'BLOCKED' ? {
             '--grass': EXTERNAL_LOT_PALETTE.grass, '--grass-light': EXTERNAL_LOT_PALETTE.lightGrass,
             '--frame': externalLotFrameColor(status) ?? 'transparent',
-          } as CSSProperties : { background: STATUS_CONFIG[status].color }} />{STATUS_CONFIG[status].label}</span>)}
+          } as CSSProperties : { background: STATUS_CONFIG[status].color }} />
+          {area.lotNumbers && <span className="is-number-plate" aria-hidden="true" data-mark={plate.mark ?? undefined}
+            style={{ '--plate-border': plate.border, '--plate-background': plate.background } as CSSProperties} />}
+          {STATUS_CONFIG[status].label}</span>;
+      })}
     </div>
   </div>;
 }
