@@ -3,9 +3,11 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import postgres from 'postgres';
+import { setSecondStagePrice } from './stage-price-fixture.mjs';
 
 const project = '0538d132-34dd-4347-a33c-526edac7339c';
 const org = '00000000-0000-4000-a000-000000000001';
+const edition = '00000000-0000-4000-a000-000000002028';
 const seller = '00000000-0000-4000-a000-000000000010';
 const gastronomyMember = '00000000-0000-4000-a000-000000000011';
 const mapViewer = '00000000-0000-4000-a000-000000000012';
@@ -14,6 +16,7 @@ const sellerWithoutContracts = '00000000-0000-4000-a000-000000000014';
 const contractsOnly = '00000000-0000-4000-a000-000000000015';
 const db = postgres({ host: '127.0.0.1', port: 55438, database: 'gastronomy_qa', user: 'postgres', max: 6, onnotice: () => {} });
 const migration = await fs.readFile(new URL('../../supabase/migrations/20261111190000_commercial_gastronomy.sql', import.meta.url), 'utf8');
+const recoveryMigration = await fs.readFile(new URL('../../supabase/migrations/20261125180000_commercial_sale_recovery.sql', import.meta.url), 'utf8');
 const contractMigration = await fs.readFile(new URL('../../supabase/migrations/20261112190000_commercial_contract_history.sql', import.meta.url), 'utf8');
 const expansionMigration = await fs.readFile(new URL('../../supabase/migrations/20261116180000_commercial_gastronomy_via_expressa_chopp.sql', import.meta.url), 'utf8');
 const expansionSeed = expansionMigration.replace(/^BEGIN;\s*/, '').replace(/COMMIT;\s*$/, '');
@@ -34,6 +37,27 @@ const runSale = (key, ids, total, { method = 'PIX', count = 1, stage = 'RENOVACA
       'Expositor de teste',NULL,NULL,NULL,NULL,${count},${method},NULL,
       ${tx.json(split(total, count))},${total / 100},NULL,NULL,${fee},0,0,NULL) AS id
   `)[0].id);
+const runCheckedSale = (key, prices, options = {}) => {
+  const { buyer = 'Expositor fictício', stage = 'RENOVACAO', user = seller } = options;
+  const ids = Object.keys(prices);
+  const total = Object.values(prices).reduce((sum, price) => sum + price, 0);
+  return asUser(user, async (tx) => (await tx`
+    SELECT public.register_commercial_sale_order_checked(${project},${user},${key},${stage},
+      ${tx.array(ids)}::uuid[],${tx.json(prices)},${buyer},NULL,NULL,NULL,'CASH',1,'PIX',NULL,
+      ${tx.json(split(total * 100, 1))},${total},NULL,NULL,0,0,0,NULL) AS id
+  `)[0].id);
+};
+const findAttempt = (key, stage, ids, user = seller) => asUser(user, async (tx) => (await tx`
+  SELECT public.get_commercial_sale_attempt(${project},${key},${stage},${tx.array(ids)}::uuid[]) AS result
+`)[0].result);
+const uploadStatus = (path, user = seller) => asUser(user, async (tx) => (await tx`
+  SELECT public.get_commercial_contract_upload(${path}) AS result
+`)[0].result);
+const foodFinance = (orderBefore) => asUser(seller, async (tx) => {
+  const rows = await tx`SELECT basis, financial_scenario_overview(${org},${edition},basis)
+    ->'currentByCategory'->'food_points'->>'amountCents' AS cents FROM unnest(ARRAY['portfolio','confirmed','cash']) AS basis`;
+  return rows.map(({ cents }, i) => Number(cents) - (orderBefore?.[i] ?? 0));
+});
 const detail = (id) => asUser(seller, async (tx) => (await tx`SELECT get_commercial_sale_order_detail(${id},NULL) AS result`)[0].result);
 const cancel = (order, items) => asUser(seller, (tx) => tx`SELECT cancel_sale_order_items(${order},${tx.array(items)}::uuid[],'QA')`);
 const confirm = (order, items) => asUser(seller, (tx) => tx`SELECT confirm_sale_order_items(${order},${tx.array(items)}::uuid[])`);
@@ -157,6 +181,7 @@ try {
   assert.equal(await getStatus(central),'SALE_OPEN');
   await db.begin((tx) => tx.unsafe(migration.replace(/^BEGIN;\s*/, '').replace(/COMMIT;\s*$/, '')));
   await db.unsafe(contractMigration);
+  await db.begin((tx) => tx.unsafe(recoveryMigration.replace(/^BEGIN;\s*/, '').replace(/COMMIT;\s*$/, '')));
   assert.equal(await getStatus(pizza),'SOLD');
   assert.equal((await getItems(order))[1].id,pizzaItem.id);
   assert.equal((await db`SELECT count(*)::int AS n FROM commercial_lots WHERE commercial_unit='FOOD_POINT'`)[0].n,12);
@@ -448,7 +473,21 @@ try {
   assert.equal((await db`SELECT count(*)::int AS n FROM map_entity_geometries WHERE entity_id=ANY(${db.array(deployed.map(r => r.entity_id))}::uuid[])`)[0].n, 0);
 
   const [, , balloon, , crioulos, popcorn, snacks, iceCream] = deployed;
-  const parkOrder = await runSale('parque-e-balao', [snacks.id, balloon.id], 2537500);
+  const financeBeforePark = await foodFinance();
+  const parkKey = 'checkout-qa-parque-e-balao';
+  const parkPrices = { [snacks.id]: 22560, [balloon.id]: 2815 };
+  const parkOrder = await runCheckedSale(parkKey, parkPrices);
+  assert.equal(await runCheckedSale(parkKey, { [balloon.id]: 2815, [snacks.id]: 22560 }), parkOrder);
+  await assert.rejects(runCheckedSale(parkKey, parkPrices, { buyer: 'Expositor diferente' }), /IDEMPOTENCY_SCOPE_MISMATCH/);
+  await assert.rejects(runCheckedSale(parkKey, { [snacks.id]: 22560 }), /IDEMPOTENCY_SCOPE_MISMATCH/);
+  await assert.rejects(runCheckedSale(parkKey, parkPrices, { stage: 'SEGUNDA_ETAPA' }), /IDEMPOTENCY_SCOPE_MISMATCH/);
+  const attempt = await findAttempt(parkKey, 'RENOVACAO', [balloon.id, snacks.id]);
+  assert.deepEqual(attempt, { orderId: parkOrder, reference: 'PV-' + parkOrder.slice(0, 8).toUpperCase() });
+  assert.equal(await findAttempt(parkKey, 'RENOVACAO', [balloon.id, snacks.id], sellerWithoutContracts), null);
+  assert.equal(await findAttempt(parkKey, 'RENOVACAO', [balloon.id]), null);
+  assert.equal(await findAttempt(parkKey, 'SEGUNDA_ETAPA', [balloon.id, snacks.id]), null);
+  await assert.rejects(findAttempt(parkKey, 'RENOVACAO', [balloon.id, snacks.id], mapViewer), /MAP_PERMISSION_DENIED/);
+  assert.deepEqual(await foodFinance(financeBeforePark), [2537500, 0, 0]);
   const parkItems = await getItems(parkOrder);
   assert.equal(parkItems.length, 2);
   assert.equal(Number((await detail(parkOrder)).header.negotiatedTotal), 25375);
@@ -459,14 +498,39 @@ try {
   await db`INSERT INTO storage.objects (bucket_id,name,owner_id) VALUES ('map-contracts',${parkDoc},${seller}),('map-contracts',${balloonDoc},${seller})`;
   await asUser(seller, tx => tx`SELECT attach_order_contract(${parkOrder},${tx.array([snacks.id,balloon.id])}::uuid[],
     ${parkDoc},'points.pdf','application/pdf',1024,'PARQUE-BALAO-QA')`);
+  const parkShared = await uploadStatus(parkDoc);
+  assert.ok(parkShared.linked && parkShared.uploaded && parkShared.registration.version === 1);
+  await assert.rejects(uploadStatus(parkDoc, sellerWithoutContracts), /MAP_PERMISSION_DENIED/);
+  await assert.rejects(asUser(seller, tx => tx`SELECT attach_order_contract(${parkOrder},
+    ${tx.array([snacks.id,balloon.id])}::uuid[],${parkDoc},'points.pdf','application/pdf',1024,'PARQUE-BALAO-QA')`),
+    /lot_contract_versions_storage_unique/);
+  assert.deepEqual(await uploadStatus(parkDoc), parkShared);
   assert.equal(await getStatus(snacks.id), 'SALE_OPEN');
-  await confirm(parkOrder, parkItems.map(r => r.id));
+  assert.deepEqual(await foodFinance(financeBeforePark), [2537500, 0, 0]);
+  const snackItem = parkItems.find(r => r.lot_id === snacks.id);
+  const balloonItem = parkItems.find(r => r.lot_id === balloon.id);
+  await confirm(parkOrder, [snackItem.id]);
+  await assert.rejects(asUser(seller, tx => tx`SELECT confirm_sale_order_items(${parkOrder},
+    ${tx.array(parkItems.map(r => r.id))}::uuid[], TRUE)`), /PENDING_ITEMS_CHANGED/);
+  assert.deepEqual(await foodFinance(financeBeforePark), [2537500, 2256000, 0]);
+  assert.equal(await getStatus(balloon.id), 'SALE_OPEN');
+  await asUser(seller, tx => tx`SELECT confirm_sale_order_items(${parkOrder},ARRAY[${balloonItem.id}]::uuid[],TRUE)`);
+  assert.deepEqual(await foodFinance(financeBeforePark), [2537500, 2537500, 0]);
   await confirm(parkOrder, parkItems.map(r => r.id));
   const balloonSaleId = parkItems.find(r => r.lot_id === balloon.id).sale_id;
   await asUser(seller, tx => tx`SELECT register_lot_contract_version(${balloon.id},${balloonDoc},
     'balloon.pdf','application/pdf',1024,'BALAO-QA',${balloonSaleId})`);
   assert.deepEqual(await Promise.all([snacks,balloon,popcorn,iceCream].map(r => getStatus(r.id))),
     ['SOLD','SOLD','AVAILABLE','AVAILABLE']);
+  const balloonRegistration = await uploadStatus(balloonDoc);
+  assert.ok(balloonRegistration.linked && balloonRegistration.registration.version === 1);
+  await assert.rejects(asUser(seller, tx => tx`SELECT register_lot_contract_version(${balloon.id},${balloonDoc},
+    'balloon.pdf','application/pdf',1024,'BALAO-QA',${balloonSaleId})`), /lot_contract_versions_storage_unique/);
+  assert.equal((await db`SELECT count(*)::int AS n FROM lot_sale_installments WHERE order_id = ${parkOrder}`)[0].n, 1);
+  assert.deepEqual(await findAttempt(parkKey, 'RENOVACAO', [balloon.id, snacks.id]), attempt);
+  const restrictedSnapshot = await asUser(mapViewer, async (tx) => (await tx`
+    SELECT get_food_point_sale_snapshot(${balloon.id}) AS result`)[0].result);
+  assert.deepEqual(restrictedSnapshot, { signatureState: 'SIGNED', negotiatedValue: null, orderFees: null });
   const beforeParkReplay = await getItems(parkOrder);
   const beforeBalloonHistory = await pointHistory(balloon.id);
   assert.equal(beforeBalloonHistory.contracts.length, 2);
@@ -526,6 +590,28 @@ try {
     JOIN map_entities a ON a.id=e.parent_entity_id WHERE a.public_identifier='CALCADA-ARVOREDO'`)[0].n, 1);
   await db.begin((tx) => tx.unsafe(sitePointsSeed));
   assert.equal((await db`SELECT count(*)::int AS n FROM lot_prices WHERE lot_id=${crioulos.id} AND is_active`)[0].n, 1);
+  // A price difference is synthetic and affects only the stage used by checkout.
+  const strawberry = deployed[3];
+  await db.begin((tx) => setSecondStagePrice(tx, strawberry.id, 18125));
+  await assert.rejects(runCheckedSale('qa-stale-price', { [strawberry.id]: 17500 }, { stage: 'SEGUNDA_ETAPA' }), /LOT_PRICE_CHANGED:GAST-B1-01/);
+  assert.equal(await findAttempt('qa-stale-price', 'SEGUNDA_ETAPA', [strawberry.id]), null);
+  const staged = await runCheckedSale('qa-stage-price', { [strawberry.id]: 18125, [sandwich.id]: 14915 }, { stage: 'SEGUNDA_ETAPA' });
+  const [stagedStrawberry, stagedSandwich] = await getItems(staged);
+  assert.equal(Number(stagedStrawberry.item_total), 18125);
+  await cancel(staged, [stagedSandwich.id]);
+  assert.equal(await getStatus(sandwich.id), 'AVAILABLE');
+  assert.equal(await getStatus(strawberry.id), 'SALE_OPEN');
+  assert.equal((await detail(staged)).header.negotiatedTotal, 18125);
+  assert.equal((await findAttempt('qa-stage-price', 'SEGUNDA_ETAPA', [strawberry.id, sandwich.id])).orderId, staged);
+  await confirm(staged, [stagedStrawberry.id]);
+  const checkedRace = await Promise.allSettled([
+    runCheckedSale('qa-checked-race-1', { [sandwich.id]: 14915 }),
+    runCheckedSale('qa-checked-race-2', { [sandwich.id]: 14915 }, { user: sellerWithoutContracts }),
+  ]);
+  assert.equal(checkedRace.filter(result => result.status === 'fulfilled').length, 1);
+  assert.match(checkedRace.find(result => result.status === 'rejected').reason.message, /LOT_NOT_SELLABLE:GAST-B3-01/);
+  assert.equal((await db`SELECT count(*)::int n FROM lot_sales WHERE lot_id = ${sandwich.id} AND status IN ('OPEN','CONFIRMED')`)[0].n, 1);
+  console.log('Recuperação PostgreSQL QA: tentativa autorizada, chave imutável, preços por etapa, assinatura e cancelamento parciais, recibos de arquivo e Financeiro 2028 OK');
   console.log('Implantação PostgreSQL QA: 8 pontos, R$ 121.297,00, J12 único no Arvoredo, J11 e J31 reconciliados com histórico, pedido conjunto de R$ 25.375,00 e reaplicação OK');
 } finally {
   await db.end();

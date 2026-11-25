@@ -4,6 +4,7 @@ import { buyerDisplayName } from '../utils/buyerDisplayName';
 import { captureCommercialMapStageRecorder, type CommercialMapStageRecorder } from '../utils/performanceDiagnostics';
 import { awaitCommercialMapRequest, boundedSignal, measureCommercialMapOperation, throwIfMapRequestAborted } from '../utils/commercialMapOperation';
 import { supabase } from '@/integrations/supabase/client';
+import { registerPrivateContractUpload } from './contractUpload';
 import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_REVISION } from '../data/officialReference2026';
 import { reconcileExporuralReference } from '../data/reconcileExporuralReference';
 import type {
@@ -1296,41 +1297,23 @@ export async function uploadLotContract(params: {
 }) {
   const validationError = validateContractFile(params.file);
   if (validationError) throw new Error(validationError);
-  const extension = params.file.name.split('.').pop()?.toLowerCase() || 'pdf';
   const sharedDocument = params.document?.scope === 'ORDER_ITEMS' ? params.document : null;
   if (sharedDocument && (!sharedDocument.orderId || !params.expectedSaleId)) {
     throw new Error('Não foi possível identificar a venda deste documento.');
   }
   const folder = sharedDocument ? `orders/${sharedDocument.orderId}` : params.lotId;
-  const objectPath = `${params.orgId}/${folder}/${crypto.randomUUID()}.${extension}`;
-  params.onProgress?.('upload');
-  const { error: uploadError } = await supabase.storage.from('map-contracts').upload(objectPath, params.file, {
-    cacheControl: '3600',
-    contentType: params.file.type,
-    upsert: false,
+  return registerPrivateContractUpload({
+    dir: `${params.orgId}/${folder}`,
+    file: params.file,
+    operation: sharedDocument ? 'replace_lot_order_contract' : 'register_lot_contract_version',
+    onProgress: params.onProgress,
+    args: {
+      p_lot_id: params.lotId,
+      p_contract_number: params.contractNumber?.trim() || null,
+      ...(params.expectedSaleId ? { p_expected_sale_id: params.expectedSaleId } : {}),
+      ...(params.document ? { p_contract_id: params.document.contractId, p_expected_version: params.document.activeVersion } : {}),
+    },
   });
-  if (uploadError) throw uploadError;
-
-  params.onProgress?.('register');
-  const { data, error } = await db.rpc(sharedDocument ? 'replace_lot_order_contract' : 'register_lot_contract_version', {
-    p_lot_id: params.lotId,
-    p_storage_path: objectPath,
-    p_original_name: params.file.name,
-    p_mime_type: params.file.type,
-    p_file_size: params.file.size,
-    p_contract_number: params.contractNumber || null,
-    ...(params.expectedSaleId ? { p_expected_sale_id: params.expectedSaleId } : {}),
-    ...(params.document ? { p_contract_id: params.document.contractId, p_expected_version: params.document.activeVersion } : {}),
-  });
-  if (error) {
-    // An ambiguous transport error can follow a committed registration. Only
-    // remove objects after an explicit database rejection.
-    if (typeof error.code === 'string' && /^[0-9A-Z]{5}$/.test(error.code) && !error.code.startsWith('08')) {
-      await supabase.storage.from('map-contracts').remove([objectPath]).catch(() => undefined);
-    }
-    throw error;
-  }
-  return data;
 }
 
 export async function updateLotContractMetadata(params: {

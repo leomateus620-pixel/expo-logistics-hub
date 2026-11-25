@@ -1,9 +1,7 @@
 import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
 import type { LotPricing2028 } from '../utils/lotPricing2028';
 import { fetchProjectSalesPricing, fetchSalesPricing, registerSaleOrder } from './salesService';
-import { SalesOrderError } from './salesErrors';
 import { summarizeCart, type SalesCartSummary } from './salesPricing';
 import { useSalesStore } from './useSalesSelection';
 import type { SalesOrderPayload } from './salesTypes';
@@ -61,26 +59,8 @@ export function useSalesCart(projectId: string | null = null, active = true): { 
 
 export function useSalesCheckout() {
   const queryClient = useQueryClient();
-  const clearSelection = useSalesStore((state) => state.clearSelection);
-  const setCheckoutOpen = useSalesStore((state) => state.setCheckoutOpen);
-
   return useMutation({
     mutationFn: (payload: SalesOrderPayload) => registerSaleOrder(payload),
-    onSuccess: () => {
-      clearSelection();
-      setCheckoutOpen(false);
-      void scheduleCommercialMapRefresh(queryClient);
-      toast({ title: 'Venda em aberto registrada', description: 'Os espaços ficam amarelos no mapa até a confirmação da assinatura do contrato.' });
-    },
-    onError: (error: Error) => {
-      const indeterminate = error instanceof SalesOrderError && error.indeterminate;
-      // Seleção e formulário são preservados; a mesma chave de idempotência é reaproveitada.
-      if (indeterminate) void scheduleCommercialMapRefresh(queryClient);
-      toast({
-        title: indeterminate ? 'Resultado não confirmado' : 'Venda não concluída',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
+    onSettled: () => { void scheduleCommercialMapRefresh(queryClient); },
   });
 }

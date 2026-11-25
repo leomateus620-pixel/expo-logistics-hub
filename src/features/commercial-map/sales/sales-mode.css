@@ -415,3 +415,10 @@
 
 .commercial-map-sale-legal-name { display: block; font-size: 12px; color: oklch(var(--muted-foreground)); overflow-wrap: anywhere; }
 .commercial-map-sale-edit-identity { margin-top: 6px; max-width: 100%; white-space: normal; height: auto; min-height: 36px; }
+
+.sales-recovery-trigger {
+  position: absolute;
+  z-index: 36;
+  left: max(12px, env(safe-area-inset-left));
+  bottom: calc(76px + env(safe-area-inset-bottom));
+}

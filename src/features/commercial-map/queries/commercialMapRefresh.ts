@@ -63,7 +63,10 @@ function flush(queryClient: QueryClient) {
   void waitForIdle(queryClient)
     .then(() => queryClient.invalidateQueries({ queryKey: MAP_KEY }, { cancelRefetch: false }))
     .then(() => refreshLotContractHistory(queryClient))
-    .then(() => queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }, { cancelRefetch: false }))
+    .then(() => Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }, { cancelRefetch: false }),
+      queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] }, { cancelRefetch: false }),
+    ]))
     .then(() => queryClient.invalidateQueries({ queryKey: ['financial-operational', 'scenarios'] }, { cancelRefetch: false }))
     .catch(() => undefined)
     .finally(pending.resolve);

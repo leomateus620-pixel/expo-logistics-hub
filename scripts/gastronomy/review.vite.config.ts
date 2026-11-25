@@ -6,12 +6,14 @@ import { tmpdir } from 'node:os';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import postgres from 'postgres';
+import { setSecondStagePrice } from './stage-price-fixture.mjs';
 
 const db = postgres({
   host: '127.0.0.1', port: 55438, database: 'gastronomy_qa', user: 'postgres', max: 6,
 });
 const seller = '00000000-0000-4000-a000-000000000010';
 const limitedSeller = '00000000-0000-4000-a000-000000000014';
+const edition = '00000000-0000-4000-a000-000000002028';
 const organization = '00000000-0000-4000-a000-000000000001';
 const documentDirectory = path.join(tmpdir(), `gastronomy-qa-contracts-${process.pid}`);
 const documentFile = (name: string) => path.join(documentDirectory, createHash('sha256').update(name).digest('hex'));
@@ -54,6 +56,18 @@ const postgresFixture: Plugin = {
         const result = await db.begin(async (tx) => {
           await tx`SELECT set_config('request.jwt.claim.sub',${identity},true)`;
           if (!(await tx`SELECT 1 FROM map_projects WHERE org_id=${organization}`).length) throw new Error('QA database required');
+          if (req.url === '/qa/second-stage' && req.method === 'POST') {
+            const { lotId, total } = JSON.parse((await requestBody(req)).toString());
+            await setSecondStagePrice(tx, lotId, total);
+            return null;
+          }
+          if (req.url === '/finance') {
+            await tx.unsafe('SET LOCAL ROLE authenticated');
+            const values = await tx`SELECT basis,
+              financial_scenario_overview(${organization},${edition},basis)->'currentByCategory'->'food_points'->>'amountCents' AS cents
+              FROM unnest(ARRAY['portfolio','confirmed','cash']) AS basis`;
+            return Object.fromEntries(values.map(({ basis, cents }) => [basis, Number(cents)]));
+          }
           if (req.url === '/inventory') {
             const [permission] = await tx`SELECT map_has_explicit_capability(${organization},'map.manage_contracts') AS allowed`;
             const [lots, entities, geometries, segments, pricing, eligibility, items, orders, exhibitors, installments, activity, contracts] = await Promise.all([
@@ -121,7 +135,8 @@ const postgresFixture: Plugin = {
           }
           const supported = new Set([
             'commercial_map_revision', 'commercial_map_lot_buyers', 'register_commercial_sale_order',
-            'get_commercial_sale_order_detail', 'list_commercial_sale_orders', 'confirm_sale_order_items',
+            'register_commercial_sale_order_checked', 'get_commercial_sale_attempt', 'get_food_point_sale_snapshot',
+            'get_commercial_contract_upload', 'get_commercial_sale_order_detail', 'list_commercial_sale_orders', 'confirm_sale_order_items',
             'cancel_sale_order_items', 'export_commercial_sale_orders', 'get_sale_order_revisions',
             'attach_order_contract', 'register_lot_contract_version', 'replace_lot_order_contract',
             'get_lot_contract_history', 'update_commercial_contract_metadata', 'revise_sale_order_items',
@@ -129,9 +144,8 @@ const postgresFixture: Plugin = {
           if (!supported.has(name)) return null;
           await tx.unsafe('SET LOCAL ROLE authenticated');
           const parameters = Object.entries(args as Record<string, unknown>);
-          const values = parameters.map(([key, value]) => Array.isArray(value)
-            ? key === 'p_installments' ? tx.json(value) : tx.array(value)
-            : value);
+          const values = parameters.map(([key, value]) => key === 'p_installments' || key === 'p_expected_prices'
+            ? tx.json(value as Parameters<typeof tx.json>[0]) : Array.isArray(value) ? tx.array(value) : value);
           const namedArguments = parameters.map(([key], i) => {
             if (!/^_?p?[a-z_]+$/.test(key)) throw new Error('Invalid QA argument');
             return `${key} => $${i + 1}${['p_lot_ids','p_item_ids','p_add_lot_ids','p_remove_item_ids'].includes(key) ? '::uuid[]' : ''}`;

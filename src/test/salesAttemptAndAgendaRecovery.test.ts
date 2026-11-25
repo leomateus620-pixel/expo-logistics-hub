@@ -1,30 +1,43 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { clearSaleAttempt, markSaleAttemptUncertain, peekSaleAttempt, resolveSaleAttempt, saleAttemptScope } from '@/features/commercial-map/sales/saleAttemptStore';
+import { adoptVerifiedSessionAttempt, clearSaleAttempt, listSaleAttempts, previousSessionAttempt, startSaleAttempt } from '@/features/commercial-map/sales/saleAttemptStore';
 import { classifySalesError } from '@/features/commercial-map/sales/salesErrors';
 import { isStructuralCronogramaReadError } from '@/hooks/useCronogramaEventos';
 
-beforeEach(() => sessionStorage.clear());
+beforeEach(() => { localStorage.clear(); sessionStorage.clear(); });
 
 describe('tentativa de venda recuperável', () => {
-  it('reutiliza a mesma chave para o mesmo conjunto de espaços até a confirmação', () => {
-    let n = 0;
-    const key = () => `k${++n}`;
-    const scope = saleAttemptScope(['b', 'a'], 'RENOVACAO');
-    expect(scope).toBe(saleAttemptScope(['a', 'b'], 'RENOVACAO'));
-    const first = resolveSaleAttempt(scope, key);
-    markSaleAttemptUncertain(first.key);
-    const again = resolveSaleAttempt(scope, key);
-    expect(again.key).toBe(first.key);
-    expect(again.uncertain).toBe(true);
-    clearSaleAttempt(first.key);
-    expect(peekSaleAttempt()).toBeNull();
-    expect(resolveSaleAttempt(scope, key).key).not.toBe(first.key);
+  const owner = { projectId: 'project-a', operatorId: 'operator-a' };
+
+  it('preserva o envio original mesmo depois de abrir outra seleção e etapa', () => {
+    const first = startSaleAttempt(owner, 'RENOVACAO', ['b', 'a']);
+    const other = startSaleAttempt(owner, 'SEGUNDA_ETAPA', ['c']);
+    expect(first.lotIds).toEqual(['a', 'b']);
+    expect(listSaleAttempts(owner)).toEqual(expect.arrayContaining([first, other]));
+    expect(other.key).not.toBe(first.key);
+    clearSaleAttempt(first);
+    expect(listSaleAttempts(owner)).toEqual([other]);
   });
 
-  it('outro conjunto de espaços recebe chave nova', () => {
-    const a = resolveSaleAttempt(saleAttemptScope(['a'], 'S'));
-    const b = resolveSaleAttempt(saleAttemptScope(['a', 'c'], 'S'));
-    expect(a.key).not.toBe(b.key);
+  it('isola os envios entre projetos e operadores e nunca herda a chave de outro envio', () => {
+    const first = startSaleAttempt(owner, 'RENOVACAO', ['a']);
+    const changed = startSaleAttempt(owner, 'RENOVACAO', ['a']);
+    expect(changed.key).not.toBe(first.key);
+    expect(listSaleAttempts({ ...owner, projectId: 'project-b' })).toEqual([]);
+    expect(listSaleAttempts({ ...owner, operatorId: 'operator-b' })).toEqual([]);
+  });
+
+  it('só registra no escopo atual a tentativa antiga depois da verificação', () => {
+    const key = crypto.randomUUID();
+    const lotId = crypto.randomUUID();
+    sessionStorage.setItem('fenasoja.commercial-sale-attempt.v1', JSON.stringify({
+      key, scope: `RENOVACAO|${lotId}`, startedAt: 1000,
+    }));
+    const candidate = previousSessionAttempt(owner);
+    expect(candidate).toMatchObject({ ...owner, key, lotIds: [lotId] });
+    expect(listSaleAttempts(owner)).toEqual([]);
+    adoptVerifiedSessionAttempt(candidate!);
+    expect(listSaleAttempts(owner)).toEqual([candidate]);
+    expect(previousSessionAttempt(owner)).toBeNull();
   });
 
   it('timeout de gateway é resultado indeterminado; regra comercial não', () => {

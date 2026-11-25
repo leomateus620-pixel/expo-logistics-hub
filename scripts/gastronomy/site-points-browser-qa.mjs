@@ -7,6 +7,8 @@ const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 const artifacts = process.argv.slice(2).find(arg => !arg.startsWith('--')) || '/tmp/fenasoja-gastronomia-qa';
 const saleOnly = process.argv.includes('--venda');
+const mobileSale = process.argv.includes('--celular');
+const checkoutDetails = { name: 'EXPOSITOR FICTÍCIO GASTRONOMIA QA', document: '52998224725', phone: '55900000000' };
 await mkdir(artifacts, { recursive: true });
 const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--enable-unsafe-swiftshader'] });
 const url = 'http://127.0.0.1:5196/scripts/gastronomy/review.html?cena-qa';
@@ -30,8 +32,8 @@ const views = {
   'cavalo-crioulo': [-39.9, -16.7],
 };
 
-async function ready(page) {
-  await page.goto(url, { waitUntil: 'domcontentloaded' });
+async function ready(page, profile) {
+  await page.goto(profile ? url + '&perfil=' + profile : url, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => {
     const root = window.gastronomyQa?.scene();
     return root?.controls && !document.querySelector('.commercial-map-boot')
@@ -127,99 +129,318 @@ async function inventoryAt(page) {
   return (await (await page.request.get(new URL('/__gastronomy/inventory', url).href)).json()).data;
 }
 
-async function saleScenario(page, byCode) {
-  const selected = sites.filter(({ code }) => ['GAST-J-02', 'GAST-D1-03'].includes(code));
-  const [snack, balloon] = selected.map(({ code }) => byCode.get(code));
-  const point = async (spec, unit) => {
-    await view(page, spec.place === 'parque' ? [-39.2, -5.1] : views.alameda, [0, 18, 0.6]);
-    try {
-      await activatePoint(page, unit, false);
-    } catch (error) {
-      await capture(page, 'checkout-posicao');
-      throw new Error('Emblema fora da área de interação no checkout: ' + spec.code, { cause: error });
-    }
-    await assertPanel(page, spec, unit);
-  };
-  const readStatuses = async (expected) => {
-    const inventory = await inventoryAt(page);
-    for (const unit of [snack, balloon, byCode.get('GAST-J-01'), byCode.get('GAST-J-03')]) {
-      const status = [snack.id, balloon.id].includes(unit.id) ? expected : 'AVAILABLE';
-      assert.equal(inventory.lots.find(lot => lot.id === unit.id).status, status, unit.public_identifier);
-    }
-    return inventory;
-  };
-  await readStatuses('AVAILABLE');
-  await page.getByRole('button', { name: 'Vendas', exact: true }).click();
-  await page.waitForTimeout(850);
-  for (const [index, unit] of [snack, balloon].entries()) {
-    await point(selected[index], unit);
-    await page.locator(panel).getByRole('checkbox', { name: 'Selecionar ' + selected[index].name }).check();
-    await page.locator(panel).getByRole('button', { name: 'Adicionar à venda' }).click();
-    await closePanel(page);
-    await page.waitForTimeout(850);
-  }
-  const cart = page.getByRole('complementary', { name: 'Venda de espaços' });
-  assert.ok((await cart.innerText()).includes('25.375,00'));
+async function qaRequest(page, path, { body, profile } = {}) {
+  const target = new URL('/__gastronomy/' + path, url).href;
+  const headers = profile ? { 'x-gastronomy-qa-user': profile } : {};
+  const response = body ? await page.request.post(target, { data: body, headers }) : await page.request.get(target, { headers });
+  assert.ok(response.ok(), target);
+  return response.json();
+}
+
+const rpc = (page, name, args, profile) => qaRequest(page, 'rpc', { body: { name, args }, profile });
+
+async function awaitText(locator, text) {
+  await locator.getByText(text, { exact: true }).waitFor();
+}
+
+async function reserveCartPoint(page, spec, unit, touch) {
+  await openPoint(page, spec, unit, touch);
+  const sheet = page.locator(panel);
+  const checkbox = sheet.getByRole('checkbox', { name: 'Selecionar ' + spec.name });
+  await checkbox.check();
+  await sheet.getByRole('button', { name: 'Adicionar à venda' }).click();
+  await sheet.locator(`[aria-controls="food-point-${unit.id}"]`).getByText('No carrinho', { exact: true }).waitFor();
+  await closePanel(page);
+  await page.waitForTimeout(600);
+}
+
+async function openPoint(page, spec, unit, touch) {
+  await view(page, spec.place === 'parque' ? [-39.2, -5.1] : views[spec.place], [0, 18, 0.6]);
+  await activatePoint(page, unit, touch);
+  await assertPanel(page, spec, unit);
+}
+
+async function cartPanel(page, touch) {
+  if (!touch) return page.getByRole('complementary', { name: 'Venda de espaços' });
+  await page.locator('.sales-mobile-bar').click();
+  return page.getByRole('dialog', { name: 'Venda de espaços' });
+}
+
+async function fillCheckout(page, cart, buyerName = checkoutDetails.name) {
   await cart.getByRole('button', { name: 'Finalizar venda' }).click();
   const checkout = page.getByRole('dialog', { name: 'Finalizar venda' });
-  await checkout.getByLabel('Nome / Razão social').fill('EXPOSITOR FICTÍCIO GASTRONOMIA QA');
-  await checkout.getByLabel('CPF ou CNPJ').fill('52998224725');
-  await checkout.getByLabel('Celular').fill('55900000000');
+  await checkout.getByLabel('Nome / Razão social').fill(buyerName);
+  await checkout.getByLabel('CPF ou CNPJ').fill(checkoutDetails.document);
+  await checkout.getByLabel('Celular').fill(checkoutDetails.phone);
   await checkout.getByRole('button', { name: 'Continuar' }).click();
   await checkout.getByRole('radio', { name: /pix/i }).click();
   await checkout.getByRole('button', { name: 'Continuar' }).click();
-  await capture(page, 'checkout-dois-pontos');
-  await checkout.getByRole('button', { name: 'Registrar venda em aberto' }).click();
-  await checkout.waitFor({ state: 'hidden' });
+  return checkout;
+}
+
+async function assertFinance(page, portfolio, confirmed) {
+  assert.deepEqual(await qaRequest(page, 'finance'), { data: { portfolio, confirmed, cash: 0 }, error: null });
+}
+
+async function saleScenario(page, byCode, touch) {
+  const viewport = touch ? 'celular' : 'desktop';
+  const captureSale = (name) => capture(page, viewport + '-' + name);
+  const [parkSpec, alamedaSpec] = sites.filter(({ code }) => ['GAST-J-02', 'GAST-D1-03'].includes(code));
+  const snack = byCode.get(parkSpec.code);
+  const balloon = byCode.get(alamedaSpec.code);
+  const readStatuses = async (snackStatus, balloonStatus = snackStatus) => {
+    const expected = [snackStatus, balloonStatus, 'AVAILABLE', 'AVAILABLE'];
+    const inventory = await inventoryAt(page);
+    [snack, balloon, byCode.get('GAST-J-01'), byCode.get('GAST-J-03')].forEach((unit, index) => {
+      assert.equal(inventory.lots.find(lot => lot.id === unit.id).status, expected[index], unit.public_identifier);
+    });
+    return inventory;
+  };
+
+  await readStatuses('AVAILABLE');
+  await page.getByRole('button', { name: 'Vendas', exact: true }).click();
+  await page.waitForTimeout(850);
+  await reserveCartPoint(page, parkSpec, snack, touch);
+  await reserveCartPoint(page, alamedaSpec, balloon, touch);
+  const cart = await cartPanel(page, touch);
+  assert.ok((await cart.innerText()).includes('25.375,00'));
+  const checkout = await fillCheckout(page, cart);
+  assert.ok((await checkout.innerText()).includes('25.375,00'));
+  await captureSale('checkout-dois-pontos');
+
+  let registrations = 0;
+  let lostOrder;
+  await page.route('**/__gastronomy/rpc', async (route) => {
+    if (route.request().postDataJSON()?.name !== 'register_commercial_sale_order_checked') return route.continue();
+    registrations += 1;
+    const committed = await route.fetch();
+    lostOrder = (await committed.json()).data;
+    await route.abort('failed');
+  });
+  await checkout.getByRole('button', { name: 'Registrar venda em aberto' }).evaluate((button) => {
+    button.click();
+    button.click();
+  });
+  await checkout.getByRole('button', { name: 'Verificar resultado', exact: true }).waitFor();
+  assert.equal(registrations, 1);
+  assert.ok(lostOrder);
+  assert.equal(await checkout.getByText(/Nenhum espaço foi alterado/).count(), 0);
+  await captureSale('resposta-perdida');
   const opened = await readStatuses('SALE_OPEN');
   assert.equal(opened.orders.length, 1);
   assert.equal(opened.items.length, 2);
+  assert.equal(opened.installments.length, 1);
   assert.equal(Number(opened.orders[0].negotiated_total), 25375);
-  const orderId = opened.orders[0].id;
-  await ready(page);
-  await point(selected[0], snack);
-  await page.getByRole('button', { name: 'Confirmar contrato assinado' }).click();
-  await page.getByRole('alertdialog').getByRole('button', { name: 'Confirmar 2 espaços' }).click();
-  await page.getByRole('alertdialog').waitFor({ state: 'hidden' });
-  await readStatuses('SOLD');
-  await closePanel(page);
+  assert.equal(opened.orders[0].id, lostOrder);
+  await assertFinance(page, 2537500, 0);
 
-  await page.getByRole('button', { name: 'Dashboard Comercial', exact: true }).click();
-  await page.getByRole('group', { name: 'Selecionar área externa' }).getByRole('button', { name: 'Gastronomia', exact: true }).click();
-  await page.getByRole('button', { name: 'Vendas e contratos', exact: true }).click();
-  await page.locator(`button[data-open-sale="${orderId}"]`).click();
-  await page.getByRole('tab', { name: 'Contratos', exact: true }).click();
+  await ready(page);
+  await page.getByRole('button', { name: 'Vendas', exact: true }).click();
+  await page.waitForTimeout(850);
+  const otherSpec = sites.find(({ code }) => code === 'GAST-B1-01');
+  await reserveCartPoint(page, otherSpec, byCode.get(otherSpec.code), touch);
+  await page.getByRole('button', { name: 'Recuperar venda (1)', exact: true }).click();
+  const recovery = page.getByRole('dialog', { name: 'Tentativas de venda' });
+  await recovery.getByText(/GAST-(J-02|D1-03), GAST-(J-02|D1-03)/).waitFor();
+  await recovery.getByRole('button', { name: 'Verificar resultado', exact: true }).click();
+  const reference = 'PV-' + lostOrder.slice(0, 8).toUpperCase();
+  await awaitText(recovery, reference);
+  assert.equal(registrations, 1);
+  await captureSale('pedido-recuperado');
+  await recovery.getByRole('button', { name: 'Abrir pedido', exact: true }).click();
+  const detail = page.locator(`[data-sale-detail="${lostOrder}"]`);
+  await awaitText(detail, reference);
+  await awaitText(detail, 'Venda em aberto');
+  await awaitText(detail, 'Sem arquivo anexado');
+  await awaitText(detail, 'Sem recebimento registrado');
+  await detail.getByRole('tab', { name: 'Contratos', exact: true }).click();
   const { jsPDF } = require('jspdf');
   const pdf = new jsPDF();
   pdf.text('Contrato ficticio para teste de Gastronomia', 20, 20);
   const buffer = Buffer.from(pdf.output('arraybuffer'));
-  for (const [scope, filename] of [['Toda a venda', 'parque-e-balao-qa.pdf'], ['Um ponto', 'balao-qa.pdf']]) {
-    await page.getByRole('button', { name: 'Anexar contrato', exact: true }).click();
-    const attachment = page.getByRole('dialog', { name: 'Anexar contrato' });
-    await attachment.locator('input[type=file]').setInputFiles({ name: filename, mimeType: 'application/pdf', buffer });
-    await attachment.getByRole('radio', { name: new RegExp(scope) }).check();
-    if (scope === 'Um ponto') await attachment.getByRole('combobox', { name: /Ponto de alimentação/ }).selectOption(balloon.id);
-    await attachment.getByRole('button', { name: 'Anexar contrato', exact: true }).click();
-    await attachment.waitFor({ state: 'hidden' });
-  }
-  await capture(page, 'contratos-do-pedido');
-  await ready(page);
+
+  let sharedWrites = 0, lotWrites = 0, receiptReads = 0;
+  const lostContract = async (route) => {
+    const name = route.request().postDataJSON()?.name;
+    if (name === 'get_commercial_contract_upload') {
+      receiptReads += 1;
+      if (receiptReads === 1) return route.abort('failed');
+      return route.continue();
+    }
+    if (name !== 'attach_order_contract' && name !== 'register_lot_contract_version') return route.continue();
+    const committed = await route.fetch();
+    const data = await committed.json();
+    if (!data.data) return route.fulfill({ response: committed });
+    if (name === 'attach_order_contract') sharedWrites += 1;
+    else lotWrites += 1;
+    return route.abort('failed');
+  };
+  await page.route('**/__gastronomy/rpc', lostContract);
+  await detail.getByRole('button', { name: 'Anexar contrato', exact: true }).click();
+  const attachment = page.getByRole('dialog', { name: 'Anexar contrato' });
+  await attachment.locator('input[type=file]').setInputFiles({ name: 'parque-e-balao-qa.pdf', mimeType: 'application/pdf', buffer });
+  await attachment.getByRole('radio', { name: /Toda a venda/ }).check();
+  await attachment.getByRole('button', { name: 'Anexar contrato', exact: true }).click();
+  await attachment.getByRole('alert').filter({ hasText: /envio ainda está sem confirmação/ }).waitFor();
+  await attachment.getByRole('button', { name: 'Anexar contrato', exact: true }).click();
+  await attachment.waitFor({ state: 'hidden' });
+  await awaitText(detail, 'parque-e-balao-qa.pdf');
+  assert.equal(sharedWrites, 1);
+  await assertFinance(page, 2537500, 0);
+  await page.getByRole('button', { name: 'Fechar Dashboard Comercial' }).click();
+
+  await openPoint(page, alamedaSpec, balloon, touch);
+  const ficha = page.locator(panel);
+  await ficha.getByRole('button', { name: 'Confirmar contrato assinado', exact: true }).click();
+  const confirm = page.getByRole('alertdialog');
+  const coverage = confirm.getByRole('list', { name: 'Espaços que serão confirmados' });
+  await awaitText(coverage, 'GAST-D1-03');
+  assert.equal(await coverage.getByText('GAST-J-02', { exact: true }).count(), 0);
+  await confirm.getByRole('radio', { name: 'Todos os pendentes do pedido' }).check();
+  await awaitText(coverage, 'GAST-J-02');
+
+  const snackItem = opened.items.find(item => item.lot_id === snack.id);
+  const confirmedElsewhere = await rpc(page, 'confirm_sale_order_items', { p_order_id: lostOrder, p_item_ids: [snackItem.id] }, 'sem-contratos');
+  assert.equal(confirmedElsewhere.error, null);
+  await confirm.getByRole('button', { name: 'Confirmar 2 espaços', exact: true }).click();
+  await confirm.getByText(/A lista de pendentes mudou/).waitFor();
+  await awaitText(coverage, 'GAST-D1-03');
+  assert.equal(await coverage.getByText('GAST-J-02', { exact: true }).count(), 0);
+  await readStatuses('SOLD', 'SALE_OPEN');
+  await assertFinance(page, 2537500, 2256000);
+  await captureSale('lista-de-assinatura-atualizada');
+  await confirm.getByRole('button', { name: 'Confirmar assinatura', exact: true }).click();
+  await confirm.waitFor({ state: 'hidden' });
   await readStatuses('SOLD');
-  await point(selected[1], balloon);
-  const documents = page.getByRole('region', { name: 'Contratos do ponto' });
-  await documents.getByText('balao-qa.pdf', { exact: true }).waitFor();
-  await documents.getByText('parque-e-balao-qa.pdf', { exact: true }).waitFor();
-  await page.getByText('Histórico de contratos', { exact: true }).click();
-  await capture(page, 'contratos-balao-apos-recarga');
+  await assertFinance(page, 2537500, 2537500);
+  await awaitText(ficha, 'Vendido · assinatura confirmada');
+
+  const docs = ficha.getByRole('region', { name: 'Contratos do ponto' });
+  await docs.getByRole('button', { name: 'Anexar contrato', exact: true }).click();
+  const pointAttachment = page.getByRole('dialog', { name: /Anexar contrato a GAST-D1-03/ });
+  await pointAttachment.locator('input[type=file]').setInputFiles({ name: 'balao-qa.pdf', mimeType: 'application/pdf', buffer });
+  await pointAttachment.getByRole('button', { name: 'Enviar contrato', exact: true }).click();
+  await pointAttachment.waitFor({ state: 'hidden' });
+  assert.equal(lotWrites, 1);
+  await page.unroute('**/__gastronomy/rpc', lostContract);
+  await ready(page);
+  await openPoint(page, alamedaSpec, balloon, touch);
+  await awaitText(docs, 'balao-qa.pdf');
+  await awaitText(docs, 'parque-e-balao-qa.pdf');
+  assert.equal(await docs.getByText(/Versão 1/).count(), 2);
+  await captureSale('contratos-apos-recarga');
   const pdfResponse = page.waitForResponse(response => response.url().includes('/__gastronomy/document/'));
-  await documents.getByRole('button', { name: 'Abrir contrato' }).first().click();
-  assert.equal((await pdfResponse).status(), 200);
-  await page.getByRole('dialog', { name: 'Contrato da venda' }).locator('iframe').waitFor();
-  console.log('Checkout, assinatura, contratos e recarga OK · 1 pedido, 2 pontos e R$ 25.375,00');
+  await docs.getByRole('button', { name: 'Abrir contrato' }).first().click();
+  const pdfUrl = (await pdfResponse).url();
+  assert.equal((await (await page.request.get(pdfUrl)).body()).subarray(0, 5).toString(), '%PDF-');
+  assert.equal((await page.request.get(new URL('/__gastronomy/document/sem-assinatura', url).href)).status(), 404);
+  const statuses = await rpc(page, 'get_lot_contract_history', { p_lot_id: balloon.id });
+  const limited = await rpc(page, 'get_lot_contract_history', { p_lot_id: balloon.id }, 'sem-contratos');
+  assert.equal(limited.data.documentsAccessible, false);
+  assert.deepEqual(limited.data.contracts, []);
+  for (const contract of statuses.data.contracts) {
+    const { data: result } = await rpc(page, 'get_commercial_contract_upload', { p_storage_path: contract.versions[0].storagePath });
+    assert.equal(result.registration.version, 1);
+    const sign = await qaRequest(page, 'storage/sign', { body: { name: contract.versions[0].storagePath }, profile: 'sem-contratos' });
+    assert.equal(sign.error.message, 'MAP_PERMISSION_DENIED');
+  }
+  assert.equal((await readStatuses('SOLD')).orders.length, 1);
+  if (!touch) {
+    await ready(page, 'sem-contratos');
+    await openPoint(page, alamedaSpec, balloon, false);
+    await awaitText(ficha, 'Documentos restritos');
+    await awaitText(ficha, 'Vendido · assinatura confirmada');
+    assert.equal(await ficha.getByText('Sem arquivo anexado', { exact: true }).count(), 0);
+    assert.equal(await ficha.getByRole('button', { name: 'Abrir contrato' }).count(), 0);
+    await captureSale('documentos-restritos');
+  }
+  console.log(`Venda ${viewport} · recuperação após recarga e novo carrinho, clique duplo, Dashboard, confirmação parcial, Financeiro, contratos privados e PDF OK`);
+
+  if (!touch && process.argv.includes('--concorrencia')) {
+    await ready(page);
+    await remainingCartScenario(page, byCode);
+  }
+}
+
+async function remainingCartScenario(page, byCode) {
+  const strawberry = byCode.get('GAST-B1-01');
+  const sandwich = byCode.get('GAST-B3-01');
+  const orchard = byCode.get('GAST-ARVOREDO-02');
+  const setPrice = async (total) => {
+    const response = await qaRequest(page, 'qa/second-stage', { body: { lotId: strawberry.id, total } });
+    assert.equal(response.error, null);
+  };
+  await setPrice(18125);
+  await ready(page);
+  await page.getByRole('button', { name: 'Vendas', exact: true }).click();
+  await page.waitForTimeout(850);
+  const cart = await cartPanel(page, false);
+  await cart.getByRole('button', { name: '2ª Etapa', exact: true }).click();
+  await reserveCartPoint(page, { ...sites.find(spec => spec.code === 'GAST-B1-01'), price: '18.125,00' }, strawberry, false);
+  await reserveCartPoint(page, sites.find(spec => spec.code === 'GAST-B3-01'), sandwich, false);
+  await reserveCartPoint(page, sites.find(spec => spec.code === 'GAST-ARVOREDO-02'), orchard, false);
+  assert.ok((await cart.innerText()).includes('43.720,00'));
+  const buyer = 'COMPRADOR DE TESTE PARA CONCORRÊNCIA';
+  const checkout = await fillCheckout(page, cart, buyer);
+
+  let changes = 0;
+  let winningOrder;
+  const race = async (route) => {
+    const { name, args } = route.request().postDataJSON();
+    if (name !== 'register_commercial_sale_order_checked') return route.continue();
+    changes += 1;
+    if (changes === 1) await setPrice(19400);
+    if (changes === 2) {
+      const other = await page.context().browser().newContext();
+      try {
+        const tab = await other.newPage();
+        const allowed = await rpc(tab, name, {
+          ...args,
+          p_operator_id: '00000000-0000-4000-a000-000000000014',
+          p_idempotency_key: 'qa-duas-sessoes-b1',
+          p_lot_ids: [strawberry.id],
+          p_expected_prices: { [strawberry.id]: 19400 },
+          p_expected_total: 19400, p_exhibitor_id: null, p_buyer_name: 'Segunda sessão fictícia',
+          p_installments: [{ ...args.p_installments[0], amount: 19400 }],
+        }, 'sem-contratos');
+        assert.equal(allowed.error, null);
+        winningOrder = allowed.data;
+      } finally { await other.close(); }
+    }
+    return route.continue();
+  };
+  await page.route('**/__gastronomy/rpc', race);
+  await checkout.getByRole('button', { name: 'Registrar venda em aberto' }).click();
+  await checkout.getByText(/O preço de tabela de GAST-B1-01 mudou/).waitFor();
+  await checkout.locator('dd').getByText('R$ 44.995,00', { exact: true }).first().waitFor();
+  await awaitText(checkout, buyer);
+  await capture(page, 'desktop-preco-alterado');
+  await checkout.getByRole('button', { name: 'Registrar venda em aberto' }).click();
+  await checkout.getByText(/GAST-B1-01 saiu do carrinho/).waitFor();
+  await awaitText(checkout, buyer);
+  await checkout.locator('dd').getByText('R$ 25.595,00', { exact: true }).first().waitFor();
+  assert.ok(winningOrder);
+  await capture(page, 'desktop-disponibilidade-alterada');
+  await checkout.getByRole('button', { name: 'Registrar venda em aberto' }).click();
+  const success = page.getByRole('dialog', { name: 'Venda em aberto registrada' });
+  await success.getByRole('button', { name: 'Voltar ao mapa', exact: true }).click();
+  await openPoint(page, sites.find(spec => spec.code === 'GAST-ARVOREDO-02'), orchard, false);
+  await page.locator(panel).getByRole('button', { name: 'Cancelar venda em aberto' }).click();
+  const confirm = page.getByRole('alertdialog');
+  await confirm.getByText(/Somente GAST-ARVOREDO-02/).waitFor();
+  await confirm.getByRole('button', { name: 'Cancelar venda', exact: true }).click();
+  await confirm.waitFor({ state: 'hidden' });
+  const inventory = await inventoryAt(page);
+  assert.equal(inventory.lots.find(lot => lot.id === strawberry.id).status, 'SALE_OPEN');
+  assert.equal(inventory.lots.find(lot => lot.id === sandwich.id).status, 'SALE_OPEN');
+  assert.equal(inventory.lots.find(lot => lot.id === orchard.id).status, 'AVAILABLE');
+  assert.equal(inventory.items.filter(item => item.lot_id === strawberry.id).length, 1);
+  await assertFinance(page, 5969000, 2537500);
+  console.log('Preço por etapa, reajuste durante revisão, duas sessões, formulário preservado e cancelamento parcial OK');
 }
 
 try {
-  for (const touch of saleOnly ? [false] : [false, true]) {
+  for (const touch of saleOnly ? [mobileSale] : [false, true]) {
     const page = await browser.newPage(touch
       ? { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }
       : { viewport: { width: 1340, height: 920 } });
@@ -229,7 +450,12 @@ try {
     const inventory = await page.evaluate(async () => (await (await fetch('/__gastronomy/inventory')).json()).data);
     const byCode = new Map(inventory.lots.map(lot => [lot.public_identifier, lot]));
     if (saleOnly) {
-      await saleScenario(page, byCode);
+      try {
+        await saleScenario(page, byCode, touch);
+      } catch (error) {
+        await capture(page, (touch ? 'celular' : 'desktop') + '-falha');
+        throw error;
+      }
       assert.deepEqual(errors, []);
       await page.close();
       continue;

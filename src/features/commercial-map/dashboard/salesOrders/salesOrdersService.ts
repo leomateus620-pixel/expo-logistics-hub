@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { registerPrivateContractUpload } from '../../services/contractUpload';
 import { validateContractFile } from '../../utils/contracts';
 import type { CommercialUnit } from '../../types';
 
@@ -207,30 +208,20 @@ export async function attachOrderContract(params: {
   const validationError = validateContractFile(params.file);
   if (validationError) throw new Error(validationError);
   if (params.lotIds.length === 0) throw new Error('Selecione ao menos um espaço.');
-  const extension = params.file.name.split('.').pop()?.toLowerCase() || 'pdf';
-  const objectPath = `${params.orgId}/orders/${params.orderId}/${crypto.randomUUID()}.${extension}`;
-  params.onProgress?.('upload');
-  const { error: uploadError } = await supabase.storage.from('map-contracts').upload(objectPath, params.file, {
-    cacheControl: '3600', contentType: params.file.type, upsert: false,
+  const registration = await registerPrivateContractUpload({
+    dir: `${params.orgId}/orders/${params.orderId}`,
+    file: params.file,
+    operation: 'attach_order_contract',
+    onProgress: params.onProgress,
+    args: {
+      p_order_id: params.orderId,
+      p_lot_ids: [...new Set(params.lotIds)].sort(),
+      p_contract_number: params.contractNumber?.trim() || null,
+      p_contract_id: params.contractId ?? null,
+    },
   });
-  if (uploadError) throw uploadError;
-  params.onProgress?.('register');
-  const { data, error } = await db.rpc('attach_order_contract', {
-    p_order_id: params.orderId,
-    p_lot_ids: params.lotIds,
-    p_storage_path: objectPath,
-    p_original_name: params.file.name,
-    p_mime_type: params.file.type,
-    p_file_size: params.file.size,
-    p_contract_number: params.contractNumber?.trim() || null,
-    p_contract_id: params.contractId ?? null,
-  });
-  if (error) {
-    await supabase.storage.from('map-contracts').remove([objectPath]).catch(() => undefined);
-    throw error;
-  }
   params.onProgress?.('done');
-  return data as { contractId: string; version: number; versionId: string };
+  return registration as { contractId: string; version: number; versionId: string };
 }
 
 export function describeSalesError(error: unknown): string {

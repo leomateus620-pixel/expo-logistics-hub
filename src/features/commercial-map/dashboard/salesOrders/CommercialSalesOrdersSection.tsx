@@ -63,7 +63,7 @@ export function CommercialSalesOrdersSection(props: CommercialSalesOrdersSection
   });
   const selected = query.data?.rows.find((row) => row.recordId === expandedRecordId);
   const selectedRecord = sameProject ? selected ?? (selectedRecordIdentity?.recordId === expandedRecordId ? selectedRecordIdentity : null) : null;
-  const errorText = query.error ? describeSalesError(query.error) : null;
+  const errorText = !expandedRecordId && query.error ? describeSalesError(query.error) : null;
   const restricted = errorText?.includes('permissão');
 
   useLayoutEffect(() => {

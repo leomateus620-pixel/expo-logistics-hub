@@ -1,4 +1,5 @@
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GastronomyStructurePanel } from '@/features/commercial-map/components/panels/GastronomyStructurePanel';
 import { OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS } from '@/features/commercial-map/data/officialReference2026';
@@ -7,6 +8,7 @@ import { useSaleInspectionStore } from '@/features/commercial-map/state/useSaleI
 import type { CommercialLot } from '@/features/commercial-map/types';
 
 const useLotContractHistory = vi.hoisted(() => vi.fn());
+vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: null }) }));
 vi.mock('@/features/commercial-map/hooks/useCommercialMap', () => ({ useLotContractHistory }));
 vi.mock('@/features/commercial-map/sales/components/SaleOpenSection', () => ({ SaleOpenSection: () => null }));
 vi.mock('@/features/commercial-map/components/commercial/LotContractFileButton', () => ({
@@ -47,9 +49,11 @@ function pointResponse(overrides: Partial<{
   } };
 }
 
+const client = new QueryClient();
+
 function panel(permissions = canManage) {
-  return <GastronomyStructurePanel structure={structure} points={points} canSell={permissions.canManageSales}
-    permissions={permissions} mapData={mapData} onClose={() => {}} />;
+  return <QueryClientProvider client={client}><GastronomyStructurePanel structure={structure} points={points} canSell={permissions.canManageSales}
+    permissions={permissions} mapData={mapData} onClose={() => {}} /></QueryClientProvider>;
 }
 
 function expand(name: string) {
@@ -84,7 +88,7 @@ describe('contratos no card de um ponto de Gastronomia', () => {
     expect(useLotContractHistory).not.toHaveBeenCalled();
     expand('Restaurante Central');
     expect(useLotContractHistory).toHaveBeenLastCalledWith('GAST-C2-01');
-    expect(screen.getByText('Nenhum contrato vigente anexado.')).toBeVisible();
+    expect(screen.getByText('Sem arquivo anexado')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Anexar contrato' })).not.toBeInTheDocument();
 
     useLotContractHistory.mockReturnValue(pointResponse({ canUpload: true }));
@@ -113,6 +117,8 @@ describe('contratos no card de um ponto de Gastronomia', () => {
     expect(within(details).getByText('central.pdf')).toBeVisible();
 
     view.rerender(panel({ ...canManage, canManageContracts: false }));
+    expect(screen.getByText('Documentos restritos')).toBeVisible();
+    expect(screen.queryByText('Sem arquivo anexado')).not.toBeInTheDocument();
     expect(screen.queryByText('central.pdf')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Abrir contrato' })).not.toBeInTheDocument();
   });

@@ -127,7 +127,7 @@ export function isPricingAvailable(pricing: LotPricing2028 | null | undefined): 
   );
 }
 
-export function stageTotal(pricing: LotPricing2028, stage: LotPricingStage): number | null {
+export function stageTotal(pricing: Pick<LotPricing2028, 'renovacaoTotal' | 'segundaTotal'>, stage: LotPricingStage): number | null {
   return stage === 'RENOVACAO' ? pricing.renovacaoTotal : pricing.segundaTotal;
 }
 

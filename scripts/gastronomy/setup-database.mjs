@@ -178,6 +178,23 @@ INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000013',org_
     const sitePoints = await buildMigrationEnvelope({ sitePoints: true });
     await db.unsafe(sitePoints.sql);
   }
+  const recovery = await buildMigrationEnvelope({ saleRecovery: true });
+  await db.unsafe(recovery.sql);
+  await db.unsafe(recovery.sql);
+  await db.unsafe(await read('./financial-scenario-fixture.sql'));
+  for (const [file, name] of [
+    ['20261124191500_financial_scenario_food_points.sql', '_financial_scenario_lots'],
+    ['20261022090000_financial_live_scenarios.sql', '_financial_scenario_commercial'],
+    ['20261124191500_financial_scenario_food_points.sql', '_financial_scenario_food_inventory'],
+    ['20261124191500_financial_scenario_food_points.sql', '_financial_scenario_build'],
+    ['20261022090000_financial_live_scenarios.sql', 'financial_scenario_overview'],
+  ]) {
+    await db.unsafe(functionDefinition(await migration(file), name));
+  }
+  await db.unsafe(`
+REVOKE EXECUTE ON FUNCTION public.financial_scenario_overview(uuid,uuid,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.financial_scenario_overview(uuid,uuid,text) TO authenticated;
+`);
   console.log('Banco descartável gastronomy_qa preparado em 127.0.0.1:55438.');
 } catch(e) {
   console.error(e.message, e.code, e.where ?? '', e.detail ?? '', e.position ?? '');

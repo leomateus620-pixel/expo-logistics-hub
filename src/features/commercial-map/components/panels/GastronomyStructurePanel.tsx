@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { ArrowLeft, BookOpen, ChevronDown, DoorOpen, FileLock2, Paperclip, Pencil, ShoppingCart, Utensils, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 import { STATUS_CONFIG } from '../../constants';
 import { getHistoryIdForEntity } from '../../history/bindings';
 import { HistoryExperience } from '../../history/HistoryExperience';
@@ -9,13 +11,15 @@ import { useLotContractHistory } from '../../hooks/useCommercialMap';
 import type { SaleContractVersion } from '../../dashboard/salesOrders/salesOrdersService';
 import { isSellableLot, toSalesEntry } from '../../sales/salesEntry';
 import { formatCents, toCents } from '../../sales/salesMoney';
+import { fetchFoodPointSaleSnapshot } from '../../sales/salesService';
+import { SALES_STAGE_LABELS } from '../../sales/salesTypes';
 import { useSalesStore } from '../../sales/useSalesSelection';
 import { SaleOpenSection } from '../../sales/components/SaleOpenSection';
 import type { LotContractHistoryDocument } from '../../services/commercialMapService';
 import { useSaleInspectionStore } from '../../state/useSaleInspectionStore';
 import { toCommercialPhase, type CommercialLot, type CommercialMapData, type MapEntity, type MapPermissions } from '../../types';
 import { FENASOJA_RESTAURANT_PRESENTATION_NAME } from '../../utils/fenasojaRestaurant';
-import { formatBrl } from '../../utils/lotPricing2028';
+import { formatBrl, stageTotal } from '../../utils/lotPricing2028';
 import { LotContractFileButton } from '../commercial/LotContractFileButton';
 import { LotWorkflowDialog } from '../commercial/LotWorkflowDialog';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
@@ -40,6 +44,7 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
 }) {
   const inspection = useSaleInspectionStore((state) => state.context);
   const inspectedSalePoint = useSaleInspectionStore((state) => state.focusedFoodLotId);
+  const stage = useSalesStore((state) => state.stage);
   const salesMode = useSalesStore((state) => state.salesModeActive);
   const cart = useSalesStore((state) => state.selection);
   const eligible = useSalesStore((state) => state.eligibleLotIds);
@@ -58,7 +63,7 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
   const name = structure.publicIdentifier === 'C2' ? FENASOJA_RESTAURANT_PRESENTATION_NAME : structure.name;
   const pricedPoints = points.map((point) => ({
     ...point,
-    price: point.lot.officialPricing2028?.renovacaoTotal ?? null,
+    price: point.lot.officialPricing2028 ? stageTotal(point.lot.officialPricing2028, stage) : null,
     inCart: cart.some(({ lotId }) => lotId === point.lot.id),
   }));
   const selected = pricedPoints.filter(({ lot, price, inCart }) => draft.has(lot.id)
@@ -169,12 +174,12 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
                       <strong>{lot.displayName}</strong>
                       {lot.foodType && <small>{lot.foodType}</small>}
                       <span className="gastronomy-panel__status" style={{ background: status.surface, color: status.border }}>
-                        {inCart ? 'Na venda' : status.label}
+                        {inCart ? 'No carrinho' : status.label}
                       </span>
                     </span>
                     <span className="gastronomy-panel__price">
                       <strong>{formatBrl(price) ?? 'Preço pendente'}</strong>
-                      {price != null && <small>por ponto</small>}
+                      {price != null && <small>Tabela · {SALES_STAGE_LABELS[stage]}</small>}
                     </span>
                     <ChevronDown aria-hidden="true" />
                   </button>
@@ -186,10 +191,11 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
                       <div><dt>Unidade comercial</dt><dd>1 ponto de alimentação</dd></div>
                       {lot.currentBuyer && <div><dt>Expositor</dt><dd>{lot.currentBuyer}</dd></div>}
                     </dl>
+                    {(lot.status === 'SALE_OPEN' || lot.status === 'SOLD') && !lot.id.startsWith('reference:') && <FoodPointSaleFacts lot={lot} canManageSales={permissions.canManageSales} />}
                     {canSell && lot.status === 'SALE_OPEN' && <SaleOpenSection lotId={lot.id} canManageSales mapData={mapData} />}
-                    {(permissions.canManageContracts || permissions.canManageSales) && !lot.id.startsWith('reference:') && !lot.archivedAt && (
-                      <GastronomyPointContracts lot={lot} structureName={name} permissions={permissions} />
-                    )}
+                    {(permissions.canManageContracts || permissions.canManageSales) && !lot.id.startsWith('reference:') && !lot.archivedAt
+                      ? <GastronomyPointContracts lot={lot} structureName={name} permissions={permissions} />
+                      : (lot.status === 'SALE_OPEN' || lot.status === 'SOLD') && <p className="gastronomy-panel__contract-status">Documentos restritos</p>}
                   </>}
                 </div>
               </li>;
@@ -197,13 +203,35 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
           </ul>
         </div>
         {selling && <footer className="gastronomy-panel__actions">
-          <span aria-live="polite"><small>{selected.length > 0 ? `${selected.length} ${selected.length === 1 ? 'ponto selecionado' : 'pontos selecionados'}` : 'Subtotal da seleção'}</small>
+          <span aria-live="polite"><small>{selected.length > 0 ? `${selected.length} ${selected.length === 1 ? 'ponto selecionado' : 'pontos selecionados'}` : 'Subtotal de tabela'}</small>
             <strong>{formatCents(subtotal)}</strong></span>
           <Button type="button" disabled={!selected.length} onClick={addSelected}><ShoppingCart />Adicionar à venda</Button>
         </footer>}
       </div>
     </aside>
   );
+}
+
+function FoodPointSaleFacts({ lot, canManageSales }: { lot: CommercialLot; canManageSales: boolean }) {
+  const { user } = useAuth();
+  const snapshot = useQuery({
+    queryKey: ['commercial-map', 'food-point-sale', lot.id, user?.id, canManageSales],
+    queryFn: () => fetchFoodPointSaleSnapshot(lot.id),
+    enabled: Boolean(user),
+    retry: false,
+  });
+  if (!snapshot.data) return null;
+  const { signatureState, negotiatedValue, orderFees } = snapshot.data;
+  return <>
+    {lot.status === 'SOLD' && <p className="gastronomy-panel__contract-status">
+      {signatureState === 'SIGNED' ? 'Vendido · assinatura confirmada'
+        : signatureState === 'LEGACY_UNVERIFIED' ? 'Vendido · assinatura sem verificação' : 'Vendido'}
+    </p>}
+    {canManageSales && (negotiatedValue != null || orderFees != null) && <dl>
+      {negotiatedValue != null && <div><dt>Valor negociado deste ponto</dt><dd>{formatBrl(negotiatedValue)}</dd></div>}
+      {orderFees != null && <div><dt>Taxas do pedido</dt><dd>{formatBrl(orderFees)}</dd></div>}
+    </dl>}
+  </>;
 }
 
 const contractDateTime = new Intl.DateTimeFormat('pt-BR', {
@@ -261,9 +289,11 @@ function GastronomyPointContracts({ lot, structureName, permissions }: {
   </div>;
 
   return <>
+    {!accessible && (lot.status === 'SALE_OPEN' || lot.status === 'SOLD') &&
+      <p className="gastronomy-panel__contract-status">Documentos restritos</p>}
     {accessible && (data?.saleId || current.length > 0) && <section className="gastronomy-panel__contracts" aria-label="Contratos do ponto">
       <h4><FileLock2 aria-hidden="true" />Contratos do ponto</h4>
-      {current.length === 0 && <p>Nenhum contrato vigente anexado.</p>}
+      {current.length === 0 && <p>Sem arquivo anexado</p>}
       {current.map((contract) => {
         const version = contract.versions.find((version) => version.version === contract.activeVersion);
         return <article className="gastronomy-panel__contract" key={contract.contractId}>
