@@ -418,7 +418,7 @@
 
 .sales-recovery-trigger {
   position: absolute;
-  z-index: 36;
+  z-index: 44;
   left: max(12px, env(safe-area-inset-left));
   bottom: calc(76px + env(safe-area-inset-bottom));
 }

@@ -1,5 +1,13 @@
 # Roadmap
 
+## Recuperação de tentativas de venda
+- [x] Permitir remover somente avisos locais sem pedido encontrado, com confirmação e nova consulta; preservar erros e pedidos existentes.
+- [x] Preservar tentativa e dados originais ao fechar/reabrir o checkout e sair/voltar ao modo Vendas, sem persistir dados pessoais do reenvio.
+- [x] Validar 50 testes de regressão; remoção com consulta real autenticada no mapa em desktop/celular, incluindo recarga e limpeza das tentativas sintéticas locais. Nenhuma gravação comercial, SQL ou publicação.
+- Auditoria por código: recuperação compartilhada do mapa 3D/lista e verificação no checkout desktop/celular receberam dispensa segura; checkout e remontagem do modo Vendas preservam o reenvio original. Armazenamento local/legado mantém escopo; serviço/hook de venda mantém erros indeterminados e consulta autorizada; RPCs versionadas de consulta/registro mantêm escopo e idempotência, sem alterações. Nenhum consumidor adicional ou job de recuperação foi encontrado nas funções pesquisadas.
+- Corrigido também o botão coberto pela camada da lista (evidência de clique bloqueado no navegador); permanece abaixo dos diálogos.
+- Limite da validação: checkout com falha e reenvio exercitado em testes de componentes; navegador autenticado validou a recuperação pela lista porque a cena WebGL travou no ambiente de teste, não o checkout 3D completo.
+
 ## Fenasoja Meeting — áudio real, Gemini 3.5 Transcribe e relatório GPT‑6.1 Sol
 - [x] Banco: pipeline de áudio, provedores efetivos, fila de transcrição, relatório estruturado, artefatos, flag e limites (migração aditiva).
 - [x] Armazenamento privado: áudio temporário (até 72 h) e exportações.

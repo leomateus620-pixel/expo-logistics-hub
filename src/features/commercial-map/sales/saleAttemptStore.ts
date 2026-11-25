@@ -1,10 +1,17 @@
-import type { SalesStage } from './salesTypes';
+import type { SalesOrderPayload, SalesStage } from './salesTypes';
 
 const LEGACY_SESSION_KEY = 'fenasoja.commercial-sale-attempt.v1';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const PREFIX = 'fenasoja.commercial-sale-attempt.v2:';
 const changed = 'commercial-sale-attempts-changed';
 const inMemory = new Map<string, SaleAttempt>();
+// Dados pessoais do reenvio ficam apenas na aplicação aberta, nunca no armazenamento persistente.
+const uncertainSales = new Map<string, UncertainSale>();
+
+export interface UncertainSale {
+  attempt: SaleAttempt;
+  payload: SalesOrderPayload;
+}
 
 export interface SaleAttemptOwner {
   projectId: string;
@@ -61,9 +68,25 @@ export function adoptVerifiedSessionAttempt(attempt: SaleAttempt) {
 
 export function clearSaleAttempt(attempt: SaleAttempt) {
   const key = storageKey(attempt);
+  uncertainSales.delete(key);
   inMemory.delete(key);
   try { localStorage.removeItem(key); } catch { /* armazenamento indisponível */ }
   window.dispatchEvent(new Event(changed));
+}
+
+export function rememberUncertainSale(attempt: SaleAttempt, payload: SalesOrderPayload): UncertainSale {
+  const sale = { attempt, payload: structuredClone(payload) };
+  uncertainSales.set(storageKey(attempt), sale);
+  window.dispatchEvent(new Event(changed));
+  return sale;
+}
+
+export function readUncertainSale(owner: SaleAttemptOwner): UncertainSale | null {
+  for (const attempt of listSaleAttempts(owner)) {
+    const sale = uncertainSales.get(storageKey(attempt));
+    if (sale) return sale;
+  }
+  return null;
 }
 
 export function listSaleAttempts(owner: SaleAttemptOwner): SaleAttempt[] {

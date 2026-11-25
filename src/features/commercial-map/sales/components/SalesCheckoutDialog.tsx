@@ -17,7 +17,7 @@ import { uploadSaleLogo } from '../saleLogo';
 import { toast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
-import { clearSaleAttempt, startSaleAttempt, type SaleAttempt, type SaleAttemptOwner } from '../saleAttemptStore';
+import { clearSaleAttempt, readUncertainSale, rememberUncertainSale, startSaleAttempt, subscribeToSaleAttempts, type SaleAttempt, type SaleAttemptOwner } from '../saleAttemptStore';
 import { SalesOrderError } from '../salesErrors';
 import { SaleAttemptCheck } from './SaleAttemptRecovery';
 
@@ -56,13 +56,17 @@ export function SalesCheckoutDialog({ summary, owner, availabilityNotices, onOpe
   const [payment, setPayment] = useState<SalesPaymentDraft>(() => initialSalesPayment(totalCents));
   const [advancing, setAdvancing] = useState(false);
   const submitting = useRef(false);
-  const [uncertain, setUncertain] = useState<{ attempt: SaleAttempt; payload: SalesOrderPayload } | null>(null);
+  const [uncertain, setUncertain] = useState(() => readUncertainSale(owner));
   const [orderId, setOrderId] = useState<string | null>(null);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [priceNotices, setPriceNotices] = useState<string[]>([]);
   const observedPrices = useRef({ stage, lines: summary.lines, open });
   const checkout = useSalesCheckout();
   const autosave = useExhibitorAutosave(buyer, selection[0]?.lotId ?? null, open);
+
+  useEffect(() => subscribeToSaleAttempts(() => {
+    setUncertain(readUncertainSale(owner));
+  }), [owner.projectId, owner.operatorId]);
 
   useEffect(() => () => { if (logoPreview) URL.revokeObjectURL(logoPreview); }, [logoPreview]);
 
@@ -140,7 +144,7 @@ export function SalesCheckoutDialog({ summary, owner, availabilityNotices, onOpe
       autosave.reset();
     } catch (error) {
       if (!(error instanceof SalesOrderError) || error.indeterminate) {
-        setUncertain({ attempt, payload });
+        setUncertain(rememberUncertainSale(attempt, payload));
       } else {
         clearSaleAttempt(attempt);
         setSubmissionError(error.message);
@@ -152,7 +156,7 @@ export function SalesCheckoutDialog({ summary, owner, availabilityNotices, onOpe
   };
 
   const confirm = () => {
-    if (!stepValid || submitting.current) return;
+    if (!stepValid || submitting.current || uncertain) return;
     const lotIds = selection.map((item) => item.lotId);
     const attempt = startSaleAttempt(owner, stage, lotIds);
     void submit(attempt, {
@@ -176,7 +180,6 @@ export function SalesCheckoutDialog({ summary, owner, availabilityNotices, onOpe
       setOrderId(null);
       setStep(0);
     }
-    setUncertain(null);
     setOpen(false);
   };
   const openOrder = (id: string) => {
