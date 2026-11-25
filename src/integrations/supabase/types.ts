@@ -6861,6 +6861,8 @@ export type Database = {
           spaces_subtotal: number | null
           stage: string
           status: string
+          submission_digest: string | null
+          submitted_lot_ids: string[] | null
           updated_at: string
         }
         Insert: {
@@ -6892,6 +6894,8 @@ export type Database = {
           spaces_subtotal?: number | null
           stage: string
           status?: string
+          submission_digest?: string | null
+          submitted_lot_ids?: string[] | null
           updated_at?: string
         }
         Update: {
@@ -6923,6 +6927,8 @@ export type Database = {
           spaces_subtotal?: number | null
           stage?: string
           status?: string
+          submission_digest?: string | null
+          submitted_lot_ids?: string[] | null
           updated_at?: string
         }
         Relationships: [
@@ -8331,6 +8337,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           display_name: string
+          expires_at: string | null
           id: string
           is_active: boolean
           org_id: string
@@ -8350,6 +8357,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           display_name: string
+          expires_at?: string | null
           id?: string
           is_active?: boolean
           org_id: string
@@ -8369,6 +8377,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           display_name?: string
+          expires_at?: string | null
           id?: string
           is_active?: boolean
           org_id?: string
@@ -12242,6 +12251,10 @@ export type Database = {
           stage: string
         }[]
       }
+      _financial_scenario_food_inventory: {
+        Args: { project: string }
+        Returns: Json
+      }
       _financial_scenario_lots: {
         Args: { project: string }
         Returns: {
@@ -13108,10 +13121,16 @@ export type Database = {
         }
         Returns: boolean
       }
-      confirm_sale_order_items: {
-        Args: { p_item_ids: string[]; p_order_id: string }
-        Returns: Json
-      }
+      confirm_sale_order_items:
+        | { Args: { p_item_ids: string[]; p_order_id: string }; Returns: Json }
+        | {
+            Args: {
+              p_expect_all_pending: boolean
+              p_item_ids: string[]
+              p_order_id: string
+            }
+            Returns: Json
+          }
       create_commercial_lot: {
         Args: {
           p_area_validation_status: string
@@ -13769,6 +13788,19 @@ export type Database = {
         Args: { _allocation: string; _details: Json; _org: string }
         Returns: undefined
       }
+      get_commercial_contract_upload: {
+        Args: { p_storage_path: string }
+        Returns: Json
+      }
+      get_commercial_sale_attempt: {
+        Args: {
+          p_idempotency_key: string
+          p_lot_ids: string[]
+          p_project_id: string
+          p_stage: string
+        }
+        Returns: Json
+      }
       get_commercial_sale_order_detail: {
         Args: { p_order_id?: string; p_sale_id?: string }
         Returns: Json
@@ -13780,6 +13812,10 @@ export type Database = {
           expected_lot_count: number
           lineage_delta: number
         }[]
+      }
+      get_food_point_sale_snapshot: {
+        Args: { p_lot_id: string }
+        Returns: Json
       }
       get_lot_contract_history: { Args: { p_lot_id: string }; Returns: Json }
       get_sale_order_revisions: { Args: { p_order_id: string }; Returns: Json }
@@ -14025,6 +14061,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           display_name: string
+          expires_at: string | null
           id: string
           is_active: boolean
           org_id: string
@@ -14193,6 +14230,33 @@ export type Database = {
           p_payment_method: string
           p_payment_type: string
           p_phone: string
+          p_stage: string
+        }
+        Returns: string
+      }
+      register_commercial_sale_order_checked: {
+        Args: {
+          p_buyer_name: string
+          p_buyer_trade_name: string
+          p_document_number: string
+          p_email: string
+          p_exhibitor_id: string
+          p_expected_prices: Json
+          p_expected_total: number
+          p_fee_admin: number
+          p_fee_cleaning_license: number
+          p_fee_ppci: number
+          p_first_due_date: string
+          p_idempotency_key: string
+          p_installment_count: number
+          p_installments: Json
+          p_lot_ids: string[]
+          p_notes: string
+          p_operator_id: string
+          p_payment_method: string
+          p_payment_type: string
+          p_phone: string
+          p_project_id: string
           p_stage: string
         }
         Returns: string
