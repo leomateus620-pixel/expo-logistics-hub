@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useSalesCheckout } from '@/features/commercial-map/sales/useSalesCheckout';
+import { scheduleCommercialMapRefresh } from '@/features/commercial-map/queries/commercialMapRefresh';
 import { useSalesStore } from '@/features/commercial-map/sales/useSalesSelection';
 import { soldLotSurfaceColor, isSoldLot } from '@/features/commercial-map/utils/soldLotPresentation';
 import { registerSaleOrder } from '@/features/commercial-map/sales/salesService';
@@ -20,7 +21,7 @@ describe('confirmed sale -> shared map query -> sold presentation', () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity }, mutations: { retry: false } } });
     const readOfficial = vi.fn(async () => ({ id: 'lot', status: officialStatus }));
     vi.mocked(registerSaleOrder).mockImplementation(async () => {
-      officialStatus = 'SOLD';
+      officialStatus = 'SALE_OPEN';
       return {} as Awaited<ReturnType<typeof registerSaleOrder>>;
     });
     const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
@@ -36,19 +37,22 @@ describe('confirmed sale -> shared map query -> sold presentation', () => {
       useSalesStore.getState().setCheckoutOpen(true);
     });
     await act(async () => { await result.current.checkout.mutateAsync({} as SalesOrderPayload); });
+    await waitFor(() => expect(result.current.map.data?.status).toBe('SALE_OPEN'));
+    expect(result.current.segment.data?.status).toBe('SALE_OPEN');
+    expect(isSoldLot(result.current.map.data?.status)).toBe(false);
+    officialStatus = 'SOLD';
+    await act(async () => { await scheduleCommercialMapRefresh(client, 0); });
     await waitFor(() => expect(result.current.map.data?.status).toBe('SOLD'));
     expect(result.current.segment.data?.status).toBe('SOLD');
     expect(isSoldLot(result.current.map.data?.status)).toBe(true);
     expect(soldLotSurfaceColor(result.current.map.data?.status)).not.toBeNull();
-    expect(useSalesStore.getState().selection).toEqual([]);
-    expect(useSalesStore.getState().checkoutOpen).toBe(false);
     officialStatus = 'RESERVED';
     await act(async () => { await client.invalidateQueries({ queryKey: ['commercial-map'] }); });
     await waitFor(() => expect(result.current.map.data?.status).toBe('RESERVED'));
     expect(isSoldLot(result.current.map.data?.status)).toBe(false);
     expect(soldLotSurfaceColor(result.current.map.data?.status)).toBeNull();
     expect(registerSaleOrder).toHaveBeenCalledTimes(1);
-    expect(readOfficial).toHaveBeenCalledTimes(6);
+    expect(readOfficial).toHaveBeenCalledTimes(8);
     unmount(); client.clear();
   });
 });

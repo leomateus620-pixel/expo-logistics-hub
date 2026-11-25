@@ -4,6 +4,7 @@ import { useCommercialMapBootVisit } from './hooks/useCommercialMapBootVisit';
 import { useExporuralRevisionSelection } from './hooks/useExporuralRevisionSelection';
 import { Profiler, lazy, Suspense, useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentType, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
@@ -54,6 +55,7 @@ import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
 import { CommercialMapDock } from './components/dock/CommercialMapDock';
 import { CommercialMapHeaderTools } from './components/shell/CommercialMapHeaderTools';
 import { SalesModeLayer } from './sales/components/SalesModeLayer';
+import { SaleAttemptsRecovery } from './sales/components/SaleAttemptRecovery';
 import { useSalesStore } from './sales/useSalesSelection';
 const GeometryEditor = lazy(() => import('./components/editor/GeometryEditor').then((m) => ({ default: m.GeometryEditor })));
 const LotCreationWorkspace = lazy(() => import('./components/editor/LotCreationWorkspace').then((m) => ({ default: m.LotCreationWorkspace })));
@@ -94,6 +96,7 @@ import { scheduleCommercialMapRefresh } from './queries/commercialMapRefresh';
 import { useSaleInspectionStore } from './state/useSaleInspectionStore';
 import { resolveSaleInspection, type SaleInspectionGroup, type SaleInspectionResolution, type SaleInspectionSpace } from './utils/saleInspectionGroups';
 import { SaleInspectionPanel } from './components/panels/SaleInspectionPanel';
+import { useSalesOrdersUiStore } from './dashboard/salesOrders/useSalesOrdersUiStore';
 import type { SaleOrderSummary } from './dashboard/salesOrders/salesOrdersService';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
@@ -206,6 +209,7 @@ const COMMISSION_READ_ONLY_PERMISSIONS: MapPermissions = {
 
 export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, previewData, previewWebGLUnavailable = false }: CommercialMapPageProps) {
   useCommercialMapBootVisit();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const isCommissionScope = scope.mode === 'commission';
   const lockedSegmentId = scope.mode === 'commission'
@@ -258,7 +262,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const lastInteriorEntityId = useRef<string | null>(null);
   const [publishReason, setPublishReason] = useState('Publicação após revisão cartográfica e comercial');
   const [dashboardOpen, setDashboardOpen] = useState(false);
+  const [recoveredSalesOpen, setRecoveredSalesOpen] = useState(false);
   const dashboardAvailable = permissions.canViewMapAnalytics && !isPreview && !isCommissionScope && !visitEnabled;
+  const recoveredSalesAvailable = permissions.canManageSales && !isPreview && !isCommissionScope && !visitEnabled;
+  const dashboardVisible = dashboardAvailable || (recoveredSalesOpen && recoveredSalesAvailable);
   const [saleResolution, setSaleResolution] = useState<SaleInspectionResolution | null>(null);
   useEffect(() => () => useSaleInspectionStore.getState().clear(), []);
   const dashboardOverlayRef = useRef<HTMLDivElement>(null);
@@ -267,6 +274,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const dashboardViewportRef = useRef<HTMLDivElement>(null);
   const closeDashboard = useCallback(() => {
     setDashboardOpen(false);
+    setRecoveredSalesOpen(false);
     window.requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(
       '[data-commercial-dashboard-trigger]',
     )?.focus());
@@ -292,8 +300,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
   const previousMapScope = useRef(mapScopeKey);
 
   useEffect(() => {
-    if (!dashboardAvailable) setDashboardOpen(false);
-  }, [dashboardAvailable]);
+    if (!dashboardVisible) setDashboardOpen(false);
+  }, [dashboardVisible]);
 
   useEffect(() => {
     if (dashboardDockRef.current) dashboardDockRef.current.inert = dashboardOpen;
@@ -762,6 +770,16 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
     useSaleInspectionStore.getState().frame(resolution.overviewEntityIds);
   };
 
+  const openRecoveredOrder = (orderId: string) => {
+    const workspace = useSalesOrdersUiStore.getState();
+    workspace.ensureProjectScope(data.project.id);
+    workspace.setSelectedRecordIdentity({ recordId: orderId, orderId, saleId: null });
+    workspace.setExpanded(orderId);
+    workspace.setArea('sales');
+    setRecoveredSalesOpen(true);
+    setDashboardOpen(true);
+  };
+
   const handleDashboardViewSale = (record: SaleOrderSummary, lotIds: string[]) => {
     const resolution = resolveSaleInspection(lotIds, data.lots, data.entities);
     useSaleInspectionStore.getState().start({
@@ -872,10 +890,14 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
           className={`commercial-map-viewport${webglAvailable ? '' : ' is-webgl-fallback'}`}
           style={dashboardOpen ? { pointerEvents: 'none' } : undefined}>
 
+        {recoveredSalesAvailable && user && data.source === 'database' && <SaleAttemptsRecovery
+          key={`${data.project.id}:${user.id}`} owner={{ projectId: data.project.id, operatorId: user.id }}
+          onOpenOrder={openRecoveredOrder} labelOf={(id) => data.lots.find((lot) => lot.id === id)?.publicIdentifier ?? id} />}
         {webglAvailable && workspaceMode === '3d' && permissions.canManageSales
           && (!visitEnabled || workspaceBeforeVisit.current === '3d') && (
           <div style={{ display: visitEnabled || soyHarvestActive ? 'none' : 'contents' }} data-visit-preserved-sales>
-          <SalesModeLayer projectId={data.project?.id ?? null} lots={data.lots} entities={data.entities} />
+          <SalesModeLayer projectId={data.project?.id ?? null} operatorId={user?.id} lots={data.lots} entities={data.entities}
+            onOpenOrder={openRecoveredOrder} />
           </div>
         )}
 
@@ -1089,7 +1111,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
             onClose={closeSaleInspection}
           />
         )}
-        {dashboardOpen && dashboardAvailable && (
+        {dashboardOpen && dashboardVisible && (
           <div
             ref={dashboardOverlayRef}
             id="commercial-dashboard-overlay"
@@ -1133,6 +1155,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                   orgId={data.project.orgId}
                   canManageSales={permissions.canManageSales}
                   canManageContracts={permissions.canManageContracts}
+                  salesOnly={!dashboardAvailable}
                   scrollContainer={getDashboardScrollContainer}
                   onViewSale={handleDashboardViewSale}
                 />

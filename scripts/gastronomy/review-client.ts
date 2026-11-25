@@ -135,7 +135,10 @@ function storage(bucket: string) {
   const byName = (operation: string, name: string, download?: string) => send(operation, { 'content-type': 'application/json' }, JSON.stringify({ name, download }));
   return {
     upload: (name: string, file: File) => send('upload', { 'content-type': file.type, 'x-gastronomy-qa-path': name }, file),
-    remove: (names: string[]) => Promise.all(names.map(name => byName('remove', name))),
+    remove: async (names: string[]) => {
+      const results = await Promise.all(names.map(name => byName('remove', name)));
+      return results.find(result => result.error) ?? ok(null);
+    },
     createSignedUrl: (name: string, _ttl: number, options?: { download?: string }) => byName('sign', name, options?.download),
   };
 }

@@ -63,6 +63,7 @@ describe('registerSaleOrder', () => {
     const { registerSaleOrder } = await import('@/features/commercial-map/sales/salesService');
 
     await expect(registerSaleOrder({
+      projectId: 'project', operatorId: 'operator', expectedPrices: { a: 50, b: 50 },
       idempotencyKey: 'key-1',
       stage: 'RENOVACAO',
       lotIds: ['a', 'b'],
@@ -72,7 +73,7 @@ describe('registerSaleOrder', () => {
       fees: { adminCents: 0, ppciCents: 0, cleaningCents: 0 },
       installments: [],
       expectedTotal: 100,
-    })).rejects.toMatchObject({ name: 'SalesOrderError' });
+    })).rejects.toMatchObject({ name: 'SalesOrderError', indeterminate: true });
 
     expect(spy).toHaveBeenCalledWith('commercial_sale_order_failed', expect.objectContaining({
       operation: 'register_commercial_sale_order',
@@ -94,6 +95,7 @@ describe('registerSaleOrder', () => {
     const { registerSaleOrder } = await import('@/features/commercial-map/sales/salesService');
 
     const failure: SalesOrderError = await registerSaleOrder({
+      projectId: 'project', operatorId: 'operator', expectedPrices: { a: 10 },
       idempotencyKey: 'key-2',
       stage: 'SEGUNDA_ETAPA',
       lotIds: ['a'],

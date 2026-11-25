@@ -154,3 +154,53 @@ Na mesma vista oblíqua próxima, o Chromium em Apple M5 alternou a visibilidade
 | Mirante · D3 | [Seleção com estados mistos](evidence/gastronomia/09-mirante-desktop.jpg) | [Seleção e subtotal](evidence/gastronomia/05-mirante-celular.jpg) |
 | Dashboard | [Recorte e valores](evidence/gastronomia/06-dashboard-desktop.jpg) | [Indicadores e estrutura](evidence/gastronomia/07-dashboard-celular.jpg) |
 | Venda | [Detalhe de C2](evidence/gastronomia/10-venda-c2-desktop.jpg) · [Inspeção da Pizzaria](evidence/gastronomia/11-inspecao-pizzaria.jpg) | [Carrinho opaco](evidence/gastronomia/04-carrinho-celular.jpg) |
+
+## Recuperação de vendas e contratos
+
+Se a resposta do checkout for interrompida, use **Verificar resultado**. Após uma recarga, acesse **Recuperar venda** no mapa. A consulta usa a etapa e os UUIDs do envio original, no projeto e na sessão do operador que o registrou. Quando o servidor localiza a venda, **Abrir pedido** leva ao número de referência na Dashboard. Uma consulta sem correspondência mantém a tentativa disponível para nova verificação.
+
+A ficha separa o preço de tabela da etapa ativa, o valor negociado do ponto e as taxas do pedido. **No carrinho** indica uma seleção local. Na confirmação da assinatura, escolha o ponto atual ou todos os pendentes do pedido. Se o conjunto de pendentes mudar, confira a lista atualizada antes de confirmar. **Sem arquivo anexado** aparece para quem pode consultar documentos. **Documentos restritos** aparece quando a consulta ao arquivo está fora do perfil.
+
+### Evidência com dados fictícios
+
+O Chromium descartou a resposta HTTP depois de o PostgreSQL confirmar a transação. Na versão anterior, a tela indicou falha e o operador ficou sem ação de recuperação após recarregar. A verificação atual abriu o pedido original com dois itens e uma parcela, mantendo GAST-J-01 e GAST-J-03 disponíveis.
+
+| Cenário | Evidência |
+| --- | --- |
+| Antes da correção | [Resposta interrompida](evidence/gastronomia/sale-recovery/antes-resposta-perdida.jpg) · [Após recarga](evidence/gastronomia/sale-recovery/antes-apos-recarga.jpg) |
+| Recuperação com outro carrinho | [Desktop](evidence/gastronomia/sale-recovery/desktop-pedido-recuperado.jpg) · [Celular](evidence/gastronomia/sale-recovery/celular-pedido-recuperado.jpg) |
+| Operador confirma após revisar a lista atualizada | [Desktop](evidence/gastronomia/sale-recovery/desktop-lista-de-assinatura-atualizada.jpg) · [Celular](evidence/gastronomia/sale-recovery/celular-lista-de-assinatura-atualizada.jpg) |
+| Contrato individual e compartilhado após recarga | [Desktop](evidence/gastronomia/sale-recovery/desktop-contratos-apos-recarga.jpg) · [Celular](evidence/gastronomia/sale-recovery/celular-contratos-apos-recarga.jpg) · [Perfil sem gestão de contratos](evidence/gastronomia/sale-recovery/desktop-documentos-restritos.jpg) |
+| Mudanças durante a revisão do checkout | [Preço atualizado](evidence/gastronomia/sale-recovery/desktop-preco-alterado.jpg) · [Disponibilidade alterada](evidence/gastronomia/sale-recovery/desktop-disponibilidade-alterada.jpg) |
+
+O cenário do pedido GAST-J-02 + GAST-D1-03 devolveu os seguintes valores na categoria Gastronomia do Financeiro 2028. A verificação executou a RPC de Simulações sobre o mesmo banco descartável do mapa.
+
+| Momento | Em carteira | Confirmado | Recebido |
+| --- | ---: | ---: | ---: |
+| Após checkout e anexo compartilhado | R$ 25.375,00 | R$ 0,00 | R$ 0,00 |
+| Após confirmar apenas GAST-J-02 | R$ 25.375,00 | R$ 22.560,00 | R$ 0,00 |
+| Após confirmar GAST-D1-03 | R$ 25.375,00 | R$ 25.375,00 | R$ 0,00 |
+
+### Repetir e revisar a entrega
+
+Use o PostgreSQL descartável em `127.0.0.1:55438`. A primeira preparação serve à suíte de banco. As demais restauram a base para cada execução que grava uma venda.
+
+```sh
+node scripts/gastronomy/setup-database.mjs
+node scripts/gastronomy/database-qa.mjs
+node scripts/gastronomy/setup-database.mjs --via-expressa-chopp --site-points
+npx vite --config scripts/gastronomy/review.vite.config.ts
+```
+
+Em outro terminal, execute os testes contra a prévia local.
+
+```sh
+node scripts/gastronomy/site-points-browser-qa.mjs
+node scripts/gastronomy/site-points-browser-qa.mjs --venda --concorrencia
+node scripts/gastronomy/setup-database.mjs --via-expressa-chopp --site-points
+node scripts/gastronomy/site-points-browser-qa.mjs --venda --celular
+```
+
+O teste usa as regras de acesso e as RPCs reais no PostgreSQL local. O servidor da prévia guarda o PDF fictício em disco e emite uma URL temporária para validar a leitura no navegador. O ensaio de upload e assinatura de URL pelo serviço Supabase Storage do projeto segue pendente. A consulta de preparação no Fenasoja Log original confirmou a versão de cadastro, o bucket privado e o índice único por caminho de contrato. [Fenasoja Log](https://lovable.dev/projects/756eeb64-0d44-4171-b445-f8a60f0492c0)
+
+A [migration de recuperação](../supabase/migrations/20261125180000_commercial_sale_recovery.sql) registra a versão `20261125180000`. O comando `node scripts/gastronomy/migration-envelope.mjs --sale-recovery` gera o SQL transacional com o SHA-256 da fonte. A preparação local aplica esse envelope duas vezes para verificar a idempotência. A aplicação no projeto original deve acompanhar a aprovação da implantação da interface.

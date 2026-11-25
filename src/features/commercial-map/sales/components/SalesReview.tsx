@@ -47,7 +47,7 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
                 <small>{[line.entry.location, line.entry.area,
                   line.entry.commercialUnit === 'FOOD_POINT' ? foodPointQuantityLabel(1) : formatAreaSqmLabel(line.areaSqm)]
                   .filter(Boolean).join(' · ')}</small></span>
-              <strong>{formatCents(toCents(line.total ?? 0))}</strong>
+              <strong>{line.total == null ? (line.pending ? 'Calculando…' : 'Preço pendente') : formatCents(toCents(line.total))}</strong>
             </li>
           ))}
         </ul>
@@ -70,7 +70,7 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
           </Button>}
         </div>
         <dl className="sales-totals">
-          <div><dt>Subtotal dos espaços</dt><dd>{formatCents(spacesCents)}</dd></div>
+          <div><dt>Subtotal de tabela</dt><dd>{formatCents(spacesCents)}</dd></div>
           {showFees && (
             <>
               {fees.adminCents > 0 && <div className="is-sub"><dt>Taxa administrativa</dt><dd>{formatCents(fees.adminCents)}</dd></div>}
@@ -79,7 +79,7 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
             </>
           )}
           {feesCents > 0 && <div><dt>Total das taxas</dt><dd>{formatCents(feesCents)}</dd></div>}
-          <div className="is-strong is-final"><dt>Total da venda</dt><dd>{formatCents(totalCents)}</dd></div>
+          <div className="is-strong is-final"><dt>Total negociado com taxas</dt><dd>{formatCents(totalCents)}</dd></div>
         </dl>
       </section>
 

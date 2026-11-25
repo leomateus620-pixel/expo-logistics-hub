@@ -60,7 +60,7 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
           <span>{formatAreaSqmLabel(summary.areaTotal)}</span>
         </div>}
         <div className="sales-cart__totals-row is-primary">
-          <span>Total</span>
+          <span>Subtotal de tabela</span>
           <strong>{loading ? '—' : formatBrl(summary.valueTotal)}</strong>
         </div>
       </div>

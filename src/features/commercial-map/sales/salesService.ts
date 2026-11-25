@@ -2,6 +2,7 @@ import { buyerDisplayName } from '../utils/buyerDisplayName';
 import { supabase } from '@/integrations/supabase/client';
 import type { LotPricing2028, LotPricingResolution } from '../utils/lotPricing2028';
 import type { SalesOrderPayload } from './salesTypes';
+import type { SaleAttempt } from './saleAttemptStore';
 import {
   SalesOrderError,
   classifySalesError,
@@ -78,8 +79,9 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 const ERROR_MESSAGES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   [/MAP_PERMISSION_DENIED/, () => 'Você não tem permissão para registrar vendas neste mapa.'],
   [/LOT_NOT_SELLABLE:(.+)/, (match) => `O espaço ${match[1]} não está mais disponível para venda.`],
+  [/LOT_PRICE_CHANGED:(.+)/, (match) => `O preço de tabela de ${match[1]} mudou. Confira o valor atualizado antes de registrar a venda.`],
   [/LOT_WITHOUT_OFFICIAL_PRICE:(.+)/, (match) => `O espaço ${match[1]} ainda não tem valor oficial definido.`],
-  [/LOT_UNAVAILABLE_OR_MISSING/, () => 'Um dos espaços selecionados deixou de existir ou foi arquivado. Nenhuma venda foi registrada.'],
+  [/LOT_UNAVAILABLE_OR_MISSING/, () => 'Um dos espaços selecionados saiu do inventário comercial. Confira a seleção atual.'],
   [/TOTAL_MISMATCH/, () => 'Os valores mudaram desde a seleção. Confira o resumo e tente novamente.'],
   [/INSTALLMENTS_MISMATCH/, () => 'A soma das parcelas não fecha com o valor total.'],
   [/LOT_PROJECT_MISMATCH/, () => 'Os espaços selecionados pertencem a projetos diferentes.'],
@@ -92,11 +94,11 @@ const ERROR_MESSAGES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
 ];
 
 const KIND_FALLBACK: Record<SalesErrorKind, string> = {
-  BUSINESS: 'Não foi possível concluir a venda. Nenhum espaço foi alterado.',
+  BUSINESS: 'O servidor recusou a venda. Confira a seleção e os dados do pedido.',
   AUTH: 'Sessão expirada ou sem permissão para registrar vendas. Entre novamente e tente de novo.',
-  SCHEMA: 'Erro interno ao gravar a venda. Nenhum espaço foi alterado. Avise a equipe técnica com o código da falha.',
-  NETWORK: 'A conexão falhou antes da resposta do servidor. Não é possível confirmar se a venda foi registrada — tente novamente sem alterar a seleção.',
-  UNKNOWN: 'Não foi possível concluir a venda. Nenhum espaço foi alterado.',
+  SCHEMA: 'O servidor recusou a gravação por um erro interno. Informe o código da falha à equipe técnica.',
+  NETWORK: 'A conexão foi interrompida. Use Verificar resultado para consultar a tentativa original.',
+  UNKNOWN: 'A gravação ainda está sem confirmação. Use Verificar resultado para consultar a tentativa original.',
 };
 
 export function describeSalesError(message: string, kind: SalesErrorKind = 'UNKNOWN'): string {
@@ -118,7 +120,11 @@ type PostgrestLikeError = {
 function buildSalesError(raw: PostgrestLikeError, payload: SalesOrderPayload): SalesOrderError {
   const message = raw.message ?? 'Erro desconhecido';
   const code = raw.code ?? null;
-  const kind = classifySalesError(message, code);
+  const classified = raw.status === 0 || (raw.status !== null && raw.status !== undefined && raw.status >= 502)
+    ? 'NETWORK' : classifySalesError(message, code);
+  const rejectedByDatabase = code === 'P0001' || code === '42501' || code === '42703' || code === '42P01' || code === '42883'
+    || code === 'PGRST202' || code === 'PGRST301' || code === 'PGRST303';
+  const kind = rejectedByDatabase || classified === 'NETWORK' ? classified : 'UNKNOWN';
   const diagnostics = {
     operation: 'register_commercial_sale_order' as const,
     kind,
@@ -132,13 +138,15 @@ function buildSalesError(raw: PostgrestLikeError, payload: SalesOrderPayload): S
     lotCount: payload.lotIds.length,
   };
   logSalesFailure(diagnostics);
-  return new SalesOrderError(describeSalesError(message, kind), diagnostics);
+  return new SalesOrderError(kind === 'NETWORK' ? KIND_FALLBACK.NETWORK : describeSalesError(message, kind), diagnostics);
 }
 
 /** Uma única transação no servidor: ou vende todos os espaços, ou nenhum. */
 export async function registerSaleOrder(payload: SalesOrderPayload): Promise<string> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.rpc as any)('register_commercial_sale_order', {
+  const args = {
+    p_project_id: payload.projectId,
+    p_operator_id: payload.operatorId,
+    p_expected_prices: payload.expectedPrices,
     p_idempotency_key: payload.idempotencyKey,
     p_stage: payload.stage,
     p_lot_ids: payload.lotIds,
@@ -162,13 +170,50 @@ export async function registerSaleOrder(payload: SalesOrderPayload): Promise<str
     p_fee_admin: payload.fees.adminCents / 100,
     p_fee_ppci: payload.fees.ppciCents / 100,
     p_fee_cleaning_license: payload.fees.cleaningCents / 100,
-  });
-  if (error) throw buildSalesError(error as PostgrestLikeError, payload);
+  };
+  const { data, error, status } = await callSalesRpc('register_commercial_sale_order_checked', args)
+    .catch((cause: unknown) => { throw buildSalesError({ message: cause instanceof Error ? cause.message : undefined, status: 0 }, payload); });
+  if (error) throw buildSalesError({ ...error, status }, payload);
   // Retorno nulo/inválido nunca é tratado como sucesso.
   if (typeof data !== 'string' || !UUID_PATTERN.test(data)) {
     throw buildSalesError({ message: 'INVALID_ORDER_ID_RETURNED', code: null }, payload);
   }
   return data;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const callSalesRpc = async (name: string, args: Record<string, unknown>) => await (supabase.rpc as any)(name, args);
+
+export interface RegisteredSaleAttempt {
+  orderId: string;
+  reference: string;
+}
+
+export async function fetchSaleAttemptResult(attempt: SaleAttempt): Promise<RegisteredSaleAttempt | null> {
+  const { data, error } = await callSalesRpc('get_commercial_sale_attempt', {
+    p_project_id: attempt.projectId,
+    p_idempotency_key: attempt.key,
+    p_stage: attempt.stage,
+    p_lot_ids: attempt.lotIds,
+  });
+  if (error) throw error;
+  if (data === null) return null;
+  if (typeof data?.orderId !== 'string' || !UUID_PATTERN.test(data.orderId) || !/^PV-[0-9A-F]{8}$/.test(data.reference)) {
+    throw new Error('O servidor retornou uma referência de pedido inválida.');
+  }
+  return data;
+}
+
+export interface FoodPointSaleSnapshot {
+  signatureState: 'PENDING_SIGNATURE' | 'SIGNED' | 'LEGACY_UNVERIFIED';
+  negotiatedValue: number | null;
+  orderFees: number | null;
+}
+
+export async function fetchFoodPointSaleSnapshot(lotId: string): Promise<FoodPointSaleSnapshot | null> {
+  const { data, error } = await callSalesRpc('get_food_point_sale_snapshot', { p_lot_id: lotId });
+  if (error) throw error;
+  return data && { signatureState: data.signatureState, negotiatedValue: numeric(data.negotiatedValue), orderFees: numeric(data.orderFees) };
 }
 
 // ---------------------------------------------------------------------------
@@ -252,14 +297,19 @@ function describeContractError(message: string): string {
     const match = message.match(pattern);
     if (match) return text.replace('$1', match[1] ?? '');
   }
-  return 'Não foi possível concluir a operação. Nenhum espaço foi alterado — atualize o mapa e tente novamente.';
+  return 'O resultado da operação ainda precisa ser conferido. Consulte a situação atual da venda.';
 }
 
 /** Confirma a assinatura do contrato de um ou vários itens do mesmo pedido. */
-export async function confirmSaleOrderItems(orderId: string, itemIds: string[]): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.rpc as any)('confirm_sale_order_items', { p_order_id: orderId, p_item_ids: itemIds });
+export async function confirmSaleOrderItems(orderId: string, itemIds: string[], expectAllPending = false): Promise<'confirmed' | 'changed'> {
+  const { error } = await callSalesRpc('confirm_sale_order_items', {
+    p_order_id: orderId,
+    p_item_ids: itemIds,
+    ...(expectAllPending ? { p_expect_all_pending: true } : {}),
+  });
+  if (error?.message === 'PENDING_ITEMS_CHANGED') return 'changed';
   if (error) throw new Error(describeContractError(error.message ?? ''));
+  return 'confirmed';
 }
 
 /** Cancela itens em aberto ou assinados; cada lote volta a Disponível e o histórico é preservado. */

@@ -16,7 +16,7 @@ import { refreshLotContractHistory, scheduleCommercialMapRefresh } from '../../q
 import { foodPointQuantityLabel } from '../../utils/lotPricing2028';
 
 const ITEM_STATE_LABEL: Record<string, string> = {
-  PENDING_SIGNATURE: 'Aguardando assinatura', SIGNED: 'Assinatura confirmada',
+  PENDING_SIGNATURE: 'Venda em aberto', SIGNED: 'Vendido · assinatura confirmada',
   CANCELLED: 'Cancelado', LEGACY_UNVERIFIED: 'Legado sem comprovação',
 };
 const INSTALLMENTS_PER_PAGE = 8;

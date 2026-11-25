@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CommercialLot, MapEntity } from '../../types';
-import { toSalesEntry } from '../salesEntry';
+import { isSellableLot, toSalesEntry } from '../salesEntry';
 import { ShoppingCart, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
@@ -11,6 +11,7 @@ import { useSalesCart } from '../useSalesCheckout';
 import { useSalesStore } from '../useSalesSelection';
 import { SalesCart, SalesCartContents, SalesStageSwitch } from './SalesCart';
 import { SalesCheckoutDialog } from './SalesCheckoutDialog';
+import { toast } from '@/hooks/use-toast';
 import '../sales-mode.css';
 
 /**
@@ -18,7 +19,13 @@ import '../sales-mode.css';
  * barra/gaveta mobile e checkout. Nenhuma geometria, área ou cadastro muda aqui,
  * e `reducedGraphics` nunca é acionado — pavilhões mantêm a arquitetura normal.
  */
-export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: string | null; lots: readonly CommercialLot[]; entities?: readonly MapEntity[] }) {
+export function SalesModeLayer({ projectId, operatorId, lots, entities = [], onOpenOrder }: {
+  projectId: string | null;
+  operatorId?: string;
+  lots: readonly CommercialLot[];
+  entities?: readonly MapEntity[];
+  onOpenOrder?: (orderId: string) => void;
+}) {
   const active = useSalesStore((state) => state.salesModeActive);
   const selectionCount = useSalesStore((state) => state.selection.length);
   const checkoutOpen = useSalesStore((state) => state.checkoutOpen);
@@ -26,19 +33,29 @@ export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: 
   const setNightModeActive = useCommercialMapStore((state) => state.setNightModeActive);
   const setSalesPresentationActive = useCommercialMapStore((state) => state.setSalesPresentationActive);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [availabilityNotices, setAvailabilityNotices] = useState<string[]>([]);
+  const owner = projectId && operatorId ? { projectId, operatorId } : null;
+  const ownerKey = owner ? `${owner.projectId}:${owner.operatorId}` : null;
   const previousVisuals = useRef<{ trees: boolean; night: boolean } | null>(null);
 
   const { summary, loading } = useSalesCart(projectId, active);
-  useSalesEligibility(projectId, active);
+  const { eligible } = useSalesEligibility(projectId, active);
 
   useLayoutEffect(() => {
     const store = useSalesStore.getState();
-    const soldIds = new Set(lots.filter(lot => lot.status === 'SOLD').map(lot => lot.id));
-    const soldSelection = store.selection.filter(entry => soldIds.has(entry.lotId));
-    if (!soldSelection.length) return;
-    soldSelection.forEach(entry => store.removeLot(entry.lotId));
-    store.setCheckoutOpen(false);
-  }, [lots]);
+    if (!store.selection.length || !lots.length) return;
+    const current = new Map(lots.map((lot) => [lot.id, lot]));
+    const unavailable = store.selection.filter(({ lotId }) => {
+      const lot = current.get(lotId);
+      return !lot || Boolean(lot.archivedAt) || lot.status === 'SOLD' || lot.status === 'SALE_OPEN'
+        || (eligible != null && !isSellableLot(lot, eligible));
+    });
+    if (!unavailable.length) return;
+    unavailable.forEach(({ lotId }) => store.removeLot(lotId));
+    const notices = unavailable.map(({ publicIdentifier }) => `${publicIdentifier} saiu do carrinho porque deixou de estar disponível para esta venda.`);
+    if (store.checkoutOpen) setAvailabilityNotices((previous) => [...new Set([...previous, ...notices])]);
+    else toast({ title: 'Carrinho atualizado', description: notices.join(' ') });
+  }, [eligible, lots]);
 
   useLayoutEffect(() => {
     const store = useSalesStore.getState();
@@ -78,6 +95,7 @@ export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: 
 
   useEffect(() => {
     if (!active || checkoutOpen) setSheetOpen(false);
+    if (!checkoutOpen) setAvailabilityNotices([]);
   }, [active, checkoutOpen]);
 
   if (!active) return null;
@@ -127,8 +145,8 @@ export function SalesModeLayer({ projectId, lots, entities = [] }: { projectId: 
         </DrawerContent>
       </Drawer>
 
-      {/* Checkout só existe quando há seleção válida. */}
-      {checkoutOpen && summary.ready && <SalesCheckoutDialog summary={summary} />}
+      {owner && onOpenOrder && <SalesCheckoutDialog key={ownerKey} owner={owner} summary={summary}
+        availabilityNotices={availabilityNotices} onOpenOrder={onOpenOrder} />}
     </>
   );
 }

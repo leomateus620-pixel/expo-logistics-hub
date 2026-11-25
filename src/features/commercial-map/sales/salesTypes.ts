@@ -86,6 +86,9 @@ export interface SalesInstallment {
 }
 
 export interface SalesOrderPayload {
+  projectId: string;
+  operatorId: string;
+  expectedPrices: Record<string, number>;
   idempotencyKey: string;
   stage: SalesStage;
   lotIds: string[];

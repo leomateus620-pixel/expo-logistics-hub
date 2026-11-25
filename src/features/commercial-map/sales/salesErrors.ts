@@ -31,7 +31,7 @@ export class SalesOrderError extends Error {
     super(message);
     this.name = 'SalesOrderError';
     this.diagnostics = diagnostics;
-    this.indeterminate = diagnostics.kind === 'NETWORK';
+    this.indeterminate = diagnostics.kind === 'NETWORK' || diagnostics.kind === 'UNKNOWN';
   }
 }
 
@@ -48,6 +48,9 @@ const BUSINESS_CODES = [
   'LOT_NOT_SELLABLE', 'LOT_WITHOUT_OFFICIAL_PRICE', 'LOT_UNAVAILABLE_OR_MISSING',
   'TOTAL_MISMATCH', 'INSTALLMENTS_MISMATCH', 'LOT_PROJECT_MISMATCH', 'BUYER_REQUIRED',
   'INVALID_STAGE', 'NO_LOTS_SELECTED', 'IDEMPOTENCY_KEY_REQUIRED', 'LOT_NOT_FOUND',
+  'LOT_PRICE_CHANGED', 'FOOD_POINT_ACTIVE_SALE', 'FOOD_POINT_PRICE_MISMATCH', 'INVALID_LOT_SELECTION',
+  'INVALID_FEE', 'INVALID_PAYMENT_METHOD', 'INSTALLMENT_COUNT_INVALID', 'INSTALLMENT_AMOUNT_INVALID',
+  'INSTALLMENT_DATE_INVALID', 'EXHIBITOR_NOT_FOUND',
 ];
 
 export function classifySalesError(message: string, code: string | null): SalesErrorKind {

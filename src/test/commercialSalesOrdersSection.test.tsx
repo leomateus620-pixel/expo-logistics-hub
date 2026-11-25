@@ -255,7 +255,7 @@ describe('espaço dedicado de vendas e contratos', () => {
     expect(screen.queryByText('Recebida', { exact: true })).not.toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('tab', { name: 'Espaços' }));
     expect(screen.getByText('Módulo 2', { exact: true }).closest('li')).toHaveTextContent('0,00');
-    expect(screen.getByText('Aguardando assinatura')).toBeInTheDocument();
+    expect(within(screen.getByText('Módulo 2', { exact: true }).closest('li')!).getByText('Venda em aberto')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Editar lotes' })).toHaveLength(1);
     expect(screen.getAllByRole('heading', { name: /^Pavilhão 13/ })).toHaveLength(1);
     expect(screen.queryByText('Parcelas e recebimentos')).not.toBeInTheDocument();

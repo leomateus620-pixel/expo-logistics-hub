@@ -37,6 +37,7 @@ export interface CommercialDashboardProps {
   orgId?: string | null;
   canManageSales?: boolean;
   canManageContracts?: boolean;
+  salesOnly?: boolean;
   scrollContainer?: () => HTMLElement | null;
   onViewSale?: (record: SaleOrderSummary, lotIds: string[]) => void;
 }
@@ -136,7 +137,7 @@ export function CommercialDashboard(props: CommercialDashboardProps) {
     : <CommercialDashboardBody key={scope} {...props} />;
 }
 
-function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
+function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onViewLot, projectId, orgId = null, canManageSales = false, canManageContracts = false, salesOnly = false, scrollContainer, onViewSale }: CommercialDashboardProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const cashflowEntryRef = useRef<HTMLButtonElement>(null);
   const signatureEntryRef = useRef<HTMLButtonElement>(null);
@@ -158,8 +159,8 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
   const area = useSalesOrdersUiStore((state) => state.area);
   const setArea = useSalesOrdersUiStore((state) => state.setArea);
   const salesAvailable = Boolean(projectId && onViewSale);
-  const inSales = salesAvailable && area === 'sales';
-  const inAnalytics = Boolean(projectId && canManageSales && (area === 'cashflow' || area === 'signature'));
+  const inSales = salesAvailable && (salesOnly || area === 'sales');
+  const inAnalytics = !salesOnly && Boolean(projectId && canManageSales && (area === 'cashflow' || area === 'signature'));
   const openAnalytics = (destination: 'cashflow' | 'signature', month?: string) => {
     overviewMemory.scrollTop = scrollContainer?.()?.scrollTop ?? 0;
     salesOrigin.current = 'overview';
@@ -235,7 +236,7 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
         }} /> : inSales && projectId && onViewSale ? <CommercialSalesOrdersSection projectId={projectId} orgId={orgId}
         canManageSales={canManageSales} canManageContracts={canManageContracts} data={data}
         scrollContainer={scrollContainer ?? emptyScrollContainer} onViewSale={onViewSale}
-        onBack={() => {
+        onBack={salesOnly ? undefined : () => {
           if (salesOrigin.current !== 'overview') {
             setArea(salesOrigin.current);
             requestAnimationFrame(() => { const container = scrollContainer?.(); if (container) {

@@ -8,7 +8,7 @@ import type { SalesCartSummary } from '../salesPricing';
 import { useSalesCheckout } from '../useSalesCheckout';
 import { useSalesStore } from '../useSalesSelection';
 import { useExhibitorAutosave } from '../useExhibitorAutosave';
-import type { SalesBuyerDraft, SalesFeesDraft, SalesPaymentDraft } from '../salesTypes';
+import type { SalesBuyerDraft, SalesFeesDraft, SalesOrderPayload, SalesPaymentDraft } from '../salesTypes';
 import { feesTotalCents } from '../salesTypes';
 import { SalesBuyerForm, buyerErrors } from './SalesBuyerForm';
 import { SalesPaymentForm, paymentErrors } from './SalesPaymentForm';
@@ -17,8 +17,9 @@ import { uploadSaleLogo } from '../saleLogo';
 import { toast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
-import { clearSaleAttempt, markSaleAttemptUncertain, resolveSaleAttempt, saleAttemptScope } from '../saleAttemptStore';
+import { clearSaleAttempt, startSaleAttempt, type SaleAttempt, type SaleAttemptOwner } from '../saleAttemptStore';
 import { SalesOrderError } from '../salesErrors';
+import { SaleAttemptCheck } from './SaleAttemptRecovery';
 
 const STEPS = ['Expositor', 'Pagamento', 'Revisão'] as const;
 
@@ -27,9 +28,12 @@ const EMPTY_FEES: SalesFeesDraft = { adminCents: 0, ppciCents: 0, cleaningCents:
 
 interface Props {
   summary: SalesCartSummary;
+  owner: SaleAttemptOwner;
+  availabilityNotices: string[];
+  onOpenOrder: (orderId: string) => void;
 }
 
-export function SalesCheckoutDialog({ summary }: Props) {
+export function SalesCheckoutDialog({ summary, owner, availabilityNotices, onOpenOrder }: Props) {
   const open = useSalesStore((state) => state.checkoutOpen);
   const setOpen = useSalesStore((state) => state.setCheckoutOpen);
   const stage = useSalesStore((state) => state.stage);
@@ -41,10 +45,9 @@ export function SalesCheckoutDialog({ summary }: Props) {
   const [logoImage, setLogoImage] = useState<Blob | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoUploading, setLogoUploading] = useState(false);
-  const uploadingRef = useRef(false);
   const changeLogo = (image: Blob | null, preview: string | null) => {
     setLogoImage(image);
-    setLogoPreview(current => { if (current) URL.revokeObjectURL(current); return preview; });
+    setLogoPreview(preview);
   };
   const [showErrors, setShowErrors] = useState(false);
   const [buyer, setBuyer] = useState<SalesBuyerDraft>(EMPTY_BUYER);
@@ -52,24 +55,29 @@ export function SalesCheckoutDialog({ summary }: Props) {
   const totalCents = spacesCents + feesTotalCents(fees);
   const [payment, setPayment] = useState<SalesPaymentDraft>(() => initialSalesPayment(totalCents));
   const [advancing, setAdvancing] = useState(false);
-  // Chave de idempotência por tentativa: guardada na sessão até um resultado confirmado.
-  const attemptScope = saleAttemptScope(selection.map((item) => item.lotId), stage);
-  const [attempt, setAttempt] = useState(() => resolveSaleAttempt(attemptScope));
-  const idempotencyKey = attempt.key;
-  useEffect(() => { if (attempt.scope !== attemptScope) setAttempt(resolveSaleAttempt(attemptScope)); }, [attempt.scope, attemptScope]);
-
+  const submitting = useRef(false);
+  const [uncertain, setUncertain] = useState<{ attempt: SaleAttempt; payload: SalesOrderPayload } | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [priceNotices, setPriceNotices] = useState<string[]>([]);
+  const observedPrices = useRef({ stage, lines: summary.lines, open });
   const checkout = useSalesCheckout();
   const autosave = useExhibitorAutosave(buyer, selection[0]?.lotId ?? null, open);
 
+  useEffect(() => () => { if (logoPreview) URL.revokeObjectURL(logoPreview); }, [logoPreview]);
+
   useEffect(() => {
-    if (open) {
-      setStep(0);
-      setShowErrors(false);
-      setAttempt(resolveSaleAttempt(attemptScope));
-      setPayment(initialSalesPayment(totalCents));
-    } else if (!uploadingRef.current) { changeLogo(null, null); }
-  // Reabrir reinicia somente a forma de pagamento; mudanças no total seguem o efeito abaixo.
-  }, [open]);
+    const previous = observedPrices.current;
+    observedPrices.current = { stage, lines: summary.lines, open };
+    if (!open || !previous.open || previous.stage !== stage) {
+      setPriceNotices([]);
+      return;
+    }
+    const before = new Map(previous.lines.map(({ entry, total }) => [entry.lotId, total]));
+    const changed = summary.lines.filter(({ entry, total, pending }) => !pending && before.get(entry.lotId) != null
+      && before.get(entry.lotId) !== total);
+    if (changed.length) setPriceNotices((notices) => [...new Set([...notices, ...changed.map(({ entry }) => entry.publicIdentifier)])]);
+  }, [open, stage, summary.lines]);
 
   // Total mudou (taxas/etapa): recalcula apenas se os valores ainda são automáticos; datas preservadas.
   const lastTotal = useRef(totalCents);
@@ -105,120 +113,173 @@ export function SalesCheckoutDialog({ summary }: Props) {
     setStep((current) => current + 1);
   };
 
+  const submit = async (attempt: SaleAttempt, payload: SalesOrderPayload) => {
+    if (submitting.current) return;
+    submitting.current = true;
+    setUncertain(null);
+    setSubmissionError(null);
+    try {
+      const id = await checkout.mutateAsync(payload);
+      clearSaleAttempt(attempt);
+      setOrderId(id);
+      const { removeLot } = useSalesStore.getState();
+      attempt.lotIds.forEach(removeLot);
+      if (logoImage) {
+        setLogoUploading(true);
+        try {
+          await uploadSaleLogo(id, attempt.key, logoImage);
+          void scheduleCommercialMapRefresh(queryClient);
+        } catch (error) {
+          toast({ title: 'Venda registrada sem imagem', description: error instanceof Error ? error.message : 'Não foi possível associar a imagem.', variant: 'destructive' });
+        }
+      }
+      changeLogo(null, null);
+      setBuyer(EMPTY_BUYER);
+      setFees(EMPTY_FEES);
+      setPayment(initialSalesPayment(0));
+      autosave.reset();
+    } catch (error) {
+      if (!(error instanceof SalesOrderError) || error.indeterminate) {
+        setUncertain({ attempt, payload });
+      } else {
+        clearSaleAttempt(attempt);
+        setSubmissionError(error.message);
+      }
+    } finally {
+      setLogoUploading(false);
+      submitting.current = false;
+    }
+  };
+
   const confirm = () => {
-    if (!stepValid || checkout.isPending) return;
-    checkout.mutate({
-      idempotencyKey,
+    if (!stepValid || submitting.current) return;
+    const lotIds = selection.map((item) => item.lotId);
+    const attempt = startSaleAttempt(owner, stage, lotIds);
+    void submit(attempt, {
+      ...owner,
+      idempotencyKey: attempt.key,
       stage,
-      lotIds: selection.map((item) => item.lotId),
+      lotIds,
+      expectedPrices: Object.fromEntries(summary.lines.flatMap(({ entry, total }) => total == null ? [] : [[entry.lotId, total]])),
       buyer,
       exhibitorId: autosave.exhibitorId,
       paymentMethod: payment.paymentMethod,
       fees,
       installments: draftsToInstallments(payment.installments),
       expectedTotal: totalCents / 100,
-    }, {
-      onError: (error) => {
-        if (error instanceof SalesOrderError && error.indeterminate) {
-          markSaleAttemptUncertain(idempotencyKey);
-          setAttempt((current) => ({ ...current, uncertain: true }));
-        }
-      },
-      onSuccess: async (orderId) => {
-        clearSaleAttempt(idempotencyKey);
-        if (logoImage) {
-          uploadingRef.current = true;
-          setLogoUploading(true);
-          try { await uploadSaleLogo(orderId, idempotencyKey, logoImage); await scheduleCommercialMapRefresh(queryClient); }
-          catch (error) { toast({ title: 'Venda registrada sem imagem', description: error instanceof Error ? error.message : 'Não foi possível associar a imagem.', variant: 'destructive' }); }
-          finally { uploadingRef.current = false; setLogoUploading(false); }
-        }
-        changeLogo(null, null);
-        setBuyer(EMPTY_BUYER);
-        setFees(EMPTY_FEES);
-        setPayment(initialSalesPayment(0));
-        autosave.reset();
-      },
     });
   };
 
+  const close = () => {
+    if (submitting.current) return;
+    if (orderId) {
+      setOrderId(null);
+      setStep(0);
+    }
+    setUncertain(null);
+    setOpen(false);
+  };
+  const openOrder = (id: string) => {
+    setUncertain(null);
+    setStep(0);
+    close();
+    onOpenOrder(id);
+  };
+
+  const displayedCount = uncertain?.attempt.lotIds.length ?? selection.length;
+  const displayedTotal = uncertain ? toCents(uncertain.payload.expectedTotal) : totalCents;
   return (
-    <Dialog open={open} onOpenChange={(next) => !checkout.isPending && !logoUploading && setOpen(next)}>
+    <Dialog open={open} onOpenChange={(next) => { if (!next) close(); }}>
       <DialogContent className="sales-checkout-dialog bg-card backdrop-blur-none sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Finalizar venda</DialogTitle>
+          <DialogTitle>{orderId ? 'Venda em aberto registrada' : 'Finalizar venda'}</DialogTitle>
           <DialogDescription>
-            {selection.length} espaço{selection.length === 1 ? '' : 's'} · {formatCents(totalCents)}
+            {orderId ? `Pedido PV-${orderId.slice(0, 8).toUpperCase()}`
+              : `${displayedCount} espaço${displayedCount === 1 ? '' : 's'} · ${formatCents(displayedTotal)}`}
           </DialogDescription>
         </DialogHeader>
 
-        <ol className="sales-checkout-steps">
-          {STEPS.map((label, index) => (
-            <li key={label} className={index === step ? 'is-active' : index < step ? 'is-done' : ''} aria-current={index === step ? 'step' : undefined}>
-              <span>{index + 1}</span>{label}
-            </li>
-          ))}
-        </ol>
+        {orderId ? <>
+          <p className="text-sm">Os espaços aguardam a confirmação da assinatura.</p>
+          <div className="sales-checkout-dialog__actions">
+            <Button type="button" variant="outline" disabled={logoUploading} onClick={close}>Voltar ao mapa</Button>
+            <Button type="button" disabled={logoUploading} onClick={() => openOrder(orderId)}>Abrir pedido</Button>
+          </div>
+        </> : <>
+          {!uncertain && <>
+            <ol className="sales-checkout-steps">
+              {STEPS.map((label, index) => (
+                <li key={label} className={index === step ? 'is-active' : index < step ? 'is-done' : ''} aria-current={index === step ? 'step' : undefined}>
+                  <span>{index + 1}</span>{label}
+                </li>
+              ))}
+            </ol>
 
-        <div className="sales-checkout-dialog__body">
-          {step === 0 && (
-            <SalesBuyerForm
-              value={buyer}
-              onChange={setBuyer}
-              showErrors={showErrors}
-               logoPreview={logoPreview}
-               onLogoChange={changeLogo}
-              saveStatus={autosave.status}
-              onRetrySave={() => { void autosave.flush(); }}
-            />
-          )}
-          {step === 1 && (
-            <SalesPaymentForm
-              value={payment}
-              onChange={setPayment}
-              fees={fees}
-              onFeesChange={setFees}
-              spacesCents={spacesCents}
-              showErrors={showErrors}
-            />
-          )}
-          {step === 2 && (
-            <SalesReview summary={summary} stage={stage} buyer={buyer} payment={payment} fees={fees} spacesCents={spacesCents} />
-          )}
-        </div>
-
-        {attempt.uncertain && step === 2 && !checkout.isPending && (
-          <p role="status" className="w-full text-sm text-muted-foreground">
-            Resultado ainda não confirmado. Verificar reenvia a mesma tentativa: se a venda já foi gravada, ela é devolvida sem duplicar.
-          </p>
-        )}
-        <div className="sales-checkout-dialog__actions">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-11 flex-1 rounded-xl"
-            disabled={checkout.isPending || logoUploading}
-            onClick={() => (step === 0 ? setOpen(false) : setStep((current) => current - 1))}
-          >
-            {step === 0 ? 'Cancelar' : 'Voltar'}
-          </Button>
-          {step < 2 ? (
-             <Button type="button" className="h-11 flex-1 rounded-xl" disabled={advancing || logoUploading} onClick={() => { void advance(); }}>
-              {advancing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Continuar
-            </Button>
-          ) : (
+            <div className="sales-checkout-dialog__body">
+              {step === 0 && (
+                <SalesBuyerForm
+                  value={buyer}
+                  onChange={setBuyer}
+                  showErrors={showErrors}
+                  logoPreview={logoPreview}
+                  onLogoChange={changeLogo}
+                  saveStatus={autosave.status}
+                  onRetrySave={() => { void autosave.flush(); }}
+                />
+              )}
+              {step === 1 && (
+                <SalesPaymentForm
+                  value={payment}
+                  onChange={setPayment}
+                  fees={fees}
+                  onFeesChange={setFees}
+                  spacesCents={spacesCents}
+                  showErrors={showErrors}
+                />
+              )}
+              {step === 2 && (
+                <SalesReview summary={summary} stage={stage} buyer={buyer} payment={payment} fees={fees} spacesCents={spacesCents} />
+              )}
+            </div>
+          </>}
+          {(availabilityNotices.length > 0 || priceNotices.length > 0 || submissionError) && <div className="text-sm text-destructive" role="alert">
+            {submissionError && <p>{submissionError}</p>}
+            {priceNotices.length > 0 && <p>Confira os valores de tabela atualizados de {priceNotices.join(', ')}.</p>}
+            {availabilityNotices.map((message) => <p key={message}>{message}</p>)}
+          </div>}
+          {uncertain && <SaleAttemptCheck key={uncertain.attempt.key} attempt={uncertain.attempt} onOpenOrder={openOrder}
+            onRetry={() => { void submit(uncertain.attempt, uncertain.payload); }} />}
+          <div className="sales-checkout-dialog__actions">
             <Button
               type="button"
+              variant="outline"
               className="h-11 flex-1 rounded-xl"
-               disabled={!stepValid || checkout.isPending || logoUploading}
-              onClick={confirm}
+              disabled={checkout.isPending || logoUploading}
+              onClick={() => {
+                if (uncertain || step === 0) close();
+                else setStep((current) => current - 1);
+              }}
             >
-              {checkout.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {attempt.uncertain ? 'Verificar resultado da venda' : 'Registrar venda em aberto'}
+              {uncertain ? 'Voltar ao carrinho' : step === 0 ? 'Cancelar' : 'Voltar'}
             </Button>
-          )}
-        </div>
+            {!uncertain && (step < 2 ? (
+               <Button type="button" className="h-11 flex-1 rounded-xl" disabled={advancing || logoUploading} onClick={() => { void advance(); }}>
+                {advancing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Continuar
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                className="h-11 flex-1 rounded-xl"
+                 disabled={!stepValid || checkout.isPending || logoUploading}
+                onClick={confirm}
+              >
+                {checkout.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Registrar venda em aberto
+              </Button>
+            ))}
+          </div>
+        </>}
       </DialogContent>
     </Dialog>
   );
