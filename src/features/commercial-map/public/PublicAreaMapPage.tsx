@@ -86,6 +86,8 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
   const data = inventory.data;
   const invalidLink = inventory.error instanceof PublicMapAccessError || context.error instanceof PublicMapAccessError
     || scopeRevision.error instanceof PublicMapAccessError;
+  const publicLotNumberInventory = area?.lotNumbers && data?.scope.slug === slug && data.scope.kind === area.kind && !invalidLink
+    ? data : undefined;
   useEffect(() => {
     applyPublicShareMetadata(slug, Boolean(data && area && !invalidLink && !inventory.error && !context.error), window.location.href);
   }, [slug, area, data, invalidLink, inventory.error, context.error]);
@@ -257,9 +259,11 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
         <PublicCanvasBoundary key={rendererAttempt} fallback={fallback} onFailure={recoverImport}>
           <Suspense fallback={null}><CommercialMapCanvas entities={sceneEntities} lots={canvasLots} calibration={null} matchingEntityIds={EMPTY_MATCHES} filtersActive={false}
             sceneSegmentId={null} sceneInteriorEntityId={pavilionEntity?.id ?? null} isolatedArea={null}
-            interactiveEntityIds={interactionScope.interactiveEntityIds} publicFocusEntityIds={usesParkContext ? publicScenePolicy?.interactiveEntityIds : null}
+            interactiveEntityIds={publicScenePolicy?.interactiveEntityIds ?? interactionScope.interactiveEntityIds}
+            publicFocusEntityIds={usesParkContext ? publicScenePolicy?.interactiveEntityIds : null}
             publicViewer publicScenePolicy={publicScenePolicy} initialPublicView={restoredNavigation} active={showMap}
             publicCompanyGroups={showCompanies ? companies.groups : undefined}
+            publicLotNumberInventory={publicLotNumberInventory}
             publicCompanyFocus={publicCompanyFocus} /></Suspense>
           {renderState !== 'ready' && <div className="public-map-stage" role="status" aria-live="polite">
             {(renderState === 'preparing' || renderState === 'recovering') && <span className="public-map-stage__spinner" aria-hidden="true" />}<strong>{renderState === 'failed' ? 'Não foi possível desenhar o mapa neste dispositivo.' : renderState === 'slow' ? 'O mapa está demorando mais que o normal.' : renderState === 'recovering' ? 'Restaurando a visualização do mapa…' : 'Preparando o mapa da área…'}</strong>

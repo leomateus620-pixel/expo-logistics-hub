@@ -1,9 +1,10 @@
-import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { fitPublicCompanyFootprint, type PublicSoldCompanyGeometry } from '../../public/publicSoldCompanyGeometry';
 import { compactCompanyCaptionAbbreviations, isReadablePublicCompanyCaption, usesCompactPublicCompanyLabels } from '../../public/publicSoldCompanyLabelPolicy';
 import { commercialMapDiagnosticsEnabled, markCommercialMapStage, measureCommercialMapSync } from '../../utils/performanceDiagnostics';
+import { publicLabelRectsOverlap, type PublicLabelRect, type PublicMapLabelLayout } from './publicMapLabelLayout';
 
 const FONT_SIZE = 54;
 const FONT = `650 ${FONT_SIZE}px system-ui, sans-serif`;
@@ -22,7 +23,6 @@ const FOCUSED_EDGE = new THREE.Color('#7bc9ff');
 const noRaycast = () => {};
 
 type Footprint = NonNullable<ReturnType<typeof fitPublicCompanyFootprint>>;
-type Rect = { x0: number; x1: number; y0: number; y1: number };
 type CaptionLayout = {
   group: PublicSoldCompanyGeometry;
   fit: Footprint;
@@ -39,7 +39,7 @@ type Label = CaptionLayout & {
   y: number;
   index: number;
   flipped: boolean;
-  rect: Rect;
+  rect: PublicLabelRect;
   opacity: number;
 };
 type CompanyLabels = {
@@ -313,11 +313,6 @@ function createContours(groups: PublicSoldCompanyGeometry[]) {
   } };
 }
 
-function fitsNextLabel(rect: Rect, accepted: readonly Rect[]) {
-  return !accepted.some(other => rect.x0 < other.x1 + 3 && rect.x1 + 3 > other.x0
-    && rect.y0 < other.y1 + 3 && rect.y1 + 3 > other.y0);
-}
-
 function projectLabel(label: Label, matrix: THREE.Matrix4, width: number, height: number, points: THREE.Vector4[]) {
   const rect = label.rect;
   rect.x0 = rect.y0 = Infinity;
@@ -346,10 +341,11 @@ function projectLabel(label: Label, matrix: THREE.Matrix4, width: number, height
 }
 
 /** One atlas draw and one contour draw. Their raycasts are disabled so the cadastral lot receives input. */
-export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ groups, hoveredEntityId, selectedEntityId }: {
+export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ groups, hoveredEntityId, selectedEntityId, layout }: {
   groups: PublicSoldCompanyGeometry[];
   hoveredEntityId: string | null;
   selectedEntityId: string | null;
+  layout?: PublicMapLabelLayout;
 }) {
   const gl = useThree(state => state.gl);
   const invalidate = useThree(state => state.invalidate);
@@ -371,7 +367,7 @@ export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ g
   const projection = useMemo(() => new THREE.Matrix4(), []);
   const last = useRef<{ matrix: THREE.Matrix4; width: number; height: number; ordered: CompanyLabels[] }>();
   const points = useMemo(() => Array.from({ length: 4 }, () => new THREE.Vector4()), []);
-  const accepted = useMemo<Rect[]>(() => [], []);
+  const accepted = useMemo<PublicLabelRect[]>(() => [], []);
   const layoutFrames = useRef(0);
 
   useLayoutEffect(() => {
@@ -388,20 +384,8 @@ export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ g
     contours.mesh.material.dispose();
   }, [contours]);
 
-  useFrame(({ camera, size }) => {
+  const updateLabels = useCallback((matrix: THREE.Matrix4, width: number, height: number, frame?: PublicMapLabelLayout) => {
     if (!labels) return;
-    camera.updateMatrixWorld();
-    projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    const previous = last.current;
-    if (previous?.ordered === ordered && previous.width === size.width && previous.height === size.height
-      && previous.matrix.equals(projection)) return;
-    if (previous) {
-      previous.matrix.copy(projection);
-      previous.width = size.width;
-      previous.height = size.height;
-      previous.ordered = ordered;
-    } else last.current = { matrix: projection.clone(), width: size.width, height: size.height, ordered };
-
     const sampleAt = commercialMapDiagnosticsEnabled && ++layoutFrames.current % 12 === 0 ? performance.now() : null;
     accepted.length = 0;
     let opacityChanged = false;
@@ -409,12 +393,15 @@ export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ g
     let anyVisible = false;
     const readVisibleHeight = (label: Label) => {
       const flipped = label.flipped;
-      const glyphHeight = projectLabel(label, projection, size.width, size.height, points);
+      const glyphHeight = projectLabel(label, matrix, width, height, points);
       if (flipped !== label.flipped) {
         setLabelUvs(label, labels.uv, labels.atlas.image.width, labels.atlas.image.height);
         uvChanged = true;
       }
-      return glyphHeight > 0 && fitsNextLabel(label.rect, accepted) ? glyphHeight : 0;
+      if (glyphHeight <= 0) return 0;
+      const blocked = frame ? frame.isOccupied(label.rect) || frame.coversDetailedLot(label.rect, label.group.entityIds)
+        : accepted.some(other => publicLabelRectsOverlap(label.rect, other));
+      return blocked ? 0 : glyphHeight;
     };
     const setOpacity = (label: Label, value: number) => {
       if (Math.abs(value - label.opacity) >= 0.01 || (value === 0 && label.opacity > 0)) {
@@ -443,7 +430,8 @@ export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ g
       company.active = next;
       if (next) {
         setOpacity(next, alpha);
-        accepted.push(next.rect);
+        if (frame) frame.reserve(next.rect);
+        else accepted.push(next.rect);
         anyVisible = true;
       }
     }
@@ -451,6 +439,29 @@ export const PublicSoldCompanyLabels = memo(function PublicSoldCompanyLabels({ g
     if (opacityChanged) labels.opacity.needsUpdate = true;
     if (uvChanged) labels.uv.needsUpdate = true;
     if (sampleAt !== null) markCommercialMapStage('public-company-projection:sample', performance.now() - sampleAt);
+  }, [accepted, hovered, labels, ordered, points, selected, useCompact]);
+
+  useLayoutEffect(() => {
+    if (!layout) return;
+    const unregister = layout.register('companies', frame => updateLabels(frame.projection, frame.width, frame.height, frame));
+    invalidate();
+    return () => { unregister(); invalidate(); };
+  }, [invalidate, layout, updateLabels]);
+
+  useFrame(({ camera, size }) => {
+    if (layout || !labels) return;
+    camera.updateMatrixWorld();
+    projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    const previous = last.current;
+    if (previous?.ordered === ordered && previous.width === size.width && previous.height === size.height
+      && previous.matrix.equals(projection)) return;
+    if (previous) {
+      previous.matrix.copy(projection);
+      previous.width = size.width;
+      previous.height = size.height;
+      previous.ordered = ordered;
+    } else last.current = { matrix: projection.clone(), width: size.width, height: size.height, ordered };
+    updateLabels(projection, size.width, size.height);
   });
 
   return <>

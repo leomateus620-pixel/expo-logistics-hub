@@ -5,6 +5,7 @@ import type { CommercialLot, MapEntity } from '../../types';
 import type { PublicExternalScenePolicy } from '../../public/publicScenePolicy';
 import { layoutTerritorialOrientation, prepareTerritorialOrientation, type OrientationItem, type TerritorialObstacle } from '../../utils/territorialOrientation';
 import { createTerritorialOrientationInputResolver } from '../../utils/territorialOrientationInputs';
+import type { PublicLabelRect, PublicMapLabelLayout } from './publicMapLabelLayout';
 
 const NO_RAYCAST = () => undefined;
 const FONT_FAMILY = 'system-ui, -apple-system, "Segoe UI", sans-serif';
@@ -16,7 +17,7 @@ const NO_OBSTACLES: readonly TerritorialObstacle[] = [];
 /** All permanent names share one texture, geometry and draw. Rasterization and
  * cadastral fitting happen once per inventory change; navigation needs no DOM. */
 function createTerritorialOrientationResources(items: readonly OrientationItem[], entities: readonly MapEntity[], anisotropy: number,
-  obstacles: readonly TerritorialObstacle[], exteriorBlockObstacles: readonly TerritorialObstacle[]) {
+  obstacles: readonly TerritorialObstacle[], exteriorBlockObstacles: readonly TerritorialObstacle[], managed: boolean) {
   if (!items.length) return null;
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
@@ -108,6 +109,8 @@ function createTerritorialOrientationResources(items: readonly OrientationItem[]
   geometry.setAttribute('labelAnchor', new THREE.Float32BufferAttribute(anchors, 3));
   geometry.setAttribute('labelDensity', new THREE.Float32BufferAttribute(density, 2));
   geometry.setIndex(indices); geometry.computeBoundingSphere();
+  const suppressed = managed ? new THREE.BufferAttribute(new Float32Array(positions.length / 3), 1).setUsage(THREE.DynamicDrawUsage) : null;
+  if (suppressed) geometry.setAttribute('labelSuppressed', suppressed);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = Math.min(8, anisotropy);
@@ -118,9 +121,13 @@ function createTerritorialOrientationResources(items: readonly OrientationItem[]
     // in oblique views even with physical clearance. Match that slope and
     // retain one extra depth unit; buildings still occlude the world plane.
     polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3,
+    defines: managed ? { PUBLIC_LABEL_LAYOUT: 1 } : undefined,
     uniforms: { atlas: { value: texture }, viewportSize: { value: new THREE.Vector2(1, 1) } },
     vertexShader: `
       attribute vec3 labelAnchor; attribute vec2 labelDensity;
+      #ifdef PUBLIC_LABEL_LAYOUT
+        attribute float labelSuppressed;
+      #endif
       uniform vec2 viewportSize;
       varying vec2 labelUv; varying float labelOpacity;
       void main() {
@@ -128,6 +135,9 @@ function createTerritorialOrientationResources(items: readonly OrientationItem[]
         float span = abs(projectionMatrix[0][0] * labelDensity.x / max(.01, -center.z)) * viewportSize.x * .5;
         labelOpacity = labelDensity.y < .5 ? 1. : labelDensity.y < 1.5
           ? smoothstep(40., 50., span) : 1. - smoothstep(30., 40., span);
+        #ifdef PUBLIC_LABEL_LAYOUT
+          labelOpacity *= 1. - labelSuppressed;
+        #endif
         labelUv = uv;
         // Vertices already contain the complete world footprint. No screen
         // expansion, camera quaternion, billboard or camera-facing rotation.
@@ -148,12 +158,13 @@ function createTerritorialOrientationResources(items: readonly OrientationItem[]
   mesh.userData = { presentationOnly: true, projection: 'world-xz', labelCount: labels.length,
     labels: labels.map(({ id, name, kind, anchor, angle, width, height, elevation, footprint, inkFootprint }) =>
       ({ id, name, kind, anchor, angle, width, height, elevation, footprint, inkFootprint })) };
-  return { mesh, geometry, material, texture };
+  return { mesh, geometry, material, texture, labels, suppressed };
 }
 
-export const TerritorialOrientation = memo(function TerritorialOrientation({ entities, lots, roads, policy,
+export const TerritorialOrientation = memo(function TerritorialOrientation({ entities, lots, roads, policy, publicLabelLayout,
   obstacles = NO_OBSTACLES, exteriorBlockObstacles = NO_OBSTACLES }: {
   entities: readonly MapEntity[]; lots: readonly CommercialLot[]; roads: readonly MapEntity[]; policy?: PublicExternalScenePolicy | null;
+  publicLabelLayout?: PublicMapLabelLayout;
   obstacles?: readonly TerritorialObstacle[];
   exteriorBlockObstacles?: readonly TerritorialObstacle[];
 }) {
@@ -171,12 +182,43 @@ export const TerritorialOrientation = memo(function TerritorialOrientation({ ent
     return prepared.filter(item => item.anchor[0] >= focus.minX - pad && item.anchor[0] <= focus.maxX + pad
       && item.anchor[1] >= focus.minZ - pad && item.anchor[1] <= focus.maxZ + pad);
   }, [entities, lots, roads, policy]);
+  const managed = Boolean(publicLabelLayout);
   const resources = useMemo(() => createTerritorialOrientationResources(items, entities, gl.capabilities.getMaxAnisotropy(),
-    obstacles, exteriorBlockObstacles), [items, entities, gl, obstacles, exteriorBlockObstacles]);
+    obstacles, exteriorBlockObstacles, managed), [items, entities, gl, obstacles, exteriorBlockObstacles, managed]);
   useLayoutEffect(() => {
     resources?.material.uniforms.viewportSize.value.set(size.width, size.height);
     invalidate();
   }, [resources, size.width, size.height, invalidate]);
+  useLayoutEffect(() => {
+    if (!publicLabelLayout || !resources?.suppressed) return;
+    const { labels, suppressed } = resources;
+    const point = new THREE.Vector4();
+    const rect: PublicLabelRect = { x0: 0, y0: 0, x1: 0, y1: 0 };
+    const unregister = publicLabelLayout.register('orientation', frame => {
+      let changed = false;
+      labels.forEach((label, index) => {
+        rect.x0 = rect.y0 = Infinity;
+        rect.x1 = rect.y1 = -Infinity;
+        const inFront = (label.inkFootprint ?? label.footprint).every(([x, z]) => {
+          point.set(x, label.elevation, z, 1).applyMatrix4(frame.projection);
+          if (point.w <= 0) return false;
+          const px = (point.x / point.w + 1) * frame.width / 2;
+          const py = (1 - point.y / point.w) * frame.height / 2;
+          rect.x0 = Math.min(rect.x0, px); rect.x1 = Math.max(rect.x1, px);
+          rect.y0 = Math.min(rect.y0, py); rect.y1 = Math.max(rect.y1, py);
+          return true;
+        });
+        const hidden = Number(inFront && frame.isOccupied(rect));
+        const first = index * 4;
+        if (suppressed.getX(first) === hidden) return;
+        for (let i = first; i < first + 4; i++) suppressed.setX(i, hidden);
+        changed = true;
+      });
+      if (changed) suppressed.needsUpdate = true;
+    });
+    invalidate();
+    return () => { unregister(); invalidate(); };
+  }, [invalidate, publicLabelLayout, resources]);
   useEffect(() => () => {
     resources?.geometry.dispose(); resources?.material.dispose(); resources?.texture.dispose();
   }, [resources]);

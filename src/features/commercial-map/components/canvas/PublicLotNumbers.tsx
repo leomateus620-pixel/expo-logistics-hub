@@ -1,83 +1,202 @@
 import { useEffect, useLayoutEffect, useMemo } from 'react';
-import { useThree } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import type { CommercialLot, MapEntity } from '../../types';
-import { placeSoldLock } from '../../utils/soldLotPresentation';
-import { hasRevisedExporuralNumbers, lotNumberAnchor } from '../../utils/exporuralRevisionPresentation';
+import type { MapEntity } from '../../types';
+import type { PublicMapInventory } from '../../public/publicMapTypes';
+import { PUBLIC_NUMBER_STYLES, type PublicNumberAvailability } from '../../public/publicLotNumberStyle';
+import { commercialMapDiagnosticsEnabled } from '../../utils/performanceDiagnostics';
+import { comparePublicLotNumbers, createPublicLotNumberProjector, preparePublicLotNumberSurfaces,
+  PUBLIC_NUMBER_HEIGHT, readPublicLotNumbers } from './publicLotNumberProjection';
+import type { PublicMapLabelLayout } from './publicMapLabelLayout';
 
-/** One atlas and one instanced draw. The vertex shader reveals numbers only
- * when their real footprint occupies enough screen space; no React frame updates. */
-export function PublicLotNumbers({ entities, lots, soldEntityIds }: { entities: readonly MapEntity[]; lots: readonly CommercialLot[]; soldEntityIds?: ReadonlySet<string> }) {
-  const size = useThree(state => state.size);
+const FONT = '700 12px system-ui, -apple-system, "Segoe UI", sans-serif';
+const RESOLUTION = 2;
+const GAP = 2;
+const STATUSES = ['AVAILABLE', 'SOLD', 'UNAVAILABLE'] as const;
+
+export function PublicMapLabelLayoutFrame({ layout }: { layout: PublicMapLabelLayout }) {
+  useFrame(({ camera, size }) => layout.update(camera, size.width, size.height));
+  return null;
+}
+
+function createAtlas(texts: string[], maxTextureSize: number) {
+  if (!texts.length) return null;
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (!context) return null;
+  context.font = FONT;
+  const rowHeight = STATUSES.length * (PUBLIC_NUMBER_HEIGHT + GAP);
+  const atlasWidth = Math.min(maxTextureSize, 1024) / RESOLUTION;
+  let x = GAP, y = GAP;
+  const cells = texts.flatMap(text => {
+    const width = Math.ceil(context.measureText(text).width) + 17;
+    if (width + 2 * GAP > atlasWidth) return [];
+    if (x + width + GAP > atlasWidth) { x = GAP; y += rowHeight; }
+    if ((y + rowHeight) * RESOLUTION > maxTextureSize) return [];
+    const cell = { text, x, y, width };
+    x += width + GAP;
+    return [cell];
+  });
+  if (!cells.length) return null;
+  const atlasHeight = cells[cells.length - 1].y + rowHeight;
+  canvas.width = atlasWidth * RESOLUTION;
+  canvas.height = atlasHeight * RESOLUTION;
+  context.scale(RESOLUTION, RESOLUTION);
+  context.font = FONT;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  const labels = new Map<string, { width: number; rects: Record<PublicNumberAvailability, THREE.Vector4> }>();
+  const middle = PUBLIC_NUMBER_HEIGHT / 2;
+  for (const cell of cells) {
+    const rects = {} as Record<PublicNumberAvailability, THREE.Vector4>;
+    STATUSES.forEach((status, index) => {
+      const { background, border, ink, mark } = PUBLIC_NUMBER_STYLES[status];
+      const top = cell.y + index * (PUBLIC_NUMBER_HEIGHT + GAP);
+      context.save();
+      context.translate(cell.x, top);
+      context.lineWidth = mark ? 1.25 : 1;
+      context.beginPath();
+      if (context.roundRect) context.roundRect(0.75, 0.75, cell.width - 1.5, PUBLIC_NUMBER_HEIGHT - 1.5, 4);
+      else context.rect(0.75, 0.75, cell.width - 1.5, PUBLIC_NUMBER_HEIGHT - 1.5);
+      context.fillStyle = background;
+      context.strokeStyle = border;
+      context.fill();
+      context.stroke();
+      context.fillStyle = border;
+      if (mark === 'dot') {
+        context.beginPath();
+        context.arc(7, middle, 2, 0, Math.PI * 2);
+        context.fill();
+      } else if (mark === 'bar') context.fillRect(4.5, middle - 1, 5, 2);
+      context.fillStyle = ink;
+      context.fillText(cell.text, cell.width / 2 + (mark ? 3 : 0), middle + 0.5);
+      context.restore();
+      rects[status] = new THREE.Vector4(cell.x / atlasWidth, 1 - (top + PUBLIC_NUMBER_HEIGHT) / atlasHeight,
+        cell.width / atlasWidth, PUBLIC_NUMBER_HEIGHT / atlasHeight);
+    });
+    labels.set(cell.text, { width: cell.width, rects });
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.generateMipmaps = false;
+  texture.minFilter = THREE.LinearFilter;
+  return { labels, texture };
+}
+
+function createBatch(texture: THREE.CanvasTexture, capacity: number) {
+  const geometry = new THREE.InstancedBufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute([-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0], 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 1], 2));
+  geometry.setIndex([0, 1, 2, 0, 2, 3]);
+  const centers = new THREE.InstancedBufferAttribute(new Float32Array(capacity * 3), 3).setUsage(THREE.DynamicDrawUsage);
+  const sizesAndSlopes = new THREE.InstancedBufferAttribute(new Float32Array(capacity * 4), 4).setUsage(THREE.DynamicDrawUsage);
+  const cells = new THREE.InstancedBufferAttribute(new Float32Array(capacity * 4), 4).setUsage(THREE.DynamicDrawUsage);
+  geometry.setAttribute('plateCenter', centers);
+  geometry.setAttribute('plateSizeAndSlope', sizesAndSlopes);
+  geometry.setAttribute('plateCell', cells);
+  geometry.instanceCount = 0;
+  const material = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, depthTest: true, toneMapped: false,
+    uniforms: { atlas: { value: texture } },
+    vertexShader: `
+      attribute vec3 plateCenter;
+      attribute vec4 plateSizeAndSlope;
+      attribute vec4 plateCell;
+      varying vec2 labelUv;
+      void main() {
+        labelUv = plateCell.xy + uv * plateCell.zw;
+        vec2 offset = position.xy * plateSizeAndSlope.xy;
+        // Screen-aligned ink with the depth of the raised lot plane at every pixel.
+        gl_Position = vec4(plateCenter.xy + offset, plateCenter.z + dot(plateSizeAndSlope.zw, offset), 1.);
+      }`,
+    fragmentShader: `
+      uniform sampler2D atlas;
+      varying vec2 labelUv;
+      void main() {
+        gl_FragColor = texture2D(atlas, labelUv);
+        if (gl_FragColor.a < .06) discard;
+        #include <colorspace_fragment>
+      }`,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.frustumCulled = false;
+  mesh.raycast = () => undefined;
+  mesh.name = 'public-authorized-lot-numbers';
+  mesh.renderOrder = 6;
+  mesh.visible = false;
+  return { mesh, geometry, material, centers, sizesAndSlopes, cells };
+}
+
+/** The authorized inventory owns the text and its cadastral surface. The atlas
+ * and instance buffers survive status changes and camera movement. */
+export function PublicLotNumbers({ inventory, renderedEntities, selectedEntityId, layout }: {
+  inventory: Pick<PublicMapInventory, 'entities' | 'lots'>;
+  renderedEntities: readonly MapEntity[];
+  selectedEntityId: string | null;
+  layout: PublicMapLabelLayout;
+}) {
+  const gl = useThree(state => state.gl);
   const invalidate = useThree(state => state.invalidate);
-  const resources = useMemo(() => {
-    const atlas = document.createElement('canvas');
-    const cellWidth = 128, cellHeight = 40, columns = 8;
-    atlas.width = columns * cellWidth;
-    atlas.height = Math.max(1, Math.ceil(entities.length / columns)) * cellHeight;
-    const context = atlas.getContext('2d');
-    if (!context || !entities.length) return null;
-    context.font = '600 23px sans-serif'; context.textAlign = 'center'; context.textBaseline = 'middle';
-    const geometry = new THREE.PlaneGeometry(1, 1);
-    const rectangles = new Float32Array(entities.length * 4);
-    const widths = new Float32Array(entities.length);
-    const lockScales = new Float32Array(entities.length);
-    const lotByEntity = new Map(lots.map(lot => [lot.entityId, lot]));
-    entities.forEach((entity, i) => {
-      const x = i % columns * cellWidth, y = Math.floor(i / columns) * cellHeight;
-      context.fillStyle = '#ffffffdd'; context.fillRect(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
-      context.fillStyle = '#15292b';
-      context.font = hasRevisedExporuralNumbers(entity) ? '700 34px sans-serif' : '600 23px sans-serif';
-      const label = String(lotByEntity.get(entity.id)?.lotNumber ?? '');
-      context.fillText(label, x + cellWidth / 2, y + cellHeight / 2, cellWidth - 12);
-      rectangles.set([x / atlas.width, 1 - (y + cellHeight) / atlas.height, cellWidth / atlas.width, cellHeight / atlas.height], i * 4);
-      const points = entity.geometry.coordinates[0] ?? [];
-      widths[i] = Math.max(0.1, Math.max(...points.map(p => p[0])) - Math.min(...points.map(p => p[0])));
-      lockScales[i] = placeSoldLock({ id: entity.id, status: 'SOLD', geometry: entity.geometry })?.scale ?? 0;
-    });
-    geometry.setAttribute('labelRect', new THREE.InstancedBufferAttribute(rectangles, 4));
-    geometry.setAttribute('lotWidth', new THREE.InstancedBufferAttribute(widths, 1));
-    geometry.setAttribute('labelVerticalOffset', new THREE.InstancedBufferAttribute(new Float32Array(entities.length), 1));
-    const texture = new THREE.CanvasTexture(atlas); texture.colorSpace = THREE.SRGBColorSpace;
-    texture.minFilter = THREE.LinearFilter; texture.generateMipmaps = false;
-    const material = new THREE.ShaderMaterial({
-      transparent: true, depthWrite: false, depthTest: false, toneMapped: false,
-      uniforms: { atlas: { value: texture }, viewportSize: { value: new THREE.Vector2(1, 1) } },
-      vertexShader: `attribute vec4 labelRect; attribute float lotWidth; attribute float labelVerticalOffset;
-        uniform vec2 viewportSize; varying vec2 labelUv; varying float showLabel;
-        void main() {
-          vec4 center = modelViewMatrix * instanceMatrix * vec4(0.,0.,0.,1.);
-          float pixels = abs(projectionMatrix[0][0] * lotWidth / max(0.01,-center.z)) * viewportSize.x * .5;
-          showLabel = step(34.,pixels) * step(0.,-center.z);
-          labelUv = labelRect.xy + uv * labelRect.zw;
-          gl_Position = projectionMatrix * center;
-          gl_Position.xy += position.xy * vec2(46.,16.) / viewportSize * 2. * gl_Position.w;
-          float markerPixels = abs(projectionMatrix[1][1] * labelVerticalOffset / max(0.01,-center.z)) * viewportSize.y * .5;
-          float labelGap = labelVerticalOffset > 0. ? markerPixels * .7 + 12. : 0.;
-          gl_Position.y -= labelGap / viewportSize.y * 2. * gl_Position.w;
-        }`,
-      fragmentShader: `uniform sampler2D atlas; varying vec2 labelUv; varying float showLabel;
-        void main(){ if(showLabel < .5) discard; gl_FragColor=texture2D(atlas,labelUv); if(gl_FragColor.a<.05)discard; }`,
-    });
-    const mesh = new THREE.InstancedMesh(geometry, material, entities.length);
-    const matrix = new THREE.Matrix4();
-    entities.forEach((entity, i) => {
-      const [x, z] = lotNumberAnchor(entity);
-      matrix.makeTranslation(x, entity.geometry.elevation + Math.max(.08, entity.geometry.extrusionHeight) + .16, z);
-      mesh.setMatrixAt(i, matrix);
-    });
-    mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere(); mesh.raycast = () => undefined;
-    mesh.name = 'public-authorized-lot-numbers'; mesh.renderOrder = 6;
-    return { mesh, geometry, material, texture, lockScales };
-  }, [entities, lots]);
+  const numbers = useMemo(() => readPublicLotNumbers(inventory.lots), [inventory.lots]);
+  const atlasKey = useMemo(() => JSON.stringify([...new Set([...numbers.values()].map(lot => lot.text))].sort()), [numbers]);
+  const atlas = useMemo(() => createAtlas(JSON.parse(atlasKey), gl.capabilities.maxTextureSize), [atlasKey, gl]);
+  const surfaces = useMemo(() => preparePublicLotNumberSurfaces(inventory.entities, renderedEntities), [inventory.entities, renderedEntities]);
+  const batch = useMemo(() => atlas && surfaces.length ? createBatch(atlas.texture, surfaces.length) : null, [atlas, surfaces.length]);
+  const project = useMemo(createPublicLotNumberProjector, []);
+  const labels = useMemo(() => surfaces.flatMap(surface => {
+    const number = numbers.get(surface.entityId);
+    const cell = number && atlas?.labels.get(number.text);
+    return number && cell ? [{ ...number, entityId: surface.entityId, cell, surface, fits: false }] : [];
+  }).sort(comparePublicLotNumbers), [atlas, numbers, surfaces]);
+
   useLayoutEffect(() => {
-    if (!resources) return;
-    const offsets = resources.geometry.getAttribute('labelVerticalOffset');
-    entities.forEach((entity, i) => offsets.setX(i, soldEntityIds?.has(entity.id) ? resources.lockScales[i] : 0));
-    offsets.needsUpdate = true;
+    if (!batch) return;
+    const selected = labels.find(label => label.entityId === selectedEntityId);
+    let visibleCount = 0;
+    const rendered: { id: string; text: string; status: PublicNumberAvailability; rect: number[] }[] = [];
+    const accept = (label: typeof labels[number], frame: PublicMapLabelLayout) => {
+      const { surface, cell, status } = label;
+      surface.visible = label.fits && !frame.isOccupied(surface.rect);
+      if (!surface.visible) return;
+      frame.reserve(surface.rect);
+      const { ndc, depthSlopeX, depthSlopeY, rect } = surface;
+      const uv = cell.rects[status];
+      batch.centers.setXYZ(visibleCount, ndc.x, ndc.y, ndc.z);
+      batch.sizesAndSlopes.setXYZW(visibleCount, 2 * cell.width / frame.width, 2 * PUBLIC_NUMBER_HEIGHT / frame.height, depthSlopeX, depthSlopeY);
+      batch.cells.setXYZW(visibleCount, uv.x, uv.y, uv.z, uv.w);
+      visibleCount++;
+      if (commercialMapDiagnosticsEnabled) rendered.push({ id: label.entityId, text: label.text, status,
+        rect: [rect.x0, rect.y0, rect.x1, rect.y1] });
+    };
+    const unregisterSelected = layout.register('selectedLot', frame => {
+      visibleCount = 0;
+      rendered.length = 0;
+      for (const label of labels) {
+        label.fits = project(label.surface, frame, label.cell.width, label === selected);
+        if (label.fits && label.surface.detailed) frame.detailedLots.set(label.entityId, label.surface.rect);
+        if (!label.fits) label.surface.detailed = false;
+      }
+      if (selected) accept(selected, frame);
+    });
+    const unregisterLots = layout.register('lots', frame => {
+      for (const label of labels) if (label !== selected) accept(label, frame);
+      batch.geometry.instanceCount = visibleCount;
+      batch.mesh.visible = visibleCount > 0;
+      if (visibleCount) batch.centers.needsUpdate = batch.cells.needsUpdate = batch.sizesAndSlopes.needsUpdate = true;
+      if (commercialMapDiagnosticsEnabled) gl.domElement.dataset.commercialMapLotNumbers = JSON.stringify(rendered);
+    });
     invalidate();
-  }, [entities, resources, soldEntityIds, invalidate]);
-  useLayoutEffect(() => { resources?.material.uniforms.viewportSize.value.set(size.width, size.height); }, [resources, size]);
-  useEffect(() => () => { if (resources) THREE.InstancedMesh.prototype.dispose.call(resources.mesh); resources?.geometry.dispose(); resources?.material.dispose(); resources?.texture.dispose(); }, [resources]);
-  return resources ? <primitive object={resources.mesh} dispose={null} /> : null;
+    return () => {
+      unregisterSelected();
+      unregisterLots();
+      invalidate();
+    };
+  }, [batch, gl, invalidate, labels, layout, project, selectedEntityId]);
+
+  useLayoutEffect(() => () => {
+    if (commercialMapDiagnosticsEnabled) delete gl.domElement.dataset.commercialMapLotNumbers;
+  }, [batch, gl]);
+  useEffect(() => () => { atlas?.texture.dispose(); }, [atlas]);
+  useEffect(() => () => { batch?.geometry.dispose(); batch?.material.dispose(); }, [batch]);
+  return batch ? <primitive object={batch.mesh} dispose={null} /> : null;
 }
