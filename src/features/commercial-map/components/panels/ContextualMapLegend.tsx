@@ -80,6 +80,7 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
   const summary = useMemo(() => deriveContextualMapSummary(scope, {
     statusFilters, matchingEntityIds, filtersActive,
   }), [scope, statusFilters, matchingEntityIds, filtersActive]);
+  const showCommercialArea = scope.kind !== 'segment' || activeSegmentId !== 'gastronomia';
   const presentation = useMemo(() => {
     const byId = new Map(scope.entities.map(entity => [entity.id, entity]));
     const external = scope.kind === 'interior' ? 0 : scope.lots.filter(lot => {
@@ -140,8 +141,8 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
     {scope.kind === 'park' && parkAction && <div className="commercial-context-park-action">{parkAction}</div>}
      {statusFilters.length > 0 && <p className="commercial-context-filter-note">Filtro: {[...new Set(statusFilters.map(toCommercialPhase))].map((status) => STATUS_CONFIG[status].label).join(', ')}</p>}
     {compact ? <details className="commercial-context-expand"><summary>Situações e legenda<ChevronDown aria-hidden="true" /></summary>{statuses}</details> : statuses}
-    {scope.unit !== 'pontos' && !compact && <dl className="commercial-context-primary-area"><OfficialArea label="Área oficial dos lotes no escopo" value={summary.officialArea} /></dl>}
-    {scope.unit !== 'pontos' && <details className="commercial-context-expand" key={`${scope.kind}:${interiorEntity?.id ?? activeSegmentId ?? 'park'}`}>
+    {showCommercialArea && !compact && <dl className="commercial-context-primary-area"><OfficialArea label="Área oficial dos lotes no escopo" value={summary.officialArea} /></dl>}
+    {showCommercialArea && <details className="commercial-context-expand" key={`${scope.kind}:${interiorEntity?.id ?? activeSegmentId ?? 'park'}`}>
       <summary>Áreas e informações<ChevronDown aria-hidden="true" /></summary>
       {compact && scope.plan && <PavilionPlanThumbnail plan={scope.plan} />}
       <dl className="commercial-context-areas">

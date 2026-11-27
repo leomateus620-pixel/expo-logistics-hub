@@ -93,8 +93,10 @@ export function resolveContextualMapScope({
     scopeEntities = activeEntities.filter((entity) => segmentIndex.get(entity.id)?.id === activeSegmentId);
   }
   const entityIds = new Set(scopeEntities.map((entity) => entity.id));
-  const scopeLots = activeLots.filter((lot) => entityIds.has(lot.entityId));
-  const lotEntityIds = new Set(scopeLots.map((lot) => lot.entityId));
+  const scopedInventory = activeLots.filter((lot) => entityIds.has(lot.entityId));
+  const scopeLots = scopedInventory.filter((lot) => lot.commercialPackageRole !== 'COMPONENT');
+  const lotEntityIds = new Set(scopedInventory.map((lot) => lot.entityId));
+  const hasFixedPackage = scopeLots.some((lot) => lot.commercialUnit === 'FIXED_PACKAGE');
   return {
     kind: interiorEntity ? 'interior' : activeSegmentId ? 'segment' : 'park',
     title: interiorEntity?.name ?? getCommercialMapSegment(activeSegmentId)?.name ?? scopeTitle ?? 'Parque Fenasoja',
@@ -103,8 +105,8 @@ export function resolveContextualMapScope({
     lots: scopeLots,
     plan: null,
     totalCount: scopeLots.length,
-    unit: activeSegmentId === 'gastronomia' ? 'pontos'
-      : scopeLots.some((lot) => lot.commercialUnit === 'FOOD_POINT') ? 'espaços' : 'lotes',
+    unit: activeSegmentId === 'gastronomia' && !hasFixedPackage ? 'pontos'
+      : hasFixedPackage || scopeLots.some((lot) => lot.commercialUnit === 'FOOD_POINT') ? 'espaços' : 'lotes',
     nonCommercialCount: scopeEntities.filter((entity) => !lotEntityIds.has(entity.id) && !entity.isSellable).length,
     unregisteredModuleCount: 0,
   };
@@ -118,7 +120,7 @@ export interface ContextualAreaTotal {
 }
 
 function officialAreaTotal(lots: readonly CommercialLot[]): ContextualAreaTotal {
-  const areaLots = lots.filter((lot) => lot.commercialUnit !== 'FOOD_POINT');
+  const areaLots = lots.filter((lot) => lot.commercialUnit !== 'FOOD_POINT' && lot.commercialUnit !== 'FIXED_PACKAGE');
   let total = 0;
   let informedCount = 0;
   areaLots.forEach((lot) => {

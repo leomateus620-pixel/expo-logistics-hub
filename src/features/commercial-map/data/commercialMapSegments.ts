@@ -431,7 +431,7 @@ export function commercialMapSegmentInventory(
   lots: readonly CommercialLot[],
 ) {
   const index = buildCommercialMapSegmentIndex(entities, lots);
-  const lotEntityIds = new Set(lots.map((lot) => lot.entityId));
+  const lotEntityIds = new Set(lots.filter((lot) => lot.commercialPackageRole !== 'COMPONENT').map((lot) => lot.entityId));
   return COMMERCIAL_MAP_SEGMENTS.map((segment) => {
     const entityIds = [...index.entries()]
       .filter(([, candidate]) => candidate.id === segment.id)
