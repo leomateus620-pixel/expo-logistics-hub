@@ -58,7 +58,8 @@ export function toCommercialPhase(status: CommercialStatus): CommercialPhase {
 export type VerificationStatus = 'DRAFT' | 'NEEDS_REVIEW' | 'VERIFIED' | 'ARCHIVED';
 export type AreaValidationStatus = 'UNVALIDATED' | 'CALCULATED' | 'VALIDATED' | 'REJECTED';
 export type PricingMode = 'FIXED_TOTAL' | 'PRICE_PER_SQUARE_METER' | 'NEGOTIABLE' | 'NOT_FOR_SALE';
-export type CommercialUnit = 'SQUARE_METER' | 'FOOD_POINT';
+export type CommercialUnit = 'SQUARE_METER' | 'FOOD_POINT' | 'FIXED_PACKAGE';
+export type CommercialPackageRole = 'PRINCIPAL' | 'COMPONENT';
 export type MapSource = 'database' | 'official-reference';
 export type MapPanel = 'layers' | 'details-layers' | 'results' | 'details' | 'calibration' | null;
 export type MapWorkspaceMode = '3d' | 'list' | 'edit' | 'create';
@@ -194,6 +195,12 @@ export interface CommercialLot {
   pricingMode: PricingMode;
   /** Older area records use the default SQUARE_METER unit. */
   commercialUnit?: CommercialUnit;
+  commercialPackageRole?: CommercialPackageRole | null;
+  commercialPackagePrincipalLotId?: string | null;
+  commercialPackageAnchorEntityId?: string | null;
+  commercialPackageComponentName?: string | null;
+  commercialPackageReconciliationPending?: boolean;
+  commercialPackageRecordedStatus?: CommercialStatus;
   unitQuantity?: number | null;
   displayOrder?: number | null;
   foodType?: string | null;

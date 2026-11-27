@@ -4,13 +4,13 @@ CREATE TABLE financial_editions (id uuid, org_id uuid, code integer, status text
 CREATE TABLE financial_scenario_sources (org_id uuid, edition_id uuid, project_id uuid);
 CREATE TABLE financial_scenario_pavilions (project_id uuid, entity_id uuid, category text);
 CREATE TABLE financial_obligations (id uuid, org_id uuid, edition_id uuid, source_type text,
-  source_id uuid, direction text, settlement_inconsistent boolean);
+  source_id uuid, direction text, description text, settlement_inconsistent boolean);
 CREATE TABLE financial_movement_allocations (org_id uuid, obligation_id uuid, movement_id uuid, amount_cents bigint);
-CREATE TABLE financial_movements (id uuid, org_id uuid, edition_id uuid, created_at timestamptz);
+CREATE TABLE financial_movements (id uuid, org_id uuid, edition_id uuid, direction text, reference text, notes text, created_at timestamptz);
 CREATE TABLE financial_scenario_revenue_links (org_id uuid, edition_id uuid, revenue_id uuid, origin_id uuid, origin_kind text, category text);
 CREATE TABLE financial_revenues (id uuid, org_id uuid, edition_id uuid, status text,
-  confirmed_cents bigint, projected_cents bigint, updated_at timestamptz);
-CREATE TABLE financial_sponsorships (id uuid, org_id uuid, edition_id uuid, negotiation_status text,
+  confirmed_cents bigint, projected_cents bigint, description text, counterparty text, notes text, updated_at timestamptz);
+CREATE TABLE financial_sponsorships (id uuid, org_id uuid, edition_id uuid, negotiation_status text, name text,
   confirmed_free_cents bigint, confirmed_rouanet_cents bigint, projected_free_cents bigint,
   projected_rouanet_cents bigint, updated_at timestamptz);
 CREATE TABLE expenses (id uuid, org_id uuid, financial_edition_id uuid, financial_status text,

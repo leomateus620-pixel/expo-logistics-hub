@@ -41,7 +41,7 @@ export function CommercialGastronomyDashboard({ aggregate, structures, onViewStr
   return <section className="dashboard-gastronomy" aria-labelledby="dashboard-gastronomy-title">
     <header>
       <div><h2 id="dashboard-gastronomy-title">Gastronomia</h2>
-        <p>{structures.length} estruturas · {aggregate.totalLots} pontos de alimentação</p></div>
+        <p>{structures.length} estruturas · {aggregate.totalLots} {aggregate.totalLots === 1 ? 'unidade comercial' : 'unidades comerciais'}</p></div>
       {onOpenSales && <Button variant="outline" onClick={onOpenSales}>Vendas e contratos <ArrowUpRight /></Button>}
     </header>
     <FoodCounts aggregate={aggregate} />
@@ -54,12 +54,12 @@ export function CommercialGastronomyDashboard({ aggregate, structures, onViewStr
       <div><dt>Comercializados por quantidade</dt><dd>{formatDashboardPercentage(quantity.percentage)}</dd></div>
       <div><dt>Comercializados por valor conhecido</dt><dd>{formatDashboardPercentage(value.percentage)}</dd></div>
     </dl>
-    {aggregate.lotsWithoutPrice > 0 && <p>{aggregate.lotsWithoutPrice} pontos com valor pendente.</p>}
+    {aggregate.lotsWithoutPrice > 0 && <p>{aggregate.lotsWithoutPrice} {aggregate.lotsWithoutPrice === 1 ? 'unidade' : 'unidades'} com valor pendente.</p>}
     <div className="dashboard-gastronomy__structures">
       {structures.map(({ structure, ...group }) => <details key={structure.id}>
         <summary>
           <span><small>{structure.publicIdentifier}</small> <strong>{structure.publicIdentifier === 'C2' ? FENASOJA_RESTAURANT_PRESENTATION_NAME : structure.name}</strong></span>
-          <span>{group.totalLots} {group.totalLots === 1 ? 'ponto' : 'pontos'}</span>
+          <span>{group.totalLots} {group.totalLots === 1 ? 'unidade' : 'unidades'}</span>
           <strong>{knownValue(group.totalKnownValue, group.knownValueLots, group.commercialLots)}</strong>
           <ChevronDown aria-hidden="true" />
         </summary>

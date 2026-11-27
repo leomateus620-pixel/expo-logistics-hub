@@ -38,7 +38,28 @@ export async function fetchPublicInventory(slug: string, token: string, signal?:
   const { data, error } = await publicRpc('public_map_inventory', { _slug: slug, _token: token }, signal);
   assertScoped(error);
   if (!data) throw new Error('PUBLIC_MAP_UNAVAILABLE');
-  return normalizePublicRuralPresentationInventory(data as PublicMapInventory);
+  const inventory = normalizePublicRuralPresentationInventory(data as PublicMapInventory);
+  return { ...inventory, lots: inventory.lots.map(normalizePublicPackageLot) };
+}
+
+function normalizePublicPackageLot(lot: PublicLot): PublicLot {
+  if (!lot.packageRole) return lot;
+  return {
+    ...lot,
+    buyerName: null,
+    buyerIdentityEligible: false,
+    buyerGroupKey: null,
+    buyerTradeName: null,
+    pricing: {
+      resolutionStatus: 'EXCLUIDO',
+      renovacaoPricePerSqm: null,
+      renovacaoTotal: null,
+      renovacaoRuleLabel: null,
+      segundaPricePerSqm: null,
+      segundaTotal: null,
+      segundaRuleLabel: null,
+    },
+  };
 }
 
 /**
@@ -92,7 +113,7 @@ export async function fetchPublicLot(slug: string, token: string, lotId: string,
   const { data, error } = await publicRpc('public_map_lot', { _slug: slug, _token: token, _lot_id: lotId }, signal);
   assertScoped(error);
   if (!data) throw new Error('PUBLIC_MAP_UNAVAILABLE');
-  return data as PublicLot;
+  return normalizePublicPackageLot(data as PublicLot);
 }
 
 export interface PublicTelemetryInput {
@@ -147,6 +168,10 @@ export function toCanvasLot(lot: PublicLot, includeBuyerName = true): Commercial
     displayName: lot.displayName,
     description: null,
     status: AVAILABILITY_TO_STATUS[lot.availability],
+    commercialUnit: lot.commercialUnit,
+    commercialPackageRole: lot.packageRole,
+    commercialPackagePrincipalLotId: lot.packagePrincipalLotId,
+    commercialPackageReconciliationPending: lot.packageReconciliationPending,
     officialAreaSqm: lot.officialAreaSqm,
     calculatedAreaSqm: null,
     areaValidationStatus: 'UNVALIDATED',
@@ -166,7 +191,7 @@ export function toCanvasLot(lot: PublicLot, includeBuyerName = true): Commercial
     accessibilityNotes: null,
     commercialNotes: null,
     internalNotes: null,
-    currentBuyer: includeBuyerName && lot.availability === 'SOLD' ? lot.buyerName?.trim() || null : null,
+    currentBuyer: !lot.packageRole && includeBuyerName && lot.availability === 'SOLD' ? lot.buyerName?.trim() || null : null,
     reservationExpiresAt: null,
     saleDate: null,
     salespersonName: null,

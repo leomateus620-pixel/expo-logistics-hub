@@ -52,7 +52,9 @@ export function SalesCheckoutDialog({ summary, owner, availabilityNotices, onOpe
   const [showErrors, setShowErrors] = useState(false);
   const [buyer, setBuyer] = useState<SalesBuyerDraft>(EMPTY_BUYER);
   const [fees, setFees] = useState<SalesFeesDraft>(EMPTY_FEES);
-  const totalCents = spacesCents + feesTotalCents(fees);
+  const fixedPackage = summary.lines.some(({ entry }) => entry.commercialUnit === 'FIXED_PACKAGE');
+  const effectiveFees = fixedPackage ? EMPTY_FEES : fees;
+  const totalCents = spacesCents + feesTotalCents(effectiveFees);
   const [payment, setPayment] = useState<SalesPaymentDraft>(() => initialSalesPayment(totalCents));
   const [advancing, setAdvancing] = useState(false);
   const submitting = useRef(false);
@@ -168,7 +170,7 @@ export function SalesCheckoutDialog({ summary, owner, availabilityNotices, onOpe
       buyer,
       exhibitorId: autosave.exhibitorId,
       paymentMethod: payment.paymentMethod,
-      fees,
+      fees: effectiveFees,
       installments: draftsToInstallments(payment.installments),
       expectedTotal: totalCents / 100,
     });
@@ -234,14 +236,15 @@ export function SalesCheckoutDialog({ summary, owner, availabilityNotices, onOpe
                 <SalesPaymentForm
                   value={payment}
                   onChange={setPayment}
-                  fees={fees}
+                  fees={effectiveFees}
                   onFeesChange={setFees}
                   spacesCents={spacesCents}
                   showErrors={showErrors}
+                  fixedPackage={fixedPackage}
                 />
               )}
               {step === 2 && (
-                <SalesReview summary={summary} stage={stage} buyer={buyer} payment={payment} fees={fees} spacesCents={spacesCents} />
+                <SalesReview summary={summary} stage={stage} buyer={buyer} payment={payment} fees={effectiveFees} spacesCents={spacesCents} />
               )}
             </div>
           </>}

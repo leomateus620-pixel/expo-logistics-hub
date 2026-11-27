@@ -36,7 +36,8 @@ function mapRow(row: PricingRow): LotPricing2028 {
     segundaTotal: numeric(row.segunda_total),
     segundaRuleLabel: (row.segunda_rule_label as string) ?? null,
     resolutionStatus: ((row.resolution_status as string) ?? 'SEM_REGRA') as LotPricingResolution,
-    commercialUnit: row.commercial_unit === 'FOOD_POINT' ? 'FOOD_POINT' : 'SQUARE_METER',
+    commercialUnit: row.commercial_unit === 'FOOD_POINT' || row.commercial_unit === 'FIXED_PACKAGE'
+      ? row.commercial_unit : 'SQUARE_METER',
     unitQuantity: numeric(row.unit_quantity),
     renovacaoDefaultTotal: numeric(row.renovacao_default_total as never),
     segundaDefaultTotal: numeric(row.segunda_default_total as never),
@@ -78,6 +79,12 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 
 const ERROR_MESSAGES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   [/MAP_PERMISSION_DENIED/, () => 'Você não tem permissão para registrar vendas neste mapa.'],
+  [/COMMERCIAL_PACKAGE_EXCLUSIVE_CHECKOUT/, () => 'Finalize a locação do parque em um pedido separado dos demais espaços.'],
+  [/COMMERCIAL_PACKAGE_NO_EXTRA_FEES/, () => 'Use o valor integral da locação do parque, sem taxas adicionais.'],
+  [/COMMERCIAL_PACKAGE_COMPONENT/, () => 'Este ponto está incluído na locação do Parque Stallonne.'],
+  [/COMMERCIAL_PACKAGE_RECONCILIATION_REQUIRED/, () => 'A locação do Parque Stallonne está pendente de conciliação.'],
+  [/COMMERCIAL_PACKAGE_UNAVAILABLE/, () => 'A locação do Parque Stallonne está indisponível. Confira a situação no mapa.'],
+  [/COMMERCIAL_PACKAGE_PRICE_MISMATCH|COMMERCIAL_PACKAGE_INCOMPLETE/, () => 'A composição do Parque Stallonne precisa de conferência antes da venda.'],
   [/LOT_NOT_SELLABLE:(.+)/, (match) => `O espaço ${match[1]} não está mais disponível para venda.`],
   [/LOT_PRICE_CHANGED:(.+)/, (match) => `O preço de tabela de ${match[1]} mudou. Confira o valor atualizado antes de registrar a venda.`],
   [/LOT_WITHOUT_OFFICIAL_PRICE:(.+)/, (match) => `O espaço ${match[1]} ainda não tem valor oficial definido.`],
@@ -282,6 +289,9 @@ export async function fetchLotOpenSaleOrder(lotId: string): Promise<OpenSaleOrde
 
 const CONTRACT_ERROR_MESSAGES: Array<[RegExp, string]> = [
   [/MAP_PERMISSION_DENIED/, 'Você não tem permissão para confirmar ou cancelar vendas neste mapa.'],
+  [/COMMERCIAL_PACKAGE_CONTRACT_REQUIRED/, 'Anexe o PDF assinado ao pedido do parque antes de confirmar a assinatura.'],
+  [/COMMERCIAL_PACKAGE_COMPONENT/, 'Este ponto está incluído na locação do Parque Stallonne. Acesse o pedido do parque.'],
+  [/COMMERCIAL_PACKAGE_RECEIVABLE_EXISTS|TOTAL_BELOW_PAID/, 'Confira os recebíveis e pagamentos no Financeiro antes de cancelar a venda.'],
   [/ORDER_NOT_FOUND/, 'O pedido não foi encontrado. Atualize o mapa e tente novamente.'],
   [/ORDER_NOT_ACTIVE/, 'Este pedido não está mais ativo. Atualize o mapa para ver a situação atual.'],
   [/ITEM_NOT_PENDING:(.+)/, 'O item $1 não está mais aguardando assinatura. Atualize o mapa.'],

@@ -60,6 +60,7 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
     segment.id === 'gastronomia' ? lotCount > 0 : segment.behavior.visibleByDefault || segment.behavior.interaction !== 'informational'), [entities, lots]);
   const structures = useMemo(() => activeSegmentId === 'gastronomia' ? foodPointsByStructure(entities, lots) : null,
     [activeSegmentId, entities, lots]);
+  const hasGastronomyPackage = lots.some((lot) => lot.commercialUnit === 'FIXED_PACKAGE' && !lot.archivedAt);
   const activeSegment = inventory.find(({ segment }) => segment.id === activeSegmentId)?.segment;
   const interiorId = interiorEntity?.id;
 
@@ -168,11 +169,12 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
           {inventory.map(({ segment, lotCount }) => {
             const Icon = segment.id === 'gastronomia' ? Utensils
               : segment.id === 'exporural' ? Tractor : segment.id === 'industria-comercio-servicos' ? Factory : CarFront;
+            const unit = segment.id === 'gastronomia' ? hasGastronomyPackage ? 'espaço' : 'ponto' : 'lote';
             return <button key={segment.id} type="button" aria-pressed={activeSegmentId === segment.id}
               className={activeSegmentId === segment.id ? 'is-active' : ''} onClick={() => onSegmentSelect(segment.id)}
               disabled={segment.behavior.interaction !== 'filter-and-focus'} aria-controls="commercial-map-viewport">
               <span className={`commercial-map-dock__territory-symbol commercial-map-dock__territory-symbol--${segment.id}`} aria-hidden="true"><Icon />{TERRITORY_SYMBOLS[segment.id].glyph}</span>
-              <span><strong>{segment.name}</strong><small>{lotCount} {segment.id === 'gastronomia' ? (lotCount === 1 ? 'ponto' : 'pontos') : (lotCount === 1 ? 'lote' : 'lotes')}</small></span>
+              <span><strong>{segment.name}</strong><small>{lotCount} {unit}{lotCount === 1 ? '' : 's'}</small></span>
               {activeSegmentId === segment.id && <Check aria-hidden="true" />}
             </button>;
           })}
@@ -186,13 +188,18 @@ export function CommercialMapDock({ entities, lots, activeSegmentId, onSegmentSe
         <h3>{structures.size} estruturas</h3>
         {entities.filter((entity) => structures.has(entity.id)).sort((a, b) => a.publicIdentifier.localeCompare(b.publicIdentifier)).map((entity) => {
           const points = structures.get(entity.id)!;
-          const available = points.filter(({ lot }) => lot.status === 'AVAILABLE').length;
+          const included = points.filter(({ lot }) => lot.commercialPackageRole === 'COMPONENT').length;
+          const available = points.filter(({ lot }) => lot.commercialPackageRole !== 'COMPONENT' && lot.status === 'AVAILABLE').length;
+          const availability = [
+            included === points.length ? null : `${available} ${available === 1 ? 'disponível' : 'disponíveis'}`,
+            included > 0 ? `${included} ${included === 1 ? 'incluído' : 'incluídos'}` : null,
+          ].filter(Boolean).join(' · ');
           const selected = selectedEntityId === entity.id || points.some(({ entity: point }) => selectedEntityId === point.id);
           return <button key={entity.id} type="button" aria-current={selected || undefined}
             onClick={() => selectStructure(gastronomyStructureSelectionId(entity.id, points))}>
             <span>{entity.publicIdentifier}</span>
             <span><strong>{entity.publicIdentifier === 'C2' ? FENASOJA_RESTAURANT_PRESENTATION_NAME : entity.name}</strong>
-              <small>{points.length} {points.length === 1 ? 'ponto' : 'pontos'} · {available} {available === 1 ? 'disponível' : 'disponíveis'}</small></span>
+              <small>{points.length} {points.length === 1 ? 'ponto' : 'pontos'} · {availability}</small></span>
             <ChevronRight aria-hidden="true" />
           </button>;
         })}

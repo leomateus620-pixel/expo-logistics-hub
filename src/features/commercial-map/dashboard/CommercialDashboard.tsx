@@ -183,6 +183,7 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
   const { overall } = snapshot;
   const spaceLabel = overall.commercialFoodPoints > 0 ? 'Espaços' : 'Lotes';
   const unitLabel = overall.commercialFoodPoints > 0 ? 'espaço' : 'lote';
+  const gastronomyLabel = overall.records.some(({ lot }) => lot.commercialUnit === 'FIXED_PACKAGE') ? 'Unidades de Gastronomia' : 'Pontos de alimentação';
   const lotShare = (value: number) => overall.commercialLots ? `${formatDashboardPercentage(value)} dos espaços comerciais` : '—';
   const updatedAtLabel = dataUpdatedAt > 0 && Number.isFinite(dataUpdatedAt)
     ? `Atualizado às ${new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(dataUpdatedAt)}`
@@ -296,7 +297,7 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
             facts: [
               ...(overall.commercialFoodPoints > 0 ? [
                 ['Espaços por metragem', formatDashboardInteger(overall.commercialAreaLots)] as const,
-                ['Pontos de alimentação', formatDashboardInteger(overall.commercialFoodPoints)] as const,
+                [gastronomyLabel, formatDashboardInteger(overall.commercialFoodPoints)] as const,
               ] : []),
               ['Reservados', formatDashboardInteger(overall.reservedLots)],
               ['Em negociação', formatDashboardInteger(overall.negotiationLots)],

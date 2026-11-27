@@ -11,6 +11,7 @@ export interface GastronomyMarkerAnchor {
   /** Beam base in map world coordinates. */
   position: [number, number, number];
   point?: boolean;
+  selectable?: boolean;
 }
 
 interface GastronomyStructureMarkersProps {
@@ -164,9 +165,10 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
     beam.instanceColor.setUsage(THREE.DynamicDrawUsage);
     return { body, face, rim, beam };
   }, [capacity, resources]);
-  const markers = useMemo(() => anchors.map(({ id, position, point }) => ({
+  const markers = useMemo(() => anchors.map(({ id, position, point, selectable = false }) => ({
     id,
     point,
+    selectable: selectable || Boolean(point),
     roof: new THREE.Vector3(...position),
     center: new THREE.Vector3(),
     phase: markerPhase(id),
@@ -238,7 +240,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
   }, [capacity, invalidate, size.width, size.height, selectedId]);
 
   useLayoutEffect(() => {
-    if (!markers.some(({ point }) => point)) return;
+    if (!markers.some(({ selectable }) => selectable)) return;
     return registerGastronomyMarkerPicking(gl.domElement, {
       hit(clientX, clientY) {
         const rect = gl.domElement.getBoundingClientRect();
@@ -248,7 +250,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
         let nearest: string | null = null;
         let distance = Infinity;
         for (const marker of markers) {
-          if (!marker.point || !marker.visible) continue;
+          if (!marker.selectable || !marker.visible) continue;
           const separation = Math.hypot(x - marker.screenX, y - marker.screenY);
           if (separation > Math.max(11, marker.radiusPx * marker.scale) || separation >= distance) continue;
           nearest = marker.id;

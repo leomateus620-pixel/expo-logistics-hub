@@ -48,6 +48,7 @@ export function SalesModeLayer({ projectId, operatorId, lots, entities = [], onO
     const unavailable = store.selection.filter(({ lotId }) => {
       const lot = current.get(lotId);
       return !lot || Boolean(lot.archivedAt) || lot.status === 'SOLD' || lot.status === 'SALE_OPEN'
+        || lot.commercialPackageRole === 'COMPONENT' || lot.commercialPackageReconciliationPending
         || (eligible != null && !isSellableLot(lot, eligible));
     });
     if (!unavailable.length) return;
@@ -68,7 +69,7 @@ export function SalesModeLayer({ projectId, operatorId, lots, entities = [], onO
       const entity = byEntity.get(lot.entityId);
       if (!entity) return entry;
       const parent = entity?.parentEntityId ? byEntity.get(entity.parentEntityId) : null;
-      return toSalesEntry(lot, null, entity, parent);
+      return toSalesEntry(lot, null, entity, parent, lots);
     });
     if (next.some((entry, index) => JSON.stringify(entry) !== JSON.stringify(store.selection[index]))) {
       useSalesStore.setState({ selection: next });

@@ -44,6 +44,16 @@ function validOfficialArea(value: number | null | undefined): number | null {
   return value != null && Number.isFinite(value) && value > 0 ? value : null;
 }
 
+function tracksOfficialArea(lot: CommercialLot): boolean {
+  return lot.commercialUnit !== 'FOOD_POINT' && lot.commercialUnit !== 'FIXED_PACKAGE';
+}
+
+function componentSaleStatus(lot: CommercialLot): 'SOLD' | 'SALE_OPEN' | null {
+  if (lot.commercialPackageRole !== 'COMPONENT' || lot.archivedAt != null) return null;
+  const status = lot.commercialPackageRecordedStatus ?? lot.status;
+  return status === 'SOLD' || status === 'SALE_OPEN' ? status : null;
+}
+
 /**
  * One amount per lot: persisted sale for open/confirmed sales, otherwise the
  * selected official stage total (already including overrides). Never receipts.
@@ -84,7 +94,7 @@ function addRecord(accumulator: MutableAggregate, record: DashboardLotRecord): v
   accumulator.records.push(record);
   const bucket = accumulator.byStatus[record.lot.status];
   bucket.lotCount += 1;
-  if (record.lot.commercialUnit !== 'FOOD_POINT') {
+  if (tracksOfficialArea(record.lot)) {
     bucket.areaLotCount += 1;
     if (record.officialAreaSqm === null) bucket.areaPendingCount += 1;
     else bucket.areaUnits += Math.round(record.officialAreaSqm * AREA_UNITS_PER_SQM);
@@ -184,14 +194,24 @@ export function buildCommercialDashboardSnapshot(
     COMMERCIAL_MAP_SEGMENTS.map((segment) => [segment.id, makeAccumulator()]),
   );
   const foodStructures = new Map<string, { structure: MapEntity; aggregate: MutableAggregate }>();
+  // Keep the prior sale visible until reconciliation closes the component
+  // sales. The package and the predecessor never contribute to one snapshot.
+  const predecessorPackageIds = new Set(data.lots.flatMap((lot) =>
+    lot.commercialPackagePrincipalLotId && componentSaleStatus(lot)
+      && !entityById.get(lot.entityId)?.isArchived ? [lot.commercialPackagePrincipalLotId] : []));
   let orphanLots = 0;
   const seenLotIds = new Set<string>();
 
-  for (const lot of data.lots) {
-    const entity = entityById.get(lot.entityId);
-    if (lot.archivedAt != null || entity?.isArchived || seenLotIds.has(lot.id)) continue;
-    seenLotIds.add(lot.id);
+  for (const sourceLot of data.lots) {
+    const entity = entityById.get(sourceLot.entityId);
+    if (sourceLot.archivedAt != null || entity?.isArchived || seenLotIds.has(sourceLot.id)) continue;
+    seenLotIds.add(sourceLot.id);
     if (!entity) { orphanLots += 1; continue; }
+    const historicalStatus = componentSaleStatus(sourceLot);
+    if ((sourceLot.commercialPackageRole === 'COMPONENT' && !historicalStatus)
+      || predecessorPackageIds.has(sourceLot.id)) continue;
+    const lot = historicalStatus && historicalStatus !== sourceLot.status
+      ? { ...sourceLot, status: historicalStatus } : sourceLot;
 
     const segmentId = segmentIndex.get(entity.id)?.id ?? null;
     const record: DashboardLotRecord = Object.freeze({
@@ -199,7 +219,7 @@ export function buildCommercialDashboardSnapshot(
       entity,
       segmentId,
       value: resolveDashboardLotValue(lot, pricingStage),
-      officialAreaSqm: lot.commercialUnit === 'FOOD_POINT' ? null : validOfficialArea(lot.officialAreaSqm),
+      officialAreaSqm: tracksOfficialArea(lot) ? validOfficialArea(lot.officialAreaSqm) : null,
       ...classifyDashboardLot(entity, lot, entityById, segmentId),
     });
     addRecord(overall, record);

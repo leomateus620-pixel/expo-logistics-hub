@@ -9,7 +9,7 @@ import postgres from 'postgres';
 import { setSecondStagePrice } from './stage-price-fixture.mjs';
 
 const db = postgres({
-  host: '127.0.0.1', port: 55438, database: 'gastronomy_qa', user: 'postgres', max: 6,
+  host: '127.0.0.1', port: Number(process.env.GASTRONOMY_QA_PORT || 55438), database: 'gastronomy_qa', user: 'postgres', max: 6,
 });
 const seller = '00000000-0000-4000-a000-000000000010';
 const limitedSeller = '00000000-0000-4000-a000-000000000014';
@@ -139,7 +139,7 @@ const postgresFixture: Plugin = {
             'get_commercial_contract_upload', 'get_commercial_sale_order_detail', 'list_commercial_sale_orders', 'confirm_sale_order_items',
             'cancel_sale_order_items', 'export_commercial_sale_orders', 'get_sale_order_revisions',
             'attach_order_contract', 'register_lot_contract_version', 'replace_lot_order_contract',
-            'get_lot_contract_history', 'update_commercial_contract_metadata', 'revise_sale_order_items',
+            'get_commercial_package_revision_review', 'get_lot_contract_history', 'update_commercial_contract_metadata', 'revise_sale_order_items',
           ]);
           if (!supported.has(name)) return null;
           await tx.unsafe('SET LOCAL ROLE authenticated');

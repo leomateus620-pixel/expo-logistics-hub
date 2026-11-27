@@ -1,4 +1,5 @@
 import { toCommercialPhase, type CommercialLot, type MapEntity } from '../../types';
+import { STALLONNE_INCLUDED_LABEL } from '../../utils/commercialPackage';
 
 export interface SaleLotScope {
   key: string;
@@ -54,6 +55,8 @@ export function commercialStatusLabel(lot: CommercialLot): string {
 }
 
 export function candidateDisabledReason(lot: CommercialLot, price: number | null): string | null {
+  if (lot.commercialPackageRole === 'COMPONENT') return STALLONNE_INCLUDED_LABEL;
+  if (lot.commercialPackageRole === 'PRINCIPAL') return 'Selecione o pacote pelo Modo Vendas';
   if (lot.status !== 'AVAILABLE') return commercialStatusLabel(lot);
   if (price === null) return 'Sem preço oficial';
   return null;

@@ -56,6 +56,7 @@ import { resolveMapPermissions } from '../utils/permissions';
 import { resolveContextualMapScope } from '../utils/contextualMapSummary';
 import { foodPointsByStructure, getCommercialMapSegment } from '../data/commercialMapSegments';
 import { LOT_CONTRACT_HISTORY_KEY, refreshLotContractHistory, scheduleCommercialMapRefresh } from '../queries/commercialMapRefresh';
+import { applyPackageComponentStatus } from '../utils/commercialPackage';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
   MAP_PERMISSION_DENIED: 'Você não possui permissão para concluir esta operação.',
@@ -204,16 +205,15 @@ export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIA
     const buyerRows = buyers.data;
     const buyerFailed = buyers.isError && !buyerRows;
     const logoUrls = logos.data ?? {};
-    if (!buyerRows && !buyerFailed && !logos.data) return base;
-    return {
-      ...base,
-      lots: base.lots.map((lot) => {
+    const enrichedLots = buyerRows || buyerFailed || logos.data
+      ? base.lots.map((lot) => {
         let next = buyerRows ? applyLotBuyerSummary(lot, buyerRows.get(lot.id)) : buyerFailed ? markLotBuyerIdentityUnavailable(lot) : lot;
         const logo = next.status === 'SOLD' ? logoUrls[next.id] ?? null : null;
         if (logo !== (next.saleLogoUrl ?? null)) next = { ...next, saleLogoUrl: logo };
         return next;
-      }),
-    };
+      }) : base.lots;
+    const lots = applyPackageComponentStatus(enrichedLots);
+    return lots === base.lots ? base : { ...base, lots };
   }, [query.data, reference.data, projectId, buyers.data, buyers.isError, logos.data]);
   return { ...query, data };
 }

@@ -1053,6 +1053,17 @@
 .commercial-map-sale-confirmed > div { display: flex; flex-wrap: wrap; gap: 5px 10px; color: #3d5948; font-size: 9px; font-weight: 700; }
 .commercial-map-sale-confirmed > div span + span::before { margin-right: 10px; color: #9ba99f; content: '·'; }
 .commercial-map-details-panel .lot-pricing-2028 { margin: 12px 15px 0; border-radius: 8px; background: transparent; }
+.commercial-map-package-facts { margin: 12px 15px; }
+.commercial-map-package-facts button { min-height: 44px; margin-top: 8px; }
+.commercial-map-package-facts h4 { margin-top: 8px; font-size: .8rem; font-weight: 700; }
+.commercial-map-package-facts ul { margin-top: 4px; padding-left: 18px; list-style: disc; }
+@media (min-width: 951px) {
+  .commercial-map-panel.is-package-selling { right: calc(clamp(340px, 26vw, 390px) + 24px); }
+}
+@media (max-width: 950px) {
+  .commercial-map-viewport .commercial-map-panel.is-package-selling { bottom: max(70px, calc(env(safe-area-inset-bottom) + 64px)); }
+  .commercial-map-details-panel[data-sheet-state="collapsed"] .commercial-map-package-facts { display: none; }
+}
 .commercial-map-detail-tabs { padding: 12px 15px 20px; }
 .commercial-map-detail-tabs [role="tablist"] { width: 100%; }
 .commercial-map-detail-tabs [role="tab"] { flex: 1; font-size: 9px; }

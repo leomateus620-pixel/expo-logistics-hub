@@ -5,16 +5,19 @@ import { validateContractFile } from '../../utils/contracts';
 import { attachOrderContract, describeSalesError, type SaleContract } from './salesOrdersService';
 import { uploadLotContract } from '../../services/commercialMapService';
 import type { CommercialUnit } from '../../types';
+import type { SalesSelectionEntry } from '../../sales/salesTypes';
 import './attach-order-contract.css';
 
 export function AttachOrderContractDialog({ orgId, orderId, items, contract, onClose, onAttached }: {
   orgId: string;
   orderId: string;
-  items: { lotId: string; saleId?: string | null; label: string; commercialUnit?: CommercialUnit }[];
+  items: { lotId: string; saleId?: string | null; label: string; commercialUnit?: CommercialUnit; includedPoints?: SalesSelectionEntry['includedPoints'] }[];
   contract: SaleContract | null;
   onClose: () => void;
   onAttached: () => Promise<void>;
 }) {
+  const fixedPackage = items.length === 1 && items[0].commercialUnit === 'FIXED_PACKAGE';
+  const coveredSpaces = items.flatMap(({ lotId, label, includedPoints }) => [{ id: lotId, label }, ...(includedPoints ?? [])]);
   const initial = contract ? contract.lotIds.filter((id) => items.some((i) => i.lotId === id)) : items.map((i) => i.lotId);
   const [scope, setScope] = useState<'all' | 'selected' | 'lot'>(contract?.scope === 'LOT' ? 'lot' : contract && initial.length !== items.length ? 'selected' : 'all');
   const foodItems = items.filter((item) => item.commercialUnit === 'FOOD_POINT' && item.saleId);
@@ -30,22 +33,25 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
   const previousFocus = useRef<HTMLElement | null>(typeof document !== 'undefined' && document.activeElement instanceof HTMLElement ? document.activeElement : null);
   const scopeName = useId();
   const point = foodItems.find((item) => item.lotId === pointId);
-  const lotIds = scope === 'lot' ? (point ? [point.lotId] : [])
-    : scope === 'all' ? items.map((i) => i.lotId) : items.filter((i) => selected.has(i.lotId)).map((i) => i.lotId);
+  const lotIds = fixedPackage || scope === 'all' ? items.map((i) => i.lotId)
+    : scope === 'lot' ? (point ? [point.lotId] : []) : items.filter((i) => selected.has(i.lotId)).map((i) => i.lotId);
+  const coverageCount = fixedPackage ? coveredSpaces.length : lotIds.length;
   const currentVersion = contract?.versions.find((version) => version.version === contract.activeVersion);
   const phaseLabel = phase === 'upload' ? 'Enviando arquivo…' : phase === 'register' ? 'Registrando vínculo…' : 'Atualizando venda…';
   const fileSize = file ? new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(file.size / (file.size < 1048576 ? 1024 : 1048576)) : '';
   const fileType = file?.name.toLowerCase().endsWith('.pdf') ? 'PDF' : file?.name.toLowerCase().endsWith('.docx') ? 'DOCX' : 'Arquivo';
+  const fileError = (selectedFile: File) => validateContractFile(selectedFile)
+    ?? (fixedPackage && !selectedFile.name.toLowerCase().endsWith('.pdf') ? 'Envie o PDF assinado da locação do parque.' : null);
 
   const submit = async () => {
     if (submitting.current) return;
     if (!file) { setError('Selecione o arquivo do contrato.'); return; }
-    const invalid = validateContractFile(file);
+    const invalid = fileError(file);
     if (invalid) { setError(invalid); return; }
     if (lotIds.length === 0) { setError('Selecione ao menos um espaço.'); return; }
     submitting.current = true; setError(null);
     try {
-      if (scope === 'lot') {
+      if (!fixedPackage && scope === 'lot') {
         setPhase('upload');
         await uploadLotContract({ orgId, lotId: lotIds[0], file, contractNumber: number,
           expectedSaleId: point?.saleId ?? undefined,
@@ -79,7 +85,7 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
             <div>
               <span className="cso-attach-eyebrow">Documento da venda</span>
               <Dialog.Title className="cso-attach-title">{contract ? 'Nova versão do contrato' : 'Anexar contrato'}</Dialog.Title>
-              <Dialog.Description className="cso-attach-description">Um único arquivo para os espaços escolhidos.</Dialog.Description>
+              <Dialog.Description className="cso-attach-description">{fixedPackage ? 'Um único arquivo para o parque e os pontos incluídos.' : 'Um único arquivo para os espaços escolhidos.'}</Dialog.Description>
             </div>
             <Dialog.Close asChild><button className="cso-attach-close" type="button" aria-label="Fechar anexação de contrato" disabled={busy}><X aria-hidden="true" /></button></Dialog.Close>
           </header>
@@ -96,19 +102,19 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
                   {file ? <FileText aria-hidden="true" /> : <Upload aria-hidden="true" />}
                   <span className="cso-attach-file-copy">
                     <strong>{file ? file.name : 'Selecionar arquivo do contrato'}</strong>
-                    <span>{file ? `${fileType} · ${fileSize} ${file.size < 1048576 ? 'KB' : 'MB'}` : 'PDF ou DOCX · Até 15 MB'}</span>
+                    <span>{file ? `${fileType} · ${fileSize} ${file.size < 1048576 ? 'KB' : 'MB'}` : fixedPackage ? 'PDF · Até 15 MB' : 'PDF ou DOCX · Até 15 MB'}</span>
                     {file && <span className="cso-attach-file-change">Trocar arquivo</span>}
                   </span>
                   <input ref={fileInput} type="file" aria-label={file ? `Trocar arquivo: ${file.name}` : 'Selecionar arquivo do contrato'} disabled={busy}
-                    accept="application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    onChange={(event) => { const next = event.target.files?.[0] ?? null; setFile(next); setError(next ? validateContractFile(next) : null); }} />
+                    accept={fixedPackage ? 'application/pdf,.pdf' : 'application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document'}
+                    onChange={(event) => { const next = event.target.files?.[0] ?? null; setFile(next); setError(next ? fileError(next) : null); }} />
                 </label>
                 <label className="cso-attach-field"><span>Número do contrato <span className="cso-attach-optional">Opcional</span></span>
                   <input value={number} disabled={busy} onChange={(event) => setNumber(event.target.value)} placeholder="Informe a referência do documento" /></label>
               </section>
               <fieldset className="cso-attach-section" disabled={busy}>
                 <legend><span aria-hidden="true">02</span> Abrangência do documento</legend>
-                {contract?.scope !== 'LOT' && <div className="cso-attach-scope-options">
+                {!fixedPackage && contract?.scope !== 'LOT' && <div className="cso-attach-scope-options">
                   <label className={scope === 'all' ? 'is-selected' : ''}>
                     <input name={scopeName} type="radio" checked={scope === 'all'} onChange={() => setScope('all')} />
                     <span><strong>Toda a venda</strong><small>{items.length} {items.length === 1 ? 'espaço da venda' : 'espaços da venda'}</small></span>
@@ -122,7 +128,9 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
                     <span><strong>Um ponto</strong><small>Contrato do ponto de alimentação</small></span>
                   </label>}
                 </div>}
-                {scope === 'lot' ? <label className="cso-attach-field"><span>Ponto de alimentação</span>
+                {fixedPackage ? <ul className="cso-attach-covered-spaces">
+                  {coveredSpaces.map(({ id, label }) => <li key={id}>{label}</li>)}
+                </ul> : scope === 'lot' ? <label className="cso-attach-field"><span>Ponto de alimentação</span>
                   <select value={pointId ?? ''} disabled={contract?.scope === 'LOT' || busy} onChange={(event) => setPointId(event.target.value)}>
                     {foodItems.map((item) => <option key={item.lotId} value={item.lotId}>{item.label}</option>)}
                   </select></label> : <>
@@ -142,7 +150,7 @@ export function AttachOrderContractDialog({ orgId, orderId, items, contract, onC
             <footer className="cso-attach-footer">
               {busy && <p className="cso-attach-state" role="status" aria-live="polite"><Loader2 aria-hidden="true" />{phaseLabel}</p>}
               {error && <p className="cso-attach-state is-error" role="alert">{error}</p>}
-              <p>{lotIds.length > 0 ? <><strong>{lotIds.length} {lotIds.length === 1 ? 'espaço' : 'espaços'}</strong><span> no mesmo documento</span></> : 'Selecione ao menos um espaço'}</p>
+              <p>{coverageCount > 0 ? <><strong>{coverageCount} {coverageCount === 1 ? 'espaço' : 'espaços'}</strong><span> no mesmo documento</span></> : 'Selecione ao menos um espaço'}</p>
               <div className="cso-attach-actions">
                 <button type="button" className="cso-attach-cancel" disabled={busy} onClick={onClose}>Cancelar</button>
                 <button type="submit" className="cso-attach-submit" disabled={busy || !file || lotIds.length === 0}>

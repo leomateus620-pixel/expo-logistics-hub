@@ -2851,6 +2851,7 @@ export interface StrategicLandmarkMeshProps {
   reducedTruckGraphics?: boolean;
   pavilionExteriorLift?: number;
   reducedPavilionGraphics?: boolean;
+  suspendParkExperience?: boolean;
 }
 
 /**
@@ -2861,16 +2862,18 @@ function NightAwareAmusementPark({
   bounds,
   selected,
   reducedGraphics,
+  suspended = false,
 }: {
   bounds: StrategicLandmarkBounds;
   selected: boolean;
   reducedGraphics: boolean;
+  suspended?: boolean;
 }) {
   const nightModeActive = useCommercialMapStore((state) => state.nightModeActive);
   return (
     <AmusementPark
       bounds={bounds}
-      parkActive={selected || nightModeActive}
+      parkActive={!suspended && (selected || nightModeActive)}
       reducedGraphics={reducedGraphics}
     />
   );
@@ -2896,6 +2899,7 @@ export function StrategicLandmarkMesh({
   reducedTruckGraphics,
   pavilionExteriorLift = 0,
   reducedPavilionGraphics,
+  suspendParkExperience,
 }: StrategicLandmarkMeshProps) {
   const kind = resolveStrategicLandmarkKind(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
@@ -3198,6 +3202,7 @@ export function StrategicLandmarkMesh({
             bounds={modelProps.bounds}
             selected={selected}
             reducedGraphics={reducedGraphics}
+            suspended={suspendParkExperience}
           />
         )}
         {kind === 'lunar-tree' && <LunarTree {...modelProps} />}

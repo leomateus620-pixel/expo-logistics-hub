@@ -56,7 +56,7 @@ async function tableRows(table: string): Promise<Record<string, any>[]> {
       parent_entity_id: toEntityId(entity.parentEntityId), segment_id: persisted?.segment_id ?? null,
       public_identifier: entity.publicIdentifier, name: entity.name, description: entity.description,
       classification: entity.classification, verification_status: entity.verificationStatus, is_sellable: entity.isSellable, is_archived: false,
-      metadata: entity.metadata,
+      metadata: { ...entity.metadata, ...persisted?.metadata },
     };
   });
   if (table === 'map_entities') {

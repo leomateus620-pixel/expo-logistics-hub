@@ -46,6 +46,7 @@ export interface SalesSelectionEntry {
   location?: string | null;
   area?: string | null;
   commercialUnit?: CommercialUnit;
+  includedPoints?: readonly { id: string; label: string }[];
 }
 
 export interface SalesBuyerDraft {

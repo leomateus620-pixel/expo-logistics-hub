@@ -23,6 +23,7 @@ export interface SalesCartSummary {
   valueTotal: number;
   blockingCount: number;
   pendingCount: number;
+  packageRequiresSeparateOrder?: boolean;
   ready: boolean;
 }
 
@@ -37,11 +38,11 @@ export function buildCartLine(
       unpriced: true, pendingReason: 'Sem correspondência na tabela oficial 2028',
     };
   }
-  if (pricing.commercialUnit === 'FOOD_POINT') {
+  if (pricing.commercialUnit === 'FOOD_POINT' || pricing.commercialUnit === 'FIXED_PACKAGE') {
     const total = stageTotal(pricing, stage);
     const priced = total != null && total > 0 && pricing.resolutionStatus === 'OK' && pricing.unitQuantity === 1;
     return {
-      entry: { ...entry, commercialUnit: 'FOOD_POINT' }, pricing, areaSqm: null, pricePerSqm: null,
+      entry: { ...entry, commercialUnit: pricing.commercialUnit }, pricing, areaSqm: null, pricePerSqm: null,
       total: priced ? total : null, unpriced: !priced, pendingReason: priced ? null : 'Valor ainda não definido',
     };
   }
@@ -88,6 +89,8 @@ export function summarizeCart(
   const valueCents = lines.reduce((sum, line) => sum + (line.total == null ? 0 : toCents(line.total)), 0);
   const blockingCount = lines.filter((line) => line.unpriced).length;
   const pendingCount = lines.filter((line) => line.pending).length;
+  const packageRequiresSeparateOrder = lines.length > 1
+    && lines.some(({ entry }) => entry.commercialUnit === 'FIXED_PACKAGE');
   return {
     lines,
     areaTotal: areaCents / 100,
@@ -95,6 +98,7 @@ export function summarizeCart(
     valueTotal: valueCents / 100,
     blockingCount,
     pendingCount,
-    ready: lines.length > 0 && blockingCount === 0 && pendingCount === 0,
+    packageRequiresSeparateOrder,
+    ready: lines.length > 0 && blockingCount === 0 && pendingCount === 0 && !packageRequiresSeparateOrder,
   };
 }

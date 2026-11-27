@@ -17,7 +17,7 @@ function functionDefinition(sql, name) {
 }
 
 const dbName = 'gastronomy_qa';
-const config = {host:'127.0.0.1',port:55438,user:'postgres',onnotice:()=>{}};
+const config = {host:'127.0.0.1',port:Number(process.env.GASTRONOMY_QA_PORT || 55438),user:'postgres',onnotice:()=>{}};
 const admin = postgres({...config,database:'postgres'});
 await admin.unsafe('DROP DATABASE IF EXISTS gastronomy_qa WITH (FORCE)');
 await admin.unsafe('CREATE DATABASE gastronomy_qa');
@@ -195,7 +195,23 @@ INSERT INTO user_capabilities SELECT '00000000-0000-4000-a000-000000000013',org_
 REVOKE EXECUTE ON FUNCTION public.financial_scenario_overview(uuid,uuid,text) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.financial_scenario_overview(uuid,uuid,text) TO authenticated;
 `);
-  console.log('Banco descartável gastronomy_qa preparado em 127.0.0.1:55438.');
+  if (process.argv.includes('--stallonne-fixture')) {
+    await db.unsafe(`
+CREATE SCHEMA app_private;
+CREATE SCHEMA extensions;
+CREATE FUNCTION extensions.digest(text,text) RETURNS bytea LANGUAGE sql IMMUTABLE
+  AS $$ SELECT sha256(convert_to($1,'UTF8')) $$;
+CREATE TABLE public.public_map_links (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), org_id uuid NOT NULL, project_id uuid NOT NULL,
+  slug text NOT NULL, token_hash text NOT NULL, display_name text NOT NULL, scope_kind text NOT NULL,
+  scope_key text, scope_entity_ids uuid[], is_active boolean NOT NULL DEFAULT true, revoked_at timestamptz
+);
+`);
+    await db.unsafe(functionDefinition(await migration('20260920140827_933304d5-bed6-4a02-9900-2e0a74616514.sql'), 'public_map_scope_entity_ids'));
+    await db.unsafe(functionDefinition(await migration('20260929010000_public_map_three_conditions.sql'), 'public_map_lot_availability'));
+    await db.unsafe(await migration('20261117140000_public_map_sold_companies.sql'));
+  }
+  console.log('Banco descartável gastronomy_qa preparado em 127.0.0.1, porta', config.port);
 } catch(e) {
   console.error(e.message, e.code, e.where ?? '', e.detail ?? '', e.position ?? '');
   if(e.position && e.query) console.error(e.query.slice(+e.position-180,+e.position+100));

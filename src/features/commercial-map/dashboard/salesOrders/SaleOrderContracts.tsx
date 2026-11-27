@@ -3,8 +3,8 @@ import { LotContractFileButton } from '../../components/commercial/LotContractFi
 import type { SaleContract } from './salesOrdersService';
 import { fmtSaleDate } from './salesOrdersPresentation';
 
-export function SaleOrderContract({ contract, labelOf, canReplace, onReplace }: {
-  contract: SaleContract; labelOf: (lotId: string) => string; canReplace: boolean; onReplace: () => void;
+export function SaleOrderContract({ contract, labelOf, canReplace, onReplace, showIdentifier }: {
+  contract: SaleContract; labelOf: (lotId: string) => string; canReplace: boolean; showIdentifier?: boolean; onReplace: () => void;
 }) {
   const active = contract.versions.find((v) => !v.supersededAt) ?? contract.versions[0];
   const formerCoverage = (contract.historicalLotIds ?? []).filter((id) => !contract.lotIds.includes(id));
@@ -13,7 +13,7 @@ export function SaleOrderContract({ contract, labelOf, canReplace, onReplace }: 
     <div className="cso-doc-body">
       <h4>{active?.originalName || (contract.contractNumber ? `Contrato ${contract.contractNumber}` : 'Contrato sem número')}</h4>
       <p className="cso-doc-meta">
-        <span>{contract.contractNumber ? `Contrato ${contract.contractNumber}` : 'Sem número'}</span>
+        <span>{contract.contractNumber ? `Contrato ${contract.contractNumber}` : showIdentifier ? 'ID ' + contract.contractId : 'Sem número'}</span>
         <span>{contract.scope === 'ORDER_ITEMS' ? 'Documento da venda' : 'Documento do lote'}</span>
         {active && <><strong>Versão {active.version}</strong><span>{fmtSaleDate(active.uploadedAt)}</span></>}
       </p>
