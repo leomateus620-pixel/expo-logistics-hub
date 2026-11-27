@@ -1,6 +1,6 @@
 # Validação local no navegador
 
-O Chrome executou o Mapa Comercial com inventário sintético e a cartografia de referência. O fixture interceptou as respostas em localhost. As imagens mostram dados sintéticos e os o preço de configuração fornecido no escopo da tarefa.
+O Chrome executou o Mapa Comercial com inventário sintético e a cartografia de referência. A aplicação recebeu as respostas de teste em localhost. As imagens mostram dados sintéticos e o preço configurado para a unidade comercial.
 
 | Cenário | Resultado em desktop, 1440 × 900 |
 |---|---|
@@ -14,7 +14,7 @@ O Chrome executou o Mapa Comercial com inventário sintético e a cartografia de
 
 ## Celular, 412 × 860
 
-O primeiro toque na área abriu a ficha nos dois modos. Em Vendas, a posição da câmera e o ângulo da roda-gigante permaneceram estáveis. O primeiro toque no marcador da estrutura abriu a ficha. A apresentação mostrou o preço e a ação de venda já no resumo inicial. A gaveta do carrinho mostrou um espaço de R$ 252.280,00 e seus três pontos incluídos. O toque nos marcadores dos pontos vinculados e o de Balão foram verificados em desktop.
+O primeiro toque na área abriu a ficha nos dois modos. Em Vendas, a posição da câmera e o ângulo da roda-gigante permaneceram estáveis. O primeiro toque no marcador da estrutura abriu a ficha. O marcador GAST-J-02 também encaminhou à ficha do parque com um toque ao navegar pelo segmento Gastronomia. A apresentação mostrou o preço e a ação de venda já no resumo inicial. A gaveta do carrinho mostrou um espaço de R$ 252.280,00 e seus três pontos incluídos. A seleção pelo marcador do Balão foi verificada em desktop.
 
 [Modo Vendas no celular](evidence/celular-modo-vendas.jpg) · [Carrinho no celular](evidence/celular-carrinho.jpg)
 
