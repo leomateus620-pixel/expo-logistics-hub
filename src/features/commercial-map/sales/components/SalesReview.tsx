@@ -7,6 +7,7 @@ import { formatCents, toCents } from '../salesMoney';
 import { formatIsoDateBr } from '../salesInstallments';
 import type { SalesBuyerDraft, SalesFeesDraft, SalesPaymentDraft, SalesStage } from '../salesTypes';
 import { SALES_PAYMENT_METHOD_LABELS, SALES_STAGE_LABELS, feesTotalCents } from '../salesTypes';
+import { IncludedFoodPoints } from './SalesCartItem';
 
 interface Props {
   summary: SalesCartSummary;
@@ -22,7 +23,8 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
   const feesCents = feesTotalCents(fees);
   const totalCents = spacesCents + feesCents;
   const n = payment.installments.length;
-  const lotCount = summary.lines.length - summary.foodPointCount;
+  const packageCount = summary.lines.filter(({ entry }) => entry.commercialUnit === 'FIXED_PACKAGE').length;
+  const lotCount = summary.lines.length - summary.foodPointCount - packageCount;
   const areas = Array.from(new Set(summary.lines.map((line) => line.entry.area).filter(Boolean)));
 
   return (
@@ -43,10 +45,12 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
         <ul className="sales-review__lots">
           {summary.lines.map((line) => (
             <li key={line.entry.lotId}>
-              <span><b>{line.entry.title ?? line.entry.displayName}</b>
+              <div><b>{line.entry.title ?? line.entry.displayName}</b>
                 <small>{[line.entry.location, line.entry.area,
                   line.entry.commercialUnit === 'FOOD_POINT' ? foodPointQuantityLabel(1) : formatAreaSqmLabel(line.areaSqm)]
-                  .filter(Boolean).join(' · ')}</small></span>
+                  .filter(Boolean).join(' · ')}</small>
+                <IncludedFoodPoints points={line.entry.includedPoints} />
+              </div>
               <strong>{line.total == null ? (line.pending ? 'Calculando…' : 'Preço pendente') : formatCents(toCents(line.total))}</strong>
             </li>
           ))}
@@ -56,6 +60,7 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
           <div><dt>Quantidade</dt><dd>{[
             lotCount > 0 ? `${lotCount} ${lotCount === 1 ? 'lote' : 'lotes'}` : '',
             summary.foodPointCount > 0 ? foodPointQuantityLabel(summary.foodPointCount) : '',
+            packageCount > 0 ? '1 locação integral' : '',
           ].filter(Boolean).join(' · ')}</dd></div>
           {lotCount > 0 && <div><dt>Área total</dt><dd>{formatAreaSqmLabel(summary.areaTotal)}</dd></div>}
           <div><dt>Modalidade</dt><dd>{SALES_STAGE_LABELS[stage]}</dd></div>
@@ -79,7 +84,7 @@ export function SalesReview({ summary, stage, buyer, payment, fees, spacesCents 
             </>
           )}
           {feesCents > 0 && <div><dt>Total das taxas</dt><dd>{formatCents(feesCents)}</dd></div>}
-          <div className="is-strong is-final"><dt>Total negociado com taxas</dt><dd>{formatCents(totalCents)}</dd></div>
+          <div className="is-strong is-final"><dt>{feesCents > 0 ? 'Total negociado com taxas' : 'Total negociado'}</dt><dd>{formatCents(totalCents)}</dd></div>
         </dl>
       </section>
 

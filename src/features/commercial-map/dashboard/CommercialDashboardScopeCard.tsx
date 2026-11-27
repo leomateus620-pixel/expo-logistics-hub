@@ -34,7 +34,8 @@ export function CommercialDashboardScopeCard({ scopeId, title, aggregate, select
   const progress = buildDashboardCommercialProgress({ total: aggregate.commercialLots,
     saleOpen: aggregate.saleOpenLots, sold: aggregate.soldLots });
   const formatted = formatDashboardCommercialProgress(progress.percentage);
-  const context = identity === 'gastronomy' ? 'pontos' : pavilionNumber !== undefined ? 'lotes' : 'espaços';
+  const gastronomyUnit = aggregate.records.some(({ lot }) => lot.commercialUnit === 'FIXED_PACKAGE') ? 'unidades' : 'pontos';
+  const context = identity === 'gastronomy' ? gastronomyUnit : pavilionNumber !== undefined ? 'lotes' : 'espaços';
   const progressText = progress.percentage === null ? 'Sem base de cálculo' : `${formatted} comercializados`;
   const note: ReactNode = <>
     {aggregate.unavailableLots > 0

@@ -17,10 +17,12 @@ export function classifyDashboardLot(
   entityById: ReadonlyMap<string, MapEntity>,
   segmentId: CommercialMapSegmentId | null,
 ): Classification {
-  if (lot.commercialUnit === 'FOOD_POINT') {
-    const structure = entity.parentEntityId ? entityById.get(entity.parentEntityId) : null;
+  if (lot.commercialUnit === 'FOOD_POINT' || lot.commercialUnit === 'FIXED_PACKAGE') {
+    const structureId = lot.commercialUnit === 'FIXED_PACKAGE' ? lot.commercialPackageAnchorEntityId : entity.parentEntityId;
+    const structure = structureId ? entityById.get(structureId) : null;
     if (segmentId !== 'gastronomia' || entity.segmentSource !== 'database'
-      || !structure || structure.isArchived || structure.isSellable || structure.projectId !== entity.projectId
+      || !structure || structure.isArchived || structure.projectId !== entity.projectId
+      || (structure.isSellable && !lot.commercialPackageRole)
       || !structure.geometry.coordinates.length) return pending('Vínculo com estrutura de Gastronomia inválido');
     return { category: 'food', foodStructure: structure, pavilion: null, blockCode: null, classificationIssue: null };
   }

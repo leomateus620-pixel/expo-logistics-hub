@@ -14,6 +14,7 @@ import { documentSummary, fmtSaleArea, fmtSaleDate, receiptSummary, saleDetailSu
 import { useSalesOrdersUiStore, type SalesOrdersDetailTab, type SalesOrdersRecordIdentity } from './useSalesOrdersUiStore';
 import { refreshLotContractHistory, scheduleCommercialMapRefresh } from '../../queries/commercialMapRefresh';
 import { foodPointQuantityLabel } from '../../utils/lotPricing2028';
+import { packageIncludedPoints } from '../../utils/commercialPackage';
 
 const ITEM_STATE_LABEL: Record<string, string> = {
   PENDING_SIGNATURE: 'Venda em aberto', SIGNED: 'Vendido · assinatura confirmada',
@@ -49,6 +50,10 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
     const lot = lotIndex.get(lotId);
     const entity = lot ? entityIndex.get(lot.entityId) : undefined;
     if (!lot || !entity) return 'Fora do inventário carregado';
+    if (lot.commercialPackageAnchorEntityId) {
+      const anchor = entityIndex.get(lot.commercialPackageAnchorEntityId);
+      return ['Gastronomia', anchor?.name].filter(Boolean).join(' · ');
+    }
     const parent = entity.parentEntityId ? entityIndex.get(entity.parentEntityId) : null;
     if (parent) return parent.name || parent.publicIdentifier;
     return lot.block ? `Quadra ${lot.block}` : 'Área externa';
@@ -75,9 +80,10 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
       hasCancelled: activeItems.length !== itemRows.length,
       attachmentItems: activeItems.map((item) => ({ lotId: item.lotId,
         saleId: item.contractState === 'SIGNED' ? item.saleId : null, commercialUnit: item.commercialUnit,
+        includedPoints: item.commercialUnit === 'FIXED_PACKAGE' ? packageIncludedPoints({ id: item.lotId }, data.lots) : undefined,
         label: `${item.displayName || item.publicIdentifier} · ${itemLocation(item)}` })),
     };
-  }, [itemRows, itemLocation]);
+  }, [itemRows, itemLocation, data.lots]);
   const contractRows = detail.data?.contracts;
   const contracts = useMemo(() => contractRows ? uniqueContracts(contractRows) : null, [contractRows]);
   const installmentRows = detail.data?.installments;
@@ -103,6 +109,8 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
   const { activeItems, activeSubtotal, hasCancelled, groupedItems, attachmentItems } = itemPresentation;
   const hasFood = d.items.some((item) => item.commercialUnit === 'FOOD_POINT');
   const onlyFood = activeItems.length > 0 && activeItems.every((item) => item.commercialUnit === 'FOOD_POINT');
+  const hasPackage = activeItems.some((item) => item.commercialUnit === 'FIXED_PACKAGE');
+  const hasPackageComponents = activeItems.some((item) => lotIndex.get(item.lotId)?.commercialPackageRole === 'COMPONENT');
   const installmentPages = Math.max(1, Math.ceil(d.installments.length / INSTALLMENTS_PER_PAGE));
   const currentInstallmentPage = Math.min(installmentPage, installmentPages - 1);
   const installments = d.installments.slice(currentInstallmentPage * INSTALLMENTS_PER_PAGE, (currentInstallmentPage + 1) * INSTALLMENTS_PER_PAGE);
@@ -145,16 +153,19 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
               useSalesOrdersUiStore.getState().rememberOrigin(record.recordId, scrollContainer()?.scrollTop ?? 0);
               onViewSale(currentRecord, currentRecord.lotIds);
             }}><MapPinned aria-hidden="true" />{hasFood ? 'Ver espaços no mapa' : 'Ver lotes no mapa'}</button>
-            {canManageSales && h.kind === 'ORDER' && h.orderId && activeItems.length > 0 && <button type="button" className="cso-view cso-edit-lots" onClick={() => setReviseOpen(true)}><Pencil aria-hidden="true" />{hasFood ? 'Editar espaços' : 'Editar lotes'}</button>}
+            {canManageSales && h.kind === 'ORDER' && h.orderId && activeItems.length > 0 && !hasPackage && !hasPackageComponents && <button type="button" className="cso-view cso-edit-lots" onClick={() => setReviseOpen(true)}><Pencil aria-hidden="true" />{hasFood ? 'Editar espaços' : 'Editar lotes'}</button>}
           </div></div>
           {Array.from(groupedItems, ([location, items]) => <div className="cso-space-group" key={location}>
             <h4>{location}<span>{items.every((item) => item.commercialUnit === 'FOOD_POINT')
               ? foodPointQuantityLabel(items.length) : `${items.length} ${items.length === 1 ? 'espaço' : 'espaços'}`}</span></h4>
             <ul className="cso-items">{items.map((item) => <li key={item.itemId ?? item.lotId} className={item.contractState === 'CANCELLED' ? 'is-cancelled' : ''}>
-              <span className="cso-strong">{item.displayName || item.publicIdentifier}</span>
+              <span className="cso-strong">{item.displayName || item.publicIdentifier}
+                {item.commercialUnit === 'FIXED_PACKAGE' && <small className="cso-included-points">{packageIncludedPoints({ id: item.lotId }, data.lots).map((point) => point.label).join(' · ')}</small>}
+              </span>
               {item.commercialUnit === 'FOOD_POINT'
                 ? <span className="cso-item-area">{foodPointQuantityLabel(item.unitQuantity ?? 1)}</span>
-                : <span className="cso-item-area" aria-label={`Área: ${fmtSaleArea(item.areaSnapshot)}`}>{fmtSaleArea(item.areaSnapshot)}</span>}
+                : item.commercialUnit === 'FIXED_PACKAGE' ? <span className="cso-item-area">1 pacote</span>
+                  : <span className="cso-item-area" aria-label={`Área: ${fmtSaleArea(item.areaSnapshot)}`}>{fmtSaleArea(item.areaSnapshot)}</span>}
               <span className="cso-item-value" aria-label={`Valor registrado: ${formatDashboardCurrency(item.itemTotal)}`}>{formatDashboardCurrency(item.itemTotal)}</span>
               <span className={`cso-item-state ${item.contractState === 'PENDING_SIGNATURE' ? 'is-wait' : ''}`}>{ITEM_STATE_LABEL[item.contractState] ?? item.contractState}</span>
             </li>)}</ul>
@@ -195,13 +206,14 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
       </TabsContent>
       <TabsContent value="contracts" className="cso-tab-content">
         <section className="cso-block"><div className="cso-block-head"><h3>Contratos {contracts && <span className="cso-count">{contracts.length}</span>}</h3>
-          {canManageContracts && h.kind === 'ORDER' && orgId && activeItems.length > 0 && <button type="button" className="cso-view" onClick={() => setAttachOpen({ contract: null })}><Paperclip aria-hidden="true" />Anexar contrato</button>}
+          {canManageContracts && h.kind === 'ORDER' && orgId && activeItems.length > 0 && !hasPackageComponents && (!hasPackage || !contracts?.length) && <button type="button" className="cso-view" onClick={() => setAttachOpen({ contract: null })}><Paperclip aria-hidden="true" />Anexar contrato</button>}
         </div>
           <p className="cso-contract-signature"><span>Assinatura dos espaços</span><strong>{signatureSummary(currentRecord)}</strong></p>
+          {hasPackageComponents && <p className="cso-note">Pontos vinculados ao Parque Stallonne. Venda anterior disponível para consulta.</p>}
           {contracts === null ? <p className="cso-state"><ShieldAlert aria-hidden="true" />Consulta de documentos restrita ao seu perfil.</p>
             : contracts.length === 0 ? <p className="cso-state">Sem arquivo anexado.</p>
               : <ul className="cso-docs">{contracts.map((contract) => <SaleOrderContract key={contract.contractId} contract={contract}
-                labelOf={labelOf} canReplace={canManageContracts && activeItems.length > 0 && (contract.scope === 'ORDER_ITEMS'
+                labelOf={labelOf} canReplace={canManageContracts && activeItems.length > 0 && !hasPackageComponents && (contract.scope === 'ORDER_ITEMS'
                   || activeItems.some((item) => item.commercialUnit === 'FOOD_POINT' && item.contractState === 'SIGNED'
                     && contract.lotIds.includes(item.lotId)))} onReplace={() => setAttachOpen({ contract })} />)}</ul>}
           <p className="cso-note">Arquivo anexado não comprova assinatura ou recebimento.</p>

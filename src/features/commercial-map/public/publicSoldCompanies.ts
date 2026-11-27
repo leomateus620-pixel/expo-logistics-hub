@@ -17,7 +17,7 @@ export function getPublicSoldCompanies(lots: readonly PublicLot[]) {
 
   for (const lot of lots) {
     const key = lot.buyerGroupKey;
-    if (lot.availability !== 'SOLD' || lot.buyerIdentityEligible !== true
+    if (lot.packageRole || lot.availability !== 'SOLD' || lot.buyerIdentityEligible !== true
       || typeof key !== 'string' || !/^[a-f0-9]{64}$/.test(key) || byEntityId.has(lot.entityId)) continue;
 
     const name = typeof lot.buyerTradeName === 'string' ? lot.buyerTradeName.trim() || null : null;

@@ -6,10 +6,11 @@ import {
   formatBrl,
   formatPricePerSqm,
 } from '../utils/lotPricing2028';
-import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from './publicMapTypes';
+import type { PublicLot } from './publicMapTypes';
 import { resolveLotIdentity } from '../utils/lotIdentity';
-import { publicAvailability } from './publicAvailability';
+import { publicAvailability, publicAvailabilityLabel } from './publicAvailability';
 import type { PublicSoldCompanyGroup } from './publicSoldCompanies';
+import { STALLONNE_INCLUDED_LABEL } from '../utils/commercialPackage';
 
 const PENDING_LABEL = 'Valor sob consulta';
 
@@ -81,7 +82,8 @@ export const PublicLotDetails = memo(function PublicLotDetails({
       </header>
       {compact && <button ref={expandButton} type="button" className="public-map-details-expand" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'Recolher ficha' : 'Expandir ficha'}</button>}
 
-      {company && <section className="public-map-details-company" aria-label="Empresa e lotes vinculados">
+      {lot.packageRole === 'COMPONENT' && <p className="public-map-details-note">{STALLONNE_INCLUDED_LABEL}</p>}
+      {!lot.packageRole && company && <section className="public-map-details-company" aria-label="Empresa e lotes vinculados">
         <h3>{companyLogoUrl && <img src={companyLogoUrl} alt="" />}<span>{company.tradeName ?? 'Empresa não informada'}</span></h3>
         <ul aria-label="Lotes vinculados">
           {company.lots.map(member => {
@@ -99,9 +101,9 @@ export const PublicLotDetails = memo(function PublicLotDetails({
         </div>
         <div>
           <dt>Disponibilidade</dt>
-          <dd data-availability={publicAvailability(lot.availability)}>{PUBLIC_AVAILABILITY_LABEL[lot.availability]}</dd>
+          <dd data-availability={publicAvailability(lot.availability)}>{publicAvailabilityLabel(lot)}</dd>
         </div>
-        {!useCompanyIdentity && lot.availability === 'SOLD' && lot.buyerName?.trim() && (
+        {!lot.packageRole && !useCompanyIdentity && lot.availability === 'SOLD' && lot.buyerName?.trim() && (
           <div>
             <dt>Comprador</dt>
             <dd>{lot.buyerName.trim()}</dd>
@@ -130,7 +132,7 @@ export const PublicLotDetails = memo(function PublicLotDetails({
         </div>
       </dl>
 
-      <section className="public-map-details-stages" aria-label="Valores oficiais 2028">
+      {!lot.packageRole && <section className="public-map-details-stages" aria-label="Valores oficiais 2028">
         <h3>Valores oficiais 2028</h3>
         <div>
           <span>Renovação</span>
@@ -143,7 +145,7 @@ export const PublicLotDetails = memo(function PublicLotDetails({
           {segunda.unit && <small>{segunda.unit}</small>}
         </div>
         {!publishable && <p className="public-map-details-note">Valor em conferência pela organização.</p>}
-      </section>
+      </section>}
 
       {(lot.hasElectricity || lot.hasWater || lot.hasInternet || lot.infrastructure.length > 0) && (
         <section className="public-map-details-infra" aria-label="Infraestrutura">

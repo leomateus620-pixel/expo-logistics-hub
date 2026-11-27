@@ -1,0 +1,22 @@
+# Parque Stallonne · conciliação e reversão
+
+## Conferência sem gravação
+
+1. Na Dashboard Comercial, abra **Vendas e contratos**. Busque pela referência do pedido anterior, pelos três identificadores de Gastronomia e pelo parque ou locatário. Compare os itens ativos, a assinatura, a abrangência de cada contrato, o histórico e a aba **Financeiro**. Registre a identificação de cada lançamento e as evidências de baixa em um local privado.
+2. Em **Financeiro Gerencial → Fenasoja 2028**, confira **Receitas projetadas** e **Receitas confirmadas** pelo locatário, pelas descrições do parque e pelas referências cruzadas. Abra os planos registrados e confira os recebíveis e movimentos vinculados. Verifique a origem dos valores, inclusive quando só parte do contrato estiver cadastrada. Se houver remessa bancária, boleto ou documento fiscal, confira a situação no sistema emissor com o perfil autorizado.
+3. Em **Simulações**, compare a categoria de Gastronomia nas bases de carteira, confirmadas e caixa. **Receitas confirmadas** do módulo financeiro cobre receitas manuais e patrocínios. **Simulações** é a visão que consolida a comercialização do mapa. Uma assinatura altera a receita contratada. O caixa vem das alocações de movimentos efetivamente registrados.
+4. Se houver um pedido principal anterior, confirme os vínculos, o documento, o plano e a origem dos recebimentos antes de registrar qualquer tentativa. Dados incompletos, fontes divergentes ou ausência de acesso à trilha necessária impedem a conciliação.
+
+## Conversão do pedido anterior
+
+A revisão genérica de venda altera itens e redistribui parcelas em aberto. Ela não aceita a lista de vencimentos com valores manuais, não converte obrigações de origem e não resolve boletos ou documentos fiscais. O checkout cria um pedido novo. O cadastro do pacote mantém a unidade bloqueada para checkout quando detecta histórico comercial ativo nos componentes. O pedido anterior continua contribuindo para os totais contratados até a conciliação.
+
+Se a produção ainda mantiver o pedido anterior, a conversão requer uma operação autorizada, transacional e idempotente no fluxo comercial. Deve preservar a referência do pedido original, relacionar os itens anteriores à unidade principal e guardar a autoria autenticada. Antes de alterar a contribuição para os totais, a operação precisa conferir as versões do pedido, dos recebíveis e das alocações, bem como as evidências de faturamento e cobrança. Os itens anteriores saem das vendas ativas no mesmo momento em que o pedido convertido passa a ter a unidade principal. Toda baixa comprovada conserva valor, data, identificador e referência de origem. Se um lançamento faturado ou baixado não puder ser relacionado ao cronograma assinado sem alterar sua origem, a operação deve parar. Uma receita manual preexistente só pode ser vinculada à origem comercial após comprovação de que os dois registros cobrem a mesma receita.
+
+A conferência do pedido convertido cobre uma unidade ativa, três vínculos de composição, um contrato ativo com o PDF original em armazenamento privado e 17 linhas de pagamento comparadas ao documento. O resultado esperado na Dashboard é R$ 252.280,00 em vendas confirmadas do parque, com a mesma contribuição na Gastronomia e na base financeira da faixa de progresso. Se o único registro anterior for o pedido dos três pontos de R$ 52.280,00, o aumento líquido esperado nas vendas confirmadas é R$ 200.000,00. A contribuição final do parque em **Simulações** também é R$ 252.280,00 em **Confirmadas**. Os valores de caixa permanecem iguais aos recebimentos comprovados e classificados.
+
+## Reversão
+
+- **Antes da conversão**. O pacote pode permanecer bloqueado e o deploy do frontend pode ser revertido. Verifique a proteção dos três pontos antes de liberar qualquer operação comercial. As migrações do pacote e das projeções não convertem o pedido anterior nem alteram parcelas, recebíveis ou baixas.
+- **Depois da conversão**. Use a reversão auditada da própria operação de conversão, com a situação anterior e as versões registradas. Se houve faturamento, emissão de boleto, assinatura externa ou recebimento posterior, a reversão depende da conciliação desses fatos no fluxo apropriado. Preserve os vínculos e os arquivos privados em histórico. Uma reversão de frontend ou de esquema não substitui a reversão comercial.
+- Qualquer alteração de esquema deve passar por migração versionada no Lovable. Os dados operacionais devem ser tratados pelo fluxo autenticado compatível com a conciliação verificada.

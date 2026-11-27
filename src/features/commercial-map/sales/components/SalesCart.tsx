@@ -55,7 +55,7 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
         {summary.foodPointCount > 0 && <div className="sales-cart__totals-row">
           <span>{foodPointQuantityLabel(summary.foodPointCount)}</span>
         </div>}
-        {summary.lines.length > summary.foodPointCount && <div className="sales-cart__totals-row">
+        {summary.lines.some(({ entry }) => entry.commercialUnit !== 'FIXED_PACKAGE' && entry.commercialUnit !== 'FOOD_POINT') && <div className="sales-cart__totals-row">
           <span>Área total</span>
           <span>{formatAreaSqmLabel(summary.areaTotal)}</span>
         </div>}
@@ -70,6 +70,9 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
           {summary.blockingCount} espaço{summary.blockingCount === 1 ? '' : 's'} sem valor oficial definido.
           Remova para concluir a venda.
         </p>
+      )}
+      {summary.packageRequiresSeparateOrder && (
+        <p className="sales-cart__warning">Finalize a locação do parque em um pedido separado dos demais espaços.</p>
       )}
 
       <div className="sales-cart__actions">

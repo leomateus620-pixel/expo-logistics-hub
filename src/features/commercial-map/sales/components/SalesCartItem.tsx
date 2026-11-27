@@ -9,8 +9,10 @@ interface Props {
 
 export function SalesCartItem({ line, onRemove }: Props) {
   const foodPoint = line.entry.commercialUnit === 'FOOD_POINT';
-  const areaLabel = foodPoint ? '1 ponto de alimentação' : formatAreaSqmLabel(line.areaSqm) ?? 'Área não informada';
-  const priceLabel = foodPoint ? null : formatPricePerSqm(line.pricePerSqm);
+  const fixedPackage = line.entry.commercialUnit === 'FIXED_PACKAGE';
+  const areaLabel = fixedPackage ? 'Locação integral' : foodPoint
+    ? '1 ponto de alimentação' : formatAreaSqmLabel(line.areaSqm) ?? 'Área não informada';
+  const priceLabel = foodPoint || fixedPackage ? null : formatPricePerSqm(line.pricePerSqm);
 
   return (
     <article className={`sales-cart__item${line.unpriced ? ' is-pending' : ''}${line.pending ? ' is-loading' : ''}`}>
@@ -27,6 +29,16 @@ export function SalesCartItem({ line, onRemove }: Props) {
       <small>
         {[line.entry.location, line.entry.area, areaLabel, priceLabel].filter(Boolean).join(' · ')}
       </small>
+      <IncludedFoodPoints points={line.entry.includedPoints} />
     </article>
+  );
+}
+
+export function IncludedFoodPoints({ points }: { points: SalesCartLine['entry']['includedPoints'] }) {
+  if (!points?.length) return null;
+  return (
+    <ul className="sales-included-points" aria-label="Pontos incluídos na locação">
+      {points.map(({ id, label }) => <li key={id}>{label}</li>)}
+    </ul>
   );
 }

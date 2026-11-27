@@ -1,6 +1,7 @@
 import { withDashboardValue } from './helpers/dashboardFinancialFixture';
 import { describe, expect, it } from 'vitest';
 import { buildCommercialDashboardSnapshot, resolveDashboardLotValue } from '../features/commercial-map/dashboard/commercialDashboardAnalytics';
+import { commercialSalesProgress } from '../features/commercial-map/dashboard/commercialSalesProgressMetrics';
 import {
   formatDashboardArea,
   formatDashboardAreaWithCoverage,
@@ -10,6 +11,7 @@ import {
 } from '../features/commercial-map/dashboard/commercialDashboardFormatters';
 import type { CommercialMapSegmentId } from '../features/commercial-map/data/commercialMapSegments';
 import type { CommercialLot, MapEntity } from '../features/commercial-map/types';
+import { applyPackageComponentStatus } from '../features/commercial-map/utils/commercialPackage';
 
 function entity(id: string, segmentId: CommercialMapSegmentId | null = null, overrides: Partial<MapEntity> = {}): MapEntity {
   return {
@@ -87,6 +89,42 @@ function lot(id: string, entityId: string, overrides: Partial<CommercialLot> = {
 }
 
 describe('Commercial Dashboard analytics', () => {
+  it('moves Stallonne from the predecessor to one Gastronomia sale and updates the common progress denominator', () => {
+    const park = entity('park', null, { classification: 'ATTRACTION', isSellable: false });
+    const balloon = entity('balloon', null, { classification: 'FOOD_AREA', isSellable: false });
+    const principal = lot('park-sale', 'park-sale', {
+      commercialUnit: 'FIXED_PACKAGE', commercialPackageRole: 'PRINCIPAL', commercialPackageAnchorEntityId: park.id,
+      status: 'BLOCKED', askingPrice: 252_280,
+    });
+    const components = [19_040, 22_560, 10_680].map((price, index) => lot(`park-food-${index}`, `park-food-${index}`, {
+      commercialUnit: 'FOOD_POINT', commercialPackageRole: 'COMPONENT', commercialPackagePrincipalLotId: principal.id,
+      status: 'SOLD', askingPrice: price,
+    }));
+    const independent = lot('balloon-food', 'balloon-food', { commercialUnit: 'FOOD_POINT', askingPrice: 2_815 });
+    const entities = [park, balloon,
+      entity(principal.entityId, 'gastronomia', { parentEntityId: park.id }),
+      ...components.map((component) => entity(component.entityId, 'gastronomia', { classification: 'FOOD_POINT', parentEntityId: park.id })),
+      entity(independent.entityId, 'gastronomia', { classification: 'FOOD_POINT', parentEntityId: balloon.id })];
+
+    const before = buildCommercialDashboardSnapshot({ entities, lots: applyPackageComponentStatus([principal, ...components, independent]) });
+    expect(before.overall).toMatchObject({ commercialLots: 4, soldLots: 3, soldValue: 52_280, totalKnownValue: 55_095 });
+
+    const withdrawn = components.map((component): CommercialLot => ({
+      ...component, status: 'BLOCKED', sales: component.sales?.map((sale) => ({ ...sale, status: 'REVERTED' })),
+    }));
+    const packageOpened = withDashboardValue({ ...principal, status: 'SALE_OPEN' }, 252_280);
+    const pending = buildCommercialDashboardSnapshot({ entities, lots: applyPackageComponentStatus([packageOpened, ...withdrawn, independent]) });
+    expect(pending.overall).toMatchObject({ commercialLots: 2, saleOpenLots: 1, soldLots: 0, soldValue: 0, saleOpenValue: 252_280 });
+
+    const packageSigned = withDashboardValue({ ...principal, status: 'SOLD' }, 252_280);
+    const after = buildCommercialDashboardSnapshot({ entities, lots: applyPackageComponentStatus([packageSigned, ...withdrawn, independent]) });
+    const gastronomy = after.segments.find((segment) => segment.segmentId === 'gastronomia');
+    expect(after.overall).toMatchObject({ commercialLots: 2, commercialAreaLots: 0, soldLots: 1, soldValue: 252_280, totalKnownValue: 255_095 });
+    expect(gastronomy).toMatchObject({ commercialLots: 2, soldLots: 1, soldValue: 252_280, availableValue: 2_815 });
+    expect(after.gastronomyStructures.find(({ structure }) => structure.id === park.id)?.records.map(({ lot: record }) => record.id)).toEqual([principal.id]);
+    expect(commercialSalesProgress(after.overall).confirmed).toBeCloseTo(252_280 / 255_095 * 100);
+  });
+
   it('reads persisted checkout/individual open amounts before signature and retains them on confirmation', () => {
     const source = withDashboardValue(lot('workflow', 'workflow', { status: 'SALE_OPEN', askingPrice: 99_999 }), 845.75, 2000);
     source.sales = [

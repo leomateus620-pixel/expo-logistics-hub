@@ -2,9 +2,10 @@ import { matchesBuyerNames } from '../utils/buyerDisplayName';
 import { memo, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { formatAreaSqmLabel, formatBrl } from '../utils/lotPricing2028';
-import { PUBLIC_AVAILABILITY_LABEL, type PublicLot } from './publicMapTypes';
+import type { PublicLot } from './publicMapTypes';
 import { resolveLotIdentity } from '../utils/lotIdentity';
-import { publicAvailability } from './publicAvailability';
+import { publicAvailability, publicAvailabilityLabel } from './publicAvailability';
+import { STALLONNE_INCLUDED_LABEL } from '../utils/commercialPackage';
 import type { PublicSoldCompanyGroup } from './publicSoldCompanies';
 
 /** Lista acessível do mesmo escopo — nunca amplia para o parque inteiro. */
@@ -53,13 +54,14 @@ export const PublicLotList = memo(function PublicLotList({
             >
                <strong>{resolveLotIdentity(lot, null, null, areaName).full}</strong>
               <span>{formatAreaSqmLabel(lot.officialAreaSqm) ?? 'Metragem não informada'}</span>
-              <span>
+              {lot.packageRole === 'COMPONENT' && <span>{STALLONNE_INCLUDED_LABEL}</span>}
+              {!lot.packageRole && <span>
                 {lot.pricing.resolutionStatus === 'OK'
                   ? formatBrl(lot.pricing.renovacaoTotal) ?? 'Valor sob consulta'
                   : 'Valor sob consulta'}
-              </span>
-              <small data-availability={publicAvailability(lot.availability)}>{PUBLIC_AVAILABILITY_LABEL[lot.availability]}</small>
-              {companiesByEntityId?.get(lot.entityId)?.tradeName &&
+              </span>}
+              <small data-availability={publicAvailability(lot.availability)}>{publicAvailabilityLabel(lot)}</small>
+              {!lot.packageRole && companiesByEntityId?.get(lot.entityId)?.tradeName &&
                 <small className="public-map-list-company">{companiesByEntityId.get(lot.entityId)?.tradeName}</small>}
             </button>
           </li>

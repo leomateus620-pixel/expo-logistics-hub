@@ -1,6 +1,7 @@
 import type { CommercialLot, MapEntity } from '../types';
 import type { SalesSelectionEntry } from './salesTypes';
 import { resolveLotIdentity } from '../utils/lotIdentity';
+import { packageIncludedPoints } from '../utils/commercialPackage';
 
 /**
  * Elegibilidade comercial é decidida no servidor pela view
@@ -13,12 +14,19 @@ export function isSellableLot(
   eligibleLotIds?: ReadonlySet<string> | null,
 ): boolean {
   // A map refresh can precede the eligibility refresh after another sale.
-  if (!lot || lot.status === 'SOLD' || lot.status === 'SALE_OPEN' || lot.id.startsWith('reference:') || lot.archivedAt) return false;
+  if (!lot || lot.status === 'SOLD' || lot.status === 'SALE_OPEN' || lot.id.startsWith('reference:') || lot.archivedAt
+    || lot.commercialPackageRole === 'COMPONENT' || lot.commercialPackageReconciliationPending) return false;
   if (!eligibleLotIds) return false;
   return eligibleLotIds.has(lot.id);
 }
 
-export function toSalesEntry(lot: CommercialLot, context?: string | null, entity?: MapEntity | null, pavilion?: MapEntity | null): SalesSelectionEntry {
+export function toSalesEntry(
+  lot: CommercialLot,
+  context?: string | null,
+  entity?: MapEntity | null,
+  pavilion?: MapEntity | null,
+  lots: readonly CommercialLot[] = [],
+): SalesSelectionEntry {
   const identity = resolveLotIdentity(lot, entity, pavilion);
   return {
     lotId: lot.id,
@@ -29,5 +37,6 @@ export function toSalesEntry(lot: CommercialLot, context?: string | null, entity
     location: identity.location,
     area: identity.area,
     commercialUnit: lot.commercialUnit,
+    ...(lot.commercialPackageRole === 'PRINCIPAL' ? { includedPoints: packageIncludedPoints(lot, lots) } : {}),
   };
 }

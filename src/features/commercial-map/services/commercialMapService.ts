@@ -81,6 +81,9 @@ interface LotRow {
   accessibility_notes: string | null; commercial_notes: string | null; internal_notes: string | null; archived_at: string | null;
   created_by: string | null; updated_by: string | null; created_at: string | null; updated_at: string | null;
   commercial_unit?: CommercialLot['commercialUnit'];
+  commercial_package_role?: CommercialLot['commercialPackageRole'];
+  commercial_package_principal_lot_id?: string | null;
+  commercial_package_reconciliation_pending?: boolean;
   unit_quantity?: number | null;
   display_order?: number | null;
   food_type?: string | null;
@@ -380,7 +383,7 @@ export async function fetchLotBuyerSummary(projectId: string, signal?: AbortSign
   return new Map(((data ?? []) as LotBuyerSummaryRow[]).map((row) => [row.lot_id, row]));
 }
 
-function mapLot(row: LotRow): CommercialLot {
+function mapLot(row: LotRow, entity?: MapEntity): CommercialLot {
   const price = Array.isArray(row.lot_prices) ? row.lot_prices.find((candidate: PriceRow) => candidate.is_active) : row.lot_prices;
   const activeReservation = Array.isArray(row.lot_reservations)
     ? row.lot_reservations.find((candidate: ReservationRow) => candidate.status === 'ACTIVE')
@@ -393,6 +396,8 @@ function mapLot(row: LotRow): CommercialLot {
   const activeContract = Array.isArray(row.lot_contracts)
     ? row.lot_contracts.find((candidate: ContractRow) => candidate.is_active)
     : null;
+  const packageAnchor = entity?.metadata.commercialPackageAnchorEntityId;
+  const packageComponentName = entity?.metadata.commercialPackageComponentName;
   return {
     id: row.id,
     entityId: row.entity_id,
@@ -410,6 +415,12 @@ function mapLot(row: LotRow): CommercialLot {
     depthMeters: row.depth_meters === null ? null : Number(row.depth_meters),
     pricingMode: price?.pricing_mode ?? 'NEGOTIABLE',
     commercialUnit: row.commercial_unit ?? 'SQUARE_METER',
+    commercialPackageRole: row.commercial_package_role ?? null,
+    commercialPackagePrincipalLotId: row.commercial_package_principal_lot_id ?? null,
+    commercialPackageAnchorEntityId: typeof packageAnchor === 'string' ? packageAnchor : null,
+    commercialPackageComponentName: typeof packageComponentName === 'string' ? packageComponentName : null,
+    commercialPackageReconciliationPending: row.commercial_package_reconciliation_pending
+      ?? (entity?.metadata.commercialPackageReconciliationPending === true),
     unitQuantity: row.unit_quantity ?? null,
     displayOrder: row.display_order ?? null,
     foodType: row.food_type ?? null,
@@ -591,7 +602,8 @@ async function fetchCommissionCommercialMap(
     (geometriesResult.data ?? []).map((row: GeometryRow) => [row.entity_id, row]),
   );
   const entities = entityRows
-    .filter((row) => geometryByEntity.has(row.id) || row.classification === 'FOOD_POINT')
+    .filter((row) => geometryByEntity.has(row.id) || row.classification === 'FOOD_POINT'
+      || row.metadata?.commercialPackageRole === 'PRINCIPAL')
     .map((row) => mapEntity(row, geometryByEntity.get(row.id), localSegment.id));
 
   if (entities.length !== entityRows.length) {
@@ -615,12 +627,18 @@ async function fetchCommissionCommercialMap(
     metadata: entity.metadata ?? {},
   })) as MapEntity[];
   if (localSegment.id === 'gastronomia') {
-    const anchors = new Set(entities.map((entity) => entity.parentEntityId));
-    entities.push(...parkContextEntities.filter((entity) => anchors.has(entity.id)));
+    const anchors = new Set(entities.flatMap((entity) => {
+      if (entity.classification === 'FOOD_POINT') return [entity.parentEntityId];
+      const packageAnchor = entity.metadata.commercialPackageAnchorEntityId;
+      return typeof packageAnchor === 'string' ? [packageAnchor] : [];
+    }));
+    const existing = new Set(entities.map((entity) => entity.id));
+    entities.push(...parkContextEntities.filter((entity) => anchors.has(entity.id) && !existing.has(entity.id)));
     if ([...anchors].some((id) => !id || !entities.some((entity) => entity.id === id && entity.geometry.coordinates.length))) {
       throw commissionMapError('MAP_SEGMENT_GEOMETRY_INCOMPLETE');
     }
   }
+  const entitiesById = new Map(entities.map((entity) => [entity.id, entity]));
   return {
     parkContextEntities,
     source: 'database',
@@ -633,7 +651,7 @@ async function fetchCommissionCommercialMap(
     calibration: null,
     layers: contextLayers,
     entities,
-    lots: lotRows.map(mapLot),
+    lots: lotRows.map((row) => mapLot(row, entitiesById.get(row.entity_id))),
     scope: {
       mode: 'commission',
       commissionId: scope.commissionId,
@@ -750,13 +768,15 @@ export async function fetchCommercialMap(
   );
   const geometryByEntity = new Map<string, GeometryRow>((geometriesResult.data ?? []).map((row: GeometryRow) => [row.entity_id, row]));
   const entities = (entitiesResult.data ?? [])
-    .filter((row: EntityRow) => geometryByEntity.has(row.id) || row.classification === 'FOOD_POINT')
+    .filter((row: EntityRow) => geometryByEntity.has(row.id) || row.classification === 'FOOD_POINT'
+      || row.metadata?.commercialPackageRole === 'PRINCIPAL')
     .map((row: EntityRow) => mapEntity(
       row,
       geometryByEntity.get(row.id),
       row.segment_id ? segmentSlugById.get(row.segment_id) : undefined,
     ));
   const entityRows = (entitiesResult.data ?? []) as EntityRow[];
+  const entitiesById = new Map<string, MapEntity>((entities as MapEntity[]).map((entity) => [entity.id, entity]));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pricingByEntity = new Map<string, any>(((pricingResult.data ?? []) as any[]).map((row) => [row.entity_id, row]));
   const lotRows = ((lotsResult.data ?? []) as LotRow[]).map((row) => ({
@@ -786,7 +806,7 @@ export async function fetchCommercialMap(
     calibration: calibrationResult.calibration,
     layers: (layersResult.data ?? []).map(mapLayer),
     entities,
-    lots: lotRows.map(mapLot),
+    lots: lotRows.map((row) => mapLot(row, entitiesById.get(row.entity_id))),
   });
   if (result.source === 'database') {
     (result as CommercialMapData).revision = typeof revisionResult.data === 'string' && !revisionResult.error ? revisionResult.data : null;

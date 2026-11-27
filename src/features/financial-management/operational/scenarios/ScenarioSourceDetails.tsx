@@ -99,7 +99,7 @@ export function ScenarioSourceDetails({
               </div>
             </dl>
             {food && <dl className="fsc-detail-totals" aria-label="Inventário de alimentação no mapa">
-              <div><dt>Pontos com preço de tabela</dt><dd>{food.pricedUnits} de {food.units}</dd></div>
+              <div><dt>{food.packageUnits ? 'Unidades' : 'Pontos'} com preço de tabela</dt><dd>{food.pricedUnits} de {food.units}</dd></div>
               <div><dt>Tabela de Renovação</dt><dd>{money(food.tableCents)}</dd></div>
               <div><dt>{food.availableUnits} disponíveis em tabela</dt><dd>{money(food.availableTableCents)}</dd></div>
             </dl>}

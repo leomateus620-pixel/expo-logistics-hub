@@ -135,11 +135,13 @@ export const overviewSchema = z.object({
   calculationVersion: z.string(),
   foodPointInventory: z.object({
     units: z.number().int().nonnegative(),
+    packageUnits: z.number().int().nonnegative().optional(),
     pricedUnits: z.number().int().nonnegative(),
     availableUnits: z.number().int().nonnegative(),
     tableCents: nonnegativeCentsSchema,
     availableTableCents: nonnegativeCentsSchema,
   }).refine((inventory) => inventory.pricedUnits <= inventory.units
+    && (inventory.packageUnits ?? 0) <= inventory.units
     && inventory.availableUnits <= inventory.units
     && BigInt(inventory.availableTableCents) <= BigInt(inventory.tableCents)).optional(),
   currentByCategory: z.object(categoryShape),

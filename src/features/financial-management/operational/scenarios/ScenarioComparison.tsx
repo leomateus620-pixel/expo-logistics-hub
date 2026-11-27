@@ -38,6 +38,7 @@ export function ScenarioComparison({
 }) {
   const current = currentLabels[data.basis];
   const food = data.foodPointInventory;
+  const foodUnit = food?.packageUnits ? 'unidade' : 'ponto';
   return (
     <div className="fsc-columns">
       {data.scenarios
@@ -113,7 +114,7 @@ export function ScenarioComparison({
                       status={data.currentByCategory[k].status}
                       onDetails={() => onCategory(k)}
                       reference={k === "food_points" && food ? <>
-                        <span>Tabela do mapa · {food.units} {food.units === 1 ? "ponto" : "pontos"}</span>
+                        <span>Tabela do mapa · {food.units} {foodUnit}{food.units === 1 ? '' : 's'}</span>
                         <b>{money(food.tableCents)}</b>
                       </> : undefined}
                       info={

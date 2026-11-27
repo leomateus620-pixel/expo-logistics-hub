@@ -17,6 +17,7 @@ interface Props {
   onFeesChange: (fees: SalesFeesDraft) => void;
   spacesCents: number;
   showErrors: boolean;
+  fixedPackage?: boolean;
 }
 
 export function paymentErrors(value: SalesPaymentDraft, totalCents: number) {
@@ -34,7 +35,7 @@ export function paymentErrors(value: SalesPaymentDraft, totalCents: number) {
 
 const plural = (n: number) => `${n} parcela${n === 1 ? '' : 's'}`;
 
-export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCents, showErrors }: Props) {
+export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCents, showErrors, fixedPackage }: Props) {
   const totalCents = spacesCents + feesTotalCents(fees);
   const errors = paymentErrors(value, totalCents);
   const sumCents = draftsSumCents(value.installments);
@@ -78,7 +79,7 @@ export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCe
 
   return (
     <div className="sales-sheet-body">
-      <section className="sales-block" aria-labelledby="sales-fees-title">
+      {!fixedPackage && <section className="sales-block" aria-labelledby="sales-fees-title">
         <h3 id="sales-fees-title">Taxas da venda</h3>
         <p className="sales-block__hint">Cobradas uma única vez nesta venda, independente da quantidade de espaços.</p>
         <div className="sales-fees-grid">
@@ -100,7 +101,7 @@ export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCe
           <div><dt>Taxas</dt><dd>{formatCents(feesTotalCents(fees))}</dd></div>
           <div className="is-strong"><dt>Total da venda</dt><dd>{formatCents(totalCents)}</dd></div>
         </dl>
-      </section>
+      </section>}
 
       <section className="sales-block" aria-labelledby="sales-method-title">
         <h3 id="sales-method-title">Forma de pagamento</h3>

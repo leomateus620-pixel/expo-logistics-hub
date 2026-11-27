@@ -26,7 +26,7 @@ import {
   UnlockKeyhole,
   X,
 } from 'lucide-react';
-import { toSalesEntry } from '../../sales/salesEntry';
+import { isSellableLot, toSalesEntry } from '../../sales/salesEntry';
 import { resolveLotIdentity } from '../../utils/lotIdentity';
 import { useSalesStore } from '../../sales/useSalesSelection';
 import { Badge } from '@/components/ui/badge';
@@ -37,13 +37,13 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CLASSIFICATION_LABELS, COMMERCIAL_PHASES, STATUS_CONFIG } from '../../constants';
-import { useLotActivity, useLotContractVersions, useLotSaleHistory, useMapMutations } from '../../hooks/useCommercialMap';
+import { useLotActivity, useLotContractHistory, useLotContractVersions, useLotSaleHistory, useMapMutations } from '../../hooks/useCommercialMap';
 import { PARK_APPEARANCES, PARK_QUALITY_CHOICES, type ParkAppearance, type ParkQualityPreference } from '../../state/parkAppearance';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { polygonAreaMapUnits } from '../../utils/geometry';
-import type { LotPricingStage } from '../../utils/lotPricing2028';
+import { formatBrl, type LotPricingStage } from '../../utils/lotPricing2028';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkSupportsInterior,
@@ -68,6 +68,8 @@ import { foodPointsByStructure } from '../../data/commercialMapSegments';
 import { gastronomyStructureSelectionId } from '../../utils/gastronomyPointPlacement';
 import { GastronomyStructurePanel } from './GastronomyStructurePanel';
 import { HeadquartersFilm } from '../HeadquartersFilm';
+import { packageIncludedPoints, PACKAGE_RECONCILIATION_LABEL } from '../../utils/commercialPackage';
+import { LotContractFileButton } from '../commercial/LotContractFileButton';
 
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const areaNumber = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -356,18 +358,24 @@ interface EntityDetailsPanelProps {
 }
 
 export function EntityDetailsPanel(props: EntityDetailsPanelProps) {
-  const { entity, entities, lots, permissions, sceneAvailable = true } = props;
+  const { entity, lot, entities, lots, permissions, sceneAvailable = true } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
+  const selectionWithoutFocusId = useCommercialMapStore((state) => state.selectionWithoutFocusId);
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
+  const salesModeActive = useSalesStore((state) => state.salesModeActive);
   const groups = useMemo(() => foodPointsByStructure(entities, lots), [entities, lots]);
   const structure = entity.classification === 'FOOD_POINT'
     ? entities.find((item) => item.id === entity.parentEntityId) : entity;
   const points = structure && groups.get(structure.id);
-  if (structure && points?.length && (entity.classification === 'FOOD_POINT'
+  const packageSheet = lot?.commercialPackageRole === 'PRINCIPAL'
+    && (salesModeActive || selectionWithoutFocusId === entity.id);
+  if (!packageSheet && structure && points?.length && (entity.classification === 'FOOD_POINT'
     || gastronomyStructureSelectionId(structure.id, points) === structure.id)) return <GastronomyStructurePanel key={structure.id} structure={structure} points={points}
     selectedPointId={points.find((point) => point.entity.id === entity.id)?.lot.id}
     mapData={{ entities, lots }} onEnterInterior={sceneAvailable && strategicLandmarkSupportsInterior(structure)
       ? () => enterInterior(structure.id) : undefined}
+    onOpenPackage={permissions.canManageSales || permissions.canManageContracts
+      ? (entityId) => setSelectedEntityId(entityId, { focus: false }) : undefined}
     permissions={permissions} canSell={permissions.canManageSales && sceneAvailable} onClose={() => setSelectedEntityId(null)} />;
   return <DefaultEntityDetailsPanel {...props} />;
 }
@@ -375,8 +383,10 @@ export function EntityDetailsPanel(props: EntityDetailsPanelProps) {
 function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, sceneAvailable = true }: EntityDetailsPanelProps) {
   const salesModeActive = useSalesStore((state) => state.salesModeActive) && sceneAvailable;
   const salesSelection = useSalesStore((state) => state.selection);
+  const eligibleLotIds = useSalesStore((state) => state.eligibleLotIds);
   const toggleSalesLot = useSalesStore((state) => state.toggleLot);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
+  const selectionWithoutFocus = useCommercialMapStore((state) => state.selectionWithoutFocusId === entity.id);
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
   const [workflow, setWorkflow] = useState<LotWorkflow>(null);
   const [structureOperation, setStructureOperation] = useState<LotStructureOperation>(null);
@@ -384,14 +394,17 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
   const historyTriggerRef = useRef<HTMLButtonElement>(null);
   const historyId = getHistoryIdForEntity(entity);
   const historyOpen = historyEntityId === entity.id && historyId !== null;
-  const sheet = useCompactDetailSheet(entity.id, historyOpen);
+  const packagePrincipal = lot?.commercialPackageRole === 'PRINCIPAL' ? lot : null;
+  const packageReconciliationPending = Boolean(packagePrincipal?.commercialPackageReconciliationPending);
+  const includedPoints = packagePrincipal ? packageIncludedPoints(packagePrincipal, lots) : [];
+  const sheet = useCompactDetailSheet(entity.id, historyOpen || selectionWithoutFocus);
   const closeHistory = () => {
     setHistoryEntityId(null);
     requestAnimationFrame(() => historyTriggerRef.current?.focus({ preventScroll: true }));
   };
   const activity = useLotActivity(lot?.id ?? null);
   const saleHistory = useLotSaleHistory(lot?.id ?? null, lot?.status === 'SOLD' || lot?.status === 'SALE_OPEN');
-  const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
+  const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts && !packagePrincipal);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
   const status = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)] : null;
   const metadata = normalizeMapEntityMetadata(entity, lot);
@@ -418,7 +431,7 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
     <>
       <aside
         ref={sheet.panelRef}
-        className="commercial-map-panel commercial-map-details-panel"
+        className={`commercial-map-panel commercial-map-details-panel${packagePrincipal && salesModeActive ? ' is-package-selling' : ''}`}
         data-sheet-state={sheet.sheetState}
         data-history-open={historyOpen}
         aria-label={`Detalhes de ${metadata.officialDisplayName}`}
@@ -441,13 +454,31 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
         <div className="commercial-map-selection-summary" aria-label="Resumo da seleção">
           {status ? (
             <span className="commercial-map-status-pill" style={{ color: status.border, background: status.surface, borderColor: status.color }}>
-              <b aria-hidden="true">{status.symbol}</b>{status.label}
+              <b aria-hidden="true">{status.symbol}</b>{packageReconciliationPending ? PACKAGE_RECONCILIATION_LABEL : status.label}
             </span>
           ) : <Badge variant="outline">Não comercial</Badge>}
-          <span>{pavilionPlan
+          <span>{packagePrincipal ? 'Locação do parque' : pavilionPlan
             ? `${pavilionPlan.stats.moduleCount} módulos · ${number.format(pavilionPlan.stats.totalAreaSquareMeters)} m² de área total`
             : lot?.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m² de área oficial` : 'Área não informada'}</span>
         </div>
+        {packagePrincipal && (
+          <section className="commercial-map-detail-section commercial-map-package-facts" aria-label="Composição da locação do parque">
+            <h3>Locação do Parque Stallonne</h3>
+            {packagePrincipal.basePrice != null && <p><strong>{formatBrl(packagePrincipal.basePrice)}</strong></p>}
+            {permissions.canManageSales && salesModeActive && !packageReconciliationPending && packagePrincipal.status === 'AVAILABLE' && (
+              <Button
+                disabled={!isSellableLot(packagePrincipal, eligibleLotIds)}
+                variant={salesSelection.some((item) => item.lotId === packagePrincipal.id) ? 'secondary' : 'default'}
+                onClick={() => toggleSalesLot(toSalesEntry(packagePrincipal, null, entity, entities.find(parent => parent.id === entity.parentEntityId), lots))}
+              >
+                <ShoppingCart className="h-4 w-4" />
+                {salesSelection.some((item) => item.lotId === packagePrincipal.id) ? 'Na venda' : 'Adicionar à venda'}
+              </Button>
+            )}
+              <h4>Pontos incluídos</h4>
+              <ul>{includedPoints.map(({ id, label }) => <li key={id}>{label}</li>)}</ul>
+            </section>
+        )}
         <CompactDetailSheetControls sheet={sheet}>
           {sceneAvailable && strategicLandmarkSupportsInterior(entity) && (
             <Button className="commercial-map-selection-interior-action"
@@ -488,12 +519,12 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
               <div>
                 {saleStageLabel(saleHistory.data?.stage) && <span>{saleStageLabel(saleHistory.data?.stage)}</span>}
                 {(saleHistory.data?.salespersonName || lot.salespersonName) && <span>Responsável: {saleHistory.data?.salespersonName || lot.salespersonName}</span>}
-                {(saleHistory.data?.contractNumber || lot.activeContractNumber) && <span>Contrato: {saleHistory.data?.contractNumber || lot.activeContractNumber}</span>}
+                {(!packagePrincipal || permissions.canManageContracts) && (saleHistory.data?.contractNumber || lot.activeContractNumber) && <span>Contrato: {saleHistory.data?.contractNumber || lot.activeContractNumber}</span>}
               </div>
             </section>
           )}
 
-          {lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} snapshotPricing={lot.officialPricing2028} confirmedStage={lot.status === 'SOLD' ? saleStage(saleHistory.data?.stage) : null} canEdit={permissions.canEditPricing && !lot.id.startsWith('reference:')} />}
+          {!packagePrincipal && lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} snapshotPricing={lot.officialPricing2028} confirmedStage={lot.status === 'SOLD' ? saleStage(saleHistory.data?.stage) : null} canEdit={permissions.canEditPricing && !lot.id.startsWith('reference:')} />}
 
           <Tabs defaultValue="overview" className="commercial-map-detail-tabs">
             <TabsList>
@@ -523,7 +554,9 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
                       {lot.status !== 'SOLD' && lot.reservationExpiresAt && <div><dt>Reserva até</dt><dd>{dateTime.format(new Date(lot.reservationExpiresAt))}</dd></div>}
                     </dl>
                   </div>
-                  {permissions.canManageContracts && (lot.status === 'SOLD' || Boolean(contracts.data?.length)) && (
+                  {packagePrincipal && permissions.canManageContracts && (lot.status === 'SOLD' || lot.status === 'SALE_OPEN')
+                    && <PackageContractFiles lotId={lot.id} />}
+                  {!packagePrincipal && permissions.canManageContracts && (lot.status === 'SOLD' || Boolean(contracts.data?.length)) && (
                     <section className="commercial-map-contract-action" aria-label="Contrato da venda">
                       <div className="commercial-map-contract-action__heading">
                         <FileLock2 aria-hidden="true" />
@@ -549,19 +582,19 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
               )}
 
               <div className="commercial-map-detail-actions">
-                {lot && permissions.canManageLots && structuralReady && (
+                {lot && !packagePrincipal && permissions.canManageLots && structuralReady && (
                   <>
                     <Button variant="outline" onClick={() => setStructureOperation('split')}><Scissors className="h-4 w-4" />Dividir</Button>
                     <Button variant="outline" onClick={() => setStructureOperation('merge')}><Combine className="h-4 w-4" />Mesclar</Button>
                   </>
                 )}
-                {lot && permissions.canManageSales && ['AVAILABLE', 'IN_NEGOTIATION'].includes(lot.status) && (
+                {lot && !packagePrincipal && permissions.canManageSales && ['AVAILABLE', 'IN_NEGOTIATION'].includes(lot.status) && (
                   <Button variant="outline" onClick={() => setWorkflow('reserve')}><CalendarClock className="h-4 w-4" />Reservar</Button>
                 )}
-                {lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED'].includes(lot.status) && (
+                {lot && !packagePrincipal && permissions.canManageSales && ['AVAILABLE', 'RESERVED'].includes(lot.status) && (
                   <Button variant="outline" onClick={() => setWorkflow('negotiate')}><Clock3 className="h-4 w-4" />Negociar</Button>
                 )}
-                {lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION'].includes(lot.status) && (
+                {lot && !packagePrincipal && permissions.canManageSales && ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION'].includes(lot.status) && (
                   salesModeActive ? (
                     <Button
                       variant={salesSelection.some((item) => item.lotId === lot.id) ? 'secondary' : 'default'}
@@ -591,4 +624,19 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
       {lot && <LotStructureDialog key={`structure:${lot.id}`} operation={structureOperation} lot={lot} entity={entity} entities={entities} lots={lots} onClose={() => setStructureOperation(null)} />}
     </>
   );
+}
+
+function PackageContractFiles({ lotId }: { lotId: string }) {
+  const history = useLotContractHistory(lotId);
+  const contracts = history.data?.documentsAccessible
+    ? history.data.contracts.filter((contract) => contract.isCurrent && contract.scope === 'ORDER_ITEMS') : [];
+  return <section className="commercial-map-contract-action" aria-label="Contrato da venda">
+    <div className="commercial-map-contract-action__heading"><FileLock2 aria-hidden="true" /><strong>Contrato da venda</strong></div>
+    {history.isLoading && <p>Carregando documentos autorizados…</p>}
+    {history.isError && <p>Não foi possível consultar os documentos autorizados.</p>}
+    {contracts.map((contract) => {
+      const version = contract.versions.find((version) => version.version === contract.activeVersion);
+      return version && <LotContractFileButton key={version.id} version={version}>Abrir contrato</LotContractFileButton>;
+    })}
+  </section>;
 }

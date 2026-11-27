@@ -230,6 +230,11 @@ export function describeSalesError(error: unknown): string {
   if (message.includes('ITEM_NOT_IN_ORDER')) return 'Algum espaço selecionado não pertence a esta venda.';
   if (message.includes('SALE_CHANGED')) return 'A venda deste ponto foi alterada. Atualize os dados antes de anexar o contrato.';
   if (message.includes('CONTRACT_OBJECT_NOT_FOUND')) return 'O arquivo não foi confirmado no armazenamento. Tente novamente.';
+  if (message.includes('COMMERCIAL_PACKAGE_PDF_REQUIRED')) return 'Envie o PDF assinado da locação do parque.';
+  if (message.includes('COMMERCIAL_PACKAGE_CONTRACT_EXISTS')) return 'O pedido já tem um contrato. Abra o documento para registrar uma nova versão.';
+  if (/COMMERCIAL_PACKAGE_(COMPONENT|CONTRACT_SCOPE)|USE_COMMERCIAL_PACKAGE_CHECKOUT/.test(message)) {
+    return 'Anexe um único documento ao pedido do Parque Stallonne para abranger os pontos incluídos.';
+  }
   if (message.includes('INVALID_CONTRACT_FILE')) return 'Envie um PDF ou DOCX de até 15 MB.';
   if (message.includes('ORDER_NOT_FOUND')) return 'Venda não encontrada.';
   if (message.includes('Failed to fetch') || message.includes('NetworkError')) return 'Falha de conexão. Verifique a internet e tente novamente.';

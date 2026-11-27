@@ -89,6 +89,7 @@ const PARKING_INSPECTION_MODE = {
 interface CommercialMapState {
   activeScopeKey: string | null;
   selectedEntityId: string | null;
+  selectionWithoutFocusId: string | null;
   interiorEntityId: string | null;
   interiorReturnView: CommercialMapCameraView | null;
   interiorReturnContext: InteriorReturnContext | null;
@@ -158,7 +159,7 @@ interface CommercialMapState {
   setDockExpanded: (expanded: boolean) => void;
   setDockSection: (section: CommercialMapDockSection | null) => void;
   activateScope: (scopeKey: string, segmentId: CommercialMapSegmentId | null) => void;
-  setSelectedEntityId: (id: string | null) => void;
+  setSelectedEntityId: (id: string | null, options?: { focus: boolean }) => void;
   clearLotInspection: () => void;
   enterInterior: (id: string) => void;
   switchInterior: (id: string) => void;
@@ -230,6 +231,7 @@ const initialPreferences = readParkPreferences();
 export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   activeScopeKey: null,
   selectedEntityId: null,
+  selectionWithoutFocusId: null,
   interiorEntityId: null,
   interiorReturnView: null,
   interiorReturnContext: null,
@@ -300,6 +302,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       activeScopeKey,
       activeSegmentId,
       selectedEntityId: null,
+      selectionWithoutFocusId: null,
       interiorEntityId: null,
       interiorReturnView: null,
       interiorReturnContext: null,
@@ -336,12 +339,13 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       lunarLaunchPreviousPanel: null,
     };
   }),
-  setSelectedEntityId: (selectedEntityId) => set((state) => (
+  setSelectedEntityId: (selectedEntityId, { focus } = { focus: true }) => set((state) => (
     state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning
       ? state
       : {
           ...CLEARED_PARKING_INSPECTION,
           selectedEntityId,
+          selectionWithoutFocusId: focus ? null : selectedEntityId,
           interiorEntityId: state.interiorEntityId === selectedEntityId ? state.interiorEntityId : null,
           interiorReturnView: state.interiorEntityId === selectedEntityId ? state.interiorReturnView : null,
           interiorReturnContext: state.interiorEntityId === selectedEntityId ? state.interiorReturnContext : null,
@@ -349,7 +353,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
           // A new tap cancels the running flight before its click is handled.
           // Repeating an exterior selection must explicitly request that focus
           // again; interior selection keeps its existing view/return contract.
-          cameraSequence: selectedEntityId !== null
+          cameraSequence: focus && selectedEntityId !== null
             && selectedEntityId === state.selectedEntityId
             && state.interiorEntityId === null
             ? state.cameraSequence + 1
@@ -469,6 +473,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   selectEntityFromExplorer: (selectedEntityId) => set((state) => ({
     ...CLEARED_PARKING_INSPECTION,
     selectedEntityId,
+    selectionWithoutFocusId: null,
     hoveredEntityId: null,
     hoveredModuleId: null,
     selectedModuleId: null,

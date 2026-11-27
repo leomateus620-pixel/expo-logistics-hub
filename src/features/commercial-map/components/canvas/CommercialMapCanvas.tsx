@@ -192,6 +192,8 @@ import {
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { dispatchSalesLotClick } from '../../sales/salesInteraction';
 import { useSalesSelectedLotIds, useSalesStore } from '../../sales/useSalesSelection';
+import { packagePrincipalsByAnchor, STALLONNE_INCLUDED_LABEL } from '../../utils/commercialPackage';
+import { toast } from 'sonner';
 import { useSaleInspectionStore } from '../../state/useSaleInspectionStore';
 import {
   getRearParkingFocusBounds, rearParkingVisibleInArea, rearParkingLayerPresentation,
@@ -959,6 +961,7 @@ interface EntityMeshProps {
   reducedTruckGraphics?: boolean;
   pavilionExteriorLift?: number;
   reducedPavilionGraphics?: boolean;
+  suspendParkExperience?: boolean;
   isMatch: boolean;
   layerOpacity: number;
   sceneCenter: readonly [number, number];
@@ -1400,6 +1403,7 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
         reducedTruckGraphics={props.reducedTruckGraphics}
         pavilionExteriorLift={props.pavilionExteriorLift}
         reducedPavilionGraphics={props.reducedPavilionGraphics}
+        suspendParkExperience={props.suspendParkExperience}
       />
     );
   }
@@ -2248,7 +2252,8 @@ function CameraRig({
   const christmasLease = useChristmasCameraLease(christmasEnabled && !publicPolicy, camera, controlsRef, gl, invalidate, () => {
     const state = useCommercialMapStore.getState();
     const focused = exteriorRenderedEntities.find(entity => entity.id === state.selectedEntityId);
-    const night = state.nightModeActive || Boolean(focused && resolveStrategicLandmarkKind(focused) === 'amusement-park');
+    const night = state.nightModeActive || Boolean(focused && state.selectionWithoutFocusId !== focused.id
+      && resolveStrategicLandmarkKind(focused) === 'amusement-park');
     return !isSoyHarvestCameraOwned() && !useVisitStore.getState().enabled
       && !state.interiorEntityId && !state.activeSegmentId && state.workspaceMode === '3d'
       && !state.hydrologicalModeActive && !state.parkingInspectionOpen && !state.salesPresentationActive
@@ -4983,6 +4988,9 @@ const Scene = memo(function Scene({
   const reducedGraphics = COMMERCIAL_MAP_CANONICAL_CONTENT.reducedGraphics;
   // Preset visual de Vendas: oculta apenas ambientação decorativa.
   const salesPresentationActive = useCommercialMapStore((state) => state.salesPresentationActive);
+  const selectionWithoutFocusId = useCommercialMapStore((state) => state.selectionWithoutFocusId);
+  const salesModeActive = useSalesStore((state) => state.salesModeActive) && !interactiveEntityIds;
+  const selectionWithoutFocus = selectionWithoutFocusId !== null && selectionWithoutFocusId === selectedRecordId;
   const salesSelectedLotIds = useSalesSelectedLotIds();
   const lunarLaunchPhase = useCommercialMapStore((state) => state.lunarLaunchPhase);
   const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
@@ -5111,6 +5119,8 @@ const Scene = memo(function Scene({
   ), [entities, isolatedArea]);
   const gastronomyStructures = useMemo(() => foodPointsByStructure(entities, lots), [entities, lots]);
   const gastronomyStructureIds = useMemo(() => new Set(gastronomyStructures.keys()), [gastronomyStructures]);
+  const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
+  const packageByAnchor = useMemo(() => packagePrincipalsByAnchor(lots), [lots]);
   const positionedGastronomyEntities = useMemo(() => {
     const byId = new Map(entities.map(entity => [entity.id, entity]));
     const positioned = new Map<string, MapEntity>();
@@ -5131,23 +5141,38 @@ const Scene = memo(function Scene({
       || (Boolean(entityId) && interactiveEntityIds.has(entityId as string)),
     [interactiveEntityIds],
   );
+  const openPackageSaleDetails = useCallback((entityId: string) => {
+    if (interactiveEntityIds || !useSalesStore.getState().salesModeActive) return false;
+    const lot = lotByEntity.get(entityId);
+    const included = lot?.commercialPackageRole === 'COMPONENT';
+    const principal = packageByAnchor.get(entityId)
+      ?? (lot?.commercialPackageRole === 'PRINCIPAL' ? lot : null)
+      ?? (included ? lots.find((candidate) => candidate.id === lot.commercialPackagePrincipalLotId
+        && candidate.commercialPackageRole === 'PRINCIPAL' && !candidate.archivedAt) : null);
+    if (!principal) return false;
+    if (included) toast.info(STALLONNE_INCLUDED_LABEL);
+    setSelectedEntityId(principal.entityId, { focus: false });
+    return true;
+  }, [interactiveEntityIds, lotByEntity, lots, packageByAnchor, setSelectedEntityId]);
   const handleEntitySelect = useCallback((entityId: string) => {
     if (isSoyHarvestCameraOwned() || isChristmasCameraOwned()) return;
     if (useVisitStore.getState().enabled) return;
     if (hydrologicalModeActive) return;
     if (!canInspectEntity(entityId)) return;
+    if (openPackageSaleDetails(entityId)) return;
     // Em modo Vendas o clique pertence ao carrinho: não seleciona a entidade
     // nem abre o painel de detalhes padrão.
     if (!gastronomyStructureIds.has(entityId) && !interactiveEntityIds
-      && dispatchSalesLotClick(lots.find((lot) => lot.entityId === entityId), null, entities.find(entity => entity.id === entityId))) return;
+      && dispatchSalesLotClick(lotByEntity.get(entityId), null, entities.find(entity => entity.id === entityId))) return;
     setSelectedEntityId(entityId);
-  }, [canInspectEntity, entities, gastronomyStructureIds, hydrologicalModeActive, interactiveEntityIds, lots, setSelectedEntityId]);
+  }, [canInspectEntity, entities, gastronomyStructureIds, hydrologicalModeActive, interactiveEntityIds, lotByEntity, openPackageSaleDetails, setSelectedEntityId]);
   const handleGastronomyPointSelect = useCallback((entityId: string) => {
     if (isSoyHarvestCameraOwned() || isChristmasCameraOwned() || useVisitStore.getState().enabled
       || hydrologicalModeActive || !canInspectEntity(entityId)) return;
+    if (openPackageSaleDetails(entityId)) return;
     // The food point sheet owns the explicit choice of what goes into a sale.
     if (useCommercialMapStore.getState().selectedEntityId !== entityId) setSelectedEntityId(entityId);
-  }, [canInspectEntity, hydrologicalModeActive, setSelectedEntityId]);
+  }, [canInspectEntity, hydrologicalModeActive, openPackageSaleDetails, setSelectedEntityId]);
   const handleEntityHover = useCallback((entityId: string | null) => {
     if (isSoyHarvestCameraOwned() || isChristmasCameraOwned()) return;
     if (useVisitStore.getState().enabled) return;
@@ -5168,6 +5193,8 @@ const Scene = memo(function Scene({
   }, [enterInterior, interactiveEntityIds]);
   const handleEntityFocus = useCallback(() => {
     if (useVisitStore.getState().enabled) return;
+    const { selectedEntityId, selectionWithoutFocusId } = useCommercialMapStore.getState();
+    if (selectionWithoutFocusId && selectionWithoutFocusId === selectedEntityId) return;
     if (!hydrologicalModeActive) focusSelection();
   }, [focusSelection, hydrologicalModeActive]);
   const handlePavilionInteriorNavigate = useCallback((targetEntityId: string) => {
@@ -5186,7 +5213,6 @@ const Scene = memo(function Scene({
   ) => {
     setSelectedHydrologicalElementId(element.id);
   }, [setSelectedHydrologicalElementId]);
-  const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
   const resolvedSegmentByEntity = useMemo(
     () => buildCommercialMapSegmentIndex(entities, lots),
     [entities, lots],
@@ -5202,11 +5228,14 @@ const Scene = memo(function Scene({
     );
   }, [activeSegmentId, resolvedSegmentByEntity]);
   const selectedRecord = entities.find((entity) => entity.id === selectedRecordId);
+  const selectionAnchorId = selectedRecordId ? lotByEntity.get(selectedRecordId)?.commercialPackageAnchorEntityId : null;
+  const selectionAnchor = selectionAnchorId && selectionAnchorId !== selectedRecordId
+    ? entities.find((entity) => entity.id === selectionAnchorId) : null;
   const positionedFoodPoint = selectedRecordId ? positionedGastronomyEntities.get(selectedRecordId) ?? null : null;
   // A point with its own emblem does not select the landmark it belongs to.
   const selectedEntity = positionedFoodPoint ? null : (selectedRecord?.classification === 'FOOD_POINT'
     ? entities.find((entity) => entity.id === selectedRecord.parentEntityId && gastronomyStructureIds.has(entity.id))
-    : selectedRecord) ?? null;
+    : selectionAnchor ?? selectedRecord) ?? null;
   const selectedEntityId = selectedEntity?.id ?? null;
   const lunarTreeEntity = useMemo(
     () => entities.find((entity) => resolveStrategicLandmarkKind(entity) === 'lunar-tree') ?? null,
@@ -5235,6 +5264,9 @@ const Scene = memo(function Scene({
   }, [entities]);
   const exteriorRenderedEntities = useMemo(() => renderedEntities.filter((entity) => {
     if (entity.classification === 'FOOD_POINT') return false;
+    const packageLot = lotByEntity.get(entity.id);
+    if (packageLot?.commercialPackageRole === 'PRINCIPAL' && packageLot.commercialPackageAnchorEntityId
+      && packageLot.commercialPackageAnchorEntityId !== entity.id) return false;
     if (entity.classification !== 'INTERNAL_STAND') return true;
     if (entity.parentEntityId && commercialPavilionIdentity.ids.has(entity.parentEntityId)) {
       return false;
@@ -5249,7 +5281,7 @@ const Scene = memo(function Scene({
     return ![...commercialPavilionIdentity.publicIdentifiers].some((pavilionIdentifier) => (
       new RegExp(`^${pavilionIdentifier}-M\\d{3}$`).test(publicIdentifier)
     ));
-  }), [commercialPavilionIdentity, renderedEntities]);
+  }), [commercialPavilionIdentity, lotByEntity, renderedEntities]);
   const selectedPavilionModuleState = useMemo(() => {
     const pavilion = entities.find((entity) => entity.id === selectedEntityId);
     if (!pavilion || resolveStrategicLandmarkKind(pavilion) !== 'commercial-pavilion') {
@@ -5259,7 +5291,8 @@ const Scene = memo(function Scene({
   }, [entities, lots, selectedEntityId]);
   const lotEntries = useMemo(() => exteriorRenderedEntities
     .map((entity) => ({ entity, lot: lotByEntity.get(entity.id) }))
-    .filter((entry): entry is LotEntry => Boolean(entry.lot)), [exteriorRenderedEntities, lotByEntity]);
+    .filter((entry): entry is LotEntry => Boolean(entry.lot) && !packageByAnchor.has(entry.entity.id)),
+  [exteriorRenderedEntities, lotByEntity, packageByAnchor]);
   const publicCompanyLayerActive = Boolean(publicPolicy && publicCompanyGroups?.length && !interiorEntity && !hydrologicalModeActive);
   const publicLotNumbersActive = Boolean(publicPolicy && publicLotNumberInventory && !interiorEntity && !hydrologicalModeActive);
   const publicLabelLayout = useMemo(() => publicLotNumbersActive ? new PublicMapLabelLayout() : undefined, [publicLotNumbersActive]);
@@ -5282,8 +5315,8 @@ const Scene = memo(function Scene({
     return entityIds.length ? { ...publicCompanyFocus, entityIds } : null;
   }, [groupedPublicEntityIds, publicCompanyFocus]);
   const nonLotEntities = useMemo(() => exteriorRenderedEntities.filter((entity) => (
-    !lotByEntity.has(entity.id)
-  )), [exteriorRenderedEntities, lotByEntity]);
+    !lotByEntity.has(entity.id) || packageByAnchor.has(entity.id)
+  )), [exteriorRenderedEntities, lotByEntity, packageByAnchor]);
   const lotLockObstacles = useMemo(() => nonLotEntities
     .filter(entity => ['PAVILION', 'BUILDING', 'RESTAURANT', 'RESTROOM', 'CHEMICAL_RESTROOM', 'ADMINISTRATION', 'SECURITY', 'EMERGENCY', 'SERVICE'].includes(entity.classification))
     .map(entity => entity.geometry.coordinates[0]), [nonLotEntities]);
@@ -5321,7 +5354,8 @@ const Scene = memo(function Scene({
     for (const [id, points] of gastronomyStructures) {
       const structure = byId.get(id);
       if (!structure || !isVisible(structure)) continue;
-      let needsStructureMarker = false;
+      const selectableStructure = salesModeActive && packageByAnchor.has(structure.id);
+      let needsStructureMarker = selectableStructure;
       for (const { entity } of points) {
         const positioned = positionedGastronomyEntities.get(entity.id);
         const position = positioned && gastronomyPointPosition(positioned);
@@ -5330,12 +5364,12 @@ const Scene = memo(function Scene({
       }
       if (needsStructureMarker) {
         const position = resolveGastronomyMarkerAnchor(structure);
-        if (position) anchors.push({ id: structure.id, position });
+        if (position) anchors.push({ id: structure.id, position, selectable: selectableStructure });
       }
     }
     return anchors;
   }, [canInspectEntity, circulationEntities, entityFiltersActive, gastronomyStructures, layerOpacity,
-    layerVisibility, positionedGastronomyEntities, presentedMatchingEntityIds, structuralEntities]);
+    layerVisibility, packageByAnchor, positionedGastronomyEntities, presentedMatchingEntityIds, salesModeActive, structuralEntities]);
   const cameraFramingEntities = useMemo(() => [
     ...exteriorRenderedEntities,
     ...[...positionedGastronomyEntities.values()].filter(entity => layerVisibility[entity.layerId] !== false),
@@ -5645,7 +5679,8 @@ const Scene = memo(function Scene({
   ) === 'amusement-park';
   // Global Night Mode extends the amusement-park night to the whole park; the
   // park focus alone still darkens the scene exactly as before.
-  const nightAtmosphereActive = amusementParkSelected;
+  const parkExperienceSuppressed = salesModeActive || selectionWithoutFocus;
+  const nightAtmosphereActive = amusementParkSelected && !parkExperienceSuppressed;
   const electricalNetworkVisible = treesVisible && !hydrologicalModeActive;
 
   const interiorKind = interiorEntity ? resolveStrategicLandmarkKind(interiorEntity) : null;
@@ -5882,6 +5917,7 @@ const Scene = memo(function Scene({
           reducedTruckGraphics={kind === 'chopp-truck' && renderQualityTier === 'LOW'}
           pavilionExteriorLift={entity.publicIdentifier === 'B8' ? pavilion5ExteriorLift : undefined}
           reducedPavilionGraphics={entity.publicIdentifier === 'B8' && renderQualityTier === 'LOW'}
+          suspendParkExperience={kind === 'amusement-park' && parkExperienceSuppressed}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           layerOpacity={layerOpacity[entity.layerId] ?? 1}
           sceneCenter={sceneCenter}
@@ -5905,7 +5941,10 @@ const Scene = memo(function Scene({
         // EntityMesh identity and picking props intact after one-time admission.
         // Lunar memorial retains its zero-intensity engine light in Stage 1:
         // late insertion would change every lit shader's global light count.
-        if (kind === 'amusement-park' || (publicPolicy && kind === 'fenasoja-headquarters')) {
+        if (kind === 'amusement-park') {
+          return <EssentialSceneLayer key={entity.id} id={`landmark:${entity.id}`}>{mesh}</EssentialSceneLayer>;
+        }
+        if (publicPolicy && kind === 'fenasoja-headquarters') {
           return salesPresentationActive
             ? null
             : <EssentialSceneLayer key={entity.id} id={`landmark:${entity.id}`}>{mesh}</EssentialSceneLayer>;
@@ -6033,7 +6072,7 @@ const Scene = memo(function Scene({
       </InteriorCameraRequestContext.Provider>
       <CameraRig
         christmasEnabled={christmasEnabled}
-        selectedEntity={positionedFoodPoint ?? selectedEntity}
+        selectedEntity={selectionWithoutFocus ? null : positionedFoodPoint ?? selectedEntity}
         interiorEntity={interiorEntity}
         interiorRequest={interiorCameraRequest}
         extent={extent}

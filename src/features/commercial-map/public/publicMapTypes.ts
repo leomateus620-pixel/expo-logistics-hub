@@ -1,4 +1,4 @@
-import type { MapEntity, MapLayer } from '../types';
+import type { CommercialPackageRole, CommercialUnit, MapEntity, MapLayer } from '../types';
 import type { LotPricingResolution } from '../utils/lotPricing2028';
 
 export type PublicLotAvailability = 'AVAILABLE' | 'RESERVED' | 'SALE_OPEN' | 'SOLD' | 'UNAVAILABLE';
@@ -28,6 +28,10 @@ export interface PublicLot {
   buyerIdentityEligible?: boolean;
   buyerGroupKey?: string | null;
   buyerTradeName?: string | null;
+  commercialUnit?: CommercialUnit;
+  packageRole?: CommercialPackageRole | null;
+  packagePrincipalLotId?: string | null;
+  packageReconciliationPending?: boolean;
   officialAreaSqm: number | null;
   isCorner: boolean;
   isCovered: boolean;

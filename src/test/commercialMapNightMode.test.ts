@@ -163,8 +163,9 @@ describe('Modo Noturno global do Mapa Comercial', () => {
 
     expect(canvas).toContain('<NightLightingLayer');
     expect(canvas).toContain('polesVisible={electricalNetworkVisible}');
-    // The amusement park keeps its own night presentation inside the global night.
-    expect(landmarks).toContain('parkActive={selected || nightModeActive}');
+    // Sales mode suspends the attraction, while the standard mode still follows selection and night.
+    expect(landmarks).toContain('parkActive={!suspended && (selected || nightModeActive)}');
+    expect(landmarks).toContain('suspended={suspendParkExperience}');
   });
 
   it('recebe luz no passeio real de B12 sem alterar luminárias e acompanha a edição de posição', () => {

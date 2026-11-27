@@ -25,6 +25,7 @@ import { LotWorkflowDialog } from '../commercial/LotWorkflowDialog';
 import { CompactDetailSheetControls } from './CompactDetailSheet';
 import { LotActivityList } from './LotActivityList';
 import './gastronomy-structure-panel.css';
+import { PACKAGE_RECONCILIATION_LABEL, STALLONNE_INCLUDED_LABEL } from '../../utils/commercialPackage';
 
 type PointPermissions = Pick<MapPermissions, 'canManageSales' | 'canManageContracts'>;
 
@@ -32,7 +33,7 @@ function stopMapGesture(event: SyntheticEvent) {
   event.stopPropagation();
 }
 
-export function GastronomyStructurePanel({ structure, points, selectedPointId, canSell, permissions, mapData, onEnterInterior, onClose }: {
+export function GastronomyStructurePanel({ structure, points, selectedPointId, canSell, permissions, mapData, onEnterInterior, onOpenPackage, onClose }: {
   structure: MapEntity;
   points: readonly { entity: MapEntity; lot: CommercialLot }[];
   selectedPointId?: string;
@@ -40,6 +41,7 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
   permissions: PointPermissions;
   mapData: Pick<CommercialMapData, 'lots' | 'entities'>;
   onEnterInterior?: () => void;
+  onOpenPackage?: (entityId: string) => void;
   onClose: () => void;
 }) {
   const inspection = useSaleInspectionStore((state) => state.context);
@@ -60,19 +62,22 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
   const sheet = useCompactDetailSheet(structure.id, true);
   const { setSheetState } = sheet;
   const selling = salesMode && canSell && !inspection;
+  const standalonePoints = points.filter(({ lot }) => lot.commercialPackageRole !== 'COMPONENT');
+  const canSelectPoints = selling && standalonePoints.length > 0;
   const name = structure.publicIdentifier === 'C2' ? FENASOJA_RESTAURANT_PRESENTATION_NAME : structure.name;
   const pricedPoints = points.map((point) => ({
     ...point,
-    price: point.lot.officialPricing2028 ? stageTotal(point.lot.officialPricing2028, stage) : null,
+    price: point.lot.commercialPackageRole !== 'COMPONENT' && point.lot.officialPricing2028
+      ? stageTotal(point.lot.officialPricing2028, stage) : null,
     inCart: cart.some(({ lotId }) => lotId === point.lot.id),
   }));
   const selected = pricedPoints.filter(({ lot, price, inCart }) => draft.has(lot.id)
     && !inCart && price != null && price > 0 && lot.status === 'AVAILABLE' && isSellableLot(lot, eligible));
   const subtotal = selected.reduce((sum, { price }) => sum + toCents(price ?? 0), 0);
-  const available = points.filter(({ lot }) => lot.status === 'AVAILABLE').length;
-  const saleOpen = points.filter(({ lot }) => lot.status === 'SALE_OPEN').length;
-  const sold = points.filter(({ lot }) => lot.status === 'SOLD').length;
-  const other = points.length - available - saleOpen - sold;
+  const available = standalonePoints.filter(({ lot }) => lot.status === 'AVAILABLE').length;
+  const saleOpen = standalonePoints.filter(({ lot }) => lot.status === 'SALE_OPEN').length;
+  const sold = standalonePoints.filter(({ lot }) => lot.status === 'SOLD').length;
+  const other = standalonePoints.length - available - saleOpen - sold;
   const counts = [
     { status: 'AVAILABLE', count: available, label: available === 1 ? 'disponível' : 'disponíveis' },
     { status: 'SALE_OPEN', count: saleOpen, label: 'em aberto' },
@@ -139,7 +144,7 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
         </CompactDetailSheetControls>
         <div className="commercial-map-panel-scroll gastronomy-panel__body">
           <h3>{points.length} {points.length === 1 ? 'ponto de alimentação' : 'pontos de alimentação'}</h3>
-          <div className="gastronomy-panel__distribution" aria-hidden="true">
+          {standalonePoints.length > 0 && <><div className="gastronomy-panel__distribution" aria-hidden="true">
             {counts.filter(({ count }) => count > 0).map(({ status, count }) => (
               <span key={status} data-status={status} style={{ flexGrow: count }} />
             ))}
@@ -148,17 +153,20 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
             {counts.filter(({ status, count }) => status !== 'BLOCKED' || count > 0).map(({ status, count, label }) => (
               <span key={status} data-status={status}>{count} {label}</span>
             ))}
-          </div>
+          </div></>}
           <ul className="gastronomy-panel__list">
             {pricedPoints.map(({ lot, price, inCart }) => {
               const status = STATUS_CONFIG[toCommercialPhase(lot.status)];
-              const selectable = selling && !inCart && lot.status === 'AVAILABLE' && isSellableLot(lot, eligible)
+              const included = lot.commercialPackageRole === 'COMPONENT';
+              const principal = included ? mapData.lots.find((candidate) => candidate.id === lot.commercialPackagePrincipalLotId
+                && candidate.commercialPackageRole === 'PRINCIPAL' && !candidate.archivedAt) : null;
+              const selectable = canSelectPoints && !included && !inCart && lot.status === 'AVAILABLE' && isSellableLot(lot, eligible)
                 && price != null && price > 0;
               const expanded = inspectedPoint === lot.id;
               return <li key={lot.id} ref={lot.id === requestedPoint ? requestedPointRow : undefined}
                 data-inspected={expanded || inspection?.lotIds.includes(lot.id) || undefined}>
                 <div className="gastronomy-panel__row">
-                  {selling && <label className="gastronomy-panel__checkbox"><input type="checkbox" aria-label={`Selecionar ${lot.displayName}`}
+                  {canSelectPoints && !included && <label className="gastronomy-panel__checkbox"><input type="checkbox" aria-label={`Selecionar ${lot.displayName}`}
                     checked={inCart || (selectable && draft.has(lot.id))} disabled={!selectable}
                     onChange={(event) => {
                       const checked = event.currentTarget.checked;
@@ -173,19 +181,25 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
                     <span className="gastronomy-panel__point">
                       <strong>{lot.displayName}</strong>
                       {lot.foodType && <small>{lot.foodType}</small>}
+                      {included && <span className="gastronomy-panel__status gastronomy-panel__package-badge">{STALLONNE_INCLUDED_LABEL}</span>}
                       <span className="gastronomy-panel__status" style={{ background: status.surface, color: status.border }}>
-                        {inCart ? 'No carrinho' : status.label}
+                        {included ? `Parque · ${lot.commercialPackageReconciliationPending ? PACKAGE_RECONCILIATION_LABEL : status.label}`
+                          : inCart ? 'No carrinho' : status.label}
                       </span>
                     </span>
-                    <span className="gastronomy-panel__price">
+                    {!included && <span className="gastronomy-panel__price">
                       <strong>{formatBrl(price) ?? 'Preço pendente'}</strong>
                       {price != null && <small>Tabela · {SALES_STAGE_LABELS[stage]}</small>}
-                    </span>
+                    </span>}
                     <ChevronDown aria-hidden="true" />
                   </button>
                 </div>
                 <div id={`food-point-${lot.id}`} hidden={!expanded} className="gastronomy-panel__point-detail">
-                  {expanded && <>
+                  {expanded && (included ? <>
+                    <dl><div><dt>Identificador</dt><dd>{lot.publicIdentifier}</dd></div></dl>
+                    {principal && onOpenPackage && <Button type="button" size="sm" variant="outline" className="gastronomy-panel__package-action"
+                      onClick={() => onOpenPackage(principal.entityId)}>Ver ficha comercial do parque</Button>}
+                  </> : <>
                     <dl>
                       <div><dt>Identificador</dt><dd>{lot.publicIdentifier}</dd></div>
                       <div><dt>Unidade comercial</dt><dd>1 ponto de alimentação</dd></div>
@@ -196,13 +210,13 @@ export function GastronomyStructurePanel({ structure, points, selectedPointId, c
                     {(permissions.canManageContracts || permissions.canManageSales) && !lot.id.startsWith('reference:') && !lot.archivedAt
                       ? <GastronomyPointContracts lot={lot} structureName={name} permissions={permissions} />
                       : (lot.status === 'SALE_OPEN' || lot.status === 'SOLD') && <p className="gastronomy-panel__contract-status">Documentos restritos</p>}
-                  </>}
+                  </>)}
                 </div>
               </li>;
             })}
           </ul>
         </div>
-        {selling && <footer className="gastronomy-panel__actions">
+        {canSelectPoints && <footer className="gastronomy-panel__actions">
           <span aria-live="polite"><small>{selected.length > 0 ? `${selected.length} ${selected.length === 1 ? 'ponto selecionado' : 'pontos selecionados'}` : 'Subtotal de tabela'}</small>
             <strong>{formatCents(subtotal)}</strong></span>
           <Button type="button" disabled={!selected.length} onClick={addSelected}><ShoppingCart />Adicionar à venda</Button>
