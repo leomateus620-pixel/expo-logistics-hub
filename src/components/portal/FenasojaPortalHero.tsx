@@ -40,9 +40,10 @@ const INTRO_VISIBILITY_THRESHOLD = 0.35;
 interface FenasojaPortalHeroProps {
   onIntroReleased?: () => void;
   introSuppressed?: boolean;
+  filmActive?: boolean;
 }
 
-export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroReleased, introSuppressed = false }: FenasojaPortalHeroProps) {
+export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroReleased, introSuppressed = false, filmActive = false }: FenasojaPortalHeroProps) {
   const heroRef = useRef<HTMLElement>(null);
   const [presentation, setPresentation] = useState<IntroPresentation>(() => (
     !introSuppressed && shouldAutoplayAlvoradaIntro() ? 'waiting' : 'done'
@@ -73,7 +74,9 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroRele
     finishIntro();
   }, [finishIntro]);
 
-  useEffect(() => { if (introSuppressed) finishIntro(); }, [introSuppressed, finishIntro]);
+  useEffect(() => {
+    if (introSuppressed || (filmActive && presentationRef.current === 'playing')) finishIntro();
+  }, [introSuppressed, filmActive, finishIntro]);
 
   useEffect(() => () => {
     if (leaveTimer.current !== null) window.clearTimeout(leaveTimer.current);
@@ -86,7 +89,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroRele
   }, [onIntroReleased, presentation]);
 
   useEffect(() => {
-    if (presentation !== 'waiting') return undefined;
+    if (presentation !== 'waiting' || filmActive) return undefined;
 
     // Download the WebGL chunk and start the shared asset pipeline while the
     // card waits for visibility; the scene consumes these same downloads, so
@@ -124,7 +127,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroRele
       observer?.disconnect();
       document.removeEventListener('visibilitychange', tryStart);
     };
-  }, [presentation]);
+  }, [presentation, filmActive]);
 
   useEffect(() => {
     if (!introActive) return undefined;
@@ -144,7 +147,7 @@ export const FenasojaPortalHero = memo(function FenasojaPortalHero({ onIntroRele
         <OfficialCountdownCompact concealed={introActive} />
       </div>
 
-      {presentation !== 'done' && (
+      {presentation !== 'done' && !filmActive && (
         <div
           className="fenasoja-portal__intro"
           data-testid="portal-alvorada-intro"

@@ -11,8 +11,9 @@ import {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { Pause, Play, X } from 'lucide-react';
+import { ArrowUpRight, Pause, Play, X } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
+import { BrandFilmDialog } from '@/components/portal/brand-film/BrandFilmDialog';
 import { FenasojaPortalHistory } from '@/components/portal/FenasojaPortalHistory';
 import { readGallerySession } from '@/components/portal/history/galleryTimeline';
 import { FenasojaPortalHero } from '@/components/portal/FenasojaPortalHero';
@@ -126,6 +127,9 @@ export default function CommissionPortalPage() {
   const [ecosystemParams, setEcosystemParams] = useSearchParams();
   const ecosystemLocation = readEcosystemLocation(ecosystemParams);
   const ecosystemOpen = ecosystemLocation !== null;
+  const [filmTrigger, setFilmTrigger] = useState<HTMLButtonElement | null>(null);
+  const closeFilm = useCallback(() => setFilmTrigger(null), []);
+  useEffect(() => { if (ecosystemOpen) closeFilm(); }, [ecosystemOpen, closeFilm]);
   const [historyReleased, setHistoryReleased] = useState(false);
   const [historyUserPaused, setHistoryUserPaused] = useState(() => readGallerySession()?.userPaused ?? false);
   const [historyMotionAvailable, setHistoryMotionAvailable] = useState(false);
@@ -407,31 +411,34 @@ export default function CommissionPortalPage() {
       <main className="fenasoja-portal__shell">
         <header className="fenasoja-portal__header portal-reveal">
           <h1 className="sr-only">FENASOJA 2028</h1>
-          <button
-            ref={ecosystemLauncherRef}
-            type="button"
-            className="fenasoja-portal__alvorada-launcher"
-            data-testid="portal-ecosystem-launcher"
-            aria-label={ECOSYSTEM_OPEN_LABEL}
-            aria-haspopup="dialog"
-            aria-expanded={ecosystemOpen}
-            onClick={openEcosystem}
-            onFocus={preloadEcosystem}
-            onPointerEnter={preloadEcosystem}
-            onTouchStart={preloadEcosystem}
-          >
-            <FenasojaPortalHistory released={historyReleased} paused={ecosystemOpen}
-              userPaused={historyUserPaused} onMotionAvailable={setHistoryMotionAvailable} />
-          </button>
+          <FenasojaPortalHistory released={historyReleased} paused={ecosystemOpen || !!filmTrigger}
+            userPaused={historyUserPaused} onMotionAvailable={setHistoryMotionAvailable} onOpenFilm={setFilmTrigger} />
           <WorkersLauncherSlot surface="portal" />
-          {historyMotionAvailable && <button type="button" className="fenasoja-portal__history-toggle"
-            aria-label={historyUserPaused ? 'Retomar faixa histórica' : 'Pausar faixa histórica'}
-            aria-pressed={historyUserPaused} onClick={() => setHistoryUserPaused((value) => !value)}>
-            {historyUserPaused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
-          </button>}
+          <div className="fenasoja-history__controls">
+            <button
+              ref={ecosystemLauncherRef}
+              type="button"
+              className="fenasoja-portal__alvorada-launcher"
+              data-testid="portal-ecosystem-launcher"
+              aria-label={ECOSYSTEM_OPEN_LABEL}
+              aria-haspopup="dialog"
+              aria-expanded={ecosystemOpen}
+              onClick={openEcosystem}
+              onFocus={preloadEcosystem}
+              onPointerEnter={preloadEcosystem}
+              onTouchStart={preloadEcosystem}
+            >
+              Abrir ecossistema <ArrowUpRight size={15} aria-hidden="true" />
+            </button>
+            {historyMotionAvailable && <button type="button" className="fenasoja-portal__history-toggle"
+              aria-label={historyUserPaused ? 'Retomar faixa histórica' : 'Pausar faixa histórica'}
+              aria-pressed={historyUserPaused} onClick={() => setHistoryUserPaused((value) => !value)}>
+              {historyUserPaused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
+            </button>}
+          </div>
         </header>
 
-        <FenasojaPortalHero onIntroReleased={releaseHistory} introSuppressed={ecosystemOpen} />
+        <FenasojaPortalHero onIntroReleased={releaseHistory} introSuppressed={ecosystemOpen} filmActive={!!filmTrigger} />
         {user && <Link to="/equipes" className="my-4 inline-flex min-h-11 items-center rounded-lg border border-white/30 bg-white/10 px-4 text-sm font-medium text-white focus-visible:outline focus-visible:outline-2">Diretório de equipes</Link>}
 
         <p
@@ -512,6 +519,7 @@ export default function CommissionPortalPage() {
         </nav>
       </main>
 
+      {filmTrigger && !ecosystemOpen && <BrandFilmDialog trigger={filmTrigger} onClose={closeFilm} />}
       {ecosystemOpen && (
         <Suspense
           fallback={createPortal((

@@ -200,6 +200,20 @@ describe('continuous Fenasoja visual history', () => {
     expect(artworkYears()).toHaveLength(12);
   });
 
+  it('abre o filme pela marca e mantém um controle independente para o ecossistema', async () => {
+    const film = vi.fn(), ecosystem = vi.fn();
+    render(<><FenasojaPortalHistory released onOpenFilm={film} />
+      <button onClick={ecosystem}>Abrir ecossistema</button></>);
+    await flush();
+    const brand = screen.getByRole('button', { name: 'Ver filme Por dentro da marca Fenasoja' });
+    fireEvent.click(brand);
+    expect(film).toHaveBeenCalledWith(brand);
+    expect(ecosystem).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir ecossistema' }));
+    expect(ecosystem).toHaveBeenCalledOnce();
+    expect(film).toHaveBeenCalledOnce();
+  });
+
   it('waits for both intro release and viewport visibility before saving any motion position', async () => {
     initiallyVisible = false;
     const view = render(<FenasojaPortalHistory released={false} />);
