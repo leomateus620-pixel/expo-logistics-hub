@@ -18,6 +18,7 @@ interface Props {
   spacesCents: number;
   showErrors: boolean;
   fixedPackage?: boolean;
+  manualScheduleOnly?: boolean;
 }
 
 export function paymentErrors(value: SalesPaymentDraft, totalCents: number) {
@@ -35,7 +36,7 @@ export function paymentErrors(value: SalesPaymentDraft, totalCents: number) {
 
 const plural = (n: number) => `${n} parcela${n === 1 ? '' : 's'}`;
 
-export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCents, showErrors, fixedPackage }: Props) {
+export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCents, showErrors, fixedPackage, manualScheduleOnly }: Props) {
   const totalCents = spacesCents + feesTotalCents(fees);
   const errors = paymentErrors(value, totalCents);
   const sumCents = draftsSumCents(value.installments);
@@ -103,7 +104,7 @@ export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCe
         </dl>
       </section>}
 
-      <section className="sales-block" aria-labelledby="sales-method-title">
+      {!manualScheduleOnly && <section className="sales-block" aria-labelledby="sales-method-title">
         <h3 id="sales-method-title">Forma de pagamento</h3>
         <div className="sales-method-row">
           <div className="sales-segmented" role="radiogroup" aria-label="Forma de pagamento">
@@ -140,7 +141,7 @@ export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCe
             </div>
           )}
         </div>
-      </section>
+      </section>}
 
       <section className="sales-block" aria-labelledby="sales-schedule-title">
         <div className="sales-installments-header">
@@ -178,7 +179,7 @@ export function SalesPaymentForm({ value, onChange, fees, onFeesChange, spacesCe
             <div className="is-alert"><dt>{diff > 0 ? 'Falta ajustar' : 'Excedente'}</dt><dd>{formatCents(Math.abs(diff))}</dd></div>
           )}
         </dl>
-        {!single && diff !== 0 && (
+        {!manualScheduleOnly && !single && diff !== 0 && (
           <Button type="button" variant="outline" className="h-10 rounded-lg" onClick={() => set({ installments: redistribute(totalCents, value.installments), manualAmounts: false })}>
             <RefreshCw className="h-4 w-4" />Redistribuir valores
           </Button>

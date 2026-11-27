@@ -6,6 +6,7 @@ import { paymentMethodLabel } from '../../sales/salesTypes';
 import { formatDashboardCurrency } from '../commercialDashboardFormatters';
 import type { CommercialSalesOrdersSectionProps } from './CommercialSalesOrdersSection';
 import { AttachOrderContractDialog } from './AttachOrderContractDialog';
+import { PackageOrderRevision } from './PackageOrderRevision';
 import { ReviseSaleOrderDialog } from './ReviseSaleOrderDialog';
 import { SaleOrderContract } from './SaleOrderContracts';
 import { SaleOrderHistory } from './SaleOrderHistory';
@@ -36,6 +37,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
   record: SaleOrderSummary | SalesOrdersRecordIdentity; onReady: () => void;
 }) {
   const queryClient = useQueryClient();
+  const [reconcileOpen, setReconcileOpen] = useState(false);
   const [reviseOpen, setReviseOpen] = useState(false);
   const [attachOpen, setAttachOpen] = useState<{ contract: SaleContract | null } | null>(null);
   const [installmentPage, setInstallmentPage] = useState(0);
@@ -111,6 +113,10 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
   const onlyFood = activeItems.length > 0 && activeItems.every((item) => item.commercialUnit === 'FOOD_POINT');
   const hasPackage = activeItems.some((item) => item.commercialUnit === 'FIXED_PACKAGE');
   const hasPackageComponents = activeItems.some((item) => lotIndex.get(item.lotId)?.commercialPackageRole === 'COMPONENT');
+  const principal = lotIndex.get(lotIndex.get(activeItems[0]?.lotId)?.commercialPackagePrincipalLotId ?? '');
+  const canReconcile = canManageSales && canManageContracts && orgId && h.orderId && principal?.commercialPackageReconciliationPending
+    && activeItems.length === 3 && activeItems.every((i) => i.contractState === 'SIGNED'
+      && lotIndex.get(i.lotId)?.commercialPackagePrincipalLotId === principal.id);
   const installmentPages = Math.max(1, Math.ceil(d.installments.length / INSTALLMENTS_PER_PAGE));
   const currentInstallmentPage = Math.min(installmentPage, installmentPages - 1);
   const installments = d.installments.slice(currentInstallmentPage * INSTALLMENTS_PER_PAGE, (currentInstallmentPage + 1) * INSTALLMENTS_PER_PAGE);
@@ -153,6 +159,7 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
               useSalesOrdersUiStore.getState().rememberOrigin(record.recordId, scrollContainer()?.scrollTop ?? 0);
               onViewSale(currentRecord, currentRecord.lotIds);
             }}><MapPinned aria-hidden="true" />{hasFood ? 'Ver espaços no mapa' : 'Ver lotes no mapa'}</button>
+            {canReconcile && <button type="button" className="cso-view" onClick={() => setReconcileOpen(true)}>Conciliar contrato do parque</button>}
             {canManageSales && h.kind === 'ORDER' && h.orderId && activeItems.length > 0 && !hasPackage && !hasPackageComponents && <button type="button" className="cso-view cso-edit-lots" onClick={() => setReviseOpen(true)}><Pencil aria-hidden="true" />{hasFood ? 'Editar espaços' : 'Editar lotes'}</button>}
           </div></div>
           {Array.from(groupedItems, ([location, items]) => <div className="cso-space-group" key={location}>
@@ -209,11 +216,12 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
           {canManageContracts && h.kind === 'ORDER' && orgId && activeItems.length > 0 && !hasPackageComponents && (!hasPackage || !contracts?.length) && <button type="button" className="cso-view" onClick={() => setAttachOpen({ contract: null })}><Paperclip aria-hidden="true" />Anexar contrato</button>}
         </div>
           <p className="cso-contract-signature"><span>Assinatura dos espaços</span><strong>{signatureSummary(currentRecord)}</strong></p>
-          {hasPackageComponents && <p className="cso-note">Pontos vinculados ao Parque Stallonne. Venda anterior disponível para consulta.</p>}
+          {hasPackageComponents && <p className="cso-note">Os três pontos pertencem ao Parque Stallonne.</p>}
+          {canReconcile && <button type="button" className="cso-view" onClick={() => setReconcileOpen(true)}>Conciliar contrato do parque</button>}
           {contracts === null ? <p className="cso-state"><ShieldAlert aria-hidden="true" />Consulta de documentos restrita ao seu perfil.</p>
             : contracts.length === 0 ? <p className="cso-state">Sem arquivo anexado.</p>
               : <ul className="cso-docs">{contracts.map((contract) => <SaleOrderContract key={contract.contractId} contract={contract}
-                labelOf={labelOf} canReplace={canManageContracts && activeItems.length > 0 && !hasPackageComponents && (contract.scope === 'ORDER_ITEMS'
+                labelOf={labelOf} showIdentifier={hasPackage} canReplace={canManageContracts && activeItems.length > 0 && !hasPackageComponents && (contract.scope === 'ORDER_ITEMS'
                   || activeItems.some((item) => item.commercialUnit === 'FOOD_POINT' && item.contractState === 'SIGNED'
                     && contract.lotIds.includes(item.lotId)))} onReplace={() => setAttachOpen({ contract })} />)}</ul>}
           <p className="cso-note">Arquivo anexado não comprova assinatura ou recebimento.</p>
@@ -223,6 +231,16 @@ export function SaleOrderDetail({ record, data, orgId, canManageContracts, canMa
         {h.kind === 'ORDER' && h.orderId && canManageSales ? <SaleOrderHistory orderId={h.orderId} /> : <p className="cso-state">Registro legado: o histórico de revisões de pedidos não se aplica a esta venda.</p>}
       </TabsContent>
     </SaleOrderDetailTabs>
+    {reconcileOpen && canReconcile && <PackageOrderRevision orgId={orgId} orderId={h.orderId}
+      detail={d} onClose={() => setReconcileOpen(false)} onSaved={async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail', record.recordId] }),
+          queryClient.invalidateQueries({ queryKey: ['commercial-sale-orders'] }),
+          queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-revisions', h.orderId] }),
+          refreshLotContractHistory(queryClient),
+          scheduleCommercialMapRefresh(queryClient),
+        ]);
+      }} />}
     {reviseOpen && h.orderId && <ReviseSaleOrderDialog orderId={h.orderId} detail={d} lots={data.lots} entities={data.entities} locationOf={locationOf} onClose={() => setReviseOpen(false)} onSaved={async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['commercial-sale-order-detail'] }),

@@ -19,3 +19,7 @@ O primeiro toque na área abriu a ficha nos dois modos. Em Vendas, a posição d
 [Modo Vendas no celular](evidence/celular-modo-vendas.jpg) · [Carrinho no celular](evidence/celular-carrinho.jpg)
 
 Os testes de persistência, assinatura, privacidade do objeto e projeção financeira estão no [registro do banco local](database-qa.md). A execução no navegador verificou a interface com dados sintéticos. A homologação hospedada, a conciliação em produção e a abertura do PDF original ainda dependem do ambiente autorizado.
+
+### Revisão do pedido pela Dashboard
+
+Em Chrome desktop, o Mapa Comercial foi ligado a uma instância local isolada de PostgreSQL 17 com os procedimentos versionados, uma venda sintética anterior e armazenamento privado de teste. Em **Vendas e contratos → Contratos**, a revisão exibiu o operador da sessão e abriu o editor de vencimentos. Foram preenchidas 17 linhas manualmente e enviado um PDF sintético. Após recarregar o navegador, o mesmo pedido mostrava um espaço ativo, R$ 252.280,00, assinatura confirmada e um documento com quatro espaços na abrangência atual. A aba Histórico mostrou a revisão e o operador autenticado.

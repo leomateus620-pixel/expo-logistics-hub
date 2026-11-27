@@ -299,3 +299,12 @@ export async function fetchSaleOrderRevisions(orderId: string): Promise<{ update
   if (error) throw error;
   return { updatedAt: data?.updatedAt, revisions: data?.revisions ?? [] };
 }
+
+export async function fetchPackageRevisionReview(orderId: string): Promise<{ operator: string; updatedAt: string; possibleOverlaps: number }> {
+  const { data, error } = await db.rpc('get_commercial_package_revision_review', { p_order_id: orderId });
+  if (error) throw error;
+  if (!data?.operator || !data.updatedAt || !Number.isInteger(data.possibleOverlaps)) {
+    throw new Error('A sessão ou a conferência de origem da venda está incompleta.');
+  }
+  return data;
+}

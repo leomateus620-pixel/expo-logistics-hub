@@ -17,7 +17,7 @@ function functionDefinition(sql, name) {
 }
 
 const dbName = 'gastronomy_qa';
-const config = {host:'127.0.0.1',port:55438,user:'postgres',onnotice:()=>{}};
+const config = {host:'127.0.0.1',port:Number(process.env.GASTRONOMY_QA_PORT || 55438),user:'postgres',onnotice:()=>{}};
 const admin = postgres({...config,database:'postgres'});
 await admin.unsafe('DROP DATABASE IF EXISTS gastronomy_qa WITH (FORCE)');
 await admin.unsafe('CREATE DATABASE gastronomy_qa');
@@ -211,7 +211,7 @@ CREATE TABLE public.public_map_links (
     await db.unsafe(functionDefinition(await migration('20260929010000_public_map_three_conditions.sql'), 'public_map_lot_availability'));
     await db.unsafe(await migration('20261117140000_public_map_sold_companies.sql'));
   }
-  console.log('Banco descartável gastronomy_qa preparado em 127.0.0.1:55438.');
+  console.log('Banco descartável gastronomy_qa preparado em 127.0.0.1, porta', config.port);
 } catch(e) {
   console.error(e.message, e.code, e.where ?? '', e.detail ?? '', e.position ?? '');
   if(e.position && e.query) console.error(e.query.slice(+e.position-180,+e.position+100));

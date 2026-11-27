@@ -2,8 +2,14 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
-export async function buildMigrationEnvelope({ viaExpressaChopp = false, sitePoints = false, saleRecovery = false } = {}) {
-  const [version, name] = saleRecovery ? ['20261125180000', 'commercial_sale_recovery']
+export async function buildMigrationEnvelope({ viaExpressaChopp = false, sitePoints = false, saleRecovery = false, stallonne } = {}) {
+  const packageVersions = {
+    catalog: ['20261127150000', 'commercial_stallonne_package'],
+    financial: ['20261127151000', 'financial_stallonne_package'],
+    revision: ['20261127152000', 'commercial_stallonne_order_revision'],
+  };
+  if (stallonne && !Object.hasOwn(packageVersions, stallonne)) throw new Error('Unknown Stallonne migration');
+  const [version, name] = stallonne ? packageVersions[stallonne] : saleRecovery ? ['20261125180000', 'commercial_sale_recovery']
     : sitePoints ? ['20261124190000', 'commercial_gastronomy_site_points']
     : viaExpressaChopp ? ['20261116180000', 'commercial_gastronomy_via_expressa_chopp']
       : ['20261111190000', 'commercial_gastronomy'];
@@ -16,7 +22,7 @@ export async function buildMigrationEnvelope({ viaExpressaChopp = false, sitePoi
     throw new Error('Unexpected migration transaction format');
   }
   const hash = createHash('sha256').update(source).digest('hex');
-  const initialInventoryCheck = viaExpressaChopp || sitePoints || saleRecovery ? '' : `
+  const initialInventoryCheck = viaExpressaChopp || sitePoints || saleRecovery || stallonne ? '' : `
   IF NOT EXISTS (
     SELECT 1 FROM public.commercial_lot_pricing_2028 p
     JOIN public.map_entities e ON e.id=p.entity_id AND e.project_id=p.project_id
@@ -49,5 +55,6 @@ if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) 
     viaExpressaChopp: process.argv.includes('--via-expressa-chopp'),
     sitePoints: process.argv.includes('--site-points'),
     saleRecovery: process.argv.includes('--sale-recovery'),
+    stallonne: process.argv.find((arg) => arg.startsWith('--stallonne='))?.split('=')[1],
   })).sql);
 }

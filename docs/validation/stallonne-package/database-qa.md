@@ -1,6 +1,6 @@
 # Validação de banco do pacote Stallonne
 
-As duas migrações foram executadas sobre o fixture sintético de Gastronomia em PostgreSQL embarcado em memória. O fixture reproduz as definições versionadas do cadastro, checkout, contratos, políticas de armazenamento e projeção financeira. A conferência usou dados e um objeto PDF fictícios.
+As três migrações foram executadas sobre o fixture sintético de Gastronomia em PostgreSQL embarcado em memória. O fixture reproduz as definições versionadas do cadastro, checkout, contratos, políticas de armazenamento e projeção financeira. A conferência usou dados e um objeto PDF fictícios.
 
 | Cenário | Resultado observado |
 |---|---|
@@ -12,7 +12,9 @@ As duas migrações foram executadas sobre o fixture sintético de Gastronomia e
 | Financeiro | Uma unidade classificada em Gastronomia. O cenário confirmado refletiu R$ 252.280,00 após a assinatura, com R$ 0,00 em recebimentos. O guard impediu o cancelamento após vincular um recebível. |
 | Pedido anterior sintético | Uma unidade já cadastrada foi reaproveitada e ficou bloqueada para conciliação. O pedido antigo assinado de R$ 52.280,00 permaneceu no cenário confirmado. Nova venda, anexo avulso, mudança no cronograma e novo recebível avulso foram recusados. A atualização de liquidação no plano preexistente foi permitida. |
 
-O cenário em memória verifica a lógica das migrações e as permissões no PostgreSQL. A homologação hospedada, a leitura do PDF original via aplicativo e a conciliação do cadastro real dependem do ambiente autorizado.
+A revisão transacional também foi exercitada com 15 parcelas pendentes e um PDF sintético. Uma parcela baixada ou um arquivo ausente bloqueou a conversão. O envio válido manteve o pedido e os 15 IDs de parcelas, acrescentou dois vencimentos e produziu 17 linhas iguais ao plano digitado. O original sintético ficou ligado a quatro espaços. A assinatura e a revisão registraram o operador autenticado. A repetição recuperou o mesmo contrato. A receita confirmada do parque passou de R$ 52.280,00 a R$ 252.280,00, sem obrigação financeira nova.
+
+O cenário em memória verifica a lógica das migrações e as permissões no PostgreSQL. A validação do documento real e a conciliação da venda exigem a sessão de produção.
 
 ## Reprodução no fixture local descartável
 

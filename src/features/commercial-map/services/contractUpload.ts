@@ -16,7 +16,7 @@ interface UploadStatus {
 }
 
 type RpcError = { message?: string; code?: string };
-type ContractRpc = 'attach_order_contract' | 'register_lot_contract_version' | 'replace_lot_order_contract';
+type ContractRpc = 'attach_order_contract' | 'register_lot_contract_version' | 'replace_lot_order_contract' | 'revise_sale_order_items';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rpc = async (name: string, args: Record<string, unknown>) => await (supabase.rpc as any)(name, args);
@@ -34,7 +34,7 @@ async function readStatus(path: string): Promise<UploadStatus | null> {
 }
 
 function isDefinitiveRejection(error: RpcError): boolean {
-  return error.code === 'P0001' && /^(MAP_PERMISSION_DENIED|AUTH_REQUIRED|NO_ITEMS_SELECTED|ORDER_NOT_FOUND|ORDER_NOT_ACTIVE|ITEM_NOT_IN_ORDER|LOT_NOT_FOUND|INVALID_CONTRACT_STORAGE_PATH|INVALID_CONTRACT_FILE|CONTRACT_OBJECT_NOT_FOUND|CONTRACT_NOT_FOUND|CONTRACT_CHANGED|ITEM_NOT_IN_CONTRACT|SALE_NOT_FOUND|SALE_CHANGED|SALE_NOT_SIGNED)$/.test(error.message ?? '');
+  return error.code === 'P0001' && /^(MAP_PERMISSION_DENIED|AUTH_REQUIRED|NO_ITEMS_SELECTED|ORDER_NOT_FOUND|ORDER_NOT_ACTIVE|ITEM_NOT_IN_ORDER|LOT_NOT_FOUND|INVALID_CONTRACT_STORAGE_PATH|INVALID_CONTRACT_FILE|CONTRACT_OBJECT_NOT_FOUND|CONTRACT_NOT_FOUND|CONTRACT_CHANGED|ITEM_NOT_IN_CONTRACT|SALE_NOT_FOUND|SALE_CHANGED|SALE_NOT_SIGNED|RECONCILIATION_REQUIRED|PACKAGE_PLAN_INVALID|ORDER_ALREADY_RECONCILED|PACKAGE_ORIGIN_CHANGED|PACKAGE_FINANCIAL_CONFLICT|ORDER_CHANGED|PACKAGE_SIGNATURE_NOT_CONFIRMED)$/.test(error.message ?? '');
 }
 
 async function digest(content: BufferSource) {

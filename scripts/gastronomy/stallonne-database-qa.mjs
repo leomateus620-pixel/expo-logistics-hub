@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import postgres from 'postgres';
+import { buildMigrationEnvelope } from './migration-envelope.mjs';
 
 const project = '0538d132-34dd-4347-a33c-526edac7339c';
 const org = '00000000-0000-4000-a000-000000000001';
@@ -14,20 +14,19 @@ const as = (db, user, operation, role = 'authenticated') => db.begin(async (tx) 
   await tx.unsafe(`SET LOCAL ROLE ${role}; SET LOCAL "request.jwt.claim.sub" = '${user}'`);
   return operation(tx);
 });
-const migration = (name) => readFile(new URL(`../../supabase/migrations/${name}.sql`, import.meta.url), 'utf8');
 
 function register(db, key, totals, overrides = {}) {
   const subtotal = Object.values(totals).reduce((sum, amount) => sum + amount, 0);
   const { fee = 0, plan = [{ due_date: '2027-01-23', amount: subtotal + fee }] } = overrides;
   return as(db, seller, async (tx) => (await tx.unsafe(`
-    SELECT public.register_commercial_sale_order_checked($1,$2,$3,'SEGUNDA_ETAPA',$4::uuid[],$5::jsonb,
-      'Comprador sintético',NULL,NULL,NULL,$6,$7,$8,NULL,$9::jsonb,$10,NULL,NULL,$11,0,0,NULL) id
+    SELECT public.register_commercial_sale_order_checked($1,$2,$3,'SEGUNDA_ETAPA',$4::uuid[],$5::text::jsonb,
+      'Comprador sintético',NULL,NULL,NULL,$6,$7,$8,NULL,$9::text::jsonb,$10,NULL,NULL,$11,0,0,NULL) id
   `, [project, seller, key, array(Object.keys(totals)), JSON.stringify(totals),
     plan.length === 1 ? 'CASH' : 'INSTALLMENTS', plan.length,
     plan.length === 1 ? 'PIX' : 'BOLETO_PARCELADO', JSON.stringify(plan), subtotal + fee, fee]))[0].id);
 }
 
-export async function verifyStallonneDatabase(db, { history = false } = {}) {
+export async function verifyStallonneDatabase(db, { history = false, prepareReview = false } = {}) {
   const fixture = await db.unsafe(`SELECT 1 FROM map_projects WHERE id=$1 AND org_id=$2 AND name='Fenasoja 2028 QA'`, [project,org]);
   assert.equal(fixture.length,1,'É necessário o projeto sintético descartável de QA.');
   const children = () => db.unsafe(`SELECT l.id,l.entity_id,l.status,e.metadata->'gastronomyMarkerPosition' position
@@ -37,19 +36,28 @@ export async function verifyStallonneDatabase(db, { history = false } = {}) {
   const original = await children();
   assert.equal(original.length, 3);
 
+  const revisedPlan = Array.from({length:17}, (_, i) => ({
+    due_date: new Date(Date.UTC(2029, i, 12)).toISOString().slice(0,10),
+    amount: i < 16 ? 12000 : 60280,
+  }));
   let prior;
   let reused;
-  if (history) {
+  if (history || prepareReview) {
     [{ id: reused }] = await db.unsafe(`INSERT INTO commercial_lots(project_id,entity_id,public_identifier,display_name)
       VALUES($1,$2,'J','Parque de Diversões') RETURNING id`, [project, anchor.id]);
-    prior = await register(db, 'qa-stallonne-predecessor', Object.fromEntries(original.map(({ id }, i) => [id, [19040, 22560, 10680][i]])));
+    const oldPlan = revisedPlan.slice(2).map(({due_date}, i) => ({due_date, amount:i === 14 ? 10280 : 3000}));
+    prior = await register(db, 'qa-stallonne-predecessor', Object.fromEntries(original.map(({ id }, i) => [id, [19040, 22560, 10680][i]])), {plan:oldPlan});
     const priorItems = await db.unsafe("SELECT id FROM lot_sale_order_items WHERE order_id=$1", [prior]);
     await as(db, seller, (tx) => tx.unsafe("SELECT public.confirm_sale_order_items($1,$2::uuid[])",
       [prior,array(priorItems.map(({ id }) => id))]));
   }
 
-  await db.unsafe(await migration('20261127150000_commercial_stallonne_package'));
-  await db.unsafe(await migration('20261127151000_financial_stallonne_package'));
+  for (const stallonne of ['catalog','financial','revision']) {
+    const {sql} = await buildMigrationEnvelope({stallonne});
+    await db.unsafe(sql);
+    await db.unsafe(sql);
+  }
+  if (prepareReview) return;
   const [main] = await db.unsafe(`SELECT l.id,l.entity_id,l.status,l.commercial_package_reconciliation_pending,
       p.renovacao_total::float8,p.segunda_total::float8
     FROM commercial_lots l JOIN commercial_lot_pricing_2028 p ON p.lot_id=l.id WHERE l.commercial_package_role='PRINCIPAL'`);
@@ -81,6 +89,34 @@ export async function verifyStallonneDatabase(db, { history = false } = {}) {
     await assert.rejects(as(db, seller, (tx) => tx.unsafe(
       "SELECT public.attach_order_contract($1,$2::uuid[],'x','x','application/pdf',1)", [prior,array([original[0].id])]
     )), /COMMERCIAL_PACKAGE_COMPONENT/);
+    const path = org + '/orders/' + prior + '/revision-qa.pdf';
+    const [{version}] = await db.unsafe("SELECT updated_at::text version FROM lot_sale_orders WHERE id=$1",[prior]);
+    const revise = (user=seller, object=path) => as(db, user, async (tx) => (await tx.unsafe(
+      "SELECT public.revise_sale_order_items($1,$2::timestamptz,$3::text::jsonb,$4,'revision-qa.pdf','application/pdf',121,true) receipt",
+      [prior,version,JSON.stringify(revisedPlan),object]))[0].receipt);
+    await assert.rejects(revise(salesOnly),/MAP_PERMISSION_DENIED/);
+    await assert.rejects(revise(),/PACKAGE_FINANCIAL_CONFLICT/);
+    // Only the synthetic fixture resets the paid flag to exercise a different source state.
+    await db.unsafe("UPDATE lot_sale_installments SET payment_status='PENDING',paid_at=NULL WHERE id=$1",[installment.id]);
+    await assert.rejects(revise(),/CONTRACT_OBJECT_NOT_FOUND/);
+    assert.equal((await confirmedFood())[0].cents,5228000);
+    const originalDates = await db.unsafe("SELECT id,due_date::text FROM lot_sale_installments WHERE order_id=$1 ORDER BY due_date",[prior]);
+    await as(db, seller, (tx) => tx.unsafe("INSERT INTO storage.objects(bucket_id,name,owner_id) VALUES('map-contracts',$1,$2)",[path,seller]));
+    const receipt = await revise();
+    assert.deepEqual(await revise(), receipt);
+    await assert.rejects(revise(seller,path+'.changed'),/ORDER_ALREADY_RECONCILED/);
+    assert.equal((await confirmedFood())[0].cents,25228000);
+    const actual = await db.unsafe("SELECT id,due_date::text,amount::float8 FROM lot_sale_installments WHERE order_id=$1 ORDER BY installment_number",[prior]);
+    assert.deepEqual(actual.map(({due_date,amount}) => ({due_date,amount})),revisedPlan);
+    assert.deepEqual(actual.slice(2).map(({id,due_date})=>({id,due_date})), Array.from(originalDates));
+    const [after] = await db.unsafe(`SELECT
+      (SELECT count(*)::int FROM lot_sale_orders WHERE status='CONFIRMED') orders,
+      (SELECT count(*)::int FROM lot_sale_order_items WHERE order_id=$1 AND contract_state='SIGNED') signed,
+      (SELECT count(*)::int FROM lot_contract_lots WHERE contract_id=$2 AND removed_at IS NULL) links,
+      (SELECT count(*)::int FROM lot_sale_order_revisions WHERE order_id=$1 AND after_state->>'operation'='package_reconciliation' AND actor_user_id=$3) revisions,
+      (SELECT count(*)::int FROM financial_obligations) obligations`, [prior,receipt.contractId,seller]);
+    assert.deepEqual(after,{orders:1,signed:1,links:4,revisions:1,obligations:0});
+    console.log('Revisão no mesmo pedido: um PDF, assinatura, 17 vencimentos, 15 IDs preservados, zero cobrança e repetição idempotente.');
     console.log('Conciliação: unidade existente e histórico preservados, concorrência e recebível avulso bloqueados.');
     return;
   }
@@ -165,10 +201,10 @@ export async function verifyStallonneDatabase(db, { history = false } = {}) {
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
-  const db = postgres({ host:'127.0.0.1', port:55438, database:'gastronomy_qa',
+  const db = postgres({ host:'127.0.0.1', port:Number(process.env.GASTRONOMY_QA_PORT || 55438), database:'gastronomy_qa',
     username:'postgres', max:1, onnotice:()=>{} });
   try {
-    await verifyStallonneDatabase(db, { history:process.argv.includes('--history') });
+    await verifyStallonneDatabase(db, { history:process.argv.includes('--history'), prepareReview:process.argv.includes('--prepare-review') });
   } finally {
     await db.end();
   }
