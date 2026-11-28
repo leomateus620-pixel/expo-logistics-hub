@@ -51,6 +51,7 @@ import {
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import { resolveCommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
+import { CessionContract } from '../../cessions/CessionContract';
 import { toCommercialPhase, type CommercialLot, type MapEntity, type MapLayer, type MapPermissions } from '../../types';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotStructureDialog, type LotStructureOperation } from '../commercial/LotStructureDialog';
@@ -355,6 +356,7 @@ interface EntityDetailsPanelProps {
   lots: CommercialLot[];
   permissions: MapPermissions;
   sceneAvailable?: boolean;
+  onLocate?: (id: string) => void;
 }
 
 export function EntityDetailsPanel(props: EntityDetailsPanelProps) {
@@ -380,7 +382,7 @@ export function EntityDetailsPanel(props: EntityDetailsPanelProps) {
   return <DefaultEntityDetailsPanel {...props} />;
 }
 
-function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, sceneAvailable = true }: EntityDetailsPanelProps) {
+function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, onLocate, sceneAvailable = true }: EntityDetailsPanelProps) {
   const salesModeActive = useSalesStore((state) => state.salesModeActive) && sceneAvailable;
   const salesSelection = useSalesStore((state) => state.selection);
   const eligibleLotIds = useSalesStore((state) => state.eligibleLotIds);
@@ -389,6 +391,7 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
   const selectionWithoutFocus = useCommercialMapStore((state) => state.selectionWithoutFocusId === entity.id);
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
   const [workflow, setWorkflow] = useState<LotWorkflow>(null);
+  const [cessionOperation, setCessionOperation] = useState<string | null>(null);
   const [structureOperation, setStructureOperation] = useState<LotStructureOperation>(null);
   const [historyEntityId, setHistoryEntityId] = useState<string | null>(null);
   const historyTriggerRef = useRef<HTMLButtonElement>(null);
@@ -448,7 +451,7 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
           <HistoryExperience key={entity.id} historyId={historyId} onClose={closeHistory} />
         </>}
         <div className="commercial-map-commercial-view" hidden={historyOpen}>
-        <PanelHeader eyebrow={lot && !lotIdentity?.number ? CLASSIFICATION_LABELS[entity.classification] : `${entity.publicIdentifier} · ${CLASSIFICATION_LABELS[entity.classification]}`} title={lotIdentity?.full ?? metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
+        <PanelHeader eyebrow={lot && !lotIdentity?.number ? CLASSIFICATION_LABELS[entity.classification] : `${entity.publicIdentifier} · ${CLASSIFICATION_LABELS[entity.classification]}`} title={lot?.cession ? lot.cession.marker ? lot.cession.purpose : `Espaço cedido · ${lot.cession.beneficiary}` : lotIdentity?.full ?? metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
         {landmarkKind === 'fenasoja-headquarters' && <HeadquartersFilm key={entity.id} />}
         {historyId && <Button ref={historyTriggerRef} variant="outline" className="commercial-map-history-trigger" onClick={() => setHistoryEntityId(entity.id)}><BookOpen aria-hidden="true" />Conhecer a história</Button>}
         <div className="commercial-map-selection-summary" aria-label="Resumo da seleção">
@@ -461,6 +464,17 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
             ? `${pavilionPlan.stats.moduleCount} módulos · ${number.format(pavilionPlan.stats.totalAreaSquareMeters)} m² de área total`
             : lot?.officialAreaSqm != null ? `${areaNumber.format(lot.officialAreaSqm)} m² de área oficial` : 'Área não informada'}</span>
         </div>
+        {lot?.cession && <section className="commercial-map-detail-section cession-lot-facts">
+          <strong>{lotIdentity?.full}</strong><p>{lot.cession.beneficiary} · {lot.cession.purpose}</p>
+          {(permissions.canManageSales || permissions.canManageContracts) && <>
+            <dl><dt>Valor original de tabela</dt><dd>Renovação · {formatBrl(lot.originalCessionPricing?.renewal) ?? 'Sob consulta'}</dd>
+              <dd>2ª etapa · {formatBrl(lot.originalCessionPricing?.second) ?? 'Sob consulta'}</dd>
+              <dt>Valor da cessão</dt><dd>R$ 0,00</dd></dl>
+            {lot.cession.id && <Button variant="outline" onClick={() => setCessionOperation(lot.cession!.id!)}>Consultar operação e contrato</Button>}
+          </>}
+        </section>}
+        {cessionOperation && <CessionContract id={cessionOperation} canManageContracts={permissions.canManageContracts}
+          onClose={() => setCessionOperation(null)} onLocate={onLocate ?? (id => setSelectedEntityId(id))}/>}
         {packagePrincipal && (
           <section className="commercial-map-detail-section commercial-map-package-facts" aria-label="Composição da locação do parque">
             <h3>Locação do Parque Stallonne</h3>
@@ -524,7 +538,7 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, s
             </section>
           )}
 
-          {!packagePrincipal && lot && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} snapshotPricing={lot.officialPricing2028} confirmedStage={lot.status === 'SOLD' ? saleStage(saleHistory.data?.stage) : null} canEdit={permissions.canEditPricing && !lot.id.startsWith('reference:')} />}
+          {!packagePrincipal && lot && !lot.cession && <LotPricing2028Panel lotId={lot.id} officialAreaSqm={lot.officialAreaSqm} snapshotPricing={lot.officialPricing2028} confirmedStage={lot.status === 'SOLD' ? saleStage(saleHistory.data?.stage) : null} canEdit={permissions.canEditPricing && !lot.id.startsWith('reference:')} />}
 
           <Tabs defaultValue="overview" className="commercial-map-detail-tabs">
             <TabsList>

@@ -137,6 +137,7 @@ const MODULE_STATUS_COLORS: Readonly<Record<CommercialStatus, THREE.Color>> = {
   SALE_OPEN: new THREE.Color(STATUS_CONFIG.SALE_OPEN.color),
   SOLD: new THREE.Color(STATUS_CONFIG.SOLD.color),
   BLOCKED: new THREE.Color(STATUS_CONFIG.BLOCKED.color),
+  CEDED: new THREE.Color(STATUS_CONFIG.CEDED.color),
   UNAVAILABLE: new THREE.Color(STATUS_CONFIG.BLOCKED.color),
 };
 

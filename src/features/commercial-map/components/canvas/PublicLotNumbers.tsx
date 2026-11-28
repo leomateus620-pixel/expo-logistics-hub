@@ -12,7 +12,7 @@ import type { PublicMapLabelLayout } from './publicMapLabelLayout';
 const FONT = '700 12px system-ui, -apple-system, "Segoe UI", sans-serif';
 const RESOLUTION = 2;
 const GAP = 2;
-const STATUSES = ['AVAILABLE', 'SOLD', 'UNAVAILABLE'] as const;
+const STATUSES = ['AVAILABLE', 'SOLD', 'UNAVAILABLE', 'CEDED'] as const;
 
 export function PublicMapLabelLayoutFrame({ layout }: { layout: PublicMapLabelLayout }) {
   useFrame(({ camera, size }) => layout.update(camera, size.width, size.height));
@@ -68,6 +68,15 @@ function createAtlas(texts: string[], maxTextureSize: number) {
         context.arc(7, middle, 2, 0, Math.PI * 2);
         context.fill();
       } else if (mark === 'bar') context.fillRect(4.5, middle - 1, 5, 2);
+      else if (mark === 'diamond') {
+        context.beginPath();
+        context.moveTo(7, middle - 3);
+        context.lineTo(10, middle);
+        context.lineTo(7, middle + 3);
+        context.lineTo(4, middle);
+        context.closePath();
+        context.stroke();
+      }
       context.fillStyle = ink;
       context.fillText(cell.text, cell.width / 2 + (mark ? 3 : 0), middle + 0.5);
       context.restore();

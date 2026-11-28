@@ -49,13 +49,14 @@ async function tableRows(table: string): Promise<Record<string, any>[]> {
   const persistedAnchors = snapshot.entities.filter((row: any) => foodAnchorIds.has(row.id)
     && !officialCodes.has(row.public_identifier) && currentGeometryById.has(row.id));
   const toEntityId = (id: string | null) => id ? liveByCode.get(officialById.get(id)?.publicIdentifier ?? '')?.id ?? id : null;
+  const cessionIds = new Set(snapshot.lots.filter((l: any) => l.cession_id).map((l: any) => l.entity_id));
   const cadastralRows = reference.entities.map((entity) => {
     const persisted = liveByCode.get(entity.publicIdentifier);
     return {
       id: persisted?.id ?? entity.id, project_id: project, layer_id: entity.layerId,
       parent_entity_id: toEntityId(entity.parentEntityId), segment_id: persisted?.segment_id ?? null,
       public_identifier: entity.publicIdentifier, name: entity.name, description: entity.description,
-      classification: entity.classification, verification_status: entity.verificationStatus, is_sellable: entity.isSellable, is_archived: false,
+      classification: entity.classification, verification_status: entity.verificationStatus, is_sellable: persisted?.is_sellable ?? entity.isSellable, is_archived: false,
       metadata: { ...entity.metadata, ...persisted?.metadata },
     };
   });
@@ -64,15 +65,15 @@ async function tableRows(table: string): Promise<Record<string, any>[]> {
       ...row, layer_id: referenceLayerIds.get(row.layer_key),
     }))];
     const byId = new Map(structures.map((entity) => [entity.id, entity]));
-    return [...structures, ...foodPoints
+    return [...structures, ...snapshot.entities.filter((row: any) => cessionIds.has(row.id) && !officialCodes.has(row.public_identifier)).map((row: any) => ({ ...row, layer_id: referenceLayerIds.get(row.layer_key) })), ...foodPoints
       .map((row: any) => ({ ...row, layer_id: byId.get(row.parent_entity_id)?.layer_id }))];
   }
   if (table === 'map_entity_geometries') return [...reference.entities.map((entity) => ({
-    id: entity.geometry.id ?? entity.id, project_id: project, entity_id: toEntityId(entity.id), geometry: entity.geometry,
+    id: entity.geometry.id ?? entity.id, project_id: project, entity_id: toEntityId(entity.id), geometry: currentGeometryById.get(toEntityId(entity.id)) && cessionIds.has(toEntityId(entity.id)) ? currentGeometryById.get(toEntityId(entity.id)).geometry : entity.geometry,
     elevation: entity.geometry.elevation, extrusion_height: entity.geometry.extrusionHeight, rotation: entity.geometry.rotation,
     version: 1, is_current: true, calibration_version: entity.geometry.calibrationVersion,
-  })), ...persistedAnchors.map((row: any) => currentGeometryById.get(row.id))];
-  if (table === 'commercial_lots') return snapshot.lots;
+  })), ...snapshot.entities.filter((row: any) => cessionIds.has(row.id) && !officialCodes.has(row.public_identifier)).map((row: any) => currentGeometryById.get(row.id)), ...persistedAnchors.map((row: any) => currentGeometryById.get(row.id))];
+  if (table === 'commercial_lots') return snapshot.lots.map((row: any) => ({ ...row, cession: snapshot.cessions?.find((op: any) => op.id === row.cession_id) }));
   if (table === 'map_segments') return snapshot.segments;
   if (table === 'commercial_lot_pricing_2028') return snapshot.pricing;
   if (table === 'commercial_sale_eligibility') return snapshot.eligibility;

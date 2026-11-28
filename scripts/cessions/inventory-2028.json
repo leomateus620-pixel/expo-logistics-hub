@@ -1,0 +1,774 @@
+[
+  {
+    "block": "R",
+    "code": "Q-R-69",
+    "display_name": "Quadra R · Lote 69",
+    "elevation": "0.000000",
+    "entity_id": "b42cf206-7e2d-4688-bacf-19f82efc9df6",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            44.411572267,
+            -13.132514812
+          ],
+          [
+            47.15870971,
+            -13.088841998
+          ],
+          [
+            47.145121184,
+            -8.825566066
+          ],
+          [
+            44.398283716,
+            -10.030286745
+          ],
+          [
+            44.411572267,
+            -13.132514812
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "73fac7d7-224e-457c-8031-4905a28c3850",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "69",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "R",
+      "contracts": null,
+      "entity_id": "b42cf206-7e2d-4688-bacf-19f82efc9df6",
+      "id": "73fac7d7-224e-457c-8031-4905a28c3850",
+      "is_sellable": true,
+      "lot_number": "69",
+      "official_area_sqm": "471.0000",
+      "orders": null,
+      "public_identifier": "Q-R-69",
+      "renovacao_total": "0.00",
+      "sales": null,
+      "segunda_total": "0.00",
+      "slug": "exporural",
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "R",
+    "code": "Q-R-70",
+    "display_name": "Quadra R · Lote 70",
+    "elevation": "0.000000",
+    "entity_id": "77922177-4ca2-4029-a696-4bef1eaace9a",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            47.15870971,
+            -13.088841998
+          ],
+          [
+            49.31895801,
+            -13.051832166
+          ],
+          [
+            49.298890518,
+            -7.877266965
+          ],
+          [
+            47.145121184,
+            -8.825566066
+          ],
+          [
+            47.15870971,
+            -13.088841998
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "467b0174-db02-4d29-9425-e53955cb20ad",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "70",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "R",
+      "contracts": null,
+      "entity_id": "77922177-4ca2-4029-a696-4bef1eaace9a",
+      "id": "467b0174-db02-4d29-9425-e53955cb20ad",
+      "is_sellable": true,
+      "lot_number": "70",
+      "official_area_sqm": "471.0000",
+      "orders": null,
+      "public_identifier": "Q-R-70",
+      "renovacao_total": "0.00",
+      "sales": null,
+      "segunda_total": "0.00",
+      "slug": "exporural",
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "R",
+    "code": "Q-R-71",
+    "display_name": "Quadra R · Lote 71",
+    "elevation": "0.000000",
+    "entity_id": "c321cc12-dc0a-4cdb-a6da-1cc3285c5692",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            49.31895801,
+            -13.051832166
+          ],
+          [
+            51.167032846,
+            -13.024608667
+          ],
+          [
+            51.14685488,
+            -7.422453258
+          ],
+          [
+            50.578666405,
+            -7.313423025
+          ],
+          [
+            49.298890518,
+            -7.877266965
+          ],
+          [
+            49.31895801,
+            -13.051832166
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "6a848982-f9bf-4d9c-8098-32c123911e04",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "71",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "R",
+      "contracts": null,
+      "entity_id": "c321cc12-dc0a-4cdb-a6da-1cc3285c5692",
+      "id": "6a848982-f9bf-4d9c-8098-32c123911e04",
+      "is_sellable": true,
+      "lot_number": "71",
+      "official_area_sqm": "471.0000",
+      "orders": null,
+      "public_identifier": "Q-R-71",
+      "renovacao_total": "0.00",
+      "sales": null,
+      "segunda_total": "0.00",
+      "slug": "exporural",
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "R",
+    "code": "Q-R-72",
+    "display_name": "Quadra R · Lote 72",
+    "elevation": "0.000000",
+    "entity_id": "55c7a6ce-8b90-40e0-bbe4-e875ca8f427e",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            53.801787262,
+            -12.982211743
+          ],
+          [
+            53.857878784,
+            -12.594557843
+          ],
+          [
+            52.127187029,
+            -7.807703903
+          ],
+          [
+            51.883627572,
+            -7.567022812
+          ],
+          [
+            51.14685488,
+            -7.422453258
+          ],
+          [
+            51.167032846,
+            -13.024608667
+          ],
+          [
+            53.801787262,
+            -12.982211743
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "39542dee-d9c3-4d07-b17e-e3b29e7b081b",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "72",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "R",
+      "contracts": null,
+      "entity_id": "55c7a6ce-8b90-40e0-bbe4-e875ca8f427e",
+      "id": "39542dee-d9c3-4d07-b17e-e3b29e7b081b",
+      "is_sellable": true,
+      "lot_number": "72",
+      "official_area_sqm": "471.0000",
+      "orders": null,
+      "public_identifier": "Q-R-72",
+      "renovacao_total": "0.00",
+      "sales": null,
+      "segunda_total": "0.00",
+      "slug": "exporural",
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "S",
+    "code": "Q-S-25",
+    "display_name": "Quadra S · Lote 25",
+    "elevation": "0.000000",
+    "entity_id": "f90a686a-ed3b-4ca2-b3ca-cc1656488d2c",
+    "extrusion_height": "0.030000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            39.360485533,
+            -36.991411103
+          ],
+          [
+            39.447854235,
+            -36.834363923
+          ],
+          [
+            39.597654727,
+            -36.66412353
+          ],
+          [
+            39.859836633,
+            -36.486365054
+          ],
+          [
+            39.890200985,
+            -33.183890637
+          ],
+          [
+            39.809025788,
+            -33.147358957
+          ],
+          [
+            39.802767772,
+            -33.091250104
+          ],
+          [
+            39.83397399,
+            -33.04720034
+          ],
+          [
+            39.890163891,
+            -33.040320202
+          ],
+          [
+            39.871389841,
+            -32.871993645
+          ],
+          [
+            39.740227926,
+            -32.686216399
+          ],
+          [
+            39.534168185,
+            -32.594922638
+          ],
+          [
+            37.785982921,
+            -32.596043242
+          ],
+          [
+            37.779760386,
+            -32.677262631
+          ],
+          [
+            37.704852882,
+            -32.73429296
+          ],
+          [
+            37.773534625,
+            -32.745997635
+          ],
+          [
+            37.798526371,
+            -32.814378225
+          ],
+          [
+            37.748592874,
+            -32.871125023
+          ],
+          [
+            37.698643249,
+            -32.865449892
+          ],
+          [
+            37.673762784,
+            -33.227780607
+          ],
+          [
+            37.643517777,
+            -36.992177293
+          ],
+          [
+            39.360485533,
+            -36.991411103
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "a6ec0be5-593e-406f-a2ef-0fda8c3448f2",
+    "is_sellable": false,
+    "layer_key": "commercial",
+    "lot_number": "25",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "S",
+      "contracts": null,
+      "entity_id": "f90a686a-ed3b-4ca2-b3ca-cc1656488d2c",
+      "id": "a6ec0be5-593e-406f-a2ef-0fda8c3448f2",
+      "is_sellable": false,
+      "lot_number": "25",
+      "official_area_sqm": "450.0000",
+      "orders": null,
+      "public_identifier": "Q-S-25",
+      "renovacao_total": "6300.00",
+      "sales": null,
+      "segunda_total": "6930.00",
+      "slug": "exporural",
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "S",
+    "code": "Q-S-26",
+    "display_name": "Quadra S · Lote 26",
+    "elevation": "0.000000",
+    "entity_id": "e8a68dde-1d1e-4b6e-a472-a18006f5c721",
+    "extrusion_height": "0.030000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            37.643517777,
+            -36.992177293
+          ],
+          [
+            37.673762784,
+            -33.227780607
+          ],
+          [
+            37.654869389,
+            -32.59753178
+          ],
+          [
+            35.479004272,
+            -32.603507855
+          ],
+          [
+            35.475914776,
+            -32.728387153
+          ],
+          [
+            35.55708836,
+            -32.758676641
+          ],
+          [
+            35.563347989,
+            -32.821027686
+          ],
+          [
+            35.475949451,
+            -32.862594299
+          ],
+          [
+            35.433314208,
+            -37.001664319
+          ],
+          [
+            37.643517777,
+            -36.992177293
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "a39b8f10-a566-484b-a563-7dc66a2b2429",
+    "is_sellable": false,
+    "layer_key": "commercial",
+    "lot_number": "26",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "S",
+      "contracts": null,
+      "entity_id": "e8a68dde-1d1e-4b6e-a472-a18006f5c721",
+      "id": "a39b8f10-a566-484b-a563-7dc66a2b2429",
+      "is_sellable": false,
+      "lot_number": "26",
+      "official_area_sqm": "450.0000",
+      "orders": null,
+      "public_identifier": "Q-S-26",
+      "renovacao_total": "6300.00",
+      "sales": null,
+      "segunda_total": "6930.00",
+      "slug": "exporural",
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "V",
+    "code": "Q-V-01",
+    "display_name": "Lote 01",
+    "elevation": "0.000000",
+    "entity_id": "9f66fb52-fe56-4a2c-92e3-d0d0b88897e4",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            -26.412,
+            -11.03018187355422
+          ],
+          [
+            -24.686181818181815,
+            -11.03018187355422
+          ],
+          [
+            -24.686181818181815,
+            -8.693454589096383
+          ],
+          [
+            -26.412,
+            -8.693454589096383
+          ],
+          [
+            -26.412,
+            -11.03018187355422
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "57c1ebe7-e652-4b21-897e-c0ed07448cb1",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "01",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "V",
+      "contracts": null,
+      "entity_id": "9f66fb52-fe56-4a2c-92e3-d0d0b88897e4",
+      "id": "57c1ebe7-e652-4b21-897e-c0ed07448cb1",
+      "is_sellable": true,
+      "lot_number": "01",
+      "official_area_sqm": "190.9800",
+      "orders": null,
+      "public_identifier": "Q-V-01",
+      "renovacao_total": "8021.16",
+      "sales": null,
+      "segunda_total": "8785.08",
+      "slug": null,
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "V",
+    "code": "Q-V-02",
+    "display_name": "Lote 02",
+    "elevation": "0.000000",
+    "entity_id": "3daeacfb-ea49-4410-b467-0da4296a784f",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            -28.201090909090915,
+            -11.03018187355422
+          ],
+          [
+            -26.475272727272724,
+            -11.03018187355422
+          ],
+          [
+            -26.475272727272724,
+            -8.693454589096383
+          ],
+          [
+            -28.201090909090915,
+            -8.693454589096383
+          ],
+          [
+            -28.201090909090915,
+            -11.03018187355422
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "3b1a50d7-b667-406d-8fb4-1303f7153452",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "02",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "V",
+      "contracts": null,
+      "entity_id": "3daeacfb-ea49-4410-b467-0da4296a784f",
+      "id": "3b1a50d7-b667-406d-8fb4-1303f7153452",
+      "is_sellable": true,
+      "lot_number": "02",
+      "official_area_sqm": "191.0000",
+      "orders": null,
+      "public_identifier": "Q-V-02",
+      "renovacao_total": "7067.00",
+      "sales": null,
+      "segunda_total": "7831.00",
+      "slug": null,
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "V",
+    "code": "Q-V-03",
+    "display_name": "Lote 03",
+    "elevation": "0.000000",
+    "entity_id": "5dbcb67a-1b2c-4df6-8bb9-65cc2e414b6a",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            -29.990181818181817,
+            -11.03018187355422
+          ],
+          [
+            -28.264363636363633,
+            -11.03018187355422
+          ],
+          [
+            -28.264363636363633,
+            -8.693454589096383
+          ],
+          [
+            -29.990181818181817,
+            -8.693454589096383
+          ],
+          [
+            -29.990181818181817,
+            -11.03018187355422
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "784fc3c0-ee5f-4376-8cf4-0aed5fe9f2e6",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "03",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "V",
+      "contracts": null,
+      "entity_id": "5dbcb67a-1b2c-4df6-8bb9-65cc2e414b6a",
+      "id": "784fc3c0-ee5f-4376-8cf4-0aed5fe9f2e6",
+      "is_sellable": true,
+      "lot_number": "03",
+      "official_area_sqm": "191.0000",
+      "orders": null,
+      "public_identifier": "Q-V-03",
+      "renovacao_total": "7067.00",
+      "sales": null,
+      "segunda_total": "7831.00",
+      "slug": null,
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "V",
+    "code": "Q-V-04",
+    "display_name": "Lote 04",
+    "elevation": "0.000000",
+    "entity_id": "9de051d7-8fb8-4aaf-955a-6eef60796282",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            -31.779272727272726,
+            -11.03018187355422
+          ],
+          [
+            -30.053454545454546,
+            -11.03018187355422
+          ],
+          [
+            -30.053454545454546,
+            -8.693454589096383
+          ],
+          [
+            -31.779272727272726,
+            -8.693454589096383
+          ],
+          [
+            -31.779272727272726,
+            -11.03018187355422
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "20868234-dc63-44c4-b14e-40aa2aa4fdf6",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "04",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "V",
+      "contracts": null,
+      "entity_id": "9de051d7-8fb8-4aaf-955a-6eef60796282",
+      "id": "20868234-dc63-44c4-b14e-40aa2aa4fdf6",
+      "is_sellable": true,
+      "lot_number": "04",
+      "official_area_sqm": "191.0000",
+      "orders": null,
+      "public_identifier": "Q-V-04",
+      "renovacao_total": "7067.00",
+      "sales": null,
+      "segunda_total": "7831.00",
+      "slug": null,
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "V",
+    "code": "Q-V-05",
+    "display_name": "Lote 05",
+    "elevation": "0.000000",
+    "entity_id": "79979e00-1215-47b1-971c-acb2f1873906",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            -33.568363636363635,
+            -11.03018187355422
+          ],
+          [
+            -31.842545454545455,
+            -11.03018187355422
+          ],
+          [
+            -31.842545454545455,
+            -8.693454589096383
+          ],
+          [
+            -33.568363636363635,
+            -8.693454589096383
+          ],
+          [
+            -33.568363636363635,
+            -11.03018187355422
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "dbe9bfb0-f8e3-4808-bd6d-4c807b57aba9",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "05",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "V",
+      "contracts": null,
+      "entity_id": "79979e00-1215-47b1-971c-acb2f1873906",
+      "id": "dbe9bfb0-f8e3-4808-bd6d-4c807b57aba9",
+      "is_sellable": true,
+      "lot_number": "05",
+      "official_area_sqm": "190.9800",
+      "orders": null,
+      "public_identifier": "Q-V-05",
+      "renovacao_total": "8021.16",
+      "sales": null,
+      "segunda_total": "8785.08",
+      "slug": null,
+      "status": "AVAILABLE"
+    }
+  },
+  {
+    "block": "V",
+    "code": "Q-V-06",
+    "display_name": "Lote 06",
+    "elevation": "0.000000",
+    "entity_id": "5ea57dcf-bb10-41f4-823e-f707d38c70b2",
+    "extrusion_height": "0.130000",
+    "geometry": {
+      "coordinates": [
+        [
+          [
+            -37.05927272727273,
+            -11.03018187355422
+          ],
+          [
+            -34.94072727272727,
+            -11.03018187355422
+          ],
+          [
+            -34.94072727272727,
+            -8.693454589096383
+          ],
+          [
+            -37.05927272727273,
+            -8.693454589096383
+          ],
+          [
+            -37.05927272727273,
+            -11.03018187355422
+          ]
+        ]
+      ],
+      "type": "Polygon"
+    },
+    "id": "3aabd05c-5c77-4c3c-bbcd-7cb91c982eaa",
+    "is_sellable": true,
+    "layer_key": "commercial",
+    "lot_number": "06",
+    "rotation": "0.000000",
+    "baseline": {
+      "block": "V",
+      "contracts": null,
+      "entity_id": "5ea57dcf-bb10-41f4-823e-f707d38c70b2",
+      "id": "3aabd05c-5c77-4c3c-bbcd-7cb91c982eaa",
+      "is_sellable": true,
+      "lot_number": "06",
+      "official_area_sqm": "239.0500",
+      "orders": null,
+      "public_identifier": "Q-V-06",
+      "renovacao_total": "10040.10",
+      "sales": null,
+      "segunda_total": "10996.30",
+      "slug": null,
+      "status": "AVAILABLE"
+    }
+  }
+]

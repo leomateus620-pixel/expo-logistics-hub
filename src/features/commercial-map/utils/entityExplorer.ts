@@ -25,7 +25,8 @@ const STATUS_SORT_ORDER: Record<CommercialStatus | 'NOT_COMMERCIAL', number> = {
   IN_NEGOTIATION: 4,
   BLOCKED: 5,
   UNAVAILABLE: 6,
-  NOT_COMMERCIAL: 7,
+  CEDED: 7,
+  NOT_COMMERCIAL: 8,
 };
 
 const LOCATION_GROUP_ORDER: Record<EntityLocationGroup, number> = {

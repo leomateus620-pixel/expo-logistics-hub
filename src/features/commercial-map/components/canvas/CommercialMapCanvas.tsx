@@ -3971,7 +3971,8 @@ function CameraRig({
           maxDistance: controlsMaximumDistance,
         });
       }
-    } else if (selectionChanged && !selectedEntity) {
+    } else if ((selectionChanged && !selectedEntity)
+      || (detailsLayoutChanged && useCommercialMapStore.getState().selectionWithoutFocusId)) {
       cancelCameraTransition(true);
       preserveManualView.current = true;
       cancelScheduledResizeRefit();
@@ -5159,6 +5160,10 @@ const Scene = memo(function Scene({
     if (useVisitStore.getState().enabled) return;
     if (hydrologicalModeActive) return;
     if (!canInspectEntity(entityId)) return;
+    if (lotByEntity.get(entityId)?.status === 'CEDED') {
+      setSelectedEntityId(entityId, { focus: false });
+      return;
+    }
     if (openPackageSaleDetails(entityId)) return;
     // Em modo Vendas o clique pertence ao carrinho: não seleciona a entidade
     // nem abre o painel de detalhes padrão.
@@ -5370,6 +5375,13 @@ const Scene = memo(function Scene({
     return anchors;
   }, [canInspectEntity, circulationEntities, entityFiltersActive, gastronomyStructures, layerOpacity,
     layerVisibility, packageByAnchor, positionedGastronomyEntities, presentedMatchingEntityIds, salesModeActive, structuralEntities]);
+  const cessionAnchors = useMemo(() => lotEntries.flatMap(({ entity, lot }) => {
+    if (lot.cession?.marker !== 'FENASOJA' || !canInspectEntity(entity.id)
+      || layerVisibility[entity.layerId] === false || (layerOpacity[entity.layerId] ?? 1) <= .015
+      || (entityFiltersActive && !presentedMatchingEntityIds.has(entity.id))) return [];
+    const position = resolveGastronomyMarkerAnchor(entity);
+    return position ? [{ id: entity.id, position, selectable: true }] : [];
+  }), [lotEntries, canInspectEntity, layerVisibility, layerOpacity, entityFiltersActive, presentedMatchingEntityIds]);
   const cameraFramingEntities = useMemo(() => [
     ...exteriorRenderedEntities,
     ...[...positionedGastronomyEntities.values()].filter(entity => layerVisibility[entity.layerId] !== false),
@@ -6053,6 +6065,11 @@ const Scene = memo(function Scene({
           <QuadrasABValidationOverlay />
         </Suspense>
       )}
+      {cessionAnchors.length > 0 && !interiorEntity && !visitEnabled && !hydrologicalModeActive
+        && !lunarCinematicActive && !soyCinematicActive && !christmasActive && !sunriseRunning && !parkingInspectionOpen &&
+        <ExteriorGastronomyMarkers anchors={cessionAnchors} faceUrl={`${import.meta.env.BASE_URL}maps/fenasoja-cession-marker.webp`}
+          selectedId={selectedEntityId} focused night={nightAtmosphereActive}
+          qualityTier={renderQualityTier} onSelectPoint={handleEntitySelect} />}
       {showGastronomyMarkers && (
           <ExteriorGastronomyMarkers
             anchors={gastronomyMarkerAnchors}

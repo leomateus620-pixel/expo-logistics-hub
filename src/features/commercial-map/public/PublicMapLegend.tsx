@@ -5,7 +5,7 @@ import type { PublicAreaDefinition } from './publicAreaRegistry';
 import { EXTERNAL_LOT_PALETTE, externalLotFrameColor } from '../utils/externalLotPresentation';
 import { PUBLIC_NUMBER_STYLES } from './publicLotNumberStyle';
 
-export function PublicMapLegend({ area }: { area: PublicAreaDefinition }) {
+export function PublicMapLegend({ area, hasCessions = false }: { area: PublicAreaDefinition; hasCessions?: boolean }) {
   const segment = COMMERCIAL_MAP_SEGMENTS.find(item => item.id === (area.segmentSlug ?? area.slug));
   const external = (area.kind === 'SEGMENT' && segment?.id === 'exporural')
     || (area.kind === 'SEGMENT_EXTERNAL' && segment?.id === 'industria-comercio-servicos')
@@ -14,6 +14,7 @@ export function PublicMapLegend({ area }: { area: PublicAreaDefinition }) {
     style={{ '--segment-color': segment?.palette.edge, '--segment-accent': segment?.palette.accent } as CSSProperties}>
     {segment && <strong className="public-map-segment" key={segment.id}>{segment.name}</strong>}
     <div className="public-map-legend__statuses">
+      {hasCessions && <span><i className="cession-swatch" aria-hidden="true">◇</i>Espaços cedidos</span>}
       {(['AVAILABLE', 'SOLD', 'BLOCKED'] as const).map(status => {
         const plate = PUBLIC_NUMBER_STYLES[status === 'BLOCKED' ? 'UNAVAILABLE' : status];
         return <span key={status}><i aria-hidden="true" className={external && status !== 'BLOCKED' ? 'is-external-lot' : undefined}

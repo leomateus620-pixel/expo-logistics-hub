@@ -92,7 +92,7 @@ export function SalesCartContents({ summary, loading }: { summary: SalesCartSumm
   );
 }
 
-export function SalesCart({ summary, loading }: { summary: SalesCartSummary; loading: boolean }) {
+export function SalesCart({ summary, loading, onCession }: { summary: SalesCartSummary; loading: boolean; onCession?: () => void }) {
   const closeSalesMode = useSalesStore((state) => state.closeSalesMode);
 
   return (
@@ -109,6 +109,7 @@ export function SalesCart({ summary, loading }: { summary: SalesCartSummary; loa
           <X aria-hidden="true" />
         </button>
       </header>
+      {onCession && <Button variant="outline" onClick={onCession}>Venda não comercializável</Button>}
       <SalesStageSwitch />
       <SalesCartContents summary={summary} loading={loading} />
     </aside>

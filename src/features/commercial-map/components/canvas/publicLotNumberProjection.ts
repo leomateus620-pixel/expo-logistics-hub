@@ -11,13 +11,13 @@ import type { PublicLabelRect, PublicMapLabelLayout } from './publicMapLabelLayo
 export const PUBLIC_NUMBER_HEIGHT = 18;
 const VIEWPORT_INSET = 2;
 const SURFACE_OFFSET = 0.12; // Clears the selection/hover lift and status lines.
-const STATUS_PRIORITY = { AVAILABLE: 0, SOLD: 1, UNAVAILABLE: 2 } as const;
+const STATUS_PRIORITY = { AVAILABLE: 0, SOLD: 1, CEDED: 2, UNAVAILABLE: 3 } as const;
 
 export function readPublicLotNumbers(lots: readonly PublicLot[]) {
   const result = new Map<string, { text: string; status: ReturnType<typeof publicAvailability> }>();
   for (const lot of lots) {
     const text = typeof lot.lotNumber === 'string' ? lot.lotNumber.trim() : '';
-    if (text && !result.has(lot.entityId)) result.set(lot.entityId, { text, status: publicAvailability(lot.availability) });
+    if (text && !result.has(lot.entityId)) result.set(lot.entityId, { text, status: publicAvailability(lot.availability, lot.cession) });
   }
   return result;
 }

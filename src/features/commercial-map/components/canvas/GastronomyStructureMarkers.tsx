@@ -15,6 +15,7 @@ export interface GastronomyMarkerAnchor {
 }
 
 interface GastronomyStructureMarkersProps {
+  faceUrl?: string;
   anchors: readonly GastronomyMarkerAnchor[];
   focused: boolean;
   selectedId?: string | null;
@@ -142,6 +143,7 @@ function getObstructions(canvas: HTMLCanvasElement): ScreenRect[] {
 
 export const GastronomyStructureMarkers = memo(function GastronomyStructureMarkers({
   anchors,
+  faceUrl = FACE_URL,
   focused,
   selectedId,
   motionEnabled,
@@ -201,7 +203,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
 
   useEffect(() => {
     let mounted = true;
-    const texture = new THREE.TextureLoader().load(FACE_URL, () => {
+    const texture = new THREE.TextureLoader().load(faceUrl, () => {
       if (!mounted) return;
       textureReady.current = true;
       resources.faceMaterial.map = texture;
@@ -217,7 +219,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
       resources.faceMaterial.map = null;
       texture.dispose();
     };
-  }, [gl, invalidate, resources]);
+  }, [faceUrl, gl, invalidate, resources]);
 
   useEffect(() => () => {
     Object.values(batches).forEach(disposeInstancedMesh);
@@ -438,7 +440,7 @@ export const GastronomyStructureMarkers = memo(function GastronomyStructureMarke
 
   if (!capacity) return null;
   return (
-    <group name="gastronomy-structure-markers" userData={diagnostics}>
+    <group name={faceUrl === FACE_URL ? 'gastronomy-structure-markers' : 'cession-structure-markers'} userData={diagnostics}>
       <primitive object={batches.body} />
       <primitive object={batches.face} />
       <primitive object={batches.rim} />

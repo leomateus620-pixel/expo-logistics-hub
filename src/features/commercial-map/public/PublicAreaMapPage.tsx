@@ -244,7 +244,7 @@ function PublicAreaMap({ slug, token }: { slug: string; token: string }) {
         {usesParkContext && showMap && <button type="button" className="public-map-refit" aria-label="Reenquadrar área" title="Reenquadrar área" onClick={refitArea}><Crosshair aria-hidden="true" /><span>Reenquadrar área</span></button>}
       </div>
     </header>
-    {data && showMap && <PublicMapLegend area={area} />}
+    {data && showMap && <PublicMapLegend area={area} hasCessions={data.lots.some(lot => !!lot.cession)} />}
     <div className="public-map-body">
       {!webglAvailable && <p className="public-map-notice" role="status">Este dispositivo não oferece WebGL 2. Consulte os lotes pela lista.</p>}
       {!data && !inventory.isError && <div className="public-map-state" role="status">Carregando os lotes autorizados…</div>}

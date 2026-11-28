@@ -37,14 +37,16 @@ export type CommercialStatus =
   | 'SALE_OPEN'
   | 'SOLD'
   | 'BLOCKED'
+  | 'CEDED'
   | 'UNAVAILABLE';
 
 /** As quatro fases comerciais exibidas em todo o ecossistema. */
-export type CommercialPhase = 'AVAILABLE' | 'SALE_OPEN' | 'SOLD' | 'BLOCKED';
+export type CommercialPhase = 'AVAILABLE' | 'SALE_OPEN' | 'SOLD' | 'BLOCKED' | 'CEDED';
 
 /** Projeta qualquer estado interno em uma das quatro fases públicas. */
 export function toCommercialPhase(status: CommercialStatus): CommercialPhase {
   switch (status) {
+    case 'CEDED': return 'CEDED';
     case 'SALE_OPEN': return 'SALE_OPEN';
     case 'SOLD': return 'SOLD';
     case 'BLOCKED':
@@ -177,7 +179,16 @@ export interface CommercialLotOfficialPricing2028 {
   resolutionStatus: LotPricingResolution;
 }
 
+export interface SpaceCession {
+  id?: string;
+  beneficiary: string;
+  purpose: string;
+  marker: 'FENASOJA' | null;
+}
+
 export interface CommercialLot {
+  cession?: SpaceCession | null;
+  originalCessionPricing?: { renewal: number | null; second: number | null; defaultRenewal?: number | null; defaultSecond?: number | null } | null;
   id: string;
   entityId: string;
   publicIdentifier: string;

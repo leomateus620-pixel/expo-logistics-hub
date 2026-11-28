@@ -89,6 +89,20 @@ function lot(id: string, entityId: string, overrides: Partial<CommercialLot> = {
 }
 
 describe('Commercial Dashboard analytics', () => {
+  it('removes only explicitly ceded lots from both stage denominators', () => {
+    const lots = [
+      lot('assigned', 'v1', { status: 'CEDED', askingPrice: 9500 }),
+      lot('free', 'r1', { status: 'AVAILABLE', askingPrice: 0 }),
+      lot('neighbor', 'v6', { status: 'AVAILABLE', askingPrice: 1200 }),
+    ];
+    const entities = lots.map(item => entity(item.entityId, 'exporural'));
+    for (const stage of ['RENOVACAO', 'SEGUNDA_ETAPA'] as const) {
+      expect(resolveDashboardLotValue(lots[0], stage)).toBeNull();
+      const { overall } = buildCommercialDashboardSnapshot({ lots, entities }, stage);
+      expect(overall).toMatchObject({ commercialLots: 2, availableLots: 2, commercialAreaLots: 2, soldLots: 0 });
+    }
+  });
+
   it('moves Stallonne from the predecessor to one Gastronomia sale and updates the common progress denominator', () => {
     const park = entity('park', null, { classification: 'ATTRACTION', isSellable: false });
     const balloon = entity('balloon', null, { classification: 'FOOD_AREA', isSellable: false });

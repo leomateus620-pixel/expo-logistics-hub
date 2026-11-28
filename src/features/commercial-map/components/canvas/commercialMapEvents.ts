@@ -6,12 +6,15 @@ interface GastronomyMarkerPicking {
   select(id: string): void;
 }
 
-const pickingByCanvas = new WeakMap<HTMLCanvasElement, GastronomyMarkerPicking>();
+const pickingByCanvas = new WeakMap<HTMLCanvasElement, Set<GastronomyMarkerPicking>>();
 
 export function registerGastronomyMarkerPicking(canvas: HTMLCanvasElement, picking: GastronomyMarkerPicking) {
-  pickingByCanvas.set(canvas, picking);
+  const group = pickingByCanvas.get(canvas) ?? new Set<GastronomyMarkerPicking>();
+  group.add(picking);
+  pickingByCanvas.set(canvas, group);
   return () => {
-    if (pickingByCanvas.get(canvas) === picking) pickingByCanvas.delete(canvas);
+    group.delete(picking);
+    if (!group.size) pickingByCanvas.delete(canvas);
   };
 }
 
@@ -22,8 +25,14 @@ export const createCommercialMapEvents: typeof events = (store) => {
   const handlers = manager.handlers;
   const canvas = () => store.getState().gl.domElement;
   const picking = () => pickingByCanvas.get(canvas());
-  const hit = (event: Event) => event instanceof MouseEvent
-    ? picking()?.hit(event.clientX, event.clientY) ?? null : null;
+  let hitLayer: GastronomyMarkerPicking | null = null;
+  const hit = (event: Event) => {
+    if (event instanceof MouseEvent) for (const layer of picking() ?? []) {
+      const id = layer.hit(event.clientX, event.clientY);
+      if (id) { hitLayer = layer; return id; }
+    }
+    return null;
+  };
   let press: { id: string; pointerId: number; x: number; y: number; releasedOnMarker: boolean } | null = null;
   let markerClick = false;
   let markerHover = false;
@@ -84,7 +93,7 @@ export const createCommercialMapEvents: typeof events = (store) => {
           handlers.onClick(event);
         } else if (completed?.releasedOnMarker && event instanceof MouseEvent
           && isMapSelectionClick(Math.hypot(event.clientX - completed.x, event.clientY - completed.y), event)) {
-          picking()?.select(completed.id);
+          hitLayer?.select(completed.id);
         }
       },
       onDoubleClick: (event) => {

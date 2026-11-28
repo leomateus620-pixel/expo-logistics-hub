@@ -21,6 +21,8 @@ const HDR_OPEN = statusBeforeAces(EXTERNAL_LOT_PALETTE.open);
 const HDR_SOLD = statusBeforeAces(EXTERNAL_LOT_PALETTE.sold);
 
 export const statusInkUniforms = {
+  uCeded: { value: new THREE.Color(EXTERNAL_LOT_PALETTE.ceded) },
+  uCededHdr: { value: statusBeforeAces(EXTERNAL_LOT_PALETTE.ceded) },
   uExternalStatusOpen: { value: new THREE.Color(EXTERNAL_LOT_PALETTE.open) },
   uExternalStatusSold: { value: new THREE.Color(EXTERNAL_LOT_PALETTE.sold) },
   uExternalHdrOpen: { value: HDR_OPEN },

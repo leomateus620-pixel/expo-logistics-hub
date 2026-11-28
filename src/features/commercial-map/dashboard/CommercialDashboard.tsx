@@ -22,6 +22,7 @@ import type { SaleOrderSummary } from './salesOrders/salesOrdersService';
 import { CommercialCashflowPreview, CashflowGlyph } from './CommercialSalesAnalyticsCards';
 import { CommercialAnalyticsView, type CashflowMemory } from './CommercialCashflow';
 import { CommercialSalesAnalyticsProvider } from './salesOrders/useCommercialSalesAnalytics';
+import { CessionCategory } from '../cessions/CessionCategory';
 import './commercial-dashboard.css';
 import './commercial-dashboard-overview.css';
 import './salesOrders/sales-orders.css';
@@ -333,6 +334,7 @@ function CommercialDashboardBody({ data, dataUpdatedAt, isFetching, onClose, onV
         </div>
       </section>
       </div>
+      {(canManageSales || canManageContracts) && <CessionCategory lots={data.lots} canManageContracts={canManageContracts} onLocate={onViewLot}/>}
       <CommercialDashboardSpaces key={presentation.scope} snapshot={snapshot} data={data} onViewLot={onViewLot}
         presentationMemory={spacesMemory} stateMemory={spacesMemory} projectId={projectId} dataUpdatedAt={dataUpdatedAt} canManageSales={canManageSales}
         onOpenGastronomySales={salesAvailable && canManageSales ? () => {
