@@ -411,6 +411,11 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, o
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
   const status = lot ? STATUS_CONFIG[toCommercialPhase(lot.status)] : null;
   const metadata = normalizeMapEntityMetadata(entity, lot);
+  const originalPricing = lot?.originalCessionPricing;
+  const hasOriginalOverride = originalPricing && (
+    (originalPricing.defaultRenewal != null && originalPricing.defaultRenewal !== originalPricing.renewal)
+    || (originalPricing.defaultSecond != null && originalPricing.defaultSecond !== originalPricing.second)
+  );
   const lotIdentity = lot ? resolveLotIdentity(lot, entity, entities.find(parent => parent.id === entity.parentEntityId)) : null;
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;
   const landmarkKind = resolveStrategicLandmarkKind(entity);
@@ -470,6 +475,10 @@ function DefaultEntityDetailsPanel({ entity, lot, entities, lots, permissions, o
             <dl><dt>Valor original de tabela</dt><dd>Renovação · {formatBrl(lot.originalCessionPricing?.renewal) ?? 'Sob consulta'}</dd>
               <dd>2ª etapa · {formatBrl(lot.originalCessionPricing?.second) ?? 'Sob consulta'}</dd>
               <dt>Valor da cessão</dt><dd>R$ 0,00</dd></dl>
+            {hasOriginalOverride && <details className="cession-original-rule"><summary>Tabela antes dos ajustes individuais</summary>
+              <p>Renovação · {formatBrl(originalPricing.defaultRenewal) ?? 'Sob consulta'}</p>
+              <p>2ª etapa · {formatBrl(originalPricing.defaultSecond) ?? 'Sob consulta'}</p>
+            </details>}
             {lot.cession.id && <Button variant="outline" onClick={() => setCessionOperation(lot.cession!.id!)}>Consultar operação e contrato</Button>}
           </>}
         </section>}

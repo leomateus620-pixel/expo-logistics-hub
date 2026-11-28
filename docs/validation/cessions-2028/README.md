@@ -50,7 +50,7 @@ R e S têm segmento persistido Exporural. Na V, o segmento do registro e o da qu
 
 ## Conciliação global
 
-Valores financeiros em reais. As contagens de vendas medem itens. O potencial considera o preço da etapa para o estoque e o valor comercial reconhecido para itens com venda. O cálculo preserva a composição dos pacotes comerciais. Cada lote participa uma vez.
+Valores financeiros em reais. As contagens de vendas medem itens. O potencial considera o preço da etapa para o estoque e o valor comercial reconhecido para itens com venda. O cálculo preserva a composição dos pacotes comerciais. Cada lote participa uma vez. A consulta de conferência foi reexecutada no banco conectado e reproduziu todos os valores posteriores. [SQL de conciliação](../../../scripts/cessions/reconcile-2028.sql)
 
 | Indicador | Antes | Depois | Variação |
 | --- | ---: | ---: | ---: |
@@ -99,3 +99,11 @@ CESSION_REVIEW=1 node_modules/.bin/vite --config scripts/gastronomy/review.vite.
 ```
 
 Com a prévia na porta 5196, execute `node scripts/cessions/browser-qa.mjs` em outro terminal com Playwright e Chrome instalados. A variável opcional `PLAYWRIGHT_PATH` permite usar o pacote de um runtime externo. A opção `--register-in-disposable-db` usa V06 como operação adicional de teste, anexa um PDF sintético e confere a leitura privada do arquivo após a assinatura. Recrie a base descartável antes de repetir esse cenário.
+
+### Resultado dos testes
+
+- Typecheck e build de produção concluídos.
+- Os 49 testes focados de navegação, indicadores, renderização externa e apresentação pública passaram.
+- A execução completa com três workers teve 4.556 testes aprovados e 87 falhas. A base `1e8e0923` teve 4.555 aprovados e as mesmas 87 falhas, conferidas pelo arquivo e nome de cada teste.
+- A migração e a reaplicação passaram no PostgreSQL descartável. Um segundo checkout tentou confirmar o lote enquanto a cessão mantinha o bloqueio transacional. A concorrência foi serializada, e o carrinho antigo recebeu o código do lote ao tentar vender uma cessão já confirmada.
+- Na prévia, o teste criou uma cessão adicional, anexou o PDF sintético, registrou a confirmação de assinatura e comparou o arquivo obtido por URL privada com o arquivo enviado. Ao final, a base de prévia foi recriada com as duas operações originais e V06 disponível.
