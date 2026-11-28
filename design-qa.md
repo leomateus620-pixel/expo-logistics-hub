@@ -97,3 +97,14 @@ Os estados de carregamento, falha, restrição e ausência de histórico comerci
 - Limites: sem validação física iOS, sem gravação da animação e sem deploy/merge da interface. Testar em Safari físico permanece acompanhamento de ambiente, não uma validação já alegada.
 
 **final result: passed**
+
+## Portal • Por dentro da marca Fenasoja · 27/11/2026
+
+A referência de montagem é a tela do monitor enviada por Leonardo e a abertura de 15 segundos publicada por Spaces. A reprodução do YouTube oferece 3840 × 2160 a 30 fps. As referências de conteúdo são o símbolo de 512 × 512, o impresso de 78 × 117, a oficina de 1005 × 670 e a fotografia DJI de 4000 × 2250. A prancha conjunta preserva a proporção dos documentos. A comparação é de enquadramento, legibilidade e movimento, com registro geométrico da marca feito à parte. [Direção e fontes](docs/por-dentro-da-marca/referencias.webp) · [Documentos ao lado da implementação](docs/por-dentro-da-marca/prancha.webp)
+
+- A primeira montagem usava uma janela diagonal que revelava toda a composição de 1966. **P1 resolvido.** A margem do impresso agora encontra o telhado e o mesmo cartaz recua no quadro. A textura da tinta acompanha a folha. [Quadro de encaixe](docs/por-dentro-da-marca/quadros/paisagem-encaixe.webp) · [Chegada a 1966 no celular](docs/por-dentro-da-marca/quadros/retrato-origem.webp)
+- A fotografia dentro dos sulcos se confundia com o conteúdo da página durante a expansão. **P2 resolvido.** O fundo escurece à medida que a máscara cresce. Os vazios da marca e o texto do cabeçalho continuam imóveis no início. [Gravação do clique](docs/por-dentro-da-marca/previas/retrato-abertura.mp4)
+- O posicionamento foi revisto com os retângulos reais do DOM antes e depois da projeção. Os últimos quadros devolvem a pintura à imagem do cabeçalho. A comparação ampliada usa a captura de tela anterior, o quadro da gravação e a sobreposição a 50%. A compressão do vídeo afeta a nitidez. [Registro da marca](docs/por-dentro-da-marca/registro-da-marca.webp) · [Coordenadas medidas](docs/por-dentro-da-marca/medicoes.json)
+- Os percursos completos usam 1366 × 768 e 390 × 844 pixels CSS, com gravação nas mesmas dimensões e DPR 1. O roteiro cobriu o portal sem sessão, reprodução normal, som optativo, modo reduzido, rotação, falha de mídia, retorno por teclado e entrada no Memorial. O monitor de exceções de página registrou zero erros no roteiro de interação. Não houve ensaio em telefone físico ou com participante externo. [Gravações e medidas](docs/por-dentro-da-marca/README.md)
+
+**final result: passed**

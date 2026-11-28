@@ -10,15 +10,6 @@
     linear-gradient(115deg, #466779, #24394f 32%, #71634a 65%, #254457) border-box;
   box-shadow: 0 16px 44px -34px #000, inset 0 1px 0 rgb(220 237 255 / 7%);
 }
-.fenasoja-portal__header .fenasoja-portal__alvorada-launcher:has(.fenasoja-history) {
-  display: block;
-  width: 100%;
-  border-radius: inherit;
-  text-align: center;
-  transition: none;
-  transform: none;
-  filter: none;
-}
 .fenasoja-history {
   position: relative;
   display: block;
@@ -141,3 +132,21 @@
   .fenasoja-portal__history-toggle { color: ButtonText; border-color: ButtonText; background: ButtonFace; }
   .fenasoja-portal__header .fenasoja-history .fenasoja-brand__wordmark { background: none; -webkit-text-fill-color: CanvasText; }
 }
+
+.brand-film-trigger {
+  display: grid; place-items: center; gap: 3px; min-height: 44px;
+  cursor: pointer; pointer-events: auto; color: #f2ddb1; border-radius: 6px;
+}
+.brand-film-trigger__caption { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1.15 system-ui; }
+.brand-film-trigger:focus-visible { outline: 2px solid #f2d18a; outline-offset: 4px; }
+.fenasoja-history__controls {
+  grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between;
+  min-height: 44px; padding-inline: 14px 6px; border-top: 1px solid #a1b6c22b;
+}
+.fenasoja-history__controls .fenasoja-portal__alvorada-launcher {
+  gap: 6px; min-height: 44px; font-size: 13px; font-weight: 600; color: #e7ebee;
+}
+.fenasoja-history__controls .fenasoja-portal__history-toggle {
+  position: static; width: 44px; height: 44px; border-color: transparent; background: transparent;
+}
+.fenasoja-portal__header:has(.fenasoja-history) .workers-launcher-slot--portal:empty { display: none; }

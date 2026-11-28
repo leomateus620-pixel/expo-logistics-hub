@@ -1,0 +1,168 @@
+{
+  "paisagem": {
+    "firstFrameAfterClickMs": 115,
+    "elapsedMs": 14018,
+    "frames": 841,
+    "p95FrameMs": 18,
+    "assets": [
+      {
+        "file": "/assets/projection-CrAURUKI.js",
+        "encoded": 2533,
+        "transfer": 2833
+      },
+      {
+        "file": "/portal/brand-film/paisagem/cartaz.webp",
+        "encoded": 16894,
+        "transfer": 17194
+      },
+      {
+        "file": "/portal/brand-film/paisagem/origem.webp",
+        "encoded": 125736,
+        "transfer": 126036
+      },
+      {
+        "file": "/portal/brand-film/paisagem/mural-2.webp",
+        "encoded": 103822,
+        "transfer": 104122
+      },
+      {
+        "file": "/portal/brand-film/paisagem/oficina.webp",
+        "encoded": 75712,
+        "transfer": 76012
+      },
+      {
+        "file": "/portal/brand-film/paisagem/mural-1.webp",
+        "encoded": 207772,
+        "transfer": 208072
+      },
+      {
+        "file": "/portal/brand-film/paisagem/parque.webp",
+        "encoded": 371956,
+        "transfer": 372256
+      },
+      {
+        "file": "/portal/brand-film/paisagem/mural-3.webp",
+        "encoded": 218516,
+        "transfer": 218816
+      },
+      {
+        "file": "/portal/brand-film/paisagem/rua.webp",
+        "encoded": 324596,
+        "transfer": 324896
+      },
+      {
+        "file": "/portal/brand-film/paisagem/margem.webp",
+        "encoded": 33118,
+        "transfer": 33418
+      },
+      {
+        "file": "/portal/brand-film/simbolo.webp",
+        "encoded": 38298,
+        "transfer": 38598
+      },
+      {
+        "file": "/portal/brand-film/tinta.webp",
+        "encoded": 28568,
+        "transfer": 28868
+      }
+    ],
+    "totalTransfer": 1551121,
+    "boxBefore": {
+      "x": 551.453125,
+      "y": 37.9609375,
+      "width": 46.4375,
+      "height": 46.4375
+    },
+    "boxAfter": {
+      "x": 551.453125,
+      "y": 37.9609375,
+      "width": 46.4375,
+      "height": 46.4375
+    }
+  },
+  "retrato": {
+    "firstFrameAfterClickMs": 98,
+    "elapsedMs": 14017,
+    "frames": 841,
+    "p95FrameMs": 18,
+    "assets": [
+      {
+        "file": "/assets/projection-CrAURUKI.js",
+        "encoded": 2533,
+        "transfer": 2833
+      },
+      {
+        "file": "/portal/brand-film/retrato/cartaz.webp",
+        "encoded": 16894,
+        "transfer": 17194
+      },
+      {
+        "file": "/portal/brand-film/retrato/origem.webp",
+        "encoded": 94520,
+        "transfer": 94820
+      },
+      {
+        "file": "/portal/brand-film/retrato/parque.webp",
+        "encoded": 253196,
+        "transfer": 253496
+      },
+      {
+        "file": "/portal/brand-film/retrato/mural-2.webp",
+        "encoded": 90046,
+        "transfer": 90346
+      },
+      {
+        "file": "/portal/brand-film/retrato/mural-1.webp",
+        "encoded": 166360,
+        "transfer": 166660
+      },
+      {
+        "file": "/portal/brand-film/retrato/oficina.webp",
+        "encoded": 75250,
+        "transfer": 75550
+      },
+      {
+        "file": "/portal/brand-film/retrato/margem.webp",
+        "encoded": 11274,
+        "transfer": 11574
+      },
+      {
+        "file": "/portal/brand-film/simbolo.webp",
+        "encoded": 38298,
+        "transfer": 38598
+      },
+      {
+        "file": "/portal/brand-film/tinta.webp",
+        "encoded": 28568,
+        "transfer": 28868
+      },
+      {
+        "file": "/portal/brand-film/retrato/rua.webp",
+        "encoded": 250442,
+        "transfer": 250742
+      },
+      {
+        "file": "/portal/brand-film/retrato/mural-3.webp",
+        "encoded": 187000,
+        "transfer": 187300
+      }
+    ],
+    "totalTransfer": 1217981,
+    "boxBefore": {
+      "x": 86.828125,
+      "y": 30.1796875,
+      "width": 34,
+      "height": 34
+    },
+    "boxAfter": {
+      "x": 86.828125,
+      "y": 30.1796875,
+      "width": 34,
+      "height": 34
+    }
+  },
+  "interacoes": {
+    "passed": true,
+    "errors": []
+  }
+}

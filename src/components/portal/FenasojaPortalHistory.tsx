@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { Play } from 'lucide-react';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import officialSymbol from '@/assets/brand/fenasoja-symbol-144.webp';
 import { FENASOJA_HISTORY_ARTS } from './history/artCatalog';
@@ -10,6 +11,7 @@ import '@/styles/portal-history.css';
 
 interface Props {
   released: boolean;
+  onOpenFilm?: (button: HTMLButtonElement) => void;
   paused?: boolean;
   userPaused?: boolean;
   onMotionAvailable?: (available: boolean) => void;
@@ -18,7 +20,7 @@ const emptyAssets: GalleryAssetsSnapshot = { ready: [], failed: [] };
 const prefers = (query: string) => window.matchMedia?.(query).matches ?? false;
 const connection = () => (navigator as Navigator & { connection?: EventTarget & { saveData?: boolean } }).connection;
 
-export function FenasojaPortalHistory({ released, paused = false, userPaused, onMotionAvailable }: Props) {
+export function FenasojaPortalHistory({ released, paused = false, userPaused, onMotionAvailable, onOpenFilm }: Props) {
   const hostRef = useRef<HTMLSpanElement>(null);
   const brandRef = useRef<HTMLSpanElement>(null);
   const trackRef = useRef<HTMLSpanElement>(null);
@@ -182,6 +184,7 @@ export function FenasojaPortalHistory({ released, paused = false, userPaused, on
     '--history-height': `${height}px`, '--history-brand-width': `${geometry.brandWidth}px`,
     '--history-slot': `${layout.slotWidth}px`, '--history-art-height': `${layout.artHeight}px`, '--history-gap': `${layout.gap}px`,
   } as CSSProperties;
+  const brand = <FenasojaBrand markSrc={officialSymbol} tone="dark" editionLabel={false} />;
   return (
     <span ref={hostRef} className="fenasoja-history" style={style} data-testid="portal-history"
       data-layout="continuous" data-mode={enabled ? 'loop' : 'static'} data-phase={enabled ? snapshot?.phase ?? 'waiting' : 'static'}
@@ -201,7 +204,11 @@ export function FenasojaPortalHistory({ released, paused = false, userPaused, on
       </span>}
       <span className="fenasoja-history__shield" aria-hidden="true" />
       <span ref={brandRef} className="fenasoja-history__brand">
-        <FenasojaBrand markSrc={officialSymbol} tone="dark" editionLabel={false} />
+        {onOpenFilm ? <button type="button" className="brand-film-trigger" aria-haspopup="dialog"
+          aria-label="Ver filme Por dentro da marca Fenasoja" onClick={(event) => onOpenFilm(event.currentTarget)}>
+          {brand}
+          <span className="brand-film-trigger__caption"><Play aria-hidden="true" size={10} fill="currentColor" /> Ver filme</span>
+        </button> : brand}
       </span>
     </span>
   );

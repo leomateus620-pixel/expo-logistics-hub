@@ -46,11 +46,11 @@ describe('contrato de acesso: ecossistema direto e introdução embutida na cont
     expect(allImplementation.match(/aria-label=\{ECOSYSTEM_OPEN_LABEL\}/g)).toHaveLength(1);
     expect(allImplementation).not.toContain('Abrir O Nascer da Alvorada');
     expect(portalPage.match(/className="fenasoja-portal__alvorada-launcher"/g)).toHaveLength(1);
-    expect(portalPage).toMatch(
-      /<button[\s\S]*?className="fenasoja-portal__alvorada-launcher"[\s\S]*?<FenasojaPortalHistory released=\{historyReleased\} paused=\{ecosystemOpen\}[\s\S]*?<\/button>/,
-    );
+    expect(portalPage).toContain('onOpenFilm={setFilmTrigger}');
+    expect(portalPage).toContain('paused={ecosystemOpen || !!filmTrigger}');
+    expect(portalPage).not.toMatch(/className="fenasoja-portal__alvorada-launcher"[^]*?<FenasojaPortalHistory[^]*?<\/button>/);
     expect(portalHistory.match(/<FenasojaBrand /g)).toHaveLength(1);
-    expect(portalHistory).not.toMatch(/<button|<Link/);
+    expect(portalHistory).toContain('Ver filme Por dentro da marca Fenasoja');
     expect(portalPage).toContain('userPaused={historyUserPaused}');
     expect(portalPage).toContain("'Retomar faixa histórica' : 'Pausar faixa histórica'");
     expect(portalPage).toContain('aria-pressed={historyUserPaused}');
