@@ -9,7 +9,7 @@ import postgres from 'postgres';
 import { setSecondStagePrice } from './stage-price-fixture.mjs';
 
 const db = postgres({
-  host: '127.0.0.1', port: Number(process.env.GASTRONOMY_QA_PORT || 55438), database: 'gastronomy_qa', user: 'postgres', max: 6,
+  host: '127.0.0.1', port: Number(process.env.GASTRONOMY_QA_PORT || 55438), database: 'gastronomy_qa', user: 'postgres', max: 6, prepare: false,
 });
 const seller = '00000000-0000-4000-a000-000000000010';
 const limitedSeller = '00000000-0000-4000-a000-000000000014';
@@ -90,7 +90,8 @@ const postgresFixture: Plugin = {
               permission.allowed ? tx`SELECT c.*, (SELECT jsonb_agg(to_jsonb(v)) FROM lot_contract_versions v WHERE v.contract_id=c.id) lot_contract_versions
                 FROM lot_contracts c WHERE c.scope='LOT'` : [],
             ]);
-            return { lots, entities, geometries, segments, pricing, eligibility, items, orders, exhibitors, installments, activity, contracts };
+            const cessions = process.env.CESSION_REVIEW === '1' ? await tx`SELECT id,beneficiary,purpose,marker FROM commercial_space_cessions` : [];
+            return { lots, entities, geometries, segments, pricing, eligibility, items, orders, exhibitors, installments, activity, contracts, cessions };
           }
           if (req.url?.startsWith('/storage/') && req.method === 'POST') {
             const [capability] = await tx`SELECT map_has_explicit_capability(${organization},'map.manage_contracts') AS allowed`;
@@ -100,7 +101,13 @@ const postgresFixture: Plugin = {
               const objectName = String(req.headers['x-gastronomy-qa-path']);
               const content = await requestBody(req);
               if (!objectName.startsWith(`${organization}/`) || !content.length) throw new Error('INVALID_CONTRACT_FILE');
-              await tx`INSERT INTO storage.objects(bucket_id,name,owner_id) VALUES ('map-contracts',${objectName},${identity})`;
+              if (process.env.CESSION_REVIEW === '1') {
+                const metadata = { size: content.length, mimetype: req.headers['content-type'] };
+                await tx`INSERT INTO storage.objects(bucket_id,name,owner_id,metadata) VALUES
+                  ('map-contracts',${objectName},${identity},${tx.json(metadata)})`;
+              } else {
+                await tx`INSERT INTO storage.objects(bucket_id,name,owner_id) VALUES ('map-contracts',${objectName},${identity})`;
+              }
               await mkdir(documentDirectory, { recursive: true, mode: 0o700 });
               await writeFile(documentFile(objectName), content, { mode: 0o600 });
               return { path: objectName };
@@ -141,6 +148,7 @@ const postgresFixture: Plugin = {
             'attach_order_contract', 'register_lot_contract_version', 'replace_lot_order_contract',
             'get_commercial_package_revision_review', 'get_lot_contract_history', 'update_commercial_contract_metadata', 'revise_sale_order_items',
           ]);
+          if (process.env.CESSION_REVIEW === '1') for (const rpc of ['space_cession_detail','attach_cession_contract','register_space_cession','sign_cession_contract']) supported.add(rpc);
           if (!supported.has(name)) return null;
           await tx.unsafe('SET LOCAL ROLE authenticated');
           const parameters = Object.entries(args as Record<string, unknown>);
@@ -148,7 +156,7 @@ const postgresFixture: Plugin = {
             ? tx.json(value as Parameters<typeof tx.json>[0]) : Array.isArray(value) ? tx.array(value) : value);
           const namedArguments = parameters.map(([key], i) => {
             if (!/^_?p?[a-z_]+$/.test(key)) throw new Error('Invalid QA argument');
-            return `${key} => $${i + 1}${['p_lot_ids','p_item_ids','p_add_lot_ids','p_remove_item_ids'].includes(key) ? '::uuid[]' : ''}`;
+            return `${key} => $${i + 1}${['p_lot_ids','p_item_ids','p_add_lot_ids','p_remove_item_ids','p_lots'].includes(key) ? '::uuid[]' : ''}`;
           }).join(',');
           if (name === 'commercial_map_lot_buyers') {
             return tx.unsafe(`SELECT * FROM public.commercial_map_lot_buyers(${namedArguments})`, values);

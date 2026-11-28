@@ -2036,6 +2036,9 @@ export type Database = {
       }
       commercial_lots: {
         Row: {
+          cession_id: string | null
+          cession_value: number | null
+          cession_original_pricing: Json | null
           accessibility_notes: string | null
           archived_at: string | null
           area_validation_status: string
@@ -2073,6 +2076,9 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          cession_id?: string | null
+          cession_value?: number | null
+          cession_original_pricing?: Json | null
           accessibility_notes?: string | null
           archived_at?: string | null
           area_validation_status?: string
@@ -2110,6 +2116,9 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          cession_id?: string | null
+          cession_value?: number | null
+          cession_original_pricing?: Json | null
           accessibility_notes?: string | null
           archived_at?: string | null
           area_validation_status?: string
@@ -2147,6 +2156,13 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "lot_cession_project_fk"
+            columns: ["cession_id", "project_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_space_cessions"
+            referencedColumns: ["id", "project_id"]
+          },
           {
             foreignKeyName: "commercial_lots_entity_id_fkey"
             columns: ["entity_id"]
@@ -2309,6 +2325,63 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commercial_space_cessions: {
+        Row: {
+          beneficiary: string
+          created_at: string
+          created_by: string | null
+          edition: number
+          exhibitor_id: string | null
+          id: string
+          marker: string | null
+          modality: string
+          project_id: string
+          purpose: string
+          total: number
+        }
+        Insert: {
+          beneficiary: string
+          created_at?: string
+          created_by?: string | null
+          edition: number
+          exhibitor_id?: string | null
+          id: string
+          marker?: string | null
+          modality?: string
+          project_id: string
+          purpose: string
+          total?: number
+        }
+        Update: {
+          beneficiary?: string
+          created_at?: string
+          created_by?: string | null
+          edition?: number
+          exhibitor_id?: string | null
+          id?: string
+          marker?: string | null
+          modality?: string
+          project_id?: string
+          purpose?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commercial_space_cessions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commercial_space_cessions_exhibitor_id_fkey"
+            columns: ["exhibitor_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_exhibitors"
             referencedColumns: ["id"]
           },
         ]
@@ -6251,6 +6324,8 @@ export type Database = {
       }
       lot_contract_versions: {
         Row: {
+          cession_signed_at: string | null
+          cession_signed_by: string | null
           contract_id: string
           covered_lot_ids: string[] | null
           file_size: number
@@ -6264,6 +6339,8 @@ export type Database = {
           version: number
         }
         Insert: {
+          cession_signed_at?: string | null
+          cession_signed_by?: string | null
           contract_id: string
           covered_lot_ids?: string[] | null
           file_size: number
@@ -6277,6 +6354,8 @@ export type Database = {
           version: number
         }
         Update: {
+          cession_signed_at?: string | null
+          cession_signed_by?: string | null
           contract_id?: string
           covered_lot_ids?: string[] | null
           file_size?: number
@@ -6301,6 +6380,7 @@ export type Database = {
       }
       lot_contracts: {
         Row: {
+          cession_id: string | null
           active_version: number
           contract_number: string | null
           created_at: string
@@ -6314,6 +6394,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cession_id?: string | null
           active_version?: number
           contract_number?: string | null
           created_at?: string
@@ -6327,6 +6408,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cession_id?: string | null
           active_version?: number
           contract_number?: string | null
           created_at?: string
@@ -6340,6 +6422,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lot_contracts_cession_id_fkey"
+            columns: ["cession_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_space_cessions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lot_contracts_lot_id_fkey"
             columns: ["lot_id"]
@@ -11620,6 +11709,8 @@ export type Database = {
     Views: {
       commercial_lot_pricing_2028: {
         Row: {
+          renovacao_table_total: number | null
+          segunda_table_total: number | null
           area_validation_status: string | null
           block: string | null
           commercial_unit: string | null
@@ -12145,6 +12236,16 @@ export type Database = {
       }
     }
     Functions: {
+      attach_cession_contract: {
+        Args: { p_id: string; p_expected_version: number; p_storage_path: string; p_original_name: string; p_mime_type: string; p_file_size: number }
+        Returns: Json
+      }
+      space_cession_detail: { Args: { p_id: string }; Returns: Json }
+      sign_cession_contract: { Args: { p_id: string; p_version: number }; Returns: undefined }
+      register_space_cession: {
+        Args: { p_id: string; p_project: string; p_beneficiary: string; p_exhibitor: string | null; p_purpose: string; p_lots: string[] }
+        Returns: string
+      }
       _cancel_sale_order_items_core: {
         Args: {
           p_actor: string

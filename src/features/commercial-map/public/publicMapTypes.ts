@@ -15,6 +15,7 @@ export interface PublicLotPricing {
 
 /** Allowlist pública: comprador de lote vendido, sem contatos, contrato, reserva nominal ou preço mínimo. */
 export interface PublicLot {
+  cession?: Pick<import('../types').SpaceCession, 'beneficiary' | 'purpose' | 'marker'>;
   id: string;
   entityId: string;
   publicIdentifier: string;

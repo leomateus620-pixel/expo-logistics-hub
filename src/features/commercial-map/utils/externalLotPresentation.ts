@@ -5,7 +5,7 @@ import type { CommercialLot, CommercialStatus, MapEntity } from '../types';
 export const EXTERNAL_LOT_PALETTE = Object.freeze({
   grass: '#739455', lightGrass: '#88A56B', darkGrass: '#5F7D45',
   open: '#FFD400', openHighlight: '#FFE66A', sold: '#1677FF', soldHighlight: '#66B0FF',
-  check: '#FFFFFF', boundary: '#40513b',
+  ceded: '#ed5550', check: '#FFFFFF', boundary: '#40513b',
   selection: '#e8f4ef', cart: '#c28bea',
 });
 
@@ -73,11 +73,11 @@ export function externalLotPresentationDecision(
 }
 
 export function externalLotUsesGrass(status: CommercialStatus) {
-  return status === 'AVAILABLE' || status === 'SALE_OPEN' || status === 'SOLD';
+  return status === 'CEDED' || status === 'AVAILABLE' || status === 'SALE_OPEN' || status === 'SOLD';
 }
 
 export function externalLotFrameColor(status: CommercialStatus) {
-  return status === 'SALE_OPEN' ? EXTERNAL_LOT_PALETTE.open
+  return status === 'CEDED' ? EXTERNAL_LOT_PALETTE.ceded : status === 'SALE_OPEN' ? EXTERNAL_LOT_PALETTE.open
     : status === 'SOLD' ? EXTERNAL_LOT_PALETTE.sold : null;
 }
 

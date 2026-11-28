@@ -81,6 +81,9 @@ interface LotRow {
   accessibility_notes: string | null; commercial_notes: string | null; internal_notes: string | null; archived_at: string | null;
   created_by: string | null; updated_by: string | null; created_at: string | null; updated_at: string | null;
   commercial_unit?: CommercialLot['commercialUnit'];
+  cession_id?: string | null;
+  cession?: CommercialLot['cession'];
+  cession_original_pricing?: CommercialLot['originalCessionPricing'];
   commercial_package_role?: CommercialLot['commercialPackageRole'];
   commercial_package_principal_lot_id?: string | null;
   commercial_package_reconciliation_pending?: boolean;
@@ -92,14 +95,14 @@ interface LotRow {
 const OFFICIAL_PRICING_EMBED = `financial_entity:map_entities!commercial_lots_entity_id_fkey(id,
   pricing:commercial_lot_pricing_2028!commercial_lots_entity_id_fkey(lot_id,entity_id,renovacao_total,segunda_total,renovacao_is_manual,segunda_is_manual,resolution_status))`;
 /** Carga completa: os preços 2028 vêm numa consulta única por projeto (ver fetchProjectPricing2028). */
-const COMMERCIAL_LOT_BASE_SELECT = `*,
+const COMMERCIAL_LOT_BASE_SELECT = `*,cession:commercial_space_cessions!lot_cession_project_fk(id,beneficiary,purpose,marker),
   lot_prices(is_active,pricing_mode,base_price,price_per_sqm,asking_price,minimum_price),
   lot_reservations(status,company_name,expires_at,responsible_name),
   lot_negotiations(status,company_name),
   lot_sales(id,lot_id,status,negotiated_value,buyer_name,buyer_trade_name,sale_date,salesperson_name,contract_number),
   lot_contracts!lot_contracts_lot_id_fkey(is_active,contract_number)`;
 const PRICING_2028_COLUMNS = 'lot_id,entity_id,public_identifier,official_area_sqm,renovacao_total,segunda_total,renovacao_is_manual,segunda_is_manual,resolution_status';
-export const COMMERCIAL_LOT_SELECT = `*,
+export const COMMERCIAL_LOT_SELECT = `*,cession:commercial_space_cessions!lot_cession_project_fk(id,beneficiary,purpose,marker),
   lot_prices(is_active,pricing_mode,base_price,price_per_sqm,asking_price,minimum_price),
   lot_reservations(status,company_name,expires_at,responsible_name),
   lot_negotiations(status,company_name),
@@ -407,7 +410,9 @@ function mapLot(row: LotRow, entity?: MapEntity): CommercialLot {
     levelLabel: row.level_label,
     displayName: row.display_name,
     description: row.description,
-    status: row.status,
+    status: row.cession_id ? 'CEDED' : row.status,
+    cession: row.cession,
+    originalCessionPricing: row.cession_original_pricing,
     officialAreaSqm: row.official_area_sqm === null ? null : Number(row.official_area_sqm),
     calculatedAreaSqm: row.calculated_area_sqm === null ? null : Number(row.calculated_area_sqm),
     areaValidationStatus: row.area_validation_status,
@@ -583,7 +588,7 @@ async function fetchCommissionCommercialMap(
   const [geometriesResult, lotsResult, parkContextResult] = await Promise.all([
     fetchCommissionRowsByEntity(entityIds, 'commission-geometries', context, (ids) => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true).in('entity_id', ids)),
     fetchCommissionRowsByEntity(entityIds, 'commission-lots', context, (ids) => db.from('commercial_lots').select(`
-      *,
+      *,cession:commercial_space_cessions!lot_cession_project_fk(id,beneficiary,purpose,marker),
       lot_prices(is_active, pricing_mode, base_price, price_per_sqm, asking_price, minimum_price),
       lot_reservations(status, company_name, expires_at, responsible_name),
       lot_negotiations(status, company_name, contact_name),

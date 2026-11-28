@@ -99,7 +99,7 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
       )}
     </div>
     <div className="commercial-context-statuses" role="group" aria-label="Filtrar por situação comercial">
-      {COMMERCIAL_PHASES.map((status) => {
+      {COMMERCIAL_PHASES.filter(status => status !== 'CEDED' || summary.byStatus.CEDED > 0).map((status) => {
         const config = STATUS_CONFIG[status];
         const selected = statusFilters.some((candidate) => toCommercialPhase(candidate) === status);
         return <button
@@ -112,15 +112,15 @@ export const ContextualMapLegend = memo(function ContextualMapLegend({
           style={{ '--status-color': config.color, '--status-border': config.border, '--status-surface': config.surface } as CSSProperties}
         >
           {(!presentation.external || presentation.mixed || status === 'BLOCKED') && <i aria-hidden="true" />}
-          {presentation.external && status !== 'BLOCKED' && <i aria-hidden="true" className="external-lot-swatch" style={{
+          {presentation.external && status !== 'BLOCKED' && <i aria-hidden="true" className={`external-lot-swatch ${status === 'CEDED' ? 'is-ceded' : ''}`} style={{
             '--grass': EXTERNAL_LOT_PALETTE.grass, '--grass-light': EXTERNAL_LOT_PALETTE.lightGrass,
             '--frame': externalLotFrameColor(status) ?? 'transparent', '--check': EXTERNAL_LOT_PALETTE.check,
-          } as CSSProperties}>{status === 'SOLD' && <Check strokeWidth={3} />}</i>}
-          <span>{config.label}</span><strong>{count.format(summary.byStatus[status])}</strong>
+          } as CSSProperties}>{status === 'CEDED' && '◇'}{status === 'SOLD' && <Check strokeWidth={3} />}</i>}
+          <span>{status === 'CEDED' ? 'Espaços cedidos' : config.label}</span><strong>{count.format(summary.byStatus[status])}</strong>
         </button>;
       })}
     </div>
-    {presentation.external && <p className="commercial-context-note">Lotes externos: gramado com borda e linhas amarelas na venda em aberto; azuis e confirmação nos vendidos.{presentation.mixed && ' Nos módulos internos e demais espaços, a cor preenche a superfície.'}</p>}
+    {presentation.external && <p className="commercial-context-note">Lotes externos: gramado com borda e linhas amarelas na venda em aberto; azuis e confirmação nos vendidos. Linhas vermelhas cruzadas indicam espaços cedidos.{presentation.mixed && ' Nos módulos internos e demais espaços, a cor preenche a superfície.'}</p>}
     {scope.kind === 'interior' && scope.totalCount === 0 && <p className="commercial-context-note">Nenhum lote interno cadastrado neste local.</p>}
   </>;
 

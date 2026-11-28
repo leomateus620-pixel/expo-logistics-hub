@@ -106,6 +106,10 @@ export const STATUS_CONFIG: Record<CommercialStatus, {
     label: 'Bloqueado', shortLabel: 'Bloqueado', color: '#dc2626', surface: '#fee2e2', border: '#991b1b', symbol: '⌧',
     description: 'Lote bloqueado por decisão administrativa.',
   },
+  CEDED: {
+    label: 'Espaço cedido', shortLabel: 'Cedido', color: '#ee5251', surface: '#fff0ed', border: '#942c32', symbol: '◇',
+    description: 'Espaço destinado por cessão, sem valor comercial.',
+  },
   UNAVAILABLE: {
     label: 'Indisponível', shortLabel: 'Indisponível', color: '#64748b', surface: '#e2e8f0', border: '#475569', symbol: '—',
     description: 'Espaço fora do fluxo comercial.',
@@ -113,7 +117,7 @@ export const STATUS_CONFIG: Record<CommercialStatus, {
 };
 
 /** Paleta canônica das quatro fases comerciais (projeção de STATUS_CONFIG). */
-export const COMMERCIAL_PHASES: readonly CommercialPhase[] = ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'BLOCKED'];
+export const COMMERCIAL_PHASES: readonly CommercialPhase[] = ['AVAILABLE', 'SALE_OPEN', 'SOLD', 'BLOCKED', 'CEDED'];
 
 export const CLASSIFICATION_COLORS: Record<MapClassification, string> = {
   FOOD_POINT: '#916226',

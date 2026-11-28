@@ -73,7 +73,8 @@ export const PublicLotDetails = memo(function PublicLotDetails({
      <aside ref={detailsPanel} className={`public-map-details${compact ? ' is-compact' : ''}${expanded ? ' is-expanded' : ''}`} aria-label={identity.full}>
       <header>
         <div>
-           <strong>{identity.title}</strong>
+           <strong>{lot.cession ? lot.cession.marker ? lot.cession.purpose : `Espaço cedido · ${lot.cession.beneficiary}` : identity.title}</strong>
+           {lot.cession && <small>{identity.title} · {lot.cession.beneficiary}</small>}
            <small>{[identity.location, identity.area].filter(Boolean).join(' · ')}</small>
         </div>
         <button ref={closeButton} type="button" onClick={onClose} aria-label="Fechar ficha do lote">
@@ -101,7 +102,7 @@ export const PublicLotDetails = memo(function PublicLotDetails({
         </div>
         <div>
           <dt>Disponibilidade</dt>
-          <dd data-availability={publicAvailability(lot.availability)}>{publicAvailabilityLabel(lot)}</dd>
+          <dd data-availability={publicAvailability(lot.availability, lot.cession)}>{publicAvailabilityLabel(lot)}</dd>
         </div>
         {!lot.packageRole && !useCompanyIdentity && lot.availability === 'SOLD' && lot.buyerName?.trim() && (
           <div>
@@ -132,7 +133,7 @@ export const PublicLotDetails = memo(function PublicLotDetails({
         </div>
       </dl>
 
-      {!lot.packageRole && <section className="public-map-details-stages" aria-label="Valores oficiais 2028">
+      {!lot.cession && !lot.packageRole && <section className="public-map-details-stages" aria-label="Valores oficiais 2028">
         <h3>Valores oficiais 2028</h3>
         <div>
           <span>Renovação</span>

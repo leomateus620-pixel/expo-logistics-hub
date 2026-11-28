@@ -47,6 +47,7 @@ export function applyExporuralTurfMaterial(material: TurfMaterial, reduced = fal
       .replace('#include <common>', `#include <common>
       uniform float uExternalTurfDetail;
       uniform float uExternalStatusPixelRatio;
+      uniform vec3 uCeded, uCededHdr;
       uniform vec3 uExternalStatusOpen;
       uniform vec3 uExternalStatusSold;
       uniform vec3 uExternalHdrOpen;
@@ -94,6 +95,8 @@ export function applyExporuralTurfMaterial(material: TurfMaterial, reduced = fal
       // fixed to the world lattice, including BatchedMesh's presentation lift.
       float externalStripeCoord=dot(vExporuralPosition.xz,vec2(.70710678,.70710678))/max(vExternalLotPitch,.0000001);
       float externalStripePixel=max(fwidth(externalStripeCoord),.0001);
+      float crossCoord=dot(vExporuralPosition.xz,vec2(.70710678,-.70710678))/max(vExternalLotPitch,.0000001);
+      float crossPixel=max(fwidth(crossCoord),.0001);
       if(vExternalLotStatus.x>.5) {
         // About 2 CSS pixels where resolvable; the lot-relative duty cap always
         // leaves green gaps and prevents a thin parcel becoming solid paint.
@@ -102,10 +105,16 @@ export function applyExporuralTurfMaterial(material: TurfMaterial, reduced = fal
         float coverage=(externalStripeIntegral(stripePhase+externalStripePixel*.5,duty)
           -externalStripeIntegral(stripePhase-externalStripePixel*.5,duty))/externalStripePixel;
         coverage=mix(clamp(coverage,0.,1.),duty,smoothstep(.2,.8,externalStripePixel));
-        vec3 statusColor=vExternalLotStatus.x>1.5 ? uExternalStatusSold : uExternalStatusOpen;
+        bool ceded=vExternalLotStatus.x>2.5;
+        if(ceded) {
+          float crossStripe=(externalStripeIntegral(crossCoord+crossPixel*.5,.13)
+            -externalStripeIntegral(crossCoord-crossPixel*.5,.13))/crossPixel;
+          coverage=max(coverage,clamp(crossStripe,0.,1.));
+        }
+        vec3 statusColor=ceded ? uCeded : vExternalLotStatus.x>1.5 ? uExternalStatusSold : uExternalStatusOpen;
         ${managed ? `
         #ifndef TONE_MAPPING
-          if (uExternalInverseExposure > 0.) statusColor=(vExternalLotStatus.x>1.5 ? uExternalHdrSold : uExternalHdrOpen)*uExternalInverseExposure;
+          if (uExternalInverseExposure > 0.) statusColor=(ceded ? uCededHdr : vExternalLotStatus.x>1.5 ? uExternalHdrSold : uExternalHdrOpen)*uExternalInverseExposure;
         #endif` : ''}
         // Status alone bypasses lighting/tone mapping; the grass keeps all its
         // existing light, texture and shadows. Depth, fog and opacity still apply.

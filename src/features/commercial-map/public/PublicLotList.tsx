@@ -27,7 +27,7 @@ export const PublicLotList = memo(function PublicLotList({
   const filtered = useMemo(() => {
     if (!term.trim()) return lots;
     // Índice público: identificadores do lote + nome de exibição autorizado (já resolvido no servidor).
-    return lots.filter((lot) => matchesBuyerNames(term, lot.displayName, lot.publicIdentifier, lot.block,
+    return lots.filter((lot) => matchesBuyerNames(term, lot.displayName, lot.publicIdentifier, lot.block, lot.cession?.beneficiary, lot.cession?.purpose,
       companiesByEntityId ? companiesByEntityId.get(lot.entityId)?.tradeName : lot.buyerName));
   }, [companiesByEntityId, lots, term]);
 
@@ -55,12 +55,13 @@ export const PublicLotList = memo(function PublicLotList({
                <strong>{resolveLotIdentity(lot, null, null, areaName).full}</strong>
               <span>{formatAreaSqmLabel(lot.officialAreaSqm) ?? 'Metragem não informada'}</span>
               {lot.packageRole === 'COMPONENT' && <span>{STALLONNE_INCLUDED_LABEL}</span>}
-              {!lot.packageRole && <span>
+              {lot.cession && <span>{lot.cession.beneficiary} · {lot.cession.purpose}</span>}
+              {!lot.cession && !lot.packageRole && <span>
                 {lot.pricing.resolutionStatus === 'OK'
                   ? formatBrl(lot.pricing.renovacaoTotal) ?? 'Valor sob consulta'
                   : 'Valor sob consulta'}
               </span>}
-              <small data-availability={publicAvailability(lot.availability)}>{publicAvailabilityLabel(lot)}</small>
+              <small data-availability={publicAvailability(lot.availability, lot.cession)}>{publicAvailabilityLabel(lot)}</small>
               {!lot.packageRole && companiesByEntityId?.get(lot.entityId)?.tradeName &&
                 <small className="public-map-list-company">{companiesByEntityId.get(lot.entityId)?.tradeName}</small>}
             </button>

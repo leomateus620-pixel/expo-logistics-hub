@@ -15,7 +15,7 @@ import type {
 const COMMERCIAL_STATUSES: readonly CommercialStatus[] = [
   'SOLD', 'SALE_OPEN', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'BLOCKED',
 ];
-const ALL_STATUSES: readonly CommercialStatus[] = [...COMMERCIAL_STATUSES, 'UNAVAILABLE'];
+const ALL_STATUSES: readonly CommercialStatus[] = [...COMMERCIAL_STATUSES, 'UNAVAILABLE', 'CEDED'];
 /** commercial_lots.official_area_sqm is numeric(14,4). */
 const AREA_UNITS_PER_SQM = 10_000;
 
@@ -59,7 +59,7 @@ function componentSaleStatus(lot: CommercialLot): 'SOLD' | 'SALE_OPEN' | null {
  * selected official stage total (already including overrides). Never receipts.
  */
 export function resolveDashboardLotValue(lot: CommercialLot, stage: LotPricingStage = 'RENOVACAO'): number | null {
-  if (lot.status === 'UNAVAILABLE') return null;
+  if (lot.status === 'UNAVAILABLE' || lot.status === 'CEDED') return null;
   if (lot.status === 'SALE_OPEN' || lot.status === 'SOLD') {
     const status = lot.status === 'SALE_OPEN' ? 'OPEN' : 'CONFIRMED';
     const sales = lot.sales?.filter((sale) => sale.status === status && sale.lotId === lot.id) ?? [];
@@ -86,6 +86,7 @@ function makeAccumulator(): MutableAggregate {
       IN_NEGOTIATION: makeMutableStatusSummary(),
       BLOCKED: makeMutableStatusSummary(),
       UNAVAILABLE: makeMutableStatusSummary(),
+      CEDED: makeMutableStatusSummary(),
     },
   };
 }
@@ -120,7 +121,7 @@ function finishAccumulator(accumulator: MutableAggregate): DashboardAggregate {
   const byStatus = {} as Record<CommercialStatus, DashboardStatusSummary>;
   for (const status of ALL_STATUSES) {
     const bucket = buckets[status];
-    const participates = status !== 'UNAVAILABLE';
+    const participates = COMMERCIAL_STATUSES.includes(status);
     byStatus[status] = Object.freeze({
       lotCount: bucket.lotCount,
       areaLotCount: bucket.areaLotCount,

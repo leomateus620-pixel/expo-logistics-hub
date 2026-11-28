@@ -16,7 +16,7 @@ interface UploadStatus {
 }
 
 type RpcError = { message?: string; code?: string };
-type ContractRpc = 'attach_order_contract' | 'register_lot_contract_version' | 'replace_lot_order_contract' | 'revise_sale_order_items';
+type ContractRpc = 'attach_cession_contract' | 'attach_order_contract' | 'register_lot_contract_version' | 'replace_lot_order_contract' | 'revise_sale_order_items';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rpc = async (name: string, args: Record<string, unknown>) => await (supabase.rpc as any)(name, args);

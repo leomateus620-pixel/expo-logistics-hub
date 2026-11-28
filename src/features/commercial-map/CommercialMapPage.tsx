@@ -896,7 +896,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         {webglAvailable && workspaceMode === '3d' && permissions.canManageSales
           && (!visitEnabled || workspaceBeforeVisit.current === '3d') && (
           <div style={{ display: visitEnabled || soyHarvestActive ? 'none' : 'contents' }} data-visit-preserved-sales>
-          <SalesModeLayer projectId={data.project?.id ?? null} operatorId={user?.id} lots={data.lots} entities={data.entities}
+          <SalesModeLayer onLocate={handleDashboardViewLot} key={`${data.project?.id}:${user?.id}`} canManageContracts={permissions.canManageContracts} projectId={data.project?.id ?? null} operatorId={user?.id} lots={data.lots} entities={data.entities}
             onOpenOrder={openRecoveredOrder} />
           </div>
         )}
@@ -1039,7 +1039,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
                 >
                   <MapPanelBoundary resetKey={selectedEntity.id}>
                     <Suspense fallback={<EntityDetailsPanelSkeleton />}>
-                      <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />
+                      <EntityDetailsPanel onLocate={handleDashboardViewLot} entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />
                     </Suspense>
                   </MapPanelBoundary>
                 </div>
@@ -1086,7 +1086,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE, p
         {!webglAvailable && selectedEntity && activePanel === 'details' && (
           <MapFeatureBoundary id={selectedEntity.id}>
             <Suspense fallback={<EntityDetailsPanelSkeleton />}>
-            <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={scopedData.entities}
+            <EntityDetailsPanel onLocate={handleDashboardViewLot} entity={selectedEntity} lot={selectedLot} entities={scopedData.entities}
               lots={scopedData.lots} permissions={permissions} sceneAvailable={false} />
             </Suspense>
           </MapFeatureBoundary>

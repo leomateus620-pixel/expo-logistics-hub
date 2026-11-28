@@ -1,0 +1,163 @@
+.cession-dialog {
+  background: #fff;
+  color: #17332c;
+  max-width: 35rem;
+  width: min(35rem, calc(100vw - 1rem));
+  max-height: 88dvh;
+  overflow: auto;
+  gap: 0.85rem;
+}
+.cession-dialog label,
+.cession-dialog h3,
+.cession-card h4 {
+  font-weight: 650;
+}
+.cession-dialog label > input:not([type='checkbox']) {
+  margin-top: 0.35rem;
+}
+.cession-dialog section h3 {
+  margin-bottom: 0.4rem;
+}
+.cession-lines,
+.cession-history,
+.cession-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.cession-lines li,
+.cession-picker label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 2.75rem;
+  border-bottom: 1px solid #d9e2dd;
+  padding: 0.35rem 0;
+}
+.cession-lines li > div {
+  flex: 1;
+}
+.cession-lines small,
+.cession-history small {
+  display: block;
+}
+.cession-total,
+.cession-document {
+  background: #f0f5f1;
+  color: #173c33;
+  padding: 0.85rem 1rem;
+  border-radius: 0.7rem;
+}
+.cession-total {
+  display: block;
+  font-weight: 700;
+  margin-top: 0.65rem;
+}
+.cession-document > div:first-child,
+.cession-actions,
+.cession-card-heading,
+.cession-card-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.cession-document p {
+  margin: 0.35rem 0 0.6rem;
+}
+.cession-picker {
+  max-height: 13rem;
+  overflow-y: auto;
+}
+.cession-picker input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: #17604c;
+}
+.cession-picker span,
+.cession-card p {
+  font-weight: 400;
+}
+.cession-history li {
+  padding-block: 0.4rem;
+}
+.cession-history button {
+  display: block;
+  text-decoration: underline;
+}
+.cession-category {
+  margin: 1.25rem 0;
+  border: 1px solid #cfdcd5;
+  background: #fff;
+  color: #203a34;
+  border-radius: 1rem;
+  padding: clamp(0.85rem, 2vw, 1.5rem);
+}
+.cession-category h2 {
+  font-size: 1.25rem;
+  font-weight: 750;
+}
+.cession-category h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.cession-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 0.75rem;
+}
+.cession-card {
+  border: 1px solid #d7e2db;
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+.cession-card-heading,
+.cession-card-footer {
+  justify-content: space-between;
+}
+.cession-card-heading span {
+  background: #fff0ee;
+  color: #903135;
+  border-radius: 0.4rem;
+  padding: 0.12rem 0.5rem;
+  font-size: 0.8rem;
+}
+.cession-card ul {
+  margin: 0.7rem 0;
+  font-size: 0.9rem;
+}
+.cession-dialog [role='alert'] {
+  color: #922c2f;
+}
+.commercial-context-statuses button > i.external-lot-swatch.is-ceded,
+.public-map-legend i.cession-swatch {
+  color: #fff;
+  background-color: #739455;
+  border: 1px solid #a23837;
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0 4px, #dc4b47 4px 6px),
+    repeating-linear-gradient(-45deg, transparent 0 6px, #dc4b47 6px 7px);
+}
+
+.commercial-map-details-panel .cession-lot-facts {
+  margin: 0.5rem 0.85rem;
+  padding: 0.8rem;
+  border: 1px solid #d6dfd8;
+  border-radius: 0.6rem;
+  background: #f8faf8;
+}
+.cession-lot-facts dl {
+  margin: 0.7rem 0;
+}
+.cession-lot-facts dt {
+  font-weight: 600;
+  color: #43574d;
+}
+.cession-lot-facts dd {
+  margin: 0.15rem 0;
+  font-variant-numeric: tabular-nums;
+}
+.cession-lot-facts dt:not(:first-child) {
+  margin-top: 0.55rem;
+}

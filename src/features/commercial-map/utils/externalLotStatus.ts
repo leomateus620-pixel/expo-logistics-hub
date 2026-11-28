@@ -4,9 +4,9 @@ import { deriveExternalLotFrame } from './externalLotFrameGeometry';
 import { isExternalPresentationLot } from './externalLotPresentation';
 
 /** Independent of the rural turf's legacy value 2. Invalid polygons fail closed. */
-export function externalLotStatusValue(entity: MapEntity, lot: CommercialLot): 0 | 1 | 2 {
+export function externalLotStatusValue(entity: MapEntity, lot: CommercialLot): 0 | 1 | 2 | 3 {
   if (!isExternalPresentationLot(entity, lot) || !deriveExternalLotFrame(entity.geometry)) return 0;
-  return lot.status === 'SALE_OPEN' ? 1 : lot.status === 'SOLD' ? 2 : 0;
+  return lot.status === 'CEDED' ? 3 : lot.status === 'SALE_OPEN' ? 1 : lot.status === 'SOLD' ? 2 : 0;
 }
 
 /** Immutable geometry owns the pitch; commercial updates only change the mask.

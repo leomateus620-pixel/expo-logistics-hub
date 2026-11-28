@@ -85,6 +85,7 @@ const ERROR_MESSAGES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
   [/COMMERCIAL_PACKAGE_RECONCILIATION_REQUIRED/, () => 'A locação do Parque Stallonne está pendente de conciliação.'],
   [/COMMERCIAL_PACKAGE_UNAVAILABLE/, () => 'A locação do Parque Stallonne está indisponível. Confira a situação no mapa.'],
   [/COMMERCIAL_PACKAGE_PRICE_MISMATCH|COMMERCIAL_PACKAGE_INCOMPLETE/, () => 'A composição do Parque Stallonne precisa de conferência antes da venda.'],
+  [/LOT_CEDED:(.+)/, (match) => `O lote ${match[1]} é um espaço cedido. Revise o carrinho.`],
   [/LOT_NOT_SELLABLE:(.+)/, (match) => `O espaço ${match[1]} não está mais disponível para venda.`],
   [/LOT_PRICE_CHANGED:(.+)/, (match) => `O preço de tabela de ${match[1]} mudou. Confira o valor atualizado antes de registrar a venda.`],
   [/LOT_WITHOUT_OFFICIAL_PRICE:(.+)/, (match) => `O espaço ${match[1]} ainda não tem valor oficial definido.`],

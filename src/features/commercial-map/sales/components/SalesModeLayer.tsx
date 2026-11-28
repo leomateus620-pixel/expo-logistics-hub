@@ -12,6 +12,8 @@ import { useSalesStore } from '../useSalesSelection';
 import { SalesCart, SalesCartContents, SalesStageSwitch } from './SalesCart';
 import { SalesCheckoutDialog } from './SalesCheckoutDialog';
 import { toast } from '@/hooks/use-toast';
+import { CreateCession } from '../../cessions/CreateCession';
+import { CessionContract } from '../../cessions/CessionContract';
 import '../sales-mode.css';
 
 /**
@@ -19,11 +21,13 @@ import '../sales-mode.css';
  * barra/gaveta mobile e checkout. Nenhuma geometria, área ou cadastro muda aqui,
  * e `reducedGraphics` nunca é acionado — pavilhões mantêm a arquitetura normal.
  */
-export function SalesModeLayer({ projectId, operatorId, lots, entities = [], onOpenOrder }: {
+export function SalesModeLayer({ projectId, operatorId, lots, entities = [], canManageContracts = false, onLocate, onOpenOrder }: {
   projectId: string | null;
   operatorId?: string;
+  canManageContracts?: boolean;
   lots: readonly CommercialLot[];
   entities?: readonly MapEntity[];
+  onLocate?: (id: string) => void;
   onOpenOrder?: (orderId: string) => void;
 }) {
   const active = useSalesStore((state) => state.salesModeActive);
@@ -34,6 +38,8 @@ export function SalesModeLayer({ projectId, operatorId, lots, entities = [], onO
   const setSalesPresentationActive = useCommercialMapStore((state) => state.setSalesPresentationActive);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [availabilityNotices, setAvailabilityNotices] = useState<string[]>([]);
+  const [creating, setCreating] = useState(false);
+  const [contract, setContract] = useState<string | null>(null);
   const owner = projectId && operatorId ? { projectId, operatorId } : null;
   const ownerKey = owner ? `${owner.projectId}:${owner.operatorId}` : null;
   const previousVisuals = useRef<{ trees: boolean; night: boolean } | null>(null);
@@ -47,13 +53,14 @@ export function SalesModeLayer({ projectId, operatorId, lots, entities = [], onO
     const current = new Map(lots.map((lot) => [lot.id, lot]));
     const unavailable = store.selection.filter(({ lotId }) => {
       const lot = current.get(lotId);
-      return !lot || Boolean(lot.archivedAt) || lot.status === 'SOLD' || lot.status === 'SALE_OPEN'
+      return !lot || lot.status === 'CEDED' || Boolean(lot.archivedAt) || lot.status === 'SOLD' || lot.status === 'SALE_OPEN'
         || lot.commercialPackageRole === 'COMPONENT' || lot.commercialPackageReconciliationPending
         || (eligible != null && !isSellableLot(lot, eligible));
     });
     if (!unavailable.length) return;
     unavailable.forEach(({ lotId }) => store.removeLot(lotId));
-    const notices = unavailable.map(({ publicIdentifier }) => `${publicIdentifier} saiu do carrinho porque deixou de estar disponível para esta venda.`);
+    const notices = unavailable.map(({ publicIdentifier, lotId }) => current.get(lotId)?.status === 'CEDED'
+      ? `${publicIdentifier} é um espaço cedido. Revise o carrinho.` : `${publicIdentifier} saiu do carrinho porque deixou de estar disponível para esta venda.`);
     if (store.checkoutOpen) setAvailabilityNotices((previous) => [...new Set([...previous, ...notices])]);
     else toast({ title: 'Carrinho atualizado', description: notices.join(' ') });
   }, [eligible, lots]);
@@ -103,7 +110,11 @@ export function SalesModeLayer({ projectId, operatorId, lots, entities = [], onO
 
   return (
     <>
-      <SalesCart summary={summary} loading={loading} />
+      <SalesCart summary={summary} loading={loading} onCession={owner ? () => setCreating(true) : undefined} />
+      {creating && owner && <CreateCession key={`cession:${ownerKey}`} projectId={owner.projectId} lots={lots} onClose={() => setCreating(false)}
+        onRegistered={id => { setCreating(false); setContract(id); }} />}
+      {contract && owner && <CessionContract id={contract} canManageContracts={canManageContracts} onClose={() => setContract(null)}
+        onLocate={onLocate ?? (id => useCommercialMapStore.getState().selectEntityFromExplorer(id))} />}
 
       <button type="button" className="sales-mobile-bar" onClick={() => setSheetOpen(true)}>
         <ShoppingCart aria-hidden="true" />
@@ -132,6 +143,7 @@ export function SalesModeLayer({ projectId, operatorId, lots, entities = [], onO
             </DrawerClose>
           </DrawerHeader>
           <div className="sales-sheet-body px-4 pb-6">
+            {owner && <Button variant="outline" onClick={() => { setSheetOpen(false); setCreating(true); }}>Venda não comercializável</Button>}
             <SalesStageSwitch />
             <SalesCartContents summary={summary} loading={loading} />
             <Button
